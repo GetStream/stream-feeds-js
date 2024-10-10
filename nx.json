@@ -1,19 +1,8 @@
 {
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx/tasks-runners/default",
-      "options": {
-        "cacheableOperations": []
-      }
-    }
-  },
   "defaultBase": "main",
-  "targetDependencies": {
-    "version": [
-      {
-        "target": "version",
-        "projects": "dependencies"
-      }
-    ]
+  "release": {
+    "version": {
+      "conventionalCommits": true
+    }
   }
 }
