@@ -1,5 +1,5 @@
 {
-  "name": "@stream-io/feeds-client",
+  "name": "@stream-io/core",
   "version": "0.0.0",
   "packageManager": "yarn@3.2.4",
   "main": "dist/index.cjs.js",
@@ -26,7 +26,6 @@
     "CHANGELOG.md"
   ],
   "dependencies": {
-    "@stream-io/core": "workspace:*",
     "axios": "^1.7.7"
   },
   "devDependencies": {

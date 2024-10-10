@@ -4,24 +4,44 @@
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
+    "ecmaVersion": "latest",
     "project": "tsconfig.json",
     "sourceType": "module"
   },
-  "extends": [
-    "plugin:import/typescript"
-  ],
+  "extends": ["standard-with-typescript", "prettier"],
   "settings": {
     "import/resolver": {
       "typescript": true
     }
   },
-  "plugins": [
-    "prettier"
-  ],
-  "ignorePatterns": ["node_modules"],
+  "plugins": ["unused-imports"],
+  "ignorePatterns": ["node_modules", "dist"],
   "rules": {
-    "prettier/prettier": "error",
-    "@typescript-eslint/no-shadow": "error",
-    "import/no-extraneous-dependencies": "error"
+    "semi": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/semi": "off",
+    "@typescript-eslint/promise-function-async": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/consistent-type-imports": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-confusing-void-expression": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-empty-interface": "off",
+    "eqeqeq": ["error", "smart"],
+    "@typescript-eslint/no-unsafe-argument": "off"
   }
 }
