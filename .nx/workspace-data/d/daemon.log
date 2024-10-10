@@ -1,0 +1,11 @@
+[NX Daemon Server] - 2024-10-10T15:38:17.911Z - Started listening on: /var/folders/jb/rwjs7l8j5d9bxxlk5xtpc6nr0000gq/T/470eb9c771906cd9af39/d.sock
+[NX Daemon Server] - 2024-10-10T15:38:17.912Z - [WATCHER]: Subscribed to changes within: /Users/zitaszupera/Stream/stream-feeds-js (native)
+[NX Daemon Server] - 2024-10-10T15:38:17.914Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-10-10T15:38:17.915Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2024-10-10T15:38:17.915Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2024-10-10T15:38:17.916Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2024-10-10T15:38:17.916Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2024-10-10T15:38:17.916Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 0.
+[NX Daemon Server] - 2024-10-10T15:38:17.916Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2024-10-10T15:38:17.916Z - [WATCHER]: Stopping the watcher for /Users/zitaszupera/Stream/stream-feeds-js (sources)
+[NX Daemon Server] - 2024-10-10T15:38:17.916Z - [WATCHER]: Stopping the watcher for /Users/zitaszupera/Stream/stream-feeds-js (outputs)

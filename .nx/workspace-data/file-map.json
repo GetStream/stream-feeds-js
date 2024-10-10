@@ -1,0 +1,304 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.0.0",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {
+      "@stream-io/feeds-client": [
+        {
+          "file": "packages/client/.env-example",
+          "hash": "7863170236433974231"
+        },
+        {
+          "file": "packages/client/LICENSE",
+          "hash": "11252168100932442371"
+        },
+        {
+          "file": "packages/client/README.md",
+          "hash": "7155826904957090402"
+        },
+        {
+          "file": "packages/client/generate-openapi.sh",
+          "hash": "13809584639123526587"
+        },
+        {
+          "file": "packages/client/index.ts",
+          "hash": "17940959196410591098"
+        },
+        {
+          "file": "packages/client/package.json",
+          "hash": "6425600576932688670",
+          "deps": [
+            "npm:@rollup/plugin-replace",
+            "npm:@rollup/plugin-typescript",
+            "npm:@vitest/coverage-v8",
+            "npm:dotenv",
+            "npm:happy-dom",
+            "npm:rimraf",
+            "npm:rollup",
+            "npm:typescript",
+            "npm:vite",
+            "npm:vitest",
+            "npm:vitest-mock-extended",
+            "npm:axios"
+          ]
+        },
+        {
+          "file": "packages/client/rollup.config.mjs",
+          "hash": "14013534068259325914"
+        },
+        {
+          "file": "packages/client/tsconfig.json",
+          "hash": "11336410907587250889"
+        },
+        {
+          "file": "packages/client/vite.config.ts",
+          "hash": "17286387919448715167"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".editorconfig",
+        "hash": "7232697649326241297"
+      },
+      {
+        "file": ".eslintignore",
+        "hash": "3570391426074745241"
+      },
+      {
+        "file": ".eslintrc.json",
+        "hash": "2345359565001013028"
+      },
+      {
+        "file": ".github/ISSUE_TEMPLATE/bug_report.md",
+        "hash": "14977433216692370436"
+      },
+      {
+        "file": ".github/ISSUE_TEMPLATE/feature_request.md",
+        "hash": "1016687017186113054"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "1550090049832333587"
+      },
+      {
+        "file": ".gitmodules",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": ".nvmrc",
+        "hash": "13664571757031547061"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "12624502311893729284"
+      },
+      {
+        "file": ".readme-assets/Github-Graphic-JS.jpg",
+        "hash": "15366484407538519208"
+      },
+      {
+        "file": ".readme-assets/Github-Graphic-React.jpg",
+        "hash": "6582136981880229541"
+      },
+      {
+        "file": ".styles/Google/AMPM.yml",
+        "hash": "4265972137180809465"
+      },
+      {
+        "file": ".styles/Google/Acronyms.yml",
+        "hash": "9749616076357885485"
+      },
+      {
+        "file": ".styles/Google/Colons.yml",
+        "hash": "5833191275526734902"
+      },
+      {
+        "file": ".styles/Google/Contractions.yml",
+        "hash": "9666262186664218240"
+      },
+      {
+        "file": ".styles/Google/DateFormat.yml",
+        "hash": "4562383349647704760"
+      },
+      {
+        "file": ".styles/Google/Ellipses.yml",
+        "hash": "18085038014314866284"
+      },
+      {
+        "file": ".styles/Google/EmDash.yml",
+        "hash": "9438002513746452940"
+      },
+      {
+        "file": ".styles/Google/EnDash.yml",
+        "hash": "3554130526576950632"
+      },
+      {
+        "file": ".styles/Google/Exclamation.yml",
+        "hash": "8604546853649539177"
+      },
+      {
+        "file": ".styles/Google/FirstPerson.yml",
+        "hash": "275555990471331793"
+      },
+      {
+        "file": ".styles/Google/Gender.yml",
+        "hash": "13532375464118964875"
+      },
+      {
+        "file": ".styles/Google/GenderBias.yml",
+        "hash": "228449251913509472"
+      },
+      {
+        "file": ".styles/Google/HeadingPunctuation.yml",
+        "hash": "2381831469212135552"
+      },
+      {
+        "file": ".styles/Google/Headings.yml",
+        "hash": "10537981522643475582"
+      },
+      {
+        "file": ".styles/Google/Latin.yml",
+        "hash": "10843300757457135444"
+      },
+      {
+        "file": ".styles/Google/LyHyphens.yml",
+        "hash": "304189100022218926"
+      },
+      {
+        "file": ".styles/Google/OptionalPlurals.yml",
+        "hash": "545726064923031542"
+      },
+      {
+        "file": ".styles/Google/Ordinal.yml",
+        "hash": "15561826218002681911"
+      },
+      {
+        "file": ".styles/Google/OxfordComma.yml",
+        "hash": "10656942457603658807"
+      },
+      {
+        "file": ".styles/Google/Parens.yml",
+        "hash": "5245756307541588834"
+      },
+      {
+        "file": ".styles/Google/Passive.yml",
+        "hash": "11405847275020174884"
+      },
+      {
+        "file": ".styles/Google/Periods.yml",
+        "hash": "6482398377128130668"
+      },
+      {
+        "file": ".styles/Google/Quotes.yml",
+        "hash": "332562350528807640"
+      },
+      {
+        "file": ".styles/Google/Ranges.yml",
+        "hash": "8313466355230605810"
+      },
+      {
+        "file": ".styles/Google/Semicolons.yml",
+        "hash": "13198282009862820400"
+      },
+      {
+        "file": ".styles/Google/Slang.yml",
+        "hash": "18189045993757013724"
+      },
+      {
+        "file": ".styles/Google/Spacing.yml",
+        "hash": "5838177544133411656"
+      },
+      {
+        "file": ".styles/Google/Spelling.yml",
+        "hash": "8637486623459605638"
+      },
+      {
+        "file": ".styles/Google/Units.yml",
+        "hash": "588292722826711829"
+      },
+      {
+        "file": ".styles/Google/We.yml",
+        "hash": "11497136325671524690"
+      },
+      {
+        "file": ".styles/Google/Will.yml",
+        "hash": "8497336791690417597"
+      },
+      {
+        "file": ".styles/Google/WordList.yml",
+        "hash": "5129573952704134081"
+      },
+      {
+        "file": ".styles/Google/meta.json",
+        "hash": "5483724795665087133"
+      },
+      {
+        "file": ".styles/Google/vocab.txt",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": ".styles/Vocab/Base/accept.txt",
+        "hash": "3422517679295857331"
+      },
+      {
+        "file": ".styles/Vocab/Base/reject.txt",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": ".vale.ini",
+        "hash": "12699503616119844550"
+      },
+      {
+        "file": ".yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+        "hash": "4939858571171452218"
+      },
+      {
+        "file": ".yarn/plugins/@yarnpkg/plugin-typescript.cjs",
+        "hash": "17330163446972071543"
+      },
+      {
+        "file": ".yarn/plugins/@yarnpkg/plugin-workspace-tools.cjs",
+        "hash": "13390403885828674423"
+      },
+      {
+        "file": ".yarn/releases/yarn-3.5.0.cjs",
+        "hash": "13738161395612611149"
+      },
+      {
+        "file": ".yarnrc.yml",
+        "hash": "2831766609399351060"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "11252168100932442371"
+      },
+      {
+        "file": "README.md",
+        "hash": "56794970767710471"
+      },
+      {
+        "file": "SECURITY.md",
+        "hash": "10639954593335525349"
+      },
+      {
+        "file": "nx.json",
+        "hash": "2387566152864873219"
+      },
+      {
+        "file": "package.json",
+        "hash": "11828800386784561921"
+      },
+      {
+        "file": "tsconfig.json",
+        "hash": "17808276480100719455"
+      },
+      {
+        "file": "yarn.lock",
+        "hash": "1698290835473325837"
+      }
+    ]
+  }
+}
