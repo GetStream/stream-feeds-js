@@ -1,6 +1,7 @@
 {
   "defaultBase": "main",
   "release": {
+    "projectsRelationship": "independent",
     "version": {
       "conventionalCommits": true
     }
