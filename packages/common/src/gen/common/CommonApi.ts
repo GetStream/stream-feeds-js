@@ -104,20 +104,20 @@ export class CommonApi extends BaseApi {
   longPoll = async (request?: {
     connection_id?: string;
     json?: WSAuthMessage;
-  }): Promise<StreamResponse<null>> => {
+  }): Promise<StreamResponse<{}>> => {
     const queryParams = {
       connection_id: request?.connection_id,
       json: request?.json,
     };
 
-    const response = await this.sendRequest<StreamResponse<null>>(
+    const response = await this.sendRequest<StreamResponse<{}>>(
       'GET',
       '/api/v2/longpoll',
       undefined,
       queryParams,
     );
 
-    decoders.null?.(response.body);
+    decoders['{}']?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };

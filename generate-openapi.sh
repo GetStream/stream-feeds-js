@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-OUTPUT_DIR="../stream-feeds-js/packages/core/src/gen"
+OUTPUT_DIR="../stream-feeds-js/packages/common/src/gen"
 CHAT_DIR="../chat"
 
 rm -rf $OUTPUT_DIR
