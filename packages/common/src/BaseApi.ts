@@ -67,23 +67,28 @@ export class BaseApi {
 
       return { body: response.data, metadata };
     } catch (error: any) {
-      error = error as AxiosError;
-      if (!error.response) {
-        throw new StreamApiError(`Stream error ${error.message}`);
-      } else {
-        // Stream specific error response
-        const data = error.response.data;
-        const code = data?.code ?? error.response.status;
-        const message = data?.message ?? error.response.statusText;
-        throw new StreamApiError(
-          `Stream error code ${code}: ${message}`,
-          this.getRequestMetadata(clientRequestId, error.response),
-          code,
-          undefined,
-        );
+      if (this.isAxiosError(error)) {
+        if (!error.response) {
+          throw new StreamApiError(`Stream error ${error.message}`);
+        } else {
+          // Stream specific error response
+          const data = error.response.data as StreamApiError;
+          const code = data?.code ?? error.response.status;
+          const message = data?.message ?? error.response.statusText;
+          throw new StreamApiError(
+            `Stream error code ${code}: ${message}`,
+            this.getRequestMetadata(clientRequestId, error.response),
+            code,
+            undefined,
+          );
+        }
       }
     }
   };
+
+  protected isAxiosError(error: any | AxiosError): error is AxiosError {
+    return typeof error.request !== 'undefined';
+  }
 
   protected queryParamsStringify = (params: Record<string, any>) => {
     const newParams = [];
@@ -116,7 +121,7 @@ export class BaseApi {
     const responseHeaders = response.headers as Record<string, string>;
     return {
       clientRequestId: requestId,
-      responseHeaders: responseHeaders,
+      responseHeaders,
       responseCode: response.status,
       rateLimit: getRateLimitFromResponseHeader(responseHeaders),
     };

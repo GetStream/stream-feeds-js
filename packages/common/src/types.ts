@@ -1,7 +1,7 @@
-export type StreamClientOptions = {
+export interface StreamClientOptions {
   baseUrl?: string;
   timeout?: number;
-};
+}
 
 export interface RateLimit {
   rateLimit?: number;

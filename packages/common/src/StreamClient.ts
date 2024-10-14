@@ -10,8 +10,8 @@ export class StreamClient extends CommonApi {
 
   constructor(apiKey: string, options?: StreamClientOptions) {
     const axiosInstance = axios.create({
-      baseURL: options?.baseUrl || 'https://chat.stream-io-api.com',
-      timeout: options?.timeout || 3000,
+      baseURL: options?.baseUrl ?? 'https://chat.stream-io-api.com',
+      timeout: options?.timeout ?? 3000,
     });
     super(axiosInstance, apiKey);
     this.moderation = new ModerationClient(axiosInstance, apiKey);

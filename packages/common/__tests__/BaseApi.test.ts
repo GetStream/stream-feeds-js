@@ -17,6 +17,7 @@ describe('API requests and error handling', () => {
 
   it('should set HTTP headers', async () => {
     let headers: Record<string, string> = {};
+    // eslint-disable-next-line @typescript-eslint/dot-notation
     client['axios'].interceptors.request.use((config) => {
       headers = config.headers;
       return config;
@@ -24,7 +25,7 @@ describe('API requests and error handling', () => {
 
     await client.getApp();
 
-    expect(typeof headers['Authorization']).toBe('string');
+    expect(typeof headers.Authorization).toBe('string');
     expect(headers['stream-auth-type']).toBe('jwt');
     expect(typeof headers['x-client-request-id']).toBe('string');
     expect(headers['X-Stream-Client']).toBe('stream-feeds-js-');
