@@ -1,4 +1,4 @@
-import { BaseApi } from '../../BaseApi';
+import { ApiClient } from '../../ApiClient';
 import { StreamResponse } from '../../types';
 import {
   BanRequest,
@@ -14,7 +14,9 @@ import {
 } from '../models';
 import { decoders } from '../model-decoders';
 
-export class ModerationApi extends BaseApi {
+export class ModerationApi {
+  constructor(protected apiClient: ApiClient) {}
+
   ban = async (request: BanRequest): Promise<StreamResponse<BanResponse>> => {
     const body = {
       target_user_id: request?.target_user_id,
@@ -27,13 +29,9 @@ export class ModerationApi extends BaseApi {
       banned_by: request?.banned_by,
     };
 
-    const response = await this.sendRequest<StreamResponse<BanResponse>>(
-      'POST',
-      '/api/v2/moderation/ban',
-      undefined,
-      undefined,
-      body,
-    );
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<BanResponse>
+    >('POST', '/api/v2/moderation/ban', undefined, undefined, body);
 
     decoders.BanResponse?.(response.body);
 
@@ -51,7 +49,7 @@ export class ModerationApi extends BaseApi {
       filter: request?.filter,
     };
 
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<QueryModerationConfigsResponse>
     >('POST', '/api/v2/moderation/configs', undefined, undefined, body);
 
@@ -72,13 +70,9 @@ export class ModerationApi extends BaseApi {
       moderation_payload: request?.moderation_payload,
     };
 
-    const response = await this.sendRequest<StreamResponse<FlagResponse>>(
-      'POST',
-      '/api/v2/moderation/flag',
-      undefined,
-      undefined,
-      body,
-    );
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<FlagResponse>
+    >('POST', '/api/v2/moderation/flag', undefined, undefined, body);
 
     decoders.FlagResponse?.(response.body);
 
@@ -93,13 +87,9 @@ export class ModerationApi extends BaseApi {
       timeout: request?.timeout,
     };
 
-    const response = await this.sendRequest<StreamResponse<MuteResponse>>(
-      'POST',
-      '/api/v2/moderation/mute',
-      undefined,
-      undefined,
-      body,
-    );
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<MuteResponse>
+    >('POST', '/api/v2/moderation/mute', undefined, undefined, body);
 
     decoders.MuteResponse?.(response.body);
 
@@ -120,7 +110,7 @@ export class ModerationApi extends BaseApi {
       filter: request?.filter,
     };
 
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<QueryReviewQueueResponse>
     >('POST', '/api/v2/moderation/review_queue', undefined, undefined, body);
 

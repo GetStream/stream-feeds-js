@@ -16,5 +16,6 @@ export const createTestClient = (options?: StreamClientOptions) => {
 
 export const createTestTokenGenerator = (user: UserRequest) => {
   const serverClient = new StreamServerClient(apiKey, apiSecret);
-  return () => serverClient.generateUserToken({ user_id: user.id });
+  return () =>
+    Promise.resolve(serverClient.generateUserToken({ user_id: user.id }));
 };

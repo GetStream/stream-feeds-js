@@ -1,21 +1,29 @@
-import {
+import axios, {
   AxiosError,
   AxiosInstance,
   AxiosResponse,
   RawAxiosRequestHeaders,
 } from 'axios';
-import { RequestMetadata, StreamApiError } from './types';
-import { v4 as uuidv4 } from 'uuid';
+import { RequestMetadata, StreamApiError, StreamClientOptions } from './types';
 import { getRateLimitFromResponseHeader } from './rate-limit';
+import { randomId } from './utils';
+import { TokenManager } from './TokenManager';
 
-export class BaseApi {
+export class ApiClient {
+  private readonly axiosInstance: AxiosInstance;
+
   constructor(
-    protected axios: AxiosInstance,
     public readonly apiKey: string,
-    protected tokenProvider?: () => string | Promise<string>,
-  ) {}
+    private readonly tokenManager: TokenManager,
+    options?: StreamClientOptions,
+  ) {
+    this.axiosInstance = axios.create({
+      baseURL: options?.baseUrl ?? 'https://chat.stream-io-api.com',
+      timeout: options?.timeout ?? 3000,
+    });
+  }
 
-  protected sendRequest = async <T>(
+  sendRequest = async <T>(
     method: string,
     url: string,
     pathParams?: Record<string, string>,
@@ -34,13 +42,10 @@ export class BaseApi {
       });
     }
     url += `?${encodedParams}`;
-    const clientRequestId = uuidv4();
+    const clientRequestId = randomId();
 
-    if (!this.tokenProvider) {
-      throw new Error(`Can't send Stream API requests without token provider`);
-    }
-
-    const token = await this.tokenProvider();
+    // TODO: handle expired token
+    const token = await this.tokenManager.getToken();
 
     const headers: RawAxiosRequestHeaders = {
       Authorization: token,
@@ -52,7 +57,7 @@ export class BaseApi {
     };
 
     try {
-      const response = await this.axios.request<T>({
+      const response = await this.axiosInstance.request<T>({
         url,
         method,
         headers,
@@ -82,6 +87,10 @@ export class BaseApi {
             undefined,
           );
         }
+      } else {
+        throw new Error('Unknown error received during an API call', {
+          cause: error,
+        });
       }
     }
   };

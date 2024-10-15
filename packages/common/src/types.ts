@@ -1,3 +1,4 @@
+
 export interface StreamClientOptions {
   baseUrl?: string;
   timeout?: number;
@@ -30,3 +31,5 @@ export class StreamApiError extends Error {
     super(message, errorOptions);
   }
 }
+
+export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';

@@ -41,6 +41,12 @@
     "@typescript-eslint/no-empty-interface": "off",
     "eqeqeq": ["error", "smart"],
     "@typescript-eslint/no-unsafe-argument": "off",
-    "@typescript-eslint/ban-types": "off"
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": false
+      }
+    ]
   }
 }

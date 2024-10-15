@@ -1,29 +1,51 @@
+import { ApiClient } from './ApiClient';
 import { CommonApi } from './gen/common/CommonApi';
-import { UserRequest } from './gen/models';
+import { OwnUser, UserRequest } from './gen/models';
 import { ModerationClient } from './ModerationClient';
+import { StateStore } from './StateStore';
+import { TokenManager } from './TokenManager';
 import { StreamClientOptions } from './types';
-import axios from 'axios';
+
+export interface StreamClientState {
+  connectedUser: OwnUser | undefined;
+  userConnectionState:
+    | 'disconnected'
+    | 'connected'
+    | 'connecting'
+    | 'disconnecting';
+}
 
 export class StreamClient extends CommonApi {
-  user?: UserRequest;
+  readonly state = new StateStore<StreamClientState>({
+    connectedUser: undefined,
+    userConnectionState: 'disconnected',
+  });
+
+  readonly tokenManager: TokenManager;
   readonly moderation: ModerationClient;
 
-  constructor(apiKey: string, options?: StreamClientOptions) {
-    const axiosInstance = axios.create({
-      baseURL: options?.baseUrl ?? 'https://chat.stream-io-api.com',
-      timeout: options?.timeout ?? 3000,
-    });
-    super(axiosInstance, apiKey);
-    this.moderation = new ModerationClient(axiosInstance, apiKey);
+  constructor(
+    public readonly apiKey: string,
+    options?: StreamClientOptions,
+  ) {
+    const tokenManager = new TokenManager();
+    const apiClient = new ApiClient(apiKey, tokenManager, options);
+    super(apiClient);
+    this.tokenManager = tokenManager;
+    this.apiClient = apiClient;
+    this.moderation = new ModerationClient(this.apiClient);
   }
 
   connectUser(
     user: UserRequest,
-    tokenProvider: string | (() => string | Promise<string>),
+    tokenProvider: string | (() => Promise<string>),
   ) {
-    this.user = user;
-    this.tokenProvider =
-      typeof tokenProvider === 'string' ? () => tokenProvider : tokenProvider;
-    // TODO: copy WebSocket logic here
+    void this.tokenManager.setTokenOrProvider(tokenProvider);
+
+    if (this.state.getLatestValue().userConnectionState !== 'disconnected') {
+      throw new Error(
+        `Can't connect a new user while the connection state is ${this.state.getLatestValue().userConnectionState}`,
+      );
+    }
   }
 }

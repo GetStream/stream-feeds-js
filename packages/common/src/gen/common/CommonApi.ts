@@ -1,4 +1,4 @@
-import { BaseApi } from '../../BaseApi';
+import { ApiClient } from '../../ApiClient';
 import { StreamResponse } from '../../types';
 import {
   BlockUsersRequest,
@@ -22,9 +22,11 @@ import {
 } from '../models';
 import { decoders } from '../model-decoders';
 
-export class CommonApi extends BaseApi {
+export class CommonApi {
+  constructor(protected apiClient: ApiClient) {}
+
   getApp = async (): Promise<StreamResponse<GetApplicationResponse>> => {
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<GetApplicationResponse>
     >('GET', '/api/v2/app', undefined, undefined);
 
@@ -40,7 +42,7 @@ export class CommonApi extends BaseApi {
       id: request?.id,
     };
 
-    const response = await this.sendRequest<StreamResponse<Response>>(
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
       'DELETE',
       '/api/v2/devices',
       undefined,
@@ -53,7 +55,7 @@ export class CommonApi extends BaseApi {
   };
 
   listDevices = async (): Promise<StreamResponse<ListDevicesResponse>> => {
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<ListDevicesResponse>
     >('GET', '/api/v2/devices', undefined, undefined);
 
@@ -72,7 +74,7 @@ export class CommonApi extends BaseApi {
       voip_token: request?.voip_token,
     };
 
-    const response = await this.sendRequest<StreamResponse<Response>>(
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
       'POST',
       '/api/v2/devices',
       undefined,
@@ -92,7 +94,7 @@ export class CommonApi extends BaseApi {
       user: request?.user,
     };
 
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<CreateGuestResponse>
     >('POST', '/api/v2/guest', undefined, undefined, body);
 
@@ -110,7 +112,7 @@ export class CommonApi extends BaseApi {
       json: request?.json,
     };
 
-    const response = await this.sendRequest<StreamResponse<{}>>(
+    const response = await this.apiClient.sendRequest<StreamResponse<{}>>(
       'GET',
       '/api/v2/longpoll',
       undefined,
@@ -129,12 +131,9 @@ export class CommonApi extends BaseApi {
       url: request?.url,
     };
 
-    const response = await this.sendRequest<StreamResponse<GetOGResponse>>(
-      'GET',
-      '/api/v2/og',
-      undefined,
-      queryParams,
-    );
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetOGResponse>
+    >('GET', '/api/v2/og', undefined, queryParams);
 
     decoders.GetOGResponse?.(response.body);
 
@@ -148,12 +147,9 @@ export class CommonApi extends BaseApi {
       payload: request?.payload,
     };
 
-    const response = await this.sendRequest<StreamResponse<QueryUsersResponse>>(
-      'GET',
-      '/api/v2/users',
-      undefined,
-      queryParams,
-    );
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryUsersResponse>
+    >('GET', '/api/v2/users', undefined, queryParams);
 
     decoders.QueryUsersResponse?.(response.body);
 
@@ -167,7 +163,7 @@ export class CommonApi extends BaseApi {
       users: request?.users,
     };
 
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<UpdateUsersResponse>
     >('PATCH', '/api/v2/users', undefined, undefined, body);
 
@@ -183,7 +179,7 @@ export class CommonApi extends BaseApi {
       users: request?.users,
     };
 
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<UpdateUsersResponse>
     >('POST', '/api/v2/users', undefined, undefined, body);
 
@@ -195,7 +191,7 @@ export class CommonApi extends BaseApi {
   getBlockedUsers = async (): Promise<
     StreamResponse<GetBlockedUsersResponse>
   > => {
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<GetBlockedUsersResponse>
     >('GET', '/api/v2/users/block', undefined, undefined);
 
@@ -211,13 +207,9 @@ export class CommonApi extends BaseApi {
       blocked_user_id: request?.blocked_user_id,
     };
 
-    const response = await this.sendRequest<StreamResponse<BlockUsersResponse>>(
-      'POST',
-      '/api/v2/users/block',
-      undefined,
-      undefined,
-      body,
-    );
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<BlockUsersResponse>
+    >('POST', '/api/v2/users/block', undefined, undefined, body);
 
     decoders.BlockUsersResponse?.(response.body);
 
@@ -231,7 +223,7 @@ export class CommonApi extends BaseApi {
       blocked_user_id: request?.blocked_user_id,
     };
 
-    const response = await this.sendRequest<
+    const response = await this.apiClient.sendRequest<
       StreamResponse<UnblockUsersResponse>
     >('POST', '/api/v2/users/unblock', undefined, undefined, body);
 

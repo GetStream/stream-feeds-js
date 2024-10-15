@@ -18,7 +18,7 @@ describe('API requests and error handling', () => {
   it('should set HTTP headers', async () => {
     let headers: Record<string, string> = {};
     // eslint-disable-next-line @typescript-eslint/dot-notation
-    client['axios'].interceptors.request.use((config) => {
+    client['apiClient']['axiosInstance'].interceptors.request.use((config) => {
       headers = config.headers;
       return config;
     });
