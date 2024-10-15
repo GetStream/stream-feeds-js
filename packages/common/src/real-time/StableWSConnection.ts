@@ -22,7 +22,9 @@ const isErrorEvent = (
 ): res is ErrorEvent => (res as ErrorEvent).error !== undefined;
 
 const isWSError = (error: WSError | any): error is WSError =>
-  typeof error.code !== 'undefined';
+  typeof error.isWSFailure !== 'undefined' ||
+  typeof error.code !== 'undefined' ||
+  typeof error.StatusCode !== 'undefined';
 
 export interface WSConfig {
   baseUrl: string;
@@ -31,9 +33,9 @@ export interface WSConfig {
 }
 
 type WSError = Error & {
-  code: string | number;
-  isWSFailure: boolean;
-  StatusCode: string | number;
+  code?: string | number;
+  isWSFailure?: boolean;
+  StatusCode?: string | number;
 };
 
 /**
