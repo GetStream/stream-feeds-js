@@ -6,19 +6,23 @@ import axios, {
 } from 'axios';
 import { RequestMetadata, StreamApiError, StreamClientOptions } from './types';
 import { getRateLimitFromResponseHeader } from './rate-limit';
-import { randomId } from './utils';
+import { KnownCodes, randomId } from './utils';
 import { TokenManager } from './TokenManager';
+import { ConnectionIdManager } from './ConnectionIdManager';
 
 export class ApiClient {
   private readonly axiosInstance: AxiosInstance;
+  private readonly baseUrl: string;
 
   constructor(
     public readonly apiKey: string,
     private readonly tokenManager: TokenManager,
+    private readonly connectionIdManager: ConnectionIdManager,
     options?: StreamClientOptions,
   ) {
+    this.baseUrl = options?.baseUrl ?? 'https://video.stream-io-api.com';
     this.axiosInstance = axios.create({
-      baseURL: options?.baseUrl ?? 'https://chat.stream-io-api.com',
+      baseURL: this.baseUrl,
       timeout: options?.timeout ?? 3000,
     });
   }
@@ -29,36 +33,35 @@ export class ApiClient {
     pathParams?: Record<string, string>,
     queryParams?: Record<string, any>,
     body?: any,
-  ) => {
+  ): Promise<{ body: T; metadata: RequestMetadata }> => {
     queryParams = queryParams ?? {};
     queryParams.api_key = this.apiKey;
     const encodedParams = this.queryParamsStringify(queryParams);
+    let requestUrl = url;
     if (pathParams) {
       Object.keys(pathParams).forEach((paramName) => {
-        url = url.replace(
+        requestUrl = requestUrl.replace(
           `{${paramName}}`,
           encodeURIComponent(pathParams[paramName]),
         );
       });
     }
-    url += `?${encodedParams}`;
+    requestUrl += `?${encodedParams}`;
     const clientRequestId = randomId();
 
-    // TODO: handle expired token
     const token = await this.tokenManager.getToken();
 
     const headers: RawAxiosRequestHeaders = {
+      ...this.commonHeaders,
       Authorization: token,
-      'stream-auth-type': 'jwt',
       'Content-Type': 'application/json',
-      'X-Stream-Client': 'stream-feeds-js-',
       'Accept-Encoding': 'gzip',
       'x-client-request-id': clientRequestId,
     };
 
     try {
       const response = await this.axiosInstance.request<T>({
-        url,
+        url: requestUrl,
         method,
         headers,
         params: queryParams,
@@ -80,6 +83,13 @@ export class ApiClient {
           const data = error.response.data as StreamApiError;
           const code = data?.code ?? error.response.status;
           const message = data?.message ?? error.response.statusText;
+          if (
+            code === KnownCodes.TOKEN_EXPIRED &&
+            error.response.status === 401
+          ) {
+            await this.tokenManager.loadToken();
+            return this.sendRequest(method, url, pathParams, queryParams, body);
+          }
           throw new StreamApiError(
             `Stream error code ${code}: ${message}`,
             this.getRequestMetadata(clientRequestId, error.response),
@@ -95,11 +105,33 @@ export class ApiClient {
     }
   };
 
-  protected isAxiosError(error: any | AxiosError): error is AxiosError {
+  get webSocketBaseUrl() {
+    const params = new URLSearchParams();
+    params.set('api_key', this.apiKey);
+    Object.keys(this.commonHeaders).forEach((key) => {
+      params.set(key, this.commonHeaders[key]);
+    });
+
+    const wsBaseURL = this.baseUrl
+      .replace('http', 'ws')
+      .replace(':3030', ':8800');
+
+    return `${wsBaseURL}/video/connect?${params.toString()}`;
+  }
+
+  private get commonHeaders(): Record<string, string> {
+    return {
+      'stream-auth-type': 'jwt',
+      // TODO: add version here
+      'X-Stream-Client': 'stream-feeds-js-',
+    };
+  }
+
+  private isAxiosError(error: any | AxiosError): error is AxiosError {
     return typeof error.request !== 'undefined';
   }
 
-  protected queryParamsStringify = (params: Record<string, any>) => {
+  private queryParamsStringify = (params: Record<string, any>) => {
     const newParams = [];
     for (const k in params) {
       const param = params[k];
@@ -123,10 +155,7 @@ export class ApiClient {
     return newParams.join('&');
   };
 
-  protected getRequestMetadata = (
-    requestId: string,
-    response: AxiosResponse,
-  ) => {
+  private getRequestMetadata = (requestId: string, response: AxiosResponse) => {
     const responseHeaders = response.headers as Record<string, string>;
     return {
       clientRequestId: requestId,

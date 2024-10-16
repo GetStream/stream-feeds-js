@@ -1,12 +1,12 @@
 import { StreamWSEvent } from './real-time/event-models';
 import { LogLevel } from './types';
 
-export class EventDispatcher {
+export class EventDispatcher<
+  Type extends string = StreamWSEvent['type'],
+  Event extends { type: string } = StreamWSEvent,
+> {
   private subscribers: Partial<
-    Record<
-      StreamWSEvent['type'],
-      Array<(event: StreamWSEvent) => void> | undefined
-    >
+    Record<Type | 'all', Array<(event: Event) => void> | undefined>
   > = {};
 
   private readonly logger = (level: LogLevel, message: string, extra: any) => {
@@ -14,9 +14,11 @@ export class EventDispatcher {
     console.log(level, message, extra);
   };
 
-  dispatch = (event: StreamWSEvent) => {
-    const listeners = this.subscribers[event.type];
-    if (!listeners) return;
+  dispatch = (event: Event) => {
+    const listeners = [
+      ...(this.subscribers[event.type as Type] ?? []),
+      ...(this.subscribers['all'] ?? []),
+    ];
     for (const fn of listeners) {
       try {
         fn(event);
@@ -26,28 +28,21 @@ export class EventDispatcher {
     }
   };
 
-  on = (
-    eventName: StreamWSEvent['type'],
-    handler: (event: StreamWSEvent) => void,
-  ) => {
+  on = (eventName: Type | 'all', handler: (event: Event) => void) => {
     (this.subscribers[eventName] ??= []).push(handler);
     return () => {
       this.off(eventName, handler);
     };
   };
 
-  off = (
-    eventName: StreamWSEvent['type'],
-    handler: (event: StreamWSEvent) => void,
-  ) => {
+  off = (eventName: Type | 'all', handler: (event: Event) => void) => {
     this.subscribers[eventName] = (this.subscribers[eventName] ?? []).filter(
       (f) => f !== handler,
     );
   };
 
-  offAll = (eventName?: StreamWSEvent['type']) => {
+  offAll = (eventName?: Type | 'all') => {
     if (eventName) {
-      this.subscribers[eventName] = [];
     } else {
       this.subscribers = {};
     }

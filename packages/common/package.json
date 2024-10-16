@@ -14,7 +14,8 @@
     "build": "yarn clean && rollup -c",
     "test": "vitest",
     "clean:docs": "rimraf generated-docs",
-    "test-ci": "vitest --coverage"
+    "test-ci": "vitest --coverage",
+    "test:browser": "vitest --workspace=vitest.workspace.ts"
   },
   "files": [
     "dist",
@@ -33,9 +34,11 @@
     "@rollup/plugin-typescript": "^12.1.0",
     "@stream-io/node-sdk": "^0.4.4",
     "@types/uuid": "^10",
+    "@vitest/browser": "^2.1.3",
     "@vitest/coverage-v8": "^2.1.2",
     "dotenv": "^16.4.5",
     "happy-dom": "^15.7.4",
+    "playwright": "^1.48.1",
     "rimraf": "^6.0.1",
     "rollup": "^4.24.0",
     "typescript": "^5.6.3",

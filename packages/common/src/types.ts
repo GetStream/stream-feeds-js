@@ -1,21 +1,22 @@
+import { StreamWSEvent } from './real-time/event-models';
 
-export interface StreamClientOptions {
+export type StreamClientOptions = {
   baseUrl?: string;
   timeout?: number;
-}
+};
 
-export interface RateLimit {
+export type RateLimit = {
   rateLimit?: number;
   rateLimitRemaining?: number;
   rateLimitReset?: Date;
-}
+};
 
-export interface RequestMetadata {
+export type RequestMetadata = {
   responseHeaders: Record<string, string>;
   rateLimit: RateLimit;
   responseCode: number;
   clientRequestId: string;
-}
+};
 
 export type StreamResponse<T> = T & {
   metadata: RequestMetadata;
@@ -33,3 +34,10 @@ export class StreamApiError extends Error {
 }
 
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
+
+export interface NetworkChangedEvent {
+  type: 'network.changed';
+  online: boolean;
+}
+
+export type StreamEvent = StreamWSEvent | NetworkChangedEvent;

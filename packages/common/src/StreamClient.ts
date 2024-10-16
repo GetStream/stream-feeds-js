@@ -1,51 +1,114 @@
 import { ApiClient } from './ApiClient';
+import { ConnectionIdManager } from './ConnectionIdManager';
+import { EventDispatcher } from './EventDispatcher';
 import { CommonApi } from './gen/common/CommonApi';
 import { OwnUser, UserRequest } from './gen/models';
 import { ModerationClient } from './ModerationClient';
+import { StableWSConnection } from './real-time/StableWSConnection';
 import { StateStore } from './StateStore';
 import { TokenManager } from './TokenManager';
-import { StreamClientOptions } from './types';
+import { StreamClientOptions, StreamEvent } from './types';
+import {
+  addConnectionEventListeners,
+  removeConnectionEventListeners,
+} from './utils';
 
-export interface StreamClientState {
+export type StreamClientState = {
   connectedUser: OwnUser | undefined;
-  userConnectionState:
-    | 'disconnected'
-    | 'connected'
-    | 'connecting'
-    | 'disconnecting';
-}
+};
 
 export class StreamClient extends CommonApi {
   readonly state = new StateStore<StreamClientState>({
     connectedUser: undefined,
-    userConnectionState: 'disconnected',
   });
-
-  readonly tokenManager: TokenManager;
   readonly moderation: ModerationClient;
+  private readonly tokenManager: TokenManager;
+  private wsConnection?: StableWSConnection;
+  private connectionIdManager: ConnectionIdManager;
+  private readonly eventDispatcher: EventDispatcher<
+    StreamEvent['type'],
+    StreamEvent
+  > = new EventDispatcher<StreamEvent['type'], StreamEvent>();
 
   constructor(
     public readonly apiKey: string,
     options?: StreamClientOptions,
   ) {
     const tokenManager = new TokenManager();
-    const apiClient = new ApiClient(apiKey, tokenManager, options);
+    const connectionIdManager = new ConnectionIdManager();
+    const apiClient = new ApiClient(
+      apiKey,
+      tokenManager,
+      connectionIdManager,
+      options,
+    );
     super(apiClient);
     this.tokenManager = tokenManager;
+    this.connectionIdManager = connectionIdManager;
     this.apiClient = apiClient;
     this.moderation = new ModerationClient(this.apiClient);
   }
 
-  connectUser(
+  connectUser = async (
     user: UserRequest,
     tokenProvider: string | (() => Promise<string>),
-  ) {
+  ) => {
+    if (
+      this.state.getLatestValue().connectedUser !== undefined ||
+      this.wsConnection
+    ) {
+      throw new Error(`Can't connect a new user, call "disconnectUser" first`);
+    }
+
     void this.tokenManager.setTokenOrProvider(tokenProvider);
 
-    if (this.state.getLatestValue().userConnectionState !== 'disconnected') {
-      throw new Error(
-        `Can't connect a new user while the connection state is ${this.state.getLatestValue().userConnectionState}`,
+    try {
+      addConnectionEventListeners(this.updateNetworkConnectionStatus);
+      this.wsConnection = new StableWSConnection(
+        {
+          user,
+          baseUrl: this.apiClient.webSocketBaseUrl,
+        },
+        this.tokenManager,
+        this.connectionIdManager,
       );
+      this.wsConnection.on('all', (event) =>
+        this.eventDispatcher.dispatch(event),
+      );
+      const connectedEvent = await this.wsConnection.connect();
+      this.state.partialNext({ connectedUser: connectedEvent?.me });
+    } catch (err) {
+      await this.disconnectUser();
+      throw err;
     }
-  }
+  };
+
+  disconnectUser = async () => {
+    if (this.wsConnection) {
+      this.wsConnection?.offAll();
+      await this.wsConnection?.disconnect();
+      this.wsConnection = undefined;
+    }
+    removeConnectionEventListeners(this.updateNetworkConnectionStatus);
+
+    this.connectionIdManager.reset();
+    this.tokenManager.reset();
+    this.state.partialNext({ connectedUser: undefined });
+  };
+
+  on = this.eventDispatcher.on;
+  off = this.eventDispatcher.off;
+
+  private updateNetworkConnectionStatus = (
+    event: { type: 'online' | 'offline' } | Event,
+  ) => {
+    if (event.type === 'offline') {
+      // TODO: add logging
+      // this.logger('debug', 'device went offline');
+      this.eventDispatcher.dispatch({ type: 'network.changed', online: false });
+    } else if (event.type === 'online') {
+      // this.logger('debug', 'device went online');
+      this.eventDispatcher.dispatch({ type: 'network.changed', online: true });
+    }
+  };
 }

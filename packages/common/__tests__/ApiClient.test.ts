@@ -1,10 +1,11 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { StreamClient } from '../src/StreamClient';
 import {
   createTestClient,
   createTestTokenGenerator,
 } from './create-test-client';
 import { UserRequest } from '../src/gen/models';
+import { sleep } from '../src/utils';
 
 describe('API requests and error handling', () => {
   let client: StreamClient;
@@ -69,6 +70,28 @@ describe('API requests and error handling', () => {
 
       expect(rateLimit.rateLimit).toBeDefined();
     }
+  });
+
+  it('should handle token expiration', async () => {
+    client = createTestClient();
+    const expInSecs = 2;
+    client.connectUser(user, createTestTokenGenerator(user, expInSecs));
+
+    await sleep(expInSecs * 1000);
+
+    await client.queryUsers({ payload: { filter_conditions: {} } });
+  });
+
+  it('should give up token refresh after 3 tries', async () => {
+    client = createTestClient();
+    const expInSecs = 2;
+    const token = await createTestTokenGenerator(user, expInSecs)();
+    await sleep(expInSecs * 1000);
+
+    const tokenProvider = () => Promise.resolve(token);
+    client.connectUser(user, tokenProvider);
+
+    await client.queryUsers({ payload: { filter_conditions: {} } });
   });
 
   it('should handle timeout', async () => {

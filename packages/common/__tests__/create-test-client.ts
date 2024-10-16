@@ -1,11 +1,8 @@
-import 'dotenv/config';
 import { StreamClient } from '../src/StreamClient';
 import { UserRequest } from '../src/gen/models';
-import { StreamClient as StreamServerClient } from '@stream-io/node-sdk';
 import { StreamClientOptions } from '../src/types';
 
-const apiKey = process.env.STREAM_API_KEY!;
-const apiSecret = process.env.STREAM_SECRET!;
+const apiKey = import.meta.env.VITE_STREAM_API_KEY!;
 
 export const createTestClient = (options?: StreamClientOptions) => {
   return new StreamClient(apiKey, {
@@ -14,8 +11,16 @@ export const createTestClient = (options?: StreamClientOptions) => {
   });
 };
 
-export const createTestTokenGenerator = (user: UserRequest) => {
-  const serverClient = new StreamServerClient(apiKey, apiSecret);
-  return () =>
-    Promise.resolve(serverClient.generateUserToken({ user_id: user.id }));
+export const createTestTokenGenerator = (
+  user: UserRequest,
+  expInSeconds?: number,
+) => {
+  return async () => {
+    const response = await fetch(
+      `https://stream-calls-dogfood.vercel.app/api/auth/create-token?user_id=${user.id}&environment=staging&exp=${expInSeconds ?? 14400}`,
+    );
+    const body = await response.json();
+
+    return body.token as string;
+  };
 };

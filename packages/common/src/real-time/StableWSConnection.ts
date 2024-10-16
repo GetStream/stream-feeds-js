@@ -11,6 +11,7 @@ import type { UserRequest, WSAuthMessage } from '../gen/models';
 import { TokenManager } from '../TokenManager';
 import { EventDispatcher } from '../EventDispatcher';
 import { ConnectedEvent } from './event-models';
+import { ConnectionIdManager } from '../ConnectionIdManager';
 
 // Type guards to check WebSocket error type
 const isCloseEvent = (
@@ -26,11 +27,10 @@ const isWSError = (error: WSError | any): error is WSError =>
   typeof error.code !== 'undefined' ||
   typeof error.StatusCode !== 'undefined';
 
-export interface WSConfig {
+export type WSConfig = {
   baseUrl: string;
   user: UserRequest;
-  clientId: string;
-}
+};
 
 type WSError = Error & {
   code?: string | number;
@@ -77,10 +77,12 @@ export class StableWSConnection {
   ws?: WebSocket;
   wsID: number;
   private readonly dispatcher = new EventDispatcher();
+  private clientId: string;
 
   constructor(
     private readonly config: WSConfig,
     private readonly tokenManager: TokenManager,
+    private readonly connectionIdManager: ConnectionIdManager,
   ) {
     /** consecutive failures influence the duration of the timeout */
     this.consecutiveFailures = 0;
@@ -103,6 +105,7 @@ export class StableWSConnection {
     /** Send a health check message every 25 seconds */
     this.pingInterval = 25 * 1000;
     this.connectionCheckTimeout = this.pingInterval + 10 * 1000;
+    this.clientId = `${config.user.id}-${randomId()}`;
 
     addConnectionEventListeners(this.onlineStatusChanged);
   }
@@ -695,7 +698,7 @@ export class StableWSConnection {
     // 30 seconds is the recommended interval (messenger uses this)
     this.healthCheckTimeoutRef = setTimeout(() => {
       // send the healthcheck..., server replies with a health check event
-      const data = [{ type: 'health.check', client_id: this.config.clientId }];
+      const data = [{ type: 'health.check', client_id: this.clientId }];
       // try to send on the connection
       try {
         this.ws?.send(JSON.stringify(data));

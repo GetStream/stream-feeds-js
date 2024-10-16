@@ -1,4 +1,4 @@
-import { isFunction } from './utils';
+import { isFunction, retryInterval, sleep } from './utils';
 
 /**
  * TokenManager
@@ -52,7 +52,7 @@ export class TokenManager {
 
   // Fetches a token from tokenProvider function and sets in tokenManager.
   // In case of static token, it will simply resolve to static token.
-  loadToken = () => {
+  loadToken = (previousFailuresCount = 0) => {
     // eslint-disable-next-line no-async-promise-executor
     this.loadTokenPromise = new Promise(async (resolve, reject) => {
       if (this.type === 'static') {
@@ -60,12 +60,23 @@ export class TokenManager {
       }
 
       if (this.tokenProvider && typeof this.tokenProvider !== 'string') {
+        this.token = undefined;
         try {
           this.token = await this.tokenProvider();
         } catch (e) {
-          return reject(
-            new Error(`Call to tokenProvider failed`, { cause: e }),
-          );
+          const numberOfFailures = previousFailuresCount++;
+          await sleep(retryInterval(numberOfFailures));
+          console.log(numberOfFailures);
+          if (previousFailuresCount === 3) {
+            return reject(
+              new Error(
+                `Stream error: tried to get token ${numberOfFailures} times, but it failed. Check your token provider`,
+                { cause: e },
+              ),
+            );
+          } else {
+            return this.loadToken(numberOfFailures);
+          }
         }
         resolve(this.token);
       }
