@@ -15,7 +15,7 @@ import {
 import { decoders } from '../model-decoders';
 
 export class ModerationApi {
-  constructor(protected apiClient: ApiClient) {}
+  constructor(public readonly apiClient: ApiClient) {}
 
   ban = async (request: BanRequest): Promise<StreamResponse<BanResponse>> => {
     const body = {

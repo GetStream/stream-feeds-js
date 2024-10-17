@@ -23,7 +23,7 @@ import {
 import { decoders } from '../model-decoders';
 
 export class CommonApi {
-  constructor(protected apiClient: ApiClient) {}
+  constructor(public readonly apiClient: ApiClient) {}
 
   getApp = async (): Promise<StreamResponse<GetApplicationResponse>> => {
     const response = await this.apiClient.sendRequest<

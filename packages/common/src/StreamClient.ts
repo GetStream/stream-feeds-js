@@ -21,8 +21,8 @@ export class StreamClient extends CommonApi {
   readonly state = new StateStore<StreamClientState>({
     connectedUser: undefined,
   });
-
   readonly moderation: ModerationClient;
+
   private readonly tokenManager: TokenManager;
   private wsConnection?: StableWSConnection;
   private readonly connectionIdManager: ConnectionIdManager;
@@ -46,7 +46,6 @@ export class StreamClient extends CommonApi {
     super(apiClient);
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
-    this.apiClient = apiClient;
     this.moderation = new ModerationClient(this.apiClient);
   }
 
