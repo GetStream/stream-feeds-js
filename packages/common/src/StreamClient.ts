@@ -60,7 +60,7 @@ export class StreamClient extends CommonApi {
       throw new Error(`Can't connect a new user, call "disconnectUser" first`);
     }
 
-    void this.tokenManager.setTokenOrProvider(tokenProvider);
+    this.tokenManager.setTokenOrProvider(tokenProvider);
 
     try {
       addConnectionEventListeners(this.updateNetworkConnectionStatus);

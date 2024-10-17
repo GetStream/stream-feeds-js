@@ -37,8 +37,6 @@ export class TokenManager {
       this.token = tokenOrProvider;
       this.type = 'static';
     }
-
-    await this.loadToken();
   };
 
   /**
@@ -52,7 +50,7 @@ export class TokenManager {
 
   // Fetches a token from tokenProvider function and sets in tokenManager.
   // In case of static token, it will simply resolve to static token.
-  loadToken = (previousFailuresCount = 0) => {
+  loadToken = () => {
     // eslint-disable-next-line no-async-promise-executor
     this.loadTokenPromise = new Promise(async (resolve, reject) => {
       if (this.type === 'static') {
@@ -61,24 +59,27 @@ export class TokenManager {
 
       if (this.tokenProvider && typeof this.tokenProvider !== 'string') {
         this.token = undefined;
-        try {
-          this.token = await this.tokenProvider();
-        } catch (e) {
-          const numberOfFailures = previousFailuresCount++;
-          await sleep(retryInterval(numberOfFailures));
-          console.log(numberOfFailures);
-          if (previousFailuresCount === 3) {
-            return reject(
-              new Error(
-                `Stream error: tried to get token ${numberOfFailures} times, but it failed. Check your token provider`,
-                { cause: e },
-              ),
-            );
-          } else {
-            return this.loadToken(numberOfFailures);
+        const tokenProvider = this.tokenProvider;
+        const loadTokenWithRetries = async (previousFailuresCount = 0) => {
+          try {
+            this.token = await tokenProvider();
+          } catch (e) {
+            const numberOfFailures = ++previousFailuresCount;
+            await sleep(retryInterval(numberOfFailures));
+            if (numberOfFailures === 3) {
+              return reject(
+                new Error(
+                  `Stream error: tried to get token ${numberOfFailures} times, but it failed. Check your token provider`,
+                  { cause: e },
+                ),
+              );
+            } else {
+              return loadTokenWithRetries(numberOfFailures);
+            }
           }
-        }
-        resolve(this.token);
+          resolve(this.token);
+        };
+        return loadTokenWithRetries();
       }
     });
 

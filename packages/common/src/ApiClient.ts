@@ -49,6 +49,7 @@ export class ApiClient {
     requestUrl += `?${encodedParams}`;
     const clientRequestId = randomId();
 
+    console.log('get token', url);
     const token = await this.tokenManager.getToken();
 
     const headers: RawAxiosRequestHeaders = {
@@ -85,7 +86,8 @@ export class ApiClient {
           const message = data?.message ?? error.response.statusText;
           if (
             code === KnownCodes.TOKEN_EXPIRED &&
-            error.response.status === 401
+            error.response.status === 401 &&
+            !this.tokenManager.isStatic()
           ) {
             await this.tokenManager.loadToken();
             return this.sendRequest(method, url, pathParams, queryParams, body);

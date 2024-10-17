@@ -84,14 +84,16 @@ describe('API requests and error handling', () => {
 
   it('should give up token refresh after 3 tries', async () => {
     client = createTestClient();
-    const expInSecs = 2;
-    const token = await createTestTokenGenerator(user, expInSecs)();
-    await sleep(expInSecs * 1000);
-
-    const tokenProvider = () => Promise.resolve(token);
+    const tokenProvider = () => Promise.reject();
     client.connectUser(user, tokenProvider);
 
-    await client.queryUsers({ payload: { filter_conditions: {} } });
+    await expect(() =>
+      client.queryUsers({ payload: { filter_conditions: {} } }),
+    ).rejects.toThrowError(
+      'Stream error: tried to get token 3 times, but it failed. Check your token provider',
+    );
+
+    await client.disconnectUser();
   });
 
   it('should handle timeout', async () => {
