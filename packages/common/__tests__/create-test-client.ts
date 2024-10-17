@@ -3,6 +3,7 @@ import { UserRequest } from '../src/gen/models';
 import { StreamClientOptions } from '../src/types';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY!;
+const tokenUrl = import.meta.env.VITE_STREAM_TOKEN_URL!;
 
 export const createTestClient = (options?: StreamClientOptions) => {
   return new StreamClient(apiKey, {
@@ -17,7 +18,7 @@ export const createTestTokenGenerator = (
 ) => {
   return async () => {
     const response = await fetch(
-      `https://stream-calls-dogfood.vercel.app/api/auth/create-token?user_id=${user.id}&environment=staging&exp=${expInSeconds ?? 14400}`,
+      `${tokenUrl}&user_id=${user.id}&exp=${expInSeconds ?? 14400}`,
     );
     const body = await response.json();
 
