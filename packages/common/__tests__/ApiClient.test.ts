@@ -82,9 +82,29 @@ describe('API requests and error handling', () => {
     await client.queryUsers({ payload: { filter_conditions: {} } });
   });
 
+  it('should add connection id when necessary', async () => {
+    let url: string | undefined;
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    client['apiClient']['axiosInstance'].interceptors.request.use((config) => {
+      url = config.url;
+      return config;
+    });
+
+    await client.queryUsers({ payload: { filter_conditions: {} } });
+
+    expect(url).not.toContain('connection_id=');
+
+    await client.queryUsers({
+      payload: { filter_conditions: {}, presence: true },
+    });
+
+    expect(url).toContain('connection_id=');
+  });
+
   it('should give up token refresh after 3 tries', async () => {
     client = createTestClient();
-    const tokenProvider = () => Promise.reject(new Error('This is a test error'));
+    const tokenProvider = () =>
+      Promise.reject(new Error('This is a test error'));
     void client.connectUser(user, tokenProvider);
 
     await expect(() =>

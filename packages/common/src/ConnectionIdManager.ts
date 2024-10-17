@@ -6,6 +6,8 @@ export class ConnectionIdManager {
 
   reset = () => {
     this.loadConnectionIdPromise = undefined;
+    this.resolve = undefined;
+    this.reject = undefined;
     this.connectionId = undefined;
   };
 
@@ -20,11 +22,17 @@ export class ConnectionIdManager {
   resolveConnectionidPromise = (connectionId: string) => {
     this.connectionId = connectionId;
     this.resolve?.(connectionId);
+    this.loadConnectionIdPromise = undefined;
+    this.resolve = undefined;
+    this.reject = undefined;
   };
 
   rejectConnectionIdPromise = (reason: any) => {
     this.connectionId = undefined;
     this.reject?.(reason);
+    this.loadConnectionIdPromise = undefined;
+    this.resolve = undefined;
+    this.reject = undefined;
   };
 
   getConnectionId = () => {
@@ -37,7 +45,7 @@ export class ConnectionIdManager {
     }
 
     throw new Error(
-      `No connection id, try to get one by calling "connectUser"`,
+      `No connection id was provided when trying to query with presence/watch. You should call "connectUser" to get a WebSocket connection id`,
     );
   };
 }

@@ -36,6 +36,20 @@ export class ApiClient {
   ): Promise<{ body: T; metadata: RequestMetadata }> => {
     queryParams = queryParams ?? {};
     queryParams.api_key = this.apiKey;
+
+    if (
+      queryParams?.watch ||
+      queryParams?.presence ||
+      queryParams?.payload?.watch ||
+      queryParams?.payload?.presence ||
+      body?.watch ||
+      body?.presence
+    ) {
+      const connectionId = await this.connectionIdManager.getConnectionId();
+      console.log(connectionId);
+      queryParams.connection_id = connectionId;
+    }
+
     const encodedParams = this.queryParamsStringify(queryParams);
     let requestUrl = url;
     if (pathParams) {
@@ -49,7 +63,6 @@ export class ApiClient {
     requestUrl += `?${encodedParams}`;
     const clientRequestId = randomId();
 
-    console.log('get token', url);
     const token = await this.tokenManager.getToken();
 
     const headers: RawAxiosRequestHeaders = {
@@ -90,7 +103,13 @@ export class ApiClient {
             !this.tokenManager.isStatic()
           ) {
             await this.tokenManager.loadToken();
-            return await this.sendRequest(method, url, pathParams, queryParams, body);
+            return await this.sendRequest(
+              method,
+              url,
+              pathParams,
+              queryParams,
+              body,
+            );
           }
           throw new StreamApiError(
             `Stream error code ${code}: ${message}`,
@@ -157,7 +176,10 @@ export class ApiClient {
     return newParams.join('&');
   };
 
-  private readonly getRequestMetadata = (requestId: string, response: AxiosResponse) => {
+  private readonly getRequestMetadata = (
+    requestId: string,
+    response: AxiosResponse,
+  ) => {
     const responseHeaders = response.headers as Record<string, string>;
     return {
       clientRequestId: requestId,

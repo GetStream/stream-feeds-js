@@ -133,6 +133,10 @@ export class StableWSConnection {
 
     this.isDisconnected = false;
 
+    if (!this.connectionIdManager.loadConnectionIdPromise) {
+      this.connectionIdManager.resetConnectionIdPromise();
+    }
+
     try {
       const healthCheck = await this._connect();
       this.consecutiveFailures = 0;
@@ -333,7 +337,6 @@ export class StableWSConnection {
       this.isConnecting = false;
 
       if (response) {
-        this.connectionID = response.connection_id;
         return response;
       }
     } catch (err) {
@@ -509,6 +512,7 @@ export class StableWSConnection {
 
     if (data && data.type === 'connection.ok') {
       this.resolvePromise?.(data);
+      this.connectionID = (data as ConnectedEvent).connection_id;
       this._setHealth(true);
     }
 
@@ -589,21 +593,40 @@ export class StableWSConnection {
     this.isHealthy = healthy;
 
     if (this.isHealthy || dispatchImmediately) {
-      this.dispatcher.dispatch({
-        type: 'connection.changed',
-        online: this.isHealthy,
-      });
+      this.dispatchConnectionChanged();
       return;
     }
 
     // we're offline, wait few seconds and fire and event if still offline
     setTimeout(() => {
       if (this.isHealthy) return;
-      this.dispatcher.dispatch({
-        type: 'connection.changed',
-        online: this.isHealthy,
-      });
+      this.dispatchConnectionChanged();
     }, 5000);
+  };
+
+  dispatchConnectionChanged = () => {
+    if (this.isHealthy) {
+      if (this.connectionID) {
+        this.connectionIdManager?.resolveConnectionidPromise(this.connectionID);
+      } else {
+        throw new Error(
+          `Stream error: WebSocket connection is healthy, but connection id isn't set`,
+        );
+      }
+    } else {
+      if (this.connectionIdManager.loadConnectionIdPromise) {
+        this.connectionIdManager.rejectConnectionIdPromise(
+          new Error(
+            `Stream error: Failed to get WebSocket connection id because WebSocket connection failed`,
+          ),
+        );
+      }
+      this.connectionIdManager.reset();
+    }
+    this.dispatcher.dispatch({
+      type: 'connection.changed',
+      online: this.isHealthy,
+    });
   };
 
   /**
