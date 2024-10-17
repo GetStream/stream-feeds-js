@@ -25,7 +25,7 @@ export class TokenManager {
    * @param {UserResponse} user - the user object.
    * @param {boolean} isAnonymous - whether the user is anonymous or not.
    */
-  setTokenOrProvider = async (
+  setTokenOrProvider = (
     tokenOrProvider?: string | (() => Promise<string>),
   ) => {
     if (isFunction(tokenOrProvider)) {
@@ -74,12 +74,12 @@ export class TokenManager {
                 ),
               );
             } else {
-              return loadTokenWithRetries(numberOfFailures);
+              return await loadTokenWithRetries(numberOfFailures);
             }
           }
           resolve(this.token);
         };
-        return loadTokenWithRetries();
+        return await loadTokenWithRetries();
       }
     });
 

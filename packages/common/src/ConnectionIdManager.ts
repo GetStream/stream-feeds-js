@@ -4,8 +4,6 @@ export class ConnectionIdManager {
   private resolve?: (connectionId: string) => void;
   private reject?: (reason: any) => void;
 
-  constructor() {}
-
   reset = () => {
     this.loadConnectionIdPromise = undefined;
     this.connectionId = undefined;

@@ -21,10 +21,11 @@ export class StreamClient extends CommonApi {
   readonly state = new StateStore<StreamClientState>({
     connectedUser: undefined,
   });
+
   readonly moderation: ModerationClient;
   private readonly tokenManager: TokenManager;
   private wsConnection?: StableWSConnection;
-  private connectionIdManager: ConnectionIdManager;
+  private readonly connectionIdManager: ConnectionIdManager;
   private readonly eventDispatcher: EventDispatcher<
     StreamEvent['type'],
     StreamEvent
@@ -99,7 +100,7 @@ export class StreamClient extends CommonApi {
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
 
-  private updateNetworkConnectionStatus = (
+  private readonly updateNetworkConnectionStatus = (
     event: { type: 'online' | 'offline' } | Event,
   ) => {
     if (event.type === 'offline') {

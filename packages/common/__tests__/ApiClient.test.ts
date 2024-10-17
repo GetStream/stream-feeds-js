@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { StreamClient } from '../src/StreamClient';
 import {
   createTestClient,
@@ -13,7 +13,7 @@ describe('API requests and error handling', () => {
 
   beforeAll(() => {
     client = createTestClient();
-    client.connectUser(user, createTestTokenGenerator(user));
+    void client.connectUser(user, createTestTokenGenerator(user));
   });
 
   it('should set HTTP headers', async () => {
@@ -75,7 +75,7 @@ describe('API requests and error handling', () => {
   it('should handle token expiration', async () => {
     client = createTestClient();
     const expInSecs = 2;
-    client.connectUser(user, createTestTokenGenerator(user, expInSecs));
+    void client.connectUser(user, createTestTokenGenerator(user, expInSecs));
 
     await sleep(expInSecs * 1000);
 
@@ -84,8 +84,8 @@ describe('API requests and error handling', () => {
 
   it('should give up token refresh after 3 tries', async () => {
     client = createTestClient();
-    const tokenProvider = () => Promise.reject();
-    client.connectUser(user, tokenProvider);
+    const tokenProvider = () => Promise.reject(new Error('This is a test error'));
+    void client.connectUser(user, tokenProvider);
 
     await expect(() =>
       client.queryUsers({ payload: { filter_conditions: {} } }),
@@ -98,7 +98,7 @@ describe('API requests and error handling', () => {
 
   it('should handle timeout', async () => {
     client = createTestClient({ timeout: 1 });
-    client.connectUser(user, createTestTokenGenerator(user));
+    void client.connectUser(user, createTestTokenGenerator(user));
 
     await expect(() => client.getApp()).rejects.toThrowError(
       'Stream error timeout of 1ms exceeded',

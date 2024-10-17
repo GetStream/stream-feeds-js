@@ -77,7 +77,7 @@ export class StableWSConnection {
   ws?: WebSocket;
   wsID: number;
   private readonly dispatcher = new EventDispatcher();
-  private clientId: string;
+  private readonly clientId: string;
 
   constructor(
     private readonly config: WSConfig,

@@ -90,7 +90,7 @@ export class ApiClient {
             !this.tokenManager.isStatic()
           ) {
             await this.tokenManager.loadToken();
-            return this.sendRequest(method, url, pathParams, queryParams, body);
+            return await this.sendRequest(method, url, pathParams, queryParams, body);
           }
           throw new StreamApiError(
             `Stream error code ${code}: ${message}`,
@@ -133,7 +133,7 @@ export class ApiClient {
     return typeof error.request !== 'undefined';
   }
 
-  private queryParamsStringify = (params: Record<string, any>) => {
+  private readonly queryParamsStringify = (params: Record<string, any>) => {
     const newParams = [];
     for (const k in params) {
       const param = params[k];
@@ -157,7 +157,7 @@ export class ApiClient {
     return newParams.join('&');
   };
 
-  private getRequestMetadata = (requestId: string, response: AxiosResponse) => {
+  private readonly getRequestMetadata = (requestId: string, response: AxiosResponse) => {
     const responseHeaders = response.headers as Record<string, string>;
     return {
       clientRequestId: requestId,

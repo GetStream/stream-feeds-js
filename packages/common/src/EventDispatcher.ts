@@ -17,7 +17,7 @@ export class EventDispatcher<
   dispatch = (event: Event) => {
     const listeners = [
       ...(this.subscribers[event.type as Type] ?? []),
-      ...(this.subscribers['all'] ?? []),
+      ...(this.subscribers.all ?? []),
     ];
     for (const fn of listeners) {
       try {
@@ -43,6 +43,7 @@ export class EventDispatcher<
 
   offAll = (eventName?: Type | 'all') => {
     if (eventName) {
+      this.subscribers[eventName] = [];
     } else {
       this.subscribers = {};
     }
