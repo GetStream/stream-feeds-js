@@ -1,5 +1,4 @@
-import { ApiClient } from '../../ApiClient';
-import { StreamResponse } from '../../types';
+import { ApiClient, StreamResponse } from '../../gen-imports';
 import {
   BlockUsersRequest,
   BlockUsersResponse,
