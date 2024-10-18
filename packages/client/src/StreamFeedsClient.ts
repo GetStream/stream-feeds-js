@@ -9,6 +9,7 @@ import {
 import { StreamFeedsEvent } from './types';
 
 export type StreamFeedsClientState = StreamClientState & {
+  // TODO remove this, this is just a test property to test the architecture
   color: string;
 };
 
