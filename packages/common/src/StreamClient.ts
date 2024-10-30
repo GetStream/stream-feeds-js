@@ -7,7 +7,7 @@ import { ModerationClient } from './ModerationClient';
 import { StableWSConnection } from './real-time/StableWSConnection';
 import { StateStore } from './StateStore';
 import { TokenManager } from './TokenManager';
-import { StreamClientOptions, StreamEvent } from './types';
+import { ProductApiInferface, StreamClientOptions, StreamEvent } from './types';
 import {
   addConnectionEventListeners,
   removeConnectionEventListeners,
@@ -17,7 +17,7 @@ export type StreamClientState = {
   connectedUser: OwnUser | undefined;
 };
 
-export class StreamClient extends CommonApi {
+export class StreamClient extends CommonApi implements ProductApiInferface {
   readonly state = new StateStore<StreamClientState>({
     connectedUser: undefined,
   });

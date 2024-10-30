@@ -5,3 +5,4 @@ export * from './src/StateStore';
 export * from './src/EventDispatcher';
 export * from './src/types';
 export * from './src/real-time/event-models';
+export * from './src/gen/common/CommonApiWrapper';

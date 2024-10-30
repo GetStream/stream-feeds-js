@@ -31,7 +31,7 @@ describe('StreamFeedsClient', () => {
   });
 
   it('should use REST API', async () => {
-    await client.common.queryUsers({ payload: { filter_conditions: {} } });
+    await client.queryUsers({ payload: { filter_conditions: {} } });
   });
 
   afterAll(async () => {

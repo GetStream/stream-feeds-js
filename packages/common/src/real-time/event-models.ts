@@ -293,44 +293,6 @@ export interface UserDeletedEvent {
 /**
  *
  * @export
- * @interface UserMutedEvent
- */
-export interface UserMutedEvent {
-  /**
-   *
-   * @type {string}
-   * @memberof UserMutedEvent
-   */
-  created_at: string;
-  /**
-   *
-   * @type {string}
-   * @memberof UserMutedEvent
-   */
-  target_user?: string;
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof UserMutedEvent
-   */
-  target_users?: string[];
-  /**
-   *
-   * @type {string}
-   * @memberof UserMutedEvent
-   */
-  type: string;
-  /**
-   *
-   * @type {UserObject}
-   * @memberof UserMutedEvent
-   */
-  user?: UserObject;
-}
-
-/**
- *
- * @export
  * @interface UserPresenceChangedEvent
  */
 export interface UserPresenceChangedEvent {
@@ -476,7 +438,6 @@ export type WSEvent =
   | ({ type: 'user.banned' } & UserBannedEvent)
   | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
   | ({ type: 'user.deleted' } & UserDeletedEvent)
-  | ({ type: 'user.muted' } & UserMutedEvent)
   | ({ type: 'user.presence.changed' } & UserPresenceChangedEvent)
   | ({ type: 'user.reactivated' } & UserReactivatedEvent)
   | ({ type: 'user.unbanned' } & UserUnbannedEvent)

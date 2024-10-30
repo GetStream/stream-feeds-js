@@ -1,5 +1,8 @@
 import {
+  CommonApiWrapper,
   EventDispatcher,
+  ModerationClient,
+  ProductApiInferface,
   StateStore,
   StreamClient,
   StreamClientOptions,
@@ -13,9 +16,12 @@ export type StreamFeedsClientState = StreamClientState & {
   color: string;
 };
 
-export class StreamFeedsClient {
+export class StreamFeedsClient
+  extends CommonApiWrapper
+  implements ProductApiInferface
+{
   readonly state: StateStore<StreamFeedsClientState>;
-  readonly common: StreamClient;
+  readonly moderation: ModerationClient;
   private readonly eventDispatcher: EventDispatcher<
     StreamFeedsEvent['type'],
     StreamFeedsEvent
@@ -27,33 +33,36 @@ export class StreamFeedsClient {
     apiKeyOrClient: StreamClient | string,
     options?: StreamClientOptions,
   ) {
+    let streamClient: StreamClient;
     if (typeof apiKeyOrClient === 'string') {
-      this.common = new StreamClient(apiKeyOrClient, options);
+      streamClient = new StreamClient(apiKeyOrClient, options);
     } else {
-      this.common = apiKeyOrClient;
+      streamClient = apiKeyOrClient;
     }
+    super(streamClient);
+    this.moderation = this.streamClient.moderation;
     this.state = new StateStore({
-      ...this.common.state.getLatestValue(),
+      ...this.streamClient.state.getLatestValue(),
       color: 'red',
     });
-    this.common.state.subscribe((state) => {
+    this.streamClient.state.subscribe((state) => {
       this.state.partialNext(state);
     });
-    this.common.on('all', (event) => this.eventDispatcher.dispatch(event));
+    this.streamClient.on('all', (event) =>
+      this.eventDispatcher.dispatch(event),
+    );
   }
 
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
 
-  // Proxy WS methods for ease of use
-  connectUser = (
+  connectUser(
     user: UserRequest,
     tokenProvider: string | (() => Promise<string>),
-  ) => {
-    return this.common.connectUser(user, tokenProvider);
-  };
-
-  disconnectUser = () => {
-    return this.common.disconnectUser();
-  };
+  ): Promise<void> {
+    return this.streamClient.connectUser(user, tokenProvider);
+  }
+  disconnectUser(): Promise<void> {
+    return this.streamClient.disconnectUser();
+  }
 }
