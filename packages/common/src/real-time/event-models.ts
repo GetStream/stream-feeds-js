@@ -1,4 +1,4 @@
-import { APIError, OwnUser, UserObject, UserResponse } from '../gen/models';
+import { APIError, OwnUser, User, UserResponse } from '../gen/models';
 
 /**
  * This event is sent when the WS connection fails
@@ -172,10 +172,10 @@ export interface UserBannedEvent {
   created_at: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserBannedEvent
    */
-  created_by: UserObject;
+  created_by: User;
   /**
    *
    * @type {string}
@@ -208,10 +208,10 @@ export interface UserBannedEvent {
   type: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserBannedEventß
    */
-  user?: UserObject;
+  user?: User;
 }
 
 /**
@@ -228,10 +228,10 @@ export interface UserDeactivatedEvent {
   created_at: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserDeactivatedEvent
    */
-  created_by: UserObject;
+  created_by: User;
   /**
    *
    * @type {string}
@@ -240,10 +240,10 @@ export interface UserDeactivatedEvent {
   type: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserDeactivatedEvent
    */
-  user?: UserObject;
+  user?: User;
 }
 
 /**
@@ -284,10 +284,10 @@ export interface UserDeletedEvent {
   type: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserDeletedEvent
    */
-  user?: UserObject;
+  user?: User;
 }
 
 /**
@@ -310,10 +310,10 @@ export interface UserPresenceChangedEvent {
   type: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserPresenceChangedEvent
    */
-  user?: UserObject;
+  user?: User;
 }
 
 /**
@@ -336,10 +336,10 @@ export interface UserReactivatedEvent {
   type: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserReactivatedEvent
    */
-  user?: UserObject;
+  user?: User;
 }
 
 /**
@@ -392,10 +392,10 @@ export interface UserUnbannedEvent {
   type: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserUnbannedEvent
    */
-  user?: UserObject;
+  user?: User;
 }
 
 /**
@@ -424,10 +424,10 @@ export interface UserUpdatedEvent {
   type: string;
   /**
    *
-   * @type {UserObject}
+   * @type {User}
    * @memberof UserUpdatedEvent
    */
-  user?: UserObject;
+  user?: User;
 }
 
 export type WSEvent =

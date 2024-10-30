@@ -1,5 +1,4 @@
 import {
-  CommonApiWrapper,
   EventDispatcher,
   ModerationClient,
   ProductApiInferface,
@@ -10,16 +9,14 @@ import {
   UserRequest,
 } from '@stream-io/common';
 import { StreamFeedsEvent } from './types';
+import { FeedsApi } from './gen/feeds/FeedsApi';
 
 export type StreamFeedsClientState = StreamClientState & {
   // TODO remove this, this is just a test property to test the architecture
   color: string;
 };
 
-export class StreamFeedsClient
-  extends CommonApiWrapper
-  implements ProductApiInferface
-{
+export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
   readonly state: StateStore<StreamFeedsClientState>;
   readonly moderation: ModerationClient;
   private readonly eventDispatcher: EventDispatcher<

@@ -61,9 +61,31 @@ export interface ActionLog {
 
   review_queue_item?: ReviewQueueItem;
 
-  target_user?: UserObject;
+  target_user?: User;
 
-  user?: UserObject;
+  user?: User;
+}
+
+export interface ActionLogResponse {
+  created_at: Date;
+
+  id: string;
+
+  reason: string;
+
+  target_user_id: string;
+
+  type: string;
+
+  user_id: string;
+
+  custom: Record<string, any>;
+
+  review_queue_item?: ReviewQueueItem;
+
+  target_user?: UserResponse;
+
+  user?: UserResponse;
 }
 
 export interface AppResponseFields {
@@ -173,9 +195,21 @@ export interface Ban {
 
   channel?: Channel;
 
-  created_by?: UserObject;
+  created_by?: User;
 
-  target?: UserObject;
+  target?: User;
+}
+
+export interface BanActionRequest {
+  channel_ban_only?: boolean;
+
+  ip_ban?: boolean;
+
+  reason?: string;
+
+  shadow?: boolean;
+
+  timeout?: number;
 }
 
 export interface BanRequest {
@@ -305,11 +339,11 @@ export interface Channel {
 
   config?: ChannelConfig;
 
-  config_overrides?: ChannelConfig;
+  config_overrides?: ConfigOverrides;
 
-  created_by?: UserObject;
+  created_by?: User;
 
-  truncated_by?: UserObject;
+  truncated_by?: User;
 }
 
 export interface ChannelConfig {
@@ -347,6 +381,8 @@ export interface ChannelConfig {
 
   search: boolean;
 
+  skip_last_msg_update_for_system_msgs: boolean;
+
   typing_events: boolean;
 
   updated_at: Date;
@@ -363,7 +399,7 @@ export interface ChannelConfig {
 
   partition_size?: number;
 
-  partition_ttl?: string;
+  partition_ttl?: number;
 
   allowed_flag_reasons?: string[];
 
@@ -425,6 +461,8 @@ export interface ChannelConfigWithInfo {
 
   partition_ttl?: string;
 
+  skip_last_msg_update_for_system_msgs?: boolean;
+
   allowed_flag_reasons?: string[];
 
   blocklists?: BlockListOptions[];
@@ -461,11 +499,13 @@ export interface ChannelMember {
 
   is_moderator?: boolean;
 
+  role?: 'member' | 'moderator' | 'admin' | 'owner';
+
   status?: string;
 
   user_id?: string;
 
-  user?: UserObject;
+  user?: UserResponse;
 }
 
 export interface ChannelMute {
@@ -477,8 +517,51 @@ export interface ChannelMute {
 
   channel?: ChannelResponse;
 
-  user?: UserObject;
+  user?: UserResponse;
 }
+
+export const ChannelOwnCapability = {
+  BAN_CHANNEL_MEMBERS: 'ban-channel-members',
+  CAST_POLL_VOTE: 'cast-poll-vote',
+  CONNECT_EVENTS: 'connect-events',
+  CREATE_ATTACHMENT: 'create-attachment',
+  CREATE_CALL: 'create-call',
+  DELETE_ANY_MESSAGE: 'delete-any-message',
+  DELETE_CHANNEL: 'delete-channel',
+  DELETE_OWN_MESSAGE: 'delete-own-message',
+  FLAG_MESSAGE: 'flag-message',
+  FREEZE_CHANNEL: 'freeze-channel',
+  JOIN_CALL: 'join-call',
+  JOIN_CHANNEL: 'join-channel',
+  LEAVE_CHANNEL: 'leave-channel',
+  MUTE_CHANNEL: 'mute-channel',
+  PIN_MESSAGE: 'pin-message',
+  QUERY_POLL_VOTES: 'query-poll-votes',
+  QUOTE_MESSAGE: 'quote-message',
+  READ_EVENTS: 'read-events',
+  SEARCH_MESSAGES: 'search-messages',
+  SEND_CUSTOM_EVENTS: 'send-custom-events',
+  SEND_LINKS: 'send-links',
+  SEND_MESSAGE: 'send-message',
+  SEND_POLL: 'send-poll',
+  SEND_REACTION: 'send-reaction',
+  SEND_REPLY: 'send-reply',
+  SEND_TYPING_EVENTS: 'send-typing-events',
+  SET_CHANNEL_COOLDOWN: 'set-channel-cooldown',
+  SKIP_SLOW_MODE: 'skip-slow-mode',
+  SLOW_MODE: 'slow-mode',
+  TYPING_EVENTS: 'typing-events',
+  UPDATE_ANY_MESSAGE: 'update-any-message',
+  UPDATE_CHANNEL: 'update-channel',
+  UPDATE_CHANNEL_MEMBERS: 'update-channel-members',
+  UPDATE_OWN_MESSAGE: 'update-own-message',
+  UPDATE_THREAD: 'update-thread',
+  UPLOAD_FILE: 'upload-file',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type ChannelOwnCapability =
+  (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
 
 export interface ChannelResponse {
   cid: string;
@@ -525,13 +608,13 @@ export interface ChannelResponse {
 
   members?: ChannelMember[];
 
-  own_capabilities?: string[];
+  own_capabilities?: ChannelOwnCapability[];
 
   config?: ChannelConfigWithInfo;
 
-  created_by?: UserObject;
+  created_by?: UserResponse;
 
-  truncated_by?: UserObject;
+  truncated_by?: UserResponse;
 }
 
 export interface Command {
@@ -548,6 +631,56 @@ export interface Command {
   updated_at?: Date;
 }
 
+export interface ConfigOverrides {
+  commands: string[];
+
+  grants: Record<string, string[]>;
+
+  blocklist?: string;
+
+  blocklist_behavior?: 'flag' | 'block';
+
+  max_message_length?: number;
+
+  quotes?: boolean;
+
+  reactions?: boolean;
+
+  replies?: boolean;
+
+  typing_events?: boolean;
+
+  uploads?: boolean;
+
+  url_enrichment?: boolean;
+}
+
+export interface ConfigResponse {
+  async: boolean;
+
+  created_at: Date;
+
+  key: string;
+
+  updated_at: Date;
+
+  automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
+
+  automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
+
+  automod_toxicity_config?: AutomodToxicityConfig;
+
+  aws_rek_og_nition_config?: AWSRekognitionConfig;
+
+  block_list_config?: BlockListConfig;
+
+  bodyguard_config?: BodyguardConfig;
+
+  go_og_le_vision_config?: GoogleVisionConfig;
+
+  velocity_filter_config?: VelocityFilterConfig;
+}
+
 export interface ConnectUserDetailsRequest {
   id: string;
 
@@ -561,7 +694,7 @@ export interface ConnectUserDetailsRequest {
 
   custom?: Record<string, any>;
 
-  privacy_settings?: PrivacySettings;
+  privacy_settings?: PrivacySettingsResponse;
 
   push_notifications?: PushNotificationSettingsInput;
 }
@@ -588,8 +721,36 @@ export interface CreateGuestResponse {
   user: UserResponse;
 }
 
+export interface CustomActionRequest {
+  id?: string;
+
+  options?: Record<string, any>;
+}
+
 export interface Data {
   id: string;
+}
+
+export interface DeleteActivityRequest {
+  hard_delete?: boolean;
+}
+
+export interface DeleteMessageRequest {
+  hard_delete?: boolean;
+}
+
+export interface DeleteReactionRequest {
+  hard_delete?: boolean;
+}
+
+export interface DeleteUserRequest {
+  delete_conversation_channels?: boolean;
+
+  delete_feeds_content?: boolean;
+
+  hard_delete?: boolean;
+
+  mark_messages_deleted?: boolean;
 }
 
 export interface Device {
@@ -597,7 +758,7 @@ export interface Device {
 
   id: string;
 
-  push_provider: string;
+  push_provider: 'firebase' | 'apn' | 'huawei' | 'xiaomi';
 
   user_id: string;
 
@@ -664,6 +825,86 @@ export interface EnrichedReaction {
   user?: Data;
 }
 
+export interface EntityCreator {
+  ban_count: number;
+
+  banned: boolean;
+
+  deleted_content_count: number;
+
+  id: string;
+
+  online: boolean;
+
+  role: string;
+
+  custom: Record<string, any>;
+
+  ban_expires?: Date;
+
+  created_at?: Date;
+
+  deactivated_at?: Date;
+
+  deleted_at?: Date;
+
+  invisible?: boolean;
+
+  language?: string;
+
+  last_active?: Date;
+
+  last_engaged_at?: Date;
+
+  revoke_tokens_issued_before?: Date;
+
+  updated_at?: Date;
+
+  teams?: string[];
+
+  privacy_settings?: PrivacySettings;
+
+  push_notifications?: PushNotificationSettings;
+}
+
+export interface EntityCreatorResponse {
+  ban_count: number;
+
+  banned: boolean;
+
+  created_at: Date;
+
+  deleted_content_count: number;
+
+  id: string;
+
+  language: string;
+
+  online: boolean;
+
+  role: string;
+
+  updated_at: Date;
+
+  blocked_user_ids: string[];
+
+  teams: string[];
+
+  custom: Record<string, any>;
+
+  deactivated_at?: Date;
+
+  deleted_at?: Date;
+
+  image?: string;
+
+  last_active?: Date;
+
+  name?: string;
+
+  revoke_tokens_issued_before?: Date;
+}
+
 export interface Field {
   short: boolean;
 
@@ -711,7 +952,37 @@ export interface Flag2 {
 
   moderation_payload?: ModerationPayload;
 
-  user?: UserObject;
+  user?: User;
+}
+
+export interface Flag2Response {
+  created_at: Date;
+
+  entity_id: string;
+
+  entity_type: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  result: Array<Record<string, any>>;
+
+  entity_creator_id?: string;
+
+  reason?: string;
+
+  review_queue_item_id?: string;
+
+  type?: string;
+
+  labels?: string[];
+
+  custom?: Record<string, any>;
+
+  moderation_payload?: ModerationPayload;
+
+  user?: UserResponse;
 }
 
 export interface FlagRequest {
@@ -765,7 +1036,7 @@ export interface FullUserResponse {
 
   channel_mutes: ChannelMute[];
 
-  devices: Device[];
+  devices: ResponseForDevice[];
 
   mutes: UserMuteResponse[];
 
@@ -893,7 +1164,13 @@ export interface LabelThresholds {
 export interface ListDevicesResponse {
   duration: string;
 
-  devices: Device[];
+  devices: ResponseForDevice[];
+}
+
+export interface MarkReviewedRequest {
+  content_to_mark_as_reviewed_limit?: number;
+
+  disable_marking_content_as_reviewed?: boolean;
 }
 
 export interface Message {
@@ -917,7 +1194,7 @@ export interface Message {
 
   text: string;
 
-  type: 'regular' | 'ephemeral' | 'error' | 'reply' | 'system' | 'deleted';
+  type: string;
 
   updated_at: Date;
 
@@ -925,7 +1202,7 @@ export interface Message {
 
   latest_reactions: Reaction[];
 
-  mentioned_users: UserObject[];
+  mentioned_users: User[];
 
   own_reactions: Reaction[];
 
@@ -959,19 +1236,19 @@ export interface Message {
 
   show_in_channel?: boolean;
 
-  thread_participants?: UserObject[];
+  thread_participants?: User[];
 
   i18n?: Record<string, string>;
 
   image_labels?: Record<string, string[]>;
 
-  pinned_by?: UserObject;
+  pinned_by?: User;
 
   poll?: Poll;
 
   quoted_message?: Message;
 
-  user?: UserObject;
+  user?: User;
 }
 
 export interface MessageResponse {
@@ -995,7 +1272,7 @@ export interface MessageResponse {
 
   text: string;
 
-  type: string;
+  type: 'regular' | 'ephemeral' | 'error' | 'reply' | 'system' | 'deleted';
 
   updated_at: Date;
 
@@ -1043,7 +1320,7 @@ export interface MessageResponse {
 
   pinned_by?: UserResponse;
 
-  poll?: Poll;
+  poll?: PollResponseData;
 
   quoted_message?: MessageResponse;
 
@@ -1064,32 +1341,6 @@ export interface ModerationActionConfig {
   custom: Record<string, any>;
 }
 
-export interface ModerationConfig {
-  async: boolean;
-
-  created_at: Date;
-
-  key: string;
-
-  updated_at: Date;
-
-  automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
-
-  automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
-
-  automod_toxicity_config?: AutomodToxicityConfig;
-
-  aws_rek_og_nition_config?: AWSRekognitionConfig;
-
-  block_list_config?: BlockListConfig;
-
-  bodyguard_config?: BodyguardConfig;
-
-  go_og_le_vision_config?: GoogleVisionConfig;
-
-  velocity_filter_config?: VelocityFilterConfig;
-}
-
 export interface ModerationEvent {
   created_at: Date;
 
@@ -1097,79 +1348,11 @@ export interface ModerationEvent {
 
   received_at?: Date;
 
-  flags?: ModerationEventFlag[];
+  flags?: Flag2Response[];
 
-  action?: ModerationEventActionLog;
+  action?: ActionLogResponse;
 
-  review_queue_item?: ModerationEventReviewQueueItem;
-}
-
-export interface ModerationEventActionLog {
-  created_at: Date;
-
-  id: string;
-
-  reason: string;
-
-  target_user_id: string;
-
-  type: string;
-
-  user_id: string;
-
-  custom: Record<string, any>;
-}
-
-export interface ModerationEventFlag {
-  created_at: Date;
-
-  updated_at: Date;
-
-  user_id: string;
-
-  result: Array<Record<string, any>>;
-
-  reason?: string;
-
-  type?: string;
-
-  labels?: string[];
-
-  custom?: Record<string, any>;
-}
-
-export interface ModerationEventReviewQueueItem {
-  created_at: Date;
-
-  entity_id: string;
-
-  entity_type: string;
-
-  id: string;
-
-  recommended_action: string;
-
-  reviewed_by: string;
-
-  severity: number;
-
-  status: string;
-
-  updated_at: Date;
-
-  languages: string[];
-
-  completed_at: NullTime;
-
-  reviewed_at: NullTime;
-
-  assigned_to?: UserResponse;
-
-  entity_creator?: UserResponse;
-
-  message?: MessageResponse;
-
-  moderation_payload?: ModerationPayload;
+  review_queue_item?: ReviewQueueItemResponse;
 }
 
 export interface ModerationPayload {
@@ -1249,6 +1432,8 @@ export interface OwnUser {
 
   last_active?: Date;
 
+  last_engaged_at?: Date;
+
   blocked_user_ids?: string[];
 
   latest_hidden_channels?: string[];
@@ -1301,7 +1486,7 @@ export interface Poll {
 
   voting_visibility?: string;
 
-  created_by?: UserObject;
+  created_by?: User;
 }
 
 export interface PollOption {
@@ -1310,6 +1495,58 @@ export interface PollOption {
   text: string;
 
   custom: Record<string, any>;
+}
+
+export interface PollOptionResponseData {
+  id: string;
+
+  text: string;
+
+  custom: Record<string, any>;
+}
+
+export interface PollResponseData {
+  allow_answers: boolean;
+
+  allow_user_suggested_options: boolean;
+
+  answers_count: number;
+
+  created_at: Date;
+
+  created_by_id: string;
+
+  description: string;
+
+  enforce_unique_vote: boolean;
+
+  id: string;
+
+  name: string;
+
+  updated_at: Date;
+
+  vote_count: number;
+
+  voting_visibility: string;
+
+  latest_answers: PollVoteResponseData[];
+
+  options: PollOptionResponseData[];
+
+  own_votes: PollVoteResponseData[];
+
+  custom: Record<string, any>;
+
+  latest_votes_by_option: Record<string, Array<PollVoteResponseData | null>>;
+
+  vote_counts_by_option: Record<string, number>;
+
+  is_closed?: boolean;
+
+  max_votes_allowed?: number;
+
+  created_by?: UserResponse;
 }
 
 export interface PollVote {
@@ -1329,7 +1566,27 @@ export interface PollVote {
 
   user_id?: string;
 
-  user?: UserObject;
+  user?: User;
+}
+
+export interface PollVoteResponseData {
+  created_at: Date;
+
+  id: string;
+
+  option_id: string;
+
+  poll_id: string;
+
+  updated_at: Date;
+
+  answer_text?: string;
+
+  is_answer?: boolean;
+
+  user_id?: string;
+
+  user?: UserResponse;
 }
 
 export interface PrivacySettings {
@@ -1377,7 +1634,7 @@ export interface QueryModerationConfigsRequest {
 export interface QueryModerationConfigsResponse {
   duration: string;
 
-  configs: ModerationConfig[];
+  configs: ConfigResponse[];
 
   next?: string;
 
@@ -1405,7 +1662,7 @@ export interface QueryReviewQueueRequest {
 export interface QueryReviewQueueResponse {
   duration: string;
 
-  items: ReviewQueueItem[];
+  items: ReviewQueueItemResponse[];
 
   action_config: Record<string, Array<ModerationActionConfig | null>>;
 
@@ -1451,7 +1708,7 @@ export interface Reaction {
 
   user_id?: string;
 
-  user?: UserObject;
+  user?: User;
 }
 
 export interface ReactionGroupResponse {
@@ -1494,6 +1751,26 @@ export interface Response {
   duration: string;
 }
 
+export interface ResponseForDevice {
+  created_at: Date;
+
+  id: string;
+
+  push_provider: string;
+
+  user_id: string;
+
+  disabled?: boolean;
+
+  disabled_reason?: string;
+
+  push_provider_name?: string;
+
+  voip?: boolean;
+}
+
+export interface RestoreActionRequest {}
+
 export interface ReviewQueueItem {
   content_changed: boolean;
 
@@ -1535,9 +1812,9 @@ export interface ReviewQueueItem {
 
   reviewed_at: NullTime;
 
-  assigned_to?: UserObject;
+  assigned_to?: User;
 
-  entity_creator?: UserObject;
+  entity_creator?: EntityCreator;
 
   feeds_v2_activity?: EnrichedActivity;
 
@@ -1548,10 +1825,94 @@ export interface ReviewQueueItem {
   moderation_payload?: ModerationPayload;
 }
 
+export interface ReviewQueueItemResponse {
+  created_at: Date;
+
+  entity_id: string;
+
+  entity_type: string;
+
+  id: string;
+
+  recommended_action: string;
+
+  reviewed_by: string;
+
+  severity: number;
+
+  status: string;
+
+  updated_at: Date;
+
+  actions: ActionLogResponse[];
+
+  bans: Ban[];
+
+  flags: Flag2Response[];
+
+  languages: string[];
+
+  completed_at?: Date;
+
+  entity_creator_id?: string;
+
+  reviewed_at?: Date;
+
+  assigned_to?: UserResponse;
+
+  entity_creator?: EntityCreatorResponse;
+
+  feeds_v2_activity?: EnrichedActivity;
+
+  feeds_v2_reaction?: Reaction;
+
+  message?: MessageResponse;
+
+  moderation_payload?: ModerationPayload;
+}
+
 export interface SortParamRequest {
   direction?: number;
 
   field?: string;
+}
+
+export interface SubmitActionRequest {
+  action_type:
+    | 'mark_reviewed'
+    | 'delete_message'
+    | 'delete_activity'
+    | 'delete_reaction'
+    | 'ban'
+    | 'custom'
+    | 'unban'
+    | 'restore'
+    | 'delete_user'
+    | 'unblock';
+
+  item_id: string;
+
+  ban?: BanActionRequest;
+
+  custom?: CustomActionRequest;
+
+  delete_activity?: DeleteActivityRequest;
+
+  delete_message?: DeleteMessageRequest;
+
+  delete_reaction?: DeleteReactionRequest;
+
+  delete_user?: DeleteUserRequest;
+
+  mark_reviewed?: MarkReviewedRequest;
+
+  unban?: UnbanActionRequest;
+}
+
+export interface SubmitActionResponse {
+  duration: string;
+
+  item?: ReviewQueueItem;
 }
 
 export interface Thresholds {
@@ -1571,6 +1932,10 @@ export interface TypingIndicators {
 export interface TypingIndicatorsResponse {
   enabled: boolean;
 }
+
+export interface UnbanActionRequest {}
+
+export interface UnblockActionRequest {}
 
 export interface UnblockUsersRequest {
   blocked_user_id: string;
@@ -1604,31 +1969,7 @@ export interface UpdateUsersResponse {
   users: Record<string, FullUserResponse>;
 }
 
-export interface UserMute {
-  created_at: Date;
-
-  updated_at: Date;
-
-  expires?: Date;
-
-  target?: UserObject;
-
-  user?: UserObject;
-}
-
-export interface UserMuteResponse {
-  created_at: Date;
-
-  updated_at: Date;
-
-  expires?: Date;
-
-  target?: UserResponse;
-
-  user?: UserResponse;
-}
-
-export interface UserObject {
+export interface User {
   banned: boolean;
 
   id: string;
@@ -1653,6 +1994,8 @@ export interface UserObject {
 
   last_active?: Date;
 
+  last_engaged_at?: Date;
+
   revoke_tokens_issued_before?: Date;
 
   updated_at?: Date;
@@ -1662,6 +2005,30 @@ export interface UserObject {
   privacy_settings?: PrivacySettings;
 
   push_notifications?: PushNotificationSettings;
+}
+
+export interface UserMute {
+  created_at: Date;
+
+  updated_at: Date;
+
+  expires?: Date;
+
+  target?: User;
+
+  user?: User;
+}
+
+export interface UserMuteResponse {
+  created_at: Date;
+
+  updated_at: Date;
+
+  expires?: Date;
+
+  target?: UserResponse;
+
+  user?: UserResponse;
 }
 
 export interface UserRequest {
@@ -1677,7 +2044,7 @@ export interface UserRequest {
 
   custom?: Record<string, any>;
 
-  privacy_settings?: PrivacySettings;
+  privacy_settings?: PrivacySettingsResponse;
 
   push_notifications?: PushNotificationSettingsInput;
 }
@@ -1721,21 +2088,35 @@ export interface VelocityFilterConfig {
 
   enabled: boolean;
 
+  first_message_only: boolean;
+
   rules: VelocityFilterConfigRule[];
 }
 
 export interface VelocityFilterConfigRule {
   action: 'flag' | 'shadow' | 'remove' | 'ban';
 
+  ban_duration: number;
+
   cascading_action: 'flag' | 'shadow' | 'remove' | 'ban';
 
   cascading_threshold: number;
+
+  check_message_context: boolean;
+
+  fast_spam_threshold: number;
+
+  fast_spam_ttl: number;
 
   ip_ban: boolean;
 
   shadow_ban: boolean;
 
-  timeout?: Date;
+  slow_spam_ban_duration: number;
+
+  slow_spam_threshold: number;
+
+  slow_spam_ttl: number;
 }
 
 export interface WSAuthMessage {

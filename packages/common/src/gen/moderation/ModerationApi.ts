@@ -10,6 +10,8 @@ import {
   QueryModerationConfigsResponse,
   QueryReviewQueueRequest,
   QueryReviewQueueResponse,
+  SubmitActionRequest,
+  SubmitActionResponse,
 } from '../models';
 import { decoders } from '../model-decoders';
 
@@ -114,6 +116,31 @@ export class ModerationApi {
     >('POST', '/api/v2/moderation/review_queue', undefined, undefined, body);
 
     decoders.QueryReviewQueueResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  submitAction = async (
+    request: SubmitActionRequest,
+  ): Promise<StreamResponse<SubmitActionResponse>> => {
+    const body = {
+      action_type: request?.action_type,
+      item_id: request?.item_id,
+      ban: request?.ban,
+      custom: request?.custom,
+      delete_activity: request?.delete_activity,
+      delete_message: request?.delete_message,
+      delete_reaction: request?.delete_reaction,
+      delete_user: request?.delete_user,
+      mark_reviewed: request?.mark_reviewed,
+      unban: request?.unban,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<SubmitActionResponse>
+    >('POST', '/api/v2/moderation/submit_action', undefined, undefined, body);
+
+    decoders.SubmitActionResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };
