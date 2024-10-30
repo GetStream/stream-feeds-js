@@ -7,7 +7,7 @@ function isPatch<T>(value: T | Patch<T>): value is Patch<T> {
 }
 
 export class StateStore<T extends Record<string, unknown>> {
-  private readonly handlerSet = new Set<Handler<T>>();
+  private handlerSet = new Set<Handler<T>>();
 
   constructor(private value: T) {}
 
@@ -39,7 +39,7 @@ export class StateStore<T extends Record<string, unknown>> {
     };
   };
 
-  public subscribeWithSelector = <O extends readonly unknown[]>(
+  public subscribeWithSelector = <O extends Readonly<Record<string, unknown>>>(
     selector: (nextValue: T) => O,
     handler: Handler<O>,
   ) => {
@@ -48,10 +48,14 @@ export class StateStore<T extends Record<string, unknown>> {
 
     const wrappedHandler: Handler<T> = (nextValue) => {
       const newlySelectedValues = selector(nextValue);
-      const hasUpdatedValues =
-        selectedValues?.some(
-          (value, index) => value !== newlySelectedValues[index],
-        ) ?? true;
+
+      let hasUpdatedValues = !selectedValues;
+
+      for (const key in selectedValues) {
+        if (selectedValues[key] === newlySelectedValues[key]) continue;
+        hasUpdatedValues = true;
+        break;
+      }
 
       if (!hasUpdatedValues) return;
 
