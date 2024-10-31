@@ -6,10 +6,13 @@ import {
   StreamClient,
   StreamClientOptions,
   StreamClientState,
+  StreamResponse,
+  UpdateUsersResponse,
   UserRequest,
 } from '@stream-io/common';
 import { StreamFeedsEvent } from './types';
 import { FeedsApi } from './gen/feeds/FeedsApi';
+import { StreamFeed } from './StreamFeed';
 
 export type StreamFeedsClientState = StreamClientState & {
   // TODO remove this, this is just a test property to test the architecture
@@ -53,13 +56,22 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
 
-  connectUser(
+  feed = (group: string, id: string) => {
+    return new StreamFeed(this, group, id);
+  };
+
+  connectUser = (
     user: UserRequest,
     tokenProvider: string | (() => Promise<string>),
-  ): Promise<void> {
+  ) => {
     return this.streamClient.connectUser(user, tokenProvider);
-  }
+  };
+
   disconnectUser(): Promise<void> {
     return this.streamClient.disconnectUser();
   }
+
+  upsertUsers = (users: UserRequest[]) => {
+    return this.streamClient.upsertUsers(users);
+  };
 }

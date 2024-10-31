@@ -103,3 +103,11 @@ export function removeConnectionEventListeners(cb: (e: Event) => void) {
     window.removeEventListener('online', cb);
   }
 }
+
+export const streamDevToken = (userId: string) => {
+  return [
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9', //{"alg": "HS256", "typ": "JWT"}
+    window.btoa(JSON.stringify({ user_id: userId })),
+    'devtoken', // hardcoded signature
+  ].join('.');
+};

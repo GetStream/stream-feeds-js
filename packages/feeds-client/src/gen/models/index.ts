@@ -82,27 +82,16 @@ export interface AddFeedMembersResponse {
   duration: string;
 }
 
-export interface CreateFeedRequest {
-  group: string;
-
-  id: string;
-
-  visibility_level:
-    | 'public'
-    | 'visible'
-    | 'followers'
-    | 'private'
-    | 'restricted';
-
-  members?: string[];
-
-  custom?: Record<string, any>;
+export interface DeleteFeedResponse {
+  duration: string;
 }
 
-export interface CreateFeedResponse {
+export interface Feed {
   created_at: Date;
 
-  duration: string;
+  follower_count: number;
+
+  following_count: number;
 
   group: string;
 
@@ -119,10 +108,6 @@ export interface CreateFeedResponse {
   created_by: UserResponse;
 
   custom?: Record<string, any>;
-}
-
-export interface DeleteFeedResponse {
-  duration: string;
 }
 
 export interface FeedMember {
@@ -157,48 +142,43 @@ export interface FeedMember {
   custom?: Record<string, any>;
 }
 
-export interface GenericFeedResponse {
-  created_at: Date;
+export interface FollowRequest {
+  target_group: string;
+
+  target_id: string;
+
+  activity_copy_limit?: number;
+}
+
+export interface FollowResponse {
+  created: boolean;
 
   duration: string;
+}
 
-  group: string;
+export interface GetFeedResponse {
+  duration: string;
 
-  id: string;
+  feed: Feed;
+}
 
-  type: string;
+export interface GetOrCreateFeedRequest {
+  visibility_level:
+    | 'public'
+    | 'visible'
+    | 'followers'
+    | 'private'
+    | 'restricted';
 
-  updated_at: Date;
-
-  visibility_level: string;
-
-  members: FeedMember[];
-
-  created_by: UserResponse;
+  members?: string[];
 
   custom?: Record<string, any>;
 }
 
-export interface GetFeedResponse {
-  created_at: Date;
-
+export interface GetOrCreateFeedResponse {
   duration: string;
 
-  group: string;
-
-  id: string;
-
-  type: string;
-
-  updated_at: Date;
-
-  visibility_level: string;
-
-  members: FeedMember[];
-
-  created_by: UserResponse;
-
-  custom?: Record<string, any>;
+  feed: Feed;
 }
 
 export interface QueryActivitiesRequest {
@@ -238,7 +218,7 @@ export interface QueryFeedsRequest {
 export interface QueryFeedsResponse {
   duration: string;
 
-  feeds: GenericFeedResponse[];
+  feeds: Feed[];
 
   next?: string;
 
@@ -263,6 +243,12 @@ export interface SortParamRequest {
   direction?: number;
 
   field?: string;
+}
+
+export interface UnfollowResponse {
+  duration: string;
+
+  unfollowed: boolean;
 }
 
 export interface UserResponse {

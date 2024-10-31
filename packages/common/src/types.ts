@@ -1,5 +1,5 @@
 import { CommonApiInterface } from './gen/common/CommonApiInterface';
-import { UserRequest } from './gen/models';
+import { UpdateUsersResponse, UserRequest } from './gen/models';
 import { ModerationClient } from './ModerationClient';
 import { StreamWSEvent } from './real-time/event-models';
 
@@ -52,4 +52,7 @@ export interface ProductApiInferface extends CommonApiInterface {
     tokenProvider: string | (() => Promise<string>),
   ): Promise<void>;
   disconnectUser(): Promise<void>;
+  upsertUsers: (
+    users: UserRequest[],
+  ) => Promise<StreamResponse<UpdateUsersResponse>>;
 }

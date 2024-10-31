@@ -2,12 +2,17 @@ import { ApiClient } from './ApiClient';
 import { ConnectionIdManager } from './ConnectionIdManager';
 import { EventDispatcher } from './EventDispatcher';
 import { CommonApi } from './gen/common/CommonApi';
-import { OwnUser, UserRequest } from './gen/models';
+import { OwnUser, UpdateUsersResponse, UserRequest } from './gen/models';
 import { ModerationClient } from './ModerationClient';
 import { StableWSConnection } from './real-time/StableWSConnection';
 import { StateStore } from './StateStore';
 import { TokenManager } from './TokenManager';
-import { ProductApiInferface, StreamClientOptions, StreamEvent } from './types';
+import {
+  ProductApiInferface,
+  StreamClientOptions,
+  StreamEvent,
+  StreamResponse,
+} from './types';
 import {
   addConnectionEventListeners,
   removeConnectionEventListeners,
@@ -48,6 +53,15 @@ export class StreamClient extends CommonApi implements ProductApiInferface {
     this.connectionIdManager = connectionIdManager;
     this.moderation = new ModerationClient(this.apiClient);
   }
+  upsertUsers = (users: UserRequest[]) => {
+    const payload: Record<string, UserRequest> = {};
+
+    users.forEach((u) => {
+      payload[u.id] = u;
+    });
+
+    return this.updateUsers({ users: payload });
+  };
 
   connectUser = async (
     user: UserRequest,

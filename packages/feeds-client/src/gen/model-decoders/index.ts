@@ -54,7 +54,7 @@ decoders.AddActivityResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.CreateFeedResponse = (input?: Record<string, any>) => {
+decoders.Feed = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
@@ -84,28 +84,16 @@ decoders.FeedMember = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.GenericFeedResponse = (input?: Record<string, any>) => {
+decoders.GetFeedResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    members: { type: 'FeedMember', isSingle: false },
-
-    created_by: { type: 'UserResponse', isSingle: true },
+    feed: { type: 'Feed', isSingle: true },
   };
   return decode(typeMappings, input);
 };
 
-decoders.GetFeedResponse = (input?: Record<string, any>) => {
+decoders.GetOrCreateFeedResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    members: { type: 'FeedMember', isSingle: false },
-
-    created_by: { type: 'UserResponse', isSingle: true },
+    feed: { type: 'Feed', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -119,7 +107,7 @@ decoders.QueryActivitiesResponse = (input?: Record<string, any>) => {
 
 decoders.QueryFeedsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
-    feeds: { type: 'GenericFeedResponse', isSingle: false },
+    feeds: { type: 'Feed', isSingle: false },
   };
   return decode(typeMappings, input);
 };

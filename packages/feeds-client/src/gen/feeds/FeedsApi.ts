@@ -9,10 +9,12 @@ import {
   AddActivityResponse,
   AddFeedMembersRequest,
   AddFeedMembersResponse,
-  CreateFeedRequest,
-  CreateFeedResponse,
   DeleteFeedResponse,
+  FollowRequest,
+  FollowResponse,
   GetFeedResponse,
+  GetOrCreateFeedRequest,
+  GetOrCreateFeedResponse,
   QueryActivitiesRequest,
   QueryActivitiesResponse,
   QueryFeedsRequest,
@@ -20,6 +22,7 @@ import {
   ReadFlatFeedResponse,
   RemoveActivityFromFeedResponse,
   RemoveFeedMembersResponse,
+  UnfollowResponse,
 } from '../models';
 import { decoders } from '../model-decoders';
 
@@ -47,26 +50,6 @@ export class FeedsApi extends CommonApiWrapper {
     >('POST', '/api/v2/feeds/activities/query', undefined, undefined, body);
 
     decoders.QueryActivitiesResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  };
-
-  createFeed = async (
-    request: CreateFeedRequest,
-  ): Promise<StreamResponse<CreateFeedResponse>> => {
-    const body = {
-      group: request?.group,
-      id: request?.id,
-      visibility_level: request?.visibility_level,
-      members: request?.members,
-      custom: request?.custom,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<CreateFeedResponse>
-    >('POST', '/api/v2/feeds/feeds', undefined, undefined, body);
-
-    decoders.CreateFeedResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };
@@ -127,6 +110,28 @@ export class FeedsApi extends CommonApiWrapper {
     return { ...response.body, metadata: response.metadata };
   };
 
+  getOrCreateFeed = async (
+    request: GetOrCreateFeedRequest & { group: string; id: string },
+  ): Promise<StreamResponse<GetOrCreateFeedResponse>> => {
+    const pathParams = {
+      group: request?.group,
+      id: request?.id,
+    };
+    const body = {
+      visibility_level: request?.visibility_level,
+      members: request?.members,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetOrCreateFeedResponse>
+    >('POST', '/api/v2/feeds/feeds/{group}/{id}', pathParams, undefined, body);
+
+    decoders.GetOrCreateFeedResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
   addActivity = async (
     request: AddActivityRequest & { group: string; id: string },
   ): Promise<StreamResponse<AddActivityResponse>> => {
@@ -144,7 +149,13 @@ export class FeedsApi extends CommonApiWrapper {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<AddActivityResponse>
-    >('POST', '/api/v2/feeds/feeds/{group}/{id}', pathParams, undefined, body);
+    >(
+      'POST',
+      '/api/v2/feeds/feeds/{group}/{id}/add_activity',
+      pathParams,
+      undefined,
+      body,
+    );
 
     decoders.AddActivityResponse?.(response.body);
 
@@ -171,6 +182,57 @@ export class FeedsApi extends CommonApiWrapper {
     >('GET', '/api/v2/feeds/feeds/{group}/{id}/flat', pathParams, queryParams);
 
     decoders.ReadFlatFeedResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  unfollow = async (request: {
+    group: string;
+    id: string;
+  }): Promise<StreamResponse<UnfollowResponse>> => {
+    const pathParams = {
+      group: request?.group,
+      id: request?.id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UnfollowResponse>
+    >(
+      'DELETE',
+      '/api/v2/feeds/feeds/{group}/{id}/follow',
+      pathParams,
+      undefined,
+    );
+
+    decoders.UnfollowResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  follow = async (
+    request: FollowRequest & { group: string; id: string },
+  ): Promise<StreamResponse<FollowResponse>> => {
+    const pathParams = {
+      group: request?.group,
+      id: request?.id,
+    };
+    const body = {
+      target_group: request?.target_group,
+      target_id: request?.target_id,
+      activity_copy_limit: request?.activity_copy_limit,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<FollowResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/feeds/{group}/{id}/follow',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.FollowResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };

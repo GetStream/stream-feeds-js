@@ -3,15 +3,16 @@ import { StreamClient } from '../src/StreamClient';
 import {
   createTestClient,
   createTestTokenGenerator,
-} from './create-test-client';
+  getTestUser,
+} from './utils';
 import { UserRequest } from '../src/gen/models';
 import { sleep } from '../src/utils';
 
 describe('API requests and error handling', () => {
   let client: StreamClient;
-  const user: UserRequest = { id: 'jane' };
+  const user: UserRequest = getTestUser();
 
-  beforeAll(() => {
+  beforeAll(async () => {
     client = createTestClient();
     void client.connectUser(user, createTestTokenGenerator(user));
   });
@@ -40,37 +41,43 @@ describe('API requests and error handling', () => {
     expect(response.users).toBeDefined();
   });
 
-  it('should return rate limit information', async () => {
-    const response = await client.queryUsers({
-      payload: { filter_conditions: {} },
-    });
+  it.skipIf(import.meta.env.VITE_API_URL?.includes('localhost'))(
+    'should return rate limit information',
+    async () => {
+      const response = await client.queryUsers({
+        payload: { filter_conditions: {} },
+      });
 
-    expect(typeof response.metadata.rateLimit.rateLimit).toBe('number');
-    expect(typeof response.metadata.rateLimit.rateLimitRemaining).toBe(
-      'number',
-    );
-    expect(response.metadata.rateLimit.rateLimitReset instanceof Date).toBe(
-      true,
-    );
-  });
-
-  it('should handle error response from Stream API', async () => {
-    try {
-      await client.queryUsers();
-      throw new Error(`Test failed because method didn't throw`);
-    } catch (error) {
-      expect(error.message).toBe(
-        'Stream error code 4: QueryUsers failed with error: "invalid json data"',
+      expect(typeof response.metadata.rateLimit.rateLimit).toBe('number');
+      expect(typeof response.metadata.rateLimit.rateLimitRemaining).toBe(
+        'number',
       );
-      expect(error.code).toBe(4);
-      expect(error.metadata).toBeDefined();
-      expect(error.metadata.responseCode).toBe(400);
+      expect(response.metadata.rateLimit.rateLimitReset instanceof Date).toBe(
+        true,
+      );
+    },
+  );
 
-      const rateLimit = error.metadata.rateLimit;
+  it.skipIf(import.meta.env.VITE_API_URL?.includes('localhost'))(
+    'should handle error response from Stream API',
+    async () => {
+      try {
+        await client.queryUsers();
+        throw new Error(`Test failed because method didn't throw`);
+      } catch (error) {
+        expect(error.message).toBe(
+          'Stream error code 4: QueryUsers failed with error: "invalid json data"',
+        );
+        expect(error.code).toBe(4);
+        expect(error.metadata).toBeDefined();
+        expect(error.metadata.responseCode).toBe(400);
 
-      expect(rateLimit.rateLimit).toBeDefined();
-    }
-  });
+        const rateLimit = error.metadata.rateLimit;
+
+        expect(rateLimit.rateLimit).toBeDefined();
+      }
+    },
+  );
 
   it('should handle token expiration', async () => {
     client = createTestClient();

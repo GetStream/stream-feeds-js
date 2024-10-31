@@ -20,6 +20,8 @@ export interface AWSRekognitionConfig {
   enabled: boolean;
 
   rules: AWSRekognitionRule[];
+
+  async?: boolean;
 }
 
 export interface AWSRekognitionRule {
@@ -154,6 +156,8 @@ export interface AutomodPlatformCircumventionConfig {
   enabled: boolean;
 
   rules: AutomodRule[];
+
+  async?: boolean;
 }
 
 export interface AutomodRule {
@@ -168,6 +172,8 @@ export interface AutomodSemanticFiltersConfig {
   enabled: boolean;
 
   rules: AutomodSemanticFiltersRule[];
+
+  async?: boolean;
 }
 
 export interface AutomodSemanticFiltersRule {
@@ -182,6 +188,8 @@ export interface AutomodToxicityConfig {
   enabled: boolean;
 
   rules: AutomodRule[];
+
+  async?: boolean;
 }
 
 export interface Ban {
@@ -238,6 +246,8 @@ export interface BlockListConfig {
   enabled: boolean;
 
   rules: BlockListRule[];
+
+  async?: boolean;
 }
 
 export interface BlockListOptions {
@@ -286,6 +296,8 @@ export interface BodyguardConfig {
   rules: BodyguardRule[];
 
   severity_rules: BodyguardSeverityRule[];
+
+  async?: boolean;
 }
 
 export interface BodyguardRule {
@@ -443,6 +455,8 @@ export interface ChannelConfigWithInfo {
 
   search: boolean;
 
+  skip_last_msg_update_for_system_msgs: boolean;
+
   typing_events: boolean;
 
   updated_at: Date;
@@ -460,8 +474,6 @@ export interface ChannelConfigWithInfo {
   partition_size?: number;
 
   partition_ttl?: string;
-
-  skip_last_msg_update_for_system_msgs?: boolean;
 
   allowed_flag_reasons?: string[];
 
@@ -2091,6 +2103,8 @@ export interface VelocityFilterConfig {
   first_message_only: boolean;
 
   rules: VelocityFilterConfigRule[];
+
+  async?: boolean;
 }
 
 export interface VelocityFilterConfigRule {
@@ -2112,11 +2126,11 @@ export interface VelocityFilterConfigRule {
 
   shadow_ban: boolean;
 
-  slow_spam_ban_duration: number;
-
   slow_spam_threshold: number;
 
   slow_spam_ttl: number;
+
+  slow_spam_ban_duration?: number;
 }
 
 export interface WSAuthMessage {

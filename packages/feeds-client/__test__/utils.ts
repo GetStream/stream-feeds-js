@@ -1,11 +1,17 @@
 import { StreamClientOptions, UserRequest } from '@stream-io/common';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
 
-const apiKey = import.meta.env.VITE_STREAM_API_KEY!;
-const tokenUrl = import.meta.env.VITE_STREAM_TOKEN_URL!;
+const apiKey = import.meta.env.VITE_STREAM_API_KEY;
+const tokenUrl = import.meta.env.VITE_STREAM_TOKEN_URL;
+const baseUrl = import.meta.env.VITE_API_URL;
+const userId = import.meta.env.VITE_STREAM_USER_ID;
 
 export const createTestClient = (options?: StreamClientOptions) => {
+  if (!apiKey) {
+    throw new Error('Provide an api key, check .env-example for details');
+  }
   return new StreamFeedsClient(apiKey, {
+    baseUrl,
     timeout: 10000,
     ...options,
   });
@@ -15,6 +21,9 @@ export const createTestTokenGenerator = (
   user: UserRequest,
   expInSeconds?: number,
 ) => {
+  if (!tokenUrl) {
+    throw new Error('Provide token url, check .env-example for details');
+  }
   return async () => {
     const response = await fetch(
       `${tokenUrl}&user_id=${user.id}&exp=${expInSeconds ?? 14400}`,
@@ -23,4 +32,11 @@ export const createTestTokenGenerator = (
 
     return body.token as string;
   };
+};
+
+export const getTestUser = () => {
+  if (!userId) {
+    throw new Error('Provide user id, check .env-example for details');
+  }
+  return { id: userId };
 };

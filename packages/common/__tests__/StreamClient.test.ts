@@ -4,14 +4,15 @@ import { UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
-} from './create-test-client';
+  getTestUser,
+} from './utils';
 import { ConnectedEvent } from '../src/real-time/event-models';
 
 describe('WebSocket connection', () => {
   let client: StreamClient;
-  const user: UserRequest = { id: 'jane' };
+  const user: UserRequest = getTestUser();
 
-  beforeAll(() => {
+  beforeAll(async () => {
     client = createTestClient();
   });
 

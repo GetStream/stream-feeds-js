@@ -6,12 +6,13 @@ import {
 import {
   createTestClient,
   createTestTokenGenerator,
-} from './create-test-client';
+  getTestUser,
+} from './utils';
 import { ConnectedEvent, UserRequest } from '@stream-io/common';
 
-describe('StreamFeedsClient', () => {
+describe('WS connection', () => {
   let client: StreamFeedsClient;
-  let user: UserRequest = { id: 'jane' };
+  let user: UserRequest = getTestUser();
 
   beforeAll(() => {
     client = createTestClient();

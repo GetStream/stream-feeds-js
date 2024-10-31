@@ -25,9 +25,7 @@ export class TokenManager {
    * @param {UserResponse} user - the user object.
    * @param {boolean} isAnonymous - whether the user is anonymous or not.
    */
-  setTokenOrProvider = (
-    tokenOrProvider?: string | (() => Promise<string>),
-  ) => {
+  setTokenOrProvider = (tokenOrProvider?: string | (() => Promise<string>)) => {
     if (isFunction(tokenOrProvider)) {
       this.tokenProvider = tokenOrProvider;
       this.type = 'provider';
@@ -69,7 +67,7 @@ export class TokenManager {
             if (numberOfFailures === 3) {
               return reject(
                 new Error(
-                  `Stream error: tried to get token ${numberOfFailures} times, but it failed. Check your token provider`,
+                  `Stream error: tried to get token ${numberOfFailures} times, but it failed with ${e}. Check your token provider`,
                   { cause: e },
                 ),
               );

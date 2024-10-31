@@ -11,8 +11,8 @@ import { TokenManager } from './TokenManager';
 import { ConnectionIdManager } from './ConnectionIdManager';
 
 export class ApiClient {
+  public readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
-  private readonly baseUrl: string;
 
   constructor(
     public readonly apiKey: string,
