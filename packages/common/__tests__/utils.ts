@@ -5,7 +5,6 @@ import { StreamClientOptions } from '../src/types';
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 const tokenUrl = import.meta.env.VITE_STREAM_TOKEN_URL;
 const baseUrl = import.meta.env.VITE_API_URL;
-const userId = import.meta.env.VITE_STREAM_USER_ID;
 
 export const createTestClient = (options?: StreamClientOptions) => {
   if (!apiKey) {
@@ -36,8 +35,5 @@ export const createTestTokenGenerator = (
 };
 
 export const getTestUser = () => {
-  if (!userId) {
-    throw new Error('Provide user id, check .env-example for details');
-  }
-  return { id: userId };
+  return { id: 'emily' };
 };
