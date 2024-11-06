@@ -40,7 +40,7 @@ describe('Feeds API - test with "visible" visibility level', () => {
   it('emily adds bob as feed member', async () => {
     const response = await emilyFeed.addFeedMembers({
       // TODO: we should be able to specify a role here
-      new_members: ['bob'],
+      new_members: [bob.id],
     });
 
     // TODO: we should receive the members in response
