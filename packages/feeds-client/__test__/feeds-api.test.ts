@@ -8,10 +8,9 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { StreamFeed } from '../src/StreamFeed';
 
-describe('Feeds API', () => {
+describe('Feeds API - test with "visible" visibility level', () => {
   let client: StreamFeedsClient;
-  let publicFeed: StreamFeed;
-  let visibleFeed: StreamFeed;
+  let feed: StreamFeed;
 
   beforeAll(async () => {
     client = createTestClient();
@@ -21,29 +20,26 @@ describe('Feeds API', () => {
     );
   });
 
-  it('create a feed with public visibility', async () => {
-    publicFeed = client.feed('user', uuidv4());
-    const response = await publicFeed.getOrCreate({
-      visibility_level: 'public',
-      custom: {
-        color: 'red',
-      },
-    });
-
-    expect(response.feed.id).toBe(publicFeed.id);
-    expect(response.feed.visibility_level).toBe('public');
-  });
-
-  it('create a feed with visible visibility', async () => {
-    visibleFeed = client.feed('user', uuidv4());
-    const response = await visibleFeed.getOrCreate({
+  it('create feed', async () => {
+    feed = client.feed('user', uuidv4());
+    const response = await feed.getOrCreate({
       visibility_level: 'visible',
       custom: {
         color: 'red',
       },
     });
 
-    expect(response.feed.id).toBe(visibleFeed.id);
+    expect(response.feed.id).toBe(feed.id);
     expect(response.feed.visibility_level).toBe('visible');
+  });
+
+  it('add members to feed', async () => {
+    const response = await feed.addFeedMembers({
+      // TODO: we should be able to specify a role here
+      new_members: ['alice', 'bob'],
+    });
+
+    // TODO: we should receive the members in response
+    expect(response);
   });
 });
