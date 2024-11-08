@@ -6,8 +6,6 @@ import {
   StreamClient,
   StreamClientOptions,
   StreamClientState,
-  StreamResponse,
-  UpdateUsersResponse,
   UserRequest,
 } from '@stream-io/common';
 import { StreamFeedsEvent } from './types';

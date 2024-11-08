@@ -24,82 +24,80 @@ export class FeedApi {
     public readonly id: string,
   ) {}
 
-  delete = (): Promise<StreamResponse<DeleteFeedResponse>> => {
+  delete(): Promise<StreamResponse<DeleteFeedResponse>> {
     return this.feedsApi.deleteFeed({ id: this.id, group: this.group });
-  };
+  }
 
-  get = (): Promise<StreamResponse<GetFeedResponse>> => {
+  get(): Promise<StreamResponse<GetFeedResponse>> {
     return this.feedsApi.getFeed({ id: this.id, group: this.group });
-  };
+  }
 
-  getOrCreate = (
+  getOrCreate(
     request: GetOrCreateFeedRequest,
-  ): Promise<StreamResponse<GetOrCreateFeedResponse>> => {
+  ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
     return this.feedsApi.getOrCreateFeed({
       id: this.id,
       group: this.group,
       ...request,
     });
-  };
+  }
 
-  addActivity = (
+  addActivity(
     request: AddActivityRequest,
-  ): Promise<StreamResponse<AddActivityResponse>> => {
+  ): Promise<StreamResponse<AddActivityResponse>> {
     return this.feedsApi.addActivity({
       id: this.id,
       group: this.group,
       ...request,
     });
-  };
+  }
 
-  readFlat = (request: {
+  readFlat(request: {
     limit: number;
     offset: number;
-  }): Promise<StreamResponse<ReadFlatFeedResponse>> => {
+  }): Promise<StreamResponse<ReadFlatFeedResponse>> {
     return this.feedsApi.readFlatFeed({
       id: this.id,
       group: this.group,
       ...request,
     });
-  };
+  }
 
-  unfollow = (): Promise<StreamResponse<UnfollowResponse>> => {
+  unfollow(): Promise<StreamResponse<UnfollowResponse>> {
     return this.feedsApi.unfollow({ id: this.id, group: this.group });
-  };
+  }
 
-  follow = (
-    request: FollowRequest,
-  ): Promise<StreamResponse<FollowResponse>> => {
+  follow(request: FollowRequest): Promise<StreamResponse<FollowResponse>> {
     return this.feedsApi.follow({ id: this.id, group: this.group, ...request });
-  };
+  }
 
-  removeFeedMembers = (request: {
+  removeFeedMembers(request: {
     remove_members: string;
-  }): Promise<StreamResponse<RemoveFeedMembersResponse>> => {
+  }): Promise<StreamResponse<RemoveFeedMembersResponse>> {
     return this.feedsApi.removeFeedMembers({
       id: this.id,
       group: this.group,
       ...request,
     });
-  };
+  }
 
-  addFeedMembers = (
+  addFeedMembers(
     request: AddFeedMembersRequest,
-  ): Promise<StreamResponse<AddFeedMembersResponse>> => {
+  ): Promise<StreamResponse<AddFeedMembersResponse>> {
     return this.feedsApi.addFeedMembers({
       id: this.id,
       group: this.group,
       ...request,
     });
-  };
+  }
 
-  removeActivityFrom = (request: {
+  removeActivityFrom(request: {
     activity_id: string;
-  }): Promise<StreamResponse<RemoveActivityFromFeedResponse>> => {
+  }): Promise<StreamResponse<RemoveActivityFromFeedResponse>> {
     return this.feedsApi.removeActivityFromFeed({
       id: this.id,
       group: this.group,
       ...request,
     });
-  };
+  }
 }

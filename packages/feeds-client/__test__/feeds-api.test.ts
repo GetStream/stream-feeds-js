@@ -82,6 +82,7 @@ describe('Feeds API - test with "visible" visibility level', () => {
     // Would it be possible to have prev/next pagination?
     const response = await tamaraFeed.readFlat({ limit: 5, offset: 0 });
 
+    console.log(response.activities);
     expect(response.activities.length).toBe(2);
   });
 
