@@ -1,5 +1,5 @@
 import { StateStore } from '@stream-io/common';
-import { FeedApi } from './gen/feeds/FeedApi';
+import { StreamFeedApi } from './gen/feeds/FeedApi';
 import { Activity, Feed, GetOrCreateFeedRequest } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
 
@@ -8,7 +8,7 @@ export type FeedState = Omit<Feed, 'group' | 'id'> & {
   activities: Activity[];
 };
 
-export class StreamFeed extends FeedApi {
+export class StreamFeed extends StreamFeedApi {
   readonly state: StateStore<FeedState>;
 
   constructor(client: StreamFeedsClient, group: string, id: string) {
@@ -45,14 +45,14 @@ export class StreamFeed extends FeedApi {
     return response;
   }
 
-  async getOrCreate(request: GetOrCreateFeedRequest) {
+  async getOrCreate(request?: GetOrCreateFeedRequest) {
     const response = await super.getOrCreate(request);
     this.state.partialNext(response.feed);
 
     return response;
   }
 
-  async create(request: GetOrCreateFeedRequest) {
+  async create(request?: GetOrCreateFeedRequest) {
     const response = await super.getOrCreate(request);
     this.state.partialNext(response.feed);
 

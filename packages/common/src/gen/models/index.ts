@@ -127,6 +127,10 @@ export interface Attachment {
 
   image_url?: string;
 
+  latitude?: number;
+
+  longitude?: number;
+
   og_scrape_url?: string;
 
   original_height?: number;
@@ -134,6 +138,8 @@ export interface Attachment {
   original_width?: number;
 
   pretext?: string;
+
+  stopped_sharing?: boolean;
 
   text?: string;
 
@@ -682,13 +688,13 @@ export interface ConfigResponse {
 
   automod_toxicity_config?: AutomodToxicityConfig;
 
-  aws_rek_og_nition_config?: AWSRekognitionConfig;
+  aws_rekognition_config?: AWSRekognitionConfig;
 
   block_list_config?: BlockListConfig;
 
   bodyguard_config?: BodyguardConfig;
 
-  go_og_le_vision_config?: GoogleVisionConfig;
+  google_vision_config?: GoogleVisionConfig;
 
   velocity_filter_config?: VelocityFilterConfig;
 }
@@ -771,6 +777,24 @@ export interface Device {
   id: string;
 
   push_provider: 'firebase' | 'apn' | 'huawei' | 'xiaomi';
+
+  user_id: string;
+
+  disabled?: boolean;
+
+  disabled_reason?: string;
+
+  push_provider_name?: string;
+
+  voip?: boolean;
+}
+
+export interface DeviceResponse {
+  created_at: Date;
+
+  id: string;
+
+  push_provider: string;
 
   user_id: string;
 
@@ -1048,7 +1072,7 @@ export interface FullUserResponse {
 
   channel_mutes: ChannelMute[];
 
-  devices: ResponseForDevice[];
+  devices: DeviceResponse[];
 
   mutes: UserMuteResponse[];
 
@@ -1110,6 +1134,10 @@ export interface GetOGResponse {
 
   image_url?: string;
 
+  latitude?: number;
+
+  longitude?: number;
+
   og_scrape_url?: string;
 
   original_height?: number;
@@ -1117,6 +1145,8 @@ export interface GetOGResponse {
   original_width?: number;
 
   pretext?: string;
+
+  stopped_sharing?: boolean;
 
   text?: string;
 
@@ -1176,7 +1206,7 @@ export interface LabelThresholds {
 export interface ListDevicesResponse {
   duration: string;
 
-  devices: ResponseForDevice[];
+  devices: DeviceResponse[];
 }
 
 export interface MarkReviewedRequest {
@@ -1761,24 +1791,6 @@ export interface ReadReceiptsResponse {
 
 export interface Response {
   duration: string;
-}
-
-export interface ResponseForDevice {
-  created_at: Date;
-
-  id: string;
-
-  push_provider: string;
-
-  user_id: string;
-
-  disabled?: boolean;
-
-  disabled_reason?: string;
-
-  push_provider_name?: string;
-
-  voip?: boolean;
 }
 
 export interface RestoreActionRequest {}

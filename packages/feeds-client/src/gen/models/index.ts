@@ -74,14 +74,6 @@ export interface AddActivityResponse {
   custom?: Record<string, any>;
 }
 
-export interface AddFeedMembersRequest {
-  new_members: string[];
-}
-
-export interface AddFeedMembersResponse {
-  duration: string;
-}
-
 export interface DeleteFeedResponse {
   duration: string;
 }
@@ -111,35 +103,33 @@ export interface Feed {
 }
 
 export interface FeedMember {
-  banned: boolean;
-
-  created_at: Date;
-
-  feed_group: string;
-
-  feed_id: string;
-
-  invited: boolean;
-
-  role: string;
-
-  shadow_banned: boolean;
-
-  status: string;
-
-  updated_at: Date;
-
-  user: UserResponse;
+  user_id: string;
 
   ban_expires_at?: Date;
 
   ban_reason?: string;
 
+  banned?: boolean;
+
+  created_at?: Date;
+
   invite_accepted_at?: Date;
 
   invite_rejected_at?: Date;
 
+  invited?: boolean;
+
+  role?: string;
+
+  shadow_banned?: boolean;
+
+  status?: string;
+
+  updated_at?: Date;
+
   custom?: Record<string, any>;
+
+  user?: UserResponse;
 }
 
 export interface FollowRequest {
@@ -163,14 +153,14 @@ export interface GetFeedResponse {
 }
 
 export interface GetOrCreateFeedRequest {
-  visibility_level:
+  visibility_level?:
     | 'public'
     | 'visible'
     | 'followers'
     | 'private'
     | 'restricted';
 
-  members?: string[];
+  members?: FeedMember[];
 
   custom?: Record<string, any>;
 }
@@ -179,6 +169,30 @@ export interface GetOrCreateFeedResponse {
   duration: string;
 
   feed: Feed;
+}
+
+export interface MemberRequest {
+  user_id: string;
+
+  role?: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface MemberResponse {
+  created_at: Date;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  user: UserResponse;
+
+  deleted_at?: Date;
+
+  role?: string;
+
+  custom?: Record<string, any>;
 }
 
 export interface QueryActivitiesRequest {
@@ -235,14 +249,18 @@ export interface RemoveActivityFromFeedResponse {
   duration: string;
 }
 
-export interface RemoveFeedMembersResponse {
-  duration: string;
-}
-
 export interface SortParamRequest {
   direction?: number;
 
   field?: string;
+}
+
+export interface UnfollowRequest {
+  target_group: string;
+
+  target_id: string;
+
+  keep_history?: boolean;
 }
 
 export interface UnfollowResponse {
@@ -251,36 +269,48 @@ export interface UnfollowResponse {
   unfollowed: boolean;
 }
 
+export interface UpdateFeedMembersRequest {
+  remove_members?: string[];
+
+  update_members?: MemberRequest[];
+}
+
+export interface UpdateFeedMembersResponse {
+  duration: string;
+
+  members: MemberResponse[];
+}
+
 export interface UserResponse {
-  banned: boolean;
+  banned?: boolean;
 
-  created_at: Date;
-
-  id: string;
-
-  language: string;
-
-  online: boolean;
-
-  role: string;
-
-  updated_at: Date;
-
-  blocked_user_ids: string[];
-
-  teams: string[];
-
-  custom: Record<string, any>;
+  created_at?: Date;
 
   deactivated_at?: Date;
 
   deleted_at?: Date;
 
+  id?: string;
+
   image?: string;
+
+  language?: string;
 
   last_active?: Date;
 
   name?: string;
 
+  online?: boolean;
+
   revoke_tokens_issued_before?: Date;
+
+  role?: string;
+
+  updated_at?: Date;
+
+  blocked_user_ids?: string[];
+
+  teams?: string[];
+
+  custom?: Record<string, any>;
 }

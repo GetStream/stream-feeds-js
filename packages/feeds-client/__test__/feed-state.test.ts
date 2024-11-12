@@ -24,7 +24,10 @@ describe('Feeds state test', () => {
     const spy = vi.fn();
     emilyFeed.state.subscribe(spy);
 
-    await emilyFeed.create({ members: ['bob'], visibility_level: 'visible' });
+    await emilyFeed.create({
+      members: [{ user_id: 'bob' }],
+      visibility_level: 'visible',
+    });
 
     const currentState = spy.mock.lastCall?.[0] as FeedState;
     expect(

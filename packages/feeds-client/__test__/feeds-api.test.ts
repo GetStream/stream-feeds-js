@@ -38,9 +38,8 @@ describe('Feeds API - test with "visible" visibility level', () => {
   });
 
   it('emily adds bob as feed member', async () => {
-    const response = await emilyFeed.addFeedMembers({
-      // TODO: we should be able to specify a role here
-      new_members: [bob.id],
+    const response = await emilyFeed.updateFeedMembers({
+      update_members: [{ user_id: bob.id }],
     });
 
     // TODO: we should receive the members in response
@@ -49,8 +48,7 @@ describe('Feeds API - test with "visible" visibility level', () => {
 
   it(`tamara will follow the emily's feed`, async () => {
     tamaraFeed = tamaraClient.feed('user', uuidv4());
-    // TODO: why do we need to provide visibility_level if there is a default for that value (visible)
-    await tamaraFeed.getOrCreate({ visibility_level: 'visible' });
+    await tamaraFeed.getOrCreate();
     const response = await tamaraFeed.follow({
       target_group: emilyFeed.group,
       target_id: emilyFeed.id,
@@ -79,7 +77,6 @@ describe('Feeds API - test with "visible" visibility level', () => {
   });
 
   it('tamara can see both activities in her feed', async () => {
-    // Would it be possible to have prev/next pagination?
     const response = await tamaraFeed.readFlat({ limit: 5, offset: 0 });
 
     console.log(response.activities);
@@ -124,16 +121,17 @@ describe('Feeds API - test with "visible" visibility level', () => {
   });
 
   it(`emily removes bob from the feed members`, async () => {
-    // TODO: this should accept an array
-    await emilyFeed.removeFeedMembers({ remove_members: bob.id });
+    await emilyFeed.updateFeedMembers({ remove_members: [bob.id] });
 
-    // TODO: why this works?
+    // TODO: why this works - permissions are coming later
     await bobFeed.addActivity({ verb: 'edit', object: 'Place:42' });
   });
 
   it(`tamara unfollows the feed`, async () => {
-    // TODO: can't provide target group and target id here
-    // await tamaraFeed.unfollow();
+    await tamaraFeed.unfollow({
+      target_group: emilyFeed.group,
+      target_id: emilyFeed.id,
+    });
   });
 
   afterAll(async () => {

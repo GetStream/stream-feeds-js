@@ -69,17 +69,17 @@ decoders.Feed = (input?: Record<string, any>) => {
 
 decoders.FeedMember = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponse', isSingle: true },
-
     ban_expires_at: { type: 'DatetimeType', isSingle: true },
+
+    created_at: { type: 'DatetimeType', isSingle: true },
 
     invite_accepted_at: { type: 'DatetimeType', isSingle: true },
 
     invite_rejected_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    user: { type: 'UserResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -94,6 +94,19 @@ decoders.GetFeedResponse = (input?: Record<string, any>) => {
 decoders.GetOrCreateFeedResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     feed: { type: 'Feed', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.MemberResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    user: { type: 'UserResponse', isSingle: true },
+
+    deleted_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -119,11 +132,16 @@ decoders.ReadFlatFeedResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.UpdateFeedMembersResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    members: { type: 'MemberResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.UserResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
 
     deactivated_at: { type: 'DatetimeType', isSingle: true },
 
@@ -132,6 +150,8 @@ decoders.UserResponse = (input?: Record<string, any>) => {
     last_active: { type: 'DatetimeType', isSingle: true },
 
     revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };

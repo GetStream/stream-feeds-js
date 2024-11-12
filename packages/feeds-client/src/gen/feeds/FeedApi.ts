@@ -3,8 +3,6 @@ import { StreamResponse } from '../../gen-imports';
 import {
   AddActivityRequest,
   AddActivityResponse,
-  AddFeedMembersRequest,
-  AddFeedMembersResponse,
   DeleteFeedResponse,
   FollowRequest,
   FollowResponse,
@@ -13,11 +11,13 @@ import {
   GetOrCreateFeedResponse,
   ReadFlatFeedResponse,
   RemoveActivityFromFeedResponse,
-  RemoveFeedMembersResponse,
+  UnfollowRequest,
   UnfollowResponse,
+  UpdateFeedMembersRequest,
+  UpdateFeedMembersResponse,
 } from '../models';
 
-export class FeedApi {
+export class StreamFeedApi {
   constructor(
     protected feedsApi: FeedsApi,
     public readonly group: string,
@@ -33,7 +33,7 @@ export class FeedApi {
   }
 
   getOrCreate(
-    request: GetOrCreateFeedRequest,
+    request?: GetOrCreateFeedRequest,
   ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
     return this.feedsApi.getOrCreateFeed({
       id: this.id,
@@ -63,28 +63,24 @@ export class FeedApi {
     });
   }
 
-  unfollow(): Promise<StreamResponse<UnfollowResponse>> {
-    return this.feedsApi.unfollow({ id: this.id, group: this.group });
-  }
-
   follow(request: FollowRequest): Promise<StreamResponse<FollowResponse>> {
     return this.feedsApi.follow({ id: this.id, group: this.group, ...request });
   }
 
-  removeFeedMembers(request: {
-    remove_members: string;
-  }): Promise<StreamResponse<RemoveFeedMembersResponse>> {
-    return this.feedsApi.removeFeedMembers({
+  updateFeedMembers(
+    request?: UpdateFeedMembersRequest,
+  ): Promise<StreamResponse<UpdateFeedMembersResponse>> {
+    return this.feedsApi.updateFeedMembers({
       id: this.id,
       group: this.group,
       ...request,
     });
   }
 
-  addFeedMembers(
-    request: AddFeedMembersRequest,
-  ): Promise<StreamResponse<AddFeedMembersResponse>> {
-    return this.feedsApi.addFeedMembers({
+  unfollow(
+    request: UnfollowRequest,
+  ): Promise<StreamResponse<UnfollowResponse>> {
+    return this.feedsApi.unfollow({
       id: this.id,
       group: this.group,
       ...request,

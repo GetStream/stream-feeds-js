@@ -227,6 +227,13 @@ decoders.Device = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.DeviceResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.EntityCreator = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     ban_expires: { type: 'DatetimeType', isSingle: true },
@@ -297,6 +304,8 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
 
     channel_mutes: { type: 'ChannelMute', isSingle: false },
 
+    devices: { type: 'DeviceResponse', isSingle: false },
+
     mutes: { type: 'UserMuteResponse', isSingle: false },
 
     deactivated_at: { type: 'DatetimeType', isSingle: true },
@@ -318,6 +327,13 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
 decoders.GetBlockedUsersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     blocks: { type: 'BlockedUserResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ListDevicesResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    devices: { type: 'DeviceResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };

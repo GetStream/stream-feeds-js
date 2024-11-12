@@ -7,8 +7,6 @@ import {
 import {
   AddActivityRequest,
   AddActivityResponse,
-  AddFeedMembersRequest,
-  AddFeedMembersResponse,
   DeleteFeedResponse,
   FollowRequest,
   FollowResponse,
@@ -21,8 +19,10 @@ import {
   QueryFeedsResponse,
   ReadFlatFeedResponse,
   RemoveActivityFromFeedResponse,
-  RemoveFeedMembersResponse,
+  UnfollowRequest,
   UnfollowResponse,
+  UpdateFeedMembersRequest,
+  UpdateFeedMembersResponse,
 } from '../models';
 import { decoders } from '../model-decoders';
 
@@ -186,29 +186,6 @@ export class FeedsApi extends CommonApiWrapper {
     return { ...response.body, metadata: response.metadata };
   };
 
-  unfollow = async (request: {
-    group: string;
-    id: string;
-  }): Promise<StreamResponse<UnfollowResponse>> => {
-    const pathParams = {
-      group: request?.group,
-      id: request?.id,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<UnfollowResponse>
-    >(
-      'DELETE',
-      '/api/v2/feeds/feeds/{group}/{id}/follow',
-      pathParams,
-      undefined,
-    );
-
-    decoders.UnfollowResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  };
-
   follow = async (
     request: FollowRequest & { group: string; id: string },
   ): Promise<StreamResponse<FollowResponse>> => {
@@ -237,46 +214,20 @@ export class FeedsApi extends CommonApiWrapper {
     return { ...response.body, metadata: response.metadata };
   };
 
-  removeFeedMembers = async (request: {
-    group: string;
-    id: string;
-    remove_members: string;
-  }): Promise<StreamResponse<RemoveFeedMembersResponse>> => {
-    const queryParams = {
-      remove_members: request?.remove_members,
-    };
-    const pathParams = {
-      group: request?.group,
-      id: request?.id,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveFeedMembersResponse>
-    >(
-      'DELETE',
-      '/api/v2/feeds/feeds/{group}/{id}/members',
-      pathParams,
-      queryParams,
-    );
-
-    decoders.RemoveFeedMembersResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  };
-
-  addFeedMembers = async (
-    request: AddFeedMembersRequest & { group: string; id: string },
-  ): Promise<StreamResponse<AddFeedMembersResponse>> => {
+  updateFeedMembers = async (
+    request: UpdateFeedMembersRequest & { group: string; id: string },
+  ): Promise<StreamResponse<UpdateFeedMembersResponse>> => {
     const pathParams = {
       group: request?.group,
       id: request?.id,
     };
     const body = {
-      new_members: request?.new_members,
+      remove_members: request?.remove_members,
+      update_members: request?.update_members,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<AddFeedMembersResponse>
+      StreamResponse<UpdateFeedMembersResponse>
     >(
       'POST',
       '/api/v2/feeds/feeds/{group}/{id}/members',
@@ -285,7 +236,35 @@ export class FeedsApi extends CommonApiWrapper {
       body,
     );
 
-    decoders.AddFeedMembersResponse?.(response.body);
+    decoders.UpdateFeedMembersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  unfollow = async (
+    request: UnfollowRequest & { group: string; id: string },
+  ): Promise<StreamResponse<UnfollowResponse>> => {
+    const pathParams = {
+      group: request?.group,
+      id: request?.id,
+    };
+    const body = {
+      target_group: request?.target_group,
+      target_id: request?.target_id,
+      keep_history: request?.keep_history,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UnfollowResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/feeds/{group}/{id}/unfollow',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.UnfollowResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };
