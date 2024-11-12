@@ -3,9 +3,7 @@ import { FeedApi } from './gen/feeds/FeedApi';
 import { Activity, Feed, GetOrCreateFeedRequest } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
 
-export type FeedState = {
-  [key in keyof Omit<Feed, 'group' | 'id'>]: Omit<Feed, 'group' | 'id'>[key];
-} & {
+export type FeedState = Omit<Feed, 'group' | 'id'> & {
   isStateStale: boolean;
   activities: Activity[];
 };
