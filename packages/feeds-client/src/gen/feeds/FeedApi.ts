@@ -10,6 +10,7 @@ import {
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   ReadFlatFeedResponse,
+  ReadNotificationFeedResponse,
   RemoveActivityFromFeedResponse,
   UnfollowRequest,
   UnfollowResponse,
@@ -71,6 +72,19 @@ export class StreamFeedApi {
     request?: UpdateFeedMembersRequest,
   ): Promise<StreamResponse<UpdateFeedMembersResponse>> {
     return this.feedsApi.updateFeedMembers({
+      id: this.id,
+      group: this.group,
+      ...request,
+    });
+  }
+
+  readNotification(request: {
+    limit: number;
+    offset: number;
+    mark_seen?: string;
+    mark_read?: string;
+  }): Promise<StreamResponse<ReadNotificationFeedResponse>> {
+    return this.feedsApi.readNotificationFeed({
       id: this.id,
       group: this.group,
       ...request,

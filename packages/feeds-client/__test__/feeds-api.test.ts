@@ -4,7 +4,7 @@ import { createTestClient, createTestTokenGenerator } from './utils';
 import { v4 as uuidv4 } from 'uuid';
 import { StreamFeed } from '../src/StreamFeed';
 
-describe('Feeds API - test with "visible" visibility level', () => {
+describe('Feeds API', () => {
   const emily = { id: 'emily' };
   const bob = { id: 'bob' };
   const tamara = { id: 'tamara' };
@@ -14,6 +14,7 @@ describe('Feeds API - test with "visible" visibility level', () => {
   let emilyFeed: StreamFeed;
   let tamaraFeed: StreamFeed;
   let bobFeed: StreamFeed;
+  let notificationFeed: StreamFeed;
 
   beforeAll(async () => {
     emilyClient = createTestClient();
@@ -102,6 +103,24 @@ describe('Feeds API - test with "visible" visibility level', () => {
     expect(response.activities.length).toBe(1);
   });
 
+  it(`create an aggregated feed`, async () => {
+    notificationFeed = emilyClient.feed('notification', uuidv4());
+    await notificationFeed.getOrCreate();
+    await notificationFeed.follow({
+      target_group: emilyFeed.group,
+      target_id: emilyFeed.id,
+    });
+    const response = await notificationFeed.readNotification({
+      limit: 5,
+      offset: 0,
+      mark_read: 'pin',
+    });
+
+    console.log(response);
+    expect(response.groups.length).toBe(2);
+    expect(response.unseen);
+  });
+
   it(`bob deletes an activity from emily's feed`, async () => {
     const response = await bobClient.queryActivities({
       filter: {
@@ -137,5 +156,6 @@ describe('Feeds API - test with "visible" visibility level', () => {
   afterAll(async () => {
     await emilyFeed.delete();
     await tamaraFeed.delete();
+    await notificationFeed.delete();
   });
 });

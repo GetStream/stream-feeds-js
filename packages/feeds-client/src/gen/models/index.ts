@@ -74,6 +74,26 @@ export interface AddActivityResponse {
   custom?: Record<string, any>;
 }
 
+export interface AggregatedActivities {
+  activity_count: number;
+
+  actor_count: number;
+
+  created_at: Date;
+
+  group: string;
+
+  id: string;
+
+  read: boolean;
+
+  seen: boolean;
+
+  updated_at: Date;
+
+  activities: Activity[];
+}
+
 export interface DeleteFeedResponse {
   duration: string;
 }
@@ -243,6 +263,16 @@ export interface ReadFlatFeedResponse {
   duration: string;
 
   activities: Activity[];
+}
+
+export interface ReadNotificationFeedResponse {
+  duration: string;
+
+  unread: number;
+
+  unseen: number;
+
+  groups: AggregatedActivities[];
 }
 
 export interface RemoveActivityFromFeedResponse {

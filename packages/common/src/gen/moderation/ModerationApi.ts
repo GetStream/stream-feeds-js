@@ -65,8 +65,8 @@ export class ModerationApi {
     const body = {
       entity_id: request?.entity_id,
       entity_type: request?.entity_type,
-      reason: request?.reason,
       entity_creator_id: request?.entity_creator_id,
+      reason: request?.reason,
       custom: request?.custom,
       moderation_payload: request?.moderation_payload,
     };
@@ -102,8 +102,9 @@ export class ModerationApi {
   ): Promise<StreamResponse<QueryReviewQueueResponse>> => {
     const body = {
       limit: request?.limit,
-      lock_moderator_duration: request?.lock_moderator_duration,
-      lock_moderator_id: request?.lock_moderator_id,
+      lock_count: request?.lock_count,
+      lock_duration: request?.lock_duration,
+      lock_items: request?.lock_items,
       next: request?.next,
       prev: request?.prev,
       stats_only: request?.stats_only,

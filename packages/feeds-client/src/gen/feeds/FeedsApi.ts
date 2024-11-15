@@ -18,6 +18,7 @@ import {
   QueryFeedsRequest,
   QueryFeedsResponse,
   ReadFlatFeedResponse,
+  ReadNotificationFeedResponse,
   RemoveActivityFromFeedResponse,
   UnfollowRequest,
   UnfollowResponse,
@@ -237,6 +238,39 @@ export class FeedsApi extends CommonApiWrapper {
     );
 
     decoders.UpdateFeedMembersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  readNotificationFeed = async (request: {
+    group: string;
+    id: string;
+    limit: number;
+    offset: number;
+    mark_seen?: string;
+    mark_read?: string;
+  }): Promise<StreamResponse<ReadNotificationFeedResponse>> => {
+    const queryParams = {
+      limit: request?.limit,
+      offset: request?.offset,
+      mark_seen: request?.mark_seen,
+      mark_read: request?.mark_read,
+    };
+    const pathParams = {
+      group: request?.group,
+      id: request?.id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ReadNotificationFeedResponse>
+    >(
+      'GET',
+      '/api/v2/feeds/feeds/{group}/{id}/notification',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.ReadNotificationFeedResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };

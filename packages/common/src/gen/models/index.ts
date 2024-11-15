@@ -505,6 +505,8 @@ export interface ChannelMember {
 
   custom: Record<string, any>;
 
+  archived_at?: Date;
+
   ban_expires?: Date;
 
   deleted_at?: Date;
@@ -516,6 +518,8 @@ export interface ChannelMember {
   invited?: boolean;
 
   is_moderator?: boolean;
+
+  pinned_at?: Date;
 
   role?: 'member' | 'moderator' | 'admin' | 'owner';
 
@@ -1026,9 +1030,9 @@ export interface FlagRequest {
 
   entity_type: string;
 
-  reason: string;
-
   entity_creator_id?: string;
+
+  reason?: string;
 
   custom?: Record<string, any>;
 
@@ -1686,9 +1690,11 @@ export interface QueryModerationConfigsResponse {
 export interface QueryReviewQueueRequest {
   limit?: number;
 
-  lock_moderator_duration?: number;
+  lock_count?: number;
 
-  lock_moderator_id?: string;
+  lock_duration?: number;
+
+  lock_items?: boolean;
 
   next?: string;
 

@@ -140,6 +140,8 @@ decoders.ChannelMember = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
+    archived_at: { type: 'DatetimeType', isSingle: true },
+
     ban_expires: { type: 'DatetimeType', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
@@ -147,6 +149,8 @@ decoders.ChannelMember = (input?: Record<string, any>) => {
     invite_accepted_at: { type: 'DatetimeType', isSingle: true },
 
     invite_rejected_at: { type: 'DatetimeType', isSingle: true },
+
+    pinned_at: { type: 'DatetimeType', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
   };

@@ -54,6 +54,17 @@ decoders.AddActivityResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.AggregatedActivities = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    activities: { type: 'Activity', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.Feed = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -128,6 +139,13 @@ decoders.QueryFeedsResponse = (input?: Record<string, any>) => {
 decoders.ReadFlatFeedResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activities: { type: 'Activity', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ReadNotificationFeedResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    groups: { type: 'AggregatedActivities', isSingle: false },
   };
   return decode(typeMappings, input);
 };
