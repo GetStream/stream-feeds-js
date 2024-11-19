@@ -1,22 +1,22 @@
 import { RateLimit } from './types';
 
 export const getRateLimitFromResponseHeader = (
-  responseHeaders: Record<string, string>,
+  response_headers: Record<string, string>,
 ) => {
-  const rateLimit = responseHeaders['x-ratelimit-limit']
-    ? +responseHeaders['x-ratelimit-limit']!
+  const rate_limit = response_headers['x-ratelimit-limit']
+    ? +response_headers['x-ratelimit-limit']!
     : undefined;
-  const rateLimitRemaining = responseHeaders['x-ratelimit-remaining']
-    ? +responseHeaders['x-ratelimit-remaining']!
+  const rate_limit_remaining = response_headers['x-ratelimit-remaining']
+    ? +response_headers['x-ratelimit-remaining']!
     : undefined;
-  const rateLimitReset = responseHeaders['x-ratelimit-reset']
-    ? new Date(+responseHeaders['x-ratelimit-reset']! * 1000)
+  const rate_limit_reset = response_headers['x-ratelimit-reset']
+    ? new Date(+response_headers['x-ratelimit-reset']! * 1000)
     : undefined;
 
   const result: RateLimit = {
-    rateLimit,
-    rateLimitRemaining,
-    rateLimitReset,
+    rate_limit,
+    rate_limit_remaining,
+    rate_limit_reset,
   };
 
   return result;

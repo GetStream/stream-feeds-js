@@ -4,21 +4,21 @@ import { ModerationClient } from './ModerationClient';
 import { StreamWSEvent } from './real-time/event-models';
 
 export type StreamClientOptions = {
-  baseUrl?: string;
+  base_url?: string;
   timeout?: number;
 };
 
 export type RateLimit = {
-  rateLimit?: number;
-  rateLimitRemaining?: number;
-  rateLimitReset?: Date;
+  rate_limit?: number;
+  rate_limit_remaining?: number;
+  rate_limit_reset?: Date;
 };
 
 export type RequestMetadata = {
-  responseHeaders: Record<string, string>;
-  rateLimit: RateLimit;
-  responseCode: number;
-  clientRequestId: string;
+  response_headers: Record<string, string>;
+  rate_limit: RateLimit;
+  response_code: number;
+  client_request_id: string;
 };
 
 export type StreamResponse<T> = T & {

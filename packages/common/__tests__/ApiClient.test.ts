@@ -48,13 +48,13 @@ describe('API requests and error handling', () => {
         payload: { filter_conditions: {} },
       });
 
-      expect(typeof response.metadata.rateLimit.rateLimit).toBe('number');
-      expect(typeof response.metadata.rateLimit.rateLimitRemaining).toBe(
+      expect(typeof response.metadata.rate_limit.rate_limit).toBe('number');
+      expect(typeof response.metadata.rate_limit.rate_limit_remaining).toBe(
         'number',
       );
-      expect(response.metadata.rateLimit.rateLimitReset instanceof Date).toBe(
-        true,
-      );
+      expect(
+        response.metadata.rate_limit.rate_limit_reset instanceof Date,
+      ).toBe(true);
     },
   );
 
@@ -70,11 +70,11 @@ describe('API requests and error handling', () => {
         );
         expect(error.code).toBe(4);
         expect(error.metadata).toBeDefined();
-        expect(error.metadata.responseCode).toBe(400);
+        expect(error.metadata.response_code).toBe(400);
 
-        const rateLimit = error.metadata.rateLimit;
+        const rate_limit = error.metadata.rate_limit;
 
-        expect(rateLimit.rateLimit).toBeDefined();
+        expect(rate_limit.rate_limit).toBeDefined();
       }
     },
   );
@@ -117,7 +117,7 @@ describe('API requests and error handling', () => {
     await expect(() =>
       client.queryUsers({ payload: { filter_conditions: {} } }),
     ).rejects.toThrowError(
-      'Stream error: tried to get token 3 times, but it failed. Check your token provider',
+      'Stream error: tried to get token 3 times, but it failed with Error: This is a test error. Check your token provider',
     );
 
     await client.disconnectUser();

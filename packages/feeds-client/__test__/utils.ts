@@ -10,7 +10,7 @@ export const createTestClient = (options?: StreamClientOptions) => {
     throw new Error('Provide an api key, check .env-example for details');
   }
   return new StreamFeedsClient(apiKey, {
-    baseUrl,
+    base_url: baseUrl,
     timeout: 10000,
     ...options,
   });

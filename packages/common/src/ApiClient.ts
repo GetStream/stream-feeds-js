@@ -20,7 +20,7 @@ export class ApiClient {
     private readonly connectionIdManager: ConnectionIdManager,
     options?: StreamClientOptions,
   ) {
-    this.baseUrl = options?.baseUrl ?? 'https://video.stream-io-api.com';
+    this.baseUrl = options?.base_url ?? 'https://video.stream-io-api.com';
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
       timeout: options?.timeout ?? 3000,
@@ -61,7 +61,7 @@ export class ApiClient {
       });
     }
     requestUrl += `?${encodedParams}`;
-    const clientRequestId = randomId();
+    const client_request_id = randomId();
 
     const token = await this.tokenManager.getToken();
 
@@ -70,7 +70,7 @@ export class ApiClient {
       Authorization: token,
       'Content-Type': 'application/json',
       'Accept-Encoding': 'gzip',
-      'x-client-request-id': clientRequestId,
+      'x-client-request-id': client_request_id,
     };
 
     try {
@@ -83,7 +83,7 @@ export class ApiClient {
       });
 
       const metadata: RequestMetadata = this.getRequestMetadata(
-        clientRequestId,
+        client_request_id,
         response,
       );
 
@@ -113,7 +113,7 @@ export class ApiClient {
           }
           throw new StreamApiError(
             `Stream error code ${code}: ${message}`,
-            this.getRequestMetadata(clientRequestId, error.response),
+            this.getRequestMetadata(client_request_id, error.response),
             code,
             undefined,
           );
@@ -180,12 +180,12 @@ export class ApiClient {
     requestId: string,
     response: AxiosResponse,
   ) => {
-    const responseHeaders = response.headers as Record<string, string>;
+    const response_headers = response.headers as Record<string, string>;
     return {
-      clientRequestId: requestId,
-      responseHeaders,
-      responseCode: response.status,
-      rateLimit: getRateLimitFromResponseHeader(responseHeaders),
+      client_request_id: requestId,
+      response_headers,
+      response_code: response.status,
+      rate_limit: getRateLimitFromResponseHeader(response_headers),
     };
   };
 }
