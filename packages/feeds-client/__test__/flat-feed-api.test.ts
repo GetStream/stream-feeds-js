@@ -4,7 +4,7 @@ import { createTestClient, createTestTokenGenerator } from './utils';
 import { v4 as uuidv4 } from 'uuid';
 import { StreamFeed } from '../src/StreamFeed';
 
-describe('Feeds API', () => {
+describe('Feeds API - flat feed', () => {
   const emily = { id: 'emily' };
   const bob = { id: 'bob' };
   const tamara = { id: 'tamara' };
@@ -14,7 +14,6 @@ describe('Feeds API', () => {
   let emilyFeed: StreamFeed;
   let tamaraFeed: StreamFeed;
   let bobFeed: StreamFeed;
-  let notificationFeed: StreamFeed;
 
   beforeAll(async () => {
     emilyClient = createTestClient();
@@ -64,7 +63,7 @@ describe('Feeds API', () => {
       object: 'Place:42',
     });
 
-    expect(response.user.id).toEqual(emily.id);
+    expect(response.activity.user.id).toEqual(emily.id);
   });
 
   it(`bob also posts to emily's feed`, async () => {
@@ -74,13 +73,12 @@ describe('Feeds API', () => {
       object: 'Place:42',
     });
 
-    expect(response.user?.id).toBe(bob.id);
+    expect(response.activity.user.id).toBe(bob.id);
   });
 
   it('tamara can see both activities in her feed', async () => {
-    const response = await tamaraFeed.readFlat({ limit: 5, offset: 0 });
+    const response = await tamaraFeed.read({ limit: 5, offset: 0 });
 
-    console.log(response.activities);
     expect(response.activities.length).toBe(2);
   });
 
@@ -103,24 +101,6 @@ describe('Feeds API', () => {
     expect(response.activities.length).toBe(1);
   });
 
-  it(`create an aggregated feed`, async () => {
-    notificationFeed = emilyClient.feed('notification', uuidv4());
-    await notificationFeed.getOrCreate();
-    await notificationFeed.follow({
-      target_group: emilyFeed.group,
-      target_id: emilyFeed.id,
-    });
-    const response = await notificationFeed.readNotification({
-      limit: 5,
-      offset: 0,
-      mark_read: 'pin',
-    });
-
-    console.log(response);
-    expect(response.groups.length).toBe(2);
-    expect(response.unseen);
-  });
-
   it(`bob deletes an activity from emily's feed`, async () => {
     const response = await bobClient.queryActivities({
       filter: {
@@ -134,7 +114,7 @@ describe('Feeds API', () => {
   });
 
   it(`activity is removed from tamara's feed`, async () => {
-    const response = await tamaraFeed.readFlat({ limit: 5, offset: 0 });
+    const response = await tamaraFeed.read({ limit: 5, offset: 0 });
 
     expect(response.activities.length).toBe(1);
   });
@@ -156,6 +136,5 @@ describe('Feeds API', () => {
   afterAll(async () => {
     await emilyFeed.delete();
     await tamaraFeed.delete();
-    await notificationFeed.delete();
   });
 });

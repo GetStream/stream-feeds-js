@@ -1,23 +1,25 @@
 import { StateStore } from '@stream-io/common';
-import { ReadFlatFeedResponse } from './gen/models';
+import { ReadNotificationFeedResponse } from './gen/models';
 import { FeedBaseState, StreamBaseFeed } from './StreamBaseFeed';
 import { StreamFeedsClient } from './StreamFeedsClient';
 
-export type FeedState = {
+export type NotificationFeedState = {
   [key in keyof FeedBaseState]: FeedBaseState[key];
-} & Partial<Omit<ReadFlatFeedResponse, 'duration'>>;
+} & Partial<Omit<ReadNotificationFeedResponse, 'duration'>>;
 
-export class StreamFeed extends StreamBaseFeed {
-  readonly state: StateStore<FeedState>;
+export class StreamNotificationFeed extends StreamBaseFeed {
+  readonly state: StateStore<NotificationFeedState>;
 
   constructor(client: StreamFeedsClient, group: string, id: string) {
     super(client, group, id);
-    this.state = new StateStore<FeedState>({
+    this.state = new StateStore<NotificationFeedState>({
       ...this.baseState.getLatestValue(),
-      activities: undefined,
+      unread: undefined,
+      unseen: undefined,
+      groups: undefined,
     });
     this.baseState.subscribe((state) => this.state.partialNext(state));
   }
 
-  read = this.readFlat;
+  read = this.readNotification;
 }

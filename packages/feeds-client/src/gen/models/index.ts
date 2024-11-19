@@ -51,27 +51,9 @@ export interface AddActivityRequest {
 }
 
 export interface AddActivityResponse {
-  created_at: Date;
-
   duration: string;
 
-  id: string;
-
-  object: string;
-
-  origin: string;
-
-  public: boolean;
-
-  updated_at: Date;
-
-  verb: string;
-
-  user: UserResponse;
-
-  to_targets?: string[];
-
-  custom?: Record<string, any>;
+  activity: Activity;
 }
 
 export interface AggregatedActivities {
@@ -96,6 +78,8 @@ export interface AggregatedActivities {
 
 export interface DeleteFeedResponse {
   duration: string;
+
+  feed: Feed;
 }
 
 export interface Feed {
@@ -118,6 +102,8 @@ export interface Feed {
   members: FeedMember[];
 
   created_by: UserResponse;
+
+  deleted_at?: Date;
 
   custom?: Record<string, any>;
 }

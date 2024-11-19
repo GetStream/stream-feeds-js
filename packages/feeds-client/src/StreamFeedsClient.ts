@@ -11,6 +11,7 @@ import {
 import { StreamFeedsEvent } from './types';
 import { FeedsApi } from './gen/feeds/FeedsApi';
 import { StreamFeed } from './StreamFeed';
+import { StreamNotificationFeed } from './StreamNotificationFeed';
 
 export type StreamFeedsClientState = StreamClientState & {
   // TODO remove this, this is just a test property to test the architecture
@@ -56,6 +57,10 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
 
   feed = (group: string, id: string) => {
     return new StreamFeed(this, group, id);
+  };
+
+  notificationFeed = (group: string, id: string) => {
+    return new StreamNotificationFeed(this, group, id);
   };
 
   connectUser = (

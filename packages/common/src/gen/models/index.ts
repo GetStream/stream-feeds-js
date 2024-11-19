@@ -1838,6 +1838,8 @@ export interface ReviewQueueItem {
 
   languages: string[];
 
+  teams: string[];
+
   completed_at: NullTime;
 
   reviewed_at: NullTime;

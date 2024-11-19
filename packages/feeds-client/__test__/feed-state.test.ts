@@ -17,7 +17,7 @@ describe('Feeds state test', () => {
   });
 
   it('set initial state', async () => {
-    expect(emilyFeed.state.getLatestValue().isStateStale).toBe(true);
+    expect(emilyFeed.state.getLatestValue().created_by).toBe(undefined);
   });
 
   it('update state on create', async () => {
@@ -31,7 +31,7 @@ describe('Feeds state test', () => {
 
     const currentState = spy.mock.lastCall?.[0] as FeedState;
     expect(
-      currentState.members.find((m) => m.user?.id === 'bob'),
+      currentState.members?.find((m) => m.user?.id === 'bob'),
     ).toBeDefined();
   });
 
