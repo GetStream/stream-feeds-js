@@ -2,13 +2,13 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
 import { createTestClient, createTestTokenGenerator } from './utils';
 import { v4 as uuidv4 } from 'uuid';
-import { FeedState, StreamFeed } from '../src/StreamFeed';
 import { FeedMember } from '../src/gen/models';
+import { StreamFlatFeed, StreamFlatFeedState } from '../src/StreamFlatFeed';
 
 describe('Feeds state test', () => {
   const emily = { id: 'emily' };
   let emilyClient: StreamFeedsClient;
-  let emilyFeed: StreamFeed;
+  let emilyFeed: StreamFlatFeed;
 
   beforeAll(async () => {
     emilyClient = createTestClient();
@@ -24,12 +24,12 @@ describe('Feeds state test', () => {
     const spy = vi.fn();
     emilyFeed.state.subscribe(spy);
 
-    await emilyFeed.create({
+    await emilyFeed.getOrCreate({
       members: [{ user_id: 'bob' }],
       visibility_level: 'visible',
     });
 
-    const currentState = spy.mock.lastCall?.[0] as FeedState;
+    const currentState = spy.mock.lastCall?.[0] as StreamFlatFeedState;
     expect(
       currentState.members?.find((m) => m.user?.id === 'bob'),
     ).toBeDefined();

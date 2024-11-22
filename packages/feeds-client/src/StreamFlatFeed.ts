@@ -2,19 +2,19 @@ import { StateStore } from '@stream-io/common';
 import {
   Feed,
   GetOrCreateFeedRequest,
-  ReadNotificationFeedResponse,
+  ReadFlatFeedResponse,
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
 import { StreamFeedApi } from './gen/feeds/FeedApi';
 
-type NotificationFeed = Feed & Omit<ReadNotificationFeedResponse, 'duration'>;
+type FlatFeed = Feed & Omit<ReadFlatFeedResponse, 'duration'>;
 
-export type StreamNotificationFeedState = Partial<{
-  [key in keyof NotificationFeed]: NotificationFeed[key];
+export type StreamFlatFeedState = Partial<{
+  [key in keyof FlatFeed]: FlatFeed[key];
 }>;
 
-export class StreamNotificationFeed extends StreamFeedApi {
-  readonly state: StateStore<StreamNotificationFeedState>;
+export class StreamFlatFeed extends StreamFeedApi {
+  readonly state: StateStore<StreamFlatFeedState>;
 
   constructor(
     client: StreamFeedsClient,
@@ -23,7 +23,7 @@ export class StreamNotificationFeed extends StreamFeedApi {
     feed?: Feed,
   ) {
     super(client, group, id);
-    const defaultState: StreamNotificationFeedState = {
+    const defaultState: StreamFlatFeedState = {
       created_at: undefined,
       follower_count: undefined,
       following_count: undefined,
@@ -37,12 +37,12 @@ export class StreamNotificationFeed extends StreamFeedApi {
       created_by: undefined,
       deleted_at: undefined,
       custom: undefined,
-      groups: undefined,
+      activities: undefined,
     };
     this.state = new StateStore({ ...feed, ...defaultState });
   }
 
-  read = this.readNotification;
+  read = this.readFlat;
 
   async get() {
     const response = await super.get();

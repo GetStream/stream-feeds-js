@@ -76,6 +76,10 @@ export interface AggregatedActivities {
   activities: Activity[];
 }
 
+export interface DeleteFeedGroupResponse {
+  duration: string;
+}
+
 export interface DeleteFeedResponse {
   duration: string;
 
@@ -99,6 +103,8 @@ export interface Feed {
 
   visibility_level: string;
 
+  invites: FeedMember[];
+
   members: FeedMember[];
 
   created_by: UserResponse;
@@ -106,6 +112,126 @@ export interface Feed {
   deleted_at?: Date;
 
   custom?: Record<string, any>;
+}
+
+export interface FeedGroupInput {
+  app_pk: number;
+
+  slug: string;
+
+  type: string;
+
+  aggregation_format?: string;
+
+  fanout_discard_rule?: number;
+
+  fanout_strategy?: number;
+
+  jnf_fallback_init?: boolean;
+
+  max_length?: number;
+
+  origin_tracking_enabled?: boolean;
+
+  prefix?: string;
+
+  private?: boolean;
+
+  realtime_transport?: number;
+
+  realtime_transports?: string;
+
+  shard_id?: string;
+
+  sqs_key?: string;
+
+  sqs_queue_name?: string;
+
+  sqs_region?: string;
+
+  sqs_secret?: string;
+
+  sqs_url?: string;
+
+  timeline_version?: number;
+
+  ttl?: number;
+
+  use_flat_realtime_updates?: boolean;
+
+  use_group_index_for_reads?: boolean;
+
+  use_journaled_class?: boolean;
+
+  use_normalized_storage?: boolean;
+
+  view_version?: number;
+
+  webhook_url?: string;
+}
+
+export interface FeedGroupResponse {
+  aggregation_format: string;
+
+  app_pk: number;
+
+  created_at: Date;
+
+  id: number;
+
+  jnf_fallback_init: boolean;
+
+  max_length: number;
+
+  origin_tracking_enabled: boolean;
+
+  prefix: string;
+
+  private: boolean;
+
+  realtime_transport: number;
+
+  realtime_transports: string;
+
+  shard_id: string;
+
+  slug: string;
+
+  sqs_key: string;
+
+  sqs_queue_name: string;
+
+  sqs_region: string;
+
+  sqs_secret: string;
+
+  sqs_url: string;
+
+  type: string;
+
+  updated_at: Date;
+
+  use_flat_realtime_updates: boolean;
+
+  use_group_index_for_reads: boolean;
+
+  use_journaled_class: boolean;
+
+  use_normalized_storage: boolean;
+
+  webhook_url: string;
+
+  deleted_at?: Date;
+
+  fanout_discard_rule?: number;
+
+  fanout_strategy?: number;
+
+  timeline_version?: number;
+
+  ttl?: number;
+
+  view_version?: number;
 }
 
 export interface FeedMember {
@@ -152,6 +278,12 @@ export interface FollowResponse {
   duration: string;
 }
 
+export interface GetFeedGroupsResponse {
+  duration: string;
+
+  feed_groups: Record<string, FeedGroupResponse>;
+}
+
 export interface GetFeedResponse {
   duration: string;
 
@@ -165,6 +297,8 @@ export interface GetOrCreateFeedRequest {
     | 'followers'
     | 'private'
     | 'restricted';
+
+  invites?: FeedMember[];
 
   members?: FeedMember[];
 
@@ -295,6 +429,26 @@ export interface UpdateFeedMembersResponse {
   duration: string;
 
   members: MemberResponse[];
+}
+
+export interface UpdateFeedRequest {
+  custom?: Record<string, any>;
+}
+
+export interface UpdateFeedResponse {
+  duration: string;
+
+  feed: Feed;
+}
+
+export interface UpsertFeedGroupRequest {
+  feed_group: FeedGroupInput;
+}
+
+export interface UpsertFeedGroupResponse {
+  duration: string;
+
+  feed_group?: FeedGroupResponse;
 }
 
 export interface UserResponse {

@@ -16,6 +16,8 @@ import {
   UnfollowResponse,
   UpdateFeedMembersRequest,
   UpdateFeedMembersResponse,
+  UpdateFeedRequest,
+  UpdateFeedResponse,
 } from '../models';
 
 export class StreamFeedApi {
@@ -31,6 +33,16 @@ export class StreamFeedApi {
 
   get(): Promise<StreamResponse<GetFeedResponse>> {
     return this.feedsApi.getFeed({ id: this.id, group: this.group });
+  }
+
+  update(
+    request?: UpdateFeedRequest,
+  ): Promise<StreamResponse<UpdateFeedResponse>> {
+    return this.feedsApi.updateFeed({
+      id: this.id,
+      group: this.group,
+      ...request,
+    });
   }
 
   getOrCreate(

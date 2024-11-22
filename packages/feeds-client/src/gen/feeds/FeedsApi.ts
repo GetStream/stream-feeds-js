@@ -7,9 +7,11 @@ import {
 import {
   AddActivityRequest,
   AddActivityResponse,
+  DeleteFeedGroupResponse,
   DeleteFeedResponse,
   FollowRequest,
   FollowResponse,
+  GetFeedGroupsResponse,
   GetFeedResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
@@ -24,6 +26,10 @@ import {
   UnfollowResponse,
   UpdateFeedMembersRequest,
   UpdateFeedMembersResponse,
+  UpdateFeedRequest,
+  UpdateFeedResponse,
+  UpsertFeedGroupRequest,
+  UpsertFeedGroupResponse,
 } from '../models';
 import { decoders } from '../model-decoders';
 
@@ -51,6 +57,44 @@ export class FeedsApi extends CommonApiWrapper {
     >('POST', '/api/v2/feeds/activities/query', undefined, undefined, body);
 
     decoders.QueryActivitiesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  getFeedGroups = async (): Promise<StreamResponse<GetFeedGroupsResponse>> => {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetFeedGroupsResponse>
+    >('GET', '/api/v2/feeds/feedgroups', undefined, undefined);
+
+    decoders.GetFeedGroupsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  deleteFeedGroup = async (): Promise<
+    StreamResponse<DeleteFeedGroupResponse>
+  > => {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteFeedGroupResponse>
+    >('DELETE', '/api/v2/feeds/feedgroups/{group}', undefined, undefined);
+
+    decoders.DeleteFeedGroupResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  upsertFeedGroup = async (
+    request: UpsertFeedGroupRequest,
+  ): Promise<StreamResponse<UpsertFeedGroupResponse>> => {
+    const body = {
+      feed_group: request?.feed_group,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpsertFeedGroupResponse>
+    >('POST', '/api/v2/feeds/feedgroups/{group}', undefined, undefined, body);
+
+    decoders.UpsertFeedGroupResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };
@@ -111,6 +155,26 @@ export class FeedsApi extends CommonApiWrapper {
     return { ...response.body, metadata: response.metadata };
   };
 
+  updateFeed = async (
+    request: UpdateFeedRequest & { group: string; id: string },
+  ): Promise<StreamResponse<UpdateFeedResponse>> => {
+    const pathParams = {
+      group: request?.group,
+      id: request?.id,
+    };
+    const body = {
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateFeedResponse>
+    >('PATCH', '/api/v2/feeds/feeds/{group}/{id}', pathParams, undefined, body);
+
+    decoders.UpdateFeedResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
   getOrCreateFeed = async (
     request: GetOrCreateFeedRequest & { group: string; id: string },
   ): Promise<StreamResponse<GetOrCreateFeedResponse>> => {
@@ -120,6 +184,7 @@ export class FeedsApi extends CommonApiWrapper {
     };
     const body = {
       visibility_level: request?.visibility_level,
+      invites: request?.invites,
       members: request?.members,
       custom: request?.custom,
     };

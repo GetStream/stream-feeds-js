@@ -25,7 +25,13 @@ export interface AWSRekognitionConfig {
 }
 
 export interface AWSRekognitionRule {
-  action: 'flag' | 'shadow' | 'remove';
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
   label: string;
 
@@ -167,7 +173,13 @@ export interface AutomodPlatformCircumventionConfig {
 }
 
 export interface AutomodRule {
-  action: 'flag' | 'shadow' | 'remove';
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
   label: string;
 
@@ -263,7 +275,13 @@ export interface BlockListOptions {
 }
 
 export interface BlockListRule {
-  action: 'flag' | 'shadow' | 'remove';
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
   name: string;
 }
@@ -307,7 +325,13 @@ export interface BodyguardConfig {
 }
 
 export interface BodyguardRule {
-  action: 'flag' | 'shadow' | 'remove';
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
   label: string;
 
@@ -315,7 +339,13 @@ export interface BodyguardRule {
 }
 
 export interface BodyguardSeverityRule {
-  action: 'flag' | 'shadow' | 'remove';
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
@@ -1288,6 +1318,8 @@ export interface Message {
 
   image_labels?: Record<string, string[]>;
 
+  moderation?: ModerationV2Response;
+
   pinned_by?: User;
 
   poll?: Poll;
@@ -1364,6 +1396,8 @@ export interface MessageResponse {
 
   image_labels?: Record<string, string[]>;
 
+  moderation?: ModerationV2Response;
+
   pinned_by?: UserResponse;
 
   poll?: PollResponseData;
@@ -1409,6 +1443,22 @@ export interface ModerationPayload {
   videos?: string[];
 
   custom?: Record<string, any>;
+}
+
+export interface ModerationV2Response {
+  action: string;
+
+  original_text: string;
+
+  blocklist_matched?: string;
+
+  platform_circumvented?: boolean;
+
+  semantic_filter_matched?: string;
+
+  image_harms?: string[];
+
+  text_harms?: string[];
 }
 
 export interface MuteRequest {

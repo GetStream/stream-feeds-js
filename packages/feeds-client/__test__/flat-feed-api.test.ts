@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
 import { createTestClient, createTestTokenGenerator } from './utils';
 import { v4 as uuidv4 } from 'uuid';
-import { StreamFeed } from '../src/StreamFeed';
+import { StreamFlatFeed } from '../src/StreamFlatFeed';
 
 describe('Feeds API - flat feed', () => {
   const emily = { id: 'emily' };
@@ -11,9 +11,9 @@ describe('Feeds API - flat feed', () => {
   let emilyClient: StreamFeedsClient;
   let bobClient: StreamFeedsClient;
   let tamaraClient: StreamFeedsClient;
-  let emilyFeed: StreamFeed;
-  let tamaraFeed: StreamFeed;
-  let bobFeed: StreamFeed;
+  let emilyFeed: StreamFlatFeed;
+  let tamaraFeed: StreamFlatFeed;
+  let bobFeed: StreamFlatFeed;
 
   beforeAll(async () => {
     emilyClient = createTestClient();

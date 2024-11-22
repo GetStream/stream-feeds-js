@@ -2,13 +2,13 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
 import { createTestClient, createTestTokenGenerator } from './utils';
 import { v4 as uuidv4 } from 'uuid';
-import { StreamFeed } from '../src/StreamFeed';
 import { StreamNotificationFeed } from '../src/StreamNotificationFeed';
+import { StreamFlatFeed } from '../src/StreamFlatFeed';
 
 describe('Feeds API - notification feed', () => {
   const emily = { id: 'emily' };
   let emilyClient: StreamFeedsClient;
-  let emilyFeed: StreamFeed;
+  let emilyFeed: StreamFlatFeed;
   let notificationFeed: StreamNotificationFeed;
 
   beforeAll(async () => {

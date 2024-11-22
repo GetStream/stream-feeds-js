@@ -74,9 +74,22 @@ decoders.Feed = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
+    invites: { type: 'FeedMember', isSingle: false },
+
     members: { type: 'FeedMember', isSingle: false },
 
     created_by: { type: 'UserResponse', isSingle: true },
+
+    deleted_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.FeedGroupResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
   };
@@ -96,6 +109,13 @@ decoders.FeedMember = (input?: Record<string, any>) => {
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.GetFeedGroupsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    feed_groups: { type: 'FeedGroupResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -158,6 +178,20 @@ decoders.ReadNotificationFeedResponse = (input?: Record<string, any>) => {
 decoders.UpdateFeedMembersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     members: { type: 'MemberResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpdateFeedResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    feed: { type: 'Feed', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpsertFeedGroupResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    feed_group: { type: 'FeedGroupResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
