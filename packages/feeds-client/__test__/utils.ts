@@ -9,11 +9,12 @@ export const createTestClient = (options?: StreamClientOptions) => {
   if (!apiKey) {
     throw new Error('Provide an api key, check .env-example for details');
   }
-  return new StreamFeedsClient(apiKey, {
+  const client = new StreamFeedsClient(apiKey, {
     base_url: baseUrl,
     timeout: 10000,
     ...options,
   });
+  return client;
 };
 
 export const createTestTokenGenerator = (

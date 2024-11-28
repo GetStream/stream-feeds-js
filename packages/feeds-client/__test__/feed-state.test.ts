@@ -13,6 +13,7 @@ describe('Feeds state test', () => {
   beforeAll(async () => {
     emilyClient = createTestClient();
     await emilyClient.connectUser(emily, createTestTokenGenerator(emily));
+
     emilyFeed = emilyClient.feed('user', uuidv4());
   });
 

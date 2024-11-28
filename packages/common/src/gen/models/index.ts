@@ -1,3 +1,23 @@
+export interface AIImageConfig {
+  enabled: boolean;
+
+  rules: AWSRekognitionRule[];
+
+  async?: boolean;
+}
+
+export interface AITextConfig {
+  enabled: boolean;
+
+  profile: string;
+
+  rules: BodyguardRule[];
+
+  severity_rules: BodyguardSeverityRule[];
+
+  async?: boolean;
+}
+
 export interface APIError {
   code: number;
 
@@ -14,14 +34,6 @@ export interface APIError {
   unrecoverable?: boolean;
 
   exception_fields?: Record<string, string>;
-}
-
-export interface AWSRekognitionConfig {
-  enabled: boolean;
-
-  rules: AWSRekognitionRule[];
-
-  async?: boolean;
 }
 
 export interface AWSRekognitionRule {
@@ -310,18 +322,6 @@ export interface BlockedUserResponse {
   blocked_user: UserResponse;
 
   user: UserResponse;
-}
-
-export interface BodyguardConfig {
-  enabled: boolean;
-
-  profile: string;
-
-  rules: BodyguardRule[];
-
-  severity_rules: BodyguardSeverityRule[];
-
-  async?: boolean;
 }
 
 export interface BodyguardRule {
@@ -716,19 +716,17 @@ export interface ConfigResponse {
 
   updated_at: Date;
 
+  ai_image_config?: AIImageConfig;
+
+  ai_text_config?: AITextConfig;
+
   automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
 
   automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
 
   automod_toxicity_config?: AutomodToxicityConfig;
 
-  aws_rekognition_config?: AWSRekognitionConfig;
-
   block_list_config?: BlockListConfig;
-
-  bodyguard_config?: BodyguardConfig;
-
-  google_vision_config?: GoogleVisionConfig;
 
   velocity_filter_config?: VelocityFilterConfig;
 }
@@ -1197,10 +1195,6 @@ export interface GetOGResponse {
   fields?: Field[];
 
   giphy?: Images;
-}
-
-export interface GoogleVisionConfig {
-  enabled: boolean;
 }
 
 export interface ImageData {

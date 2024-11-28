@@ -379,6 +379,24 @@ export interface QueryFeedsResponse {
   prev?: string;
 }
 
+export interface ReactionResponse {
+  activity_id: string;
+
+  created_at: Date;
+
+  score: number;
+
+  type: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  custom: Record<string, any>;
+
+  user: UserResponse;
+}
+
 export interface ReadFlatFeedResponse {
   duration: string;
 
@@ -397,6 +415,26 @@ export interface ReadNotificationFeedResponse {
 
 export interface RemoveActivityFromFeedResponse {
   duration: string;
+}
+
+export interface SendReactionRequest {
+  type: string;
+
+  created_at?: Date;
+
+  enforce_unique?: boolean;
+
+  score?: number;
+
+  updated_at?: Date;
+
+  custom?: Record<string, any>;
+}
+
+export interface SendReactionResponse {
+  duration: string;
+
+  reaction: ReactionResponse;
 }
 
 export interface SortParamRequest {
@@ -432,6 +470,18 @@ export interface UpdateFeedMembersResponse {
 }
 
 export interface UpdateFeedRequest {
+  accept_invite?: boolean;
+
+  reject_invite?: boolean;
+
+  add_members?: FeedMember[];
+
+  assign_roles?: FeedMember[];
+
+  invites?: FeedMember[];
+
+  remove_members?: string[];
+
   custom?: Record<string, any>;
 }
 

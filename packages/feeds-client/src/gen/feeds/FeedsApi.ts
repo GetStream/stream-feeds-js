@@ -22,6 +22,8 @@ import {
   ReadFlatFeedResponse,
   ReadNotificationFeedResponse,
   RemoveActivityFromFeedResponse,
+  SendReactionRequest,
+  SendReactionResponse,
   UnfollowRequest,
   UnfollowResponse,
   UpdateFeedMembersRequest,
@@ -57,6 +59,36 @@ export class FeedsApi extends CommonApiWrapper {
     >('POST', '/api/v2/feeds/activities/query', undefined, undefined, body);
 
     decoders.QueryActivitiesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  feedsSendReaction = async (
+    request: SendReactionRequest & { id: string },
+  ): Promise<StreamResponse<SendReactionResponse>> => {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      type: request?.type,
+      created_at: request?.created_at,
+      enforce_unique: request?.enforce_unique,
+      score: request?.score,
+      updated_at: request?.updated_at,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<SendReactionResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/activities/{id}/reactions',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.SendReactionResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };
@@ -163,6 +195,12 @@ export class FeedsApi extends CommonApiWrapper {
       id: request?.id,
     };
     const body = {
+      accept_invite: request?.accept_invite,
+      reject_invite: request?.reject_invite,
+      add_members: request?.add_members,
+      assign_roles: request?.assign_roles,
+      invites: request?.invites,
+      remove_members: request?.remove_members,
       custom: request?.custom,
     };
 

@@ -1,4 +1,5 @@
 const { StreamClient } = require('@stream-io/node-sdk');
+const { kMaxLength } = require('node:buffer');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
@@ -17,6 +18,37 @@ require('dotenv').config();
 
   console.log('Creating users...');
   await client.upsertUsers(users);
+
+  await client['sendRequest'](
+    'POST',
+    '/api/v2/feeds/feedgroups/{group}',
+    undefined,
+    undefined,
+    {
+      feed_group: {
+        app_pk: 31264,
+        slug: 'user',
+        type: 'flat',
+        max_length: 500,
+      },
+    },
+  );
+
+  await client['sendRequest'](
+    'POST',
+    '/api/v2/feeds/feedgroups/{group}',
+    undefined,
+    undefined,
+    {
+      feed_group: {
+        app_pk: 31264,
+        slug: 'notification',
+        type: 'notification',
+        aggregation_format: '{{verb.id}}',
+        max_length: 3600,
+      },
+    },
+  );
 
   console.log('Finished initialization');
 })();
