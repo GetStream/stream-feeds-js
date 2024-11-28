@@ -37,6 +37,16 @@ describe('Feeds API - flat feed', () => {
     expect(response.feed.visibility_level).toBe('visible');
   });
 
+  it('updates the feed', async () => {
+    const response = await emilyFeed.update({
+      custom: {
+        color: 'green',
+      },
+    });
+
+    expect(response.feed.custom?.color).toBe('green');
+  });
+
   it('emily adds bob as feed member', async () => {
     const response = await emilyFeed.updateFeedMembers({
       update_members: [{ user_id: bob.id }],
@@ -80,6 +90,19 @@ describe('Feeds API - flat feed', () => {
     const response = await tamaraFeed.read({ limit: 5, offset: 0 });
 
     expect(response.activities.length).toBe(2);
+  });
+
+  it('tamara can add a reaction to the activities', async () => {
+    const response = await tamaraFeed.read({ limit: 5, offset: 0 });
+    const activity = response.activities[0];
+
+    const reactionResponse = await tamaraClient.feedsSendReaction({
+      type: 'like',
+      id: activity.id,
+    });
+
+    expect(reactionResponse.reaction.type).toBe('like');
+    expect(reactionResponse.reaction.activity_id).toBe(activity.id);
   });
 
   it('tamara can query activities', async () => {

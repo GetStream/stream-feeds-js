@@ -19,6 +19,7 @@ require('dotenv').config();
   console.log('Creating users...');
   await client.upsertUsers(users);
 
+  console.log('Creating feed groups...');
   await client['sendRequest'](
     'POST',
     '/api/v2/feeds/feedgroups/{group}',
