@@ -103,6 +103,12 @@ describe('Feeds API - flat feed', () => {
 
     expect(reactionResponse.reaction.type).toBe('like');
     expect(reactionResponse.reaction.activity_id).toBe(activity.id);
+
+    const queryResponse = await tamaraClient.feedsQueryReactions({
+      id: activity.id,
+    });
+
+    expect(queryResponse.reactions.length).toBe(1);
   });
 
   it('tamara can query activities', async () => {

@@ -19,6 +19,8 @@ import {
   QueryActivitiesResponse,
   QueryFeedsRequest,
   QueryFeedsResponse,
+  QueryReactionsRequest,
+  QueryReactionsResponse,
   ReadFlatFeedResponse,
   ReadNotificationFeedResponse,
   RemoveActivityFromFeedResponse,
@@ -89,6 +91,35 @@ export class FeedsApi extends CommonApiWrapper {
     );
 
     decoders.SendReactionResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  feedsQueryReactions = async (
+    request: QueryReactionsRequest & { id: string },
+  ): Promise<StreamResponse<QueryReactionsResponse>> => {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryReactionsResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/activities/{id}/reactions/query',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.QueryReactionsResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };

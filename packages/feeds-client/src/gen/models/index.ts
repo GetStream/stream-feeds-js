@@ -97,11 +97,16 @@ export interface Feed {
 
   id: string;
 
-  type: string;
+  type: 'flat' | 'notification';
 
   updated_at: Date;
 
-  visibility_level: string;
+  visibility_level:
+    | 'public'
+    | 'visible'
+    | 'followers'
+    | 'private'
+    | 'restricted';
 
   invites: FeedMember[];
 
@@ -119,7 +124,7 @@ export interface FeedGroupInput {
 
   slug: string;
 
-  type: string;
+  type: 'flat' | 'notification';
 
   aggregation_format?: string;
 
@@ -207,7 +212,7 @@ export interface FeedGroupResponse {
 
   sqs_url: string;
 
-  type: string;
+  type: 'flat' | 'notification';
 
   updated_at: Date;
 
@@ -373,6 +378,28 @@ export interface QueryFeedsResponse {
   duration: string;
 
   feeds: Feed[];
+
+  next?: string;
+
+  prev?: string;
+}
+
+export interface QueryReactionsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryReactionsResponse {
+  duration: string;
+
+  reactions: ReactionResponse[];
 
   next?: string;
 

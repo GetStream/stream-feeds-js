@@ -161,6 +161,13 @@ decoders.QueryFeedsResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.QueryReactionsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    reactions: { type: 'ReactionResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.ReactionResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
