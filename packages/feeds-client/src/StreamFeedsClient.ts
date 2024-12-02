@@ -27,8 +27,8 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     StreamFeedsEvent
   > = new EventDispatcher<StreamFeedsEvent['type'], StreamFeedsEvent>();
 
-  constructor(commonClient: StreamClient);
   constructor(apiKey: string, options?: StreamClientOptions);
+  constructor(commonClient: StreamClient);
   constructor(
     apiKeyOrClient: StreamClient | string,
     options?: StreamClientOptions,

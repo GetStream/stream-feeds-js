@@ -12,7 +12,7 @@
     "clean": "rimraf dist",
     "start": "rollup -w -c",
     "build": "yarn clean && rollup -c",
-    "test": "node ./__test__/create-users.js && vitest",
+    "test": "node ./__test__/setup-env.js && vitest",
     "clean:docs": "rimraf generated-docs",
     "test-ci": "vitest --coverage"
   },

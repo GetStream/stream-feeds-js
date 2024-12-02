@@ -2548,7 +2548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stream-io/common@workspace:*, @stream-io/common@workspace:packages/common":
+"@stream-io/common@workspace:*, @stream-io/common@workspace:^, @stream-io/common@workspace:packages/common":
   version: 0.0.0-use.local
   resolution: "@stream-io/common@workspace:packages/common"
   dependencies:
@@ -2567,7 +2567,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@stream-io/feeds-client@workspace:packages/feeds-client":
+"@stream-io/feeds-client@workspace:^, @stream-io/feeds-client@workspace:packages/feeds-client":
   version: 0.0.0-use.local
   resolution: "@stream-io/feeds-client@workspace:packages/feeds-client"
   dependencies:
@@ -5799,6 +5799,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "facebook-clone@workspace:sample-apps/facebook-clone"
   dependencies:
+    "@stream-io/common": "workspace:^"
+    "@stream-io/feeds-client": "workspace:^"
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18
