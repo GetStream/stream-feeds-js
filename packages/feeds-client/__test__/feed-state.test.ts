@@ -3,12 +3,15 @@ import { StreamFeedsClient } from '../src/StreamFeedsClient';
 import { createTestClient, createTestTokenGenerator } from './utils';
 import { v4 as uuidv4 } from 'uuid';
 import { FeedMember } from '../src/gen/models';
-import { StreamFlatFeed, StreamFlatFeedState } from '../src/StreamFlatFeed';
+import {
+  StreamFlatFeedClient,
+  StreamFlatFeedState,
+} from '../src/StreamFlatFeedClient';
 
 describe('Feeds state test', () => {
   const emily = { id: 'emily' };
   let emilyClient: StreamFeedsClient;
-  let emilyFeed: StreamFlatFeed;
+  let emilyFeed: StreamFlatFeedClient;
 
   beforeAll(async () => {
     emilyClient = createTestClient();

@@ -269,6 +269,14 @@ export interface FeedMember {
   user?: UserResponse;
 }
 
+export interface FollowRelationship {
+  created_at: Date;
+
+  updated_at: Date;
+
+  feed: Feed;
+}
+
 export interface FollowRequest {
   target_group: string;
 
@@ -293,6 +301,18 @@ export interface GetFeedResponse {
   duration: string;
 
   feed: Feed;
+}
+
+export interface GetFollowedFeedsResponse {
+  duration: string;
+
+  followed_feeds: FollowRelationship[];
+}
+
+export interface GetFollowingFeedsResponse {
+  duration: string;
+
+  followers: FollowRelationship[];
 }
 
 export interface GetOrCreateFeedRequest {

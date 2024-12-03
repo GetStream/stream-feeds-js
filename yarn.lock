@@ -5804,6 +5804,8 @@ __metadata:
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18
+    dotenv: ^16.4.5
+    material-symbols: ^0.27.1
     next: 15.0.3
     postcss: ^8
     react: 19.0.0-rc-66855b96-20241106
@@ -7501,6 +7503,13 @@ __metadata:
     socks-proxy-agent: ^7.0.0
     ssri: ^9.0.0
   checksum: 2332eb9a8ec96f1ffeeea56ccefabcb4193693597b132cd110734d50f2928842e22b84cfa1508e921b8385cdfd06dda9ad68645fed62b50fff629a580f5fb72c
+  languageName: node
+  linkType: hard
+
+"material-symbols@npm:^0.27.1":
+  version: 0.27.1
+  resolution: "material-symbols@npm:0.27.1"
+  checksum: 4906f95ec47a5981fddc586c258527508f344f094682016359faa37206312662e1ee4403467866c8e2e432756ea3564d418fe8445c40c8799819484e61838dba
   languageName: node
   linkType: hard
 

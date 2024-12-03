@@ -13,7 +13,7 @@ export type StreamFlatFeedState = Partial<{
   [key in keyof FlatFeed]: FlatFeed[key];
 }>;
 
-export class StreamFlatFeed extends StreamFeedApi {
+export class StreamFlatFeedClient extends StreamFeedApi {
   readonly state: StateStore<StreamFlatFeedState>;
 
   constructor(

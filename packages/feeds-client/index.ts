@@ -1,3 +1,4 @@
 export * from './src/StreamFeedsClient';
-export * from './src/StreamFlatFeed';
-export * from './src/StreamNotificationFeed';
+export * from './src/StreamFlatFeedClient';
+export * from './src/StreamNotificationFeedClient';
+export * from './src/gen/models';

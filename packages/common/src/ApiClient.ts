@@ -69,7 +69,6 @@ export class ApiClient {
       ...this.commonHeaders,
       Authorization: token,
       'Content-Type': 'application/json',
-      'Accept-Encoding': 'gzip',
       'x-client-request-id': client_request_id,
     };
 

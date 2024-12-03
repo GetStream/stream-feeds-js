@@ -7,6 +7,8 @@ import {
   FollowRequest,
   FollowResponse,
   GetFeedResponse,
+  GetFollowedFeedsResponse,
+  GetFollowingFeedsResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   ReadFlatFeedResponse,
@@ -78,6 +80,29 @@ export class StreamFeedApi {
 
   follow(request: FollowRequest): Promise<StreamResponse<FollowResponse>> {
     return this.feedsApi.follow({ id: this.id, group: this.group, ...request });
+  }
+
+  getFollowingFeeds(request: {
+    limit: number;
+    offset: number;
+  }): Promise<StreamResponse<GetFollowingFeedsResponse>> {
+    return this.feedsApi.getFollowingFeeds({
+      id: this.id,
+      group: this.group,
+      ...request,
+    });
+  }
+
+  getFollowedFeeds(request: {
+    limit: number;
+    offset: number;
+    filter?: string[];
+  }): Promise<StreamResponse<GetFollowedFeedsResponse>> {
+    return this.feedsApi.getFollowedFeeds({
+      id: this.id,
+      group: this.group,
+      ...request,
+    });
   }
 
   updateFeedMembers(

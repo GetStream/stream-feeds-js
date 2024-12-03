@@ -13,7 +13,7 @@ export type StreamNotificationFeedState = Partial<{
   [key in keyof NotificationFeed]: NotificationFeed[key];
 }>;
 
-export class StreamNotificationFeed extends StreamFeedApi {
+export class StreamNotificationFeedClient extends StreamFeedApi {
   readonly state: StateStore<StreamNotificationFeedState>;
 
   constructor(

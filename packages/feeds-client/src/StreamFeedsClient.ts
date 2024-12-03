@@ -10,8 +10,8 @@ import {
 } from '@stream-io/common';
 import { StreamFeedsEvent } from './types';
 import { FeedsApi } from './gen/feeds/FeedsApi';
-import { StreamFlatFeed } from './StreamFlatFeed';
-import { StreamNotificationFeed } from './StreamNotificationFeed';
+import { StreamFlatFeedClient } from './StreamFlatFeedClient';
+import { StreamNotificationFeedClient } from './StreamNotificationFeedClient';
 import { QueryFeedsRequest } from './gen/models';
 
 export type StreamFeedsClientState = StreamClientState & {
@@ -57,11 +57,11 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
   off = this.eventDispatcher.off;
 
   feed = (group: string, id: string) => {
-    return new StreamFlatFeed(this, group, id);
+    return new StreamFlatFeedClient(this, group, id);
   };
 
   notificationFeed = (group: string, id: string) => {
-    return new StreamNotificationFeed(this, group, id);
+    return new StreamNotificationFeedClient(this, group, id);
   };
 
   async _queryFeeds(request?: QueryFeedsRequest) {
@@ -70,9 +70,9 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     const feeds = response.feeds.map((f) => {
       switch (f.type) {
         case 'flat':
-          return new StreamFlatFeed(this, f.group, f.id, f);
+          return new StreamFlatFeedClient(this, f.group, f.id, f);
         case 'notification':
-          return new StreamNotificationFeed(this, f.group, f.id, f);
+          return new StreamNotificationFeedClient(this, f.group, f.id, f);
         default:
           throw new Error(`This SDK doesn't yet support ${f.type} type`);
       }

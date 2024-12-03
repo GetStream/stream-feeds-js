@@ -8,47 +8,35 @@ import {
 } from 'react';
 import { StreamFeedsClient } from '@stream-io/feeds-client';
 import { UserRequest } from '@stream-io/common';
+import * as usersJSON from '../users.json';
 
 const tokenProviderURL = process.env.NEXT_PUBLIC_STREAM_TOKEN_URL!;
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY!;
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 
-const users: UserRequest[] = [
-  {
-    id: 'alice',
-    name: 'Alice',
-    image: 'https://randomuser.me/api/portraits/women/47.jpg',
-  },
-  {
-    id: 'mark',
-    name: 'Mark',
-    image: 'https://randomuser.me/api/portraits/men/38.jpg',
-  },
-  {
-    id: 'bob',
-    name: 'Bob',
-    image: 'https://randomuser.me/api/portraits/men/42.jpg',
-  },
-  {
-    id: 'jane',
-    name: 'Jane',
-    image: 'https://randomuser.me/api/portraits/women/60.jpg',
-  },
-  {
-    id: 'tamara',
-    name: 'Tamara',
-    image: 'https://randomuser.me/api/portraits/women/40.jpg',
-  },
-  {
-    id: 'john',
-    name: 'John',
-    image: 'https://randomuser.me/api/portraits/men/54.jpg',
-  },
-];
+const getCookieValue = (cookieName: string) => {
+  // Split document.cookie into individual "key=value" strings
+  const cookies = document.cookie.split('; ');
+
+  // Find the cookie with the matching name
+  for (const cookie of cookies) {
+    // Split each "key=value" string into key and value
+    const [key, value] = cookie.split('=');
+    if (key === cookieName) {
+      // Return the decoded value if the key matches
+      return decodeURIComponent(value);
+    }
+  }
+
+  // Return null if the cookie is not found
+  return null;
+};
+
+const users = Array.from(usersJSON);
 
 type UserContextValue = {
   users: UserRequest[];
-  client: StreamFeedsClient;
+  client?: StreamFeedsClient;
   user?: UserRequest;
   logIn: (user: UserRequest) => Promise<void>;
   logOut: () => Promise<void>;
@@ -56,22 +44,21 @@ type UserContextValue = {
 
 const UserContext = createContext<UserContextValue>({
   user: undefined,
-  client: new StreamFeedsClient(apiKey, { base_url: apiUrl }),
+  client: undefined,
   users: users,
   logIn: () => Promise.resolve(),
   logOut: () => Promise.resolve(),
 });
 
 export const UserContextProvider = ({ children }: PropsWithChildren) => {
-  const client = new StreamFeedsClient(apiKey, { base_url: apiUrl });
-
+  const [client, setClient] = useState<StreamFeedsClient | undefined>();
   const [user, setUser] = useState<UserRequest | undefined>();
 
   const logIn = async (user: UserRequest) => {
-    localStorage.setItem('USER_ID', user.id);
+    document.cookie = `user_id=${user.id}`;
     setUser(user);
     try {
-      await client.connectUser(user, async () => {
+      const tokenProvider = async () => {
         const url = new URL(tokenProviderURL);
         url.searchParams.set('api_key', apiKey);
         url.searchParams.set('user_id', user.id);
@@ -79,18 +66,34 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
         const response = await fetch(url.toString());
         const data = await response.json();
         return data.token;
-      });
+      };
+      const _client = new StreamFeedsClient(apiKey, { base_url: apiUrl });
+      const connectPromise = _client.connectUser(user, tokenProvider);
+      setClient(_client);
+      await connectPromise;
     } catch (error) {
       logOut();
       throw error;
     }
   };
 
+  useEffect(() => {
+    const user_id = getCookieValue('user_id');
+    const loggedInUser = users.find((u) => u.id === user_id);
+    if (loggedInUser) {
+      logIn(loggedInUser);
+    } else {
+      document.cookie = '';
+    }
+  }, []);
+
   const logOut = () => {
-    localStorage.removeItem('USER_ID');
+    document.cookie = '';
     setUser(undefined);
-    if (client.state.getLatestValue().connectedUser) {
-      return client.disconnectUser();
+    const _client = client;
+    setClient(undefined);
+    if (_client?.state.getLatestValue().connectedUser) {
+      return _client.disconnectUser();
     } else {
       return Promise.resolve();
     }

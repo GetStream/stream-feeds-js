@@ -13,6 +13,8 @@ import {
   FollowResponse,
   GetFeedGroupsResponse,
   GetFeedResponse,
+  GetFollowedFeedsResponse,
+  GetFollowingFeedsResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   QueryActivitiesRequest,
@@ -345,6 +347,66 @@ export class FeedsApi extends CommonApiWrapper {
     );
 
     decoders.FollowResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  getFollowingFeeds = async (request: {
+    group: string;
+    id: string;
+    limit: number;
+    offset: number;
+  }): Promise<StreamResponse<GetFollowingFeedsResponse>> => {
+    const queryParams = {
+      limit: request?.limit,
+      offset: request?.offset,
+    };
+    const pathParams = {
+      group: request?.group,
+      id: request?.id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetFollowingFeedsResponse>
+    >(
+      'GET',
+      '/api/v2/feeds/feeds/{group}/{id}/followers',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.GetFollowingFeedsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  };
+
+  getFollowedFeeds = async (request: {
+    group: string;
+    id: string;
+    limit: number;
+    offset: number;
+    filter?: string[];
+  }): Promise<StreamResponse<GetFollowedFeedsResponse>> => {
+    const queryParams = {
+      limit: request?.limit,
+      offset: request?.offset,
+      filter: request?.filter,
+    };
+    const pathParams = {
+      group: request?.group,
+      id: request?.id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetFollowedFeedsResponse>
+    >(
+      'GET',
+      '/api/v2/feeds/feeds/{group}/{id}/following',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.GetFollowedFeedsResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   };

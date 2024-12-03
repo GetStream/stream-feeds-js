@@ -14,7 +14,7 @@ export default function Login() {
 
   return (
     <div className="w-3/4 m-auto">
-      <h2 className="text-4xl font-extrabold text-center dark:text-white">
+      <h2 className="text-4xl font-extrabold text-center">
         Choose a user to log in
       </h2>
       <ul className="divide-y divide-gray-200">
@@ -25,9 +25,7 @@ export default function Login() {
               onClick={() => login(user)}
             >
               <img className="size-10 rounded-full" src={user.image} alt="" />
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {user.name}
-              </p>
+              <p className="text-sm font-medium text-gray-900">{user.name}</p>
             </button>
           </li>
         ))}

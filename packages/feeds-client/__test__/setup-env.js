@@ -10,7 +10,7 @@ require('dotenv').config();
   const url = process.env.VITE_API_URL;
 
   const users = JSON.parse(
-    await fs.readFile(path.resolve('..', '..', 'users.json'), 'utf-8'),
+    await fs.readFile(path.resolve('__test__', 'users.json'), 'utf-8'),
   );
 
   const client = new StreamClient(key, secret, { basePath: url });
