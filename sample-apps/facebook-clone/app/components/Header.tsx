@@ -27,6 +27,20 @@ export function Header() {
                 className={`absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
               >
                 <Link
+                  href="/home"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/my-feed"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  My posts
+                </Link>
+                <Link
                   href="/users"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-100"
                   onClick={() => setIsMenuOpen(false)}

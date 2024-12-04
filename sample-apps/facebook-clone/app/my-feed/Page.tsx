@@ -1,7 +1,13 @@
 'use client';
-import { useUserContext } from '../user-context';
+import { Feed } from '../components/Feed';
+import { useFeedContext } from '../feed-context';
 
 export default function Home() {
-  const { user, client } = useUserContext();
-  return <div>Welcome {user?.name}</div>;
+  const { ownFeed } = useFeedContext();
+
+  if (!ownFeed) {
+    return '';
+  }
+
+  return <Feed feed={ownFeed}></Feed>;
 }

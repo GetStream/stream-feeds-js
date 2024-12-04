@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import './globals.css';
 import { UserContextProvider } from './user-context';
 import { Header } from './components/Header';
+import { FeedContextProvider } from './feed-context';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -31,8 +32,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <UserContextProvider>
-          <Header></Header>
-          {children}
+          <FeedContextProvider>
+            <Header></Header>
+            {children}
+          </FeedContextProvider>
         </UserContextProvider>
       </body>
     </html>

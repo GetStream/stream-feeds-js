@@ -1,19 +1,17 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useUserContext } from '../user-context';
-import { StreamFlatFeedClient } from '@stream-io/feeds-client';
 import { UserRequest } from '@stream-io/common';
+import { useFeedContext } from '../feed-context';
 
 type FeedCid = string;
 
 type FeedFollowerMapping = { [key: FeedCid]: boolean };
 
 export default function Users() {
-  const { client, users, user } = useUserContext();
+  const { users, user } = useUserContext();
   const [filteredUsers, setUsers] = useState<UserRequest[]>([]);
-  const [timeline, setTimeline] = useState<StreamFlatFeedClient | undefined>(
-    undefined,
-  );
+  const { ownTimeline } = useFeedContext();
   const [followerMapping, setFollowerMapping] = useState<FeedFollowerMapping>(
     {},
   );
@@ -23,18 +21,10 @@ export default function Users() {
   }, [users, user]);
 
   useEffect(() => {
-    if (!client || !user) {
-      setTimeline(undefined);
-    } else {
-      setTimeline(client.feed('timeline', user.id));
-    }
-  }, [client, user]);
-
-  useEffect(() => {
-    if (!timeline) {
+    if (!ownTimeline) {
       return;
     }
-    timeline
+    ownTimeline
       .getFollowedFeeds({
         offset: 0,
         limit: 30,
@@ -48,10 +38,10 @@ export default function Users() {
         });
         setFollowerMapping(mapping);
       });
-  }, [users, timeline]);
+  }, [users, ownTimeline]);
 
   const follow = async (userId: string) => {
-    await timeline?.follow({
+    await ownTimeline?.follow({
       target_group: 'user',
       target_id: userId,
     });
@@ -60,7 +50,7 @@ export default function Users() {
   };
 
   const unfollow = async (userId: string) => {
-    await timeline?.unfollow({
+    await ownTimeline?.unfollow({
       target_group: 'user',
       target_id: userId,
     });
