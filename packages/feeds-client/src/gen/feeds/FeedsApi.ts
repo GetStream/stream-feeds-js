@@ -37,7 +37,7 @@ import {
   UpsertFeedGroupRequest,
   UpsertFeedGroupResponse,
 } from '../models';
-import { decoders } from '../model-decoders';
+import { decoders } from '../model-decoders/decoders';
 
 export class FeedsApi extends CommonApiWrapper {
   public readonly apiClient: ApiClient;
@@ -247,14 +247,22 @@ export class FeedsApi extends CommonApiWrapper {
   };
 
   getOrCreateFeed = async (
-    request: GetOrCreateFeedRequest & { group: string; id: string },
+    request: GetOrCreateFeedRequest & {
+      group: string;
+      id: string;
+      connection_id?: string;
+    },
   ): Promise<StreamResponse<GetOrCreateFeedResponse>> => {
+    const queryParams = {
+      connection_id: request?.connection_id,
+    };
     const pathParams = {
       group: request?.group,
       id: request?.id,
     };
     const body = {
       visibility_level: request?.visibility_level,
+      watch: request?.watch,
       invites: request?.invites,
       members: request?.members,
       custom: request?.custom,
@@ -262,7 +270,13 @@ export class FeedsApi extends CommonApiWrapper {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<GetOrCreateFeedResponse>
-    >('POST', '/api/v2/feeds/feeds/{group}/{id}', pathParams, undefined, body);
+    >(
+      'POST',
+      '/api/v2/feeds/feeds/{group}/{id}',
+      pathParams,
+      queryParams,
+      body,
+    );
 
     decoders.GetOrCreateFeedResponse?.(response.body);
 

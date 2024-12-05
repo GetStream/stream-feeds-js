@@ -19,7 +19,7 @@ import {
   UpdateUsersResponse,
   WSAuthMessage,
 } from '../models';
-import { decoders } from '../model-decoders';
+import { decoders } from '../model-decoders/decoders';
 
 export class CommonApi {
   constructor(public readonly apiClient: ApiClient) {}

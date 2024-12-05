@@ -1,11 +1,6 @@
-import { StateStore } from '@stream-io/common';
-import {
-  Feed,
-  GetOrCreateFeedRequest,
-  ReadFlatFeedResponse,
-} from './gen/models';
+import { ActivityAddedEvent, Feed, ReadFlatFeedResponse } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
-import { StreamFeedApi } from './gen/feeds/FeedApi';
+import { StreamBaseFeed } from './StreamBaseFeed';
 
 type FlatFeed = Feed & Omit<ReadFlatFeedResponse, 'duration'>;
 
@@ -13,16 +8,26 @@ export type StreamFlatFeedState = Partial<{
   [key in keyof FlatFeed]: FlatFeed[key];
 }>;
 
-export class StreamFlatFeedClient extends StreamFeedApi {
-  readonly state: StateStore<StreamFlatFeedState>;
-
+export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
   constructor(
     client: StreamFeedsClient,
     group: string,
     id: string,
     feed?: Feed,
   ) {
-    super(client, group, id);
+    super(client, group, id, feed);
+  }
+
+  read = async (request: { limit: number; offset: number }) => {
+    const response = await this.readFlat(request);
+    const activities = this.state.getLatestValue().activities ?? [];
+    this.addActivitiesToState(response.activities, activities);
+    this.state.partialNext({ activities: [...activities] });
+
+    return response;
+  };
+
+  protected getInitialState(feed?: Feed) {
     const defaultState: StreamFlatFeedState = {
       created_at: undefined,
       follower_count: undefined,
@@ -39,22 +44,17 @@ export class StreamFlatFeedClient extends StreamFeedApi {
       custom: undefined,
       activities: undefined,
     };
-    this.state = new StateStore({ ...feed, ...defaultState });
+
+    return { ...feed, ...defaultState };
   }
 
-  read = this.readFlat;
-
-  async get() {
-    const response = await super.get();
-    this.state.partialNext(response.feed);
-
-    return response;
+  protected updateFromFeedResponse(feed: Feed): void {
+    this.state.partialNext(feed);
   }
 
-  async getOrCreate(request?: GetOrCreateFeedRequest) {
-    const response = await super.getOrCreate(request);
-    this.state.partialNext(response.feed);
-
-    return response;
+  protected newActivityReceived(event: ActivityAddedEvent): void {
+    const activities = this.state.getLatestValue().activities ?? [];
+    this.addActivitiesToState([event.activity], activities);
+    this.state.partialNext({ activities: [...activities] });
   }
 }

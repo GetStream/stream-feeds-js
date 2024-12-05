@@ -1,11 +1,10 @@
-import { StateStore } from '@stream-io/common';
 import {
+  ActivityAddedEvent,
   Feed,
-  GetOrCreateFeedRequest,
   ReadNotificationFeedResponse,
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
-import { StreamFeedApi } from './gen/feeds/FeedApi';
+import { StreamBaseFeed } from './StreamBaseFeed';
 
 type NotificationFeed = Feed & Omit<ReadNotificationFeedResponse, 'duration'>;
 
@@ -13,16 +12,19 @@ export type StreamNotificationFeedState = Partial<{
   [key in keyof NotificationFeed]: NotificationFeed[key];
 }>;
 
-export class StreamNotificationFeedClient extends StreamFeedApi {
-  readonly state: StateStore<StreamNotificationFeedState>;
-
+export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificationFeedState> {
   constructor(
     client: StreamFeedsClient,
     group: string,
     id: string,
     feed?: Feed,
   ) {
-    super(client, group, id);
+    super(client, group, id, feed);
+  }
+
+  read = this.readNotification;
+
+  protected getInitialState(feed?: Feed) {
     const defaultState: StreamNotificationFeedState = {
       created_at: undefined,
       follower_count: undefined,
@@ -39,22 +41,14 @@ export class StreamNotificationFeedClient extends StreamFeedApi {
       custom: undefined,
       groups: undefined,
     };
-    this.state = new StateStore({ ...feed, ...defaultState });
+    return { ...feed, ...defaultState };
   }
 
-  read = this.readNotification;
-
-  async get() {
-    const response = await super.get();
-    this.state.partialNext(response.feed);
-
-    return response;
+  protected updateFromFeedResponse(feed: Feed): void {
+    this.state.partialNext(feed);
   }
 
-  async getOrCreate(request?: GetOrCreateFeedRequest) {
-    const response = await super.getOrCreate(request);
-    this.state.partialNext(response.feed);
-
-    return response;
+  protected newActivityReceived(event: ActivityAddedEvent): void {
+    // TODO: implement me
   }
 }

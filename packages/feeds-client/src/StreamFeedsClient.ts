@@ -8,16 +8,17 @@ import {
   StreamClientState,
   UserRequest,
 } from '@stream-io/common';
-import { StreamFeedsEvent } from './types';
 import { FeedsApi } from './gen/feeds/FeedsApi';
 import { StreamFlatFeedClient } from './StreamFlatFeedClient';
 import { StreamNotificationFeedClient } from './StreamNotificationFeedClient';
-import { QueryFeedsRequest } from './gen/models';
+import { Feed, QueryFeedsRequest, WSEvent } from './gen/models';
+import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
+import { StreamFeedsEvent } from './types';
+import { StreamBaseFeed } from './StreamBaseFeed';
 
-export type StreamFeedsClientState = StreamClientState & {
-  // TODO remove this, this is just a test property to test the architecture
-  color: string;
-};
+export type StreamFeedsClientState = StreamClientState;
+
+type FID = string;
 
 export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
   readonly state: StateStore<StreamFeedsClientState>;
@@ -26,6 +27,7 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     StreamFeedsEvent['type'],
     StreamFeedsEvent
   > = new EventDispatcher<StreamFeedsEvent['type'], StreamFeedsEvent>();
+  private activeFeeds: { [key: FID]: StreamBaseFeed } = {};
 
   constructor(apiKey: string, options?: StreamClientOptions);
   constructor(commonClient: StreamClient);
@@ -39,44 +41,51 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     } else {
       streamClient = apiKeyOrClient;
     }
+    streamClient.addEventDecoder(decodeWSEvent);
     super(streamClient);
     this.moderation = this.streamClient.moderation;
     this.state = new StateStore({
       ...this.streamClient.state.getLatestValue(),
-      color: 'red',
     });
     this.streamClient.state.subscribe((state) => {
       this.state.partialNext(state);
     });
-    this.streamClient.on('all', (event) =>
-      this.eventDispatcher.dispatch(event),
-    );
+    this.streamClient.on('all', (event) => {
+      if (Object.hasOwn(event, 'fid')) {
+        const feed = this.activeFeeds[(event as unknown as WSEvent)['fid']];
+        if (feed) {
+          feed.handleWSEvent(event as unknown as WSEvent);
+        }
+      }
+      this.eventDispatcher.dispatch(event);
+    });
   }
 
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
 
   feed = (group: string, id: string) => {
-    return new StreamFlatFeedClient(this, group, id);
+    return this.getOrCreateActiveFeed(
+      group,
+      id,
+      'flat',
+    ) as StreamFlatFeedClient;
   };
 
   notificationFeed = (group: string, id: string) => {
-    return new StreamNotificationFeedClient(this, group, id);
+    return this.getOrCreateActiveFeed(
+      group,
+      id,
+      'notification',
+    ) as StreamNotificationFeedClient;
   };
 
   async _queryFeeds(request?: QueryFeedsRequest) {
     const response = await this.queryFeeds(request);
 
-    const feeds = response.feeds.map((f) => {
-      switch (f.type) {
-        case 'flat':
-          return new StreamFlatFeedClient(this, f.group, f.id, f);
-        case 'notification':
-          return new StreamNotificationFeedClient(this, f.group, f.id, f);
-        default:
-          throw new Error(`This SDK doesn't yet support ${f.type} type`);
-      }
-    });
+    const feeds = response.feeds.map((f) =>
+      this.getOrCreateActiveFeed(f.group, f.id, f.type, f),
+    );
 
     return feeds;
   }
@@ -88,11 +97,37 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     return this.streamClient.connectUser(user, tokenProvider);
   };
 
-  disconnectUser(): Promise<void> {
+  disconnectUser = () => {
     return this.streamClient.disconnectUser();
-  }
+  };
 
   upsertUsers = (users: UserRequest[]) => {
     return this.streamClient.upsertUsers(users);
+  };
+
+  private getOrCreateActiveFeed = (
+    group: string,
+    id: string,
+    type: 'flat' | 'notification',
+    data?: Feed,
+  ) => {
+    const fid = `${group}:${id}`;
+    if (this.activeFeeds[fid]) {
+      return this.activeFeeds[fid];
+    } else {
+      let feed: StreamBaseFeed;
+      switch (type) {
+        case 'flat':
+          feed = new StreamFlatFeedClient(this, group, id, data);
+          break;
+        case 'notification':
+          feed = new StreamNotificationFeedClient(this, group, id, data);
+          break;
+        default:
+          throw new Error(`This SDK doesn't yet support ${type} type`);
+      }
+      this.activeFeeds[fid] = feed;
+      return feed;
+    }
   };
 }

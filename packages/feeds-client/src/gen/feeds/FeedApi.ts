@@ -48,7 +48,7 @@ export class StreamFeedApi {
   }
 
   getOrCreate(
-    request?: GetOrCreateFeedRequest,
+    request?: GetOrCreateFeedRequest & { connection_id?: string },
   ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
     return this.feedsApi.getOrCreateFeed({
       id: this.id,

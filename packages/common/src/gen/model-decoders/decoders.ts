@@ -412,6 +412,21 @@ decoders.MessageResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.ModerationEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+
+    flags: { type: 'Flag2Response', isSingle: false },
+
+    action: { type: 'ActionLogResponse', isSingle: true },
+
+    review_queue_item: { type: 'ReviewQueueItemResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.MuteResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     mutes: { type: 'UserMute', isSingle: false },

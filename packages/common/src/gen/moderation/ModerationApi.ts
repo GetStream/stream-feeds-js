@@ -13,7 +13,7 @@ import {
   SubmitActionRequest,
   SubmitActionResponse,
 } from '../models';
-import { decoders } from '../model-decoders';
+import { decoders } from '../model-decoders/decoders';
 
 export class ModerationApi {
   constructor(public readonly apiClient: ApiClient) {}

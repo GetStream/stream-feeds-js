@@ -38,6 +38,18 @@ export interface Activity {
   custom?: Record<string, any>;
 }
 
+export interface ActivityAddedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  type: string;
+
+  activity: Activity;
+
+  received_at?: Date;
+}
+
 export interface AddActivityRequest {
   object: string;
 
@@ -323,6 +335,8 @@ export interface GetOrCreateFeedRequest {
     | 'private'
     | 'restricted';
 
+  watch?: boolean;
+
   invites?: FeedMember[];
 
   members?: FeedMember[];
@@ -581,3 +595,9 @@ export interface UserResponse {
 
   custom?: Record<string, any>;
 }
+
+export type WSEvent = { type: 'feeds.activity_added' } & ActivityAddedEvent;
+
+export type WebhookEvent = {
+  type: 'feeds.activity_added';
+} & ActivityAddedEvent;

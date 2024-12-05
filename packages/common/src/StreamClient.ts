@@ -7,12 +7,7 @@ import { ModerationClient } from './ModerationClient';
 import { StableWSConnection } from './real-time/StableWSConnection';
 import { StateStore } from './StateStore';
 import { TokenManager } from './TokenManager';
-import {
-  ProductApiInferface,
-  StreamClientOptions,
-  StreamEvent,
-  StreamResponse,
-} from './types';
+import { ProductApiInferface, StreamClientOptions, StreamEvent } from './types';
 import {
   addConnectionEventListeners,
   removeConnectionEventListeners,
@@ -35,6 +30,7 @@ export class StreamClient extends CommonApi implements ProductApiInferface {
     StreamEvent['type'],
     StreamEvent
   > = new EventDispatcher<StreamEvent['type'], StreamEvent>();
+  private eventDecoders: ((event: any) => any)[] = [];
 
   constructor(
     public readonly apiKey: string,
@@ -53,6 +49,7 @@ export class StreamClient extends CommonApi implements ProductApiInferface {
     this.connectionIdManager = connectionIdManager;
     this.moderation = new ModerationClient(this.apiClient);
   }
+
   upsertUsers = (users: UserRequest[]) => {
     const payload: Record<string, UserRequest> = {};
 
@@ -85,6 +82,7 @@ export class StreamClient extends CommonApi implements ProductApiInferface {
         },
         this.tokenManager,
         this.connectionIdManager,
+        this.eventDecoders,
       );
       this.wsConnection.on('all', (event) =>
         this.eventDispatcher.dispatch(event),
@@ -112,6 +110,22 @@ export class StreamClient extends CommonApi implements ProductApiInferface {
 
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
+
+  /**
+   * @internal
+   */
+  addEventDecoder(fn: (data: { type: string } & Record<string, any>) => any) {
+    this.eventDecoders.push(fn);
+  }
+
+  /**
+   * @internal
+   */
+  removeEventDecoder(
+    fn: (data: { type: string } & Record<string, any>) => any,
+  ) {
+    this.eventDecoders.splice(this.eventDecoders.indexOf(fn), 1);
+  }
 
   private readonly updateNetworkConnectionStatus = (
     event: { type: 'online' | 'offline' } | Event,

@@ -29,6 +29,7 @@ describe('Feeds state test', () => {
     emilyFeed.state.subscribe(spy);
 
     await emilyFeed.getOrCreate({
+      watch: true,
       members: [{ user_id: 'bob' }],
       visibility_level: 'visible',
     });
@@ -55,6 +56,37 @@ describe('Feeds state test', () => {
     });
 
     expect(spy.mock.calls.length).toBe(1);
+  });
+
+  it('add activities to state on read', async () => {
+    const activityResponse = await emilyFeed.addActivity({
+      object: 'post:12',
+      verb: 'create',
+    });
+
+    await emilyFeed.read({ offset: 0, limit: 30 });
+
+    const activities = emilyFeed.state.getLatestValue().activities ?? [];
+    expect(activities.length).toBe(1);
+    expect(activities[0].id).toBe(activityResponse.activity.id);
+  });
+
+  it('add new activity to state on WS event', async () => {
+    const activityResponse = await emilyFeed.addActivity({
+      object: 'post:13',
+      verb: 'create',
+    });
+
+    // hacky solution to wait for WS event
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    const activities = emilyFeed.state.getLatestValue().activities ?? [];
+    const lastActivity = activities[1];
+    expect(activities.length).toBe(2);
+    expect(lastActivity.id).toBe(activityResponse.activity.id);
+
+    //check WS event decoding
+    expect(lastActivity.created_at instanceof Date).toBe(true);
   });
 
   afterAll(async () => {

@@ -1,7 +1,7 @@
 import { CommonApiInterface } from './gen/common/CommonApiInterface';
 import { UpdateUsersResponse, UserRequest } from './gen/models';
 import { ModerationClient } from './ModerationClient';
-import { StreamWSEvent } from './real-time/event-models';
+import { StreamWSEvent, WSEvent } from './real-time/event-models';
 
 export type StreamClientOptions = {
   base_url?: string;

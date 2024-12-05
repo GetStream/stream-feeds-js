@@ -46,7 +46,6 @@ export class ApiClient {
       body?.presence
     ) {
       const connectionId = await this.connectionIdManager.getConnectionId();
-      console.log(connectionId);
       queryParams.connection_id = connectionId;
     }
 

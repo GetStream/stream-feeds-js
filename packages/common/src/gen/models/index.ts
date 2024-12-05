@@ -2205,6 +2205,6 @@ export interface WSAuthMessage {
   products?: string[];
 }
 
-export interface WebhookEvent {
-  type: string;
-}
+export type WebhookEvent =
+  | ({ type: 'review_queue_item.new' } & ModerationEvent)
+  | ({ type: 'review_queue_item.updated' } & ModerationEvent);

@@ -83,6 +83,7 @@ export class StableWSConnection {
     private readonly config: WSConfig,
     private readonly tokenManager: TokenManager,
     private readonly connectionIdManager: ConnectionIdManager,
+    private readonly decoders: ((event: any) => any)[] = [],
   ) {
     /** consecutive failures influence the duration of the timeout */
     this.consecutiveFailures = 0;
@@ -486,7 +487,10 @@ export class StableWSConnection {
     if (this.wsID !== wsID) return;
 
     this._log('onmessage() - onmessage callback', { event, wsID });
-    const data = typeof event.data === 'string' ? JSON.parse(event.data) : null;
+    let data = typeof event.data === 'string' ? JSON.parse(event.data) : null;
+    this.decoders.forEach((decode) => {
+      data = decode(data);
+    });
 
     // we wait till the first message before we consider the connection open.
     // the reason for this is that auth errors and similar errors trigger a ws.onopen and immediately
