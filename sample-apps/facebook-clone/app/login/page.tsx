@@ -8,7 +8,9 @@ export default function Login() {
   const router = useRouter();
 
   const login = (user: UserRequest) => {
-    logIn(user);
+    logIn(user).catch((err) => {
+      throw err;
+    });
     router.push('/home');
   };
 

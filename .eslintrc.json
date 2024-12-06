@@ -48,6 +48,7 @@
         "checksVoidReturn": false
       }
     ],
-    "@typescript-eslint/consistent-type-definitions": "off"
+    "@typescript-eslint/consistent-type-definitions": "off",
+    "@typescript-eslint/naming-convention": "off"
   }
 }

@@ -45,7 +45,7 @@ type UserContextValue = {
 const UserContext = createContext<UserContextValue>({
   user: undefined,
   client: undefined,
-  users: users,
+  users,
   logIn: () => Promise.resolve(),
   logOut: () => Promise.resolve(),
 });
@@ -72,7 +72,9 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
       setClient(_client);
       await connectPromise;
     } catch (error) {
-      logOut();
+      logOut().catch((err) => {
+        throw err;
+      });
       throw error;
     }
   };
@@ -81,7 +83,9 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
     const user_id = getCookieValue('user_id');
     const loggedInUser = users.find((u) => u.id === user_id);
     if (loggedInUser) {
-      logIn(loggedInUser);
+      logIn(loggedInUser).catch((err) => {
+        throw err;
+      });
     } else {
       document.cookie = '';
     }

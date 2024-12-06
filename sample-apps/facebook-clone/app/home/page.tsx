@@ -1,7 +1,13 @@
 'use client';
-import { useUserContext } from '../user-context';
+import { Feed } from '../components/Feed';
+import { useFeedContext } from '../feed-context';
 
 export default function Home() {
-  const { user } = useUserContext();
-  return <div>Welcome {user?.name}</div>;
+  const { ownTimeline } = useFeedContext();
+
+  if (!ownTimeline) {
+    return '';
+  }
+
+  return <Feed readOnly={true} feed={ownTimeline}></Feed>;
 }

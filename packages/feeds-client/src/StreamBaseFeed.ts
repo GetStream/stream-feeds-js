@@ -68,9 +68,9 @@ export abstract class StreamBaseFeed<
         activities[index] = newActivity;
       }
     });
-    activities.sort(
-      (a1, a2) => a1.created_at.getTime() - a2.created_at.getTime(),
-    );
+    activities.sort((a1, a2) => {
+      return a2.created_at.getTime() - a1.created_at.getTime();
+    });
   }
 
   protected abstract getInitialState(feed?: Feed): T;

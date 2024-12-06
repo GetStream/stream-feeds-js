@@ -9,5 +9,5 @@ export default function Home() {
     return '';
   }
 
-  return <Feed feed={ownFeed}></Feed>;
+  return <Feed readOnly={false} feed={ownFeed}></Feed>;
 }

@@ -6,7 +6,7 @@ import { useFeedContext } from '../feed-context';
 
 type FeedCid = string;
 
-type FeedFollowerMapping = { [key: FeedCid]: boolean };
+type FeedFollowerMapping = Record<FeedCid, boolean>;
 
 export default function Users() {
   const { users, user } = useUserContext();
@@ -37,6 +37,9 @@ export default function Users() {
           mapping[fid] = true;
         });
         setFollowerMapping(mapping);
+      })
+      .catch((err) => {
+        throw err;
       });
   }, [users, ownTimeline]);
 
@@ -45,6 +48,8 @@ export default function Users() {
       target_group: 'user',
       target_id: userId,
     });
+    // Reinit state to include activities from newly followed user
+    await ownTimeline?.read({ limit: 30, offset: 0 });
     const fid = `user:${userId}`;
     setFollowerMapping({ ...followerMapping, [fid]: true });
   };
@@ -54,6 +59,8 @@ export default function Users() {
       target_group: 'user',
       target_id: userId,
     });
+    // Reinit state to exclude activities from newly unfollowed user
+    await ownTimeline?.read({ limit: 30, offset: 0 });
     const fid = `user:${userId}`;
     setFollowerMapping({ ...followerMapping, [fid]: false });
   };

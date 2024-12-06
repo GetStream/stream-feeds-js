@@ -4,8 +4,10 @@ type TypeMapping = Record<string, { type: string; isSingle: boolean }>;
 
 export const decoders: Record<string, Decoder> = {};
 
-const decodeDatetimeType = (input: number) =>
-  new Date(Math.floor(input / 1000000));
+const decodeDatetimeType = (input: number | string) =>
+  typeof input === 'number'
+    ? new Date(Math.floor(input / 1000000))
+    : new Date(input);
 
 decoders.DatetimeType = decodeDatetimeType;
 

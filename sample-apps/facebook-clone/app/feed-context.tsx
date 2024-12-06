@@ -31,8 +31,22 @@ export const FeedContextProvider = ({ children }: PropsWithChildren) => {
       setOwnFeed(undefined);
       setOwnTimeline(undefined);
     } else {
-      setOwnFeed(client.feed('user', user.id));
-      setOwnTimeline(client.feed('timeline', user.id));
+      const _ownFeed = client.feed('user', user.id);
+      _ownFeed.getOrCreate({ watch: true }).catch((err) => {
+        throw err;
+      });
+      _ownFeed.read({ offset: 0, limit: 30 }).catch((err) => {
+        throw err;
+      });
+      const _ownTimeline = client.feed('timeline', user.id);
+      _ownTimeline.getOrCreate({ watch: true }).catch((err) => {
+        throw err;
+      });
+      _ownTimeline.read({ offset: 0, limit: 30 }).catch((err) => {
+        throw err;
+      });
+      setOwnFeed(_ownFeed);
+      setOwnTimeline(_ownTimeline);
     }
   }, [user, client]);
 

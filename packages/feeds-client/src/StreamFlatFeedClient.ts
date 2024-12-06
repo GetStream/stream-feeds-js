@@ -2,11 +2,15 @@ import { ActivityAddedEvent, Feed, ReadFlatFeedResponse } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
 import { StreamBaseFeed } from './StreamBaseFeed';
 
-type FlatFeed = Feed & Omit<ReadFlatFeedResponse, 'duration'>;
+type FlatFeed = Partial<Feed> & Omit<ReadFlatFeedResponse, 'duration'>;
 
 export type StreamFlatFeedState = Partial<{
   [key in keyof FlatFeed]: FlatFeed[key];
-}>;
+}> & {
+  offset: number;
+  limit: number;
+  has_next_page: boolean;
+};
 
 export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
   constructor(
@@ -20,11 +24,30 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
 
   read = async (request: { limit: number; offset: number }) => {
     const response = await this.readFlat(request);
-    const activities = this.state.getLatestValue().activities ?? [];
+    let activities = this.state.getLatestValue().activities ?? [];
+    if (request.offset === 0) {
+      activities = [];
+    }
     this.addActivitiesToState(response.activities, activities);
-    this.state.partialNext({ activities: [...activities] });
+    this.state.partialNext({
+      activities: [...activities],
+      limit: request.limit,
+      offset: request.offset,
+      has_next_page: response.activities.length === request.limit,
+    });
 
     return response;
+  };
+
+  readNextPage = async () => {
+    const offset = this.state.getLatestValue().offset;
+    const limit = this.state.getLatestValue().limit ?? 30;
+
+    if (!this.state.getLatestValue().has_next_page) {
+      return Promise.resolve();
+    } else {
+      return this.read({ offset: offset + limit, limit });
+    }
   };
 
   protected getInitialState(feed?: Feed) {
@@ -43,6 +66,9 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
       deleted_at: undefined,
       custom: undefined,
       activities: undefined,
+      limit: 0,
+      offset: 0,
+      has_next_page: true,
     };
 
     return { ...feed, ...defaultState };

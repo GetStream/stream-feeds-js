@@ -16,7 +16,7 @@ export function Header() {
           <li className="mr-6">
             <div className="relative">
               <button
-                onClick={() => setIsMenuOpen(isMenuOpen ? false : true)}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
                 id="dropdownButton"
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
               >
@@ -60,7 +60,9 @@ export function Header() {
                   className="flex"
                   title="Log out"
                   onClick={() => {
-                    logOut();
+                    logOut().catch((err) => {
+                      throw err;
+                    });
                     router.push('/login');
                   }}
                 >

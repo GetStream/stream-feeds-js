@@ -81,7 +81,7 @@ describe('Feeds state test', () => {
     await new Promise((resolve) => setTimeout(resolve, 3000));
 
     const activities = emilyFeed.state.getLatestValue().activities ?? [];
-    const lastActivity = activities[1];
+    const lastActivity = activities[0];
     expect(activities.length).toBe(2);
     expect(lastActivity.id).toBe(activityResponse.activity.id);
 
