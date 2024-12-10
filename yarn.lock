@@ -2626,6 +2626,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stream-io/node-sdk@npm:^0.4.5":
+  version: 0.4.5
+  resolution: "@stream-io/node-sdk@npm:0.4.5"
+  dependencies:
+    "@types/jsonwebtoken": ^9.0.3
+    "@types/node": ^20.11.24
+    jsonwebtoken: ^9.0.2
+    uuid: ^9.0.1
+  checksum: faa754979e7aa11bb05e339a778830b83401fa82ccfc0a88ec1117e6d42cb287c5a359067bea5dd572fe9481beda6dbe33186cee9d75ed7d3f1d1a8a27caa7e5
+  languageName: node
+  linkType: hard
+
 "@swc/counter@npm:0.1.3":
   version: 0.1.3
   resolution: "@swc/counter@npm:0.1.3"
@@ -5801,6 +5813,7 @@ __metadata:
   dependencies:
     "@stream-io/common": "workspace:^"
     "@stream-io/feeds-client": "workspace:^"
+    "@stream-io/node-sdk": ^0.4.5
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18

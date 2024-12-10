@@ -10,7 +10,11 @@ type NotificationFeed = Feed & Omit<ReadNotificationFeedResponse, 'duration'>;
 
 export type StreamNotificationFeedState = Partial<{
   [key in keyof NotificationFeed]: NotificationFeed[key];
-}>;
+}> & {
+  offset: number;
+  limit: number;
+  has_next_page: boolean;
+};
 
 export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificationFeedState> {
   constructor(
@@ -22,7 +26,38 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
     super(client, group, id, feed);
   }
 
-  read = this.readNotification;
+  read = async (request: {
+    limit: number;
+    offset: number;
+    mark_seen?: string;
+    mark_read?: string;
+  }) => {
+    const response = await this.readNotification(request);
+    let groups = this.state.getLatestValue().groups ?? [];
+    const newGrpoups = [...(request.offset === 0 ? [] : groups)];
+    newGrpoups.push(...response.groups);
+    this.state.partialNext({
+      unread: response.unread,
+      unseen: response.unseen,
+      groups: newGrpoups,
+      limit: request.limit,
+      offset: request.offset,
+      has_next_page: response.groups.length === request.limit,
+    });
+
+    return response;
+  };
+
+  readNextPage = async () => {
+    const offset = this.state.getLatestValue().offset;
+    const limit = this.state.getLatestValue().limit ?? 30;
+
+    if (!this.state.getLatestValue().has_next_page) {
+      return Promise.resolve();
+    } else {
+      return this.read({ offset: offset + limit, limit });
+    }
+  };
 
   protected getInitialState(feed?: Feed) {
     const defaultState: StreamNotificationFeedState = {
@@ -40,6 +75,11 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
       deleted_at: undefined,
       custom: undefined,
       groups: undefined,
+      unread: undefined,
+      unseen: undefined,
+      limit: 0,
+      offset: 0,
+      has_next_page: true,
     };
     return { ...feed, ...defaultState };
   }

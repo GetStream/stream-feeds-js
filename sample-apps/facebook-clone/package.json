@@ -10,6 +10,7 @@
   "dependencies": {
     "@stream-io/common": "workspace:^",
     "@stream-io/feeds-client": "workspace:^",
+    "@stream-io/node-sdk": "^0.4.5",
     "material-symbols": "^0.27.1",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",

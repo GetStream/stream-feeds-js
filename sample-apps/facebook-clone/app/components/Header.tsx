@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useUserContext } from '../user-context';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Notification } from './Notification';
 
 export function Header() {
   const { user, logOut } = useUserContext();
@@ -23,7 +24,6 @@ export function Header() {
                 Menu
               </button>
               <div
-                id="dropdownMenu"
                 className={`absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
               >
                 <Link
@@ -53,9 +53,12 @@ export function Header() {
           {user && (
             <>
               <li className="mr-3">
+                <Notification></Notification>
+              </li>
+              <li className="mr-3">
                 <img className="size-8 rounded-full" src={user.image} alt="" />
               </li>
-              <li className=" ">
+              <li>
                 <button
                   className="flex"
                   title="Log out"
