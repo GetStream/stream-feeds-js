@@ -77,7 +77,7 @@ export default function Users() {
   };
 
   return (
-    <div className="w-3/4 m-auto">
+    <div>
       <h2 className="text-4xl font-extrabold text-center">Users</h2>
       <ul className="divide-y divide-gray-200">
         {filteredUsers.map((user) => (

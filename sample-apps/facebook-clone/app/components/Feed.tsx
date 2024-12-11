@@ -91,7 +91,7 @@ export const Feed = ({
 
   return (
     <>
-      <div className="w-3/4 m-auto flex flex-col items-center gap-3 overflow-auto">
+      <div className="w-full flex flex-col items-center gap-3 overflow-auto">
         {!readOnly && (
           <div className="w-full">
             <textarea
@@ -101,7 +101,7 @@ export const Feed = ({
               onChange={(e) => setPost(e.target.value)}
               rows={5}
               placeholder="Write your post here..."
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              className="w-full p-3 border border-gray-300 rounded-md resize-none"
             />
             <button
               type="submit"

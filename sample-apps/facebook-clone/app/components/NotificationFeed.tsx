@@ -92,7 +92,7 @@ export const NotificationFeed = (proprs: {
 
   return (
     <>
-      <div className="flex flex-col gap-3 text-gray-800">
+      <div className="flex flex-col gap-3 text-gray-800 overflow-auto">
         {groups.length === 0 && isLoading && (
           <LoadingIndicator color={'blue'}></LoadingIndicator>
         )}

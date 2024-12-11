@@ -15,7 +15,7 @@ export default function Login() {
   };
 
   return (
-    <div className="w-3/4 m-auto">
+    <div>
       <h2 className="text-4xl font-extrabold text-center">
         Choose a user to log in
       </h2>
