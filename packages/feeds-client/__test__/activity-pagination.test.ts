@@ -48,7 +48,7 @@ describe('Activity pagination', () => {
   it('read next page', async () => {
     await emilyFeed.readNextPage();
 
-    let state = emilyFeed.state.getLatestValue();
+    const state = emilyFeed.state.getLatestValue();
 
     expect(state.activities?.length).toBe(20);
     expect(state.offset).toBe(10);
@@ -59,7 +59,7 @@ describe('Activity pagination', () => {
   it(`reading the same page twice shouldn't mess up state`, async () => {
     await emilyFeed.read({ offset: 10, limit: 10 });
 
-    let state = emilyFeed.state.getLatestValue();
+    const state = emilyFeed.state.getLatestValue();
 
     expect(state.activities?.length).toBe(20);
     expect(state.offset).toBe(10);
@@ -70,7 +70,7 @@ describe('Activity pagination', () => {
   it('read last page', async () => {
     await emilyFeed.readNextPage();
 
-    let state = emilyFeed.state.getLatestValue();
+    const state = emilyFeed.state.getLatestValue();
 
     expect(state.activities?.length).toBe(25);
     expect(state.offset).toBe(20);

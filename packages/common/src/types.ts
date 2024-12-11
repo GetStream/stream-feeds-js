@@ -1,7 +1,7 @@
 import { CommonApiInterface } from './gen/common/CommonApiInterface';
 import { UpdateUsersResponse, UserRequest } from './gen/models';
 import { ModerationClient } from './ModerationClient';
-import { StreamWSEvent, WSEvent } from './real-time/event-models';
+import { StreamWSEvent } from './real-time/event-models';
 
 export type StreamClientOptions = {
   base_url?: string;
@@ -47,11 +47,11 @@ export type StreamEvent = StreamWSEvent | NetworkChangedEvent;
 
 export interface ProductApiInferface extends CommonApiInterface {
   moderation: ModerationClient;
-  connectUser(
+  connectUser: (
     user: UserRequest,
     tokenProvider: string | (() => Promise<string>),
-  ): Promise<void>;
-  disconnectUser(): Promise<void>;
+  ) => Promise<void>;
+  disconnectUser: () => Promise<void>;
   upsertUsers: (
     users: UserRequest[],
   ) => Promise<StreamResponse<UpdateUsersResponse>>;

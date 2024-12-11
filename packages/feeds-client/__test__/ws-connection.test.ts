@@ -12,7 +12,7 @@ import { ConnectedEvent, UserRequest } from '@stream-io/common';
 
 describe('WS connection', () => {
   let client: StreamFeedsClient;
-  let user: UserRequest = getTestUser();
+  const user: UserRequest = getTestUser();
 
   beforeAll(() => {
     client = createTestClient();

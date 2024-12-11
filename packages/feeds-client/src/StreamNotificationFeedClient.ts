@@ -3,59 +3,40 @@ import {
   Feed,
   ReadNotificationFeedResponse,
 } from './gen/models';
-import { StreamFeedsClient } from './StreamFeedsClient';
-import { StreamBaseFeed } from './StreamBaseFeed';
+import { StreamBaseFeed, StreamBaseFeedState } from './StreamBaseFeed';
 
-type NotificationFeed = Feed & Omit<ReadNotificationFeedResponse, 'duration'>;
+type NotificationFeed = StreamBaseFeedState &
+  Partial<Omit<ReadNotificationFeedResponse, 'duration'>>;
 
-export type StreamNotificationFeedState = Partial<{
+export type StreamNotificationFeedState = {
   [key in keyof NotificationFeed]: NotificationFeed[key];
-}> & {
-  offset: number;
-  limit: number;
-  has_next_page: boolean;
 };
 
 export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificationFeedState> {
-  constructor(
-    client: StreamFeedsClient,
-    group: string,
-    id: string,
-    feed?: Feed,
-  ) {
-    super(client, group, id, feed);
-  }
-
   read = async (request: {
     limit: number;
     offset: number;
     mark_seen?: string;
     mark_read?: string;
   }) => {
-    const response = await this.readNotification(request);
-    let groups = this.state.getLatestValue().groups ?? [];
-    const newGrpoups = [...(request.offset === 0 ? [] : groups)];
-    newGrpoups.push(...response.groups);
-    this.state.partialNext({
-      unread: response.unread,
-      unseen: response.unseen,
-      groups: newGrpoups,
-      limit: request.limit,
-      offset: request.offset,
-      has_next_page: response.groups.length === request.limit,
-    });
+    this.setLoadingState(true);
+    try {
+      const response = await this.readNotification(request);
+      const groups = this.state.getLatestValue().groups ?? [];
+      const newGrpoups = [...(request.offset === 0 ? [] : groups)];
+      newGrpoups.push(...response.groups);
+      this.state.partialNext({
+        unread: response.unread,
+        unseen: response.unseen,
+        groups: newGrpoups,
+        limit: request.limit,
+        offset: request.offset,
+        has_next_page: response.groups.length === request.limit,
+      });
 
-    return response;
-  };
-
-  readNextPage = async () => {
-    const offset = this.state.getLatestValue().offset;
-    const limit = this.state.getLatestValue().limit ?? 30;
-
-    if (!this.state.getLatestValue().has_next_page) {
-      return Promise.resolve();
-    } else {
-      return this.read({ offset: offset + limit, limit });
+      return response;
+    } finally {
+      this.setLoadingState(false);
     }
   };
 
@@ -80,15 +61,20 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
       limit: 0,
       offset: 0,
       has_next_page: true,
+      is_loading_next_page: false,
     };
     return { ...feed, ...defaultState };
+  }
+
+  protected setLoadingState(state: boolean): void {
+    this.state.partialNext({ is_loading_next_page: state });
   }
 
   protected updateFromFeedResponse(feed: Feed): void {
     this.state.partialNext(feed);
   }
 
-  protected newActivityReceived(event: ActivityAddedEvent): void {
+  protected newActivityReceived(_: ActivityAddedEvent): void {
     // TODO: implement me
   }
 }

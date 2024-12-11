@@ -26,9 +26,11 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     StreamFeedsEvent['type'],
     StreamFeedsEvent
   > = new EventDispatcher<StreamFeedsEvent['type'], StreamFeedsEvent>();
-  private activeFeeds: {
-    [key: FID]: StreamFlatFeedClient | StreamNotificationFeedClient;
-  } = {};
+
+  private activeFeeds: Record<
+    FID,
+    StreamFlatFeedClient | StreamNotificationFeedClient
+  > = {};
 
   constructor(apiKey: string, options?: StreamClientOptions);
   constructor(commonClient: StreamClient);
@@ -53,7 +55,7 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     });
     this.streamClient.on('all', (event) => {
       if (Object.hasOwn(event, 'fid')) {
-        const feed = this.activeFeeds[(event as unknown as WSEvent)['fid']];
+        const feed = this.activeFeeds[(event as unknown as WSEvent).fid];
         if (feed) {
           feed.handleWSEvent(event as unknown as WSEvent);
         }
@@ -106,7 +108,7 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     return this.streamClient.upsertUsers(users);
   };
 
-  private getOrCreateActiveFeed = (
+  private readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
     type: 'flat' | 'notification',
@@ -125,6 +127,7 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
           feed = new StreamNotificationFeedClient(this, group, id, data);
           break;
         default:
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           throw new Error(`This SDK doesn't yet support ${type} type`);
       }
       this.activeFeeds[fid] = feed;

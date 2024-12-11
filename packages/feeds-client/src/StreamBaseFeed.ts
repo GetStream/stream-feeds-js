@@ -9,8 +9,17 @@ import {
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
 
+export type StreamBaseFeedState = Partial<Feed> & {
+  offset: number;
+  limit: number;
+  has_next_page: boolean;
+  is_loading_next_page: boolean;
+};
+
 export abstract class StreamBaseFeed<
-  T extends Partial<{ [key in keyof Feed]: Feed[key] }> = Partial<Feed>,
+  T extends {
+    [key in keyof StreamBaseFeedState]: StreamBaseFeedState[key];
+  } = StreamBaseFeedState,
 > extends StreamFeedApi {
   readonly state: StateStore<T>;
 
@@ -40,6 +49,23 @@ export abstract class StreamBaseFeed<
 
     return response;
   }
+
+  readNextPage = async () => {
+    const offset = this.state.getLatestValue().offset;
+    const limit = this.state.getLatestValue().limit ?? 30;
+
+    if (!this.state.getLatestValue().has_next_page) {
+      return Promise.resolve();
+    } else {
+      this.setLoadingState(true);
+      try {
+        const response = await this.read({ offset: offset + limit, limit });
+        return response;
+      } finally {
+        this.setLoadingState(false);
+      }
+    }
+  };
 
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
@@ -73,7 +99,14 @@ export abstract class StreamBaseFeed<
     });
   }
 
+  public abstract read(request: {
+    limit: number;
+    offset: number;
+  }): Promise<any>;
+
   protected abstract getInitialState(feed?: Feed): T;
+
+  protected abstract setLoadingState(state: boolean): void;
 
   protected abstract updateFromFeedResponse(feed: Feed): void;
 

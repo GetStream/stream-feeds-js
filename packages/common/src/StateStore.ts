@@ -7,7 +7,7 @@ function isPatch<T>(value: T | Patch<T>): value is Patch<T> {
 }
 
 export class StateStore<T extends Record<string, unknown>> {
-  private handlerSet = new Set<Handler<T>>();
+  private readonly handlerSet = new Set<Handler<T>>();
 
   constructor(private value: T) {}
 

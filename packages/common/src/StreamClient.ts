@@ -2,7 +2,7 @@ import { ApiClient } from './ApiClient';
 import { ConnectionIdManager } from './ConnectionIdManager';
 import { EventDispatcher } from './EventDispatcher';
 import { CommonApi } from './gen/common/CommonApi';
-import { OwnUser, UpdateUsersResponse, UserRequest } from './gen/models';
+import { OwnUser, UserRequest } from './gen/models';
 import { ModerationClient } from './ModerationClient';
 import { StableWSConnection } from './real-time/StableWSConnection';
 import { StateStore } from './StateStore';
@@ -21,6 +21,7 @@ export class StreamClient extends CommonApi implements ProductApiInferface {
   readonly state = new StateStore<StreamClientState>({
     connectedUser: undefined,
   });
+
   readonly moderation: ModerationClient;
 
   private readonly tokenManager: TokenManager;
@@ -30,7 +31,8 @@ export class StreamClient extends CommonApi implements ProductApiInferface {
     StreamEvent['type'],
     StreamEvent
   > = new EventDispatcher<StreamEvent['type'], StreamEvent>();
-  private eventDecoders: ((event: any) => any)[] = [];
+
+  private readonly eventDecoders: Array<(event: any) => any> = [];
 
   constructor(
     public readonly apiKey: string,

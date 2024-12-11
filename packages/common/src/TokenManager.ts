@@ -67,6 +67,7 @@ export class TokenManager {
             if (numberOfFailures === 3) {
               return reject(
                 new Error(
+                  /* eslint-disable-next-line @typescript-eslint/restrict-template-expressions */
                   `Stream error: tried to get token ${numberOfFailures} times, but it failed with ${e}. Check your token provider`,
                   { cause: e },
                 ),

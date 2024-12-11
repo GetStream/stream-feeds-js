@@ -51,8 +51,10 @@ describe('Feeds state test', () => {
 
     expect(spy.mock.calls.length).toBe(0);
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const member: FeedMember = { user: { id: 'alice' } } as FeedMember;
     emilyFeed.state.partialNext({
-      members: [{ user: { id: 'alice' } } as FeedMember],
+      members: [member],
     });
 
     expect(spy.mock.calls.length).toBe(1);
@@ -85,7 +87,7 @@ describe('Feeds state test', () => {
     expect(activities.length).toBe(2);
     expect(lastActivity.id).toBe(activityResponse.activity.id);
 
-    //check WS event decoding
+    // check WS event decoding
     expect(lastActivity.created_at instanceof Date).toBe(true);
   });
 

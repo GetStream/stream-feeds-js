@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { Activity } from './Activity';
 import { v4 as uuidv4 } from 'uuid';
 import Link from 'next/link';
+import { LoadingIndicator } from './LoadingIndicator';
 
 export const Feed = ({
   feed,
@@ -15,6 +16,8 @@ export const Feed = ({
   readOnly: boolean;
 }) => {
   const [activities, setActivities] = useState<StreamActivity[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
   const [followingCount, setFollowingCount] = useState<number>(0);
   const [post, setPost] = useState<string>('');
@@ -24,6 +27,17 @@ export const Feed = ({
       (state) => ({ activities: state.activities }),
       ({ activities }) => {
         setActivities(activities ?? []);
+      },
+    );
+
+    return unsubscribe;
+  }, [feed]);
+
+  useEffect(() => {
+    const unsubscribe = feed.state.subscribeWithSelector(
+      (state) => ({ is_loading_next_page: state.is_loading_next_page }),
+      ({ is_loading_next_page }) => {
+        setIsLoading(is_loading_next_page);
       },
     );
 
@@ -53,15 +67,20 @@ export const Feed = ({
   }, [feed]);
 
   const sendPost = async () => {
-    await feed.addActivity({
-      verb: 'post',
-      object: uuidv4(),
-      // TODO: we don't yet have enrichment, so we just store data in custom property
-      custom: {
-        text: post,
-      },
-    });
-    setPost('');
+    setIsSending(true);
+    try {
+      await feed.addActivity({
+        verb: 'post',
+        object: uuidv4(),
+        // TODO: we don't yet have enrichment, so we just store data in custom property
+        custom: {
+          text: post,
+        },
+      });
+      setPost('');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const getNextPage = () => {
@@ -88,30 +107,43 @@ export const Feed = ({
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
               onClick={() => sendPost()}
+              disabled={isSending || post === ''}
             >
-              Post
+              {isSending ? <LoadingIndicator></LoadingIndicator> : 'Post'}
             </button>
           </div>
         )}
-        {activities.length === 0 && readOnly && followingCount === 0 && (
-          <div className="text-gray-800">
-            Start{' '}
-            <Link href="/users" className="underline">
-              following people
-            </Link>{' '}
-            to see posts
-          </div>
+        {activities.length === 0 && isLoading && (
+          <LoadingIndicator color={'blue'}></LoadingIndicator>
         )}
+        {activities.length === 0 &&
+          !isLoading &&
+          readOnly &&
+          followingCount === 0 && (
+            <div className="text-gray-800">
+              Start{' '}
+              <Link href="/users" className="underline">
+                following people
+              </Link>{' '}
+              to see posts
+            </div>
+          )}
+        {activities.length === 0 &&
+          !isLoading &&
+          readOnly &&
+          followingCount > 0 && (
+            <div className="text-gray-800">No posts yet</div>
+          )}
         {activities.map((a) => (
           <Activity key={a.id} activity={a}></Activity>
         ))}
-        {hasNextPage && (
+        {activities.length > 0 && hasNextPage && (
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
             onClick={() => getNextPage()}
           >
-            Load more
+            {isLoading ? <LoadingIndicator></LoadingIndicator> : 'Load more'}
           </button>
         )}
       </div>

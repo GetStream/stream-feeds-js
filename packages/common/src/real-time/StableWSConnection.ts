@@ -83,7 +83,7 @@ export class StableWSConnection {
     private readonly config: WSConfig,
     private readonly tokenManager: TokenManager,
     private readonly connectionIdManager: ConnectionIdManager,
-    private readonly decoders: ((event: any) => any)[] = [],
+    private readonly decoders: Array<(event: any) => any> = [],
   ) {
     /** consecutive failures influence the duration of the timeout */
     this.consecutiveFailures = 0;

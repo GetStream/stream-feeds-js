@@ -106,7 +106,7 @@ export function removeConnectionEventListeners(cb: (e: Event) => void) {
 
 export const streamDevToken = (userId: string) => {
   return [
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9', //{"alg": "HS256", "typ": "JWT"}
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9', // {"alg": "HS256", "typ": "JWT"}
     window.btoa(JSON.stringify({ user_id: userId })),
     'devtoken', // hardcoded signature
   ].join('.');

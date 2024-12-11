@@ -48,7 +48,7 @@ export default function Users() {
       target_group: 'user',
       target_id: userId,
     });
-    await fetch('/api/send-notification', {
+    fetch('/api/send-notification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export default function Users() {
         verb: 'follow',
         objectId: `user:${userId}`,
       }),
-    });
+    }).catch((err) => console.warn(err));
     // Reinit state to include activities from newly followed user
     await ownTimeline?.read({ limit: 30, offset: 0 });
     const fid = `user:${userId}`;
