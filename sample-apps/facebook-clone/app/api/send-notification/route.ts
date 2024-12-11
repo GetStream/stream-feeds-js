@@ -15,18 +15,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    /* eslint-disable-next-line @typescript-eslint/dot-notation */
-    await streamServerClient['sendRequest'](
-      'POST',
-      '/api/v2/feeds/feeds/{group}/{id}/add_activity',
-      { group: 'notification', id: targetUserId },
-      undefined,
-      {
+    await streamServerClient.feeds
+      .feed('notification', targetUserId)
+      .addActivity({
         verb,
         object: objectId,
         user_id: userId,
-      },
-    );
+      });
   } catch (err) {
     return new Response(undefined, {
       status: 500,

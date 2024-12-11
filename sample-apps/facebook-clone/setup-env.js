@@ -19,77 +19,47 @@ require('dotenv').config();
   await client.upsertUsers(users);
 
   console.log('Creating feed groups...');
-  await client['sendRequest'](
-    'POST',
-    '/api/v2/feeds/feedgroups/{group}',
-    undefined,
-    undefined,
-    {
-      feed_group: {
-        app_pk: 31264,
-        slug: 'user',
-        type: 'flat',
-        max_length: 500,
-      },
+  await client.feeds.upsertFeedGroup({
+    feed_group: {
+      app_pk: 31264,
+      slug: 'user',
+      type: 'flat',
+      max_length: 500,
     },
-  );
+  });
 
-  await client['sendRequest'](
-    'POST',
-    '/api/v2/feeds/feedgroups/{group}',
-    undefined,
-    undefined,
-    {
-      feed_group: {
-        app_pk: 31264,
-        slug: 'timeline',
-        type: 'flat',
-        max_length: 500,
-      },
+  await client.feeds.upsertFeedGroup({
+    feed_group: {
+      app_pk: 31264,
+      slug: 'timeline',
+      type: 'flat',
+      max_length: 500,
     },
-  );
+  });
 
-  await client['sendRequest'](
-    'POST',
-    '/api/v2/feeds/feedgroups/{group}',
-    undefined,
-    undefined,
-    {
-      feed_group: {
-        app_pk: 31264,
-        slug: 'notification',
-        type: 'notification',
-        aggregation_format: '{{verb.id}}',
-        max_length: 3600,
-      },
+  await client.feeds.upsertFeedGroup({
+    feed_group: {
+      app_pk: 31264,
+      slug: 'notification',
+      type: 'notification',
+      aggregation_format: '{{verb.id}}',
+      max_length: 3600,
     },
-  );
+  });
 
   console.log('Creating user feeds for users...');
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
 
-    await client['sendRequest'](
-      'POST',
-      '/api/v2/feeds/feeds/{group}/{id}',
-      { group: 'user', id: user.id },
-      undefined,
-      {
-        visibility_level: 'visible',
-        user_id: user.id,
-      },
-    );
+    await client.feeds.feed('user', user.id).getOrCreate({
+      visibility_level: 'visible',
+      user_id: user.id,
+    });
 
-    await client['sendRequest'](
-      'POST',
-      '/api/v2/feeds/feeds/{group}/{id}',
-      { group: 'timeline', id: user.id },
-      undefined,
-      {
-        visibility_level: 'visible',
-        user_id: user.id,
-      },
-    );
+    await client.feeds.feed('timeline', user.id).getOrCreate({
+      visibility_level: 'visible',
+      user_id: user.id,
+    });
   }
 
   console.log('Finished initialization');
