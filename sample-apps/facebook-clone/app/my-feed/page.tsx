@@ -2,7 +2,7 @@
 import { Feed } from '../components/Feed';
 import { useFeedContext } from '../feed-context';
 
-export default function Home() {
+export default function MyFeed() {
   const { ownFeed } = useFeedContext();
 
   if (!ownFeed) {

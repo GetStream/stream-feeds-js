@@ -55,7 +55,7 @@ export abstract class StreamBaseFeed<
     const limit = this.state.getLatestValue().limit ?? 30;
 
     if (!this.state.getLatestValue().has_next_page) {
-      return Promise.resolve();
+      return await Promise.resolve();
     } else {
       this.setLoadingState(true);
       try {

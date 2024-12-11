@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useUserContext } from '../user-context';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Notification } from './Notification';
+import { NotificationBell } from './NotificationBell';
 
 export function Header() {
   const { user, logOut } = useUserContext();
@@ -53,7 +53,7 @@ export function Header() {
           {user && (
             <>
               <li className="mr-3">
-                <Notification></Notification>
+                <NotificationBell></NotificationBell>
               </li>
               <li className="mr-3">
                 <img className="size-8 rounded-full" src={user.image} alt="" />
