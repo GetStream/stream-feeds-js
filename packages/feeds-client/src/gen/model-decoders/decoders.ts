@@ -93,7 +93,18 @@ decoders.Feed = (input?: Record<string, any>) => {
 
     created_by: { type: 'UserResponse', isSingle: true },
 
+    follow_requests: { type: 'FollowRequests', isSingle: true },
+
     deleted_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.FeedFollowRequest = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -133,6 +144,15 @@ decoders.FollowRelationship = (input?: Record<string, any>) => {
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     feed: { type: 'Feed', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.FollowRequests = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    invites: { type: 'FeedFollowRequest', isSingle: false },
+
+    pending: { type: 'FeedFollowRequest', isSingle: false },
   };
   return decode(typeMappings, input);
 };

@@ -1846,6 +1846,8 @@ export interface Response {
 export interface RestoreActionRequest {}
 
 export interface ReviewQueueItem {
+  bounce_count: number;
+
   content_changed: boolean;
 
   created_at: Date;

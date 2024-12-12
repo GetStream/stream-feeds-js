@@ -230,10 +230,14 @@ export class FeedsApi extends CommonApiWrapper {
     const body = {
       accept_invite: request?.accept_invite,
       reject_invite: request?.reject_invite,
+      accepted_follow_requests: request?.accepted_follow_requests,
       add_members: request?.add_members,
       assign_roles: request?.assign_roles,
+      invited_follow_requests: request?.invited_follow_requests,
       invites: request?.invites,
+      rejected_follow_requests: request?.rejected_follow_requests,
       remove_members: request?.remove_members,
+      revoked_follow_requests: request?.revoked_follow_requests,
       custom: request?.custom,
     };
 

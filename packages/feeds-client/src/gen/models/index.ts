@@ -113,12 +113,7 @@ export interface Feed {
 
   updated_at: Date;
 
-  visibility_level:
-    | 'public'
-    | 'visible'
-    | 'followers'
-    | 'private'
-    | 'restricted';
+  visibility_level: 'public' | 'visible' | 'followers' | 'private';
 
   invites: FeedMember[];
 
@@ -126,9 +121,23 @@ export interface Feed {
 
   created_by: UserResponse;
 
+  follow_requests: FollowRequests;
+
   deleted_at?: Date;
 
   custom?: Record<string, any>;
+}
+
+export interface FeedFollowRequest {
+  created_at: Date;
+
+  source_fid: string;
+
+  status: string;
+
+  target_fid: string;
+
+  updated_at: Date;
 }
 
 export interface FeedGroupInput {
@@ -297,10 +306,18 @@ export interface FollowRequest {
   activity_copy_limit?: number;
 }
 
+export interface FollowRequests {
+  invites: FeedFollowRequest[];
+
+  pending: FeedFollowRequest[];
+}
+
 export interface FollowResponse {
   created: boolean;
 
   duration: string;
+
+  follow_request_status?: string;
 }
 
 export interface GetFeedGroupsResponse {
@@ -328,12 +345,7 @@ export interface GetFollowingFeedsResponse {
 }
 
 export interface GetOrCreateFeedRequest {
-  visibility_level?:
-    | 'public'
-    | 'visible'
-    | 'followers'
-    | 'private'
-    | 'restricted';
+  visibility_level?: 'public' | 'visible' | 'followers' | 'private';
 
   watch?: boolean;
 
@@ -535,13 +547,21 @@ export interface UpdateFeedRequest {
 
   reject_invite?: boolean;
 
+  accepted_follow_requests?: string[];
+
   add_members?: FeedMember[];
 
   assign_roles?: FeedMember[];
 
+  invited_follow_requests?: string[];
+
   invites?: FeedMember[];
 
+  rejected_follow_requests?: string[];
+
   remove_members?: string[];
+
+  revoked_follow_requests?: string[];
 
   custom?: Record<string, any>;
 }
