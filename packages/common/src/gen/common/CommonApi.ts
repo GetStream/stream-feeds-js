@@ -24,7 +24,7 @@ import { decoders } from '../model-decoders/decoders';
 export class CommonApi {
   constructor(public readonly apiClient: ApiClient) {}
 
-  getApp = async (): Promise<StreamResponse<GetApplicationResponse>> => {
+  async getApp(): Promise<StreamResponse<GetApplicationResponse>> {
     const response = await this.apiClient.sendRequest<
       StreamResponse<GetApplicationResponse>
     >('GET', '/api/v2/app', undefined, undefined);
@@ -32,11 +32,11 @@ export class CommonApi {
     decoders.GetApplicationResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  deleteDevice = async (request: {
+  async deleteDevice(request: {
     id: string;
-  }): Promise<StreamResponse<Response>> => {
+  }): Promise<StreamResponse<Response>> {
     const queryParams = {
       id: request?.id,
     };
@@ -51,9 +51,9 @@ export class CommonApi {
     decoders.Response?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  listDevices = async (): Promise<StreamResponse<ListDevicesResponse>> => {
+  async listDevices(): Promise<StreamResponse<ListDevicesResponse>> {
     const response = await this.apiClient.sendRequest<
       StreamResponse<ListDevicesResponse>
     >('GET', '/api/v2/devices', undefined, undefined);
@@ -61,11 +61,11 @@ export class CommonApi {
     decoders.ListDevicesResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  createDevice = async (
+  async createDevice(
     request: CreateDeviceRequest,
-  ): Promise<StreamResponse<Response>> => {
+  ): Promise<StreamResponse<Response>> {
     const body = {
       id: request?.id,
       push_provider: request?.push_provider,
@@ -84,11 +84,11 @@ export class CommonApi {
     decoders.Response?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  createGuest = async (
+  async createGuest(
     request: CreateGuestRequest,
-  ): Promise<StreamResponse<CreateGuestResponse>> => {
+  ): Promise<StreamResponse<CreateGuestResponse>> {
     const body = {
       user: request?.user,
     };
@@ -100,12 +100,12 @@ export class CommonApi {
     decoders.CreateGuestResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  longPoll = async (request?: {
+  async longPoll(request?: {
     connection_id?: string;
     json?: WSAuthMessage;
-  }): Promise<StreamResponse<{}>> => {
+  }): Promise<StreamResponse<{}>> {
     const queryParams = {
       connection_id: request?.connection_id,
       json: request?.json,
@@ -121,11 +121,11 @@ export class CommonApi {
     decoders['{}']?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  getOG = async (request: {
+  async getOG(request: {
     url: string;
-  }): Promise<StreamResponse<GetOGResponse>> => {
+  }): Promise<StreamResponse<GetOGResponse>> {
     const queryParams = {
       url: request?.url,
     };
@@ -137,11 +137,11 @@ export class CommonApi {
     decoders.GetOGResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  queryUsers = async (request?: {
+  async queryUsers(request?: {
     payload?: QueryUsersPayload;
-  }): Promise<StreamResponse<QueryUsersResponse>> => {
+  }): Promise<StreamResponse<QueryUsersResponse>> {
     const queryParams = {
       payload: request?.payload,
     };
@@ -153,11 +153,11 @@ export class CommonApi {
     decoders.QueryUsersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  updateUsersPartial = async (
+  async updateUsersPartial(
     request: UpdateUsersPartialRequest,
-  ): Promise<StreamResponse<UpdateUsersResponse>> => {
+  ): Promise<StreamResponse<UpdateUsersResponse>> {
     const body = {
       users: request?.users,
     };
@@ -169,11 +169,11 @@ export class CommonApi {
     decoders.UpdateUsersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  updateUsers = async (
+  async updateUsers(
     request: UpdateUsersRequest,
-  ): Promise<StreamResponse<UpdateUsersResponse>> => {
+  ): Promise<StreamResponse<UpdateUsersResponse>> {
     const body = {
       users: request?.users,
     };
@@ -185,11 +185,9 @@ export class CommonApi {
     decoders.UpdateUsersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  getBlockedUsers = async (): Promise<
-    StreamResponse<GetBlockedUsersResponse>
-  > => {
+  async getBlockedUsers(): Promise<StreamResponse<GetBlockedUsersResponse>> {
     const response = await this.apiClient.sendRequest<
       StreamResponse<GetBlockedUsersResponse>
     >('GET', '/api/v2/users/block', undefined, undefined);
@@ -197,11 +195,11 @@ export class CommonApi {
     decoders.GetBlockedUsersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  blockUsers = async (
+  async blockUsers(
     request: BlockUsersRequest,
-  ): Promise<StreamResponse<BlockUsersResponse>> => {
+  ): Promise<StreamResponse<BlockUsersResponse>> {
     const body = {
       blocked_user_id: request?.blocked_user_id,
     };
@@ -213,11 +211,11 @@ export class CommonApi {
     decoders.BlockUsersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  unblockUsers = async (
+  async unblockUsers(
     request: UnblockUsersRequest,
-  ): Promise<StreamResponse<UnblockUsersResponse>> => {
+  ): Promise<StreamResponse<UnblockUsersResponse>> {
     const body = {
       blocked_user_id: request?.blocked_user_id,
     };
@@ -229,5 +227,5 @@ export class CommonApi {
     decoders.UnblockUsersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 }

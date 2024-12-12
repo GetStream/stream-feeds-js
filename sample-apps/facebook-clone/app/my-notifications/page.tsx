@@ -1,5 +1,5 @@
 'use client';
-import { NotificationFeed } from '../components/NotificationFeed';
+import { NotificationFeed } from '../components/notifications/NotificationFeed';
 
 export default function MyNotifications() {
   return (

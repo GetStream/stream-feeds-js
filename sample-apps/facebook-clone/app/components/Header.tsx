@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useUserContext } from '../user-context';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { NotificationBell } from './NotificationBell';
+import { NotificationBell } from './notifications/NotificationBell';
 
 export function Header() {
   const { user, logOut } = useUserContext();

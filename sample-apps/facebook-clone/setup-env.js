@@ -52,12 +52,12 @@ require('dotenv').config();
     const user = users[i];
 
     await client.feeds.feed('user', user.id).getOrCreate({
-      visibility_level: 'visible',
+      visibility_level: i < 3 ? 'visible' : 'followers',
       user_id: user.id,
     });
 
     await client.feeds.feed('timeline', user.id).getOrCreate({
-      visibility_level: 'visible',
+      visibility_level: 'private',
       user_id: user.id,
     });
   }

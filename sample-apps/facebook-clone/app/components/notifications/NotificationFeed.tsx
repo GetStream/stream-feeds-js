@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useFeedContext } from '../feed-context';
+import { useFeedContext } from '../../feed-context';
 import { AggregatedActivities } from '@stream-io/feeds-client';
-import { LoadingIndicator } from './LoadingIndicator';
+import { LoadingIndicator } from '../LoadingIndicator';
+import { FollowRequestNotification } from './notification-types/FollowRequestNotification';
+import { SimpleNotification } from './notification-types/SimpleNotification';
 
 export const NotificationFeed = (proprs: {
   loadMoreText?: string;
@@ -55,39 +57,21 @@ export const NotificationFeed = (proprs: {
     return unsubscribe;
   }, [ownNotifications]);
 
-  const getNotificationText = (group: AggregatedActivities) => {
-    let text = '';
-    const previewCount = 5;
-    text = Array.from(new Set(group.activities.map((a) => a.user.name)))
-      .slice(0, previewCount)
-      .join(', ');
-    const remainingActors = group.actor_count - previewCount;
-    if (remainingActors > 0) {
-      text += ` and ${remainingActors} more people`;
-    }
-    const verb = group.activities[0].verb;
-
-    switch (verb) {
-      case 'follow':
-        text += ` started following you`;
-        break;
-      case 'unfollow':
-        text += ` unfollowed you`;
-        break;
-    }
-
-    return text;
-  };
-
-  const markRead = async (group: AggregatedActivities) => {
-    await ownNotifications?.read({ limit: 30, offset: 0, mark_read: group.id });
-    await ownNotifications?.read({ limit: 30, offset: 0 });
-  };
-
   const getNextPage = () => {
     ownNotifications?.readNextPage().catch((err) => {
       throw err;
     });
+  };
+
+  const markRead = async (group: AggregatedActivities) => {
+    if (!group.read) {
+      await ownNotifications?.read({
+        limit: 30,
+        offset: 0,
+        mark_read: group.id,
+      });
+      await ownNotifications?.read({ limit: 30, offset: 0 });
+    }
   };
 
   return (
@@ -101,20 +85,19 @@ export const NotificationFeed = (proprs: {
         )}
         {groups.map((g, i) => (
           <div
-            key={`notification${i}`}
+            key={`notification:${i}`}
             className="text-gray-800 flex items-center justify-between gap-1"
           >
-            <div>{getNotificationText(g)}</div>
-            {!g.read && (
-              <div className="flex items-center gap-1.5">
-                <div className="rounded-full bg-blue-500 w-2 h-2"></div>
-                <button
-                  className="w-max px-1 py-0.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-                  onClick={() => markRead(g)}
-                >
-                  Mark read
-                </button>
-              </div>
+            {g.activities[0]?.verb === 'follow-request' ? (
+              <FollowRequestNotification
+                group={g}
+                onMarkRead={() => markRead(g)}
+              ></FollowRequestNotification>
+            ) : (
+              <SimpleNotification
+                group={g}
+                onMarkRead={() => markRead(g)}
+              ></SimpleNotification>
             )}
           </div>
         ))}

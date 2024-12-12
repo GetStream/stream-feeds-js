@@ -83,14 +83,20 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     ) as StreamNotificationFeedClient;
   };
 
-  async _queryFeeds(request?: QueryFeedsRequest) {
-    const response = await this.queryFeeds(request);
+  async queryFeeds(request?: QueryFeedsRequest) {
+    const response = await this._queryFeeds(request);
 
     const feeds = response.feeds.map((f) =>
       this.getOrCreateActiveFeed(f.group, f.id, f.type, f),
     );
 
-    return feeds;
+    return {
+      feeds,
+      next: response.next,
+      prev: response.prev,
+      metadata: response.metadata,
+      duration: response.duration,
+    };
   }
 
   connectUser = (

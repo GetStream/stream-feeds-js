@@ -36,6 +36,10 @@ export abstract class StreamBaseFeed<
     this.state = new StateStore<T>(this.getInitialState(feed));
   }
 
+  get fid() {
+    return `${this.group}:${this.id}`;
+  }
+
   async get() {
     const response = await super.get();
     this.updateFromFeedResponse(response.feed);

@@ -2616,13 +2616,13 @@ __metadata:
 
 "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#feedsv3":
   version: 0.4.5
-  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=9ed305afd5a83fcda9257678d0f4364529e3cac9"
+  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=2f06ab8d192dc2f29f8fd21f5a7fd79aac6bad50"
   dependencies:
     "@types/jsonwebtoken": ^9.0.3
     "@types/node": ^20.11.24
     jsonwebtoken: ^9.0.2
     uuid: ^9.0.1
-  checksum: 7499aa9abde24a173879e01ee9d6cf87190c5e2833c1fee9149449077c85be72b0a3e87214e33d747b5f08b3b479205c32cc5439738bac3ad04220fa67ba398d
+  checksum: 976a7d2e48e083960006290d9c9f8fc68abd74e05c58346b359622cef3561ee79fc8d842cde4b781eea373c8382309d3843ce1bdb52e2c9dee5806bf4e941ea7
   languageName: node
   linkType: hard
 

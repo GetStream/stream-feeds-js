@@ -63,7 +63,7 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
       has_next_page: true,
       is_loading_next_page: false,
     };
-    return { ...feed, ...defaultState };
+    return { ...defaultState, ...feed };
   }
 
   protected setLoadingState(state: boolean): void {

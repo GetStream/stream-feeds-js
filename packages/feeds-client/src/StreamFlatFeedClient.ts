@@ -53,7 +53,7 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
       is_loading_next_page: false,
     };
 
-    return { ...feed, ...defaultState };
+    return { ...defaultState, ...feed };
   }
 
   protected setLoadingState(state: boolean): void {

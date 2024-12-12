@@ -25,20 +25,14 @@ require('dotenv').config();
     const post = posts[i];
     const user = users[Math.floor(Math.random() * users.length)];
 
-    await client['sendRequest'](
-      'POST',
-      '/api/v2/feeds/feeds/{group}/{id}/add_activity',
-      { group: 'user', id: user.id },
-      undefined,
-      {
-        verb: 'post',
-        object: uuidv4(),
-        custom: {
-          text: post,
-        },
-        user_id: user.id,
+    await client.feeds.feed('user', user.id).addActivity({
+      verb: 'post',
+      object: uuidv4(),
+      custom: {
+        text: post,
       },
-    );
+      user_id: user.id,
+    });
   }
 
   console.log('Finished');

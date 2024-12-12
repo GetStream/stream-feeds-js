@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useFeedContext } from '../feed-context';
+import { useFeedContext } from '../../feed-context';
 import { NotificationFeed } from './NotificationFeed';
 import { usePathname, useRouter } from 'next/navigation';
 

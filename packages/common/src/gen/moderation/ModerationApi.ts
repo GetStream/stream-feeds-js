@@ -18,7 +18,7 @@ import { decoders } from '../model-decoders/decoders';
 export class ModerationApi {
   constructor(public readonly apiClient: ApiClient) {}
 
-  ban = async (request: BanRequest): Promise<StreamResponse<BanResponse>> => {
+  async ban(request: BanRequest): Promise<StreamResponse<BanResponse>> {
     const body = {
       target_user_id: request?.target_user_id,
       banned_by_id: request?.banned_by_id,
@@ -37,11 +37,11 @@ export class ModerationApi {
     decoders.BanResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  queryModerationConfigs = async (
+  async queryModerationConfigs(
     request?: QueryModerationConfigsRequest,
-  ): Promise<StreamResponse<QueryModerationConfigsResponse>> => {
+  ): Promise<StreamResponse<QueryModerationConfigsResponse>> {
     const body = {
       limit: request?.limit,
       next: request?.next,
@@ -57,11 +57,9 @@ export class ModerationApi {
     decoders.QueryModerationConfigsResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  flag = async (
-    request: FlagRequest,
-  ): Promise<StreamResponse<FlagResponse>> => {
+  async flag(request: FlagRequest): Promise<StreamResponse<FlagResponse>> {
     const body = {
       entity_id: request?.entity_id,
       entity_type: request?.entity_type,
@@ -78,11 +76,9 @@ export class ModerationApi {
     decoders.FlagResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  mute = async (
-    request: MuteRequest,
-  ): Promise<StreamResponse<MuteResponse>> => {
+  async mute(request: MuteRequest): Promise<StreamResponse<MuteResponse>> {
     const body = {
       target_ids: request?.target_ids,
       timeout: request?.timeout,
@@ -95,11 +91,11 @@ export class ModerationApi {
     decoders.MuteResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  queryReviewQueue = async (
+  async queryReviewQueue(
     request?: QueryReviewQueueRequest,
-  ): Promise<StreamResponse<QueryReviewQueueResponse>> => {
+  ): Promise<StreamResponse<QueryReviewQueueResponse>> {
     const body = {
       limit: request?.limit,
       lock_count: request?.lock_count,
@@ -119,11 +115,11 @@ export class ModerationApi {
     decoders.QueryReviewQueueResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 
-  submitAction = async (
+  async submitAction(
     request: SubmitActionRequest,
-  ): Promise<StreamResponse<SubmitActionResponse>> => {
+  ): Promise<StreamResponse<SubmitActionResponse>> {
     const body = {
       action_type: request?.action_type,
       item_id: request?.item_id,
@@ -144,5 +140,5 @@ export class ModerationApi {
     decoders.SubmitActionResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  };
+  }
 }
