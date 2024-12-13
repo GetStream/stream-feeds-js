@@ -19,7 +19,7 @@ export default function Users() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [next, setNext] = useState<string | undefined>(undefined);
   const [feeds, setFeeds] = useState<
-    (StreamFlatFeedClient | StreamNotificationFeedClient)[]
+    Array<StreamFlatFeedClient | StreamNotificationFeedClient>
   >([]);
   const { ownTimeline } = useFeedContext();
   const [followerMapping, setFollowerMapping] = useState<FeedFollowerMapping>(
@@ -31,14 +31,14 @@ export default function Users() {
       return;
     }
     setFollowerMapping({});
-    loadMore();
+    void loadMore();
   }, [client, user, ownTimeline]);
 
   const follow = async (
     feed: StreamFlatFeedClient | StreamNotificationFeedClient,
   ) => {
     const visibilityLevel = feed.state.getLatestValue().visibility_level;
-    await ownTimeline?.follow({
+    const followResponse = await ownTimeline?.follow({
       target_group: feed.group,
       target_id: feed.id,
     });
@@ -49,7 +49,7 @@ export default function Users() {
       },
       body: JSON.stringify({
         targetUserId: feed.id,
-        verb: visibilityLevel === 'visible' ? 'follow' : 'follow-request',
+        verb: visibilityLevel === 'visible' ? 'follow' : `follow-request`,
         objectId: feed.fid,
       }),
     }).catch((err) => console.warn(err));
@@ -58,7 +58,9 @@ export default function Users() {
     setFollowerMapping({
       ...followerMapping,
       [feed.fid]:
-        visibilityLevel === 'visible' ? 'following' : 'follow-request-sent',
+        followResponse?.follow_request_status === 'pending'
+          ? 'follow-request-sent'
+          : 'following',
     });
   };
 

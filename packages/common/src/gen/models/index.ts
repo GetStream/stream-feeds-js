@@ -298,32 +298,6 @@ export interface BlockListRule {
   name: string;
 }
 
-export interface BlockUsersRequest {
-  blocked_user_id: string;
-}
-
-export interface BlockUsersResponse {
-  blocked_by_user_id: string;
-
-  blocked_user_id: string;
-
-  created_at: Date;
-
-  duration: string;
-}
-
-export interface BlockedUserResponse {
-  blocked_user_id: string;
-
-  created_at: Date;
-
-  user_id: string;
-
-  blocked_user: UserResponse;
-
-  user: UserResponse;
-}
-
 export interface BodyguardRule {
   action:
     | 'flag'
@@ -852,13 +826,13 @@ export interface EnrichedActivity {
 
   actor?: Data;
 
-  latest_reactions?: Record<string, Array<EnrichedReaction | null>>;
+  latest_reactions?: Record<string, EnrichedReaction[]>;
 
   object?: Data;
 
   origin?: Data;
 
-  own_reactions?: Record<string, Array<EnrichedReaction | null>>;
+  own_reactions?: Record<string, EnrichedReaction[]>;
 
   reaction_counts?: Record<string, number>;
 
@@ -884,9 +858,9 @@ export interface EnrichedReaction {
 
   data?: Record<string, any>;
 
-  latest_children?: Record<string, Array<EnrichedReaction | null>>;
+  latest_children?: Record<string, EnrichedReaction[]>;
 
-  own_children?: Record<string, Array<EnrichedReaction | null>>;
+  own_children?: Record<string, EnrichedReaction[]>;
 
   updated_at?: Time;
 
@@ -1135,12 +1109,6 @@ export interface GetApplicationResponse {
   duration: string;
 
   app: AppResponseFields;
-}
-
-export interface GetBlockedUsersResponse {
-  duration: string;
-
-  blocks: BlockedUserResponse[];
 }
 
 export interface GetOGResponse {
@@ -1415,18 +1383,40 @@ export interface ModerationActionConfig {
   custom: Record<string, any>;
 }
 
-export interface ModerationEvent {
+export interface ModerationCustomActionEvent {
   created_at: Date;
 
   type: string;
 
-  received_at?: Date;
+  item?: ReviewQueueItem;
 
-  flags?: Flag2Response[];
+  message?: Message;
 
-  action?: ActionLogResponse;
+  user?: User;
+}
 
-  review_queue_item?: ReviewQueueItemResponse;
+export interface ModerationFlaggedEvent {
+  created_at: Date;
+
+  type: string;
+
+  item?: string;
+
+  object_id?: string;
+
+  user?: User;
+}
+
+export interface ModerationMarkReviewedEvent {
+  created_at: Date;
+
+  type: string;
+
+  item?: ReviewQueueItem;
+
+  message?: Message;
+
+  user?: User;
 }
 
 export interface ModerationPayload {
@@ -1566,7 +1556,7 @@ export interface Poll {
 
   custom: Record<string, any>;
 
-  latest_votes_by_option: Record<string, Array<PollVote | null>>;
+  latest_votes_by_option: Record<string, PollVote[]>;
 
   vote_counts_by_option: Record<string, number>;
 
@@ -1628,7 +1618,7 @@ export interface PollResponseData {
 
   custom: Record<string, any>;
 
-  latest_votes_by_option: Record<string, Array<PollVoteResponseData | null>>;
+  latest_votes_by_option: Record<string, PollVoteResponseData[]>;
 
   vote_counts_by_option: Record<string, number>;
 
@@ -1756,7 +1746,7 @@ export interface QueryReviewQueueResponse {
 
   items: ReviewQueueItemResponse[];
 
-  action_config: Record<string, Array<ModerationActionConfig | null>>;
+  action_config: Record<string, ModerationActionConfig[]>;
 
   stats: Record<string, number>;
 
@@ -2015,14 +2005,6 @@ export interface UnbanActionRequest {}
 
 export interface UnblockActionRequest {}
 
-export interface UnblockUsersRequest {
-  blocked_user_id: string;
-}
-
-export interface UnblockUsersResponse {
-  duration: string;
-}
-
 export interface UpdateUserPartialRequest {
   id: string;
 
@@ -2207,6 +2189,7 @@ export interface WSAuthMessage {
   products?: string[];
 }
 
-export type WebhookEvent =
-  | ({ type: 'review_queue_item.new' } & ModerationEvent)
-  | ({ type: 'review_queue_item.updated' } & ModerationEvent);
+// export type WSEvent =
+//   | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+//   | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
+//   | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);

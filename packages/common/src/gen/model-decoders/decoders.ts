@@ -75,24 +75,6 @@ decoders.Ban = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.BlockUsersResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.BlockedUserResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    blocked_user: { type: 'UserResponse', isSingle: true },
-
-    user: { type: 'UserResponse', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.Channel = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -330,13 +312,6 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.GetBlockedUsersResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    blocks: { type: 'BlockedUserResponse', isSingle: false },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.ListDevicesResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     devices: { type: 'DeviceResponse', isSingle: false },
@@ -414,17 +389,37 @@ decoders.MessageResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.ModerationEvent = (input?: Record<string, any>) => {
+decoders.ModerationCustomActionEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
-    received_at: { type: 'DatetimeType', isSingle: true },
+    item: { type: 'ReviewQueueItem', isSingle: true },
 
-    flags: { type: 'Flag2Response', isSingle: false },
+    message: { type: 'Message', isSingle: true },
 
-    action: { type: 'ActionLogResponse', isSingle: true },
+    user: { type: 'User', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
 
-    review_queue_item: { type: 'ReviewQueueItemResponse', isSingle: true },
+decoders.ModerationFlaggedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    user: { type: 'User', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ModerationMarkReviewedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    item: { type: 'ReviewQueueItem', isSingle: true },
+
+    message: { type: 'Message', isSingle: true },
+
+    user: { type: 'User', isSingle: true },
   };
   return decode(typeMappings, input);
 };

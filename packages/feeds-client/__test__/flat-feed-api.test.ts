@@ -151,8 +151,11 @@ describe('Feeds API - flat feed', () => {
   it(`emily removes bob from the feed members`, async () => {
     await emilyFeed.updateFeedMembers({ remove_members: [bob.id] });
 
-    // TODO: why this works - permissions are coming later
-    await bobFeed.addActivity({ verb: 'edit', object: 'Place:42' });
+    await expect(
+      bobFeed.addActivity({ verb: 'edit', object: 'Place:42' }),
+    ).rejects.toThrowError(
+      `Stream error code 17: AddActivity failed with error: "User 'bob' with role 'user' is not allowed to perform action AddActivity in scope 'feeds:visible'"`,
+    );
   });
 
   it(`tamara unfollows the feed`, async () => {

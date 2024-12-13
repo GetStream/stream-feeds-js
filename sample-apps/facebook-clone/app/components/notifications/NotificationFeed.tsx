@@ -84,10 +84,7 @@ export const NotificationFeed = (proprs: {
           <div>You're all caught up 🎉</div>
         )}
         {groups.map((g, i) => (
-          <div
-            key={`notification:${i}`}
-            className="text-gray-800 flex items-center justify-between gap-1"
-          >
+          <div key={`notification:${i}`} className="w-full text-gray-800">
             {g.activities[0]?.verb === 'follow-request' ? (
               <FollowRequestNotification
                 group={g}

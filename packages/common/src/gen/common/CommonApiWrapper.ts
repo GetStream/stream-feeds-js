@@ -1,10 +1,8 @@
 import { StreamClient } from '../../gen-imports';
 import {
-  BlockUsersRequest,
   CreateDeviceRequest,
   CreateGuestRequest,
   QueryUsersPayload,
-  UnblockUsersRequest,
   UpdateUsersPartialRequest,
   UpdateUsersRequest,
   WSAuthMessage,
@@ -51,17 +49,5 @@ export class CommonApiWrapper {
 
   updateUsers = (request: UpdateUsersRequest) => {
     return this.streamClient.updateUsers(request);
-  };
-
-  getBlockedUsers = () => {
-    return this.streamClient.getBlockedUsers();
-  };
-
-  blockUsers = (request: BlockUsersRequest) => {
-    return this.streamClient.blockUsers(request);
-  };
-
-  unblockUsers = (request: UnblockUsersRequest) => {
-    return this.streamClient.unblockUsers(request);
   };
 }

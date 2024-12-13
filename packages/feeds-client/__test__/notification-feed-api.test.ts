@@ -25,6 +25,7 @@ describe('Feeds API - notification feed', () => {
       target_group: emilyFeed.group,
       target_id: emilyFeed.id,
     });
+
     const response = await notificationFeed.read({
       limit: 20,
       offset: 0,
@@ -96,22 +97,6 @@ describe('Feeds API - notification feed', () => {
     expect(postGroup.seen).toBe(true);
     expect(postGroup.read).toBe(false);
     expect(postGroup.actor_count).toBe(1);
-  });
-
-  it('test', async () => {
-    const activity = await notificationFeed.addActivity({
-      verb: 'test',
-      object: 'user:emily',
-    });
-
-    console.log(activity.activity);
-
-    const response = await emilyFeed.follow({
-      target_group: notificationFeed.group,
-      target_id: notificationFeed.id,
-    });
-
-    console.log(response.created);
   });
 
   afterAll(async () => {

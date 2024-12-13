@@ -1,19 +1,14 @@
 import { StreamResponse } from '../../gen-imports';
 import {
-  BlockUsersRequest,
-  BlockUsersResponse,
   CreateDeviceRequest,
   CreateGuestRequest,
   CreateGuestResponse,
   GetApplicationResponse,
-  GetBlockedUsersResponse,
   GetOGResponse,
   ListDevicesResponse,
   QueryUsersPayload,
   QueryUsersResponse,
   Response,
-  UnblockUsersRequest,
-  UnblockUsersResponse,
   UpdateUsersPartialRequest,
   UpdateUsersRequest,
   UpdateUsersResponse,
@@ -53,14 +48,4 @@ export interface CommonApiInterface {
   updateUsers: (
     request: UpdateUsersRequest,
   ) => Promise<StreamResponse<UpdateUsersResponse>>;
-
-  getBlockedUsers: () => Promise<StreamResponse<GetBlockedUsersResponse>>;
-
-  blockUsers: (
-    request: BlockUsersRequest,
-  ) => Promise<StreamResponse<BlockUsersResponse>>;
-
-  unblockUsers: (
-    request: UnblockUsersRequest,
-  ) => Promise<StreamResponse<UnblockUsersResponse>>;
 }

@@ -31,7 +31,7 @@ export const SimpleNotification = ({
   };
 
   return (
-    <div className="text-gray-800 flex items-center justify-between gap-1">
+    <div className="flex items-center justify-between gap-1">
       <div>{getNotificationText(group)}</div>
       {!group.read && (
         <div className="flex items-center gap-1.5">

@@ -42,7 +42,12 @@ require('dotenv').config();
       app_pk: 31264,
       slug: 'notification',
       type: 'notification',
-      aggregation_format: '{{verb.id}}',
+      aggregation_format: `
+      {% if verb == 'follow-request' %}
+        {{ actor }}_{{ verb }}_{{ time.strftime("%Y-%m-%d") }}
+      {% else %}
+          {{ verb }}_{{ time.strftime("%Y-%m-%d") }}
+      {% endif %}`,
       max_length: 3600,
     },
   });

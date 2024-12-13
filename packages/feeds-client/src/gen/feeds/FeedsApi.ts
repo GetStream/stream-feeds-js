@@ -9,6 +9,7 @@ import {
   AddActivityResponse,
   DeleteFeedGroupResponse,
   DeleteFeedResponse,
+  DeleteReactionResponse,
   FollowRequest,
   FollowResponse,
   GetFeedGroupsResponse,
@@ -122,6 +123,29 @@ export class FeedsApi extends CommonApiWrapper {
     );
 
     decoders.QueryReactionsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async feedsDeleteReaction(request: {
+    id: string;
+    type: string;
+  }): Promise<StreamResponse<DeleteReactionResponse>> {
+    const pathParams = {
+      id: request?.id,
+      type: request?.type,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteReactionResponse>
+    >(
+      'DELETE',
+      '/api/v2/feeds/activities/{id}/reactions/{type}',
+      pathParams,
+      undefined,
+    );
+
+    decoders.DeleteReactionResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
