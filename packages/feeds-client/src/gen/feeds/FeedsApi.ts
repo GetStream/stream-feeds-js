@@ -258,6 +258,7 @@ export class FeedsApi extends CommonApiWrapper {
       invited_follow_requests: request?.invited_follow_requests,
       invites: request?.invites,
       rejected_follow_requests: request?.rejected_follow_requests,
+      rejected_invite_follow_requests: request?.rejected_invite_follow_requests,
       remove_members: request?.remove_members,
       revoked_follow_requests: request?.revoked_follow_requests,
       custom: request?.custom,

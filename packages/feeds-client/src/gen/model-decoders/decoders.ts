@@ -41,6 +41,8 @@ decoders.Activity = (input?: Record<string, any>) => {
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
+
+    reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -370,6 +372,15 @@ decoders.QueryReactionsResponse = (input?: Record<string, any>) => {
 decoders.QueryUsersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     users: { type: 'FullUserResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ReactionGroupResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    first_reaction_at: { type: 'DatetimeType', isSingle: true },
+
+    last_reaction_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };

@@ -48,6 +48,8 @@ export interface Activity {
   to_targets?: string[];
 
   custom?: Record<string, any>;
+
+  reaction_groups?: Record<string, ReactionGroupResponse>;
 }
 
 export interface ActivityAddedEvent {
@@ -456,7 +458,13 @@ export interface FeedFollowRequest {
 
   source_fid: string;
 
-  status: string;
+  status:
+    | 'invited'
+    | 'pending'
+    | 'accepted'
+    | 'rejected'
+    | 'revoked'
+    | 'rejected_invite';
 
   target_fid: string;
 
@@ -1008,6 +1016,16 @@ export interface QueryUsersResponse {
   users: FullUserResponse[];
 }
 
+export interface ReactionGroupResponse {
+  count: number;
+
+  first_reaction_at: Date;
+
+  last_reaction_at: Date;
+
+  sum_scores: number;
+}
+
 export interface ReactionResponse {
   activity_id: string;
 
@@ -1134,6 +1152,8 @@ export interface UpdateFeedRequest {
   invites?: FeedMember[];
 
   rejected_follow_requests?: string[];
+
+  rejected_invite_follow_requests?: string[];
 
   remove_members?: string[];
 
