@@ -13,3 +13,7 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.fill.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+}
