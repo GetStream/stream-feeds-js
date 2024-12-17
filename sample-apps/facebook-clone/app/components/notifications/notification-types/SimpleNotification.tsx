@@ -23,8 +23,8 @@ export const SimpleNotification = ({
       case 'follow':
         text += ` started following you`;
         break;
-      case 'follow-request':
-        text += ``;
+      case 'like':
+        text += ` liked your post`;
     }
 
     return text;

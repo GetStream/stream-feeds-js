@@ -3,15 +3,33 @@ import { useState } from 'react';
 import { useUserContext } from '../user-context';
 
 export const Activity = ({ activity }: { activity: StreamActivity }) => {
-  const [likes] = useState(activity.reaction_groups?.like);
+  const [likes, setLikes] = useState(activity.reaction_groups.like?.count ?? 0);
+  const [hasOwnLike, setHasOwnLike] = useState(
+    !!activity.own_reactions?.find((r) => r.type === 'like'),
+  );
   const { client } = useUserContext();
 
-  const addReaction = () => {
-    void client?.feedsSendReaction({ type: 'like', id: activity.id });
+  const addReaction = async () => {
+    await client?.feedsSendReaction({ type: 'like', id: activity.id });
+    void fetch('/api/send-notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        targetUserId: activity.user.id,
+        verb: 'like',
+        objectId: activity.id,
+      }),
+    }).catch((err) => console.warn(err));
+    setLikes(likes + 1);
+    setHasOwnLike(true);
   };
 
-  const removeReaction = () => {
-    void client?.feedsDeleteReaction({ type: 'like', id: activity.id });
+  const removeReaction = async () => {
+    await client?.feedsDeleteReaction({ type: 'like', id: activity.id });
+    setLikes(likes - 1);
+    setHasOwnLike(false);
   };
 
   return (
@@ -31,29 +49,21 @@ export const Activity = ({ activity }: { activity: StreamActivity }) => {
           </div>
         </div>
         <div>{activity.custom?.text}</div>
-        {(likes?.count ?? 0) > 0 && (
-          <div className="flex items-center gap-1 text-gray-700 text-sm">
+        <div className="flex items-center gap-1 text-gray-700 text-sm">
+          <button
+            onClick={() => (hasOwnLike ? removeReaction() : addReaction())}
+          >
             <span
-              className="text-blue-500 material-symbols-outlined fill"
+              className={`text-blue-500 material-symbols-outlined ${hasOwnLike ? 'fill' : ''}`}
               style={{ fontSize: '22px' }}
             >
               thumb_up
             </span>
-            <div>{likes!.count}</div>
+          </button>
+          <div>
+            {likes} like{likes !== 1 ? 's' : ''}
           </div>
-        )}
-        <button
-          onClick={() => addReaction()}
-          className="text-gray-700 text-sm p-1 border border-gray-300 rounded-md flex items-center gap-1 w-min"
-        >
-          <span
-            className={`text-blue-500 material-symbols-outlined`}
-            style={{ fontSize: '22px' }}
-          >
-            thumb_up
-          </span>
-          <div>Like</div>
-        </button>
+        </div>
       </div>
     </>
   );

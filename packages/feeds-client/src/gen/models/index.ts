@@ -43,13 +43,17 @@ export interface Activity {
 
   verb: string;
 
+  reaction_groups: Record<string, ReactionGroupResponse>;
+
   user: UserResponse;
+
+  latest_reactions?: ReactionResponse[];
+
+  own_reactions?: ReactionResponse[];
 
   to_targets?: string[];
 
   custom?: Record<string, any>;
-
-  reaction_groups?: Record<string, ReactionGroupResponse>;
 }
 
 export interface ActivityAddedEvent {

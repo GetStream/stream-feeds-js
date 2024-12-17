@@ -37,7 +37,7 @@ require('dotenv').config();
     },
   });
 
-  await client.feeds.upsertFeedGroup({
+  const response = await client.feeds.upsertFeedGroup({
     feed_group: {
       app_pk: 31264,
       slug: 'notification',
@@ -51,6 +51,8 @@ require('dotenv').config();
       max_length: 3600,
     },
   });
+
+  console.log(response.feed_group?.aggregation_format);
 
   console.log('Creating user feeds for users...');
   for (let i = 0; i < users.length; i++) {

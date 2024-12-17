@@ -33,6 +33,9 @@ export const FollowRequestNotification = ({
     <div className="w-full flex items-center justify-between">
       {activity.user?.name} wants to follow you
       <div className="flex items-center gap-1">
+        {!group.read && (
+          <div className="rounded-full bg-blue-500 w-2 h-2"></div>
+        )}
         {!activity.custom?.state && (
           <>
             <button
@@ -50,9 +53,6 @@ export const FollowRequestNotification = ({
           </>
         )}
         {activity.custom?.state && <div>{activity.custom?.state}</div>}
-        {!group.read && (
-          <div className="rounded-full bg-blue-500 w-2 h-2"></div>
-        )}
       </div>
     </div>
   );
