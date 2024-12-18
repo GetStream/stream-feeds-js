@@ -17,3 +17,7 @@ body {
 .fill.material-symbols-outlined {
   font-variation-settings: 'FILL' 1;
 }
+
+::backdrop {
+  @apply backdrop-blur-sm bg-black/25  transition-all duration-300;
+}
