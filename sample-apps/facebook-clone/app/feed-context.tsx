@@ -39,7 +39,7 @@ export const FeedContextProvider = ({ children }: PropsWithChildren) => {
       setOwnFeed(undefined);
       setOwnTimeline(undefined);
     } else {
-      client
+      void client
         .queryFeeds({
           watch: true,
           filter: {
