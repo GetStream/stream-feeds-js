@@ -59,7 +59,13 @@ export function Header() {
                 <NotificationBell></NotificationBell>
               </li>
               <li className="mr-3">
-                <img className="size-8 rounded-full" src={user.image} alt="" />
+                <Link href="/profile">
+                  <img
+                    className="size-8 rounded-full"
+                    src={user.image}
+                    alt=""
+                  />
+                </Link>
               </li>
               <li>
                 <button

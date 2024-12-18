@@ -16,7 +16,6 @@ export const ReactionsList = ({
   const { client } = useUserContext();
 
   useEffect(() => {
-    console.log(client);
     void loadMore();
   }, [client]);
 
