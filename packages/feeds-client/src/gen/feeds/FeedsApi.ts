@@ -187,19 +187,23 @@ export class FeedsApi extends CommonApiWrapper {
   }
 
   protected async _queryFeeds(
-    request?: QueryFeedsRequest,
+    request?: QueryFeedsRequest & { connection_id?: string },
   ): Promise<StreamResponse<QueryFeedsResponse>> {
+    const queryParams = {
+      connection_id: request?.connection_id,
+    };
     const body = {
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,
+      watch: request?.watch,
       sort: request?.sort,
       filter: request?.filter,
     };
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryFeedsResponse>
-    >('POST', '/api/v2/feeds/feeds/query', undefined, undefined, body);
+    >('POST', '/api/v2/feeds/feeds/query', undefined, queryParams, body);
 
     decoders.QueryFeedsResponse?.(response.body);
 

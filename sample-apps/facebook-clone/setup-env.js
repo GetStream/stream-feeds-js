@@ -54,16 +54,21 @@ require('dotenv').config();
 
   console.log(response.feed_group?.aggregation_format);
 
-  console.log('Creating user feeds for users...');
+  console.log('Creating feeds for users...');
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
 
     await client.feeds.feed('user', user.id).getOrCreate({
-      visibility_level: i < 3 ? 'visible' : 'followers',
+      visibility_level: user.id === 'jack' ? 'followers' : 'visible',
       user_id: user.id,
     });
 
     await client.feeds.feed('timeline', user.id).getOrCreate({
+      visibility_level: 'private',
+      user_id: user.id,
+    });
+
+    await client.feeds.feed('notification', user.id).getOrCreate({
       visibility_level: 'private',
       user_id: user.id,
     });

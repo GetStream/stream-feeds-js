@@ -9,6 +9,7 @@ export type StreamFlatFeedState = {
 };
 
 export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
+  type = 'flat' as const;
   read = async (request: { limit: number; offset: number }) => {
     this.setLoadingState(true);
     try {

@@ -13,6 +13,7 @@ export type StreamNotificationFeedState = {
 };
 
 export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificationFeedState> {
+  type = 'notification' as const;
   read = async (request: {
     limit: number;
     offset: number;

@@ -22,6 +22,7 @@ export abstract class StreamBaseFeed<
   } = StreamBaseFeedState,
 > extends StreamFeedApi {
   readonly state: StateStore<T>;
+  abstract type: Feed['type'];
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
     new EventDispatcher<WSEvent['type'], WSEvent>();

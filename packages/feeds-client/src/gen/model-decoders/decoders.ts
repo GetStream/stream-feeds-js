@@ -40,13 +40,13 @@ decoders.Activity = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
-    reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
-
-    user: { type: 'UserResponse', isSingle: true },
-
     latest_reactions: { type: 'ReactionResponse', isSingle: false },
 
     own_reactions: { type: 'ReactionResponse', isSingle: false },
+
+    reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
+
+    user: { type: 'UserResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };

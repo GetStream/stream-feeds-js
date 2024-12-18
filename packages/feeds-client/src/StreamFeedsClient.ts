@@ -13,7 +13,7 @@ import { StreamFlatFeedClient } from './StreamFlatFeedClient';
 import { StreamNotificationFeedClient } from './StreamNotificationFeedClient';
 import { Feed, QueryFeedsRequest, WSEvent } from './gen/models';
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
-import { StreamFeedsEvent } from './types';
+import { StreamFeedClient, StreamFeedsEvent } from './types';
 
 export type StreamFeedsClientState = StreamClientState;
 
@@ -27,10 +27,7 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     StreamFeedsEvent
   > = new EventDispatcher<StreamFeedsEvent['type'], StreamFeedsEvent>();
 
-  private activeFeeds: Record<
-    FID,
-    StreamFlatFeedClient | StreamNotificationFeedClient
-  > = {};
+  private activeFeeds: Record<FID, StreamFeedClient> = {};
 
   constructor(apiKey: string, options?: StreamClientOptions);
   constructor(commonClient: StreamClient);
@@ -124,7 +121,7 @@ export class StreamFeedsClient extends FeedsApi implements ProductApiInferface {
     if (this.activeFeeds[fid]) {
       return this.activeFeeds[fid];
     } else {
-      let feed: StreamFlatFeedClient | StreamNotificationFeedClient;
+      let feed: StreamFeedClient;
       switch (type) {
         case 'flat':
           feed = new StreamFlatFeedClient(this, group, id, data);

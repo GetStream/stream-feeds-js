@@ -43,13 +43,13 @@ export interface Activity {
 
   verb: string;
 
+  latest_reactions: ReactionResponse[];
+
+  own_reactions: ReactionResponse[];
+
   reaction_groups: Record<string, ReactionGroupResponse>;
 
   user: UserResponse;
-
-  latest_reactions?: ReactionResponse[];
-
-  own_reactions?: ReactionResponse[];
 
   to_targets?: string[];
 
@@ -962,6 +962,8 @@ export interface QueryFeedsRequest {
   next?: string;
 
   prev?: string;
+
+  watch?: boolean;
 
   sort?: SortParamRequest[];
 
