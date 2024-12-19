@@ -66,7 +66,7 @@ export default function Profile() {
 
   return (
     <div>
-      <h2 className="text-4xl font-extrabold text-center">Porfile</h2>
+      <h2 className="text-4xl font-extrabold text-center">Profile</h2>
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div>

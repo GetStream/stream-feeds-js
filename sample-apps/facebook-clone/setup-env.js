@@ -37,22 +37,16 @@ require('dotenv').config();
     },
   });
 
-  const response = await client.feeds.upsertFeedGroup({
+  await client.feeds.upsertFeedGroup({
     feed_group: {
       app_pk: 31264,
       slug: 'notification',
       type: 'notification',
-      aggregation_format: `
-      {% if verb == 'follow-request' %}
-        {{ actor }}_{{ verb }}_{{ time.strftime("%Y-%m-%d") }}
-      {% else %}
-          {{ verb }}_{{ time.strftime("%Y-%m-%d") }}
-      {% endif %}`,
+      aggregation_format:
+        '{% if verb == "follow-request" %}{{ actor }}_{{ verb }}_{{ time.strftime("%Y-%m-%d") }}{% elif verb == "like" %}{{ verb }}_{{object}}_{{ time.strftime("%Y-%m-%d") }}{% else %}{{ verb }}_{{ time.strftime("%Y-%m-%d") }}{% endif %}',
       max_length: 3600,
     },
   });
-
-  console.log(response.feed_group?.aggregation_format);
 
   console.log('Creating feeds for users...');
   for (let i = 0; i < users.length; i++) {

@@ -1,6 +1,6 @@
 import { useFeedContext } from '@/app/feed-context';
 import { Activity, AggregatedActivities } from '@stream-io/feeds-client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const FollowRequestNotification = ({
   group,
@@ -11,21 +11,42 @@ export const FollowRequestNotification = ({
 }) => {
   // Follow requests are grouped by id so activities.length will always be exactly 1
   const [activity] = useState<Activity>(group.activities[0]);
+  const [isPending, setIsPending] = useState<boolean>(true);
   const { ownFeed } = useFeedContext();
 
-  const accept = (activity: Activity) => {
-    void ownFeed?.update({
+  useEffect(() => {
+    if (!ownFeed) {
+      return;
+    }
+    const unsubscribe = ownFeed.state.subscribeWithSelector(
+      (state) => ({ pending: state.follow_requests?.pending }),
+      ({ pending }) => {
+        setIsPending(
+          !!pending?.find(
+            (r) => r.source_fid === `timeline:${activity.user.id}`,
+          ),
+        );
+      },
+    );
+
+    return unsubscribe;
+  }, [ownFeed, activity]);
+
+  const accept = async (activity: Activity) => {
+    await ownFeed?.update({
       accepted_follow_requests: [`timeline:${activity.user.id}`],
     });
-    // TODO: update activity here
+    // reload state because we don't yet have WS events
+    await ownFeed?.getOrCreate();
     onMarkRead();
   };
 
-  const decline = (activity: Activity) => {
-    void ownFeed?.update({
+  const decline = async (activity: Activity) => {
+    await ownFeed?.update({
       rejected_follow_requests: [`timeline:${activity.user.id}`],
     });
-    // TODO: update activity here
+    // reload state because we don't yet have WS events
+    await ownFeed?.getOrCreate();
     onMarkRead();
   };
 
@@ -39,14 +60,16 @@ export const FollowRequestNotification = ({
         {!activity.custom?.state && (
           <>
             <button
-              className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+              className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md disabled:bg-blue-100 hover:bg-blue-700 focus:outline-none"
               onClick={() => accept(activity)}
+              disabled={!isPending}
             >
               <span className="material-symbols-outlined">check</span>
             </button>
             <button
-              className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+              className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md rounded-md disabled:bg-blue-100 hover:bg-blue-700 focus:outline-none"
               onClick={() => decline(activity)}
+              disabled={!isPending}
             >
               <span className="material-symbols-outlined">close</span>
             </button>

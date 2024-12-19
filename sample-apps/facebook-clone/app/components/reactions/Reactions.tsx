@@ -64,6 +64,7 @@ export const Reactions = ({
   return (
     <div className="flex items-center gap-1 text-gray-700 text-sm">
       <button
+        className="flex"
         onClick={() => (hasOwnReaction ? removeReaction() : addReaction())}
       >
         <span
