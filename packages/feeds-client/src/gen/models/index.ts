@@ -28,6 +28,12 @@ export interface Action {
   value?: string;
 }
 
+export interface ActionableFollowRequests {
+  invites: FeedFollowRequest[];
+
+  pending: FeedFollowRequest[];
+}
+
 export interface Activity {
   created_at: Date;
 
@@ -450,7 +456,7 @@ export interface Feed {
 
   created_by: UserResponse;
 
-  follow_requests: FollowRequests;
+  follow_requests: ActionableFollowRequests;
 
   deleted_at?: Date;
 
@@ -461,6 +467,8 @@ export interface FeedFollowRequest {
   created_at: Date;
 
   source_fid: string;
+
+  source_user_id: string;
 
   status:
     | 'invited'
@@ -473,6 +481,8 @@ export interface FeedFollowRequest {
   target_fid: string;
 
   updated_at: Date;
+
+  source_user: UserResponse;
 }
 
 export interface FeedGroupInput {
@@ -659,12 +669,6 @@ export interface FollowRequest {
   target_id: string;
 
   activity_copy_limit?: number;
-}
-
-export interface FollowRequests {
-  invites: FeedFollowRequest[];
-
-  pending: FeedFollowRequest[];
 }
 
 export interface FollowResponse {
@@ -974,6 +978,28 @@ export interface QueryFeedsResponse {
   duration: string;
 
   feeds: Feed[];
+
+  next?: string;
+
+  prev?: string;
+}
+
+export interface QueryFollowRequestsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryFollowRequestsResponse {
+  duration: string;
+
+  follow_requests: FeedFollowRequest[];
 
   next?: string;
 

@@ -22,6 +22,8 @@ import {
   QueryActivitiesResponse,
   QueryFeedsRequest,
   QueryFeedsResponse,
+  QueryFollowRequestsRequest,
+  QueryFollowRequestsResponse,
   QueryReactionsRequest,
   QueryReactionsResponse,
   ReadFlatFeedResponse,
@@ -565,6 +567,32 @@ export class FeedsApi extends CommonApiWrapper {
     );
 
     decoders.RemoveActivityFromFeedResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async feedsQueryFollowRequests(
+    request?: QueryFollowRequestsRequest,
+  ): Promise<StreamResponse<QueryFollowRequestsResponse>> {
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryFollowRequestsResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/follow_requests/query',
+      undefined,
+      undefined,
+      body,
+    );
+
+    decoders.QueryFollowRequestsResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

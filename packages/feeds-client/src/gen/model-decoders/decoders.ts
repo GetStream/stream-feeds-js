@@ -34,6 +34,15 @@ const decode = (typeMappings: TypeMapping, input?: Record<string, any>) => {
   return input;
 };
 
+decoders.ActionableFollowRequests = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    invites: { type: 'FeedFollowRequest', isSingle: false },
+
+    pending: { type: 'FeedFollowRequest', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.Activity = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -198,7 +207,7 @@ decoders.Feed = (input?: Record<string, any>) => {
 
     created_by: { type: 'UserResponse', isSingle: true },
 
-    follow_requests: { type: 'FollowRequests', isSingle: true },
+    follow_requests: { type: 'ActionableFollowRequests', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
   };
@@ -210,6 +219,8 @@ decoders.FeedFollowRequest = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
+
+    source_user: { type: 'UserResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -249,15 +260,6 @@ decoders.FollowRelationship = (input?: Record<string, any>) => {
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     feed: { type: 'Feed', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.FollowRequests = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    invites: { type: 'FeedFollowRequest', isSingle: false },
-
-    pending: { type: 'FeedFollowRequest', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -362,6 +364,13 @@ decoders.QueryActivitiesResponse = (input?: Record<string, any>) => {
 decoders.QueryFeedsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     feeds: { type: 'Feed', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.QueryFollowRequestsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    follow_requests: { type: 'FeedFollowRequest', isSingle: false },
   };
   return decode(typeMappings, input);
 };

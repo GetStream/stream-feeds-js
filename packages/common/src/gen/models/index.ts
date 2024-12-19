@@ -18,6 +18,14 @@ export interface AITextConfig {
   async?: boolean;
 }
 
+export interface AIVideoConfig {
+  enabled: boolean;
+
+  rules: AWSRekognitionRule[];
+
+  async?: boolean;
+}
+
 export interface APIError {
   code: number;
 
@@ -693,6 +701,8 @@ export interface ConfigResponse {
   ai_image_config?: AIImageConfig;
 
   ai_text_config?: AITextConfig;
+
+  ai_video_config?: AIVideoConfig;
 
   automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
 
@@ -2189,7 +2199,7 @@ export interface WSAuthMessage {
   products?: string[];
 }
 
-// export type WSEvent =
-//   | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
-//   | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
-//   | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);
+export type WSEvent =
+  | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+  | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
+  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);
