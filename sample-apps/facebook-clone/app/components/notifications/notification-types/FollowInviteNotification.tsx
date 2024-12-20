@@ -2,7 +2,7 @@ import { useFeedContext } from '@/app/feed-context';
 import { Activity, AggregatedActivities } from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
 
-export const FollowRequestNotification = ({
+export const FollowInviteNotification = ({
   group,
   onMarkRead,
 }: {
@@ -12,47 +12,43 @@ export const FollowRequestNotification = ({
   // activities.length will always be exactly 1
   const [activity] = useState<Activity>(group.activities[0]);
   const [isPending, setIsPending] = useState<boolean>(true);
-  const { ownFeed } = useFeedContext();
+  const { ownTimeline } = useFeedContext();
 
   useEffect(() => {
-    if (!ownFeed) {
+    if (!ownTimeline) {
       return;
     }
-    const unsubscribe = ownFeed.state.subscribeWithSelector(
-      (state) => ({ pending: state.follow_requests?.pending }),
-      ({ pending }) => {
-        setIsPending(
-          !!pending?.find(
-            (r) => r.source_fid === `timeline:${activity.user.id}`,
-          ),
-        );
+    const unsubscribe = ownTimeline.state.subscribeWithSelector(
+      (state) => ({ invites: state.follow_requests?.invites }),
+      ({ invites }) => {
+        setIsPending(!!invites?.find((r) => r.target_fid === activity.object));
       },
     );
 
     return unsubscribe;
-  }, [ownFeed, activity]);
+  }, [ownTimeline, activity]);
 
   const accept = async (activity: Activity) => {
-    await ownFeed?.update({
-      accepted_follow_requests: [`timeline:${activity.user.id}`],
+    const feedFid = activity.object.split(':');
+    await ownTimeline?.follow({
+      target_group: feedFid[0],
+      target_id: feedFid[1],
     });
     // reload state because we don't yet have WS events
-    await ownFeed?.getOrCreate();
+    await ownTimeline?.getOrCreate();
     onMarkRead();
+    // Reinit state to include activities from newly followed user
+    await ownTimeline?.read({ limit: 30, offset: 0 });
   };
 
-  const decline = async (activity: Activity) => {
-    await ownFeed?.update({
-      rejected_follow_requests: [`timeline:${activity.user.id}`],
-    });
-    // reload state because we don't yet have WS events
-    await ownFeed?.getOrCreate();
+  const decline = async (_: Activity) => {
+    alert(`We don't yet have an API to decline an invite`);
     onMarkRead();
   };
 
   return (
     <div className="w-full flex items-center justify-between">
-      {activity.user?.name} wants to follow you
+      {activity.user?.name} invited you to follow
       <div className="flex items-center gap-1">
         {!group.read && (
           <div className="rounded-full bg-blue-500 w-2 h-2"></div>

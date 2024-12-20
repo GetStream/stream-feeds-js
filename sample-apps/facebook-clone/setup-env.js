@@ -43,7 +43,7 @@ require('dotenv').config();
       slug: 'notification',
       type: 'notification',
       aggregation_format:
-        '{% if verb == "follow-request" %}{{ actor }}_{{ verb }}_{{ time.strftime("%Y-%m-%d") }}{% elif verb == "like" %}{{ verb }}_{{object}}_{{ time.strftime("%Y-%m-%d") }}{% else %}{{ verb }}_{{ time.strftime("%Y-%m-%d") }}{% endif %}',
+        '{% if verb == "follow-request" %}{{ actor }}_{{ verb }}_{{ time.strftime("%Y-%m-%d") }}{% elif verb == "invite" %}{{ actor }}_{{ verb }}_{{ time.strftime("%Y-%m-%d") }}{% elif verb == "like" %}{{ verb }}_{{object}}_{{ time.strftime("%Y-%m-%d") }}{% else %}{{ verb }}_{{ time.strftime("%Y-%m-%d") }}{% endif %}',
       max_length: 3600,
     },
   });
@@ -53,7 +53,7 @@ require('dotenv').config();
     const user = users[i];
 
     await client.feeds.feed('user', user.id).getOrCreate({
-      visibility_level: user.id === 'jack' ? 'followers' : 'visible',
+      visibility_level: user.visibility_level,
       user_id: user.id,
     });
 

@@ -2199,7 +2199,7 @@ export interface WSAuthMessage {
   products?: string[];
 }
 
-export type WSEvent =
-  | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
-  | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
-  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);
+// export type WSEvent =
+// | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+// | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
+// | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);

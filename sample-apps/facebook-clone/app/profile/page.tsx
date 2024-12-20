@@ -75,11 +75,10 @@ export default function Profile() {
             </h3>
           </div>
           <div className="flex items-center gap-3">
-            {followerCount === undefined ? (
+            {followerCount === undefined && (
               <LoadingIndicator color="blue"></LoadingIndicator>
-            ) : (
-              followerCount
             )}
+            {followerCount ?? followingCount}
             <button
               onClick={() => {
                 setSelectedRelationship('followers');
@@ -98,11 +97,10 @@ export default function Profile() {
             </h3>
           </div>
           <div className="flex items-center gap-3">
-            {followingCount === undefined ? (
+            {followingCount === undefined && (
               <LoadingIndicator color="blue"></LoadingIndicator>
-            ) : (
-              followingCount
             )}
+            {followingCount ?? followingCount}
             <button
               onClick={() => {
                 setSelectedRelationship('following');
@@ -121,11 +119,10 @@ export default function Profile() {
             </h3>
           </div>
           <div>
-            {visibilityLevel === undefined ? (
+            {!visibilityLevel && (
               <LoadingIndicator color="blue"></LoadingIndicator>
-            ) : (
-              visibilityLevel
             )}
+            {visibilityLevel && visibilityLevel}
           </div>
         </div>
       </div>

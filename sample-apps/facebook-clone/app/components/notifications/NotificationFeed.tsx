@@ -4,6 +4,7 @@ import { AggregatedActivities } from '@stream-io/feeds-client';
 import { LoadingIndicator } from '../LoadingIndicator';
 import { FollowRequestNotification } from './notification-types/FollowRequestNotification';
 import { SimpleNotification } from './notification-types/SimpleNotification';
+import { FollowInviteNotification } from './notification-types/FollowInviteNotification';
 
 export const NotificationFeed = (proprs: {
   loadMoreText?: string;
@@ -85,17 +86,25 @@ export const NotificationFeed = (proprs: {
         )}
         {groups.map((g, i) => (
           <div key={`notification:${i}`} className="w-full text-gray-800">
-            {g.activities[0]?.verb === 'follow-request' ? (
+            {g.activities[0]?.verb === 'follow-request' && (
               <FollowRequestNotification
                 group={g}
                 onMarkRead={() => markRead(g)}
               ></FollowRequestNotification>
-            ) : (
-              <SimpleNotification
+            )}
+            {g.activities[0]?.verb === 'invite' && (
+              <FollowInviteNotification
                 group={g}
                 onMarkRead={() => markRead(g)}
-              ></SimpleNotification>
+              ></FollowInviteNotification>
             )}
+            {g.activities[0]?.verb !== 'invite' &&
+              g.activities[0]?.verb !== 'follow-request' && (
+                <SimpleNotification
+                  group={g}
+                  onMarkRead={() => markRead(g)}
+                ></SimpleNotification>
+              )}
           </div>
         ))}
       </div>

@@ -7,6 +7,7 @@ import { Activity } from './Activity';
 import { v4 as uuidv4 } from 'uuid';
 import Link from 'next/link';
 import { LoadingIndicator } from './LoadingIndicator';
+import { Invite } from './Invite';
 
 export const Feed = ({
   feed,
@@ -92,6 +93,11 @@ export const Feed = ({
   return (
     <>
       <div className="w-full flex flex-col items-center gap-3 overflow-auto">
+        {!readOnly && (
+          <div className="self-end">
+            <Invite feed={feed}></Invite>
+          </div>
+        )}
         {!readOnly && (
           <div className="w-full">
             <textarea
