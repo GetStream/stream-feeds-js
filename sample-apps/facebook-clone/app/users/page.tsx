@@ -52,6 +52,8 @@ export default function Users() {
         objectId: feed.fid,
       }),
     }).catch((err) => console.warn(err));
+    // Reinit state to update follower count
+    await ownTimeline?.getOrCreate();
     // Reinit state to include activities from newly followed user
     await ownTimeline?.read({ limit: 30, offset: 0 });
     setFollowerMapping({
@@ -68,6 +70,8 @@ export default function Users() {
       target_group: feed.group,
       target_id: feed.id,
     });
+    // Reinit state to update follower count
+    await ownTimeline?.getOrCreate();
     // Reinit state to exclude activities from newly unfollowed user
     await ownTimeline?.read({ limit: 30, offset: 0 });
     setFollowerMapping({ ...followerMapping, [feed.fid]: 'not-followed' });
