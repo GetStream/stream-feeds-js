@@ -430,6 +430,13 @@ decoders.SendReactionResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.UpdateActivityResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    activity: { type: 'Activity', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.UpdateFeedMembersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     members: { type: 'MemberResponse', isSingle: false },

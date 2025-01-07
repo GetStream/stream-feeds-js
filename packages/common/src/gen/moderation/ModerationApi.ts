@@ -2,8 +2,10 @@ import { ApiClient, StreamResponse } from '../../gen-imports';
 import {
   BanRequest,
   BanResponse,
+  DeleteModerationConfigResponse,
   FlagRequest,
   FlagResponse,
+  GetConfigResponse,
   MuteRequest,
   MuteResponse,
   QueryModerationConfigsRequest,
@@ -12,6 +14,8 @@ import {
   QueryReviewQueueResponse,
   SubmitActionRequest,
   SubmitActionResponse,
+  UpsertConfigRequest,
+  UpsertConfigResponse,
 } from '../models';
 import { decoders } from '../model-decoders/decoders';
 
@@ -35,6 +39,76 @@ export class ModerationApi {
     >('POST', '/api/v2/moderation/ban', undefined, undefined, body);
 
     decoders.BanResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async upsertConfig(
+    request: UpsertConfigRequest,
+  ): Promise<StreamResponse<UpsertConfigResponse>> {
+    const body = {
+      key: request?.key,
+      async: request?.async,
+      team: request?.team,
+      ai_image_config: request?.ai_image_config,
+      ai_text_config: request?.ai_text_config,
+      ai_video_config: request?.ai_video_config,
+      automod_platform_circumvention_config:
+        request?.automod_platform_circumvention_config,
+      automod_semantic_filters_config: request?.automod_semantic_filters_config,
+      automod_toxicity_config: request?.automod_toxicity_config,
+      aws_rekognition_config: request?.aws_rekognition_config,
+      block_list_config: request?.block_list_config,
+      bodyguard_config: request?.bodyguard_config,
+      google_vision_config: request?.google_vision_config,
+      velocity_filter_config: request?.velocity_filter_config,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpsertConfigResponse>
+    >('POST', '/api/v2/moderation/config', undefined, undefined, body);
+
+    decoders.UpsertConfigResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteConfig(request: {
+    key: string;
+    team?: string;
+  }): Promise<StreamResponse<DeleteModerationConfigResponse>> {
+    const queryParams = {
+      team: request?.team,
+    };
+    const pathParams = {
+      key: request?.key,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteModerationConfigResponse>
+    >('DELETE', '/api/v2/moderation/config/{key}', pathParams, queryParams);
+
+    decoders.DeleteModerationConfigResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getConfig(request: {
+    key: string;
+    team?: string;
+  }): Promise<StreamResponse<GetConfigResponse>> {
+    const queryParams = {
+      team: request?.team,
+    };
+    const pathParams = {
+      key: request?.key,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetConfigResponse>
+    >('GET', '/api/v2/moderation/config/{key}', pathParams, queryParams);
+
+    decoders.GetConfigResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

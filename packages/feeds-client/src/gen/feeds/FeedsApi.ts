@@ -33,6 +33,8 @@ import {
   SendReactionResponse,
   UnfollowRequest,
   UnfollowResponse,
+  UpdateActivityRequest,
+  UpdateActivityResponse,
   UpdateFeedMembersRequest,
   UpdateFeedMembersResponse,
   UpdateFeedRequest,
@@ -66,6 +68,30 @@ export class FeedsApi extends CommonApiWrapper {
     >('POST', '/api/v2/feeds/activities/query', undefined, undefined, body);
 
     decoders.QueryActivitiesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateActivity(
+    request: UpdateActivityRequest & { id: string },
+  ): Promise<StreamResponse<UpdateActivityResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      object: request?.object,
+      verb: request?.verb,
+      add_to_targets: request?.add_to_targets,
+      remove_to_targets: request?.remove_to_targets,
+      replace_to_targets: request?.replace_to_targets,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateActivityResponse>
+    >('PATCH', '/api/v2/feeds/activities/{id}', pathParams, undefined, body);
+
+    decoders.UpdateActivityResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

@@ -1156,6 +1156,26 @@ export interface UnfollowResponse {
   unfollowed: boolean;
 }
 
+export interface UpdateActivityRequest {
+  object?: string;
+
+  verb?: string;
+
+  add_to_targets?: string[];
+
+  remove_to_targets?: string[];
+
+  replace_to_targets?: string[];
+
+  custom?: Record<string, any>;
+}
+
+export interface UpdateActivityResponse {
+  duration: string;
+
+  activity: Activity;
+}
+
 export interface UpdateFeedMembersRequest {
   remove_members?: string[];
 

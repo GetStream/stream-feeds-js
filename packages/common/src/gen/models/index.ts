@@ -696,6 +696,8 @@ export interface ConfigResponse {
 
   key: string;
 
+  team: string;
+
   updated_at: Date;
 
   ai_image_config?: AIImageConfig;
@@ -771,6 +773,10 @@ export interface DeleteActivityRequest {
 
 export interface DeleteMessageRequest {
   hard_delete?: boolean;
+}
+
+export interface DeleteModerationConfigResponse {
+  duration: string;
 }
 
 export interface DeleteReactionRequest {
@@ -1121,6 +1127,12 @@ export interface GetApplicationResponse {
   app: AppResponseFields;
 }
 
+export interface GetConfigResponse {
+  duration: string;
+
+  config?: ConfigResponse;
+}
+
 export interface GetOGResponse {
   duration: string;
 
@@ -1173,6 +1185,10 @@ export interface GetOGResponse {
   fields?: Field[];
 
   giphy?: Images;
+}
+
+export interface GoogleVisionConfig {
+  enabled?: boolean;
 }
 
 export interface ImageData {
@@ -2039,6 +2055,42 @@ export interface UpdateUsersResponse {
   users: Record<string, FullUserResponse>;
 }
 
+export interface UpsertConfigRequest {
+  key: string;
+
+  async?: boolean;
+
+  team?: string;
+
+  ai_image_config?: AIImageConfig;
+
+  ai_text_config?: AITextConfig;
+
+  ai_video_config?: AIVideoConfig;
+
+  automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
+
+  automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
+
+  automod_toxicity_config?: AutomodToxicityConfig;
+
+  aws_rekognition_config?: AIImageConfig;
+
+  block_list_config?: BlockListConfig;
+
+  bodyguard_config?: AITextConfig;
+
+  google_vision_config?: GoogleVisionConfig;
+
+  velocity_filter_config?: VelocityFilterConfig;
+}
+
+export interface UpsertConfigResponse {
+  duration: string;
+
+  config?: ConfigResponse;
+}
+
 export interface User {
   banned: boolean;
 
@@ -2199,7 +2251,7 @@ export interface WSAuthMessage {
   products?: string[];
 }
 
-// export type WSEvent =
-// | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
-// | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
-// | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);
+export type WSEvent =
+  | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+  | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
+  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);

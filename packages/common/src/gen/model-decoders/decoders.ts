@@ -312,6 +312,13 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.GetConfigResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    config: { type: 'ConfigResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.ListDevicesResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     devices: { type: 'DeviceResponse', isSingle: false },
@@ -647,6 +654,13 @@ decoders.SubmitActionResponse = (input?: Record<string, any>) => {
 decoders.UpdateUsersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     users: { type: 'FullUserResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpsertConfigResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    config: { type: 'ConfigResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
