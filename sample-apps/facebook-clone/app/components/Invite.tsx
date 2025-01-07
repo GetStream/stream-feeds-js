@@ -4,7 +4,7 @@ import {
 } from '@stream-io/feeds-client';
 import { useEffect, useRef, useState } from 'react';
 import { useUserContext } from '../user-context';
-import { LoadingIndicator } from './LoadingIndicator';
+import { PaginatedList } from './PaginatedList';
 
 type FeedCid = string;
 
@@ -121,6 +121,36 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
     setIsLoading(false);
   };
 
+  const renderItem = (timelineFeed: StreamFeedClient) => {
+    return (
+      <li
+        key={timelineFeed.id}
+        className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
+      >
+        <div className="flex flex-row items-center gap-1">
+          <img
+            className="size-10 rounded-full"
+            src={timelineFeed.state.getLatestValue().created_by?.image}
+            alt=""
+          />
+          <p className="text-sm font-medium text-gray-900">
+            {timelineFeed.state.getLatestValue().created_by?.name}
+          </p>
+        </div>
+        {followerMapping[timelineFeed.fid] === 'needs-invite' && (
+          <button
+            onClick={() => invite(timelineFeed)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+          >
+            Invite
+          </button>
+        )}
+        {followerMapping[timelineFeed.fid] === 'invited' && 'Invited'}
+        {followerMapping[timelineFeed.fid] === 'following' && 'Following'}
+      </li>
+    );
+  };
+
   return (
     <>
       {canInvite && (
@@ -141,54 +171,13 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
         {isDialogOpen && (
           <div>
             <h2 className="text-4xl font-extrabold text-center">Users</h2>
-            {isLoading && feeds.length === 0 && (
-              <LoadingIndicator color="blue"></LoadingIndicator>
-            )}
-            <ul className="divide-y divide-gray-200">
-              {feeds.map((timelineFeed) => (
-                <li
-                  key={timelineFeed.id}
-                  className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
-                >
-                  <div className="flex flex-row items-center gap-1">
-                    <img
-                      className="size-10 rounded-full"
-                      src={
-                        timelineFeed.state.getLatestValue().created_by?.image
-                      }
-                      alt=""
-                    />
-                    <p className="text-sm font-medium text-gray-900">
-                      {timelineFeed.state.getLatestValue().created_by?.name}
-                    </p>
-                  </div>
-                  {followerMapping[timelineFeed.fid] === 'needs-invite' && (
-                    <button
-                      onClick={() => invite(timelineFeed)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-                    >
-                      Invite
-                    </button>
-                  )}
-                  {followerMapping[timelineFeed.fid] === 'invited' && 'Invited'}
-                  {followerMapping[timelineFeed.fid] === 'following' &&
-                    'Following'}
-                </li>
-              ))}
-            </ul>
-            {feeds.length > 0 && next && (
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-                onClick={() => loadMore()}
-              >
-                {isLoading ? (
-                  <LoadingIndicator></LoadingIndicator>
-                ) : (
-                  'Load more'
-                )}
-              </button>
-            )}
+            <PaginatedList
+              items={feeds}
+              isLoading={isLoading}
+              hasNext={!!next}
+              renderItem={renderItem}
+              onLoadMore={loadMore}
+            ></PaginatedList>
           </div>
         )}
       </dialog>

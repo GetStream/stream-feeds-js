@@ -4,6 +4,7 @@ import './globals.css';
 import { UserContextProvider } from './user-context';
 import { Header } from './components/Header';
 import { FeedContextProvider } from './feed-context';
+import { ErrorContextProvider } from './error-context';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -31,15 +32,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased max-h-full h-full w-full`}
       >
-        <div className="flex flex-col max-h-full h-full">
-          <UserContextProvider>
-            <FeedContextProvider>
-              <Header></Header>
-              <div className="w-3/4 py-5 max-h-full h-full min-h-0 m-auto flex flex-col justify-items-start">
-                {children}
-              </div>
-            </FeedContextProvider>
-          </UserContextProvider>
+        <div className="flex flex-col max-h-full h-full text-gray-800">
+          <ErrorContextProvider>
+            <UserContextProvider>
+              <FeedContextProvider>
+                <Header></Header>
+                <div className="w-3/4 py-5 max-h-full h-full min-h-0 m-auto flex flex-col justify-items-start">
+                  {children}
+                </div>
+              </FeedContextProvider>
+            </UserContextProvider>
+          </ErrorContextProvider>
         </div>
       </body>
     </html>

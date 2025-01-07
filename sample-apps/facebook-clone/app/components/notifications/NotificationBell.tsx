@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation';
 export const NotificationBell = () => {
   const [unseen, setUnseen] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
   const { ownNotifications } = useFeedContext();
   const pathname = usePathname();
   const router = useRouter();
@@ -19,20 +18,6 @@ export const NotificationBell = () => {
       (state) => ({ unseen: state.unseen }),
       ({ unseen }) => {
         setUnseen(unseen ?? 0);
-      },
-    );
-
-    return unsubscribe;
-  }, [ownNotifications]);
-
-  useEffect(() => {
-    if (!ownNotifications) {
-      return;
-    }
-    const unsubscribe = ownNotifications.state.subscribeWithSelector(
-      (state) => ({ has_next_page: state.has_next_page }),
-      ({ has_next_page }) => {
-        setHasNextPage(has_next_page);
       },
     );
 
@@ -83,14 +68,9 @@ export const NotificationBell = () => {
           )}
         </button>
         <div
-          className={`absolute right-0 mt-2 p-4 min-w-80 flex flex-col gap-3  bg-white rounded-md shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
+          className={`absolute right-0 mt-2 p-4 min-w-80 flex flex-col gap-3 text-gray-800 bg-white rounded-md shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
         >
           <NotificationFeed
-            loadMoreText={
-              hasNextPage
-                ? 'See all unread notifications'
-                : 'See all notifications'
-            }
             onLoadMore={() => navigateToNotifications()}
           ></NotificationFeed>
         </div>

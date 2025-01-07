@@ -1,7 +1,7 @@
 import { FollowRelationship } from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
-import { LoadingIndicator } from './LoadingIndicator';
 import { useFeedContext } from '../feed-context';
+import { PaginatedList } from './PaginatedList';
 
 export const FollowRelationships = ({
   type,
@@ -37,40 +37,33 @@ export const FollowRelationships = ({
     }
   };
 
+  const renderItem = (relationship: FollowRelationship) => {
+    return (
+      <li
+        key={relationship.feed.created_by.id}
+        className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
+      >
+        <div className="flex flex-row items-center gap-1">
+          <img
+            className="size-10 rounded-full"
+            src={relationship.feed.created_by.image}
+            alt=""
+          />
+          <p className="text-sm font-medium text-gray-900">
+            {relationship.feed.created_by.name}
+          </p>
+        </div>
+      </li>
+    );
+  };
+
   return (
-    <div>
-      {isLoading && relationships.length === 0 && (
-        <LoadingIndicator color="blue"></LoadingIndicator>
-      )}
-      {!isLoading && relationships.length === 0 && <div>No relationships</div>}
-      <ul className="divide-y divide-gray-200 overflow-auto">
-        {relationships.map((relationship) => (
-          <li
-            key={relationship.feed.created_by.id}
-            className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
-          >
-            <div className="flex flex-row items-center gap-1">
-              <img
-                className="size-10 rounded-full"
-                src={relationship.feed.created_by.image}
-                alt=""
-              />
-              <p className="text-sm font-medium text-gray-900">
-                {relationship.feed.created_by.name}
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
-      {relationships.length > 0 && next && (
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-          onClick={() => loadMore()}
-        >
-          {isLoading ? <LoadingIndicator></LoadingIndicator> : 'Load more'}
-        </button>
-      )}
-    </div>
+    <PaginatedList
+      items={relationships}
+      isLoading={isLoading}
+      hasNext={!!next}
+      renderItem={renderItem}
+      onLoadMore={loadMore}
+    ></PaginatedList>
   );
 };

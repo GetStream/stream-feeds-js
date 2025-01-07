@@ -9,6 +9,7 @@ import {
 import { StreamFeedsClient } from '@stream-io/feeds-client';
 import { UserRequest } from '@stream-io/common';
 import * as usersJSON from '../users.json';
+import { useRouter } from 'next/navigation';
 
 const tokenProviderURL = process.env.NEXT_PUBLIC_STREAM_TOKEN_URL!;
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY!;
@@ -51,6 +52,7 @@ const UserContext = createContext<UserContextValue>({
 });
 
 export const UserContextProvider = ({ children }: PropsWithChildren) => {
+  const router = useRouter();
   const [client, setClient] = useState<StreamFeedsClient | undefined>();
   const [user, setUser] = useState<UserRequest | undefined>();
 
@@ -84,7 +86,9 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
     const loggedInUser = users.find((u) => u.id === user_id);
     if (loggedInUser) {
       logIn(loggedInUser).catch((err) => {
-        throw err;
+        document.cookie = '';
+        console.warn(`Failed to login with user from cookie: ${user_id}`, err);
+        router.push('/login');
       });
     } else {
       document.cookie = '';

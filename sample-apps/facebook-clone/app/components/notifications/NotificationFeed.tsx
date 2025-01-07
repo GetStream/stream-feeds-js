@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useFeedContext } from '../../feed-context';
 import { AggregatedActivities } from '@stream-io/feeds-client';
-import { LoadingIndicator } from '../LoadingIndicator';
 import { FollowRequestNotification } from './notification-types/FollowRequestNotification';
 import { SimpleNotification } from './notification-types/SimpleNotification';
 import { FollowInviteNotification } from './notification-types/FollowInviteNotification';
+import { PaginatedList } from '../PaginatedList';
 
-export const NotificationFeed = (proprs: {
-  loadMoreText?: string;
-  onLoadMore?: () => void;
-}) => {
-  const { loadMoreText = 'Load more', onLoadMore } = proprs;
+export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
+  const { onLoadMore } = proprs;
   const [groups, setGroups] = useState<AggregatedActivities[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
@@ -75,51 +72,44 @@ export const NotificationFeed = (proprs: {
     }
   };
 
+  const renderItem = (group: AggregatedActivities, index: number) => {
+    return (
+      <li key={`notification:${index}`} className="w-full">
+        {group.activities[0]?.verb === 'follow-request' && (
+          <FollowRequestNotification
+            group={group}
+            onMarkRead={() => markRead(group)}
+          ></FollowRequestNotification>
+        )}
+        {group.activities[0]?.verb === 'invite' && (
+          <FollowInviteNotification
+            group={group}
+            onMarkRead={() => markRead(group)}
+          ></FollowInviteNotification>
+        )}
+        {group.activities[0]?.verb !== 'invite' &&
+          group.activities[0]?.verb !== 'follow-request' && (
+            <SimpleNotification
+              group={group}
+              onMarkRead={() => markRead(group)}
+            ></SimpleNotification>
+          )}
+      </li>
+    );
+  };
+
   return (
     <>
-      <div className="flex flex-col gap-3 text-gray-800 overflow-auto">
-        {groups.length === 0 && isLoading && (
-          <LoadingIndicator color={'blue'}></LoadingIndicator>
-        )}
-        {groups.length === 0 && !isLoading && (
-          <div>You're all caught up 🎉</div>
-        )}
-        {groups.map((g, i) => (
-          <div key={`notification:${i}`} className="w-full text-gray-800">
-            {g.activities[0]?.verb === 'follow-request' && (
-              <FollowRequestNotification
-                group={g}
-                onMarkRead={() => markRead(g)}
-              ></FollowRequestNotification>
-            )}
-            {g.activities[0]?.verb === 'invite' && (
-              <FollowInviteNotification
-                group={g}
-                onMarkRead={() => markRead(g)}
-              ></FollowInviteNotification>
-            )}
-            {g.activities[0]?.verb !== 'invite' &&
-              g.activities[0]?.verb !== 'follow-request' && (
-                <SimpleNotification
-                  group={g}
-                  onMarkRead={() => markRead(g)}
-                ></SimpleNotification>
-              )}
-          </div>
-        ))}
-      </div>
-      {groups.length > 0 && hasNextPage && (
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-          onClick={() => {
-            getNextPage();
-            onLoadMore?.();
-          }}
-        >
-          {isLoading ? <LoadingIndicator></LoadingIndicator> : loadMoreText}
-        </button>
-      )}
+      <PaginatedList
+        items={groups}
+        hasNext={hasNextPage}
+        isLoading={isLoading}
+        onLoadMore={() => {
+          getNextPage();
+          onLoadMore?.();
+        }}
+        renderItem={renderItem}
+      ></PaginatedList>
     </>
   );
 };

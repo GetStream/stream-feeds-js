@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react';
 import { useUserContext } from './user-context';
+import { useErrorContext } from './error-context';
 
 type FeedContextValue = {
   ownFeed: StreamFlatFeedClient | undefined;
@@ -33,6 +34,7 @@ export const FeedContextProvider = ({ children }: PropsWithChildren) => {
     StreamNotificationFeedClient | undefined
   >();
   const { user, client } = useUserContext();
+  const { throwUnrecoverableError } = useErrorContext();
 
   useEffect(() => {
     if (!user || !client) {
@@ -63,6 +65,9 @@ export const FeedContextProvider = ({ children }: PropsWithChildren) => {
             }
             void f.read({ offset: 0, limit: 30 });
           });
+        })
+        .catch((error) => {
+          throwUnrecoverableError(error);
         });
     }
   }, [user, client]);

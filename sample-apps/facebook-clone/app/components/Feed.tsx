@@ -5,9 +5,9 @@ import {
 import { useEffect, useState } from 'react';
 import { Activity } from './Activity';
 import { v4 as uuidv4 } from 'uuid';
-import Link from 'next/link';
 import { LoadingIndicator } from './LoadingIndicator';
 import { Invite } from './Invite';
+import { PaginatedList } from './PaginatedList';
 
 export const Feed = ({
   feed,
@@ -20,7 +20,6 @@ export const Feed = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
-  const [followingCount, setFollowingCount] = useState<number>(0);
   const [post, setPost] = useState<string>('');
 
   useEffect(() => {
@@ -56,17 +55,6 @@ export const Feed = ({
     return unsubscribe;
   }, [feed]);
 
-  useEffect(() => {
-    const unsubscribe = feed.state.subscribeWithSelector(
-      (state) => ({ following_count: state.following_count }),
-      ({ following_count }) => {
-        setFollowingCount(following_count ?? 0);
-      },
-    );
-
-    return unsubscribe;
-  }, [feed]);
-
   const sendPost = async () => {
     setIsSending(true);
     try {
@@ -88,6 +76,14 @@ export const Feed = ({
     feed.readNextPage().catch((err) => {
       throw err;
     });
+  };
+
+  const renderItem = (activity: StreamActivity) => {
+    return (
+      <li className="w-full" key={activity.id}>
+        <Activity activity={activity}></Activity>
+      </li>
+    );
   };
 
   return (
@@ -119,39 +115,13 @@ export const Feed = ({
             </button>
           </div>
         )}
-        {activities.length === 0 && isLoading && (
-          <LoadingIndicator color={'blue'}></LoadingIndicator>
-        )}
-        {activities.length === 0 &&
-          !isLoading &&
-          readOnly &&
-          followingCount === 0 && (
-            <div className="text-gray-800">
-              Start{' '}
-              <Link href="/users" className="underline">
-                following people
-              </Link>{' '}
-              to see posts
-            </div>
-          )}
-        {activities.length === 0 &&
-          !isLoading &&
-          readOnly &&
-          followingCount > 0 && (
-            <div className="text-gray-800">No posts yet</div>
-          )}
-        {activities.map((a) => (
-          <Activity key={a.id} activity={a}></Activity>
-        ))}
-        {activities.length > 0 && hasNextPage && (
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            onClick={() => getNextPage()}
-          >
-            {isLoading ? <LoadingIndicator></LoadingIndicator> : 'Load more'}
-          </button>
-        )}
+        <PaginatedList
+          items={activities}
+          isLoading={isLoading}
+          hasNext={hasNextPage}
+          renderItem={renderItem}
+          onLoadMore={getNextPage}
+        ></PaginatedList>
       </div>
     </>
   );

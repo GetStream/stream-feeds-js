@@ -2,14 +2,16 @@
 import { UserRequest } from '@stream-io/common';
 import { useRouter } from 'next/navigation';
 import { useUserContext } from '../user-context';
+import { useErrorContext } from '../error-context';
 
 export default function Login() {
   const { users, logIn } = useUserContext();
+  const { throwUnrecoverableError } = useErrorContext();
   const router = useRouter();
 
   const login = (user: UserRequest) => {
     logIn(user).catch((err) => {
-      throw err;
+      throwUnrecoverableError(err);
     });
     router.push('/home');
   };

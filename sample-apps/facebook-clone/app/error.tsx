@@ -1,8 +1,9 @@
 'use client'; // Error boundaries must be Client Components
 
 import { useEffect } from 'react';
+import { Error } from './components/Error';
 
-export default function Error({
+export default function ErrorBoundaryPage({
   error,
   reset,
 }: {
@@ -11,22 +12,9 @@ export default function Error({
 }) {
   useEffect(() => {
     if (error) {
-      alert(error);
       console.error(error);
     }
   }, [error]);
 
-  return (
-    <div>
-      <h2>Something went wrong!</h2>
-      <button
-        onClick={
-          // Attempt to recover by trying to re-render the segment
-          () => reset()
-        }
-      >
-        Try again
-      </button>
-    </div>
-  );
+  return <Error error={error} reset={() => reset()}></Error>;
 }
