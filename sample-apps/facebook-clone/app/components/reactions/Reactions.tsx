@@ -2,6 +2,7 @@ import { useUserContext } from '@/app/user-context';
 import { Activity } from '@stream-io/feeds-client';
 import { useRef, useState } from 'react';
 import { ReactionsList } from './ReactionsList';
+import { useErrorContext } from '@/app/error-context';
 
 const emojiMapping: Record<string, string> = {
   like: 'thumb_up',
@@ -14,6 +15,7 @@ export const Reactions = ({
   type: string;
   activity: Activity;
 }) => {
+  const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const [counts, setCounts] = useState(
     activity.reaction_groups[type]?.count ?? 0,
   );
@@ -25,26 +27,40 @@ export const Reactions = ({
   const { client } = useUserContext();
 
   const addReaction = async () => {
-    await client?.feedsSendReaction({ type, id: activity.id });
-    void fetch('/api/send-notification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        targetUserId: activity.user.id,
-        verb: type,
-        objectId: activity.id,
-      }),
-    }).catch((err) => console.warn(err));
-    setCounts(counts + 1);
-    setHasOwnReaction(true);
+    try {
+      await client?.feedsSendReaction({ type, id: activity.id });
+      void fetch('/api/send-notification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          targetUserId: activity.user.id,
+          verb: type,
+          objectId: activity.id,
+        }),
+      }).catch((err) => logError(err));
+      setCounts(counts + 1);
+      setHasOwnReaction(true);
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to add reaction, this could've been a temporary issue, try again`,
+      );
+    }
   };
 
   const removeReaction = async () => {
-    await client?.feedsDeleteReaction({ type, id: activity.id });
-    setCounts(counts - 1);
-    setHasOwnReaction(false);
+    try {
+      await client?.feedsDeleteReaction({ type, id: activity.id });
+      setCounts(counts - 1);
+      setHasOwnReaction(false);
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to remove reaction, this could've been a temporary issue, try again`,
+      );
+    }
   };
 
   const openDialog = () => {

@@ -1,29 +1,51 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { createContext, PropsWithChildren, useContext, useState } from 'react';
+import { useAppNotificationsContext } from './app-notifications-context';
 
 type ErrorContextValue = {
   throwUnrecoverableError: (error: Error) => void;
-  error?: Error;
+  unrecoverableError?: Error;
+  logError: (error: Error) => void;
+  logErrorAndDisplayNotification: (error: Error, message: string) => void;
 };
 
 const ErrorContext = createContext<ErrorContextValue>({
   throwUnrecoverableError: () => {},
-  error: undefined,
+  logError: () => {},
+  logErrorAndDisplayNotification: () => {},
+  unrecoverableError: undefined,
 });
 
 export const ErrorContextProvider = ({ children }: PropsWithChildren) => {
-  const [error, setError] = useState<Error>();
+  const { showNotification } = useAppNotificationsContext();
+  const [unrecoverableError, setUnrecoverableError] = useState<Error>();
   const router = useRouter();
 
   const throwUnrecoverableError = (error: Error) => {
-    console.error(error);
-    setError(error);
+    logError(error);
+    setUnrecoverableError(error);
     router.push('/error');
   };
 
+  const logError = (error: Error) => {
+    console.error(error);
+  };
+
+  const logErrorAndDisplayNotification = (error: Error, message: string) => {
+    logError(error);
+    showNotification({ message, type: 'error' });
+  };
+
   return (
-    <ErrorContext.Provider value={{ error, throwUnrecoverableError }}>
+    <ErrorContext.Provider
+      value={{
+        unrecoverableError,
+        throwUnrecoverableError,
+        logError,
+        logErrorAndDisplayNotification,
+      }}
+    >
       {children}
     </ErrorContext.Provider>
   );

@@ -7,7 +7,7 @@ import { Error } from '../components/Error';
 
 export default function ErrorPage() {
   const router = useRouter();
-  const { error, throwUnrecoverableError } = useErrorContext();
+  const { unrecoverableError, throwUnrecoverableError } = useErrorContext();
   const { logOut } = useUserContext();
 
   const reset = useCallback(() => {
@@ -17,5 +17,5 @@ export default function ErrorPage() {
     router.push('/login');
   }, [logOut]);
 
-  return <Error error={error} reset={reset}></Error>;
+  return <Error error={unrecoverableError} reset={reset}></Error>;
 }

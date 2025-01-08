@@ -5,6 +5,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { useUserContext } from '../user-context';
 import { PaginatedList } from './PaginatedList';
+import { useErrorContext } from '../error-context';
 
 type FeedCid = string;
 
@@ -13,7 +14,9 @@ type FollowStatus = 'following' | 'invited' | 'needs-invite';
 type FeedFollowerMapping = Record<FeedCid, FollowStatus>;
 
 export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
+  const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const [canInvite, setCanInvite] = useState(false);
+  const [error, setError] = useState<Error>();
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { client, user } = useUserContext();
@@ -50,19 +53,26 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
   };
 
   const invite = async (timelineFeed: StreamFeedClient) => {
-    await feed.update({ invited_follow_requests: [timelineFeed.fid] });
-    setFollowerMapping({ ...followerMapping, [timelineFeed.fid]: 'invited' });
-    void fetch('/api/send-notification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        targetUserId: timelineFeed.state.getLatestValue().created_by?.id,
-        verb: 'invite',
-        objectId: feed.fid,
-      }),
-    }).catch((err) => console.warn(err));
+    try {
+      await feed.update({ invited_follow_requests: [timelineFeed.fid] });
+      setFollowerMapping({ ...followerMapping, [timelineFeed.fid]: 'invited' });
+      void fetch('/api/send-notification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          targetUserId: timelineFeed.state.getLatestValue().created_by?.id,
+          verb: 'invite',
+          objectId: feed.fid,
+        }),
+      }).catch((err) => logError(err));
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to send invite to ${timelineFeed.state.getLatestValue().created_by?.name}, this could've been a temporary issue, try again`,
+      );
+    }
   };
 
   useEffect(() => {
@@ -82,6 +92,7 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
     if (!client || !user || !feed) {
       return;
     }
+    setError(undefined);
     setIsLoading(true);
     const limit = 30;
     const response = await client.queryFeeds({
@@ -92,33 +103,38 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
       next,
     });
     const newFeeds = response.feeds.filter((f) => f.id !== user.id);
-    const followingFeeds = (
-      await feed.getFollowingFeeds({
-        offset: 0,
-        limit,
-        // TODO: we should have filter here
-      })
-    ).followers.map((r) => r.feed);
-    newFeeds.forEach((timelineFeed) => {
-      followerMapping[timelineFeed.fid] = followingFeeds.find(
-        (f) => `${f.group}:${f.id}` === timelineFeed.fid,
-      )
-        ? 'following'
-        : 'needs-invite';
-      if (
-        timelineFeed.state
-          .getLatestValue()
-          .follow_requests?.invites?.find(
-            (r) => r.source_fid === timelineFeed.fid,
-          )
-      ) {
-        followerMapping[timelineFeed.fid] = 'invited';
-      }
-    });
-    setFeeds([...feeds, ...newFeeds]);
-    setFollowerMapping({ ...followerMapping });
-    setNext(response.next);
-    setIsLoading(false);
+    try {
+      const followingFeeds = (
+        await feed.getFollowingFeeds({
+          offset: 0,
+          limit,
+          // TODO: we should have filter here
+        })
+      ).followers.map((r) => r.feed);
+      newFeeds.forEach((timelineFeed) => {
+        followerMapping[timelineFeed.fid] = followingFeeds.find(
+          (f) => `${f.group}:${f.id}` === timelineFeed.fid,
+        )
+          ? 'following'
+          : 'needs-invite';
+        if (
+          timelineFeed.state
+            .getLatestValue()
+            .follow_requests?.invites?.find(
+              (r) => r.source_fid === timelineFeed.fid,
+            )
+        ) {
+          followerMapping[timelineFeed.fid] = 'invited';
+        }
+      });
+      setFeeds([...feeds, ...newFeeds]);
+      setFollowerMapping({ ...followerMapping });
+      setNext(response.next);
+    } catch (error) {
+      setError(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderItem = (timelineFeed: StreamFeedClient) => {
@@ -177,6 +193,8 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
               hasNext={!!next}
               renderItem={renderItem}
               onLoadMore={loadMore}
+              error={error}
+              itemsName="users"
             ></PaginatedList>
           </div>
         )}

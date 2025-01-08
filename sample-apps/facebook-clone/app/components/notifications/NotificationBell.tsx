@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useFeedContext } from '../../feed-context';
 import { NotificationFeed } from './NotificationFeed';
 import { usePathname, useRouter } from 'next/navigation';
+import { useErrorContext } from '@/app/error-context';
 
 export const NotificationBell = () => {
+  const { logError } = useErrorContext();
   const [unseen, setUnseen] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { ownNotifications } = useFeedContext();
@@ -35,11 +37,11 @@ export const NotificationBell = () => {
               offset: 0,
             })
             .catch((err) => {
-              throw err;
+              logError(err);
             });
         })
         .catch((err) => {
-          throw err;
+          logError(err);
         });
     }
   }, [isMenuOpen, unseen]);

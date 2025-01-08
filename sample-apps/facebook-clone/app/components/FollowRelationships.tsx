@@ -10,6 +10,7 @@ export const FollowRelationships = ({
 }) => {
   const [relationships, setRelationships] = useState<FollowRelationship[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error>();
   const [next, setNext] = useState<number | undefined>(0);
   const { ownFeed, ownTimeline } = useFeedContext();
 
@@ -19,6 +20,7 @@ export const FollowRelationships = ({
 
   const loadMore = async () => {
     setIsLoading(true);
+    setError(undefined);
     const limit = 30;
     const offset = next ?? 0;
     try {
@@ -32,6 +34,8 @@ export const FollowRelationships = ({
       }
       setRelationships([...relationships, ...newRelationships]);
       setNext(newRelationships.length < limit ? undefined : offset + limit);
+    } catch (error) {
+      setError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -64,6 +68,8 @@ export const FollowRelationships = ({
       hasNext={!!next}
       renderItem={renderItem}
       onLoadMore={loadMore}
+      error={error}
+      itemsName={type === 'followers' ? 'followers' : 'following users'}
     ></PaginatedList>
   );
 };

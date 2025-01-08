@@ -10,6 +10,7 @@ import { StreamFeedsClient } from '@stream-io/feeds-client';
 import { UserRequest } from '@stream-io/common';
 import * as usersJSON from '../users.json';
 import { useRouter } from 'next/navigation';
+import { useAppNotificationsContext } from './app-notifications-context';
 
 const tokenProviderURL = process.env.NEXT_PUBLIC_STREAM_TOKEN_URL!;
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY!;
@@ -53,6 +54,7 @@ const UserContext = createContext<UserContextValue>({
 
 export const UserContextProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter();
+  const { resetNotifications } = useAppNotificationsContext();
   const [client, setClient] = useState<StreamFeedsClient | undefined>();
   const [user, setUser] = useState<UserRequest | undefined>();
 
@@ -100,6 +102,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
     setUser(undefined);
     const _client = client;
     setClient(undefined);
+    resetNotifications();
     if (_client?.state.getLatestValue().connectedUser) {
       return _client.disconnectUser();
     } else {

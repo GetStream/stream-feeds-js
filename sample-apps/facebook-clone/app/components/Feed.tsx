@@ -8,6 +8,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { LoadingIndicator } from './LoadingIndicator';
 import { Invite } from './Invite';
 import { PaginatedList } from './PaginatedList';
+import { useErrorContext } from '../error-context';
+import Link from 'next/link';
 
 export const Feed = ({
   feed,
@@ -16,7 +18,9 @@ export const Feed = ({
   feed: StreamFlatFeedClient;
   readOnly: boolean;
 }) => {
+  const { logErrorAndDisplayNotification } = useErrorContext();
   const [activities, setActivities] = useState<StreamActivity[]>([]);
+  const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
@@ -67,15 +71,25 @@ export const Feed = ({
         },
       });
       setPost('');
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to send post, this could've been a temporary issue, try again`,
+      );
     } finally {
       setIsSending(false);
     }
   };
 
   const getNextPage = () => {
-    feed.readNextPage().catch((err) => {
-      throw err;
-    });
+    setError(undefined);
+    setIsLoading(true);
+    feed
+      .readNextPage()
+      .catch((err) => {
+        setError(err);
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const renderItem = (activity: StreamActivity) => {
@@ -88,7 +102,7 @@ export const Feed = ({
 
   return (
     <>
-      <div className="w-full flex flex-col items-center gap-3 overflow-auto">
+      <div className="w-full flex flex-col items-center gap-3">
         {!readOnly && (
           <div className="self-end">
             <Invite feed={feed}></Invite>
@@ -121,7 +135,14 @@ export const Feed = ({
           hasNext={hasNextPage}
           renderItem={renderItem}
           onLoadMore={getNextPage}
+          error={error}
+          itemsName="posts"
         ></PaginatedList>
+        {readOnly && !isLoading && !error && activities.length === 0 && (
+          <Link href="/users" className="underline">
+            Start following people
+          </Link>
+        )}
       </div>
     </>
   );

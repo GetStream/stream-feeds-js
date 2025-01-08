@@ -5,9 +5,12 @@ import { FollowRequestNotification } from './notification-types/FollowRequestNot
 import { SimpleNotification } from './notification-types/SimpleNotification';
 import { FollowInviteNotification } from './notification-types/FollowInviteNotification';
 import { PaginatedList } from '../PaginatedList';
+import { useErrorContext } from '@/app/error-context';
 
 export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
+  const { logError } = useErrorContext();
   const { onLoadMore } = proprs;
+  const [error, setError] = useState<Error>();
   const [groups, setGroups] = useState<AggregatedActivities[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
@@ -55,20 +58,27 @@ export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
     return unsubscribe;
   }, [ownNotifications]);
 
-  const getNextPage = () => {
-    ownNotifications?.readNextPage().catch((err) => {
-      throw err;
-    });
+  const getNextPage = async () => {
+    setError(undefined);
+    try {
+      await ownNotifications?.readNextPage();
+    } catch (error) {
+      setError(error as Error);
+    }
   };
 
   const markRead = async (group: AggregatedActivities) => {
     if (!group.read) {
-      await ownNotifications?.read({
-        limit: 30,
-        offset: 0,
-        mark_read: group.id,
-      });
-      await ownNotifications?.read({ limit: 30, offset: 0 });
+      try {
+        await ownNotifications?.read({
+          limit: 30,
+          offset: 0,
+          mark_read: group.id,
+        });
+        await ownNotifications?.read({ limit: 30, offset: 0 });
+      } catch (error) {
+        logError(error as Error);
+      }
     }
   };
 
@@ -105,10 +115,12 @@ export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
         hasNext={hasNextPage}
         isLoading={isLoading}
         onLoadMore={() => {
-          getNextPage();
+          void getNextPage();
           onLoadMore?.();
         }}
         renderItem={renderItem}
+        error={error}
+        itemsName="notifications"
       ></PaginatedList>
     </>
   );

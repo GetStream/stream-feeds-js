@@ -5,6 +5,7 @@ import { useFeedContext } from '../feed-context';
 import { StreamFeedClient } from '@stream-io/feeds-client';
 import Link from 'next/link';
 import { PaginatedList } from '../components/PaginatedList';
+import { useErrorContext } from '../error-context';
 
 type FeedCid = string;
 
@@ -18,8 +19,10 @@ type FollowStatus =
 type FeedFollowerMapping = Record<FeedCid, FollowStatus>;
 
 export default function Users() {
+  const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const { client, user } = useUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error>();
   const [next, setNext] = useState<string | undefined>(undefined);
   const [feeds, setFeeds] = useState<StreamFeedClient[]>([]);
   const { ownTimeline } = useFeedContext();
@@ -37,32 +40,41 @@ export default function Users() {
 
   const follow = async (feed: StreamFeedClient) => {
     const visibilityLevel = feed.state.getLatestValue().visibility_level;
-    const followResponse = await ownTimeline?.follow({
-      target_group: feed.group,
-      target_id: feed.id,
-    });
-    fetch('/api/send-notification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        targetUserId: feed.id,
-        verb: visibilityLevel === 'visible' ? 'follow' : `follow-request`,
-        objectId: feed.fid,
-      }),
-    }).catch((err) => console.warn(err));
-    // Reinit state to update follower count
-    await ownTimeline?.getOrCreate();
-    // Reinit state to include activities from newly followed user
-    await ownTimeline?.read({ limit: 30, offset: 0 });
-    setFollowerMapping({
-      ...followerMapping,
-      [feed.fid]:
-        followResponse?.follow_request_status === 'pending'
-          ? 'follow-request-sent'
-          : 'following',
-    });
+    try {
+      const followResponse = await ownTimeline?.follow({
+        target_group: feed.group,
+        target_id: feed.id,
+      });
+      fetch('/api/send-notification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          targetUserId: feed.id,
+          verb: visibilityLevel === 'visible' ? 'follow' : `follow-request`,
+          objectId: feed.fid,
+        }),
+      }).catch((err) => logError(err));
+      // Reinit state to update follower count
+      await ownTimeline?.getOrCreate().catch((err) => logError(err));
+      // Reinit state to include activities from newly followed user
+      await ownTimeline
+        ?.read({ limit: 30, offset: 0 })
+        .catch((err) => logError(err));
+      setFollowerMapping({
+        ...followerMapping,
+        [feed.fid]:
+          followResponse?.follow_request_status === 'pending'
+            ? 'follow-request-sent'
+            : 'following',
+      });
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to follow ${feed.state.getLatestValue().created_by?.name}, this could've been a temporary issue, try again`,
+      );
+    }
   };
 
   const unfollow = async (feed: StreamFeedClient) => {
@@ -81,58 +93,64 @@ export default function Users() {
     if (!client || !user || !ownTimeline) {
       return;
     }
+    setError(undefined);
     setIsLoading(true);
     const limit = 30;
-    const response = await client.queryFeeds({
-      limit,
-      filter: {
-        feed_group: 'user',
-      },
-      next,
-    });
-    const newFeeds = response.feeds.filter((f) => f.id !== user.id);
-    const followedNewFeeds = (
-      await ownTimeline.getFollowedFeeds({
-        offset: 0,
+    try {
+      const response = await client.queryFeeds({
         limit,
-        filter: newFeeds.map((f) => f.fid),
-      })
-    ).followed_feeds.map((r) => r.feed);
-    newFeeds.forEach((feed) => {
-      followerMapping[feed.fid] = followedNewFeeds.find(
-        (f) => `${f.group}:${f.id}` === feed.fid,
-      )
-        ? 'following'
-        : 'not-followed';
-      if (feed.state.getLatestValue().visibility_level === 'followers') {
-        if (
-          feed.state
-            .getLatestValue()
-            .follow_requests?.pending?.find(
-              (r) => r.source_fid === ownTimeline.fid,
-            )
-        ) {
-          followerMapping[feed.fid] = 'follow-request-sent';
+        filter: {
+          feed_group: 'user',
+        },
+        next,
+      });
+      const newFeeds = response.feeds.filter((f) => f.id !== user.id);
+      const followedNewFeeds = (
+        await ownTimeline.getFollowedFeeds({
+          offset: 0,
+          limit,
+          filter: newFeeds.map((f) => f.fid),
+        })
+      ).followed_feeds.map((r) => r.feed);
+      newFeeds.forEach((feed) => {
+        followerMapping[feed.fid] = followedNewFeeds.find(
+          (f) => `${f.group}:${f.id}` === feed.fid,
+        )
+          ? 'following'
+          : 'not-followed';
+        if (feed.state.getLatestValue().visibility_level === 'followers') {
+          if (
+            feed.state
+              .getLatestValue()
+              .follow_requests?.pending?.find(
+                (r) => r.source_fid === ownTimeline.fid,
+              )
+          ) {
+            followerMapping[feed.fid] = 'follow-request-sent';
+          }
         }
-      }
-      if (feed.state.getLatestValue().visibility_level === 'private') {
-        if (
-          feed.state
-            .getLatestValue()
-            .follow_requests?.invites?.find(
-              (r) => r.source_fid === ownTimeline.fid,
-            )
-        ) {
-          followerMapping[feed.fid] = 'invited';
-        } else if (followerMapping[feed.fid] === 'not-followed') {
-          followerMapping[feed.fid] = 'needs-invite';
+        if (feed.state.getLatestValue().visibility_level === 'private') {
+          if (
+            feed.state
+              .getLatestValue()
+              .follow_requests?.invites?.find(
+                (r) => r.source_fid === ownTimeline.fid,
+              )
+          ) {
+            followerMapping[feed.fid] = 'invited';
+          } else if (followerMapping[feed.fid] === 'not-followed') {
+            followerMapping[feed.fid] = 'needs-invite';
+          }
         }
-      }
-    });
-    setFeeds([...feeds, ...newFeeds]);
-    setFollowerMapping({ ...followerMapping });
-    setNext(response.next);
-    setIsLoading(false);
+      });
+      setFeeds([...feeds, ...newFeeds]);
+      setFollowerMapping({ ...followerMapping });
+      setNext(response.next);
+    } catch (error) {
+      setError(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderUser = (feed: StreamFeedClient) => {
@@ -193,6 +211,8 @@ export default function Users() {
         renderItem={renderUser}
         onLoadMore={loadMore}
         listContainerClassNames="divide-y divide-gray-200"
+        itemsName="users"
+        error={error}
       ></PaginatedList>
     </div>
   );

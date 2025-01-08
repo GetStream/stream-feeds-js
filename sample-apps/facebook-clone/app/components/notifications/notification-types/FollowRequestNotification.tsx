@@ -1,3 +1,4 @@
+import { useErrorContext } from '@/app/error-context';
 import { useFeedContext } from '@/app/feed-context';
 import { Activity, AggregatedActivities } from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
@@ -9,6 +10,7 @@ export const FollowRequestNotification = ({
   group: AggregatedActivities;
   onMarkRead: () => {};
 }) => {
+  const { logErrorAndDisplayNotification } = useErrorContext();
   // activities.length will always be exactly 1
   const [activity] = useState<Activity>(group.activities[0]);
   const [isPending, setIsPending] = useState<boolean>(true);
@@ -33,21 +35,35 @@ export const FollowRequestNotification = ({
   }, [ownFeed, activity]);
 
   const accept = async (activity: Activity) => {
-    await ownFeed?.update({
-      accepted_follow_requests: [`timeline:${activity.user.id}`],
-    });
-    // reload state because we don't yet have WS events
-    await ownFeed?.getOrCreate();
-    onMarkRead();
+    try {
+      await ownFeed?.update({
+        accepted_follow_requests: [`timeline:${activity.user.id}`],
+      });
+      // reload state because we don't yet have WS events
+      await ownFeed?.getOrCreate();
+      onMarkRead();
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to accept invitation, this could've been a temporary issue, try again`,
+      );
+    }
   };
 
   const decline = async (activity: Activity) => {
-    await ownFeed?.update({
-      rejected_follow_requests: [`timeline:${activity.user.id}`],
-    });
-    // reload state because we don't yet have WS events
-    await ownFeed?.getOrCreate();
-    onMarkRead();
+    try {
+      await ownFeed?.update({
+        rejected_follow_requests: [`timeline:${activity.user.id}`],
+      });
+      // reload state because we don't yet have WS events
+      onMarkRead();
+      await ownFeed?.getOrCreate();
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to decline invitation, this could've been a temporary issue, try again`,
+      );
+    }
   };
 
   return (

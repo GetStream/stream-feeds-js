@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { Error } from './components/Error';
+import { useErrorContext } from './error-context';
 
 export default function ErrorBoundaryPage({
   error,
@@ -10,9 +11,11 @@ export default function ErrorBoundaryPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { logError } = useErrorContext();
+
   useEffect(() => {
     if (error) {
-      console.error(error);
+      logError(error);
     }
   }, [error]);
 

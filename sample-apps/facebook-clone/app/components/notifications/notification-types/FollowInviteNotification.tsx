@@ -1,3 +1,4 @@
+import { useErrorContext } from '@/app/error-context';
 import { useFeedContext } from '@/app/feed-context';
 import { Activity, AggregatedActivities } from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
@@ -9,6 +10,7 @@ export const FollowInviteNotification = ({
   group: AggregatedActivities;
   onMarkRead: () => {};
 }) => {
+  const { logError, logErrorAndDisplayNotification } = useErrorContext();
   // activities.length will always be exactly 1
   const [activity] = useState<Activity>(group.activities[0]);
   const [isPending, setIsPending] = useState<boolean>(true);
@@ -29,16 +31,25 @@ export const FollowInviteNotification = ({
   }, [ownTimeline, activity]);
 
   const accept = async (activity: Activity) => {
-    const feedFid = activity.object.split(':');
-    await ownTimeline?.follow({
-      target_group: feedFid[0],
-      target_id: feedFid[1],
-    });
-    // reload state because we don't yet have WS events
-    await ownTimeline?.getOrCreate();
-    onMarkRead();
-    // Reinit state to include activities from newly followed user
-    await ownTimeline?.read({ limit: 30, offset: 0 });
+    try {
+      const feedFid = activity.object.split(':');
+      await ownTimeline?.follow({
+        target_group: feedFid[0],
+        target_id: feedFid[1],
+      });
+      // reload state because we don't yet have WS events
+      await ownTimeline?.getOrCreate().catch((err) => logError(err));
+      onMarkRead();
+      // Reinit state to include activities from newly followed user
+      await ownTimeline
+        ?.read({ limit: 30, offset: 0 })
+        .catch((err) => logError(err));
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to accept follow request, this could've been a temporary issue, try again`,
+      );
+    }
   };
 
   const decline = async (_: Activity) => {

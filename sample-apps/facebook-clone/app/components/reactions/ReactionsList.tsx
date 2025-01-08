@@ -11,6 +11,7 @@ export const ReactionsList = ({
   activity: Activity;
 }) => {
   const [reactions, setReactions] = useState<ReactionResponse[]>([]);
+  const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [next, setNext] = useState<string>();
   const { client } = useUserContext();
@@ -23,6 +24,7 @@ export const ReactionsList = ({
     if (!client) {
       return;
     }
+    setError(undefined);
     setIsLoading(true);
     try {
       const response = await client.feedsQueryReactions({
@@ -35,6 +37,8 @@ export const ReactionsList = ({
       });
       setReactions([...reactions, ...response.reactions]);
       setNext(response.next);
+    } catch (error) {
+      setError(error as Error);
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +71,8 @@ export const ReactionsList = ({
       hasNext={!!next}
       onLoadMore={loadMore}
       renderItem={renderItem}
+      error={error}
+      itemsName="reactions"
     ></PaginatedList>
   );
 };
