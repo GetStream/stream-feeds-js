@@ -10,7 +10,7 @@ export const FollowRequestNotification = ({
   group: AggregatedActivities;
   onMarkRead: () => {};
 }) => {
-  const { logErrorAndDisplayNotification } = useErrorContext();
+  const { logError, logErrorAndDisplayNotification } = useErrorContext();
   // activities.length will always be exactly 1
   const [activity] = useState<Activity>(group.activities[0]);
   const [isPending, setIsPending] = useState<boolean>(true);
@@ -40,7 +40,7 @@ export const FollowRequestNotification = ({
         accepted_follow_requests: [`timeline:${activity.user.id}`],
       });
       // reload state because we don't yet have WS events
-      await ownFeed?.getOrCreate();
+      await ownFeed?.getOrCreate().catch((err) => logError(err));
       onMarkRead();
     } catch (error) {
       logErrorAndDisplayNotification(
@@ -73,25 +73,20 @@ export const FollowRequestNotification = ({
         {!group.read && (
           <div className="rounded-full bg-blue-500 w-2 h-2"></div>
         )}
-        {!activity.custom?.state && (
-          <>
-            <button
-              className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md disabled:bg-blue-100 hover:bg-blue-700 focus:outline-none"
-              onClick={() => accept(activity)}
-              disabled={!isPending}
-            >
-              <span className="material-symbols-outlined">check</span>
-            </button>
-            <button
-              className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md rounded-md disabled:bg-blue-100 hover:bg-blue-700 focus:outline-none"
-              onClick={() => decline(activity)}
-              disabled={!isPending}
-            >
-              <span className="material-symbols-outlined">close</span>
-            </button>
-          </>
-        )}
-        {activity.custom?.state && <div>{activity.custom?.state}</div>}
+        <button
+          className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md disabled:bg-blue-100 hover:bg-blue-700 focus:outline-none"
+          onClick={() => accept(activity)}
+          disabled={!isPending}
+        >
+          <span className="material-symbols-outlined">check</span>
+        </button>
+        <button
+          className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md rounded-md disabled:bg-blue-100 hover:bg-blue-700 focus:outline-none"
+          onClick={() => decline(activity)}
+          disabled={!isPending}
+        >
+          <span className="material-symbols-outlined">close</span>
+        </button>
       </div>
     </div>
   );
