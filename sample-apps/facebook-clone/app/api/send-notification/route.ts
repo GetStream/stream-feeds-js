@@ -14,6 +14,12 @@ export async function POST(request: Request) {
     });
   }
 
+  if (targetUserId === userId) {
+    return new Response(undefined, {
+      status: 201,
+    });
+  }
+
   try {
     await streamServerClient.feeds
       .feed('notification', targetUserId)
