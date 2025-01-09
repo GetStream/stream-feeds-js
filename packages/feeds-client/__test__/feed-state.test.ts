@@ -1,6 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
-import { createTestClient, createTestTokenGenerator } from './utils';
+import {
+  createTestClient,
+  createTestTokenGenerator,
+  waitForEvent,
+} from './utils';
 import { v4 as uuidv4 } from 'uuid';
 import { FeedMember } from '../src/gen/models';
 import {
@@ -74,13 +78,14 @@ describe('Feeds state test', () => {
   });
 
   it('add new activity to state on WS event', async () => {
-    const activityResponse = await emilyFeed.addActivity({
+    const request = emilyFeed.addActivity({
       object: 'post:13',
       verb: 'create',
     });
 
-    // hacky solution to wait for WS event
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForEvent(emilyClient, 'feeds.activity_added');
+
+    const activityResponse = await request;
 
     const activities = emilyFeed.state.getLatestValue().activities ?? [];
     const lastActivity = activities[0];

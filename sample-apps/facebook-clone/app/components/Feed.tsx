@@ -18,7 +18,7 @@ export const Feed = ({
   feed: StreamFlatFeedClient;
   readOnly: boolean;
 }) => {
-  const { logError, logErrorAndDisplayNotification } = useErrorContext();
+  const { logErrorAndDisplayNotification } = useErrorContext();
   const [activities, setActivities] = useState<StreamActivity[]>([]);
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -81,15 +81,6 @@ export const Feed = ({
     }
   };
 
-  const reloadCurrentPage = () => {
-    void feed
-      .read({
-        limit: feed.state.getLatestValue().limit,
-        offset: feed.state.getLatestValue().offset,
-      })
-      .catch((error) => logError(error));
-  };
-
   const getNextPage = () => {
     setError(undefined);
     setIsLoading(true);
@@ -104,7 +95,7 @@ export const Feed = ({
   const renderItem = (activity: StreamActivity) => {
     return (
       <li className="w-full" key={activity.id}>
-        <Activity activity={activity} onUpdate={reloadCurrentPage}></Activity>
+        <Activity activity={activity}></Activity>
       </li>
     );
   };
