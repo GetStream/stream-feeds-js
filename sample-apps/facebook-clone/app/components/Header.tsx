@@ -27,7 +27,7 @@ export function Header() {
                 Menu
               </button>
               <div
-                className={`absolute rounded-md right-0 mt-2 w-48 bg-white shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
+                className={`absolute z-50 rounded-md right-0 mt-2 w-48 bg-white shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
               >
                 <Link
                   href="/home"
@@ -49,6 +49,13 @@ export function Header() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Users
+                </Link>
+                <Link
+                  href="/pages"
+                  className="block px-4 py-2 text-gray-800 rounded-md hover:bg-gray-100"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Pages
                 </Link>
               </div>
             </div>

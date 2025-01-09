@@ -148,9 +148,15 @@ export const Feed = ({
           itemsName="posts"
         ></PaginatedList>
         {readOnly && !isLoading && !error && activities.length === 0 && (
-          <Link href="/users" className="underline">
-            Start following people
-          </Link>
+          <div className="flex items-center gap-1">
+            <Link href="/users" className="underline">
+              Start following people
+            </Link>
+            <div>or</div>
+            <Link href="/pages" className="underline">
+              start following pages
+            </Link>
+          </div>
         )}
       </div>
     </>
