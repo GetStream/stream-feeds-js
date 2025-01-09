@@ -48,7 +48,7 @@ describe('Feeds API - notification feed', () => {
       new Array(4).fill(null).map((_, i) =>
         emilyFeed.addActivity({
           verb: 'like',
-          object: `Post:other-${i}`,
+          object: `Post:other-0`,
         }),
       ),
     );
