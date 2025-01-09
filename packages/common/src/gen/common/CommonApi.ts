@@ -1,14 +1,19 @@
 import { ApiClient, StreamResponse } from '../../gen-imports';
 import {
+  BlockUsersRequest,
+  BlockUsersResponse,
   CreateDeviceRequest,
   CreateGuestRequest,
   CreateGuestResponse,
   GetApplicationResponse,
+  GetBlockedUsersResponse,
   GetOGResponse,
   ListDevicesResponse,
   QueryUsersPayload,
   QueryUsersResponse,
   Response,
+  UnblockUsersRequest,
+  UnblockUsersResponse,
   UpdateUsersPartialRequest,
   UpdateUsersRequest,
   UpdateUsersResponse,
@@ -178,6 +183,48 @@ export class CommonApi {
     >('POST', '/api/v2/users', undefined, undefined, body);
 
     decoders.UpdateUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getBlockedUsers(): Promise<StreamResponse<GetBlockedUsersResponse>> {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetBlockedUsersResponse>
+    >('GET', '/api/v2/users/block', undefined, undefined);
+
+    decoders.GetBlockedUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async blockUsers(
+    request: BlockUsersRequest,
+  ): Promise<StreamResponse<BlockUsersResponse>> {
+    const body = {
+      blocked_user_id: request?.blocked_user_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<BlockUsersResponse>
+    >('POST', '/api/v2/users/block', undefined, undefined, body);
+
+    decoders.BlockUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async unblockUsers(
+    request: UnblockUsersRequest,
+  ): Promise<StreamResponse<UnblockUsersResponse>> {
+    const body = {
+      blocked_user_id: request?.blocked_user_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UnblockUsersResponse>
+    >('POST', '/api/v2/users/unblock', undefined, undefined, body);
+
+    decoders.UnblockUsersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

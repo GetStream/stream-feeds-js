@@ -75,6 +75,24 @@ decoders.Ban = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.BlockUsersResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.BlockedUserResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    blocked_user: { type: 'UserResponse', isSingle: true },
+
+    user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.Channel = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -308,6 +326,13 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
       type: 'PushNotificationSettingsResponse',
       isSingle: true,
     },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.GetBlockedUsersResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    blocks: { type: 'BlockedUserResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };

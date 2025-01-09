@@ -67,9 +67,9 @@ export interface ActivityAddedEvent {
 
   fid: string;
 
-  type: string;
-
   activity: Activity;
+
+  type: string;
 
   received_at?: Date;
 }
@@ -121,8 +121,6 @@ export interface AppResponseFields {
 
   name: string;
 
-  video_provider: string;
-
   file_upload_config: FileUploadConfig;
 
   image_upload_config: FileUploadConfig;
@@ -132,6 +130,32 @@ export interface BlockListOptions {
   behavior: 'flag' | 'block' | 'shadow_block';
 
   blocklist: string;
+}
+
+export interface BlockUsersRequest {
+  blocked_user_id: string;
+}
+
+export interface BlockUsersResponse {
+  blocked_by_user_id: string;
+
+  blocked_user_id: string;
+
+  created_at: Date;
+
+  duration: string;
+}
+
+export interface BlockedUserResponse {
+  blocked_user_id: string;
+
+  created_at: Date;
+
+  user_id: string;
+
+  blocked_user: UserResponse;
+
+  user: UserResponse;
 }
 
 export interface ChannelConfigWithInfo {
@@ -255,13 +279,11 @@ export const ChannelOwnCapability = {
   CAST_POLL_VOTE: 'cast-poll-vote',
   CONNECT_EVENTS: 'connect-events',
   CREATE_ATTACHMENT: 'create-attachment',
-  CREATE_CALL: 'create-call',
   DELETE_ANY_MESSAGE: 'delete-any-message',
   DELETE_CHANNEL: 'delete-channel',
   DELETE_OWN_MESSAGE: 'delete-own-message',
   FLAG_MESSAGE: 'flag-message',
   FREEZE_CHANNEL: 'freeze-channel',
-  JOIN_CALL: 'join-call',
   JOIN_CHANNEL: 'join-channel',
   LEAVE_CHANNEL: 'leave-channel',
   MUTE_CHANNEL: 'mute-channel',
@@ -748,6 +770,12 @@ export interface GetApplicationResponse {
   app: AppResponseFields;
 }
 
+export interface GetBlockedUsersResponse {
+  duration: string;
+
+  blocks: BlockedUserResponse[];
+}
+
 export interface GetFeedGroupsResponse {
   duration: string;
 
@@ -1140,6 +1168,14 @@ export interface Thresholds {
 
 export interface TypingIndicatorsResponse {
   enabled: boolean;
+}
+
+export interface UnblockUsersRequest {
+  blocked_user_id: string;
+}
+
+export interface UnblockUsersResponse {
+  duration: string;
 }
 
 export interface UnfollowRequest {

@@ -1,4 +1,4 @@
-import { APIError, OwnUser, User, UserResponse } from '../gen/models';
+import { APIError, OwnUser, User, UserResponse, WSEvent } from '../gen/models';
 
 /**
  * This event is sent when the WS connection fails
@@ -430,7 +430,7 @@ export interface UserUpdatedEvent {
   user?: User;
 }
 
-export type WSEvent =
+export type WSEvent_ =
   | ({ type: 'connection.error' } & ConnectionErrorEvent)
   | ({ type: 'connection.ok' } & ConnectedEvent)
   | ({ type: 'custom' } & CustomEvent)
@@ -448,4 +448,4 @@ export interface ConnectionChangedEvent {
   online: boolean;
 }
 
-export type StreamWSEvent = WSEvent | ConnectionChangedEvent;
+export type StreamWSEvent = WSEvent_ | ConnectionChangedEvent | WSEvent;
