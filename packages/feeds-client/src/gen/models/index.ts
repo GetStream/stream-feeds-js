@@ -74,6 +74,30 @@ export interface ActivityAddedEvent {
   received_at?: Date;
 }
 
+export interface ActivityRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface ActivityUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  type: string;
+
+  received_at?: Date;
+}
+
 export interface AddActivityRequest {
   object: string;
 
@@ -1362,4 +1386,7 @@ export interface WSAuthMessage {
   products?: string[];
 }
 
-export type WSEvent = { type: 'feeds.activity_added' } & ActivityAddedEvent;
+export type WSEvent =
+  | ({ type: 'feeds.activity_added' } & ActivityAddedEvent)
+  | ({ type: 'feeds.activity_removed' } & ActivityRemovedEvent)
+  | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent);
