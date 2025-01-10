@@ -67,7 +67,7 @@ export function PaginatedList<T>({
       {items.length > 0 && hasNext && (
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+          className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
           onClick={() => onLoadMore()}
           disabled={isLoading}
         >

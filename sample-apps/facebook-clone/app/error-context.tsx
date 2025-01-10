@@ -34,7 +34,7 @@ export const ErrorContextProvider = ({ children }: PropsWithChildren) => {
 
   const logErrorAndDisplayNotification = (error: Error, message: string) => {
     logError(error);
-    showNotification({ message, type: 'error' });
+    showNotification({ message, type: 'error' }, { hideTimeout: 10000 });
   };
 
   return (
