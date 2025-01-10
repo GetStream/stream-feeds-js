@@ -1251,6 +1251,8 @@ export interface UpdateFeedMembersResponse {
 export interface UpdateFeedRequest {
   accept_invite?: boolean;
 
+  max_activity_copy_limit_for_invites?: number;
+
   reject_invite?: boolean;
 
   accepted_follow_requests?: string[];
