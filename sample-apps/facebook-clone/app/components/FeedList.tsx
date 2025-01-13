@@ -19,8 +19,7 @@ type FollowStatus =
 type FeedFollowerMapping = Record<FeedCid, FollowStatus>;
 
 export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
-  const { logError, logErrorAndDisplayNotification, throwUnrecoverableError } =
-    useErrorContext();
+  const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const { client, user } = useUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error>();

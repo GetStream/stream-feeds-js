@@ -18,12 +18,12 @@ import { pageTitle } from '../page-title';
 
 export const Feed = ({
   feed,
-  readOnly,
   onNewPost,
+  readOnly,
 }: {
   feed: StreamFlatFeedClient;
-  readOnly: boolean;
   onNewPost: 'show-immediately' | 'show-notification';
+  readOnly: boolean;
 }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const { showNotification } = useAppNotificationsContext();
@@ -35,6 +35,8 @@ export const Feed = ({
   const [post, setPost] = useState<string>('');
   const [newPostsNotification, setNewPostsNotification] =
     useState<AppNotificaion>();
+  const [ownCapabilities, setOwnCapabilities] = useState<string[]>([]);
+  const [canAddActivity, setCanAddActivity] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = feed.state.subscribeWithSelector(
@@ -62,6 +64,23 @@ export const Feed = ({
 
     return unsubscribe;
   }, [feed, isLoading, onNewPost]);
+
+  useEffect(() => {
+    const unsubscribe = feed.state.subscribeWithSelector(
+      (state) => ({
+        own_capabilities: state.own_capabilities,
+      }),
+      (state) => {
+        setOwnCapabilities(state.own_capabilities ?? []);
+      },
+    );
+
+    return unsubscribe;
+  }, [feed]);
+
+  useEffect(() => {
+    setCanAddActivity(!readOnly && ownCapabilities.includes('add-activity'));
+  }, [ownCapabilities]);
 
   useEffect(() => {
     if (onNewPost === 'show-immediately') {
@@ -157,7 +176,10 @@ export const Feed = ({
   const renderItem = (activity: StreamActivity) => {
     return (
       <li className="w-full" key={activity.id}>
-        <Activity activity={activity}></Activity>
+        <Activity
+          activity={activity}
+          ownCapabilities={ownCapabilities}
+        ></Activity>
       </li>
     );
   };
@@ -165,12 +187,12 @@ export const Feed = ({
   return (
     <>
       <div className="w-full flex flex-col items-center gap-3">
-        {!readOnly && (
+        {canAddActivity && (
           <div className="self-end">
             <Invite feed={feed}></Invite>
           </div>
         )}
-        {!readOnly && (
+        {canAddActivity && (
           <div className="w-full">
             <textarea
               id="question"
@@ -200,7 +222,7 @@ export const Feed = ({
           error={error}
           itemsName="posts"
         ></PaginatedList>
-        {readOnly && !isLoading && !error && activities.length === 0 && (
+        {!canAddActivity && !isLoading && !error && activities.length === 0 && (
           <div className="flex items-center gap-1">
             <Link href="/users" className="underline">
               Start following people

@@ -11,9 +11,11 @@ const emojiMapping: Record<string, string> = {
 export const Reactions = ({
   type,
   activity,
+  readOnly,
 }: {
   type: string;
   activity: Activity;
+  readOnly: boolean;
 }) => {
   const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const [counts, setCounts] = useState(
@@ -79,17 +81,27 @@ export const Reactions = ({
 
   return (
     <div className="flex items-center gap-1 text-gray-700 text-sm">
-      <button
-        className="flex"
-        onClick={() => (hasOwnReaction ? removeReaction() : addReaction())}
-      >
+      {!readOnly && (
+        <button
+          className="flex"
+          onClick={() => (hasOwnReaction ? removeReaction() : addReaction())}
+        >
+          <span
+            className={`text-blue-500 material-symbols-outlined ${hasOwnReaction ? 'fill' : ''}`}
+            style={{ fontSize: '22px' }}
+          >
+            {emojiMapping[type]}
+          </span>
+        </button>
+      )}
+      {readOnly && (
         <span
           className={`text-blue-500 material-symbols-outlined ${hasOwnReaction ? 'fill' : ''}`}
           style={{ fontSize: '22px' }}
         >
           {emojiMapping[type]}
         </span>
-      </button>
+      )}
       <button onClick={() => openDialog()}>
         <div>
           {counts} {type}
