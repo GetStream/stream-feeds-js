@@ -92,6 +92,18 @@ export interface AddActivityResponse {
   activity: Activity;
 }
 
+export interface AddCommentRequest {
+  text: string;
+
+  parent_id?: string;
+}
+
+export interface AddCommentResponse {
+  duration: string;
+
+  comment: Comment;
+}
+
 export interface AggregatedActivities {
   activity_count: number;
 
@@ -383,6 +395,40 @@ export interface Command {
   updated_at?: Date;
 }
 
+export interface Comment {
+  activity_id: string;
+
+  created_at: Date;
+
+  feed_fid: string;
+
+  id: string;
+
+  reply_count: number;
+
+  text: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  mentioned_user_ids: string[];
+
+  custom: Record<string, any>;
+
+  reaction_counts: Record<string, ReactionGroupResponse>;
+
+  deleted_at?: Date;
+
+  parent_id?: string;
+
+  pin_expires?: Date;
+
+  pinned_at?: Date;
+
+  pinned_by_id?: string;
+}
+
 export interface ConnectUserDetailsRequest {
   id: string;
 
@@ -475,6 +521,8 @@ export interface Feed {
   invites: FeedMember[];
 
   members: FeedMember[];
+
+  own_capabilities: string[];
 
   created_by: UserResponse;
 
@@ -948,6 +996,12 @@ export interface NullTime {
   value?: Date;
 }
 
+export interface PagerResponse {
+  next?: string;
+
+  prev?: string;
+}
+
 export interface PrivacySettingsResponse {
   read_receipts?: ReadReceiptsResponse;
 
@@ -986,6 +1040,14 @@ export interface QueryActivitiesResponse {
   next?: string;
 
   prev?: string;
+}
+
+export interface QueryCommentsResponse {
+  duration: string;
+
+  comments: Comment[];
+
+  pager: PagerResponse;
 }
 
 export interface QueryFeedsRequest {
@@ -1108,6 +1170,8 @@ export interface ReadFlatFeedResponse {
   duration: string;
 
   activities: Activity[];
+
+  feed: Feed;
 }
 
 export interface ReadNotificationFeedResponse {
@@ -1125,6 +1189,10 @@ export interface ReadReceiptsResponse {
 }
 
 export interface RemoveActivityFromFeedResponse {
+  duration: string;
+}
+
+export interface RemoveCommentResponse {
   duration: string;
 }
 
@@ -1210,6 +1278,26 @@ export interface UpdateActivityResponse {
   duration: string;
 
   activity: Activity;
+}
+
+export interface UpdateCommentRequest {
+  text: string;
+
+  pin_expires?: Date;
+
+  pinned_at?: Date;
+
+  pinned_by_id?: string;
+
+  mentioned_user_ids?: string[];
+
+  custom?: Record<string, any>;
+}
+
+export interface UpdateCommentResponse {
+  duration: string;
+
+  comment: Comment;
 }
 
 export interface UpdateFeedMembersRequest {

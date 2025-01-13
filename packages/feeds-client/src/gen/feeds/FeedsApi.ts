@@ -7,6 +7,8 @@ import {
 import {
   AddActivityRequest,
   AddActivityResponse,
+  AddCommentRequest,
+  AddCommentResponse,
   DeleteFeedGroupResponse,
   DeleteFeedResponse,
   DeleteReactionResponse,
@@ -20,6 +22,7 @@ import {
   GetOrCreateFeedResponse,
   QueryActivitiesRequest,
   QueryActivitiesResponse,
+  QueryCommentsResponse,
   QueryFeedsRequest,
   QueryFeedsResponse,
   QueryFollowRequestsRequest,
@@ -29,12 +32,15 @@ import {
   ReadFlatFeedResponse,
   ReadNotificationFeedResponse,
   RemoveActivityFromFeedResponse,
+  RemoveCommentResponse,
   SendReactionRequest,
   SendReactionResponse,
   UnfollowRequest,
   UnfollowResponse,
   UpdateActivityRequest,
   UpdateActivityResponse,
+  UpdateCommentRequest,
+  UpdateCommentResponse,
   UpdateFeedMembersRequest,
   UpdateFeedMembersResponse,
   UpdateFeedRequest,
@@ -50,6 +56,16 @@ export class FeedsApi extends CommonApiWrapper {
   constructor(streamClient: StreamClient) {
     super(streamClient);
     this.apiClient = streamClient.apiClient;
+  }
+
+  async queryFeedComments(): Promise<StreamResponse<QueryCommentsResponse>> {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryCommentsResponse>
+    >('GET', '/api/v2/feeds/activities/comments', undefined, undefined);
+
+    decoders.QueryCommentsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
   }
 
   async queryActivities(
@@ -68,6 +84,36 @@ export class FeedsApi extends CommonApiWrapper {
     >('POST', '/api/v2/feeds/activities/query', undefined, undefined, body);
 
     decoders.QueryActivitiesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateComment(
+    request: UpdateCommentRequest & { comment_id: string },
+  ): Promise<StreamResponse<UpdateCommentResponse>> {
+    const pathParams = {
+      comment_id: request?.comment_id,
+    };
+    const body = {
+      text: request?.text,
+      pin_expires: request?.pin_expires,
+      pinned_at: request?.pinned_at,
+      pinned_by_id: request?.pinned_by_id,
+      mentioned_user_ids: request?.mentioned_user_ids,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateCommentResponse>
+    >(
+      'PATCH',
+      '/api/v2/feeds/activities/{activity_id}/comment/{comment_id}',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.UpdateCommentResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -92,6 +138,39 @@ export class FeedsApi extends CommonApiWrapper {
     >('PATCH', '/api/v2/feeds/activities/{id}', pathParams, undefined, body);
 
     decoders.UpdateActivityResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async removeComment(): Promise<StreamResponse<RemoveCommentResponse>> {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<RemoveCommentResponse>
+    >('DELETE', '/api/v2/feeds/activities/{id}/comment', undefined, undefined);
+
+    decoders.RemoveCommentResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async addComment(
+    request: AddCommentRequest,
+  ): Promise<StreamResponse<AddCommentResponse>> {
+    const body = {
+      text: request?.text,
+      parent_id: request?.parent_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<AddCommentResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/activities/{id}/comment',
+      undefined,
+      undefined,
+      body,
+    );
+
+    decoders.AddCommentResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

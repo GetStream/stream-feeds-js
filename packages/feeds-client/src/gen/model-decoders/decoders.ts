@@ -78,6 +78,13 @@ decoders.AddActivityResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.AddCommentResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    comment: { type: 'Comment', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.AggregatedActivities = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -188,6 +195,23 @@ decoders.Command = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.Comment = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    reaction_counts: { type: 'ReactionGroupResponse', isSingle: false },
+
+    deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    pin_expires: { type: 'DatetimeType', isSingle: true },
+
+    pinned_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -437,6 +461,8 @@ decoders.ReactionResponse = (input?: Record<string, any>) => {
 decoders.ReadFlatFeedResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activities: { type: 'Activity', isSingle: false },
+
+    feed: { type: 'Feed', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -458,6 +484,13 @@ decoders.SendReactionResponse = (input?: Record<string, any>) => {
 decoders.UpdateActivityResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activity: { type: 'Activity', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpdateCommentResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    comment: { type: 'Comment', isSingle: true },
   };
   return decode(typeMappings, input);
 };
