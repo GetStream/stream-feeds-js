@@ -1,5 +1,6 @@
 import { StreamClientOptions, UserRequest } from '@stream-io/common';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
+import { StreamFeedsEvent } from '../src/types';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 const tokenUrl = import.meta.env.VITE_STREAM_TOKEN_URL;
@@ -36,4 +37,15 @@ export const createTestTokenGenerator = (
 
 export const getTestUser = () => {
   return { id: 'emily' };
+};
+
+export const waitForEvent = (
+  client: StreamFeedsClient,
+  type: StreamFeedsEvent['type'],
+) => {
+  // hacky solution to wait for WS event
+  return new Promise((resolve) => {
+    client.on(type, resolve);
+    setTimeout(resolve, 3000);
+  });
 };

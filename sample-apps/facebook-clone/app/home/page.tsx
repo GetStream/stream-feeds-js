@@ -10,5 +10,11 @@ export default function Home() {
     return <LoadingIndicator color="blue"></LoadingIndicator>;
   }
 
-  return <Feed readOnly={true} feed={ownTimeline}></Feed>;
+  return (
+    <Feed
+      readOnly={true}
+      feed={ownTimeline}
+      onNewPost="show-notification"
+    ></Feed>
+  );
 }

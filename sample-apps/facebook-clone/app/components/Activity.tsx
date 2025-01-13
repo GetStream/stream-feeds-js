@@ -4,13 +4,7 @@ import { useUserContext } from '../user-context';
 import { useEffect, useRef, useState } from 'react';
 import { useErrorContext } from '../error-context';
 
-export const Activity = ({
-  activity,
-  onUpdate,
-}: {
-  activity: StreamActivity;
-  onUpdate: () => void;
-}) => {
+export const Activity = ({ activity }: { activity: StreamActivity }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const { user, client } = useUserContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,8 +29,6 @@ export const Activity = ({
         custom: { text: editedPost, edited_at: Date.now() },
       });
       setIsEditing(false);
-      // No WS events, so we force update
-      void onUpdate();
     } catch (error) {
       logErrorAndDisplayNotification(
         error as Error,
@@ -53,8 +45,6 @@ export const Activity = ({
         group: feedGroup,
         activity_id: activity.id,
       });
-      // No WS events, so we force update
-      void onUpdate();
       setIsMenuOpen(false);
     } catch (error) {
       logErrorAndDisplayNotification(

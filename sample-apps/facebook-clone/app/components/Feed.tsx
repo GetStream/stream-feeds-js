@@ -10,32 +10,94 @@ import { Invite } from './Invite';
 import { PaginatedList } from './PaginatedList';
 import { useErrorContext } from '../error-context';
 import Link from 'next/link';
+import {
+  AppNotificaion,
+  useAppNotificationsContext,
+} from '../app-notifications-context';
+import { pageTitle } from '../page-title';
 
 export const Feed = ({
   feed,
   readOnly,
+  onNewPost,
 }: {
   feed: StreamFlatFeedClient;
   readOnly: boolean;
+  onNewPost: 'show-immediately' | 'show-notification';
 }) => {
-  const { logError, logErrorAndDisplayNotification } = useErrorContext();
+  const { logErrorAndDisplayNotification } = useErrorContext();
+  const { showNotification } = useAppNotificationsContext();
   const [activities, setActivities] = useState<StreamActivity[]>([]);
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
   const [post, setPost] = useState<string>('');
+  const [newPostsNotification, setNewPostsNotification] =
+    useState<AppNotificaion>();
 
   useEffect(() => {
     const unsubscribe = feed.state.subscribeWithSelector(
-      (state) => ({ activities: state.activities }),
-      ({ activities }) => {
-        setActivities(activities ?? []);
+      (state) => ({
+        activities: state.activities,
+      }),
+      (state, prevState) => {
+        const activities = state.activities ?? [];
+        const prevActivities = prevState?.activities;
+        // When we receive feeds.activity_added we won't immediately update the list, just display a notification about new activities
+        if (
+          onNewPost === 'show-immediately' ||
+          !prevActivities ||
+          activities.length <= prevActivities.length ||
+          isLoading
+        ) {
+          setActivities(activities);
+          if (newPostsNotification) {
+            newPostsNotification.hide();
+            document.title = pageTitle;
+          }
+        }
       },
     );
 
     return unsubscribe;
-  }, [feed]);
+  }, [feed, isLoading, onNewPost]);
+
+  useEffect(() => {
+    if (onNewPost === 'show-immediately') {
+      return;
+    }
+    const unsubscribe = feed.on('feeds.activity_added', () => {
+      const numberOfNewPosts =
+        (feed.state.getLatestValue().activities?.length ?? 0) -
+        activities.length;
+      if (numberOfNewPosts > 0) {
+        document.title = `${pageTitle} (${numberOfNewPosts})`;
+        if (!newPostsNotification) {
+          const notification = showNotification({
+            message: 'There are new posts',
+            type: 'info',
+            action: {
+              label: 'Show me',
+              onClick: () => {
+                setActivities(feed.state.getLatestValue().activities ?? []);
+                document.title = pageTitle;
+                setNewPostsNotification(undefined);
+                notification.hide();
+                // TODO this is a bit hacky
+                document
+                  .getElementById('scrollContainer')
+                  ?.scrollTo({ top: 0 });
+              },
+            },
+          });
+          setNewPostsNotification(notification);
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [feed, onNewPost, activities]);
 
   useEffect(() => {
     const unsubscribe = feed.state.subscribeWithSelector(
@@ -81,15 +143,6 @@ export const Feed = ({
     }
   };
 
-  const reloadCurrentPage = () => {
-    void feed
-      .read({
-        limit: feed.state.getLatestValue().limit,
-        offset: feed.state.getLatestValue().offset,
-      })
-      .catch((error) => logError(error));
-  };
-
   const getNextPage = () => {
     setError(undefined);
     setIsLoading(true);
@@ -104,7 +157,7 @@ export const Feed = ({
   const renderItem = (activity: StreamActivity) => {
     return (
       <li className="w-full" key={activity.id}>
-        <Activity activity={activity} onUpdate={reloadCurrentPage}></Activity>
+        <Activity activity={activity}></Activity>
       </li>
     );
   };

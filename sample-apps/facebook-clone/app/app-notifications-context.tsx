@@ -7,17 +7,26 @@ export type AppNotificaion = {
   message: string;
   type: AppNotificationType;
   hide: () => void;
+  action?: {
+    label: string;
+    onClick?: () => void;
+  };
 };
 
 type AppNotificationsContextValue = {
   notifications: AppNotificaion[];
-  showNotification: (notification: Omit<AppNotificaion, 'hide'>) => void;
+  showNotification: (
+    notification: Omit<AppNotificaion, 'hide'>,
+    options?: {
+      hideTimeout?: number;
+    },
+  ) => AppNotificaion;
   resetNotifications: () => void;
 };
 
 const AppNotificationsContext = createContext<AppNotificationsContextValue>({
   notifications: [],
-  showNotification: () => {},
+  showNotification: () => ({ message: '', type: 'info', hide: () => {} }),
   resetNotifications: () => {},
 });
 
@@ -29,7 +38,12 @@ export const AppNotificationsContextProvider = ({
     Array<ReturnType<typeof setTimeout>>
   >([]);
 
-  const showNotification = (notification: Omit<AppNotificaion, 'hide'>) => {
+  const showNotification = (
+    notification: Omit<AppNotificaion, 'hide'>,
+    options?: {
+      hideTimeout?: number;
+    },
+  ) => {
     const appNotficiation = { ...notification, hide: () => {} };
     const hide = () => {
       const updatedNotifications = [...notifications];
@@ -40,17 +54,21 @@ export const AppNotificationsContextProvider = ({
       setNotifications(updatedNotifications);
     };
     appNotficiation.hide = hide;
-    const timeout = setTimeout(() => {
-      hide();
-      const updatedTimeouts = [...timeouts];
-      const index = updatedTimeouts.indexOf(timeout);
-      if (index !== -1) {
-        updatedTimeouts.splice(index, 1);
-      }
-      setTimeouts(updatedTimeouts);
-    }, 10000);
+    if (options?.hideTimeout) {
+      const timeout = setTimeout(() => {
+        hide();
+        const updatedTimeouts = [...timeouts];
+        const index = updatedTimeouts.indexOf(timeout);
+        if (index !== -1) {
+          updatedTimeouts.splice(index, 1);
+        }
+        setTimeouts(updatedTimeouts);
+      }, 10000);
+      setTimeouts([...timeouts, timeout]);
+    }
     setNotifications([...notifications, appNotficiation]);
-    setTimeouts([...timeouts, timeout]);
+
+    return appNotficiation;
   };
 
   const resetNotifications = () => {

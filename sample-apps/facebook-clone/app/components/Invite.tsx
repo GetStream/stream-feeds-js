@@ -54,7 +54,10 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
 
   const invite = async (timelineFeed: StreamFeedClient) => {
     try {
-      await feed.update({ invited_follow_requests: [timelineFeed.fid] });
+      await feed.update({
+        invited_follow_requests: [timelineFeed.fid],
+        max_activity_copy_limit_for_invites: 1000,
+      });
       setFollowerMapping({ ...followerMapping, [timelineFeed.fid]: 'invited' });
       void fetch('/api/send-notification', {
         method: 'POST',

@@ -7,6 +7,7 @@ import { FeedContextProvider } from './feed-context';
 import { ErrorContextProvider } from './error-context';
 import { AppNotificationsContextProvider } from './app-notifications-context';
 import AppNotifications from './components/AppNotifications';
+import { pageTitle } from './page-title';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -20,7 +21,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Stream Facebook Clone',
+  title: pageTitle,
   description: 'Showcases Feeds v3 API',
 };
 
@@ -40,7 +41,10 @@ export default function RootLayout({
               <UserContextProvider>
                 <FeedContextProvider>
                   <Header></Header>
-                  <div className="max-h-full h-full overflow-auto">
+                  <div
+                    id="scrollContainer"
+                    className="max-h-full h-full overflow-auto"
+                  >
                     <div className="w-3/4 py-5 max-h-full h-full min-h-0 m-auto flex flex-col justify-items-start">
                       {children}
                       <AppNotifications></AppNotifications>

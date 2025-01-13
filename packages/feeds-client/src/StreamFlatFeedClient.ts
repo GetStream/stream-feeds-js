@@ -1,4 +1,10 @@
-import { ActivityAddedEvent, Feed, ReadFlatFeedResponse } from './gen/models';
+import {
+  ActivityAddedEvent,
+  ActivityRemovedEvent,
+  ActivityUpdatedEvent,
+  Feed,
+  ReadFlatFeedResponse,
+} from './gen/models';
 import { StreamBaseFeed, StreamBaseFeedState } from './StreamBaseFeed';
 
 type FlatFeed = StreamBaseFeedState &
@@ -18,9 +24,13 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
       if (request.offset === 0) {
         activities = [];
       }
-      this.addActivitiesToState(response.activities, activities);
+      const result = this.addActivitiesToState(
+        response.activities,
+        activities,
+        'end',
+      );
       this.state.partialNext({
-        activities: [...activities],
+        activities: result.activities,
         limit: request.limit,
         offset: request.offset,
         has_next_page: response.activities.length === request.limit,
@@ -67,7 +77,29 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
 
   protected newActivityReceived(event: ActivityAddedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
-    this.addActivitiesToState([event.activity], activities);
-    this.state.partialNext({ activities: [...activities] });
+    const result = this.addActivitiesToState(
+      [event.activity],
+      activities,
+      'start',
+    );
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
+    }
+  }
+
+  protected activityUpdated(event: ActivityUpdatedEvent): void {
+    const activities = this.state.getLatestValue().activities ?? [];
+    const result = this.updateActivityInState(event.activity, activities);
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
+    }
+  }
+
+  protected activityRemoved(event: ActivityRemovedEvent): void {
+    const activities = this.state.getLatestValue().activities ?? [];
+    const result = this.removeActivityFromState(event.activity, activities);
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
+    }
   }
 }

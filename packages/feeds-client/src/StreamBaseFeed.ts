@@ -3,6 +3,8 @@ import { StreamFeedApi } from './gen/feeds/FeedApi';
 import {
   Activity,
   ActivityAddedEvent,
+  ActivityRemovedEvent,
+  ActivityUpdatedEvent,
   Feed,
   GetOrCreateFeedRequest,
   WSEvent,
@@ -80,8 +82,16 @@ export abstract class StreamBaseFeed<
    * @param event
    */
   handleWSEvent(event: WSEvent) {
-    if (event.type === 'feeds.activity_added') {
-      this.newActivityReceived(event);
+    switch (event.type) {
+      case 'feeds.activity_added':
+        this.newActivityReceived(event);
+        break;
+      case 'feeds.activity_updated':
+        this.activityUpdated(event);
+        break;
+      case 'feeds.activity_removed':
+        this.activityRemoved(event);
+        break;
     }
     this.eventDispatcher.dispatch(event);
   }
@@ -89,19 +99,59 @@ export abstract class StreamBaseFeed<
   protected addActivitiesToState(
     newActivities: Activity[],
     activities: Activity[],
+    position: 'start' | 'end',
   ) {
-    // TODO: this should be more performant
+    const newActivitiesDeduplicated: Activity[] = [];
     newActivities.forEach((newActivity) => {
       const index = activities.findIndex((a) => a.id === newActivity.id);
       if (index === -1) {
-        activities.push(newActivity);
-      } else {
-        activities[index] = newActivity;
+        newActivitiesDeduplicated.push(newActivity);
       }
     });
-    activities.sort((a1, a2) => {
-      return a2.created_at.getTime() - a1.created_at.getTime();
-    });
+    if (newActivitiesDeduplicated.length === 0) {
+      return { changed: false, activities };
+    } else {
+      const updatedActivities = [
+        ...(position === 'start' ? newActivitiesDeduplicated : []),
+        ...activities,
+        ...(position === 'end' ? newActivitiesDeduplicated : []),
+      ];
+      return { changed: true, activities: updatedActivities };
+    }
+  }
+
+  protected updateActivityInState(
+    updatedActivity: Activity,
+    activities: Activity[],
+  ) {
+    const index = activities.findIndex((a) => a.id === updatedActivity.id);
+    if (index !== -1) {
+      const newActivities = [...activities];
+      const activitiy = activities[index];
+      newActivities[index] = {
+        ...updatedActivity,
+        own_reactions: activitiy.own_reactions,
+        latest_reactions: activitiy.latest_reactions,
+        reaction_groups: activitiy.reaction_groups,
+      };
+      return { changed: true, activities: newActivities };
+    } else {
+      return { changed: false, activities };
+    }
+  }
+
+  protected removeActivityFromState(
+    activity: Activity,
+    activities: Activity[],
+  ) {
+    const index = activities.findIndex((a) => a.id === activity.id);
+    if (index !== -1) {
+      const newActivities = [...activities];
+      newActivities.splice(index, 1);
+      return { changed: true, activities: newActivities };
+    } else {
+      return { changed: false, activities };
+    }
   }
 
   public abstract read(request: {
@@ -116,4 +166,8 @@ export abstract class StreamBaseFeed<
   protected abstract updateFromFeedResponse(feed: Feed): void;
 
   protected abstract newActivityReceived(event: ActivityAddedEvent): void;
+
+  protected abstract activityUpdated(event: ActivityUpdatedEvent): void;
+
+  protected abstract activityRemoved(event: ActivityRemovedEvent): void;
 }

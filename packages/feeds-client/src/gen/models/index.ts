@@ -74,6 +74,30 @@ export interface ActivityAddedEvent {
   received_at?: Date;
 }
 
+export interface ActivityRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface ActivityUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  type: string;
+
+  received_at?: Date;
+}
+
 export interface AddActivityRequest {
   object: string;
 
@@ -546,7 +570,8 @@ export interface FeedFollowRequest {
     | 'accepted'
     | 'rejected'
     | 'revoked'
-    | 'rejected_invite';
+    | 'rejected_invite'
+    | 'cancelled';
 
   target_fid: string;
 
@@ -1315,6 +1340,8 @@ export interface UpdateFeedMembersResponse {
 export interface UpdateFeedRequest {
   accept_invite?: boolean;
 
+  max_activity_copy_limit_for_invites?: number;
+
   reject_invite?: boolean;
 
   accepted_follow_requests?: string[];
@@ -1322,6 +1349,8 @@ export interface UpdateFeedRequest {
   add_members?: FeedMember[];
 
   assign_roles?: FeedMember[];
+
+  cancelled_pending_follow_requests?: string[];
 
   invited_follow_requests?: string[];
 
@@ -1450,4 +1479,7 @@ export interface WSAuthMessage {
   products?: string[];
 }
 
-export type WSEvent = { type: 'feeds.activity_added' } & ActivityAddedEvent;
+export type WSEvent =
+  | ({ type: 'feeds.activity_added' } & ActivityAddedEvent)
+  | ({ type: 'feeds.activity_removed' } & ActivityRemovedEvent)
+  | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent);

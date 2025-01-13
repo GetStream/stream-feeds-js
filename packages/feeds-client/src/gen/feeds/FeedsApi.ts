@@ -362,10 +362,14 @@ export class FeedsApi extends CommonApiWrapper {
     };
     const body = {
       accept_invite: request?.accept_invite,
+      max_activity_copy_limit_for_invites:
+        request?.max_activity_copy_limit_for_invites,
       reject_invite: request?.reject_invite,
       accepted_follow_requests: request?.accepted_follow_requests,
       add_members: request?.add_members,
       assign_roles: request?.assign_roles,
+      cancelled_pending_follow_requests:
+        request?.cancelled_pending_follow_requests,
       invited_follow_requests: request?.invited_follow_requests,
       invites: request?.invites,
       rejected_follow_requests: request?.rejected_follow_requests,

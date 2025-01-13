@@ -24,11 +24,16 @@ const AppNotifications = () => {
       {notifications.map((n, i) => (
         <div
           key={`app-notification-${i}`}
-          className={`p-4 rounded w-fit shadow-lg text-white ${
+          className={`p-4 rounded w-fit shadow-lg flex gap-3 items-center text-white ${
             backgroundColors[n.type]
           }`}
         >
           <span>{n.message}</span>
+          {n.action && (
+            <button className="underline" onClick={n.action.onClick}>
+              {n.action.label}
+            </button>
+          )}
         </div>
       ))}
     </div>

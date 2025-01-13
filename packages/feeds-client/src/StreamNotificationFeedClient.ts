@@ -1,5 +1,7 @@
 import {
   ActivityAddedEvent,
+  ActivityRemovedEvent,
+  ActivityUpdatedEvent,
   Feed,
   ReadNotificationFeedResponse,
 } from './gen/models';
@@ -76,6 +78,14 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
   }
 
   protected newActivityReceived(_: ActivityAddedEvent): void {
-    // TODO: implement me
+    throw new Error('Method not implemented.');
+  }
+
+  protected activityUpdated(_: ActivityUpdatedEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  protected activityRemoved(_: ActivityRemovedEvent): void {
+    throw new Error('Method not implemented.');
   }
 }

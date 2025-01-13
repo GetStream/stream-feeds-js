@@ -10,5 +10,7 @@ export default function MyFeed() {
     return <LoadingIndicator color="blue"></LoadingIndicator>;
   }
 
-  return <Feed readOnly={false} feed={ownFeed}></Feed>;
+  return (
+    <Feed readOnly={false} feed={ownFeed} onNewPost="show-immediately"></Feed>
+  );
 }
