@@ -522,7 +522,8 @@ export interface FeedFollowRequest {
     | 'accepted'
     | 'rejected'
     | 'revoked'
-    | 'rejected_invite';
+    | 'rejected_invite'
+    | 'cancelled';
 
   target_fid: string;
 
@@ -1260,6 +1261,8 @@ export interface UpdateFeedRequest {
   add_members?: FeedMember[];
 
   assign_roles?: FeedMember[];
+
+  cancelled_pending_follow_requests?: string[];
 
   invited_follow_requests?: string[];
 

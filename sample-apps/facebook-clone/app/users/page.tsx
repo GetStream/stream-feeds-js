@@ -77,6 +77,23 @@ export default function Users() {
     }
   };
 
+  const cancelFollowRequest = async (feed: StreamFeedClient) => {
+    try {
+      await ownTimeline?.update({
+        cancelled_pending_follow_requests: [feed.fid],
+      });
+      setFollowerMapping({
+        ...followerMapping,
+        [feed.fid]: 'not-followed',
+      });
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to cancel follow request for ${feed.state.getLatestValue().created_by?.name}, this could've been a temporary issue, try again`,
+      );
+    }
+  };
+
   const unfollow = async (feed: StreamFeedClient) => {
     await ownTimeline?.unfollow({
       target_group: feed.group,
@@ -169,8 +186,17 @@ export default function Users() {
             {feed.state.getLatestValue().created_by?.name}
           </p>
         </div>
-        {followerMapping[feed.fid] === 'follow-request-sent' &&
-          'Follow request is waiting for approval'}
+        {followerMapping[feed.fid] === 'follow-request-sent' && (
+          <div className="flex items-center gap-3">
+            <div>Follow request is waiting for approval</div>
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+              onClick={() => cancelFollowRequest(feed)}
+            >
+              Cancel request
+            </button>
+          </div>
+        )}
         {followerMapping[feed.fid] === 'needs-invite' &&
           'You need an invite to follow'}
         {followerMapping[feed.fid] === 'invited' && (
