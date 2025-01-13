@@ -4,12 +4,7 @@ import {
 } from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
 import { Activity } from './Activity';
-import { v4 as uuidv4 } from 'uuid';
-import { LoadingIndicator } from './LoadingIndicator';
-import { Invite } from './Invite';
 import { PaginatedList } from './PaginatedList';
-import { useErrorContext } from '../error-context';
-import Link from 'next/link';
 import {
   AppNotificaion,
   useAppNotificationsContext,
@@ -18,21 +13,17 @@ import { pageTitle } from '../page-title';
 
 export const Feed = ({
   feed,
-  readOnly,
   onNewPost,
 }: {
   feed: StreamFlatFeedClient;
-  readOnly: boolean;
   onNewPost: 'show-immediately' | 'show-notification';
 }) => {
-  const { logErrorAndDisplayNotification } = useErrorContext();
   const { showNotification } = useAppNotificationsContext();
   const [activities, setActivities] = useState<StreamActivity[]>([]);
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSending, setIsSending] = useState<boolean>(false);
+
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
-  const [post, setPost] = useState<string>('');
   const [newPostsNotification, setNewPostsNotification] =
     useState<AppNotificaion>();
 
@@ -121,28 +112,6 @@ export const Feed = ({
     return unsubscribe;
   }, [feed]);
 
-  const sendPost = async () => {
-    setIsSending(true);
-    try {
-      await feed.addActivity({
-        verb: 'post',
-        object: uuidv4(),
-        // TODO: we don't yet have enrichment, so we just store data in custom property
-        custom: {
-          text: post,
-        },
-      });
-      setPost('');
-    } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to send post, this could've been a temporary issue, try again`,
-      );
-    } finally {
-      setIsSending(false);
-    }
-  };
-
   const getNextPage = () => {
     setError(undefined);
     setIsLoading(true);
@@ -163,49 +132,14 @@ export const Feed = ({
   };
 
   return (
-    <>
-      <div className="w-full flex flex-col items-center gap-3">
-        {!readOnly && (
-          <div className="self-end">
-            <Invite feed={feed}></Invite>
-          </div>
-        )}
-        {!readOnly && (
-          <div className="w-full">
-            <textarea
-              id="question"
-              name="question"
-              value={[post]}
-              onChange={(e) => setPost(e.target.value)}
-              rows={5}
-              placeholder="Write your post here..."
-              className="w-full p-3 border border-gray-300 rounded-md resize-none"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-              onClick={() => sendPost()}
-              disabled={isSending || post === ''}
-            >
-              {isSending ? <LoadingIndicator></LoadingIndicator> : 'Post'}
-            </button>
-          </div>
-        )}
-        <PaginatedList
-          items={activities}
-          isLoading={isLoading}
-          hasNext={hasNextPage}
-          renderItem={renderItem}
-          onLoadMore={getNextPage}
-          error={error}
-          itemsName="posts"
-        ></PaginatedList>
-        {readOnly && !isLoading && !error && activities.length === 0 && (
-          <Link href="/users" className="underline">
-            Start following people
-          </Link>
-        )}
-      </div>
-    </>
+    <PaginatedList
+      items={activities}
+      isLoading={isLoading}
+      hasNext={hasNextPage}
+      renderItem={renderItem}
+      onLoadMore={getNextPage}
+      error={error}
+      itemsName="posts"
+    ></PaginatedList>
   );
 };
