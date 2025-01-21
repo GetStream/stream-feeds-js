@@ -85,6 +85,7 @@ export class StreamFeedApi {
   getFollowingFeeds(request: {
     limit: number;
     offset: number;
+    filter?: string[];
   }): Promise<StreamResponse<GetFollowingFeedsResponse>> {
     return this.feedsApi.getFollowingFeeds({
       id: this.id,

@@ -46,6 +46,22 @@ describe('Feed WS events', () => {
     // TODO
   });
 
+  it('should add new reaction', async () => {
+    let activity = emilyFeed.state.getLatestValue().activities?.[0]!;
+
+    emilyClient.feedsAddReactionToActivity({
+      id: activity.id,
+      type: 'like',
+    });
+
+    await waitForEvent(emilyClient, 'feeds.activity_reaction_new');
+    activity = emilyFeed.state.getLatestValue().activities?.[0]!;
+
+    expect(activity.latest_reactions.length).toBe(1);
+    expect(activity.own_reactions.length).toBe(1);
+    expect(activity.reaction_groups.like.count).toBe(1);
+  });
+
   it('should update state on delete activity', async () => {
     const activity = emilyFeed.state.getLatestValue().activities?.[0]!;
 

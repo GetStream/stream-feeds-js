@@ -1,8 +1,9 @@
 import { Activity as StreamActivity } from '@stream-io/feeds-client';
 import { Reactions } from './reactions/Reactions';
 import { useUserContext } from '../user-context';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useErrorContext } from '../error-context';
+import { ActivityComposer } from './ActivityComposer';
 
 export const Activity = ({ activity }: { activity: StreamActivity }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
@@ -10,23 +11,18 @@ export const Activity = ({ activity }: { activity: StreamActivity }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [canManage, setCanManage] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedPost, setEditedPost] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [editedActivityText, setEditedActivityText] = useState('');
 
   useEffect(() => {
     setCanManage(user?.id === activity.user.id);
   }, [user, activity]);
-
-  useEffect(() => {
-    setEditedPost(activity.custom?.text);
-  }, [activity]);
 
   const updateActivity = async () => {
     try {
       await client?.updateActivity({
         id: activity.id,
         // TODO: edited_at should be determined by a webhook, not client-side
-        custom: { text: editedPost, edited_at: Date.now() },
+        custom: { text: editedActivityText, edited_at: Date.now() },
       });
       setIsEditing(false);
     } catch (error) {
@@ -56,7 +52,7 @@ export const Activity = ({ activity }: { activity: StreamActivity }) => {
 
   useEffect(() => {
     if (isEditing) {
-      textareaRef.current?.focus();
+      setEditedActivityText(activity.custom?.text ?? '');
     }
   }, [isEditing]);
 
@@ -134,11 +130,10 @@ export const Activity = ({ activity }: { activity: StreamActivity }) => {
         </div>
         {!isEditing && <div>{activity.custom?.text}</div>}
         {isEditing && (
-          <textarea
-            ref={textareaRef}
-            value={editedPost}
-            onChange={(e) => setEditedPost(e.target.value)}
-          ></textarea>
+          <ActivityComposer
+            text={editedActivityText}
+            onChange={(text) => setEditedActivityText(text)}
+          ></ActivityComposer>
         )}
         <Reactions type="like" activity={activity} />
       </div>

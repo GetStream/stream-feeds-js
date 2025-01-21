@@ -7,6 +7,15 @@ const eventDecoderMapping: {
   'feeds.activity_added': (data: Record<string, any>) =>
     decoders.ActivityAddedEvent(data),
 
+  'feeds.activity_reaction_deleted': (data: Record<string, any>) =>
+    decoders.ActivityReactionDeletedEvent(data),
+
+  'feeds.activity_reaction_new': (data: Record<string, any>) =>
+    decoders.ActivityReactionNewEvent(data),
+
+  'feeds.activity_reaction_updated': (data: Record<string, any>) =>
+    decoders.ActivityReactionUpdatedEvent(data),
+
   'feeds.activity_removed': (data: Record<string, any>) =>
     decoders.ActivityRemovedEvent(data),
 

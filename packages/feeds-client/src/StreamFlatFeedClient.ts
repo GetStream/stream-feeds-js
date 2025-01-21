@@ -1,4 +1,9 @@
 import {
+  addActivitiesToState,
+  removeActivityFromState,
+  updateActivityInState,
+} from './activity-utils';
+import {
   ActivityAddedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
@@ -24,7 +29,7 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
       if (request.offset === 0) {
         activities = [];
       }
-      const result = this.addActivitiesToState(
+      const result = addActivitiesToState(
         response.activities,
         activities,
         'end',
@@ -77,11 +82,7 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
 
   protected newActivityReceived(event: ActivityAddedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
-    const result = this.addActivitiesToState(
-      [event.activity],
-      activities,
-      'start',
-    );
+    const result = addActivitiesToState([event.activity], activities, 'start');
     if (result.changed) {
       this.state.partialNext({ activities: result.activities });
     }
@@ -89,7 +90,7 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
 
   protected activityUpdated(event: ActivityUpdatedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
-    const result = this.updateActivityInState(event.activity, activities);
+    const result = updateActivityInState(event.activity, activities);
     if (result.changed) {
       this.state.partialNext({ activities: result.activities });
     }
@@ -97,7 +98,7 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
 
   protected activityRemoved(event: ActivityRemovedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
-    const result = this.removeActivityFromState(event.activity, activities);
+    const result = removeActivityFromState(event.activity, activities);
     if (result.changed) {
       this.state.partialNext({ activities: result.activities });
     }

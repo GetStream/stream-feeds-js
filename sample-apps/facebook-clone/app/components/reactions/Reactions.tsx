@@ -28,7 +28,7 @@ export const Reactions = ({
 
   const addReaction = async () => {
     try {
-      await client?.feedsSendReaction({ type, id: activity.id });
+      await client?.feedsAddReactionToActivity({ type, id: activity.id });
       void fetch('/api/send-notification', {
         method: 'POST',
         headers: {
@@ -52,7 +52,7 @@ export const Reactions = ({
 
   const removeReaction = async () => {
     try {
-      await client?.feedsDeleteReaction({ type, id: activity.id });
+      await client?.feedsDeleteReactionFromActivity({ type, id: activity.id });
       setCounts(counts - 1);
       setHasOwnReaction(false);
     } catch (error) {

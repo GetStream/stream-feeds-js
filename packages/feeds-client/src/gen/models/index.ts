@@ -49,9 +49,9 @@ export interface Activity {
 
   verb: string;
 
-  latest_reactions: ReactionResponse[];
+  latest_reactions: Reaction[];
 
-  own_reactions: ReactionResponse[];
+  own_reactions: Reaction[];
 
   reaction_groups: Record<string, ReactionGroupResponse>;
 
@@ -69,6 +69,56 @@ export interface ActivityAddedEvent {
 
   activity: Activity;
 
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface ActivityReactionDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface ActivityReactionNewEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface ActivityReactionUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
   type: string;
 
   received_at?: Date;
@@ -81,6 +131,8 @@ export interface ActivityRemovedEvent {
 
   activity: Activity;
 
+  custom: Record<string, any>;
+
   type: string;
 
   received_at?: Date;
@@ -92,6 +144,8 @@ export interface ActivityUpdatedEvent {
   fid: string;
 
   activity: Activity;
+
+  custom: Record<string, any>;
 
   type: string;
 
@@ -114,6 +168,28 @@ export interface AddActivityResponse {
   duration: string;
 
   activity: Activity;
+}
+
+export interface AddReactionToActivityRequest {
+  type: string;
+
+  created_at?: Date;
+
+  enforce_unique?: boolean;
+
+  score?: number;
+
+  updated_at?: Date;
+
+  custom?: Record<string, any>;
+}
+
+export interface AddReactionToActivityResponse {
+  duration: string;
+
+  activity: Activity;
+
+  reaction: Reaction;
 }
 
 export interface AggregatedActivities {
@@ -457,8 +533,12 @@ export interface DeleteFeedResponse {
   feed: Feed;
 }
 
-export interface DeleteReactionResponse {
+export interface DeleteReactionFromActivityResponse {
   duration: string;
+
+  activity: Activity;
+
+  reaction: Reaction;
 }
 
 export interface DeviceResponse {
@@ -1074,7 +1154,7 @@ export interface QueryReactionsRequest {
 export interface QueryReactionsResponse {
   duration: string;
 
-  reactions: ReactionResponse[];
+  reactions: Reaction[];
 
   next?: string;
 
@@ -1101,20 +1181,12 @@ export interface QueryUsersResponse {
   users: FullUserResponse[];
 }
 
-export interface ReactionGroupResponse {
-  count: number;
-
-  first_reaction_at: Date;
-
-  last_reaction_at: Date;
-
-  sum_scores: number;
-}
-
-export interface ReactionResponse {
-  activity_id: string;
-
+export interface Reaction {
   created_at: Date;
+
+  entity_id: string;
+
+  entity_type: string;
 
   score: number;
 
@@ -1127,6 +1199,16 @@ export interface ReactionResponse {
   custom: Record<string, any>;
 
   user: UserResponse;
+}
+
+export interface ReactionGroupResponse {
+  count: number;
+
+  first_reaction_at: Date;
+
+  last_reaction_at: Date;
+
+  sum_scores: number;
 }
 
 export interface ReadFlatFeedResponse {
@@ -1155,26 +1237,6 @@ export interface RemoveActivityFromFeedResponse {
 
 export interface Response {
   duration: string;
-}
-
-export interface SendReactionRequest {
-  type: string;
-
-  created_at?: Date;
-
-  enforce_unique?: boolean;
-
-  score?: number;
-
-  updated_at?: Date;
-
-  custom?: Record<string, any>;
-}
-
-export interface SendReactionResponse {
-  duration: string;
-
-  reaction: ReactionResponse;
 }
 
 export interface SortParamRequest {
@@ -1393,5 +1455,8 @@ export interface WSAuthMessage {
 
 export type WSEvent =
   | ({ type: 'feeds.activity_added' } & ActivityAddedEvent)
+  | ({ type: 'feeds.activity_reaction_deleted' } & ActivityReactionDeletedEvent)
+  | ({ type: 'feeds.activity_reaction_new' } & ActivityReactionNewEvent)
+  | ({ type: 'feeds.activity_reaction_updated' } & ActivityReactionUpdatedEvent)
   | ({ type: 'feeds.activity_removed' } & ActivityRemovedEvent)
   | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent);
