@@ -135,7 +135,10 @@ export const Activity = ({ activity }: { activity: StreamActivity }) => {
             onChange={(text) => setEditedActivityText(text)}
           ></ActivityComposer>
         )}
-        <Reactions type="like" activity={activity} />
+        <div className="flex items-center gap-3">
+          <Reactions type="dislike" activity={activity} showCounter={false} />
+          <Reactions type="like" activity={activity} showCounter={true} />
+        </div>
       </div>
     </>
   );

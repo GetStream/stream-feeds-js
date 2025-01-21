@@ -1,5 +1,8 @@
 import {
   ActivityAddedEvent,
+  ActivityReactionDeletedEvent,
+  ActivityReactionNewEvent,
+  ActivityReactionUpdatedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
   Feed,
@@ -86,6 +89,17 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
   }
 
   protected activityRemoved(_: ActivityRemovedEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  protected reactionAddedToActivity(_: ActivityReactionNewEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  protected activityReactionUpdated(event: ActivityReactionUpdatedEvent): void {
+    throw new Error('Method not implemented.');
+  }
+  protected activityReactionRemoved(event: ActivityReactionDeletedEvent): void {
     throw new Error('Method not implemented.');
   }
 }

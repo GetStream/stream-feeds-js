@@ -5,11 +5,19 @@ import {
 } from './activity-utils';
 import {
   ActivityAddedEvent,
+  ActivityReactionDeletedEvent,
+  ActivityReactionNewEvent,
+  ActivityReactionUpdatedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
   Feed,
   ReadFlatFeedResponse,
 } from './gen/models';
+import {
+  addReactionToActivity,
+  deleteReactionFromActivity,
+  updateReactionOfActivity,
+} from './reaction-utils';
 import { StreamBaseFeed, StreamBaseFeedState } from './StreamBaseFeed';
 
 type FlatFeed = StreamBaseFeedState &
@@ -99,6 +107,44 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
   protected activityRemoved(event: ActivityRemovedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
     const result = removeActivityFromState(event.activity, activities);
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
+    }
+  }
+
+  protected reactionAddedToActivity(event: ActivityReactionNewEvent): void {
+    const activities = this.state.getLatestValue().activities ?? [];
+    const result = addReactionToActivity(
+      activities,
+      event,
+      this.client.state.getLatestValue().connectedUser?.id ===
+        event.reaction.user_id,
+    );
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
+    }
+  }
+
+  protected activityReactionUpdated(event: ActivityReactionUpdatedEvent): void {
+    const activities = this.state.getLatestValue().activities ?? [];
+    const result = updateReactionOfActivity(
+      activities,
+      event,
+      this.client.state.getLatestValue().connectedUser?.id ===
+        event.reaction.user_id,
+    );
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
+    }
+  }
+  protected activityReactionRemoved(event: ActivityReactionDeletedEvent): void {
+    const activities = this.state.getLatestValue().activities ?? [];
+    const result = deleteReactionFromActivity(
+      activities,
+      event,
+      this.client.state.getLatestValue().connectedUser?.id ===
+        event.reaction.user_id,
+    );
     if (result.changed) {
       this.state.partialNext({ activities: result.activities });
     }

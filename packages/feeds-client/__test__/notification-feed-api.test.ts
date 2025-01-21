@@ -45,7 +45,7 @@ describe('Feeds API - notification feed', () => {
     );
 
     await Promise.all(
-      new Array(4).fill(null).map((_, i) =>
+      new Array(4).fill(null).map((_) =>
         emilyFeed.addActivity({
           verb: 'like',
           object: `Post:other-0`,

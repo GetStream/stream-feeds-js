@@ -2,6 +2,9 @@ import { EventDispatcher, StateStore } from '@stream-io/common';
 import { StreamFeedApi } from './gen/feeds/FeedApi';
 import {
   ActivityAddedEvent,
+  ActivityReactionDeletedEvent,
+  ActivityReactionNewEvent,
+  ActivityReactionUpdatedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
   Feed,
@@ -27,6 +30,20 @@ export abstract class StreamBaseFeed<
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
     new EventDispatcher<WSEvent['type'], WSEvent>();
+
+  private eventHandlers: {
+    [key in WSEvent['type']]: (event: Extract<WSEvent, { type: key }>) => void;
+  } = {
+    'feeds.activity_added': (event) => this.newActivityReceived(event),
+    'feeds.activity_reaction_deleted': (event) =>
+      this.activityReactionRemoved(event),
+    'feeds.activity_reaction_new': (event) =>
+      this.reactionAddedToActivity(event),
+    'feeds.activity_reaction_updated': (event) =>
+      this.activityReactionUpdated(event),
+    'feeds.activity_removed': (event) => this.activityRemoved(event),
+    'feeds.activity_updated': (event) => this.activityUpdated(event),
+  };
 
   constructor(
     client: StreamFeedsClient,
@@ -81,17 +98,8 @@ export abstract class StreamBaseFeed<
    * @param event
    */
   handleWSEvent(event: WSEvent) {
-    switch (event.type) {
-      case 'feeds.activity_added':
-        this.newActivityReceived(event);
-        break;
-      case 'feeds.activity_updated':
-        this.activityUpdated(event);
-        break;
-      case 'feeds.activity_removed':
-        this.activityRemoved(event);
-        break;
-    }
+    // @ts-expect-error TODO: figure this out
+    this.eventHandlers[event.type](event);
     this.eventDispatcher.dispatch(event);
   }
 
@@ -111,4 +119,16 @@ export abstract class StreamBaseFeed<
   protected abstract activityUpdated(event: ActivityUpdatedEvent): void;
 
   protected abstract activityRemoved(event: ActivityRemovedEvent): void;
+
+  protected abstract reactionAddedToActivity(
+    event: ActivityReactionNewEvent,
+  ): void;
+
+  protected abstract activityReactionUpdated(
+    event: ActivityReactionUpdatedEvent,
+  ): void;
+
+  protected abstract activityReactionRemoved(
+    event: ActivityReactionDeletedEvent,
+  ): void;
 }
