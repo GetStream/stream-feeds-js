@@ -43,9 +43,11 @@ export const waitForEvent = (
   client: StreamFeedsClient,
   type: StreamFeedsEvent['type'],
 ) => {
-  // hacky solution to wait for WS event
   return new Promise((resolve) => {
-    client.on(type, resolve);
-    setTimeout(resolve, 3000);
+    client.on(type, () => {
+      resolve(undefined);
+      clearTimeout(timeout);
+    });
+    const timeout = setTimeout(resolve, 3000);
   });
 };

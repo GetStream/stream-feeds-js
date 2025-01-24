@@ -350,6 +350,19 @@ decoders.FeedMember = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.FollowEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    source_feed: { type: 'Feed', isSingle: true },
+
+    target_feed: { type: 'Feed', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.FollowRelationship = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -357,6 +370,19 @@ decoders.FollowRelationship = (input?: Record<string, any>) => {
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     feed: { type: 'Feed', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.FollowRequestEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    source_feed: { type: 'Feed', isSingle: true },
+
+    target_feed: { type: 'Feed', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -523,6 +549,19 @@ decoders.ReadFlatFeedResponse = (input?: Record<string, any>) => {
 decoders.ReadNotificationFeedResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     groups: { type: 'AggregatedActivities', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UnfollowEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    source_feed: { type: 'Feed', isSingle: true },
+
+    target_feed: { type: 'Feed', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };

@@ -4,6 +4,7 @@ import {
   updateActivityInState,
 } from './activity-utils';
 import {
+  Activity,
   ActivityAddedEvent,
   ActivityReactionDeletedEvent,
   ActivityReactionNewEvent,
@@ -19,6 +20,7 @@ import {
   updateReactionOfActivity,
 } from './reaction-utils';
 import { StreamBaseFeed, StreamBaseFeedState } from './StreamBaseFeed';
+import { UpdateStateResult } from './types-internal';
 
 type FlatFeed = StreamBaseFeedState &
   Partial<Omit<ReadFlatFeedResponse, 'duration'>>;
@@ -91,25 +93,19 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
   protected newActivityReceived(event: ActivityAddedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
     const result = addActivitiesToState([event.activity], activities, 'start');
-    if (result.changed) {
-      this.state.partialNext({ activities: result.activities });
-    }
+    this.updateActivitiesIfNecessary(result);
   }
 
   protected activityUpdated(event: ActivityUpdatedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
     const result = updateActivityInState(event.activity, activities);
-    if (result.changed) {
-      this.state.partialNext({ activities: result.activities });
-    }
+    this.updateActivitiesIfNecessary(result);
   }
 
   protected activityRemoved(event: ActivityRemovedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
     const result = removeActivityFromState(event.activity, activities);
-    if (result.changed) {
-      this.state.partialNext({ activities: result.activities });
-    }
+    this.updateActivitiesIfNecessary(result);
   }
 
   protected reactionAddedToActivity(event: ActivityReactionNewEvent): void {
@@ -120,9 +116,7 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
       this.client.state.getLatestValue().connectedUser?.id ===
         event.reaction.user_id,
     );
-    if (result.changed) {
-      this.state.partialNext({ activities: result.activities });
-    }
+    this.updateActivitiesIfNecessary(result);
   }
 
   protected activityReactionUpdated(event: ActivityReactionUpdatedEvent): void {
@@ -133,10 +127,9 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
       this.client.state.getLatestValue().connectedUser?.id ===
         event.reaction.user_id,
     );
-    if (result.changed) {
-      this.state.partialNext({ activities: result.activities });
-    }
+    this.updateActivitiesIfNecessary(result);
   }
+
   protected activityReactionRemoved(event: ActivityReactionDeletedEvent): void {
     const activities = this.state.getLatestValue().activities ?? [];
     const result = deleteReactionFromActivity(
@@ -145,6 +138,12 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
       this.client.state.getLatestValue().connectedUser?.id ===
         event.reaction.user_id,
     );
+    this.updateActivitiesIfNecessary(result);
+  }
+
+  private updateActivitiesIfNecessary(
+    result: UpdateStateResult<{ activities: Activity[] }>,
+  ) {
     if (result.changed) {
       this.state.partialNext({ activities: result.activities });
     }

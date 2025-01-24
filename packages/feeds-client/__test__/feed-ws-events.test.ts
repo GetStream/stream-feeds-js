@@ -42,14 +42,10 @@ describe('Feed WS events', () => {
     expect(emilyFeed.state.getLatestValue().activities?.[0].verb).toBe('like');
   });
 
-  it(`shouldn't add or delete activities on update event`, async () => {
-    // TODO
-  });
-
   it('should add new reaction', async () => {
     let activity = emilyFeed.state.getLatestValue().activities![0]!;
 
-    void emilyClient.feedsAddReactionToActivity({
+    void emilyClient.addReactionToActivity({
       id: activity.id,
       type: 'like',
     });
@@ -65,7 +61,7 @@ describe('Feed WS events', () => {
   it('should update reaction', async () => {
     let activity = emilyFeed.state.getLatestValue().activities![0]!;
 
-    void emilyClient.feedsAddReactionToActivity({
+    void emilyClient.addReactionToActivity({
       id: activity.id,
       type: 'dislike',
       enforce_unique: true,
@@ -84,7 +80,7 @@ describe('Feed WS events', () => {
   it('should delete reaction', async () => {
     let activity = emilyFeed.state.getLatestValue().activities![0]!;
 
-    void emilyClient.feedsDeleteReactionFromActivity({
+    void emilyClient.deleteReactionFromActivity({
       id: activity.id,
       type: 'dislike',
     });

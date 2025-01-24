@@ -27,7 +27,7 @@ export const ReactionsList = ({
     setError(undefined);
     setIsLoading(true);
     try {
-      const response = await client.feedsQueryReactions({
+      const response = await client.queryFeedsReactions({
         id: activity.id,
         filter: {
           type,

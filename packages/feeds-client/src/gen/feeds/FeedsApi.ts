@@ -96,7 +96,7 @@ export class FeedsApi extends CommonApiWrapper {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async feedsAddReactionToActivity(
+  async addReactionToActivity(
     request: AddReactionToActivityRequest & { id: string },
   ): Promise<StreamResponse<AddReactionToActivityResponse>> {
     const pathParams = {
@@ -126,7 +126,7 @@ export class FeedsApi extends CommonApiWrapper {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async feedsDeleteReactionFromActivity(request: {
+  async deleteReactionFromActivity(request: {
     id: string;
     type: string;
   }): Promise<StreamResponse<DeleteReactionFromActivityResponse>> {
@@ -574,7 +574,7 @@ export class FeedsApi extends CommonApiWrapper {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async feedsQueryFollowRequests(
+  async queryFollowRequests(
     request?: QueryFollowRequestsRequest,
   ): Promise<StreamResponse<QueryFollowRequestsResponse>> {
     const body = {
@@ -600,7 +600,7 @@ export class FeedsApi extends CommonApiWrapper {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async feedsQueryReactions(
+  async queryFeedsReactions(
     request: QueryReactionsRequest & { id: string },
   ): Promise<StreamResponse<QueryReactionsResponse>> {
     const pathParams = {

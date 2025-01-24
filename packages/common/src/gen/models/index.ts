@@ -1802,7 +1802,7 @@ export interface QueryReviewQueueResponse {
 
   action_config: Record<string, ModerationActionConfig[]>;
 
-  stats: Record<string, number>;
+  stats: Record<string, any>;
 
   next?: string;
 

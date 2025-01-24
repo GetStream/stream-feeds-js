@@ -32,7 +32,7 @@ export const Reactions = ({
 
   const addReaction = async () => {
     try {
-      await client?.feedsAddReactionToActivity({
+      await client?.addReactionToActivity({
         type,
         id: activity.id,
         enforce_unique: true,
@@ -58,7 +58,7 @@ export const Reactions = ({
 
   const removeReaction = async () => {
     try {
-      await client?.feedsDeleteReactionFromActivity({ type, id: activity.id });
+      await client?.deleteReactionFromActivity({ type, id: activity.id });
     } catch (error) {
       logErrorAndDisplayNotification(
         error as Error,

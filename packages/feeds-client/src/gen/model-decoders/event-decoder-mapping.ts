@@ -21,6 +21,16 @@ const eventDecoderMapping: {
 
   'feeds.activity_updated': (data: Record<string, any>) =>
     decoders.ActivityUpdatedEvent(data),
+
+  'feeds.follow': (data: Record<string, any>) => decoders.FollowEvent(data),
+
+  'feeds.follow_request_created': (data: Record<string, any>) =>
+    decoders.FollowRequestEvent(data),
+
+  'feeds.follow_request_updated': (data: Record<string, any>) =>
+    decoders.FollowRequestEvent(data),
+
+  'feeds.unfollow': (data: Record<string, any>) => decoders.UnfollowEvent(data),
 };
 
 export const decodeWSEvent = (data: { type: string } & Record<string, any>) => {

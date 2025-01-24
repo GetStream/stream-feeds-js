@@ -121,7 +121,7 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
           ? 'following'
           : 'needs-invite';
         if (
-          timelineFeed.state
+          feed.state
             .getLatestValue()
             .follow_requests?.invites?.find(
               (r) => r.source_fid === timelineFeed.fid,

@@ -96,10 +96,11 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
     throw new Error('Method not implemented.');
   }
 
-  protected activityReactionUpdated(event: ActivityReactionUpdatedEvent): void {
+  protected activityReactionUpdated(_: ActivityReactionUpdatedEvent): void {
     throw new Error('Method not implemented.');
   }
-  protected activityReactionRemoved(event: ActivityReactionDeletedEvent): void {
+
+  protected activityReactionRemoved(_: ActivityReactionDeletedEvent): void {
     throw new Error('Method not implemented.');
   }
 }

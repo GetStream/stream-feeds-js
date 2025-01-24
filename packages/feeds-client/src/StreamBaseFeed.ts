@@ -8,7 +8,10 @@ import {
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
   Feed,
+  FollowEvent,
+  FollowRequestEvent,
   GetOrCreateFeedRequest,
+  UnfollowEvent,
   WSEvent,
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
@@ -31,7 +34,7 @@ export abstract class StreamBaseFeed<
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
     new EventDispatcher<WSEvent['type'], WSEvent>();
 
-  private eventHandlers: {
+  private readonly eventHandlers: {
     [key in WSEvent['type']]: (event: Extract<WSEvent, { type: key }>) => void;
   } = {
     'feeds.activity_added': (event) => this.newActivityReceived(event),
@@ -43,6 +46,12 @@ export abstract class StreamBaseFeed<
       this.activityReactionUpdated(event),
     'feeds.activity_removed': (event) => this.activityRemoved(event),
     'feeds.activity_updated': (event) => this.activityUpdated(event),
+    'feeds.follow': (event) => this.updateFeedFromFollowEvent(event),
+    'feeds.follow_request_created': (event) =>
+      this.updateFeedFromFollowEvent(event),
+    'feeds.follow_request_updated': (event) =>
+      this.updateFeedFromFollowEvent(event),
+    'feeds.unfollow': (event) => this.updateFeedFromFollowEvent(event),
   };
 
   constructor(
@@ -98,7 +107,7 @@ export abstract class StreamBaseFeed<
    * @param event
    */
   handleWSEvent(event: WSEvent) {
-    // @ts-expect-error TODO: figure this out
+    // @ts-expect-error TODO solve this
     this.eventHandlers[event.type](event);
     this.eventDispatcher.dispatch(event);
   }
@@ -131,4 +140,22 @@ export abstract class StreamBaseFeed<
   protected abstract activityReactionRemoved(
     event: ActivityReactionDeletedEvent,
   ): void;
+
+  private updateFeedFromFollowEvent(
+    event: FollowRequestEvent | FollowEvent | UnfollowEvent,
+  ) {
+    const sourceFeed = event.source_feed;
+    const targetFeed = event.target_feed;
+    if (`${sourceFeed.group}:${sourceFeed.id}` === this.fid) {
+      this.updateFromFeedResponse({
+        ...sourceFeed,
+        members: this.state.getLatestValue().members ?? [],
+      });
+    } else if (`${targetFeed.group}:${targetFeed.id}` === this.fid) {
+      this.updateFromFeedResponse({
+        ...targetFeed,
+        members: this.state.getLatestValue().members ?? [],
+      });
+    }
+  }
 }

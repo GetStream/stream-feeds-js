@@ -600,6 +600,7 @@ export interface FeedFollowRequest {
     | 'invited'
     | 'pending'
     | 'accepted'
+    | 'accepted_invite'
     | 'rejected'
     | 'revoked'
     | 'rejected_invite'
@@ -782,6 +783,22 @@ export interface FileUploadConfig {
   blocked_mime_types: string[];
 }
 
+export interface FollowEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
+}
+
 export interface FollowRelationship {
   created_at: Date;
 
@@ -796,6 +813,24 @@ export interface FollowRequest {
   target_id: string;
 
   activity_copy_limit?: number;
+}
+
+export interface FollowRequestEvent {
+  created_at: Date;
+
+  fid: string;
+
+  status: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
 }
 
 export interface FollowResponse {
@@ -1265,6 +1300,22 @@ export interface UnblockUsersResponse {
   duration: string;
 }
 
+export interface UnfollowEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
+}
+
 export interface UnfollowRequest {
   target_group: string;
 
@@ -1459,4 +1510,8 @@ export type WSEvent =
   | ({ type: 'feeds.activity_reaction_new' } & ActivityReactionNewEvent)
   | ({ type: 'feeds.activity_reaction_updated' } & ActivityReactionUpdatedEvent)
   | ({ type: 'feeds.activity_removed' } & ActivityRemovedEvent)
-  | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent);
+  | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent)
+  | ({ type: 'feeds.follow' } & FollowEvent)
+  | ({ type: 'feeds.follow_request_created' } & FollowRequestEvent)
+  | ({ type: 'feeds.follow_request_updated' } & FollowRequestEvent)
+  | ({ type: 'feeds.unfollow' } & UnfollowEvent);

@@ -56,8 +56,6 @@ export default function Users() {
           objectId: feed.fid,
         }),
       }).catch((err) => logError(err));
-      // Reinit state to update follower count
-      await ownTimeline?.getOrCreate().catch((err) => logError(err));
       // Reinit state to include activities from newly followed user
       await ownTimeline
         ?.read({ limit: 30, offset: 0 })
@@ -99,8 +97,6 @@ export default function Users() {
       target_group: feed.group,
       target_id: feed.id,
     });
-    // Reinit state to update follower count
-    await ownTimeline?.getOrCreate();
     // Reinit state to exclude activities from newly unfollowed user
     await ownTimeline?.read({ limit: 30, offset: 0 });
     setFollowerMapping({ ...followerMapping, [feed.fid]: 'not-followed' });
@@ -137,22 +133,18 @@ export default function Users() {
           : 'not-followed';
         if (feed.state.getLatestValue().visibility_level === 'followers') {
           if (
-            feed.state
+            ownTimeline.state
               .getLatestValue()
-              .follow_requests?.pending?.find(
-                (r) => r.source_fid === ownTimeline.fid,
-              )
+              .follow_requests?.pending?.find((r) => r.target_fid === feed.fid)
           ) {
             followerMapping[feed.fid] = 'follow-request-sent';
           }
         }
         if (feed.state.getLatestValue().visibility_level === 'private') {
           if (
-            feed.state
+            ownTimeline.state
               .getLatestValue()
-              .follow_requests?.invites?.find(
-                (r) => r.source_fid === ownTimeline.fid,
-              )
+              .follow_requests?.invites?.find((r) => r.target_fid === feed.fid)
           ) {
             followerMapping[feed.fid] = 'invited';
           } else if (followerMapping[feed.fid] === 'not-followed') {

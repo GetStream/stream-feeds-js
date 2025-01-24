@@ -96,7 +96,7 @@ describe('Feeds API - flat feed', () => {
     const response = await tamaraFeed.read({ limit: 5, offset: 0 });
     const activity = response.activities[0];
 
-    const reactionResponse = await tamaraClient.feedsAddReactionToActivity({
+    const reactionResponse = await tamaraClient.addReactionToActivity({
       type: 'like',
       id: activity.id,
     });
@@ -104,7 +104,7 @@ describe('Feeds API - flat feed', () => {
     expect(reactionResponse.reaction.type).toBe('like');
     expect(reactionResponse.reaction.entity_id).toBe(activity.id);
 
-    const queryResponse = await tamaraClient.feedsQueryReactions({
+    const queryResponse = await tamaraClient.queryFeedsReactions({
       id: activity.id,
     });
 
