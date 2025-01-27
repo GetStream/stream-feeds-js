@@ -111,7 +111,7 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
         await feed.getFollowingFeeds({
           offset: 0,
           limit,
-          // TODO: we should have filter here
+          filter: newFeeds.map((f) => f.fid),
         })
       ).followers.map((r) => r.feed);
       newFeeds.forEach((timelineFeed) => {
@@ -121,7 +121,7 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
           ? 'following'
           : 'needs-invite';
         if (
-          timelineFeed.state
+          feed.state
             .getLatestValue()
             .follow_requests?.invites?.find(
               (r) => r.source_fid === timelineFeed.fid,

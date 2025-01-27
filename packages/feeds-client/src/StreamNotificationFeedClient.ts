@@ -1,5 +1,8 @@
 import {
   ActivityAddedEvent,
+  ActivityReactionDeletedEvent,
+  ActivityReactionNewEvent,
+  ActivityReactionUpdatedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
   Feed,
@@ -73,7 +76,7 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
     this.state.partialNext({ is_loading_next_page: state });
   }
 
-  protected updateFromFeedResponse(feed: Feed): void {
+  protected feedUpdated(feed: Feed): void {
     this.state.partialNext(feed);
   }
 
@@ -86,6 +89,18 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
   }
 
   protected activityRemoved(_: ActivityRemovedEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  protected reactionAddedToActivity(_: ActivityReactionNewEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  protected activityReactionUpdated(_: ActivityReactionUpdatedEvent): void {
+    throw new Error('Method not implemented.');
+  }
+
+  protected activityReactionRemoved(_: ActivityReactionDeletedEvent): void {
     throw new Error('Method not implemented.');
   }
 }

@@ -49,9 +49,9 @@ export interface Activity {
 
   verb: string;
 
-  latest_reactions: ReactionResponse[];
+  latest_reactions: Reaction[];
 
-  own_reactions: ReactionResponse[];
+  own_reactions: Reaction[];
 
   reaction_groups: Record<string, ReactionGroupResponse>;
 
@@ -69,6 +69,56 @@ export interface ActivityAddedEvent {
 
   activity: Activity;
 
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface ActivityReactionDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface ActivityReactionNewEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface ActivityReactionUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: Activity;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
   type: string;
 
   received_at?: Date;
@@ -81,6 +131,8 @@ export interface ActivityRemovedEvent {
 
   activity: Activity;
 
+  custom: Record<string, any>;
+
   type: string;
 
   received_at?: Date;
@@ -92,6 +144,8 @@ export interface ActivityUpdatedEvent {
   fid: string;
 
   activity: Activity;
+
+  custom: Record<string, any>;
 
   type: string;
 
@@ -116,16 +170,26 @@ export interface AddActivityResponse {
   activity: Activity;
 }
 
-export interface AddCommentRequest {
-  text: string;
+export interface AddReactionToActivityRequest {
+  type: string;
 
-  parent_id?: string;
+  created_at?: Date;
+
+  enforce_unique?: boolean;
+
+  score?: number;
+
+  updated_at?: Date;
+
+  custom?: Record<string, any>;
 }
 
-export interface AddCommentResponse {
+export interface AddReactionToActivityResponse {
   duration: string;
 
-  comment: Comment;
+  activity: Activity;
+
+  reaction: Reaction;
 }
 
 export interface AggregatedActivities {
@@ -467,8 +531,6 @@ export interface ConnectUserDetailsRequest {
   custom?: Record<string, any>;
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsInput;
 }
 
 export interface CreateDeviceRequest {
@@ -503,8 +565,12 @@ export interface DeleteFeedResponse {
   feed: Feed;
 }
 
-export interface DeleteReactionResponse {
+export interface DeleteReactionFromActivityResponse {
   duration: string;
+
+  activity: Activity;
+
+  reaction: Reaction;
 }
 
 export interface DeviceResponse {
@@ -557,6 +623,20 @@ export interface Feed {
   custom?: Record<string, any>;
 }
 
+export interface FeedDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
+}
+
 export interface FeedFollowRequest {
   created_at: Date;
 
@@ -568,6 +648,7 @@ export interface FeedFollowRequest {
     | 'invited'
     | 'pending'
     | 'accepted'
+    | 'accepted_invite'
     | 'rejected'
     | 'revoked'
     | 'rejected_invite'
@@ -750,6 +831,22 @@ export interface FileUploadConfig {
   blocked_mime_types: string[];
 }
 
+export interface FollowEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
+}
+
 export interface FollowRelationship {
   created_at: Date;
 
@@ -764,6 +861,24 @@ export interface FollowRequest {
   target_id: string;
 
   activity_copy_limit?: number;
+}
+
+export interface FollowRequestEvent {
+  created_at: Date;
+
+  fid: string;
+
+  status: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
 }
 
 export interface FollowResponse {
@@ -833,8 +948,6 @@ export interface FullUserResponse {
   latest_hidden_channels?: string[];
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsResponse;
 }
 
 export interface GetApplicationResponse {
@@ -1009,40 +1122,10 @@ export interface MemberResponse {
   custom?: Record<string, any>;
 }
 
-export interface NullBool {
-  has_value?: boolean;
-
-  value?: boolean;
-}
-
-export interface NullTime {
-  has_value?: boolean;
-
-  value?: Date;
-}
-
-export interface PagerResponse {
-  next?: string;
-
-  prev?: string;
-}
-
 export interface PrivacySettingsResponse {
   read_receipts?: ReadReceiptsResponse;
 
   typing_indicators?: TypingIndicatorsResponse;
-}
-
-export interface PushNotificationSettingsInput {
-  disabled?: NullBool;
-
-  disabled_until?: NullTime;
-}
-
-export interface PushNotificationSettingsResponse {
-  disabled?: boolean;
-
-  disabled_until?: Date;
 }
 
 export interface QueryActivitiesRequest {
@@ -1136,7 +1219,7 @@ export interface QueryReactionsRequest {
 export interface QueryReactionsResponse {
   duration: string;
 
-  reactions: ReactionResponse[];
+  reactions: Reaction[];
 
   next?: string;
 
@@ -1163,20 +1246,12 @@ export interface QueryUsersResponse {
   users: FullUserResponse[];
 }
 
-export interface ReactionGroupResponse {
-  count: number;
-
-  first_reaction_at: Date;
-
-  last_reaction_at: Date;
-
-  sum_scores: number;
-}
-
-export interface ReactionResponse {
-  activity_id: string;
-
+export interface Reaction {
   created_at: Date;
+
+  entity_id: string;
+
+  entity_type: string;
 
   score: number;
 
@@ -1189,6 +1264,16 @@ export interface ReactionResponse {
   custom: Record<string, any>;
 
   user: UserResponse;
+}
+
+export interface ReactionGroupResponse {
+  count: number;
+
+  first_reaction_at: Date;
+
+  last_reaction_at: Date;
+
+  sum_scores: number;
 }
 
 export interface ReadFlatFeedResponse {
@@ -1225,26 +1310,6 @@ export interface Response {
   duration: string;
 }
 
-export interface SendReactionRequest {
-  type: string;
-
-  created_at?: Date;
-
-  enforce_unique?: boolean;
-
-  score?: number;
-
-  updated_at?: Date;
-
-  custom?: Record<string, any>;
-}
-
-export interface SendReactionResponse {
-  duration: string;
-
-  reaction: ReactionResponse;
-}
-
 export interface SortParamRequest {
   direction?: number;
 
@@ -1269,6 +1334,22 @@ export interface UnblockUsersRequest {
 
 export interface UnblockUsersResponse {
   duration: string;
+}
+
+export interface UnfollowEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
 }
 
 export interface UnfollowRequest {
@@ -1433,8 +1514,6 @@ export interface UserRequest {
   custom?: Record<string, any>;
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsInput;
 }
 
 export interface UserResponse {
@@ -1481,5 +1560,13 @@ export interface WSAuthMessage {
 
 export type WSEvent =
   | ({ type: 'feeds.activity_added' } & ActivityAddedEvent)
+  | ({ type: 'feeds.activity_reaction_deleted' } & ActivityReactionDeletedEvent)
+  | ({ type: 'feeds.activity_reaction_new' } & ActivityReactionNewEvent)
+  | ({ type: 'feeds.activity_reaction_updated' } & ActivityReactionUpdatedEvent)
   | ({ type: 'feeds.activity_removed' } & ActivityRemovedEvent)
-  | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent);
+  | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent)
+  | ({ type: 'feeds.feed_deleted' } & FeedDeletedEvent)
+  | ({ type: 'feeds.follow' } & FollowEvent)
+  | ({ type: 'feeds.follow_request_created' } & FollowRequestEvent)
+  | ({ type: 'feeds.follow_request_updated' } & FollowRequestEvent)
+  | ({ type: 'feeds.unfollow' } & UnfollowEvent);

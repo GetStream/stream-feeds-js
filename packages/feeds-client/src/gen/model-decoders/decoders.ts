@@ -49,9 +49,9 @@ decoders.Activity = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
-    latest_reactions: { type: 'ReactionResponse', isSingle: false },
+    latest_reactions: { type: 'Reaction', isSingle: false },
 
-    own_reactions: { type: 'ReactionResponse', isSingle: false },
+    own_reactions: { type: 'Reaction', isSingle: false },
 
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
 
@@ -65,6 +65,45 @@ decoders.ActivityAddedEvent = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     activity: { type: 'Activity', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ActivityReactionDeletedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'Activity', isSingle: true },
+
+    reaction: { type: 'Reaction', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ActivityReactionNewEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'Activity', isSingle: true },
+
+    reaction: { type: 'Reaction', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ActivityReactionUpdatedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'Activity', isSingle: true },
+
+    reaction: { type: 'Reaction', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
   };
@@ -100,9 +139,11 @@ decoders.AddActivityResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.AddCommentResponse = (input?: Record<string, any>) => {
+decoders.AddReactionToActivityResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
-    comment: { type: 'Comment', isSingle: true },
+    activity: { type: 'Activity', isSingle: true },
+
+    reaction: { type: 'Reaction', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -252,6 +293,15 @@ decoders.DeleteFeedResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.DeleteReactionFromActivityResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    activity: { type: 'Activity', isSingle: true },
+
+    reaction: { type: 'Reaction', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.DeviceResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -274,6 +324,17 @@ decoders.Feed = (input?: Record<string, any>) => {
     follow_requests: { type: 'ActionableFollowRequests', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.FeedDeletedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    feed: { type: 'Feed', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -317,6 +378,19 @@ decoders.FeedMember = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.FollowEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    source_feed: { type: 'Feed', isSingle: true },
+
+    target_feed: { type: 'Feed', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.FollowRelationship = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -324,6 +398,19 @@ decoders.FollowRelationship = (input?: Record<string, any>) => {
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     feed: { type: 'Feed', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.FollowRequestEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    source_feed: { type: 'Feed', isSingle: true },
+
+    target_feed: { type: 'Feed', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -347,11 +434,6 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
     last_active: { type: 'DatetimeType', isSingle: true },
 
     revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
-
-    push_notifications: {
-      type: 'PushNotificationSettingsResponse',
-      isSingle: true,
-    },
   };
   return decode(typeMappings, input);
 };
@@ -418,13 +500,6 @@ decoders.MemberResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.PushNotificationSettingsResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    disabled_until: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.QueryActivitiesResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activities: { type: 'Activity', isSingle: false },
@@ -448,7 +523,7 @@ decoders.QueryFollowRequestsResponse = (input?: Record<string, any>) => {
 
 decoders.QueryReactionsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
-    reactions: { type: 'ReactionResponse', isSingle: false },
+    reactions: { type: 'Reaction', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -460,22 +535,22 @@ decoders.QueryUsersResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.ReactionGroupResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    first_reaction_at: { type: 'DatetimeType', isSingle: true },
-
-    last_reaction_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.ReactionResponse = (input?: Record<string, any>) => {
+decoders.Reaction = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ReactionGroupResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    first_reaction_at: { type: 'DatetimeType', isSingle: true },
+
+    last_reaction_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -496,9 +571,15 @@ decoders.ReadNotificationFeedResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.SendReactionResponse = (input?: Record<string, any>) => {
+decoders.UnfollowEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
-    reaction: { type: 'ReactionResponse', isSingle: true },
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    source_feed: { type: 'Feed', isSingle: true },
+
+    target_feed: { type: 'Feed', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };

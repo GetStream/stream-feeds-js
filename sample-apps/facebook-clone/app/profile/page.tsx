@@ -4,6 +4,7 @@ import { useFeedContext } from '../feed-context';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { Feed } from '@stream-io/feeds-client';
 import { FollowRelationships } from '../components/FollowRelationships';
+import { Invite } from '../components/Invite';
 
 export default function Profile() {
   const { ownFeed, ownTimeline } = useFeedContext();
@@ -88,6 +89,7 @@ export default function Profile() {
             >
               Show all
             </button>
+            {ownFeed && <Invite feed={ownFeed}></Invite>}
           </div>
         </div>
         <div className="flex items-center justify-between">

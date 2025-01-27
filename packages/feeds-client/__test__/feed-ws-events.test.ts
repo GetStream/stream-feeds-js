@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
 import {
   createTestClient,
@@ -33,7 +33,7 @@ describe('Feed WS events', () => {
   });
 
   it('should update state on update activity', async () => {
-    const activity = emilyFeed.state.getLatestValue().activities?.[0]!;
+    const activity = emilyFeed.state.getLatestValue().activities![0]!;
 
     void emilyClient.updateActivity({ id: activity.id, verb: 'like' });
 
@@ -42,12 +42,59 @@ describe('Feed WS events', () => {
     expect(emilyFeed.state.getLatestValue().activities?.[0].verb).toBe('like');
   });
 
-  it(`shouldn't add or delete activities on update event`, async () => {
-    // TODO
+  it('should add new reaction', async () => {
+    let activity = emilyFeed.state.getLatestValue().activities![0]!;
+
+    void emilyClient.addReactionToActivity({
+      id: activity.id,
+      type: 'like',
+    });
+
+    await waitForEvent(emilyClient, 'feeds.activity_reaction_new');
+    activity = emilyFeed.state.getLatestValue().activities![0]!;
+
+    expect(activity.latest_reactions.length).toBe(1);
+    expect(activity.own_reactions.length).toBe(1);
+    expect(activity.reaction_groups.like.count).toBe(1);
+  });
+
+  it('should update reaction', async () => {
+    let activity = emilyFeed.state.getLatestValue().activities![0]!;
+
+    void emilyClient.addReactionToActivity({
+      id: activity.id,
+      type: 'dislike',
+      enforce_unique: true,
+    });
+
+    await waitForEvent(emilyClient, 'feeds.activity_reaction_updated');
+    activity = emilyFeed.state.getLatestValue().activities![0]!;
+
+    expect(activity.latest_reactions.length).toBe(1);
+    expect(activity.own_reactions.length).toBe(1);
+    expect(activity.own_reactions[0].type).toBe('dislike');
+    expect(activity.reaction_groups.dislike.count).toBe(1);
+    expect(activity.reaction_groups.like).toBeUndefined();
+  });
+
+  it('should delete reaction', async () => {
+    let activity = emilyFeed.state.getLatestValue().activities![0]!;
+
+    void emilyClient.deleteReactionFromActivity({
+      id: activity.id,
+      type: 'dislike',
+    });
+
+    await waitForEvent(emilyClient, 'feeds.activity_reaction_deleted');
+    activity = emilyFeed.state.getLatestValue().activities![0]!;
+
+    expect(activity.latest_reactions.length).toBe(0);
+    expect(activity.own_reactions.length).toBe(0);
+    expect(activity.reaction_groups.like).toBe(undefined);
   });
 
   it('should update state on delete activity', async () => {
-    const activity = emilyFeed.state.getLatestValue().activities?.[0]!;
+    const activity = emilyFeed.state.getLatestValue().activities![0]!;
 
     void emilyClient.removeActivityFromFeed({
       id: emilyFeed.id,
@@ -60,7 +107,13 @@ describe('Feed WS events', () => {
     expect(emilyFeed.state.getLatestValue().activities?.length).toBe(0);
   });
 
-  afterAll(async () => {
-    await emilyFeed.delete();
+  it('should delete feed', async () => {
+    expect(emilyFeed.state.getLatestValue().deleted_at).toBeUndefined();
+
+    void emilyFeed.delete();
+
+    await waitForEvent(emilyClient, 'feeds.feed_deleted');
+
+    expect(emilyFeed.state.getLatestValue().deleted_at).toBeDefined();
   });
 });

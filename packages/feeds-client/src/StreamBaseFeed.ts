@@ -1,12 +1,17 @@
 import { EventDispatcher, StateStore } from '@stream-io/common';
 import { StreamFeedApi } from './gen/feeds/FeedApi';
 import {
-  Activity,
   ActivityAddedEvent,
+  ActivityReactionDeletedEvent,
+  ActivityReactionNewEvent,
+  ActivityReactionUpdatedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
   Feed,
+  FollowEvent,
+  FollowRequestEvent,
   GetOrCreateFeedRequest,
+  UnfollowEvent,
   WSEvent,
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
@@ -29,6 +34,31 @@ export abstract class StreamBaseFeed<
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
     new EventDispatcher<WSEvent['type'], WSEvent>();
 
+  private readonly eventHandlers: {
+    [key in WSEvent['type']]: (event: Extract<WSEvent, { type: key }>) => void;
+  } = {
+    'feeds.activity_added': (event) => this.newActivityReceived(event),
+    'feeds.activity_reaction_deleted': (event) =>
+      this.activityReactionRemoved(event),
+    'feeds.activity_reaction_new': (event) =>
+      this.reactionAddedToActivity(event),
+    'feeds.activity_reaction_updated': (event) =>
+      this.activityReactionUpdated(event),
+    'feeds.activity_removed': (event) => this.activityRemoved(event),
+    'feeds.activity_updated': (event) => this.activityUpdated(event),
+    'feeds.follow': (event) => this.updateFeedFromFollowEvent(event),
+    'feeds.follow_request_created': (event) =>
+      this.updateFeedFromFollowEvent(event),
+    'feeds.follow_request_updated': (event) =>
+      this.updateFeedFromFollowEvent(event),
+    'feeds.unfollow': (event) => this.updateFeedFromFollowEvent(event),
+    'feeds.feed_deleted': (event) =>
+      this.feedUpdated({
+        ...event.feed,
+        members: this.state.getLatestValue().members ?? [],
+      }),
+  };
+
   constructor(
     client: StreamFeedsClient,
     group: string,
@@ -45,14 +75,14 @@ export abstract class StreamBaseFeed<
 
   async get() {
     const response = await super.get();
-    this.updateFromFeedResponse(response.feed);
+    this.feedUpdated(response.feed);
 
     return response;
   }
 
   async getOrCreate(request?: GetOrCreateFeedRequest) {
     const response = await super.getOrCreate(request);
-    this.updateFromFeedResponse(response.feed);
+    this.feedUpdated(response.feed);
 
     return response;
   }
@@ -82,76 +112,9 @@ export abstract class StreamBaseFeed<
    * @param event
    */
   handleWSEvent(event: WSEvent) {
-    switch (event.type) {
-      case 'feeds.activity_added':
-        this.newActivityReceived(event);
-        break;
-      case 'feeds.activity_updated':
-        this.activityUpdated(event);
-        break;
-      case 'feeds.activity_removed':
-        this.activityRemoved(event);
-        break;
-    }
+    // @ts-expect-error TODO solve this
+    this.eventHandlers[event.type](event);
     this.eventDispatcher.dispatch(event);
-  }
-
-  protected addActivitiesToState(
-    newActivities: Activity[],
-    activities: Activity[],
-    position: 'start' | 'end',
-  ) {
-    const newActivitiesDeduplicated: Activity[] = [];
-    newActivities.forEach((newActivity) => {
-      const index = activities.findIndex((a) => a.id === newActivity.id);
-      if (index === -1) {
-        newActivitiesDeduplicated.push(newActivity);
-      }
-    });
-    if (newActivitiesDeduplicated.length === 0) {
-      return { changed: false, activities };
-    } else {
-      const updatedActivities = [
-        ...(position === 'start' ? newActivitiesDeduplicated : []),
-        ...activities,
-        ...(position === 'end' ? newActivitiesDeduplicated : []),
-      ];
-      return { changed: true, activities: updatedActivities };
-    }
-  }
-
-  protected updateActivityInState(
-    updatedActivity: Activity,
-    activities: Activity[],
-  ) {
-    const index = activities.findIndex((a) => a.id === updatedActivity.id);
-    if (index !== -1) {
-      const newActivities = [...activities];
-      const activitiy = activities[index];
-      newActivities[index] = {
-        ...updatedActivity,
-        own_reactions: activitiy.own_reactions,
-        latest_reactions: activitiy.latest_reactions,
-        reaction_groups: activitiy.reaction_groups,
-      };
-      return { changed: true, activities: newActivities };
-    } else {
-      return { changed: false, activities };
-    }
-  }
-
-  protected removeActivityFromState(
-    activity: Activity,
-    activities: Activity[],
-  ) {
-    const index = activities.findIndex((a) => a.id === activity.id);
-    if (index !== -1) {
-      const newActivities = [...activities];
-      newActivities.splice(index, 1);
-      return { changed: true, activities: newActivities };
-    } else {
-      return { changed: false, activities };
-    }
   }
 
   public abstract read(request: {
@@ -163,11 +126,41 @@ export abstract class StreamBaseFeed<
 
   protected abstract setLoadingState(state: boolean): void;
 
-  protected abstract updateFromFeedResponse(feed: Feed): void;
+  protected abstract feedUpdated(feed: Feed): void;
 
   protected abstract newActivityReceived(event: ActivityAddedEvent): void;
 
   protected abstract activityUpdated(event: ActivityUpdatedEvent): void;
 
   protected abstract activityRemoved(event: ActivityRemovedEvent): void;
+
+  protected abstract reactionAddedToActivity(
+    event: ActivityReactionNewEvent,
+  ): void;
+
+  protected abstract activityReactionUpdated(
+    event: ActivityReactionUpdatedEvent,
+  ): void;
+
+  protected abstract activityReactionRemoved(
+    event: ActivityReactionDeletedEvent,
+  ): void;
+
+  private updateFeedFromFollowEvent(
+    event: FollowRequestEvent | FollowEvent | UnfollowEvent,
+  ) {
+    const sourceFeed = event.source_feed;
+    const targetFeed = event.target_feed;
+    if (`${sourceFeed.group}:${sourceFeed.id}` === this.fid) {
+      this.feedUpdated({
+        ...sourceFeed,
+        members: this.state.getLatestValue().members ?? [],
+      });
+    } else if (`${targetFeed.group}:${targetFeed.id}` === this.fid) {
+      this.feedUpdated({
+        ...targetFeed,
+        members: this.state.getLatestValue().members ?? [],
+      });
+    }
+  }
 }

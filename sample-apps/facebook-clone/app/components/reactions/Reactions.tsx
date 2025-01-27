@@ -1,36 +1,42 @@
 import { useUserContext } from '@/app/user-context';
 import { Activity } from '@stream-io/feeds-client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ReactionsList } from './ReactionsList';
 import { useErrorContext } from '@/app/error-context';
 
 const emojiMapping: Record<string, string> = {
   like: 'thumb_up',
+  dislike: 'thumb_down',
 };
 
 export const Reactions = ({
   type,
   activity,
-  readOnly,
+  showCounter,
 }: {
   type: string;
   activity: Activity;
-  readOnly: boolean;
+  showCounter: boolean;
 }) => {
   const { logError, logErrorAndDisplayNotification } = useErrorContext();
-  const [counts, setCounts] = useState(
-    activity.reaction_groups[type]?.count ?? 0,
-  );
-  const [hasOwnReaction, setHasOwnReaction] = useState(
-    !!activity.own_reactions?.find((r) => r.type === type),
-  );
+  const [counts, setCounts] = useState(0);
+  const [hasOwnReaction, setHasOwnReaction] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { client } = useUserContext();
 
+  useEffect(() => {
+    setCounts(activity.reaction_groups[type]?.count ?? 0);
+    setHasOwnReaction(!!activity.own_reactions.find((r) => r.type === type));
+  }, [activity, type]);
+
   const addReaction = async () => {
     try {
-      await client?.feedsSendReaction({ type, id: activity.id });
+      await client?.addReactionToActivity({
+        type,
+        id: activity.id,
+        enforce_unique: true,
+      });
       void fetch('/api/send-notification', {
         method: 'POST',
         headers: {
@@ -42,8 +48,6 @@ export const Reactions = ({
           objectId: activity.id,
         }),
       }).catch((err) => logError(err));
-      setCounts(counts + 1);
-      setHasOwnReaction(true);
     } catch (error) {
       logErrorAndDisplayNotification(
         error as Error,
@@ -54,9 +58,7 @@ export const Reactions = ({
 
   const removeReaction = async () => {
     try {
-      await client?.feedsDeleteReaction({ type, id: activity.id });
-      setCounts(counts - 1);
-      setHasOwnReaction(false);
+      await client?.deleteReactionFromActivity({ type, id: activity.id });
     } catch (error) {
       logErrorAndDisplayNotification(
         error as Error,
@@ -81,33 +83,31 @@ export const Reactions = ({
 
   return (
     <div className="flex items-center gap-1 text-gray-700 text-sm">
-      {!readOnly && (
-        <button
-          className="flex"
-          onClick={() => (hasOwnReaction ? removeReaction() : addReaction())}
-        >
-          <span
-            className={`text-blue-500 material-symbols-outlined ${hasOwnReaction ? 'fill' : ''}`}
-            style={{ fontSize: '22px' }}
-          >
-            {emojiMapping[type]}
-          </span>
-        </button>
-      )}
-      {readOnly && (
+      <button
+        className="flex"
+        onClick={() => (hasOwnReaction ? removeReaction() : addReaction())}
+      >
         <span
           className={`text-blue-500 material-symbols-outlined ${hasOwnReaction ? 'fill' : ''}`}
           style={{ fontSize: '22px' }}
         >
           {emojiMapping[type]}
         </span>
-      )}
-      <button onClick={() => openDialog()}>
-        <div>
-          {counts} {type}
-          {counts !== 1 ? 's' : ''}
-        </div>
       </button>
+      <span
+        className={`text-blue-500 material-symbols-outlined ${hasOwnReaction ? 'fill' : ''}`}
+        style={{ fontSize: '22px' }}
+      >
+        {emojiMapping[type]}
+      </span>
+      {showCounter && (
+        <button onClick={() => openDialog()}>
+          <div>
+            {counts} {type}
+            {counts !== 1 ? 's' : ''}
+          </div>
+        </button>
+      )}
       <dialog
         className={`w-6/12 h-3/6 rounded-lg p-6 bg-white shadow-lg flex flex-col ${isDialogOpen ? '' : 'hidden'}`}
         ref={dialogRef}

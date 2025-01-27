@@ -1,5 +1,4 @@
-import { FeedsApi } from './FeedsApi';
-import { StreamResponse } from '../../gen-imports';
+import { StreamResponse, StreamFeedsClient } from '../../gen-imports';
 import {
   AddActivityRequest,
   AddActivityResponse,
@@ -24,23 +23,23 @@ import {
 
 export class StreamFeedApi {
   constructor(
-    protected feedsApi: FeedsApi,
+    protected client: StreamFeedsClient,
     public readonly group: string,
     public readonly id: string,
   ) {}
 
   delete(): Promise<StreamResponse<DeleteFeedResponse>> {
-    return this.feedsApi.deleteFeed({ id: this.id, group: this.group });
+    return this.client.deleteFeed({ id: this.id, group: this.group });
   }
 
   get(): Promise<StreamResponse<GetFeedResponse>> {
-    return this.feedsApi.getFeed({ id: this.id, group: this.group });
+    return this.client.getFeed({ id: this.id, group: this.group });
   }
 
   update(
     request?: UpdateFeedRequest,
   ): Promise<StreamResponse<UpdateFeedResponse>> {
-    return this.feedsApi.updateFeed({
+    return this.client.updateFeed({
       id: this.id,
       group: this.group,
       ...request,
@@ -50,7 +49,7 @@ export class StreamFeedApi {
   getOrCreate(
     request?: GetOrCreateFeedRequest & { connection_id?: string },
   ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
-    return this.feedsApi.getOrCreateFeed({
+    return this.client.getOrCreateFeed({
       id: this.id,
       group: this.group,
       ...request,
@@ -60,7 +59,7 @@ export class StreamFeedApi {
   addActivity(
     request: AddActivityRequest,
   ): Promise<StreamResponse<AddActivityResponse>> {
-    return this.feedsApi.addActivity({
+    return this.client.addActivity({
       id: this.id,
       group: this.group,
       ...request,
@@ -71,7 +70,7 @@ export class StreamFeedApi {
     limit: number;
     offset: number;
   }): Promise<StreamResponse<ReadFlatFeedResponse>> {
-    return this.feedsApi.readFlatFeed({
+    return this.client.readFlatFeed({
       id: this.id,
       group: this.group,
       ...request,
@@ -79,14 +78,15 @@ export class StreamFeedApi {
   }
 
   follow(request: FollowRequest): Promise<StreamResponse<FollowResponse>> {
-    return this.feedsApi.follow({ id: this.id, group: this.group, ...request });
+    return this.client.follow({ id: this.id, group: this.group, ...request });
   }
 
   getFollowingFeeds(request: {
     limit: number;
     offset: number;
+    filter?: string[];
   }): Promise<StreamResponse<GetFollowingFeedsResponse>> {
-    return this.feedsApi.getFollowingFeeds({
+    return this.client.getFollowingFeeds({
       id: this.id,
       group: this.group,
       ...request,
@@ -98,7 +98,7 @@ export class StreamFeedApi {
     offset: number;
     filter?: string[];
   }): Promise<StreamResponse<GetFollowedFeedsResponse>> {
-    return this.feedsApi.getFollowedFeeds({
+    return this.client.getFollowedFeeds({
       id: this.id,
       group: this.group,
       ...request,
@@ -108,7 +108,7 @@ export class StreamFeedApi {
   updateFeedMembers(
     request?: UpdateFeedMembersRequest,
   ): Promise<StreamResponse<UpdateFeedMembersResponse>> {
-    return this.feedsApi.updateFeedMembers({
+    return this.client.updateFeedMembers({
       id: this.id,
       group: this.group,
       ...request,
@@ -121,7 +121,7 @@ export class StreamFeedApi {
     mark_seen?: string;
     mark_read?: string;
   }): Promise<StreamResponse<ReadNotificationFeedResponse>> {
-    return this.feedsApi.readNotificationFeed({
+    return this.client.readNotificationFeed({
       id: this.id,
       group: this.group,
       ...request,
@@ -131,17 +131,13 @@ export class StreamFeedApi {
   unfollow(
     request: UnfollowRequest,
   ): Promise<StreamResponse<UnfollowResponse>> {
-    return this.feedsApi.unfollow({
-      id: this.id,
-      group: this.group,
-      ...request,
-    });
+    return this.client.unfollow({ id: this.id, group: this.group, ...request });
   }
 
   removeActivityFrom(request: {
     activity_id: string;
   }): Promise<StreamResponse<RemoveActivityFromFeedResponse>> {
-    return this.feedsApi.removeActivityFromFeed({
+    return this.client.removeActivityFromFeed({
       id: this.id,
       group: this.group,
       ...request,

@@ -4,3 +4,4 @@ export type {
   StreamResponse,
 } from '@stream-io/common';
 export { CommonApiWrapper } from '@stream-io/common';
+export { StreamFeedsClient } from './StreamFeedsClient';

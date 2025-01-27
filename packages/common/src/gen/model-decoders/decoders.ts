@@ -257,8 +257,6 @@ decoders.EntityCreator = (input?: Record<string, any>) => {
     revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
-
-    push_notifications: { type: 'PushNotificationSettings', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -321,11 +319,6 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
     last_active: { type: 'DatetimeType', isSingle: true },
 
     revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
-
-    push_notifications: {
-      type: 'PushNotificationSettingsResponse',
-      isSingle: true,
-    },
   };
   return decode(typeMappings, input);
 };
@@ -465,13 +458,6 @@ decoders.MuteResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.NullTime = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    value: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.OwnUser = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -492,7 +478,7 @@ decoders.OwnUser = (input?: Record<string, any>) => {
 
     last_engaged_at: { type: 'DatetimeType', isSingle: true },
 
-    push_notifications: { type: 'PushNotificationSettings', isSingle: true },
+    push_preferences: { type: 'PushPreferences', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -549,14 +535,7 @@ decoders.PollVoteResponseData = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.PushNotificationSettings = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    disabled_until: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.PushNotificationSettingsResponse = (input?: Record<string, any>) => {
+decoders.PushPreferences = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     disabled_until: { type: 'DatetimeType', isSingle: true },
   };
@@ -626,10 +605,6 @@ decoders.ReviewQueueItem = (input?: Record<string, any>) => {
     bans: { type: 'Ban', isSingle: false },
 
     flags: { type: 'Flag2', isSingle: false },
-
-    completed_at: { type: 'NullTime', isSingle: true },
-
-    reviewed_at: { type: 'NullTime', isSingle: true },
 
     assigned_to: { type: 'User', isSingle: true },
 
@@ -707,8 +682,6 @@ decoders.User = (input?: Record<string, any>) => {
     revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
-
-    push_notifications: { type: 'PushNotificationSettings', isSingle: true },
   };
   return decode(typeMappings, input);
 };

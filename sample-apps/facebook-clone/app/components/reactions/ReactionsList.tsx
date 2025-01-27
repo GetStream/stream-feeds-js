@@ -1,5 +1,5 @@
 import { useUserContext } from '@/app/user-context';
-import { Activity, ReactionResponse } from '@stream-io/feeds-client';
+import { Activity, Reaction } from '@stream-io/feeds-client';
 import React, { useEffect, useState } from 'react';
 import { PaginatedList } from '../PaginatedList';
 
@@ -10,7 +10,7 @@ export const ReactionsList = ({
   type: string;
   activity: Activity;
 }) => {
-  const [reactions, setReactions] = useState<ReactionResponse[]>([]);
+  const [reactions, setReactions] = useState<Reaction[]>([]);
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [next, setNext] = useState<string>();
@@ -27,7 +27,7 @@ export const ReactionsList = ({
     setError(undefined);
     setIsLoading(true);
     try {
-      const response = await client.feedsQueryReactions({
+      const response = await client.queryFeedsReactions({
         id: activity.id,
         filter: {
           type,
@@ -44,7 +44,7 @@ export const ReactionsList = ({
     }
   };
 
-  const renderItem = (reaction: ReactionResponse) => {
+  const renderItem = (reaction: Reaction) => {
     return (
       <li
         key={reaction.user_id}

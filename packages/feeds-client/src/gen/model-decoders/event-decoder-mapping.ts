@@ -7,11 +7,33 @@ const eventDecoderMapping: {
   'feeds.activity_added': (data: Record<string, any>) =>
     decoders.ActivityAddedEvent(data),
 
+  'feeds.activity_reaction_deleted': (data: Record<string, any>) =>
+    decoders.ActivityReactionDeletedEvent(data),
+
+  'feeds.activity_reaction_new': (data: Record<string, any>) =>
+    decoders.ActivityReactionNewEvent(data),
+
+  'feeds.activity_reaction_updated': (data: Record<string, any>) =>
+    decoders.ActivityReactionUpdatedEvent(data),
+
   'feeds.activity_removed': (data: Record<string, any>) =>
     decoders.ActivityRemovedEvent(data),
 
   'feeds.activity_updated': (data: Record<string, any>) =>
     decoders.ActivityUpdatedEvent(data),
+
+  'feeds.feed_deleted': (data: Record<string, any>) =>
+    decoders.FeedDeletedEvent(data),
+
+  'feeds.follow': (data: Record<string, any>) => decoders.FollowEvent(data),
+
+  'feeds.follow_request_created': (data: Record<string, any>) =>
+    decoders.FollowRequestEvent(data),
+
+  'feeds.follow_request_updated': (data: Record<string, any>) =>
+    decoders.FollowRequestEvent(data),
+
+  'feeds.unfollow': (data: Record<string, any>) => decoders.UnfollowEvent(data),
 };
 
 export const decodeWSEvent = (data: { type: string } & Record<string, any>) => {

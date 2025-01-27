@@ -1,8 +1,9 @@
 import { Activity as StreamActivity } from '@stream-io/feeds-client';
 import { Reactions } from './reactions/Reactions';
 import { useUserContext } from '../user-context';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useErrorContext } from '../error-context';
+import { ActivityComposer } from './ActivityComposer';
 
 export const Activity = ({
   activity,
@@ -18,8 +19,7 @@ export const Activity = ({
   const [canDelete, setCanDelete] = useState(false);
   const [canSendReaction, setCanSendReaction] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedPost, setEditedPost] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [editedActivityText, setEditedActivityText] = useState('');
 
   useEffect(() => {
     setCanEdit(
@@ -35,16 +35,12 @@ export const Activity = ({
     setCanSendReaction(ownCapabilities.includes('send-feed-reaction'));
   }, [user, activity, ownCapabilities]);
 
-  useEffect(() => {
-    setEditedPost(activity.custom?.text);
-  }, [activity]);
-
   const updateActivity = async () => {
     try {
       await client?.updateActivity({
         id: activity.id,
         // TODO: edited_at should be determined by a webhook, not client-side
-        custom: { text: editedPost, edited_at: Date.now() },
+        custom: { text: editedActivityText, edited_at: Date.now() },
       });
       setIsEditing(false);
     } catch (error) {
@@ -74,7 +70,7 @@ export const Activity = ({
 
   useEffect(() => {
     if (isEditing) {
-      textareaRef.current?.focus();
+      setEditedActivityText(activity.custom?.text ?? '');
     }
   }, [isEditing]);
 
@@ -156,17 +152,15 @@ export const Activity = ({
         </div>
         {!isEditing && <div>{activity.custom?.text}</div>}
         {isEditing && (
-          <textarea
-            ref={textareaRef}
-            value={editedPost}
-            onChange={(e) => setEditedPost(e.target.value)}
-          ></textarea>
+          <ActivityComposer
+            text={editedActivityText}
+            onChange={(text) => setEditedActivityText(text)}
+          ></ActivityComposer>
         )}
-        <Reactions
-          type="like"
-          activity={activity}
-          readOnly={!canSendReaction}
-        />
+        <div className="flex items-center gap-3">
+          <Reactions type="dislike" activity={activity} showCounter={false} />
+          <Reactions type="like" activity={activity} showCounter={true} />
+        </div>
       </div>
     </>
   );
