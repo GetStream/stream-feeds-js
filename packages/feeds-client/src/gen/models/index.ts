@@ -497,8 +497,6 @@ export interface ConnectUserDetailsRequest {
   custom?: Record<string, any>;
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsInput;
 }
 
 export interface CreateDeviceRequest {
@@ -587,6 +585,20 @@ export interface Feed {
   deleted_at?: Date;
 
   custom?: Record<string, any>;
+}
+
+export interface FeedDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
 }
 
 export interface FeedFollowRequest {
@@ -900,8 +912,6 @@ export interface FullUserResponse {
   latest_hidden_channels?: string[];
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsResponse;
 }
 
 export interface GetApplicationResponse {
@@ -1076,34 +1086,10 @@ export interface MemberResponse {
   custom?: Record<string, any>;
 }
 
-export interface NullBool {
-  has_value?: boolean;
-
-  value?: boolean;
-}
-
-export interface NullTime {
-  has_value?: boolean;
-
-  value?: Date;
-}
-
 export interface PrivacySettingsResponse {
   read_receipts?: ReadReceiptsResponse;
 
   typing_indicators?: TypingIndicatorsResponse;
-}
-
-export interface PushNotificationSettingsInput {
-  disabled?: NullBool;
-
-  disabled_until?: NullTime;
-}
-
-export interface PushNotificationSettingsResponse {
-  disabled?: boolean;
-
-  disabled_until?: Date;
 }
 
 export interface QueryActivitiesRequest {
@@ -1458,8 +1444,6 @@ export interface UserRequest {
   custom?: Record<string, any>;
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsInput;
 }
 
 export interface UserResponse {
@@ -1511,6 +1495,7 @@ export type WSEvent =
   | ({ type: 'feeds.activity_reaction_updated' } & ActivityReactionUpdatedEvent)
   | ({ type: 'feeds.activity_removed' } & ActivityRemovedEvent)
   | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent)
+  | ({ type: 'feeds.feed_deleted' } & FeedDeletedEvent)
   | ({ type: 'feeds.follow' } & FollowEvent)
   | ({ type: 'feeds.follow_request_created' } & FollowRequestEvent)
   | ({ type: 'feeds.follow_request_updated' } & FollowRequestEvent)

@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
 import {
   createTestClient,
@@ -107,7 +107,13 @@ describe('Feed WS events', () => {
     expect(emilyFeed.state.getLatestValue().activities?.length).toBe(0);
   });
 
-  afterAll(async () => {
-    await emilyFeed.delete();
+  it('should delete feed', async () => {
+    expect(emilyFeed.state.getLatestValue().deleted_at).toBeUndefined();
+
+    void emilyFeed.delete();
+
+    await waitForEvent(emilyClient, 'feeds.feed_deleted');
+
+    expect(emilyFeed.state.getLatestValue().deleted_at).toBeDefined();
   });
 });

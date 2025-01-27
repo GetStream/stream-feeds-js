@@ -76,7 +76,7 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
     this.state.partialNext({ is_loading_next_page: state });
   }
 
-  protected updateFromFeedResponse(feed: Feed): void {
+  protected feedUpdated(feed: Feed): void {
     this.state.partialNext(feed);
   }
 

@@ -311,6 +311,17 @@ decoders.Feed = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.FeedDeletedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    feed: { type: 'Feed', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.FeedFollowRequest = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -406,11 +417,6 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
     last_active: { type: 'DatetimeType', isSingle: true },
 
     revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
-
-    push_notifications: {
-      type: 'PushNotificationSettingsResponse',
-      isSingle: true,
-    },
   };
   return decode(typeMappings, input);
 };
@@ -473,13 +479,6 @@ decoders.MemberResponse = (input?: Record<string, any>) => {
     user: { type: 'UserResponse', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.PushNotificationSettingsResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    disabled_until: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };

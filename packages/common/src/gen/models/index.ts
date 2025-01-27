@@ -753,8 +753,6 @@ export interface ConnectUserDetailsRequest {
   custom?: Record<string, any>;
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsInput;
 }
 
 export interface CreateDeviceRequest {
@@ -943,8 +941,6 @@ export interface EntityCreator {
   teams?: string[];
 
   privacy_settings?: PrivacySettings;
-
-  push_notifications?: PushNotificationSettings;
 }
 
 export interface EntityCreatorResponse {
@@ -1139,8 +1135,6 @@ export interface FullUserResponse {
   latest_hidden_channels?: string[];
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsResponse;
 }
 
 export interface GetApplicationResponse {
@@ -1515,17 +1509,7 @@ export interface MuteResponse {
   own_user?: OwnUser;
 }
 
-export interface NullBool {
-  has_value?: boolean;
-
-  value?: boolean;
-}
-
-export interface NullTime {
-  has_value?: boolean;
-
-  value?: Date;
-}
+export interface NullTime {}
 
 export interface OwnUser {
   banned: boolean;
@@ -1576,7 +1560,7 @@ export interface OwnUser {
 
   privacy_settings?: PrivacySettings;
 
-  push_notifications?: PushNotificationSettings;
+  push_preferences?: PushPreferences;
 }
 
 export interface Poll {
@@ -1735,20 +1719,10 @@ export interface PrivacySettingsResponse {
   typing_indicators?: TypingIndicatorsResponse;
 }
 
-export interface PushNotificationSettings {
-  disabled?: boolean;
+export interface PushPreferences {
+  call_level?: string;
 
-  disabled_until?: Date;
-}
-
-export interface PushNotificationSettingsInput {
-  disabled?: NullBool;
-
-  disabled_until?: NullTime;
-}
-
-export interface PushNotificationSettingsResponse {
-  disabled?: boolean;
+  chat_level?: string;
 
   disabled_until?: Date;
 }
@@ -1929,8 +1903,6 @@ export interface ReviewQueueItem {
   languages: string[];
 
   teams: string[];
-
-  completed_at: NullTime;
 
   reviewed_at: NullTime;
 
@@ -2161,8 +2133,6 @@ export interface User {
   teams?: string[];
 
   privacy_settings?: PrivacySettings;
-
-  push_notifications?: PushNotificationSettings;
 }
 
 export interface UserMute {
@@ -2203,8 +2173,6 @@ export interface UserRequest {
   custom?: Record<string, any>;
 
   privacy_settings?: PrivacySettingsResponse;
-
-  push_notifications?: PushNotificationSettingsInput;
 }
 
 export interface UserResponse {

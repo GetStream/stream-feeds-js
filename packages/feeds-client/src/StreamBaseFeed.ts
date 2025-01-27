@@ -52,6 +52,11 @@ export abstract class StreamBaseFeed<
     'feeds.follow_request_updated': (event) =>
       this.updateFeedFromFollowEvent(event),
     'feeds.unfollow': (event) => this.updateFeedFromFollowEvent(event),
+    'feeds.feed_deleted': (event) =>
+      this.feedUpdated({
+        ...event.feed,
+        members: this.state.getLatestValue().members ?? [],
+      }),
   };
 
   constructor(
@@ -70,14 +75,14 @@ export abstract class StreamBaseFeed<
 
   async get() {
     const response = await super.get();
-    this.updateFromFeedResponse(response.feed);
+    this.feedUpdated(response.feed);
 
     return response;
   }
 
   async getOrCreate(request?: GetOrCreateFeedRequest) {
     const response = await super.getOrCreate(request);
-    this.updateFromFeedResponse(response.feed);
+    this.feedUpdated(response.feed);
 
     return response;
   }
@@ -121,7 +126,7 @@ export abstract class StreamBaseFeed<
 
   protected abstract setLoadingState(state: boolean): void;
 
-  protected abstract updateFromFeedResponse(feed: Feed): void;
+  protected abstract feedUpdated(feed: Feed): void;
 
   protected abstract newActivityReceived(event: ActivityAddedEvent): void;
 
@@ -147,12 +152,12 @@ export abstract class StreamBaseFeed<
     const sourceFeed = event.source_feed;
     const targetFeed = event.target_feed;
     if (`${sourceFeed.group}:${sourceFeed.id}` === this.fid) {
-      this.updateFromFeedResponse({
+      this.feedUpdated({
         ...sourceFeed,
         members: this.state.getLatestValue().members ?? [],
       });
     } else if (`${targetFeed.group}:${targetFeed.id}` === this.fid) {
-      this.updateFromFeedResponse({
+      this.feedUpdated({
         ...targetFeed,
         members: this.state.getLatestValue().members ?? [],
       });
