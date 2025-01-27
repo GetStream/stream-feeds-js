@@ -72,8 +72,6 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
           objectId: feed.fid,
         }),
       }).catch((err) => logError(err));
-      // Reinit state to update follower count
-      await ownTimeline?.getOrCreate().catch((err) => logError(err));
       // Reinit state to include activities from newly followed user
       await ownTimeline
         ?.read({ limit: 30, offset: 0 })
@@ -99,8 +97,6 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
         target_group: feed.group,
         target_id: feed.id,
       });
-      // Reinit state to update follower count
-      await ownTimeline?.getOrCreate().catch((err) => logError(err));
       // Reinit state to exclude activities from newly unfollowed user
       await ownTimeline
         ?.read({ limit: 30, offset: 0 })
@@ -110,6 +106,23 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
       logErrorAndDisplayNotification(
         error as Error,
         `Failed to unfollow, this could've been a temporary issue, try again`,
+      );
+    }
+  };
+
+  const cancelFollowRequest = async (feed: StreamFeedClient) => {
+    try {
+      await ownTimeline?.update({
+        cancelled_pending_follow_requests: [feed.fid],
+      });
+      setFollowerMapping({
+        ...followerMapping,
+        [feed.fid]: 'not-followed',
+      });
+    } catch (error) {
+      logErrorAndDisplayNotification(
+        error as Error,
+        `Failed to cancel follow request for ${feed.state.getLatestValue().created_by?.name}, this could've been a temporary issue, try again`,
       );
     }
   };
@@ -125,7 +138,7 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
       const response = await client.queryFeeds({
         limit,
         filter: {
-          feed_group: { $in: types },
+          feed_group: 'user',
         },
         next,
       });
@@ -145,22 +158,18 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
           : 'not-followed';
         if (feed.state.getLatestValue().visibility_level === 'followers') {
           if (
-            feed.state
+            ownTimeline.state
               .getLatestValue()
-              .follow_requests?.pending?.find(
-                (r) => r.source_fid === ownTimeline.fid,
-              )
+              .follow_requests?.pending?.find((r) => r.target_fid === feed.fid)
           ) {
             followerMapping[feed.fid] = 'follow-request-sent';
           }
         }
         if (feed.state.getLatestValue().visibility_level === 'private') {
           if (
-            feed.state
+            ownTimeline.state
               .getLatestValue()
-              .follow_requests?.invites?.find(
-                (r) => r.source_fid === ownTimeline.fid,
-              )
+              .follow_requests?.invites?.find((r) => r.target_fid === feed.fid)
           ) {
             followerMapping[feed.fid] = 'invited';
           } else if (followerMapping[feed.fid] === 'not-followed') {
@@ -194,8 +203,17 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
             {feed.state.getLatestValue().created_by?.name}
           </p>
         </div>
-        {followerMapping[feed.fid] === 'follow-request-sent' &&
-          'Follow request is waiting for approval'}
+        {followerMapping[feed.fid] === 'follow-request-sent' && (
+          <div className="flex items-center gap-3">
+            <div>Follow request is waiting for approval</div>
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+              onClick={() => cancelFollowRequest(feed)}
+            >
+              Cancel request
+            </button>
+          </div>
+        )}
         {followerMapping[feed.fid] === 'needs-invite' &&
           'You need an invite to follow'}
         {followerMapping[feed.fid] === 'invited' && (
