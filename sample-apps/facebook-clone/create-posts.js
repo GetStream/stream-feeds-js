@@ -16,10 +16,13 @@ require('dotenv').config();
   const posts = JSON.parse(
     await fs.readFile(path.resolve('posts.json'), 'utf-8'),
   );
+  const pages = JSON.parse(
+    await fs.readFile(path.resolve('pages.json'), 'utf-8'),
+  );
 
   const client = new StreamClient(key, secret, { basePath: url });
 
-  console.log('Creating activities...');
+  console.log('Creating activities for users...');
 
   for (let i = 0; i < posts.length; i++) {
     const post = posts[i];
@@ -32,6 +35,22 @@ require('dotenv').config();
         text: post,
       },
       user_id: user.id,
+    });
+  }
+
+  console.log('Creating activities for pages...');
+
+  for (let i = 0; i < posts.length; i++) {
+    const post = posts[i];
+    const page = pages[Math.floor(Math.random() * pages.length)];
+
+    await client.feeds.feed('page', page.id).addActivity({
+      verb: 'post',
+      object: uuidv4(),
+      custom: {
+        text: post,
+      },
+      user_id: page.owner_id,
     });
   }
 

@@ -177,6 +177,7 @@ describe('Feed followers', () => {
     });
 
     expect(secondPage.followed_feeds.length).toBe(1);
+    expect(secondPage.next).toBeUndefined();
 
     const allFollowingFeeds = [
       ...firstPage.followed_feeds,

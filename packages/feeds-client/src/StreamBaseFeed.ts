@@ -7,6 +7,12 @@ import {
   ActivityReactionUpdatedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
+  CommentAddedEvent,
+  CommentReactionDeletedEvent,
+  CommentReactionNewEvent,
+  CommentReactionUpdatedEvent,
+  CommentRemovedEvent,
+  CommentUpdatedEvent,
   Feed,
   NotificationFollowEvent,
   NotificationFollowRequestEvent,
@@ -19,12 +25,6 @@ import {
   NotificationFeedMemberAddedEvent,
   NotificationFeedMemberInvitedEvent,
   NotificationFeedMemberRemovedEvent,
-  CommentAddedEvent,
-  CommentReactionDeletedEvent,
-  CommentReactionNewEvent,
-  CommentReactionUpdatedEvent,
-  CommentRemovedEvent,
-  CommentUpdatedEvent,
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
 

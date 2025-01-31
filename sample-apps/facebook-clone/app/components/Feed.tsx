@@ -26,6 +26,7 @@ export const Feed = ({
   const [hasNextPage, setHasNextPage] = useState<boolean>(false);
   const [newPostsNotification, setNewPostsNotification] =
     useState<AppNotificaion>();
+  const [ownCapabilities, setOwnCapabilities] = useState<string[]>([]);
 
   useEffect(() => {
     const unsubscribe = feed.state.subscribeWithSelector(
@@ -53,6 +54,19 @@ export const Feed = ({
 
     return unsubscribe;
   }, [feed, isLoading, onNewPost]);
+
+  useEffect(() => {
+    const unsubscribe = feed.state.subscribeWithSelector(
+      (state) => ({
+        own_capabilities: state.own_capabilities,
+      }),
+      (state) => {
+        setOwnCapabilities(state.own_capabilities ?? []);
+      },
+    );
+
+    return unsubscribe;
+  }, [feed]);
 
   useEffect(() => {
     if (onNewPost === 'show-immediately') {
@@ -126,7 +140,10 @@ export const Feed = ({
   const renderItem = (activity: StreamActivity) => {
     return (
       <li className="w-full" key={activity.id}>
-        <Activity activity={activity}></Activity>
+        <Activity
+          activity={activity}
+          ownCapabilities={ownCapabilities}
+        ></Activity>
       </li>
     );
   };

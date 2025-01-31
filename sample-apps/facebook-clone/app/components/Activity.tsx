@@ -5,17 +5,35 @@ import { useEffect, useState } from 'react';
 import { useErrorContext } from '../error-context';
 import { ActivityComposer } from './ActivityComposer';
 
-export const Activity = ({ activity }: { activity: StreamActivity }) => {
+export const Activity = ({
+  activity,
+  ownCapabilities,
+}: {
+  activity: StreamActivity;
+  ownCapabilities: string[];
+}) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const { user, client } = useUserContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [canManage, setCanManage] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+  const [canDelete, setCanDelete] = useState(false);
+  const [_, setCanSendReaction] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedActivityText, setEditedActivityText] = useState('');
 
   useEffect(() => {
-    setCanManage(user?.id === activity.user.id);
-  }, [user, activity]);
+    setCanEdit(
+      ownCapabilities.includes('update-any-activity') ||
+        (ownCapabilities.includes('update-own-activity') &&
+          activity.user.id === user?.id),
+    );
+    setCanDelete(
+      ownCapabilities.includes('remove-any-activity-from-feed') ||
+        (ownCapabilities.includes('remove-own-activity-from-feed') &&
+          activity.user.id === user?.id),
+    );
+    setCanSendReaction(ownCapabilities.includes('send-feed-reaction'));
+  }, [user, activity, ownCapabilities]);
 
   const updateActivity = async () => {
     try {
@@ -77,7 +95,7 @@ export const Activity = ({ activity }: { activity: StreamActivity }) => {
               )}
             </div>
           </div>
-          {canManage && (
+          {(canEdit || canDelete) && (
             <div className="self-start flex items-center gap-1">
               {isEditing && (
                 <>
@@ -105,24 +123,28 @@ export const Activity = ({ activity }: { activity: StreamActivity }) => {
                 <div
                   className={`absolute rounded-md right-0 w-48 bg-white shadow-lg flex flex-col items-stretch ${isMenuOpen ? '' : 'hidden'}`}
                 >
-                  <button
-                    className="text-gray-700 flex gap-1 p-3 items-center rounded-md hover:bg-gray-100"
-                    onClick={() => {
-                      setIsEditing(true);
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    <span className="material-symbols-outlined">edit</span>
-                    <div>Edit</div>
-                  </button>
+                  {canEdit && (
+                    <button
+                      className="text-gray-700 flex gap-1 p-3 items-center rounded-md hover:bg-gray-100"
+                      onClick={() => {
+                        setIsEditing(true);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <span className="material-symbols-outlined">edit</span>
+                      <div>Edit</div>
+                    </button>
+                  )}
 
-                  <button
-                    className="text-red-700 flex gap-1 p-3 items-center rounded-md hover:bg-gray-100"
-                    onClick={() => deleteActivity()}
-                  >
-                    <span className="material-symbols-outlined">delete</span>
-                    <div>Delete</div>
-                  </button>
+                  {canDelete && (
+                    <button
+                      className="text-red-700 flex gap-1 p-3 items-center rounded-md hover:bg-gray-100"
+                      onClick={() => deleteActivity()}
+                    >
+                      <span className="material-symbols-outlined">delete</span>
+                      <div>Delete</div>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

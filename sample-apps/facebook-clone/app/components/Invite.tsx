@@ -28,15 +28,24 @@ export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
   );
 
   useEffect(() => {
+    if (!user) {
+      setCanInvite(false);
+      return;
+    }
     const unsubscribe = feed.state.subscribeWithSelector(
-      (state) => ({ visibility_level: state.visibility_level }),
-      ({ visibility_level }) => {
-        setCanInvite(visibility_level === 'private');
+      (state) => ({
+        visibility_level: state.visibility_level,
+        created_by: state.created_by,
+      }),
+      ({ visibility_level, created_by }) => {
+        setCanInvite(
+          visibility_level === 'private' && created_by?.id === user.id,
+        );
       },
     );
 
     return unsubscribe;
-  }, [feed]);
+  }, [feed, user]);
 
   const openDialog = () => {
     if (dialogRef.current) {
