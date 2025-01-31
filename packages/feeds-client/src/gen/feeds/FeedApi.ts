@@ -91,9 +91,10 @@ export class StreamFeedApi {
     });
   }
 
-  getFollowedFeeds(request: {
-    limit: number;
-    offset: number;
+  getFollowedFeeds(request?: {
+    limit?: number;
+    next?: string;
+    prev?: string;
     filter?: string[];
   }): Promise<StreamResponse<GetFollowedFeedsResponse>> {
     return this.client.getFollowedFeeds({

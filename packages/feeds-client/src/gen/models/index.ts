@@ -1162,6 +1162,10 @@ export interface GetFollowedFeedsResponse {
   duration: string;
 
   followed_feeds: FollowRelationship[];
+
+  next?: string;
+
+  prev?: string;
 }
 
 export interface GetFollowingFeedsResponse {

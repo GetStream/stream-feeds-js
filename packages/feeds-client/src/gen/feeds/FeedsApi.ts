@@ -588,13 +588,15 @@ export class FeedsApi extends CommonApiWrapper {
   async getFollowedFeeds(request: {
     group: string;
     id: string;
-    limit: number;
-    offset: number;
+    limit?: number;
+    next?: string;
+    prev?: string;
     filter?: string[];
   }): Promise<StreamResponse<GetFollowedFeedsResponse>> {
     const queryParams = {
       limit: request?.limit,
-      offset: request?.offset,
+      next: request?.next,
+      prev: request?.prev,
       filter: request?.filter,
     };
     const pathParams = {

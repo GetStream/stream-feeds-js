@@ -167,38 +167,38 @@ describe('Feed followers', () => {
     expect(markFeed.state.getLatestValue().following_count).toBe(3);
   });
 
-  // it(`mark now follows 3 feeds`, async () => {
-  //   const firstPage = await markFeed.getFollowedFeeds({ limit: 2 });
+  it(`mark now follows 3 feeds`, async () => {
+    const firstPage = await markFeed.getFollowedFeeds({ limit: 2 });
 
-  //   expect(firstPage.followed_feeds.length).toBe(2);
+    expect(firstPage.followed_feeds.length).toBe(2);
 
-  //   const secondPage = await markFeed.getFollowedFeeds({
-  //     next: firstPage.next,
-  //   });
+    const secondPage = await markFeed.getFollowedFeeds({
+      next: firstPage.next,
+    });
 
-  //   expect(secondPage.followed_feeds.length).toBe(1);
+    expect(secondPage.followed_feeds.length).toBe(1);
 
-  //   const allFollowingFeeds = [
-  //     ...firstPage.followed_feeds,
-  //     ...secondPage.followed_feeds,
-  //   ];
+    const allFollowingFeeds = [
+      ...firstPage.followed_feeds,
+      ...secondPage.followed_feeds,
+    ];
 
-  //   expect(
-  //     allFollowingFeeds.find((f) => f.feed.id === emilyFeed.id),
-  //   ).toBeDefined();
-  //   expect(
-  //     allFollowingFeeds.find((f) => f.feed.id === tamaraFeed.id),
-  //   ).toBeDefined();
-  //   expect(
-  //     allFollowingFeeds.find((f) => f.feed.id === janeFeed.id),
-  //   ).toBeDefined();
+    expect(
+      allFollowingFeeds.find((f) => f.feed.id === emilyFeed.id),
+    ).toBeDefined();
+    expect(
+      allFollowingFeeds.find((f) => f.feed.id === tamaraFeed.id),
+    ).toBeDefined();
+    expect(
+      allFollowingFeeds.find((f) => f.feed.id === janeFeed.id),
+    ).toBeDefined();
 
-  //   const firstPageAgain = await markFeed.getFollowedFeeds({
-  //     prev: secondPage.prev,
-  //   });
+    const firstPageAgain = await markFeed.getFollowedFeeds({
+      prev: secondPage.prev,
+    });
 
-  //   expect(firstPageAgain.followed_feeds.length).toBe(2);
-  // });
+    expect(firstPageAgain.followed_feeds.length).toBe(2);
+  });
 
   it(`tamara unfollows the feed, emily now only has 2 followers`, async () => {
     void tamaraFeed.unfollow({
