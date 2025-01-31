@@ -94,12 +94,6 @@ export const Reactions = ({
           {emojiMapping[type]}
         </span>
       </button>
-      <span
-        className={`text-blue-500 material-symbols-outlined ${hasOwnReaction ? 'fill' : ''}`}
-        style={{ fontSize: '22px' }}
-      >
-        {emojiMapping[type]}
-      </span>
       {showCounter && (
         <button onClick={() => openDialog()}>
           <div>

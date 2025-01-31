@@ -14,11 +14,9 @@ import { pageTitle } from '../page-title';
 export const Feed = ({
   feed,
   onNewPost,
-  readOnly,
 }: {
   feed: StreamFlatFeedClient;
   onNewPost: 'show-immediately' | 'show-notification';
-  readOnly: boolean;
 }) => {
   const { showNotification } = useAppNotificationsContext();
   const [activities, setActivities] = useState<StreamActivity[]>([]);
@@ -29,7 +27,6 @@ export const Feed = ({
   const [newPostsNotification, setNewPostsNotification] =
     useState<AppNotificaion>();
   const [ownCapabilities, setOwnCapabilities] = useState<string[]>([]);
-  const [canAddActivity, setCanAddActivity] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = feed.state.subscribeWithSelector(
@@ -70,10 +67,6 @@ export const Feed = ({
 
     return unsubscribe;
   }, [feed]);
-
-  useEffect(() => {
-    setCanAddActivity(!readOnly && ownCapabilities.includes('add-activity'));
-  }, [ownCapabilities]);
 
   useEffect(() => {
     if (onNewPost === 'show-immediately') {

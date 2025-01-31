@@ -138,7 +138,7 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
       const response = await client.queryFeeds({
         limit,
         filter: {
-          feed_group: 'user',
+          feed_group: { $in: types },
         },
         next,
       });

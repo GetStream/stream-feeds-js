@@ -69,8 +69,16 @@ require('dotenv').config();
       user_id: user.id,
     });
 
-    await client.feeds.feed('timeline', user.id).getOrCreate({
+    const timeline = client.feeds.feed('timeline', user.id);
+    await timeline.getOrCreate({
       visibility_level: 'private',
+      user_id: user.id,
+    });
+
+    // user's timeline follows user's post feed
+    await timeline.follow({
+      target_group: 'user',
+      target_id: user.id,
       user_id: user.id,
     });
 

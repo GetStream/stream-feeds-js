@@ -7,11 +7,16 @@ import {
 import {
   AddActivityRequest,
   AddActivityResponse,
+  AddCommentRequest,
+  AddCommentResponse,
   AddReactionToActivityRequest,
   AddReactionToActivityResponse,
+  AddReactionToCommentRequest,
+  AddReactionToCommentResponse,
   DeleteFeedGroupResponse,
   DeleteFeedResponse,
   DeleteReactionFromActivityResponse,
+  DeleteReactionFromCommentResponse,
   FollowRequest,
   FollowResponse,
   GetFeedGroupsResponse,
@@ -32,14 +37,13 @@ import {
   ReadFlatFeedResponse,
   ReadNotificationFeedResponse,
   RemoveActivityFromFeedResponse,
+  RemoveCommentResponse,
   UnfollowRequest,
   UnfollowResponse,
   UpdateActivityRequest,
   UpdateActivityResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
-  UpdateFeedMembersRequest,
-  UpdateFeedMembersResponse,
   UpdateFeedRequest,
   UpdateFeedResponse,
   UpsertFeedGroupRequest,
@@ -104,7 +108,7 @@ export class FeedsApi extends CommonApiWrapper {
       StreamResponse<UpdateCommentResponse>
     >(
       'PATCH',
-      '/api/v2/feeds/activities/{activity_id}/comment/{comment_id}',
+      '/api/v2/feeds/activities/{activity_id}/comments/{comment_id}',
       pathParams,
       undefined,
       body,
@@ -135,6 +139,103 @@ export class FeedsApi extends CommonApiWrapper {
     >('PATCH', '/api/v2/feeds/activities/{id}', pathParams, undefined, body);
 
     decoders.UpdateActivityResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async addComment(
+    request: AddCommentRequest,
+  ): Promise<StreamResponse<AddCommentResponse>> {
+    const body = {
+      text: request?.text,
+      parent_id: request?.parent_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<AddCommentResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/activities/{id}/comments',
+      undefined,
+      undefined,
+      body,
+    );
+
+    decoders.AddCommentResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async removeComment(request: {
+    comment_id: string;
+  }): Promise<StreamResponse<RemoveCommentResponse>> {
+    const pathParams = {
+      comment_id: request?.comment_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<RemoveCommentResponse>
+    >(
+      'DELETE',
+      '/api/v2/feeds/activities/{id}/comments/{comment_id}',
+      pathParams,
+      undefined,
+    );
+
+    decoders.RemoveCommentResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async addReactionToComment(
+    request: AddReactionToCommentRequest & { id: string },
+  ): Promise<StreamResponse<AddReactionToCommentResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      type: request?.type,
+      created_at: request?.created_at,
+      enforce_unique: request?.enforce_unique,
+      score: request?.score,
+      updated_at: request?.updated_at,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<AddReactionToCommentResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/activities/{id}/comments/{comment_id}/reactions',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.AddReactionToCommentResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteReactionFromComment(request: {
+    id: string;
+    type: string;
+  }): Promise<StreamResponse<DeleteReactionFromCommentResponse>> {
+    const pathParams = {
+      id: request?.id,
+      type: request?.type,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteReactionFromCommentResponse>
+    >(
+      'DELETE',
+      '/api/v2/feeds/activities/{id}/comments/{comment_id}/reactions/{type}',
+      pathParams,
+      undefined,
+    );
+
+    decoders.DeleteReactionFromCommentResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -500,33 +601,6 @@ export class FeedsApi extends CommonApiWrapper {
     );
 
     decoders.GetFollowedFeedsResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async updateFeedMembers(
-    request: UpdateFeedMembersRequest & { group: string; id: string },
-  ): Promise<StreamResponse<UpdateFeedMembersResponse>> {
-    const pathParams = {
-      group: request?.group,
-      id: request?.id,
-    };
-    const body = {
-      remove_members: request?.remove_members,
-      update_members: request?.update_members,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<UpdateFeedMembersResponse>
-    >(
-      'POST',
-      '/api/v2/feeds/feeds/{group}/{id}/members',
-      pathParams,
-      undefined,
-      body,
-    );
-
-    decoders.UpdateFeedMembersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

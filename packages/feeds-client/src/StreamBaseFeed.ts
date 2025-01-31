@@ -7,6 +7,12 @@ import {
   ActivityReactionUpdatedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
+  CommentAddedEvent,
+  CommentReactionDeletedEvent,
+  CommentReactionNewEvent,
+  CommentReactionUpdatedEvent,
+  CommentRemovedEvent,
+  CommentUpdatedEvent,
   Feed,
   FollowEvent,
   FollowRequestEvent,
@@ -57,6 +63,40 @@ export abstract class StreamBaseFeed<
         ...event.feed,
         members: this.state.getLatestValue().members ?? [],
       }),
+    'feeds.activity_comment_new': function (
+      event: { type: 'feeds.activity_comment_new' } & CommentAddedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.activity_comment_removed': function (
+      event: { type: 'feeds.activity_comment_removed' } & CommentRemovedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.activity_comment_updated': function (
+      event: { type: 'feeds.activity_comment_updated' } & CommentUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.comment_reaction_deleted': function (
+      event: {
+        type: 'feeds.comment_reaction_deleted';
+      } & CommentReactionDeletedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.comment_reaction_new': function (
+      event: { type: 'feeds.comment_reaction_new' } & CommentReactionNewEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.comment_reaction_updated': function (
+      event: {
+        type: 'feeds.comment_reaction_updated';
+      } & CommentReactionUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
   };
 
   constructor(

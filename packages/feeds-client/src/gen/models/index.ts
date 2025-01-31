@@ -35,6 +35,8 @@ export interface ActionableFollowRequests {
 }
 
 export interface Activity {
+  comment_count: number;
+
   created_at: Date;
 
   id: string;
@@ -170,6 +172,18 @@ export interface AddActivityResponse {
   activity: Activity;
 }
 
+export interface AddCommentRequest {
+  text: string;
+
+  parent_id?: string;
+}
+
+export interface AddCommentResponse {
+  duration: string;
+
+  comment: Comment;
+}
+
 export interface AddReactionToActivityRequest {
   type: string;
 
@@ -188,6 +202,28 @@ export interface AddReactionToActivityResponse {
   duration: string;
 
   activity: Activity;
+
+  reaction: Reaction;
+}
+
+export interface AddReactionToCommentRequest {
+  type: string;
+
+  created_at?: Date;
+
+  enforce_unique?: boolean;
+
+  score?: number;
+
+  updated_at?: Date;
+
+  custom?: Record<string, any>;
+}
+
+export interface AddReactionToCommentResponse {
+  duration: string;
+
+  comment: Comment;
 
   reaction: Reaction;
 }
@@ -517,6 +553,98 @@ export interface Comment {
   pinned_by_id?: string;
 }
 
+export interface CommentAddedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  comment: Comment;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface CommentReactionDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  comment: Comment;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface CommentReactionNewEvent {
+  created_at: Date;
+
+  fid: string;
+
+  comment: Comment;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface CommentReactionUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  comment: Comment;
+
+  custom: Record<string, any>;
+
+  reaction: Reaction;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface CommentRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  comment: Comment;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface CommentUpdatedEvent {
+  activity_id: string;
+
+  created_at: Date;
+
+  fid: string;
+
+  comment: Comment;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+}
+
 export interface ConnectUserDetailsRequest {
   id: string;
 
@@ -569,6 +697,12 @@ export interface DeleteReactionFromActivityResponse {
   duration: string;
 
   activity: Activity;
+
+  reaction: Reaction;
+}
+
+export interface DeleteReactionFromCommentResponse {
+  duration: string;
 
   reaction: Reaction;
 }
@@ -811,6 +945,54 @@ export interface FeedMember {
   user?: UserResponse;
 }
 
+export interface FeedMemberAddedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  feed: Feed;
+
+  member: FeedMember;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface FeedMemberRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  feed: Feed;
+
+  member: FeedMember;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface FeedMemberUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  feed: Feed;
+
+  member: FeedMember;
+
+  type: string;
+
+  received_at?: Date;
+}
+
 export interface Field {
   short: boolean;
 
@@ -831,22 +1013,6 @@ export interface FileUploadConfig {
   blocked_mime_types: string[];
 }
 
-export interface FollowEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  source_feed: Feed;
-
-  target_feed: Feed;
-
-  type: string;
-
-  received_at?: Date;
-}
-
 export interface FollowRelationship {
   created_at: Date;
 
@@ -861,24 +1027,6 @@ export interface FollowRequest {
   target_id: string;
 
   activity_copy_limit?: number;
-}
-
-export interface FollowRequestEvent {
-  created_at: Date;
-
-  fid: string;
-
-  status: string;
-
-  custom: Record<string, any>;
-
-  source_feed: Feed;
-
-  target_feed: Feed;
-
-  type: string;
-
-  received_at?: Date;
 }
 
 export interface FollowResponse {
@@ -1098,28 +1246,108 @@ export interface ListDevicesResponse {
   devices: DeviceResponse[];
 }
 
-export interface MemberRequest {
-  user_id: string;
-
-  role?: string;
-
-  custom?: Record<string, any>;
-}
-
-export interface MemberResponse {
+export interface NotificationFeedMemberAddedEvent {
   created_at: Date;
 
-  updated_at: Date;
+  fid: string;
 
-  user_id: string;
+  custom: Record<string, any>;
 
-  user: UserResponse;
+  feed: Feed;
 
-  deleted_at?: Date;
+  member: FeedMember;
 
-  role?: string;
+  type: string;
 
-  custom?: Record<string, any>;
+  received_at?: Date;
+}
+
+export interface NotificationFeedMemberInvitedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  feed: Feed;
+
+  member: FeedMember;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface NotificationFeedMemberRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  feed: Feed;
+
+  member: FeedMember;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface NotificationFollowEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface NotificationFollowRequestEvent {
+  created_at: Date;
+
+  fid: string;
+
+  status: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface NotificationUnfollowEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  source_feed: Feed;
+
+  target_feed: Feed;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface PagerResponse {
+  next?: string;
+
+  prev?: string;
 }
 
 export interface PrivacySettingsResponse {
@@ -1336,22 +1564,6 @@ export interface UnblockUsersResponse {
   duration: string;
 }
 
-export interface UnfollowEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  source_feed: Feed;
-
-  target_feed: Feed;
-
-  type: string;
-
-  received_at?: Date;
-}
-
 export interface UnfollowRequest {
   target_group: string;
 
@@ -1404,18 +1616,6 @@ export interface UpdateCommentResponse {
   duration: string;
 
   comment: Comment;
-}
-
-export interface UpdateFeedMembersRequest {
-  remove_members?: string[];
-
-  update_members?: MemberRequest[];
-}
-
-export interface UpdateFeedMembersResponse {
-  duration: string;
-
-  members: MemberResponse[];
 }
 
 export interface UpdateFeedRequest {
@@ -1560,13 +1760,35 @@ export interface WSAuthMessage {
 
 export type WSEvent =
   | ({ type: 'feeds.activity_added' } & ActivityAddedEvent)
+  | ({ type: 'feeds.activity_comment_new' } & CommentAddedEvent)
+  | ({ type: 'feeds.activity_comment_removed' } & CommentRemovedEvent)
+  | ({ type: 'feeds.activity_comment_updated' } & CommentUpdatedEvent)
   | ({ type: 'feeds.activity_reaction_deleted' } & ActivityReactionDeletedEvent)
   | ({ type: 'feeds.activity_reaction_new' } & ActivityReactionNewEvent)
   | ({ type: 'feeds.activity_reaction_updated' } & ActivityReactionUpdatedEvent)
   | ({ type: 'feeds.activity_removed' } & ActivityRemovedEvent)
   | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent)
+  | ({ type: 'feeds.comment_reaction_deleted' } & CommentReactionDeletedEvent)
+  | ({ type: 'feeds.comment_reaction_new' } & CommentReactionNewEvent)
+  | ({ type: 'feeds.comment_reaction_updated' } & CommentReactionUpdatedEvent)
   | ({ type: 'feeds.feed_deleted' } & FeedDeletedEvent)
-  | ({ type: 'feeds.follow' } & FollowEvent)
-  | ({ type: 'feeds.follow_request_created' } & FollowRequestEvent)
-  | ({ type: 'feeds.follow_request_updated' } & FollowRequestEvent)
-  | ({ type: 'feeds.unfollow' } & UnfollowEvent);
+  | ({ type: 'feeds.member_added' } & FeedMemberAddedEvent)
+  | ({ type: 'feeds.member_removed' } & FeedMemberRemovedEvent)
+  | ({ type: 'feeds.member_updated' } & FeedMemberUpdatedEvent)
+  | ({ type: 'feeds.notification.follow' } & NotificationFollowEvent)
+  | ({
+      type: 'feeds.notification.follow_request_created';
+    } & NotificationFollowRequestEvent)
+  | ({
+      type: 'feeds.notification.follow_request_updated';
+    } & NotificationFollowRequestEvent)
+  | ({
+      type: 'feeds.notification.member_added';
+    } & NotificationFeedMemberAddedEvent)
+  | ({
+      type: 'feeds.notification.member_invited';
+    } & NotificationFeedMemberInvitedEvent)
+  | ({
+      type: 'feeds.notification.member_removed';
+    } & NotificationFeedMemberRemovedEvent)
+  | ({ type: 'feeds.notification.unfollow' } & NotificationUnfollowEvent);

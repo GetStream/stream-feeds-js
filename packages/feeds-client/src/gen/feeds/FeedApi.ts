@@ -15,8 +15,6 @@ import {
   RemoveActivityFromFeedResponse,
   UnfollowRequest,
   UnfollowResponse,
-  UpdateFeedMembersRequest,
-  UpdateFeedMembersResponse,
   UpdateFeedRequest,
   UpdateFeedResponse,
 } from '../models';
@@ -99,16 +97,6 @@ export class StreamFeedApi {
     filter?: string[];
   }): Promise<StreamResponse<GetFollowedFeedsResponse>> {
     return this.client.getFollowedFeeds({
-      id: this.id,
-      group: this.group,
-      ...request,
-    });
-  }
-
-  updateFeedMembers(
-    request?: UpdateFeedMembersRequest,
-  ): Promise<StreamResponse<UpdateFeedMembersResponse>> {
-    return this.client.updateFeedMembers({
       id: this.id,
       group: this.group,
       ...request,
