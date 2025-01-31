@@ -75,6 +75,15 @@ decoders.Ban = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.BlockListResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.BlockUsersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -219,6 +228,13 @@ decoders.ConfigResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.CreateBlockListResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    blocklist: { type: 'BlockListResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.CreateGuestResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     user: { type: 'UserResponse', isSingle: true },
@@ -333,6 +349,13 @@ decoders.GetBlockedUsersResponse = (input?: Record<string, any>) => {
 decoders.GetConfigResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     config: { type: 'ConfigResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ListBlockListResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    blocklists: { type: 'BlockListResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -647,6 +670,13 @@ decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
 decoders.SubmitActionResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     item: { type: 'ReviewQueueItem', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpdateBlockListResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    blocklist: { type: 'BlockListResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };

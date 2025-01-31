@@ -48,8 +48,11 @@ describe('Feeds API - follow requests', () => {
       target_id: emilyFeed.id,
     });
 
-    await waitForEvent(emilyClient, 'feeds.follow_request_created');
-    await waitForEvent(bobClient, 'feeds.follow_request_created');
+    await waitForEvent(
+      emilyClient,
+      'feeds.notification.follow_request_created',
+    );
+    await waitForEvent(bobClient, 'feeds.notification.follow_request_created');
 
     expect(
       emilyFeed.state.getLatestValue().follow_requests?.pending.length,
@@ -71,7 +74,10 @@ describe('Feeds API - follow requests', () => {
       target_id: emilyFeed.id,
     });
 
-    await waitForEvent(emilyClient, 'feeds.follow_request_created');
+    await waitForEvent(
+      emilyClient,
+      'feeds.notification.follow_request_created',
+    );
 
     expect(
       emilyFeed.state.getLatestValue().follow_requests?.pending.length,
@@ -83,8 +89,8 @@ describe('Feeds API - follow requests', () => {
       accepted_follow_requests: [bobFeed.fid],
     });
 
-    await waitForEvent(emilyClient, 'feeds.follow');
-    await waitForEvent(bobClient, 'feeds.follow');
+    await waitForEvent(emilyClient, 'feeds.notification.follow');
+    await waitForEvent(bobClient, 'feeds.notification.follow');
 
     expect(emilyFeed.state.getLatestValue()?.follower_count).toBe(1);
     expect(
@@ -98,8 +104,14 @@ describe('Feeds API - follow requests', () => {
       rejected_follow_requests: [tamaraFeed.fid],
     });
 
-    await waitForEvent(emilyClient, 'feeds.follow_request_updated');
-    await waitForEvent(tamaraClient, 'feeds.follow_request_updated');
+    await waitForEvent(
+      emilyClient,
+      'feeds.notification.follow_request_updated',
+    );
+    await waitForEvent(
+      tamaraClient,
+      'feeds.notification.follow_request_updated',
+    );
 
     expect(emilyFeed.state.getLatestValue()?.follower_count).toBe(1);
     expect(
@@ -114,8 +126,8 @@ describe('Feeds API - follow requests', () => {
       target_id: emilyFeed.id,
     });
 
-    await waitForEvent(emilyClient, 'feeds.unfollow');
-    await waitForEvent(bobClient, 'feeds.unfollow');
+    await waitForEvent(emilyClient, 'feeds.notification.unfollow');
+    await waitForEvent(bobClient, 'feeds.notification.unfollow');
 
     expect(emilyFeed.state.getLatestValue()?.follower_count).toBe(0);
     expect(bobFeed.state.getLatestValue()?.following_count).toBe(0);

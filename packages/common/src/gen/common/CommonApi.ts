@@ -2,18 +2,23 @@ import { ApiClient, StreamResponse } from '../../gen-imports';
 import {
   BlockUsersRequest,
   BlockUsersResponse,
+  CreateBlockListRequest,
+  CreateBlockListResponse,
   CreateDeviceRequest,
   CreateGuestRequest,
   CreateGuestResponse,
   GetApplicationResponse,
   GetBlockedUsersResponse,
   GetOGResponse,
+  ListBlockListResponse,
   ListDevicesResponse,
   QueryUsersPayload,
   QueryUsersResponse,
   Response,
   UnblockUsersRequest,
   UnblockUsersResponse,
+  UpdateBlockListRequest,
+  UpdateBlockListResponse,
   UpdateUsersPartialRequest,
   UpdateUsersRequest,
   UpdateUsersResponse,
@@ -30,6 +35,84 @@ export class CommonApi {
     >('GET', '/api/v2/app', undefined, undefined);
 
     decoders.GetApplicationResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async listBlockLists(request?: {
+    team?: string;
+  }): Promise<StreamResponse<ListBlockListResponse>> {
+    const queryParams = {
+      team: request?.team,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ListBlockListResponse>
+    >('GET', '/api/v2/blocklists', undefined, queryParams);
+
+    decoders.ListBlockListResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async createBlockList(
+    request: CreateBlockListRequest,
+  ): Promise<StreamResponse<CreateBlockListResponse>> {
+    const body = {
+      name: request?.name,
+      words: request?.words,
+      team: request?.team,
+      type: request?.type,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<CreateBlockListResponse>
+    >('POST', '/api/v2/blocklists', undefined, undefined, body);
+
+    decoders.CreateBlockListResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteBlockList(request: {
+    name: string;
+    team?: string;
+  }): Promise<StreamResponse<Response>> {
+    const queryParams = {
+      team: request?.team,
+    };
+    const pathParams = {
+      name: request?.name,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'DELETE',
+      '/api/v2/blocklists/{name}',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateBlockList(
+    request: UpdateBlockListRequest & { name: string },
+  ): Promise<StreamResponse<UpdateBlockListResponse>> {
+    const pathParams = {
+      name: request?.name,
+    };
+    const body = {
+      team: request?.team,
+      words: request?.words,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateBlockListResponse>
+    >('PUT', '/api/v2/blocklists/{name}', pathParams, undefined, body);
+
+    decoders.UpdateBlockListResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

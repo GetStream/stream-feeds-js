@@ -123,6 +123,8 @@ export interface AppResponseFields {
 
   moderation_enabled: boolean;
 
+  moderation_multitenant_blocklist_enabled: boolean;
+
   name: string;
 
   file_upload_config: FileUploadConfig;
@@ -292,6 +294,22 @@ export interface BlockListOptions {
   blocklist: string;
 }
 
+export interface BlockListResponse {
+  name: string;
+
+  type: string;
+
+  words: string[];
+
+  created_at?: Date;
+
+  id?: string;
+
+  team?: string;
+
+  updated_at?: Date;
+}
+
 export interface BlockListRule {
   action:
     | 'flag'
@@ -302,6 +320,8 @@ export interface BlockListRule {
     | 'bounce_remove';
 
   name: string;
+
+  team: string;
 }
 
 export interface BlockUsersRequest {
@@ -753,6 +773,22 @@ export interface ConnectUserDetailsRequest {
   custom?: Record<string, any>;
 
   privacy_settings?: PrivacySettingsResponse;
+}
+
+export interface CreateBlockListRequest {
+  name: string;
+
+  words: string[];
+
+  team?: string;
+
+  type?: 'regex' | 'domain' | 'email' | 'word';
+}
+
+export interface CreateBlockListResponse {
+  duration: string;
+
+  blocklist?: BlockListResponse;
 }
 
 export interface CreateDeviceRequest {
@@ -1245,6 +1281,12 @@ export interface LabelThresholds {
   block?: number;
 
   flag?: number;
+}
+
+export interface ListBlockListResponse {
+  duration: string;
+
+  blocklists: BlockListResponse[];
 }
 
 export interface ListDevicesResponse {
@@ -1864,6 +1906,8 @@ export interface Response {
 export interface RestoreActionRequest {}
 
 export interface ReviewQueueItem {
+  ai_text_severity: string;
+
   bounce_count: number;
 
   content_changed: boolean;
@@ -1920,6 +1964,8 @@ export interface ReviewQueueItem {
 }
 
 export interface ReviewQueueItemResponse {
+  ai_text_severity: string;
+
   created_at: Date;
 
   entity_id: string;
@@ -2037,6 +2083,18 @@ export interface UnblockUsersRequest {
 
 export interface UnblockUsersResponse {
   duration: string;
+}
+
+export interface UpdateBlockListRequest {
+  team?: string;
+
+  words?: string[];
+}
+
+export interface UpdateBlockListResponse {
+  duration: string;
+
+  blocklist?: BlockListResponse;
 }
 
 export interface UpdateUserPartialRequest {

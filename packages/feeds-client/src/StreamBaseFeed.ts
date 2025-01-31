@@ -8,11 +8,23 @@ import {
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
   Feed,
-  FollowEvent,
-  FollowRequestEvent,
+  NotificationFollowEvent,
+  NotificationFollowRequestEvent,
   GetOrCreateFeedRequest,
-  UnfollowEvent,
+  NotificationUnfollowEvent,
   WSEvent,
+  FeedMemberAddedEvent,
+  FeedMemberRemovedEvent,
+  FeedMemberUpdatedEvent,
+  NotificationFeedMemberAddedEvent,
+  NotificationFeedMemberInvitedEvent,
+  NotificationFeedMemberRemovedEvent,
+  CommentAddedEvent,
+  CommentReactionDeletedEvent,
+  CommentReactionNewEvent,
+  CommentReactionUpdatedEvent,
+  CommentRemovedEvent,
+  CommentUpdatedEvent,
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
 
@@ -46,17 +58,89 @@ export abstract class StreamBaseFeed<
       this.activityReactionUpdated(event),
     'feeds.activity_removed': (event) => this.activityRemoved(event),
     'feeds.activity_updated': (event) => this.activityUpdated(event),
-    'feeds.follow': (event) => this.updateFeedFromFollowEvent(event),
-    'feeds.follow_request_created': (event) =>
+    'feeds.notification.follow': (event) =>
       this.updateFeedFromFollowEvent(event),
-    'feeds.follow_request_updated': (event) =>
+    'feeds.notification.follow_request_created': (event) =>
       this.updateFeedFromFollowEvent(event),
-    'feeds.unfollow': (event) => this.updateFeedFromFollowEvent(event),
+    'feeds.notification.follow_request_updated': (event) =>
+      this.updateFeedFromFollowEvent(event),
+    'feeds.notification.unfollow': (event) =>
+      this.updateFeedFromFollowEvent(event),
     'feeds.feed_deleted': (event) =>
       this.feedUpdated({
         ...event.feed,
         members: this.state.getLatestValue().members ?? [],
       }),
+    'feeds.member_added': function (
+      event: { type: 'feeds.member_added' } & FeedMemberAddedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.member_removed': function (
+      event: { type: 'feeds.member_removed' } & FeedMemberRemovedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.member_updated': function (
+      event: { type: 'feeds.member_updated' } & FeedMemberUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.notification.member_added': function (
+      event: {
+        type: 'feeds.notification.member_added';
+      } & NotificationFeedMemberAddedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.notification.member_invited': function (
+      event: {
+        type: 'feeds.notification.member_invited';
+      } & NotificationFeedMemberInvitedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.notification.member_removed': function (
+      event: {
+        type: 'feeds.notification.member_removed';
+      } & NotificationFeedMemberRemovedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.activity_comment_new': function (
+      event: { type: 'feeds.activity_comment_new' } & CommentAddedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.activity_comment_removed': function (
+      event: { type: 'feeds.activity_comment_removed' } & CommentRemovedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.activity_comment_updated': function (
+      event: { type: 'feeds.activity_comment_updated' } & CommentUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.comment_reaction_deleted': function (
+      event: {
+        type: 'feeds.comment_reaction_deleted';
+      } & CommentReactionDeletedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.comment_reaction_new': function (
+      event: { type: 'feeds.comment_reaction_new' } & CommentReactionNewEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.comment_reaction_updated': function (
+      event: {
+        type: 'feeds.comment_reaction_updated';
+      } & CommentReactionUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
   };
 
   constructor(
@@ -147,7 +231,10 @@ export abstract class StreamBaseFeed<
   ): void;
 
   private updateFeedFromFollowEvent(
-    event: FollowRequestEvent | FollowEvent | UnfollowEvent,
+    event:
+      | NotificationFollowRequestEvent
+      | NotificationFollowEvent
+      | NotificationUnfollowEvent,
   ) {
     const sourceFeed = event.source_feed;
     const targetFeed = event.target_feed;
