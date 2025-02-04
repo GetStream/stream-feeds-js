@@ -31,7 +31,7 @@ export function PaginatedList<T>({
       if (items.length === 0) {
         logError(error);
       } else {
-        logErrorAndDisplayNotification(error, (error as Error).message);
+        logErrorAndDisplayNotification(error, error.message);
       }
     }
   }, [error, items]);
