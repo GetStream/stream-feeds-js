@@ -6,6 +6,7 @@ import { useFeedContext } from '../feed-context';
 import { FollowStatus } from '../types';
 import { useErrorContext } from '../error-context';
 import { FollowStatusButton } from './FollowStatusButton';
+import { FeedMenu } from './FeedMenu';
 
 export const FeedMetadata = ({
   feed,
@@ -113,50 +114,36 @@ export const FeedMetadata = ({
 
   return (
     <>
-      <div className="flex gap-3 items-center">
-        <img
-          className="size-32 rounded-full object-cover"
-          src={
-            feed.group === 'user'
-              ? feed.state.getLatestValue().created_by?.image
-              : feed.state.getLatestValue().custom?.image
-          }
-          alt=""
-        />
-        <div className="flex flex-col gap-1">
-          {feed.group === 'user' && (
-            <div className="text-lg text-gray-900">
-              <b>{feed.state.getLatestValue().created_by?.name}</b>
-            </div>
-          )}
-          {feed.group === 'page' && (
-            <div className="flex flex-col gap-0.5">
+      <div className="flex gap-3">
+        <div className="w-full flex gap-3 items-center">
+          <img
+            className="size-32 rounded-full object-cover"
+            src={
+              feed.group === 'user'
+                ? feed.state.getLatestValue().created_by?.image
+                : feed.state.getLatestValue().custom?.image
+            }
+            alt=""
+          />
+          <div className="flex flex-col gap-1">
+            {feed.group === 'user' && (
               <div className="text-lg text-gray-900">
-                <b>{feed.state.getLatestValue().custom?.name}</b>
+                <b>{feed.state.getLatestValue().created_by?.name}</b>
               </div>
-              <div className="text-md text-gray-900">
-                {feed.state.getLatestValue().custom?.description}
+            )}
+            {feed.group === 'page' && (
+              <div className="flex flex-col gap-0.5">
+                <div className="text-lg text-gray-900">
+                  <b>{feed.state.getLatestValue().custom?.name}</b>
+                </div>
+                <div className="text-md text-gray-900">
+                  {feed.state.getLatestValue().custom?.description}
+                </div>
               </div>
-            </div>
-          )}
-          <div className="text-md flex gap-3">
-            <div className="text-md">
-              {followerCount === undefined && (
-                <LoadingIndicator color="blue"></LoadingIndicator>
-              )}
-              <button
-                className="no-underline hover:underline"
-                onClick={() => {
-                  setSelectedRelationship('followers');
-                  openDialog();
-                }}
-              >
-                {`${followerCount} ${followerCount === 1 ? 'follower' : 'followers'}`}
-              </button>
-            </div>
-            {timeline && (
+            )}
+            <div className="text-md flex gap-3">
               <div className="text-md">
-                {followingCount === undefined && (
+                {followerCount === undefined && (
                   <LoadingIndicator color="blue"></LoadingIndicator>
                 )}
                 <button
@@ -166,29 +153,46 @@ export const FeedMetadata = ({
                     openDialog();
                   }}
                 >
-                  {`${followingCount} following`}
+                  {`${followerCount} ${followerCount === 1 ? 'follower' : 'followers'}`}
                 </button>
               </div>
+              {timeline && (
+                <div className="text-md">
+                  {followingCount === undefined && (
+                    <LoadingIndicator color="blue"></LoadingIndicator>
+                  )}
+                  <button
+                    className="no-underline hover:underline"
+                    onClick={() => {
+                      setSelectedRelationship('followers');
+                      openDialog();
+                    }}
+                  >
+                    {`${followingCount} following`}
+                  </button>
+                </div>
+              )}
+            </div>
+            {followStatus && (
+              <FollowStatusButton
+                feed={feed}
+                status={followStatus}
+                onStatusChange={(newStatus) => {
+                  if (newStatus === 'following') {
+                    setFollowerCount((followerCount ?? 0) + 1);
+                  } else if (
+                    followStatus === 'following' &&
+                    newStatus === 'not-followed'
+                  ) {
+                    setFollowerCount((followerCount ?? 0) - 1);
+                  }
+                  setFollowStatus(newStatus);
+                }}
+              ></FollowStatusButton>
             )}
           </div>
-          {followStatus && (
-            <FollowStatusButton
-              feed={feed}
-              status={followStatus}
-              onStatusChange={(newStatus) => {
-                if (newStatus === 'following') {
-                  setFollowerCount((followerCount ?? 0) + 1);
-                } else if (
-                  followStatus === 'following' &&
-                  newStatus === 'not-followed'
-                ) {
-                  setFollowerCount((followerCount ?? 0) - 1);
-                }
-                setFollowStatus(newStatus);
-              }}
-            ></FollowStatusButton>
-          )}
         </div>
+        <FeedMenu feed={feed}></FeedMenu>
       </div>
       <dialog
         className={`w-6/12 h-3/6 rounded-lg p-6 bg-white shadow-lg flex flex-col ${isDialogOpen ? '' : 'hidden'}`}

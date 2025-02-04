@@ -10,11 +10,17 @@ type FollowStatus = 'following' | 'invited' | 'needs-invite';
 
 type FeedFollowerMapping = Record<FeedCid, FollowStatus>;
 
-export const Invite = ({ feed }: { feed: StreamFeedClient }) => {
+export const Invite = ({
+  feed,
+  open,
+  onOpenChange,
+}: {
+  feed: StreamFeedClient;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => {
   const { logError, logErrorAndDisplayNotification } = useErrorContext();
-  const [canInvite, setCanInvite] = useState(false);
   const [error, setError] = useState<Error>();
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { client, user } = useUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -25,38 +31,24 @@ export const Invite = ({ feed }: { feed: StreamFeedClient }) => {
   );
 
   useEffect(() => {
-    if (!user) {
-      setCanInvite(false);
-      return;
-    }
-    const unsubscribe = feed.state.subscribeWithSelector(
-      (state) => ({
-        visibility_level: state.visibility_level,
-        created_by: state.created_by,
-      }),
-      ({ visibility_level, created_by }) => {
-        setCanInvite(
-          visibility_level === 'private' && created_by?.id === user.id,
-        );
-      },
-    );
-
-    return unsubscribe;
-  }, [feed, user]);
-
-  const openDialog = () => {
-    if (dialogRef.current) {
+    if (open && dialogRef.current) {
       dialogRef.current.showModal();
-      setIsDialogOpen(true);
     }
-  };
+  }, [open]);
 
   const closeDialog = () => {
     if (dialogRef.current) {
       dialogRef.current.close();
-      setIsDialogOpen(false);
+      setFeeds([]);
+      onOpenChange(false);
     }
   };
+
+  useEffect(() => {
+    if (open && feeds.length === 0) {
+      void loadMore();
+    }
+  }, [open]);
 
   const invite = async (timelineFeed: StreamFeedClient) => {
     try {
@@ -87,12 +79,6 @@ export const Invite = ({ feed }: { feed: StreamFeedClient }) => {
     setNext(undefined);
     setFollowerMapping({});
   }, [feed]);
-
-  useEffect(() => {
-    if (isDialogOpen && feeds.length === 0) {
-      void loadMore();
-    }
-  }, [isDialogOpen]);
 
   const loadMore = async () => {
     if (!client || !user || !feed) {
@@ -174,37 +160,27 @@ export const Invite = ({ feed }: { feed: StreamFeedClient }) => {
   };
 
   return (
-    <>
-      {canInvite && (
-        <button
-          onClick={() => openDialog()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md  hover:bg-blue-700 focus:outline-none"
-        >
-          Invite followers
-        </button>
+    <dialog
+      className={`w-6/12 h-3/6 rounded-lg p-6 bg-white shadow-lg flex flex-col ${open ? '' : 'hidden'}`}
+      ref={dialogRef}
+    >
+      <button className="self-end" onClick={() => closeDialog()}>
+        <span className="material-symbols-outlined">close</span>
+      </button>
+      {open && (
+        <div>
+          <h2 className="text-4xl font-extrabold text-center">Users</h2>
+          <PaginatedList
+            items={feeds}
+            isLoading={isLoading}
+            hasNext={!!next}
+            renderItem={renderItem}
+            onLoadMore={loadMore}
+            error={error}
+            itemsName="users"
+          ></PaginatedList>
+        </div>
       )}
-      <dialog
-        className={`w-6/12 h-3/6 rounded-lg p-6 bg-white shadow-lg flex flex-col ${isDialogOpen ? '' : 'hidden'}`}
-        ref={dialogRef}
-      >
-        <button className="self-end" onClick={() => closeDialog()}>
-          <span className="material-symbols-outlined">close</span>
-        </button>
-        {isDialogOpen && (
-          <div>
-            <h2 className="text-4xl font-extrabold text-center">Users</h2>
-            <PaginatedList
-              items={feeds}
-              isLoading={isLoading}
-              hasNext={!!next}
-              renderItem={renderItem}
-              onLoadMore={loadMore}
-              error={error}
-              itemsName="users"
-            ></PaginatedList>
-          </div>
-        )}
-      </dialog>
-    </>
+    </dialog>
   );
 };
