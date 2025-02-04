@@ -1,6 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { StreamFeedsClient } from '../src/StreamFeedsClient';
-import { createTestClient, createTestTokenGenerator } from './utils';
+import {
+  createTestClient,
+  createTestTokenGenerator,
+  waitForEvent,
+} from './utils';
 import { v4 as uuidv4 } from 'uuid';
 import { StreamFlatFeedClient } from '../src/StreamFlatFeedClient';
 
@@ -26,56 +30,65 @@ describe('Feeds API - invites', () => {
 
   it('emily creates a feed', async () => {
     emilyFeed = emilyClient.feed('user', uuidv4());
-    const response = await emilyFeed.getOrCreate();
+    const response = await emilyFeed.getOrCreate({ watch: true });
 
     expect(response.feed.id).toBe(emilyFeed.id);
     expect(response.feed.visibility_level).toBe('visible');
   });
 
   it('emily invites tamara and bob', async () => {
-    const response = await emilyFeed.update({
+    void emilyFeed.update({
       invites: [
         { user_id: bob.id, role: 'feed_member' },
         { user_id: tamara.id },
       ],
     });
 
-    expect(response.feed.invites.length).toBe(2);
+    await waitForEvent(emilyClient, 'feeds.member_added');
+    await waitForEvent(emilyClient, 'feeds.member_added');
+
+    expect(emilyFeed.state.getLatestValue().members?.length).toBe(2);
+    expect(emilyFeed.state.getLatestValue().members?.[0].invited).toBe(true);
+    expect(emilyFeed.state.getLatestValue().members?.[0].status).toBe(
+      'pending',
+    );
+    expect(emilyFeed.state.getLatestValue().invites?.length).toBe(2);
   });
 
   it('bob accepts the invite', async () => {
     bobFeed = bobClient.feed(emilyFeed.group, emilyFeed.id);
-    await bobFeed.getOrCreate();
+    await bobFeed.getOrCreate({ watch: true });
 
-    const response = await bobFeed.update({
+    void bobFeed.update({
       accept_invite: true,
     });
 
-    expect(
-      response.feed.members.find((m) => m.user_id === bob.id),
-    ).toBeDefined();
+    await waitForEvent(bobClient, 'feeds.member_updated');
+    await waitForEvent(emilyClient, 'feeds.member_updated');
+
+    const bobMember = bobFeed.state
+      .getLatestValue()
+      .members?.find((m) => m.user_id === bob.id);
+
+    expect(bobMember?.status).toBe('member');
+    expect(emilyFeed.state.getLatestValue().invites?.length).toBe(1);
   });
 
   it('tamara rejects the invite', async () => {
     tamaraFeed = tamaraClient.feed(emilyFeed.group, emilyFeed.id);
-    await tamaraFeed.getOrCreate();
+    await tamaraFeed.getOrCreate({ watch: true });
 
-    const response = await tamaraFeed.update({
+    void tamaraFeed.update({
       reject_invite: true,
     });
 
-    expect(
-      response.feed.members.find((m) => m.user_id === tamara.id),
-    ).toBeUndefined();
-  });
+    await waitForEvent(tamaraClient, 'feeds.member_updated');
 
-  it('there are no pedning invites', async () => {
-    const respone = await emilyFeed.getOrCreate();
-
-    expect(respone.feed.members.length).toBe(1);
-
-    expect(respone.feed.invites.length).toBe(1);
-    expect(respone.feed.invites[0].status).toBe('rejected');
+    expect(tamaraFeed.state.getLatestValue().members?.length).toBe(1);
+    expect(tamaraFeed.state.getLatestValue().invites?.length).toBe(1);
+    expect(tamaraFeed.state.getLatestValue().invites?.[0].status).toBe(
+      'rejected',
+    );
   });
 
   afterAll(async () => {

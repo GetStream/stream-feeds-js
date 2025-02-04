@@ -2,7 +2,7 @@ import {
   addActivitiesToState,
   removeActivityFromState,
   updateActivityInState,
-} from './activity-utils';
+} from './state-updates/activity-utils';
 import {
   Activity,
   ActivityAddedEvent,
@@ -18,7 +18,7 @@ import {
   addReactionToActivity,
   deleteReactionFromActivity,
   updateReactionOfActivity,
-} from './reaction-utils';
+} from './state-updates/reaction-utils';
 import { StreamBaseFeed, StreamBaseFeedState } from './StreamBaseFeed';
 import { UpdateStateResult } from './types-internal';
 
@@ -86,7 +86,7 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
     this.state.partialNext({ is_loading_next_page: state });
   }
 
-  protected feedUpdated(feed: Feed): void {
+  protected feedUpdated(feed: Partial<Feed>): void {
     this.state.partialNext(feed);
   }
 

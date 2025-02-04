@@ -7,26 +7,19 @@ import {
   ActivityReactionUpdatedEvent,
   ActivityRemovedEvent,
   ActivityUpdatedEvent,
-  CommentAddedEvent,
-  CommentReactionDeletedEvent,
-  CommentReactionNewEvent,
-  CommentReactionUpdatedEvent,
-  CommentRemovedEvent,
-  CommentUpdatedEvent,
   Feed,
   NotificationFollowEvent,
   NotificationFollowRequestEvent,
   GetOrCreateFeedRequest,
   NotificationUnfollowEvent,
   WSEvent,
-  FeedMemberAddedEvent,
-  FeedMemberRemovedEvent,
-  FeedMemberUpdatedEvent,
-  NotificationFeedMemberAddedEvent,
-  NotificationFeedMemberInvitedEvent,
-  NotificationFeedMemberRemovedEvent,
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
+import {
+  addMemberToState,
+  removeMemberFromState,
+  updateMemberInState,
+} from './state-updates/member-utils';
 
 export type StreamBaseFeedState = Partial<Feed> & {
   offset: number;
@@ -47,7 +40,7 @@ export abstract class StreamBaseFeed<
     new EventDispatcher<WSEvent['type'], WSEvent>();
 
   private readonly eventHandlers: {
-    [key in WSEvent['type']]: (event: Extract<WSEvent, { type: key }>) => void;
+    [key in WSEvent['type']]: (event: WSEvent & { type: key }) => void;
   } = {
     'feeds.activity_added': (event) => this.newActivityReceived(event),
     'feeds.activity_reaction_deleted': (event) =>
@@ -71,74 +64,55 @@ export abstract class StreamBaseFeed<
         ...event.feed,
         members: this.state.getLatestValue().members ?? [],
       }),
-    'feeds.member_added': function (
-      event: { type: 'feeds.member_added' } & FeedMemberAddedEvent,
-    ): void {
+    'feeds.member_added': (event) => {
+      const result = addMemberToState(
+        event.member,
+        this.state.getLatestValue().members ?? [],
+        this.state.getLatestValue().invites ?? [],
+      );
+      if (result.changed) {
+        this.feedUpdated({ members: result.members, invites: result.invites });
+      }
+    },
+    'feeds.member_removed': (event) => {
+      const result = removeMemberFromState(
+        event.member,
+        this.state.getLatestValue().members ?? [],
+      );
+      if (result.changed) {
+        this.feedUpdated({ members: result.members });
+      }
+    },
+    'feeds.member_updated': (event) => {
+      const result = updateMemberInState(
+        event.member,
+        this.state.getLatestValue().members ?? [],
+        this.state.getLatestValue().invites ?? [],
+      );
+      if (result.changed) {
+        this.feedUpdated({ members: result.members, invites: result.invites });
+      }
+    },
+    // Integrators should handle notification.member* events
+    'feeds.notification.member_added': (_) => {},
+    'feeds.notification.member_invited': (_) => {},
+    'feeds.notification.member_removed': (_) => {},
+    'feeds.activity_comment_new': function (_): void {
       throw new Error('Function not implemented.');
     },
-    'feeds.member_removed': function (
-      event: { type: 'feeds.member_removed' } & FeedMemberRemovedEvent,
-    ): void {
+    'feeds.activity_comment_removed': function (_): void {
       throw new Error('Function not implemented.');
     },
-    'feeds.member_updated': function (
-      event: { type: 'feeds.member_updated' } & FeedMemberUpdatedEvent,
-    ): void {
+    'feeds.activity_comment_updated': function (_): void {
       throw new Error('Function not implemented.');
     },
-    'feeds.notification.member_added': function (
-      event: {
-        type: 'feeds.notification.member_added';
-      } & NotificationFeedMemberAddedEvent,
-    ): void {
+    'feeds.comment_reaction_deleted': function (_): void {
       throw new Error('Function not implemented.');
     },
-    'feeds.notification.member_invited': function (
-      event: {
-        type: 'feeds.notification.member_invited';
-      } & NotificationFeedMemberInvitedEvent,
-    ): void {
+    'feeds.comment_reaction_new': function (_): void {
       throw new Error('Function not implemented.');
     },
-    'feeds.notification.member_removed': function (
-      event: {
-        type: 'feeds.notification.member_removed';
-      } & NotificationFeedMemberRemovedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'feeds.activity_comment_new': function (
-      event: { type: 'feeds.activity_comment_new' } & CommentAddedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'feeds.activity_comment_removed': function (
-      event: { type: 'feeds.activity_comment_removed' } & CommentRemovedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'feeds.activity_comment_updated': function (
-      event: { type: 'feeds.activity_comment_updated' } & CommentUpdatedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'feeds.comment_reaction_deleted': function (
-      event: {
-        type: 'feeds.comment_reaction_deleted';
-      } & CommentReactionDeletedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'feeds.comment_reaction_new': function (
-      event: { type: 'feeds.comment_reaction_new' } & CommentReactionNewEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'feeds.comment_reaction_updated': function (
-      event: {
-        type: 'feeds.comment_reaction_updated';
-      } & CommentReactionUpdatedEvent,
-    ): void {
+    'feeds.comment_reaction_updated': function (_): void {
       throw new Error('Function not implemented.');
     },
   };
@@ -196,7 +170,7 @@ export abstract class StreamBaseFeed<
    * @param event
    */
   handleWSEvent(event: WSEvent) {
-    // @ts-expect-error TODO solve this
+    // @ts-expect-error TODO: why?
     this.eventHandlers[event.type](event);
     this.eventDispatcher.dispatch(event);
   }
@@ -210,7 +184,7 @@ export abstract class StreamBaseFeed<
 
   protected abstract setLoadingState(state: boolean): void;
 
-  protected abstract feedUpdated(feed: Feed): void;
+  protected abstract feedUpdated(feed: Partial<Feed>): void;
 
   protected abstract newActivityReceived(event: ActivityAddedEvent): void;
 
@@ -241,12 +215,16 @@ export abstract class StreamBaseFeed<
     if (`${sourceFeed.group}:${sourceFeed.id}` === this.fid) {
       this.feedUpdated({
         ...sourceFeed,
-        members: this.state.getLatestValue().members ?? [],
+        members: this.state.getLatestValue().members,
+        invites: this.state.getLatestValue().invites,
+        own_capabilities: this.state.getLatestValue().own_capabilities,
       });
     } else if (`${targetFeed.group}:${targetFeed.id}` === this.fid) {
       this.feedUpdated({
         ...targetFeed,
-        members: this.state.getLatestValue().members ?? [],
+        members: this.state.getLatestValue().members,
+        invites: this.state.getLatestValue().invites,
+        own_capabilities: this.state.getLatestValue().own_capabilities,
       });
     }
   }

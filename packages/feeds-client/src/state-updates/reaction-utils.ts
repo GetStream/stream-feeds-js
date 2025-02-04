@@ -3,7 +3,7 @@ import {
   ActivityReactionNewEvent,
   ActivityReactionUpdatedEvent,
   Reaction,
-} from './gen/models';
+} from '../gen/models';
 
 export const addReactionToActivity = (
   activities: Activity[],

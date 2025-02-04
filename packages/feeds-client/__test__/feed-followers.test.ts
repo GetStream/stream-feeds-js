@@ -30,7 +30,7 @@ describe('Feed followers', () => {
     janeClient = createTestClient();
     await janeClient.connectUser(jane, createTestTokenGenerator(jane));
     markClient = createTestClient();
-    await markClient.connectUser(jane, createTestTokenGenerator(jane));
+    await markClient.connectUser(mark, createTestTokenGenerator(mark));
   });
 
   it('emily creates a feed', async () => {

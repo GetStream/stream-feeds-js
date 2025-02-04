@@ -1,4 +1,4 @@
-import { Activity } from './gen/models';
+import { Activity } from '../gen/models';
 
 export const addActivitiesToState = (
   newActivities: Activity[],
