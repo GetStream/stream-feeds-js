@@ -49,10 +49,7 @@ export const Reactions = ({
         }),
       }).catch((err) => logError(err));
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to add reaction, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 
@@ -60,10 +57,7 @@ export const Reactions = ({
     try {
       await client?.deleteReactionFromActivity({ type, id: activity.id });
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to remove reaction, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 

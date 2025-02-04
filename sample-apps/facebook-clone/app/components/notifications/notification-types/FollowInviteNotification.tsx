@@ -45,10 +45,7 @@ export const FollowInviteNotification = ({
         ?.read({ limit: 30, offset: 0 })
         .catch((err) => logError(err));
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to accept follow request, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 

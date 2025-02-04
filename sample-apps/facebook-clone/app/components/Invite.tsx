@@ -77,10 +77,7 @@ export const Invite = ({ feed }: { feed: StreamFeedClient }) => {
         }),
       }).catch((err) => logError(err));
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to send invite to ${timelineFeed.state.getLatestValue().created_by?.name}, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 

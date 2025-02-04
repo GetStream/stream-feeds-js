@@ -37,10 +37,7 @@ export default function ProfilePage() {
           });
         })
         .catch((error) => {
-          logErrorAndDisplayNotification(
-            error,
-            `Couldn't load data, this could've been a temproray issue, please retry`,
-          );
+          logErrorAndDisplayNotification(error, (error as Error).message);
         });
     }
   }, [params.id, client]);

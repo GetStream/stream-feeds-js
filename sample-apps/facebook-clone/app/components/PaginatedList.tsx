@@ -31,10 +31,7 @@ export function PaginatedList<T>({
       if (items.length === 0) {
         logError(error);
       } else {
-        logErrorAndDisplayNotification(
-          error,
-          `Failed to load next page of ${itemsName}. It could've been a temporary issue, try again.`,
-        );
+        logErrorAndDisplayNotification(error, (error as Error).message);
       }
     }
   }, [error, items]);

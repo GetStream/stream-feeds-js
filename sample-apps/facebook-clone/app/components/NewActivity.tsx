@@ -33,10 +33,7 @@ export const NewActivity = ({ feed }: { feed: StreamFlatFeedClient }) => {
       });
       setActivityText('');
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to send post, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     } finally {
       setIsSending(false);
     }

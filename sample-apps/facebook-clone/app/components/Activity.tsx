@@ -45,10 +45,7 @@ export const Activity = ({
       });
       setIsEditing(false);
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to update post, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 
@@ -62,10 +59,7 @@ export const Activity = ({
       });
       setIsMenuOpen(false);
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to delete post, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 

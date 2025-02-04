@@ -44,10 +44,7 @@ export const FollowStatusButton = ({
           : 'following',
       );
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to follow, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 
@@ -63,10 +60,7 @@ export const FollowStatusButton = ({
         .catch((err) => logError(err));
       onStatusChange('not-followed');
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to unfollow, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 
@@ -77,10 +71,7 @@ export const FollowStatusButton = ({
       });
       onStatusChange('not-followed');
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to cancel follow request for ${feed.state.getLatestValue().created_by?.name}, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 

@@ -43,10 +43,7 @@ export const FollowRequestNotification = ({
       await ownFeed?.getOrCreate().catch((err) => logError(err));
       onMarkRead();
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to accept invitation, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 
@@ -59,10 +56,7 @@ export const FollowRequestNotification = ({
       onMarkRead();
       await ownFeed?.getOrCreate();
     } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to decline invitation, this could've been a temporary issue, try again`,
-      );
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 
