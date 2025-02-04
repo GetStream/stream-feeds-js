@@ -175,13 +175,16 @@ export const FeedMetadata = ({
             <FollowStatusButton
               feed={feed}
               status={followStatus}
-              onStatusChange={(s) => {
-                if (s === 'following') {
+              onStatusChange={(newStatus) => {
+                if (newStatus === 'following') {
                   setFollowerCount((followerCount ?? 0) + 1);
-                } else if (s === 'not-followed') {
+                } else if (
+                  followStatus === 'following' &&
+                  newStatus === 'not-followed'
+                ) {
                   setFollowerCount((followerCount ?? 0) - 1);
                 }
-                setFollowStatus(s);
+                setFollowStatus(newStatus);
               }}
             ></FollowStatusButton>
           )}
