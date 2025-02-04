@@ -29,6 +29,15 @@ export const Feed = ({
   const [ownCapabilities, setOwnCapabilities] = useState<string[]>([]);
 
   useEffect(() => {
+    if (
+      !feed.state.getLatestValue().activities &&
+      ownCapabilities.includes('read-feed')
+    ) {
+      void feed.read({ limit: 30, offset: 0 });
+    }
+  }, [feed, ownCapabilities]);
+
+  useEffect(() => {
     const unsubscribe = feed.state.subscribeWithSelector(
       (state) => ({
         activities: state.activities,
@@ -147,6 +156,10 @@ export const Feed = ({
       </li>
     );
   };
+
+  if (!ownCapabilities.includes('read-feed')) {
+    return `You need to be a follower to see posts`;
+  }
 
   return (
     <PaginatedList

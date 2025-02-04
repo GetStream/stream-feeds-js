@@ -30,14 +30,14 @@ export function Header() {
                 className={`absolute z-50 rounded-md right-0 mt-2 w-48 bg-white shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
               >
                 <Link
-                  href="/home"
+                  href="/timeline"
                   className="block px-4 py-2 text-gray-800 rounded-md hover:bg-gray-100"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Home
+                  Timeline
                 </Link>
                 <Link
-                  href="/my-feed"
+                  href={'/users/' + user.id}
                   className="block px-4 py-2 text-gray-800 rounded-md hover:bg-gray-100"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -66,7 +66,7 @@ export function Header() {
                 <NotificationBell></NotificationBell>
               </li>
               <li className="mr-3">
-                <Link href="/profile">
+                <Link href={'/users/' + user.id}>
                   <img
                     className="size-8 rounded-full"
                     src={user.image}

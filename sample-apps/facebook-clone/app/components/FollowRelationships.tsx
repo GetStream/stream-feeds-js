@@ -1,7 +1,4 @@
-import {
-  FollowRelationship,
-  StreamFlatFeedClient,
-} from '@stream-io/feeds-client';
+import { FollowRelationship, StreamFeedClient } from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
 
@@ -11,8 +8,8 @@ export const FollowRelationships = ({
   timeline,
 }: {
   type: 'followers' | 'following';
-  feed: StreamFlatFeedClient;
-  timeline: StreamFlatFeedClient;
+  feed: StreamFeedClient;
+  timeline?: StreamFeedClient;
 }) => {
   const [relationships, setRelationships] = useState<FollowRelationship[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -33,16 +30,21 @@ export const FollowRelationships = ({
         const offset = (next as number) ?? 0;
         const response = await feed.getFollowingFeeds({ limit, offset });
         newRelationships = response.followers.filter(
-          (f) => `${f.feed.group}:${f.feed.id}` !== timeline.fid,
+          (f) => f.feed.fid !== timeline?.fid,
         );
         setNext(newRelationships.length < limit ? undefined : offset + limit);
       } else if (type === 'following') {
+        if (!timeline) {
+          throw new Error(
+            'Provide timeline if you want to list following relationships',
+          );
+        }
         const response = await timeline.getFollowedFeeds({
           limit,
           next: next as string | undefined,
         });
         newRelationships = response.followed_feeds.filter(
-          (f) => `${f.feed.group}:${f.feed.id}` !== feed.fid,
+          (f) => f.feed.fid !== feed.fid,
         );
         setNext(response.next);
       }
@@ -59,6 +61,8 @@ export const FollowRelationships = ({
       case 'page':
         return renderPage(relationship);
       case 'user':
+        return renderUser(relationship);
+      case 'timeline':
         return renderUser(relationship);
       default:
         throw new Error('Not supported feed in feed list');

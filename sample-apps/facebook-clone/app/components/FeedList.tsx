@@ -5,21 +5,12 @@ import { useFeedContext } from '../feed-context';
 import { StreamFeedClient } from '@stream-io/feeds-client';
 import Link from 'next/link';
 import { PaginatedList } from '../components/PaginatedList';
-import { useErrorContext } from '../error-context';
-
-type FeedCid = string;
-
-type FollowStatus =
-  | 'following'
-  | 'follow-request-sent'
-  | 'invited'
-  | 'needs-invite'
-  | 'not-followed';
+import { FollowStatusButton } from './FollowStatusButton';
+import { FeedCid, FollowStatus } from '../types';
 
 type FeedFollowerMapping = Record<FeedCid, FollowStatus>;
 
 export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
-  const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const { client, user } = useUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error>();
@@ -54,79 +45,6 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
     void loadMore();
   }, [client, user, ownTimeline]);
 
-  const follow = async (feed: StreamFeedClient) => {
-    const visibilityLevel = feed.state.getLatestValue().visibility_level;
-    try {
-      const followResponse = await ownTimeline?.follow({
-        target_group: feed.group,
-        target_id: feed.id,
-      });
-      fetch('/api/send-notification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          targetUserId: feed.id,
-          verb: visibilityLevel === 'visible' ? 'follow' : `follow-request`,
-          objectId: feed.fid,
-        }),
-      }).catch((err) => logError(err));
-      // Reinit state to include activities from newly followed user
-      await ownTimeline
-        ?.read({ limit: 30, offset: 0 })
-        .catch((err) => logError(err));
-      setFollowerMapping({
-        ...followerMapping,
-        [feed.fid]:
-          followResponse?.follow_request_status === 'pending'
-            ? 'follow-request-sent'
-            : 'following',
-      });
-    } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to follow, this could've been a temporary issue, try again`,
-      );
-    }
-  };
-
-  const unfollow = async (feed: StreamFeedClient) => {
-    try {
-      await ownTimeline?.unfollow({
-        target_group: feed.group,
-        target_id: feed.id,
-      });
-      // Reinit state to exclude activities from newly unfollowed user
-      await ownTimeline
-        ?.read({ limit: 30, offset: 0 })
-        .catch((err) => logError(err));
-      setFollowerMapping({ ...followerMapping, [feed.fid]: 'not-followed' });
-    } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to unfollow, this could've been a temporary issue, try again`,
-      );
-    }
-  };
-
-  const cancelFollowRequest = async (feed: StreamFeedClient) => {
-    try {
-      await ownTimeline?.update({
-        cancelled_pending_follow_requests: [feed.fid],
-      });
-      setFollowerMapping({
-        ...followerMapping,
-        [feed.fid]: 'not-followed',
-      });
-    } catch (error) {
-      logErrorAndDisplayNotification(
-        error as Error,
-        `Failed to cancel follow request for ${feed.state.getLatestValue().created_by?.name}, this could've been a temporary issue, try again`,
-      );
-    }
-  };
-
   const loadMore = async () => {
     if (!client || !user || !ownTimeline) {
       return;
@@ -151,7 +69,7 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
       ).followed_feeds.map((r) => r.feed);
       newFeeds.forEach((feed) => {
         followerMapping[feed.fid] = followedNewFeeds.find(
-          (f) => `${f.group}:${f.id}` === feed.fid,
+          (f) => f.fid === feed.fid,
         )
           ? 'following'
           : 'not-followed';
@@ -192,53 +110,25 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
         key={feed.id}
         className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
       >
-        <div className="flex flex-row items-center gap-1">
-          <img
-            className="size-10 rounded-full"
-            src={feed.state.getLatestValue().created_by?.image}
-            alt=""
-          />
-          <p className="text-sm font-medium text-gray-900">
-            {feed.state.getLatestValue().created_by?.name}
-          </p>
-        </div>
-        {followerMapping[feed.fid] === 'follow-request-sent' && (
-          <div className="flex items-center gap-3">
-            <div>Follow request is waiting for approval</div>
-            <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-              onClick={() => cancelFollowRequest(feed)}
-            >
-              Cancel request
-            </button>
+        <Link href={'/users/' + feed.id}>
+          <div className="flex flex-row items-center gap-1">
+            <img
+              className="size-10 rounded-full"
+              src={feed.state.getLatestValue().created_by?.image}
+              alt=""
+            />
+            <p className="text-sm font-medium text-gray-900">
+              {feed.state.getLatestValue().created_by?.name}
+            </p>
           </div>
-        )}
-        {followerMapping[feed.fid] === 'needs-invite' &&
-          'You need an invite to follow'}
-        {followerMapping[feed.fid] === 'invited' && (
-          <Link
-            href="/my-notifications"
-            className="text-blue-500 underline hover:no-underline"
-          >
-            Accept your invite to follow
-          </Link>
-        )}
-        {followerMapping[feed.fid] === 'following' && (
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            onClick={() => unfollow(feed)}
-          >
-            Unfollow
-          </button>
-        )}
-        {followerMapping[feed.fid] === 'not-followed' && (
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            onClick={() => follow(feed)}
-          >
-            Follow
-          </button>
-        )}
+        </Link>
+        <FollowStatusButton
+          feed={feed}
+          status={followerMapping[feed.fid]}
+          onStatusChange={(s) =>
+            setFollowerMapping({ ...followerMapping, [feed.fid]: s })
+          }
+        ></FollowStatusButton>
       </li>
     );
   };
@@ -249,49 +139,30 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
         key={feed.id}
         className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
       >
-        <div className="flex flex-row items-center gap-3">
-          <img
-            className="size-20 rounded-full object-cover"
-            src={feed.state.getLatestValue()?.custom?.image}
-            alt=""
-          />
-          <div className="flex flex-col gap-3">
-            <p className="text-md font-medium text-gray-900">
-              <b>{feed.state.getLatestValue().custom?.name}</b>
-            </p>
-            <p className="text-sm font-medium text-gray-900">
-              {feed.state.getLatestValue().custom?.description}
-            </p>
+        <Link href={'/pages/' + feed.id}>
+          <div className="flex flex-row items-center gap-3">
+            <img
+              className="size-20 rounded-full object-cover"
+              src={feed.state.getLatestValue()?.custom?.image}
+              alt=""
+            />
+            <div className="flex flex-col gap-3">
+              <p className="text-md font-medium text-gray-900">
+                <b>{feed.state.getLatestValue().custom?.name}</b>
+              </p>
+              <p className="text-sm font-medium text-gray-900">
+                {feed.state.getLatestValue().custom?.description}
+              </p>
+            </div>
           </div>
-        </div>
-        {followerMapping[feed.fid] === 'follow-request-sent' &&
-          'Follow request is waiting for approval'}
-        {followerMapping[feed.fid] === 'needs-invite' &&
-          'You need an invite to follow'}
-        {followerMapping[feed.fid] === 'invited' && (
-          <Link
-            href="/my-notifications"
-            className="text-blue-500 underline hover:no-underline"
-          >
-            Accept your invite to follow
-          </Link>
-        )}
-        {followerMapping[feed.fid] === 'following' && (
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            onClick={() => unfollow(feed)}
-          >
-            Unfollow
-          </button>
-        )}
-        {followerMapping[feed.fid] === 'not-followed' && (
-          <button
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            onClick={() => follow(feed)}
-          >
-            Follow
-          </button>
-        )}
+        </Link>
+        <FollowStatusButton
+          feed={feed}
+          status={followerMapping[feed.fid]}
+          onStatusChange={(s) =>
+            setFollowerMapping({ ...followerMapping, [feed.fid]: s })
+          }
+        ></FollowStatusButton>
       </li>
     );
   };

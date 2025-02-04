@@ -4,6 +4,7 @@ import { useUserContext } from '../user-context';
 import { useEffect, useState } from 'react';
 import { useErrorContext } from '../error-context';
 import { ActivityComposer } from './ActivityComposer';
+import Link from 'next/link';
 
 export const Activity = ({
   activity,
@@ -78,13 +79,17 @@ export const Activity = ({
     <>
       <div className="w-full p-3 border border-gray-300 gap-3 flex flex-col rounded-md">
         <div className="flex items-center gap-1">
-          <img
-            className="size-12 rounded-full"
-            src={activity.user.image}
-            alt=""
-          />
+          <Link href={'/users/' + activity.user.id}>
+            <img
+              className="size-12 rounded-full"
+              src={activity.user.image}
+              alt=""
+            />
+          </Link>
           <div className="max-w-full w-full min-w-0">
-            <b>{activity.user.name}</b>
+            <Link href={'/users/' + activity.user.id}>
+              <b>{activity.user.name}</b>
+            </Link>
             <div className="text-sm text-gray-700 flex items-center gap-1">
               <div>{activity.created_at.toLocaleString()}</div>
               {activity.custom?.edited_at && (

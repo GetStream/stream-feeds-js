@@ -1,7 +1,4 @@
-import {
-  StreamFeedClient,
-  StreamFlatFeedClient,
-} from '@stream-io/feeds-client';
+import { StreamFeedClient } from '@stream-io/feeds-client';
 import { useEffect, useRef, useState } from 'react';
 import { useUserContext } from '../user-context';
 import { PaginatedList } from './PaginatedList';
@@ -13,7 +10,7 @@ type FollowStatus = 'following' | 'invited' | 'needs-invite';
 
 type FeedFollowerMapping = Record<FeedCid, FollowStatus>;
 
-export const Invite = ({ feed }: { feed: StreamFlatFeedClient }) => {
+export const Invite = ({ feed }: { feed: StreamFeedClient }) => {
   const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const [canInvite, setCanInvite] = useState(false);
   const [error, setError] = useState<Error>();

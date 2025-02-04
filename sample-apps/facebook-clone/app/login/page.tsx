@@ -13,7 +13,7 @@ export default function Login() {
     logIn(user).catch((err) => {
       throwUnrecoverableError(err);
     });
-    router.push('/home');
+    router.push('/timeline');
   };
 
   return (
