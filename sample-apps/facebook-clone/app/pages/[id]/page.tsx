@@ -25,6 +25,7 @@ export default function ProfilePage() {
             feed_id: params.id,
             feed_group: 'page',
           },
+          watch: true,
         })
         .then((response) => {
           response.feeds.forEach((feed) => {
@@ -40,6 +41,8 @@ export default function ProfilePage() {
           logErrorAndDisplayNotification(error, (error as Error).message);
         });
     }
+
+    // TODO: feed.stopWatching() -> we don't yet have this API method
   }, [params.id, client]);
 
   if (!page) {

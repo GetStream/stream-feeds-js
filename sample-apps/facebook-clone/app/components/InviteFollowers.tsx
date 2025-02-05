@@ -10,7 +10,7 @@ type FollowStatus = 'following' | 'invited' | 'needs-invite';
 
 type FeedFollowerMapping = Record<FeedCid, FollowStatus>;
 
-export const Invite = ({
+export const InviteFollowers = ({
   feed,
   open,
   onOpenChange,

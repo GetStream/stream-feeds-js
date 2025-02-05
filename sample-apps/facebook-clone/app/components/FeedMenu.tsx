@@ -1,14 +1,16 @@
 import { StreamFeedClient } from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
 import { useUserContext } from '../user-context';
-import { Invite } from './Invite';
+import { InviteFollowers } from './InviteFollowers';
+import { ManageMembers } from './ManageMembers';
 
-type Action = 'invite';
+type Action = 'invite' | 'update-feed-members';
 
 export const FeedMenu = ({ feed }: { feed: StreamFeedClient }) => {
   const { user } = useUserContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
   const [enabledActions, setEnabledActions] = useState<Action[]>([]);
   const actionMapping: {
     [key in Action]: { label: string; icon: string; handler: () => void };
@@ -18,15 +20,34 @@ export const FeedMenu = ({ feed }: { feed: StreamFeedClient }) => {
       icon: 'mail',
       handler: () => setIsInviteOpen(true),
     },
+    'update-feed-members': {
+      label: 'Manage members',
+      icon: 'group',
+      handler: () => setIsMemberModalOpen(true),
+    },
   };
 
   useEffect(() => {
     return feed.state.subscribeWithSelector(
       (s) => ({
+        own_capabilities: s.own_capabilities,
         visibility_level: s.visibility_level,
         created_by: s.created_by,
       }),
-      ({ visibility_level, created_by }) => {
+      ({ own_capabilities, visibility_level, created_by }) => {
+        if (
+          own_capabilities?.includes('update-feed-members') &&
+          !enabledActions.includes('update-feed-members')
+        ) {
+          setEnabledActions([...enabledActions, 'update-feed-members']);
+        } else if (
+          !own_capabilities?.includes('update-feed-members') &&
+          enabledActions.includes('update-feed-members')
+        ) {
+          setEnabledActions(
+            enabledActions.filter((a) => a !== 'update-feed-members'),
+          );
+        }
         if (
           visibility_level === 'private' &&
           user?.id === created_by?.id &&
@@ -73,11 +94,16 @@ export const FeedMenu = ({ feed }: { feed: StreamFeedClient }) => {
           ))}
         </div>
       </div>
-      <Invite
+      <InviteFollowers
         open={isInviteOpen}
         onOpenChange={setIsInviteOpen}
         feed={feed}
-      ></Invite>
+      ></InviteFollowers>
+      <ManageMembers
+        feed={feed}
+        open={isMemberModalOpen}
+        onOpenChange={setIsMemberModalOpen}
+      ></ManageMembers>
     </>
   );
 };
