@@ -6,6 +6,7 @@ import { SimpleNotification } from './notification-types/SimpleNotification';
 import { FollowInviteNotification } from './notification-types/FollowInviteNotification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
+import { MemberNotification } from './notification-types/MemberNotification';
 
 export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
   const { logError } = useErrorContext();
@@ -97,8 +98,15 @@ export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
             onMarkRead={() => markRead(group)}
           ></FollowInviteNotification>
         )}
+        {group.activities[0]?.verb === 'added-as-member' && (
+          <MemberNotification
+            group={group}
+            onMarkRead={() => markRead(group)}
+          ></MemberNotification>
+        )}
         {group.activities[0]?.verb !== 'invite' &&
-          group.activities[0]?.verb !== 'follow-request' && (
+          group.activities[0]?.verb !== 'follow-request' &&
+          group.activities[0]?.verb !== 'added-as-member' && (
             <SimpleNotification
               group={group}
               onMarkRead={() => markRead(group)}

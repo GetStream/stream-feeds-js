@@ -35,28 +35,15 @@ export const FeedMenu = ({ feed }: { feed: StreamFeedClient }) => {
         created_by: s.created_by,
       }),
       ({ own_capabilities, visibility_level, created_by }) => {
-        if (
-          own_capabilities?.includes('update-feed-members') &&
-          !enabledActions.includes('update-feed-members')
-        ) {
-          setEnabledActions([...enabledActions, 'update-feed-members']);
-        } else if (
-          !own_capabilities?.includes('update-feed-members') &&
-          enabledActions.includes('update-feed-members')
-        ) {
-          setEnabledActions(
-            enabledActions.filter((a) => a !== 'update-feed-members'),
-          );
+        const actions: Action[] = [];
+        if (own_capabilities?.includes('update-feed-members')) {
+          actions.push('update-feed-members');
         }
-        if (
-          visibility_level === 'private' &&
-          user?.id === created_by?.id &&
-          !enabledActions.includes('invite')
-        ) {
-          setEnabledActions([...enabledActions, 'invite']);
-        } else if (enabledActions.includes('invite')) {
-          setEnabledActions(enabledActions.filter((a) => a !== 'invite'));
+        if (visibility_level === 'private' && user?.id === created_by?.id) {
+          actions.push('invite');
         }
+
+        setEnabledActions(actions);
       },
     );
   }, [feed, user]);

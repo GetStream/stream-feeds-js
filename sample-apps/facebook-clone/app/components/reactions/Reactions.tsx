@@ -13,10 +13,12 @@ export const Reactions = ({
   type,
   activity,
   showCounter,
+  canReact,
 }: {
   type: string;
   activity: Activity;
   showCounter: boolean;
+  canReact: boolean;
 }) => {
   const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const [counts, setCounts] = useState(0);
@@ -77,17 +79,27 @@ export const Reactions = ({
 
   return (
     <div className="flex items-center gap-1 text-gray-700 text-sm">
-      <button
-        className="flex"
-        onClick={() => (hasOwnReaction ? removeReaction() : addReaction())}
-      >
+      {canReact && (
+        <button
+          className="flex"
+          onClick={() => (hasOwnReaction ? removeReaction() : addReaction())}
+        >
+          <span
+            className={`text-blue-500 material-symbols-outlined ${hasOwnReaction ? 'fill' : ''}`}
+            style={{ fontSize: '22px' }}
+          >
+            {emojiMapping[type]}
+          </span>
+        </button>
+      )}
+      {!canReact && showCounter && (
         <span
           className={`text-blue-500 material-symbols-outlined ${hasOwnReaction ? 'fill' : ''}`}
           style={{ fontSize: '22px' }}
         >
           {emojiMapping[type]}
         </span>
-      </button>
+      )}
       {showCounter && (
         <button onClick={() => openDialog()}>
           <div>

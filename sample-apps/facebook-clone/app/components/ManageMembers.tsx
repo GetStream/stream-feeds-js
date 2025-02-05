@@ -89,6 +89,17 @@ export const ManageMembers = ({
           { user_id: newFeedMemberUserId!, role: newFeedMemberRole },
         ],
       });
+      void fetch('/api/send-notification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          targetUserId: newFeedMemberUserId,
+          verb: 'added-as-member',
+          objectId: feed.fid,
+        }),
+      }).catch((err) => logError(err));
       setUserQuery('');
       setUserOptions([]);
       setNewFeedMemberUserId(undefined);

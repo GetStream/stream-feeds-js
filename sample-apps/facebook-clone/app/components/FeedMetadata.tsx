@@ -32,6 +32,8 @@ export const FeedMetadata = ({
   const [followStatus, setFollowStatus] = useState<FollowStatus | undefined>(
     undefined,
   );
+  const [canQueryFollowers, setCanQueryFollowers] = useState(false);
+  const [canQueryFollowings, setCanQueryFollowings] = useState(false);
 
   useEffect(() => {
     const unsubscribe = feed.state.subscribeWithSelector(
@@ -49,6 +51,36 @@ export const FeedMetadata = ({
 
     return unsubscribe;
   }, [feed]);
+
+  useEffect(() => {
+    const unsubscribe = feed.state.subscribeWithSelector(
+      (state) => ({
+        own_capabilities: state.own_capabilities,
+      }),
+      ({ own_capabilities }) => {
+        setCanQueryFollowers(
+          !!own_capabilities?.includes('get-following-feeds'),
+        );
+      },
+    );
+
+    return unsubscribe;
+  }, [feed]);
+
+  useEffect(() => {
+    const unsubscribe = feed.state.subscribeWithSelector(
+      (state) => ({
+        own_capabilities: state.own_capabilities,
+      }),
+      ({ own_capabilities }) => {
+        setCanQueryFollowings(
+          !!own_capabilities?.includes('get-followed-feeds'),
+        );
+      },
+    );
+
+    return unsubscribe;
+  }, [timeline]);
 
   useEffect(() => {
     if (timeline?.fid !== ownTimeline?.fid) {
@@ -125,7 +157,7 @@ export const FeedMetadata = ({
             }
             alt=""
           />
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 items-start">
             {feed.group === 'user' && (
               <div className="text-lg text-gray-900">
                 <b>{feed.state.getLatestValue().created_by?.name}</b>
@@ -147,7 +179,8 @@ export const FeedMetadata = ({
                   <LoadingIndicator color="blue"></LoadingIndicator>
                 )}
                 <button
-                  className="no-underline hover:underline"
+                  disabled={!canQueryFollowers}
+                  className={`no-underline ${canQueryFollowers ? 'hover:underline' : ''}`}
                   onClick={() => {
                     setSelectedRelationship('followers');
                     openDialog();
@@ -162,7 +195,8 @@ export const FeedMetadata = ({
                     <LoadingIndicator color="blue"></LoadingIndicator>
                   )}
                   <button
-                    className="no-underline hover:underline"
+                    disabled={!canQueryFollowings}
+                    className={`no-underline ${canQueryFollowings ? 'hover:underline' : ''}`}
                     onClick={() => {
                       setSelectedRelationship('followers');
                       openDialog();

@@ -81,7 +81,8 @@ export class StreamNotificationFeedClient extends StreamBaseFeed<StreamNotificat
   }
 
   protected newActivityReceived(_: ActivityAddedEvent): void {
-    throw new Error('Method not implemented.');
+    // TODO: we should do a proper state update here, but WS event doesn't have all necessary info, so we just reload instead
+    void this.read({ offset: 0, limit: 30 });
   }
 
   protected activityUpdated(_: ActivityUpdatedEvent): void {

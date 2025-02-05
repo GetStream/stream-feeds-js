@@ -18,7 +18,7 @@ export const Activity = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
   const [canDelete, setCanDelete] = useState(false);
-  const [_, setCanSendReaction] = useState(false);
+  const [canSendReaction, setCanSendReaction] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedActivityText, setEditedActivityText] = useState('');
 
@@ -157,8 +157,18 @@ export const Activity = ({
           ></ActivityComposer>
         )}
         <div className="flex items-center gap-3">
-          <Reactions type="dislike" activity={activity} showCounter={false} />
-          <Reactions type="like" activity={activity} showCounter={true} />
+          <Reactions
+            type="dislike"
+            activity={activity}
+            canReact={canSendReaction}
+            showCounter={false}
+          />
+          <Reactions
+            type="like"
+            activity={activity}
+            canReact={canSendReaction}
+            showCounter={true}
+          />
         </div>
       </div>
     </>
