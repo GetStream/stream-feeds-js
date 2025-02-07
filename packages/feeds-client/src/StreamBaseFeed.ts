@@ -13,6 +13,8 @@ import {
   GetOrCreateFeedRequest,
   NotificationUnfollowEvent,
   WSEvent,
+  QueryCommentsRequest,
+  Comment,
 } from './gen/models';
 import { StreamFeedsClient } from './StreamFeedsClient';
 import {
@@ -20,12 +22,24 @@ import {
   removeMemberFromState,
   updateMemberInState,
 } from './state-updates/member-utils';
+import { ActivityOrCommentId } from './types';
+import {
+  addCommentsToState,
+  removeCommentFromState,
+  updateCommentInState,
+} from './state-updates/comment-utils';
 
+// TODO: since generated models use snake_case we have to use snake_case in state as well
+// Maybe we should do a transformation in the generated code and use camelCase?
 export type StreamBaseFeedState = Partial<Feed> & {
   offset: number;
   limit: number;
   has_next_page: boolean;
   is_loading_next_page: boolean;
+  activity_comments: Record<
+    ActivityOrCommentId,
+    { comments: Comment[]; next?: string }
+  >;
 };
 
 export abstract class StreamBaseFeed<
@@ -97,14 +111,50 @@ export abstract class StreamBaseFeed<
     'feeds.notification.member_added': (_) => {},
     'feeds.notification.member_invited': (_) => {},
     'feeds.notification.member_removed': (_) => {},
-    'feeds.activity_comment_new': function (_): void {
-      throw new Error('Function not implemented.');
+    'feeds.activity_comment_new': (event) => {
+      const activityId = event.comment.activity_id;
+      const parentId = event.comment.parent_id;
+      // TODO: backend sends empty parent id as empty string intead of undefined
+      const id = parentId && parentId?.length > 0 ? parentId : activityId;
+      const activityComments =
+        this.state.getLatestValue().activity_comments ?? {};
+      if (activityComments[id]) {
+        this.addNewCommentToState(
+          id,
+          event.comment,
+          activityComments[id].comments,
+        );
+      }
     },
-    'feeds.activity_comment_removed': function (_): void {
-      throw new Error('Function not implemented.');
+    'feeds.activity_comment_removed': (event) => {
+      const activityId = event.comment.activity_id;
+      const parentId = event.comment.parent_id;
+      // TODO: backend sends empty parent id as empty string intead of undefined
+      const id = parentId && parentId?.length > 0 ? parentId : activityId;
+      const activityComments =
+        this.state.getLatestValue().activity_comments ?? {};
+      if (activityComments[id]) {
+        this.deleteCommentFromState(
+          id,
+          event.comment,
+          activityComments[id].comments,
+        );
+      }
     },
-    'feeds.activity_comment_updated': function (_): void {
-      throw new Error('Function not implemented.');
+    'feeds.activity_comment_updated': (event) => {
+      const activityId = event.comment.activity_id;
+      const parentId = event.comment.parent_id;
+      // TODO: backend sends empty parent id as empty string intead of undefined
+      const id = parentId && parentId?.length > 0 ? parentId : activityId;
+      const activityComments =
+        this.state.getLatestValue().activity_comments ?? {};
+      if (activityComments[id]) {
+        this.updateCommentInState(
+          activityId,
+          event.comment,
+          activityComments[id].comments,
+        );
+      }
     },
     'feeds.comment_reaction_deleted': function (_): void {
       throw new Error('Function not implemented.');
@@ -160,6 +210,38 @@ export abstract class StreamBaseFeed<
         this.setLoadingState(false);
       }
     }
+  };
+
+  queryActivityComments = async (
+    { activityId, parentId }: { activityId: string; parentId?: string },
+    request: QueryCommentsRequest = {},
+  ) => {
+    if (!request.filter) {
+      request.filter = { activity_id: activityId };
+    } else {
+      request.filter.activity_id = activityId;
+    }
+    if (parentId) {
+      request.filter.parent_id = parentId;
+    }
+    const response = await this.client.queryFeedComments(request);
+
+    const activityComments =
+      this.state.getLatestValue().activity_comments ?? {};
+    const id = parentId ?? activityId;
+    const comments = request.next ? activityComments[id]?.comments : undefined;
+    const result = addCommentsToState(response.comments, comments);
+    if (result.changed) {
+      const newActivityComments = { ...activityComments };
+      newActivityComments[id] = {
+        comments: result.comments,
+        next: response.pager.next,
+      };
+      // @ts-expect-error TODO: why is this needed?
+      this.state.partialNext({ activity_comments: newActivityComments });
+    }
+
+    return response;
   };
 
   on = this.eventDispatcher.on;
@@ -226,6 +308,63 @@ export abstract class StreamBaseFeed<
         invites: this.state.getLatestValue().invites,
         own_capabilities: this.state.getLatestValue().own_capabilities,
       });
+    }
+  }
+
+  private addNewCommentToState(
+    id: ActivityOrCommentId,
+    comment: Comment,
+    comments: Comment[],
+  ) {
+    const result = addCommentsToState([comment], comments);
+    if (result.changed) {
+      const activityComments =
+        this.state.getLatestValue().activity_comments ?? {};
+      const newActivityComments = { ...activityComments };
+      newActivityComments[id] = {
+        ...activityComments[id],
+        comments: result.comments,
+      };
+      // @ts-expect-error TODO: why is this needed?
+      this.state.partialNext({ activity_comments: newActivityComments });
+    }
+  }
+
+  private updateCommentInState(
+    id: ActivityOrCommentId,
+    comment: Comment,
+    comments: Comment[],
+  ) {
+    const result = updateCommentInState(comment, comments);
+    if (result.changed) {
+      const activityComments =
+        this.state.getLatestValue().activity_comments ?? {};
+      const newActivityComments = { ...activityComments };
+      newActivityComments[id] = {
+        ...activityComments[id],
+        comments: result.comments,
+      };
+      // @ts-expect-error TODO: why is this needed?
+      this.state.partialNext({ activity_comments: newActivityComments });
+    }
+  }
+
+  private deleteCommentFromState(
+    id: ActivityOrCommentId,
+    comment: Comment,
+    comments: Comment[],
+  ) {
+    const result = removeCommentFromState(comment, comments);
+    if (result.changed) {
+      const activityComments =
+        this.state.getLatestValue().activity_comments ?? {};
+      const newActivityComments = { ...activityComments };
+      newActivityComments[id] = {
+        ...activityComments[id],
+        comments: result.comments,
+      };
+      // @ts-expect-error TODO: why is this needed?
+      this.state.partialNext({ activity_comments: newActivityComments });
     }
   }
 }

@@ -37,6 +37,7 @@ describe('Feeds state test', () => {
       members: [{ user_id: 'bob' }],
       visibility_level: 'visible',
     });
+    await emilyFeed.read({ offset: 0, limit: 25 });
 
     const currentState = spy.mock.lastCall?.[0] as StreamFlatFeedState;
     expect(
@@ -59,6 +60,31 @@ describe('Feeds state test', () => {
     const member: FeedMember = { user: { id: 'alice' } } as FeedMember;
     emilyFeed.state.partialNext({
       members: [member],
+    });
+
+    expect(spy.mock.calls.length).toBe(1);
+  });
+
+  it('subscribe to partial state changes - comments', () => {
+    const spy = vi.fn();
+    const activityId = '1';
+    emilyFeed.state.subscribeWithSelector(
+      (state) => ({ comments: state.activity_comments[activityId]?.comments }),
+      spy,
+    );
+    spy.mockReset();
+
+    emilyFeed.state.partialNext({
+      activity_comments: { 2: { comments: [], next: undefined } },
+    });
+
+    expect(spy.mock.calls.length).toBe(0);
+
+    emilyFeed.state.partialNext({
+      activity_comments: {
+        2: { comments: [], next: undefined },
+        [activityId]: { comments: [], next: undefined },
+      },
     });
 
     expect(spy.mock.calls.length).toBe(1);

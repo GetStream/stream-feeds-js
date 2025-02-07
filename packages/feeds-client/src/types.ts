@@ -8,3 +8,5 @@ export type StreamFeedsEvent = WSEvent | StreamEvent;
 export type StreamFeedClient =
   | ({ type: 'flat' } & StreamFlatFeedClient)
   | ({ type: 'notification' } & StreamNotificationFeedClient);
+
+export type ActivityOrCommentId = string;

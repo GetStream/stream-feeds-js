@@ -35,9 +35,9 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
     this.setLoadingState(true);
     try {
       const response = await this.readFlat(request);
-      let activities = this.state.getLatestValue().activities ?? [];
+      let activities = this.state.getLatestValue().activities;
       if (request.offset === 0) {
-        activities = [];
+        activities = undefined;
       }
       const result = addActivitiesToState(
         response.activities,
@@ -77,6 +77,7 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
       offset: 0,
       has_next_page: true,
       is_loading_next_page: false,
+      activity_comments: {},
     };
 
     return { ...defaultState, ...feed };
@@ -91,7 +92,10 @@ export class StreamFlatFeedClient extends StreamBaseFeed<StreamFlatFeedState> {
   }
 
   protected newActivityReceived(event: ActivityAddedEvent): void {
-    const activities = this.state.getLatestValue().activities ?? [];
+    if (!this.state.getLatestValue().activities) {
+      return;
+    }
+    const activities = this.state.getLatestValue().activities;
     const result = addActivitiesToState([event.activity], activities, 'start');
     this.updateActivitiesIfNecessary(result);
   }

@@ -23,6 +23,7 @@ export class EventDispatcher<
       try {
         fn(event);
       } catch (e) {
+        // TODO: do we really want to silence this error?
         this.logger('warn', 'Listener failed with error', e);
       }
     }

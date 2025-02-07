@@ -23,6 +23,7 @@ describe('Activity reactions', () => {
 
     emilyFeed = emilyClient.feed('user', uuidv4());
     await emilyFeed.getOrCreate({ watch: true });
+    await emilyFeed.read({ offset: 0, limit: 25 });
 
     await emilyFeed.addActivity({ object: uuidv4(), verb: 'post' });
 

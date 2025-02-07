@@ -1998,6 +1998,8 @@ export interface ReviewQueueItemResponse {
 
   reviewed_at?: Date;
 
+  teams?: string[];
+
   assigned_to?: UserResponse;
 
   entity_creator?: EntityCreatorResponse;

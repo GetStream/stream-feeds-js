@@ -60,6 +60,7 @@ export class TokenManager {
         const tokenProvider = this.tokenProvider;
         const loadTokenWithRetries = async (previousFailuresCount = 0) => {
           try {
+            // TODO: make sure we can't start two parallel token renew requests
             this.token = await tokenProvider();
           } catch (e) {
             const numberOfFailures = ++previousFailuresCount;

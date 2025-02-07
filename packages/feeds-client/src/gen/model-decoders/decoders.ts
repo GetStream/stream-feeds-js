@@ -703,6 +703,13 @@ decoders.QueryActivitiesResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.QueryCommentsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    comments: { type: 'Comment', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.QueryFeedsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     feeds: { type: 'Feed', isSingle: false },
