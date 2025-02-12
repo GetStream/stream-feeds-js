@@ -121,6 +121,8 @@ export interface AppResponseFields {
 
   auto_translation_enabled: boolean;
 
+  guest_user_creation_disabled: boolean;
+
   moderation_enabled: boolean;
 
   moderation_multitenant_blocklist_enabled: boolean;
@@ -622,6 +624,7 @@ export const ChannelOwnCapability = {
   SEND_POLL: 'send-poll',
   SEND_REACTION: 'send-reaction',
   SEND_REPLY: 'send-reply',
+  SEND_RESTRICTED_VISIBILITY_MESSAGE: 'send-restricted-visibility-message',
   SEND_TYPING_EVENTS: 'send-typing-events',
   SET_CHANNEL_COOLDOWN: 'set-channel-cooldown',
   SKIP_SLOW_MODE: 'skip-slow-mode',
@@ -1334,6 +1337,8 @@ export interface Message {
 
   own_reactions: Reaction[];
 
+  restricted_visibility: string[];
+
   custom: Record<string, any>;
 
   reaction_counts: Record<string, number>;
@@ -1413,6 +1418,8 @@ export interface MessageResponse {
   mentioned_users: UserResponse[];
 
   own_reactions: ReactionResponse[];
+
+  restricted_visibility: string[];
 
   custom: Record<string, any>;
 
