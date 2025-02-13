@@ -1,4 +1,7 @@
-import { StreamFlatFeedClient } from '@stream-io/feeds-client';
+import {
+  FeedOwnCapability,
+  StreamFlatFeedClient,
+} from '@stream-io/feeds-client';
 import { useErrorContext } from '../error-context';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +17,9 @@ export const NewActivity = ({ feed }: { feed: StreamFlatFeedClient }) => {
   useEffect(() => {
     return feed.state.subscribeWithSelector(
       (s) => ({
-        isAllowedToPost: !!s.own_capabilities?.includes('add-activity'),
+        isAllowedToPost: !!s.own_capabilities?.includes(
+          FeedOwnCapability.ADD_ACTIVITY,
+        ),
       }),
       ({ isAllowedToPost }) => setCanPost(isAllowedToPost),
     );

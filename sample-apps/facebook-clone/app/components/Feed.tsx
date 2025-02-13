@@ -1,4 +1,5 @@
 import {
+  FeedOwnCapability,
   Activity as StreamActivity,
   StreamFlatFeedClient,
 } from '@stream-io/feeds-client';
@@ -31,7 +32,7 @@ export const Feed = ({
   useEffect(() => {
     if (
       !feed.state.getLatestValue().activities &&
-      ownCapabilities.includes('read-feed')
+      ownCapabilities.includes(FeedOwnCapability.READ_FEED)
     ) {
       void feed.read({ limit: 30, offset: 0 });
     }
@@ -157,7 +158,7 @@ export const Feed = ({
     );
   };
 
-  if (!ownCapabilities.includes('read-feed')) {
+  if (!ownCapabilities.includes(FeedOwnCapability.READ_FEED)) {
     return `You need to be a follower to see posts`;
   }
 

@@ -1,4 +1,4 @@
-import { StreamFeedClient } from '@stream-io/feeds-client';
+import { FeedOwnCapability, StreamFeedClient } from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
 import { useUserContext } from '../user-context';
 import { InviteFollowers } from './InviteFollowers';
@@ -31,15 +31,18 @@ export const FeedMenu = ({ feed }: { feed: StreamFeedClient }) => {
     return feed.state.subscribeWithSelector(
       (s) => ({
         own_capabilities: s.own_capabilities,
-        visibility_level: s.visibility_level,
-        created_by: s.created_by,
       }),
-      ({ own_capabilities, visibility_level, created_by }) => {
+      ({ own_capabilities }) => {
         const actions: Action[] = [];
-        if (own_capabilities?.includes('update-feed-members')) {
+        if (
+          own_capabilities?.includes(FeedOwnCapability.UPDATE_FEED_MEMBERS) &&
+          feed.group === 'page'
+        ) {
           actions.push('update-feed-members');
         }
-        if (visibility_level === 'private' && user?.id === created_by?.id) {
+        if (
+          own_capabilities?.includes(FeedOwnCapability.UPDATE_FEED_FOLLOWERS)
+        ) {
           actions.push('invite');
         }
 

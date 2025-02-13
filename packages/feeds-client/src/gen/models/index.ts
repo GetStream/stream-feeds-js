@@ -785,7 +785,7 @@ export interface Feed {
 
   members: FeedMember[];
 
-  own_capabilities: string[];
+  own_capabilities: FeedOwnCapability[];
 
   created_by: UserResponse;
 
@@ -1031,6 +1031,33 @@ export interface FeedMemberUpdatedEvent {
 
   received_at?: Date;
 }
+
+export const FeedOwnCapability = {
+  ADD_ACTIVITY: 'add-activity',
+  ADD_COMMENT: 'add-comment',
+  DELETE_FEED: 'delete-feed',
+  GET_FEED: 'get-feed',
+  GET_FOLLOWED_FEEDS: 'get-followed-feeds',
+  GET_FOLLOWING_FEEDS: 'get-following-feeds',
+  QUERY_COMMENTS: 'query-comments',
+  READ_FEED: 'read-feed',
+  REMOVE_ANY_ACTIVITY_FROM_FEED: 'remove-any-activity-from-feed',
+  REMOVE_ANY_COMMENT: 'remove-any-comment',
+  REMOVE_COMMENT: 'remove-comment',
+  REMOVE_OWN_ACTIVITY_FROM_FEED: 'remove-own-activity-from-feed',
+  REMOVE_OWN_FEED_MEMBERSHIP: 'remove-own-feed-membership',
+  SEND_FEED_REACTION: 'send-feed-reaction',
+  UPDATE_ANY_ACTIVITY: 'update-any-activity',
+  UPDATE_FEED: 'update-feed',
+  UPDATE_FEED_FOLLOWERS: 'update-feed-followers',
+  UPDATE_FEED_MEMBERS: 'update-feed-members',
+  UPDATE_OWN_ACTIVITY: 'update-own-activity',
+  UPDATE_OWN_COMMENT: 'update-own-comment',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type FeedOwnCapability =
+  (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
 
 export interface Field {
   short: boolean;

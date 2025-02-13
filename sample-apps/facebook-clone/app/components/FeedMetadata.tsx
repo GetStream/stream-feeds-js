@@ -1,4 +1,4 @@
-import { StreamFeedClient } from '@stream-io/feeds-client';
+import { FeedOwnCapability, StreamFeedClient } from '@stream-io/feeds-client';
 import { useEffect, useRef, useState } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { FollowRelationships } from './FollowRelationships';
@@ -59,7 +59,7 @@ export const FeedMetadata = ({
       }),
       ({ own_capabilities }) => {
         setCanQueryFollowers(
-          !!own_capabilities?.includes('get-following-feeds'),
+          !!own_capabilities?.includes(FeedOwnCapability.GET_FOLLOWING_FEEDS),
         );
       },
     );
@@ -74,7 +74,7 @@ export const FeedMetadata = ({
       }),
       ({ own_capabilities }) => {
         setCanQueryFollowings(
-          !!own_capabilities?.includes('get-followed-feeds'),
+          !!own_capabilities?.includes(FeedOwnCapability.GET_FOLLOWED_FEEDS),
         );
       },
     );
