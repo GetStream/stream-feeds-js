@@ -16,15 +16,6 @@
     "clean:docs": "rimraf generated-docs",
     "test-ci": "vitest --coverage"
   },
-  "files": [
-    "dist",
-    "src",
-    "index.ts",
-    "package.json",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
-  ],
   "dependencies": {
     "@rollup/plugin-replace": "^6.0.1",
     "@rollup/plugin-typescript": "^12.1.0",
