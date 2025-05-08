@@ -200,7 +200,7 @@ export abstract class BaseFeed<
    * internal
    * @param event
    */
-  handleWSEvent(_: WSEvent) {
+  handleWSEvent(event: WSEvent) {
     // @ts-expect-error TODO: why?
     this.eventHandlers[event.type](event);
     this.eventDispatcher.dispatch(event);
