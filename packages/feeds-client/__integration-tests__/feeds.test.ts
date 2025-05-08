@@ -28,6 +28,9 @@ describe('Feeds API dummy test', () => {
     const response = await feed.get();
 
     expect(response.feed.id).toBe(feed.id);
+
+    // check date decoding
+    expect(Date.now() - response.feed.created_at.getTime()).toBeLessThan(3000);
   });
 
   it('delete feed', async () => {
