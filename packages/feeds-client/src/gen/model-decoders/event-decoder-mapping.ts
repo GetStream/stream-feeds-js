@@ -4,74 +4,59 @@ import { decoders } from '../model-decoders/decoders';
 const eventDecoderMapping: {
   [key in WSEvent['type']]: (data: Record<string, any>) => WSEvent;
 } = {
-  'feeds.activity_added': (data: Record<string, any>) =>
+  'activity.added': (data: Record<string, any>) =>
     decoders.ActivityAddedEvent(data),
 
-  'feeds.activity_comment_new': (data: Record<string, any>) =>
-    decoders.CommentAddedEvent(data),
+  'activity.reaction.added': (data: Record<string, any>) =>
+    decoders.ReactionAddedEvent(data),
 
-  'feeds.activity_comment_removed': (data: Record<string, any>) =>
-    decoders.CommentRemovedEvent(data),
+  'activity.reaction.removed': (data: Record<string, any>) =>
+    decoders.ReactionRemovedEvent(data),
 
-  'feeds.activity_comment_updated': (data: Record<string, any>) =>
-    decoders.CommentUpdatedEvent(data),
-
-  'feeds.activity_reaction_deleted': (data: Record<string, any>) =>
-    decoders.ActivityReactionDeletedEvent(data),
-
-  'feeds.activity_reaction_new': (data: Record<string, any>) =>
-    decoders.ActivityReactionNewEvent(data),
-
-  'feeds.activity_reaction_updated': (data: Record<string, any>) =>
-    decoders.ActivityReactionUpdatedEvent(data),
-
-  'feeds.activity_removed': (data: Record<string, any>) =>
+  'activity.removed': (data: Record<string, any>) =>
     decoders.ActivityRemovedEvent(data),
 
-  'feeds.activity_updated': (data: Record<string, any>) =>
+  'activity.updated': (data: Record<string, any>) =>
     decoders.ActivityUpdatedEvent(data),
 
-  'feeds.comment_reaction_deleted': (data: Record<string, any>) =>
-    decoders.CommentReactionDeletedEvent(data),
+  'bookmark.added': (data: Record<string, any>) =>
+    decoders.BookmarkAddedEvent(data),
 
-  'feeds.comment_reaction_new': (data: Record<string, any>) =>
-    decoders.CommentReactionNewEvent(data),
+  'bookmark.removed': (data: Record<string, any>) =>
+    decoders.BookmarkRemovedEvent(data),
 
-  'feeds.comment_reaction_updated': (data: Record<string, any>) =>
-    decoders.CommentReactionUpdatedEvent(data),
+  'bookmark.updated': (data: Record<string, any>) =>
+    decoders.BookmarkUpdatedEvent(data),
 
-  'feeds.feed_deleted': (data: Record<string, any>) =>
-    decoders.FeedDeletedEvent(data),
+  'comment.added': (data: Record<string, any>) =>
+    decoders.CommentAddedEvent(data),
 
-  'feeds.member_added': (data: Record<string, any>) =>
-    decoders.FeedMemberAddedEvent(data),
+  'comment.removed': (data: Record<string, any>) =>
+    decoders.CommentRemovedEvent(data),
 
-  'feeds.member_removed': (data: Record<string, any>) =>
-    decoders.FeedMemberRemovedEvent(data),
+  'comment.updated': (data: Record<string, any>) =>
+    decoders.CommentUpdatedEvent(data),
 
-  'feeds.member_updated': (data: Record<string, any>) =>
-    decoders.FeedMemberUpdatedEvent(data),
+  'feed.created': (data: Record<string, any>) =>
+    decoders.FeedCreatedEvent(data),
 
-  'feeds.notification.follow': (data: Record<string, any>) =>
-    decoders.NotificationFollowEvent(data),
+  'feed.removed': (data: Record<string, any>) =>
+    decoders.FeedRemovedEvent(data),
 
-  'feeds.notification.follow_request_created': (data: Record<string, any>) =>
-    decoders.NotificationFollowRequestEvent(data),
+  'feed_group.changed': (data: Record<string, any>) =>
+    decoders.FeedGroupChangedEvent(data),
 
-  'feeds.notification.follow_request_updated': (data: Record<string, any>) =>
-    decoders.NotificationFollowRequestEvent(data),
+  'feed_group.removed': (data: Record<string, any>) =>
+    decoders.FeedGroupRemovedEvent(data),
 
-  'feeds.notification.member_added': (data: Record<string, any>) =>
-    decoders.NotificationFeedMemberAddedEvent(data),
+  'follow.added': (data: Record<string, any>) =>
+    decoders.FollowAddedEvent(data),
 
-  'feeds.notification.member_invited': (data: Record<string, any>) =>
-    decoders.NotificationFeedMemberInvitedEvent(data),
+  'follow.removed': (data: Record<string, any>) =>
+    decoders.FollowRemovedEvent(data),
 
-  'feeds.notification.member_removed': (data: Record<string, any>) =>
-    decoders.NotificationFeedMemberRemovedEvent(data),
-
-  'feeds.notification.unfollow': (data: Record<string, any>) =>
-    decoders.NotificationUnfollowEvent(data),
+  'follow.updated': (data: Record<string, any>) =>
+    decoders.FollowUpdatedEvent(data),
 };
 
 export const decodeWSEvent = (data: { type: string } & Record<string, any>) => {

@@ -16,52 +16,88 @@ export interface APIError {
   exception_fields?: Record<string, string>;
 }
 
-export interface Action {
-  name: string;
-
-  text: string;
-
-  type: string;
-
-  style?: string;
-
-  value?: string;
+export interface AcceptFeedMemberRequest {
+  user_id: string;
 }
 
-export interface ActionableFollowRequests {
-  invites: FeedFollowRequest[];
+export interface AcceptFeedMemberResponse {
+  duration: string;
 
-  pending: FeedFollowRequest[];
+  feed_member: FeedMember;
+}
+
+export interface AcceptFollowRequest {
+  source_fid: string;
+
+  target_fid: string;
+}
+
+export interface AcceptFollowResponse {
+  duration: string;
+
+  follow: Follow;
 }
 
 export interface Activity {
+  bookmark_count: number;
+
   comment_count: number;
 
   created_at: Date;
 
   id: string;
 
-  object: string;
+  text: string;
 
-  origin: string;
-
-  public: boolean;
+  type: string;
 
   updated_at: Date;
 
-  verb: string;
+  visibility: string;
 
-  latest_reactions: Reaction[];
-
-  own_reactions: Reaction[];
-
-  reaction_groups: Record<string, ReactionGroupResponse>;
+  feeds: string[];
 
   user: UserResponse;
 
-  to_targets?: string[];
+  deleted_at?: Date;
+
+  edited_at?: Date;
+
+  expires_at?: Date;
+
+  popularity?: number;
+
+  score?: number;
+
+  share_count?: number;
+
+  attachments?: ActivityAttachment[];
+
+  comments?: Comment[];
+
+  filter_tags?: string[];
+
+  interest_tags?: string[];
+
+  latest_reactions?: ActivityReaction[];
+
+  mentioned_users?: UserResponse[];
+
+  own_bookmarks?: Bookmark[];
+
+  own_reactions?: ActivityReaction[];
+
+  current_feed?: Feed;
 
   custom?: Record<string, any>;
+
+  location?: ActivityLocation;
+
+  parent?: BaseActivity;
+
+  reaction_groups?: Record<string, ReactionGroup>;
+
+  search_data?: Record<string, any>;
 }
 
 export interface ActivityAddedEvent {
@@ -76,54 +112,56 @@ export interface ActivityAddedEvent {
   type: string;
 
   received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
-export interface ActivityReactionDeletedEvent {
+export interface ActivityAnalyserConfig {}
+
+export interface ActivityAttachment {
+  type: string;
+
+  url: string;
+
+  asset_url?: string;
+
+  image_url?: string;
+
+  live_call_cid?: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface ActivityLocation {
+  lat: number;
+
+  lng: number;
+}
+
+export interface ActivityPin {
+  activity_id: string;
+
   created_at: Date;
 
-  fid: string;
+  feed: string;
 
-  activity: Activity;
+  updated_at: Date;
 
-  custom: Record<string, any>;
+  user: UserResponse;
+}
 
-  reaction: Reaction;
+export interface ActivityReaction {
+  activity_id: string;
+
+  created_at: Date;
 
   type: string;
 
-  received_at?: Date;
-}
+  updated_at: Date;
 
-export interface ActivityReactionNewEvent {
-  created_at: Date;
+  user: UserResponse;
 
-  fid: string;
-
-  activity: Activity;
-
-  custom: Record<string, any>;
-
-  reaction: Reaction;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface ActivityReactionUpdatedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  activity: Activity;
-
-  custom: Record<string, any>;
-
-  reaction: Reaction;
-
-  type: string;
-
-  received_at?: Date;
+  custom?: Record<string, any>;
 }
 
 export interface ActivityRemovedEvent {
@@ -138,6 +176,52 @@ export interface ActivityRemovedEvent {
   type: string;
 
   received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface ActivityRequest {
+  type: string;
+
+  fids: string[];
+
+  expires_at?: string;
+
+  id?: string;
+
+  parent_id?: string;
+
+  text?: string;
+
+  user_id?: string;
+
+  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+
+  attachments?: ActivityAttachment[];
+
+  filter_tags?: string[];
+
+  interest_tags?: string[];
+
+  mentioned_user_ids?: string[];
+
+  custom?: Record<string, any>;
+
+  location?: ActivityLocation;
+
+  search_data?: Record<string, any>;
+}
+
+export interface ActivitySelectorConfig {
+  cutoff_time: Date;
+
+  type: string;
+
+  min_popularity?: number;
+
+  tag_filter_type?: string;
+
+  tags?: string[];
 }
 
 export interface ActivityUpdatedEvent {
@@ -152,18 +236,40 @@ export interface ActivityUpdatedEvent {
   type: string;
 
   received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
 export interface AddActivityRequest {
-  object: string;
+  type: string;
 
-  verb: string;
+  fids: string[];
 
-  public?: boolean;
+  expires_at?: string;
 
-  to_targets?: string[];
+  id?: string;
+
+  parent_id?: string;
+
+  text?: string;
+
+  user_id?: string;
+
+  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+
+  attachments?: ActivityAttachment[];
+
+  filter_tags?: string[];
+
+  interest_tags?: string[];
+
+  mentioned_user_ids?: string[];
 
   custom?: Record<string, any>;
+
+  location?: ActivityLocation;
+
+  search_data?: Record<string, any>;
 }
 
 export interface AddActivityResponse {
@@ -172,10 +278,26 @@ export interface AddActivityResponse {
   activity: Activity;
 }
 
+export interface AddBookmarkRequest {
+  folder_id?: string;
+
+  custom?: Record<string, any>;
+
+  new_folder?: AddFolderRequest;
+}
+
+export interface AddBookmarkResponse {
+  duration: string;
+
+  bookmark: Bookmark;
+}
+
 export interface AddCommentRequest {
-  text: string;
+  comment: string;
 
   parent_id?: string;
+
+  custom?: Record<string, any>;
 }
 
 export interface AddCommentResponse {
@@ -184,360 +306,174 @@ export interface AddCommentResponse {
   comment: Comment;
 }
 
-export interface AddReactionToActivityRequest {
-  type: string;
-
-  created_at?: Date;
-
-  enforce_unique?: boolean;
-
-  score?: number;
-
-  updated_at?: Date;
+export interface AddFolderRequest {
+  name: string;
 
   custom?: Record<string, any>;
 }
 
-export interface AddReactionToActivityResponse {
-  duration: string;
-
-  activity: Activity;
-
-  reaction: Reaction;
-}
-
-export interface AddReactionToCommentRequest {
+export interface AddReactionRequest {
   type: string;
-
-  created_at?: Date;
-
-  enforce_unique?: boolean;
-
-  score?: number;
-
-  updated_at?: Date;
 
   custom?: Record<string, any>;
 }
 
-export interface AddReactionToCommentResponse {
+export interface AddReactionResponse {
   duration: string;
 
-  comment: Comment;
-
-  reaction: Reaction;
+  reaction: ActivityReaction;
 }
 
-export interface AggregatedActivities {
+export interface AggregatedActivity {
   activity_count: number;
-
-  actor_count: number;
 
   created_at: Date;
 
   group: string;
 
-  id: string;
-
-  read: boolean;
-
-  seen: boolean;
+  score: number;
 
   updated_at: Date;
+
+  user_count: number;
 
   activities: Activity[];
 }
 
-export interface AppResponseFields {
-  async_url_enrich_enabled: boolean;
-
-  auto_translation_enabled: boolean;
-
-  guest_user_creation_disabled: boolean;
-
-  moderation_enabled: boolean;
-
-  moderation_multitenant_blocklist_enabled: boolean;
-
-  name: string;
-
-  file_upload_config: FileUploadConfig;
-
-  image_upload_config: FileUploadConfig;
+export interface AggregationConfig {
+  format: string;
 }
 
-export interface BlockListOptions {
-  behavior: 'flag' | 'block' | 'shadow_block';
+export interface BaseActivity {
+  bookmark_count: number;
 
-  blocklist: string;
-}
-
-export interface BlockListResponse {
-  name: string;
-
-  type: string;
-
-  words: string[];
-
-  created_at?: Date;
-
-  id?: string;
-
-  team?: string;
-
-  updated_at?: Date;
-}
-
-export interface BlockUsersRequest {
-  blocked_user_id: string;
-}
-
-export interface BlockUsersResponse {
-  blocked_by_user_id: string;
-
-  blocked_user_id: string;
+  comment_count: number;
 
   created_at: Date;
-
-  duration: string;
-}
-
-export interface BlockedUserResponse {
-  blocked_user_id: string;
-
-  created_at: Date;
-
-  user_id: string;
-
-  blocked_user: UserResponse;
-
-  user: UserResponse;
-}
-
-export interface ChannelConfigWithInfo {
-  automod: 'disabled' | 'simple' | 'AI';
-
-  automod_behavior: 'flag' | 'block' | 'shadow_block';
-
-  connect_events: boolean;
-
-  created_at: Date;
-
-  custom_events: boolean;
-
-  mark_messages_pending: boolean;
-
-  max_message_length: number;
-
-  mutes: boolean;
-
-  name: string;
-
-  polls: boolean;
-
-  push_notifications: boolean;
-
-  quotes: boolean;
-
-  reactions: boolean;
-
-  read_events: boolean;
-
-  reminders: boolean;
-
-  replies: boolean;
-
-  search: boolean;
-
-  skip_last_msg_update_for_system_msgs: boolean;
-
-  typing_events: boolean;
-
-  updated_at: Date;
-
-  uploads: boolean;
-
-  url_enrichment: boolean;
-
-  commands: Command[];
-
-  blocklist?: string;
-
-  blocklist_behavior?: 'flag' | 'block' | 'shadow_block';
-
-  partition_size?: number;
-
-  partition_ttl?: string;
-
-  allowed_flag_reasons?: string[];
-
-  blocklists?: BlockListOptions[];
-
-  automod_thresholds?: Thresholds;
-
-  grants?: Record<string, string[]>;
-}
-
-export interface ChannelMember {
-  banned: boolean;
-
-  channel_role: string;
-
-  created_at: Date;
-
-  notifications_muted: boolean;
-
-  shadow_banned: boolean;
-
-  updated_at: Date;
-
-  custom: Record<string, any>;
-
-  archived_at?: Date;
-
-  ban_expires?: Date;
-
-  deleted_at?: Date;
-
-  invite_accepted_at?: Date;
-
-  invite_rejected_at?: Date;
-
-  invited?: boolean;
-
-  is_moderator?: boolean;
-
-  pinned_at?: Date;
-
-  role?: 'member' | 'moderator' | 'admin' | 'owner';
-
-  status?: string;
-
-  user_id?: string;
-
-  user?: UserResponse;
-}
-
-export interface ChannelMute {
-  created_at: Date;
-
-  updated_at: Date;
-
-  expires?: Date;
-
-  channel?: ChannelResponse;
-
-  user?: UserResponse;
-}
-
-export const ChannelOwnCapability = {
-  BAN_CHANNEL_MEMBERS: 'ban-channel-members',
-  CAST_POLL_VOTE: 'cast-poll-vote',
-  CONNECT_EVENTS: 'connect-events',
-  CREATE_ATTACHMENT: 'create-attachment',
-  DELETE_ANY_MESSAGE: 'delete-any-message',
-  DELETE_CHANNEL: 'delete-channel',
-  DELETE_OWN_MESSAGE: 'delete-own-message',
-  FLAG_MESSAGE: 'flag-message',
-  FREEZE_CHANNEL: 'freeze-channel',
-  JOIN_CHANNEL: 'join-channel',
-  LEAVE_CHANNEL: 'leave-channel',
-  MUTE_CHANNEL: 'mute-channel',
-  PIN_MESSAGE: 'pin-message',
-  QUERY_POLL_VOTES: 'query-poll-votes',
-  QUOTE_MESSAGE: 'quote-message',
-  READ_EVENTS: 'read-events',
-  SEARCH_MESSAGES: 'search-messages',
-  SEND_CUSTOM_EVENTS: 'send-custom-events',
-  SEND_LINKS: 'send-links',
-  SEND_MESSAGE: 'send-message',
-  SEND_POLL: 'send-poll',
-  SEND_REACTION: 'send-reaction',
-  SEND_REPLY: 'send-reply',
-  SEND_RESTRICTED_VISIBILITY_MESSAGE: 'send-restricted-visibility-message',
-  SEND_TYPING_EVENTS: 'send-typing-events',
-  SET_CHANNEL_COOLDOWN: 'set-channel-cooldown',
-  SKIP_SLOW_MODE: 'skip-slow-mode',
-  SLOW_MODE: 'slow-mode',
-  TYPING_EVENTS: 'typing-events',
-  UPDATE_ANY_MESSAGE: 'update-any-message',
-  UPDATE_CHANNEL: 'update-channel',
-  UPDATE_CHANNEL_MEMBERS: 'update-channel-members',
-  UPDATE_OWN_MESSAGE: 'update-own-message',
-  UPDATE_THREAD: 'update-thread',
-  UPLOAD_FILE: 'upload-file',
-} as const;
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export type ChannelOwnCapability =
-  (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
-
-export interface ChannelResponse {
-  cid: string;
-
-  created_at: Date;
-
-  disabled: boolean;
-
-  frozen: boolean;
 
   id: string;
 
+  text: string;
+
   type: string;
 
   updated_at: Date;
 
-  custom: Record<string, any>;
+  visibility: string;
 
-  auto_translation_enabled?: boolean;
+  feeds: string[];
 
-  auto_translation_language?: string;
-
-  blocked?: boolean;
-
-  cooldown?: number;
+  user: UserResponse;
 
   deleted_at?: Date;
 
-  hidden?: boolean;
+  edited_at?: Date;
 
-  hide_messages_before?: Date;
+  expires_at?: Date;
 
-  last_message_at?: Date;
+  popularity?: number;
 
-  member_count?: number;
+  score?: number;
 
-  mute_expires_at?: Date;
+  share_count?: number;
 
-  muted?: boolean;
+  attachments?: ActivityAttachment[];
 
-  team?: string;
+  comments?: Comment[];
 
-  truncated_at?: Date;
+  filter_tags?: string[];
 
-  members?: ChannelMember[];
+  interest_tags?: string[];
 
-  own_capabilities?: ChannelOwnCapability[];
+  latest_reactions?: ActivityReaction[];
 
-  config?: ChannelConfigWithInfo;
+  mentioned_users?: UserResponse[];
 
-  created_by?: UserResponse;
+  current_feed?: Feed;
 
-  truncated_by?: UserResponse;
+  custom?: Record<string, any>;
+
+  location?: ActivityLocation;
+
+  moderation?: Moderation;
+
+  reaction_groups?: Record<string, ReactionGroup>;
+
+  search_data?: Record<string, any>;
 }
 
-export interface Command {
-  args: string;
+export interface Bookmark {
+  activity_id: string;
 
-  description: string;
+  created_at: Date;
+
+  updated_at: Date;
+
+  folder: BookmarkFolder;
+
+  user: UserResponse;
+
+  custom?: Record<string, any>;
+}
+
+export interface BookmarkAddedEvent {
+  activity_id: string;
+
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface BookmarkFolder {
+  created_at: Date;
+
+  id: string;
 
   name: string;
 
-  set: string;
+  updated_at: Date;
 
-  created_at?: Date;
+  custom?: Record<string, any>;
+}
 
-  updated_at?: Date;
+export interface BookmarkRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  bookmark: Bookmark;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface BookmarkUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  bookmark: Bookmark;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
 export interface Comment {
@@ -545,33 +481,27 @@ export interface Comment {
 
   created_at: Date;
 
-  feed_fid: string;
-
   id: string;
+
+  reaction_count: number;
 
   reply_count: number;
 
-  text: string;
-
   updated_at: Date;
 
-  user_id: string;
-
-  mentioned_user_ids: string[];
-
-  custom: Record<string, any>;
-
-  reaction_counts: Record<string, ReactionGroupResponse>;
+  user: UserResponse;
 
   deleted_at?: Date;
 
   parent_id?: string;
 
-  pin_expires?: Date;
+  text?: string;
 
-  pinned_at?: Date;
+  latest_reactions?: ActivityReaction[];
 
-  pinned_by_id?: string;
+  custom?: Record<string, any>;
+
+  reaction_groups?: Record<string, ReactionGroup>;
 }
 
 export interface CommentAddedEvent {
@@ -586,54 +516,8 @@ export interface CommentAddedEvent {
   type: string;
 
   received_at?: Date;
-}
 
-export interface CommentReactionDeletedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  comment: Comment;
-
-  custom: Record<string, any>;
-
-  reaction: Reaction;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface CommentReactionNewEvent {
-  created_at: Date;
-
-  fid: string;
-
-  comment: Comment;
-
-  custom: Record<string, any>;
-
-  reaction: Reaction;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface CommentReactionUpdatedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  comment: Comment;
-
-  custom: Record<string, any>;
-
-  reaction: Reaction;
-
-  type: string;
-
-  received_at?: Date;
+  user?: UserResponseCommonFields;
 }
 
 export interface CommentRemovedEvent {
@@ -648,11 +532,11 @@ export interface CommentRemovedEvent {
   type: string;
 
   received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
 export interface CommentUpdatedEvent {
-  activity_id: string;
-
   created_at: Date;
 
   fid: string;
@@ -664,102 +548,60 @@ export interface CommentUpdatedEvent {
   type: string;
 
   received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
-export interface ConnectUserDetailsRequest {
-  id: string;
+export interface CreateActivitiesBatchRequest {
+  activities: ActivityRequest[];
+}
 
-  image?: string;
+export interface CreateActivitiesBatchResponse {
+  duration: string;
 
-  invisible?: boolean;
+  activities: Activity[];
+}
 
-  language?: string;
+export interface CreateFeedRequest {
+  feed_id: string;
 
-  name?: string;
+  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+
+  members?: FeedMemberPayload[];
 
   custom?: Record<string, any>;
-
-  privacy_settings?: PrivacySettingsResponse;
 }
 
-export interface CreateBlockListRequest {
-  name: string;
-
-  words: string[];
-
-  team?: string;
-
-  type?: 'regex' | 'domain' | 'email' | 'word';
-}
-
-export interface CreateBlockListResponse {
-  duration: string;
-
-  blocklist?: BlockListResponse;
-}
-
-export interface CreateDeviceRequest {
-  id: string;
-
-  push_provider: 'firebase' | 'apn' | 'huawei' | 'xiaomi';
-
-  push_provider_name?: string;
-
-  voip_token?: boolean;
-}
-
-export interface CreateGuestRequest {
-  user: UserRequest;
-}
-
-export interface CreateGuestResponse {
-  access_token: string;
-
-  duration: string;
-
-  user: UserResponse;
-}
-
-export interface DeleteFeedGroupResponse {
-  duration: string;
-}
-
-export interface DeleteFeedResponse {
+export interface CreateFeedResponse {
   duration: string;
 
   feed: Feed;
+
+  members?: FeedMember[];
 }
 
-export interface DeleteReactionFromActivityResponse {
+export interface CreateManyFeedsRequest {
+  feeds: FeedPayload[];
+}
+
+export interface CreateManyFeedsResponse {
   duration: string;
 
-  activity: Activity;
-
-  reaction: Reaction;
+  feeds: Feed[];
 }
 
-export interface DeleteReactionFromCommentResponse {
-  duration: string;
+export interface DecayFunctionConfig {
+  base?: string;
 
-  reaction: Reaction;
-}
+  decay?: string;
 
-export interface DeviceResponse {
-  created_at: Date;
+  direction?: string;
 
-  id: string;
+  offset?: string;
 
-  push_provider: string;
+  origin?: string;
 
-  user_id: string;
-
-  disabled?: boolean;
-
-  disabled_reason?: string;
-
-  push_provider_name?: string;
-
-  voip?: boolean;
+  scale?: string;
 }
 
 export interface Feed {
@@ -771,653 +613,351 @@ export interface Feed {
 
   following_count: number;
 
-  group: string;
+  group_id: string;
 
   id: string;
 
-  type: 'flat' | 'notification';
+  member_count: number;
+
+  pin_count: number;
 
   updated_at: Date;
 
-  visibility_level: 'public' | 'visible' | 'followers' | 'private';
-
-  invites: FeedMember[];
-
-  members: FeedMember[];
-
-  own_capabilities: FeedOwnCapability[];
-
-  created_by: UserResponse;
-
-  follow_requests: ActionableFollowRequests;
+  owner: UserResponse;
 
   deleted_at?: Date;
+
+  visibility?: string;
 
   custom?: Record<string, any>;
 }
 
-export interface FeedDeletedEvent {
+export interface FeedCreatedEvent {
   created_at: Date;
 
   fid: string;
 
   custom: Record<string, any>;
 
-  feed: Feed;
+  type: string;
+
+  received_at?: Date;
+
+  feed?: Feed;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface FeedGroup {
+  created_at: Date;
+
+  group_id: string;
+
+  id: string;
+
+  updated_at: Date;
+
+  default_visibility?: string;
+
+  activity_analysers?: ActivityAnalyserConfig[];
+
+  activity_selectors?: ActivitySelectorConfig[];
+
+  aggregation?: AggregationConfig;
+
+  custom?: Record<string, any>;
+
+  notification?: NotificationConfig;
+
+  ranking?: RankingConfig;
+
+  stories?: StoriesConfig;
+}
+
+export interface FeedGroupChangedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  feed_group?: FeedGroup;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface FeedGroupRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  group_id: string;
+
+  custom: Record<string, any>;
 
   type: string;
 
   received_at?: Date;
 }
 
-export interface FeedFollowRequest {
+export interface FeedMember {
   created_at: Date;
+
+  updated_at: Date;
+
+  request?: boolean;
+
+  request_accepted_at?: Date;
+
+  request_rejected_at?: Date;
+
+  role?: string;
+
+  status?: string;
+
+  custom?: Record<string, any>;
+
+  feed?: Feed;
+
+  user?: UserResponse;
+}
+
+export interface FeedMemberPayload {
+  user_id: string;
+
+  request?: boolean;
+
+  role?: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface FeedPayload {
+  feed_group_id: string;
+
+  feed_id: string;
+
+  owner_id?: string;
+
+  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+
+  members?: FeedMemberPayload[];
+
+  custom?: Record<string, any>;
+}
+
+export interface FeedRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface Follow {
+  created_at: Date;
+
+  push_preference: string;
+
+  request: boolean;
 
   source_fid: string;
 
-  source_user_id: string;
-
-  status:
-    | 'invited'
-    | 'pending'
-    | 'accepted'
-    | 'accepted_invite'
-    | 'rejected'
-    | 'revoked'
-    | 'rejected_invite'
-    | 'cancelled';
+  status: string;
 
   target_fid: string;
 
   updated_at: Date;
 
-  source_user: UserResponse;
-}
+  source_feed: Feed;
 
-export interface FeedGroupInput {
-  app_pk: number;
+  target_feed: Feed;
 
-  slug: string;
+  request_accepted_at?: Date;
 
-  type: 'flat' | 'notification';
-
-  aggregation_format?: string;
-
-  fanout_discard_rule?: number;
-
-  fanout_strategy?: number;
-
-  jnf_fallback_init?: boolean;
-
-  max_length?: number;
-
-  origin_tracking_enabled?: boolean;
-
-  prefix?: string;
-
-  private?: boolean;
-
-  realtime_transport?: number;
-
-  realtime_transports?: string;
-
-  shard_id?: string;
-
-  sqs_key?: string;
-
-  sqs_queue_name?: string;
-
-  sqs_region?: string;
-
-  sqs_secret?: string;
-
-  sqs_url?: string;
-
-  timeline_version?: number;
-
-  ttl?: number;
-
-  use_flat_realtime_updates?: boolean;
-
-  use_group_index_for_reads?: boolean;
-
-  use_journaled_class?: boolean;
-
-  use_normalized_storage?: boolean;
-
-  view_version?: number;
-
-  webhook_url?: string;
-}
-
-export interface FeedGroupResponse {
-  aggregation_format: string;
-
-  app_pk: number;
-
-  created_at: Date;
-
-  id: number;
-
-  jnf_fallback_init: boolean;
-
-  max_length: number;
-
-  origin_tracking_enabled: boolean;
-
-  prefix: string;
-
-  private: boolean;
-
-  realtime_transport: number;
-
-  realtime_transports: string;
-
-  shard_id: string;
-
-  slug: string;
-
-  sqs_key: string;
-
-  sqs_queue_name: string;
-
-  sqs_region: string;
-
-  sqs_secret: string;
-
-  sqs_url: string;
-
-  type: 'flat' | 'notification';
-
-  updated_at: Date;
-
-  use_flat_realtime_updates: boolean;
-
-  use_group_index_for_reads: boolean;
-
-  use_journaled_class: boolean;
-
-  use_normalized_storage: boolean;
-
-  webhook_url: string;
-
-  deleted_at?: Date;
-
-  fanout_discard_rule?: number;
-
-  fanout_strategy?: number;
-
-  timeline_version?: number;
-
-  ttl?: number;
-
-  view_version?: number;
-}
-
-export interface FeedMember {
-  user_id: string;
-
-  ban_expires_at?: Date;
-
-  ban_reason?: string;
-
-  banned?: boolean;
-
-  created_at?: Date;
-
-  invite_accepted_at?: Date;
-
-  invite_rejected_at?: Date;
-
-  invited?: boolean;
+  request_rejected_at?: Date;
 
   role?: string;
 
-  shadow_banned?: boolean;
+  custom?: Record<string, any>;
+}
 
-  status?: string;
+export interface FollowAddedEvent {
+  created_at: Date;
 
-  updated_at?: Date;
+  fid: string;
+
+  custom: Record<string, any>;
+
+  follow: Follow;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface FollowManyRequest {
+  follows: FollowPayload[];
+}
+
+export interface FollowManyResponse {
+  duration: string;
+
+  follows: Follow[];
+}
+
+export interface FollowPayload {
+  source: string;
+
+  target: string;
+
+  push_preference?: string;
+
+  request?: boolean;
 
   custom?: Record<string, any>;
-
-  user?: UserResponse;
 }
 
-export interface FeedMemberAddedEvent {
+export interface FollowRemovedEvent {
   created_at: Date;
 
   fid: string;
 
   custom: Record<string, any>;
 
-  feed: Feed;
-
-  member: FeedMember;
+  follow: Follow;
 
   type: string;
 
   received_at?: Date;
-}
 
-export interface FeedMemberRemovedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  feed: Feed;
-
-  member: FeedMember;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface FeedMemberUpdatedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  feed: Feed;
-
-  member: FeedMember;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export const FeedOwnCapability = {
-  ADD_ACTIVITY: 'add-activity',
-  ADD_COMMENT: 'add-comment',
-  DELETE_FEED: 'delete-feed',
-  GET_FEED: 'get-feed',
-  GET_FOLLOWED_FEEDS: 'get-followed-feeds',
-  GET_FOLLOWING_FEEDS: 'get-following-feeds',
-  QUERY_COMMENTS: 'query-comments',
-  READ_FEED: 'read-feed',
-  REMOVE_ANY_ACTIVITY_FROM_FEED: 'remove-any-activity-from-feed',
-  REMOVE_ANY_COMMENT: 'remove-any-comment',
-  REMOVE_COMMENT: 'remove-comment',
-  REMOVE_OWN_ACTIVITY_FROM_FEED: 'remove-own-activity-from-feed',
-  REMOVE_OWN_FEED_MEMBERSHIP: 'remove-own-feed-membership',
-  SEND_FEED_REACTION: 'send-feed-reaction',
-  UPDATE_ANY_ACTIVITY: 'update-any-activity',
-  UPDATE_FEED: 'update-feed',
-  UPDATE_FEED_FOLLOWERS: 'update-feed-followers',
-  UPDATE_FEED_MEMBERS: 'update-feed-members',
-  UPDATE_OWN_ACTIVITY: 'update-own-activity',
-  UPDATE_OWN_COMMENT: 'update-own-comment',
-} as const;
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export type FeedOwnCapability =
-  (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
-
-export interface Field {
-  short: boolean;
-
-  title: string;
-
-  value: string;
-}
-
-export interface FileUploadConfig {
-  size_limit: number;
-
-  allowed_file_extensions: string[];
-
-  allowed_mime_types: string[];
-
-  blocked_file_extensions: string[];
-
-  blocked_mime_types: string[];
-}
-
-export interface FollowRelationship {
-  created_at: Date;
-
-  updated_at: Date;
-
-  feed: Feed;
+  user?: UserResponseCommonFields;
 }
 
 export interface FollowRequest {
-  target_group: string;
+  source: string;
 
-  target_id: string;
+  target: string;
 
-  activity_copy_limit?: number;
+  push_preference?: string;
+
+  request?: boolean;
+
+  custom?: Record<string, any>;
 }
 
 export interface FollowResponse {
-  created: boolean;
-
   duration: string;
 
-  follow_request_status?:
-    | 'invited'
-    | 'pending'
-    | 'accepted'
-    | 'rejected'
-    | 'revoked';
+  follow: Follow;
 }
 
-export interface FullUserResponse {
-  banned: boolean;
-
-  created_at: Date;
-
-  id: string;
-
-  invisible: boolean;
-
-  language: string;
-
-  online: boolean;
-
-  role: string;
-
-  shadow_banned: boolean;
-
-  total_unread_count: number;
-
-  unread_channels: number;
-
-  unread_count: number;
-
-  unread_threads: number;
-
-  updated_at: Date;
-
-  blocked_user_ids: string[];
-
-  channel_mutes: ChannelMute[];
-
-  devices: DeviceResponse[];
-
-  mutes: UserMuteResponse[];
-
-  teams: string[];
-
-  custom: Record<string, any>;
-
-  deactivated_at?: Date;
-
-  deleted_at?: Date;
-
-  image?: string;
-
-  last_active?: Date;
-
-  name?: string;
-
-  revoke_tokens_issued_before?: Date;
-
-  latest_hidden_channels?: string[];
-
-  privacy_settings?: PrivacySettingsResponse;
-}
-
-export interface GetApplicationResponse {
+export interface FollowSuggestionsResponse {
   duration: string;
 
-  app: AppResponseFields;
-}
-
-export interface GetBlockedUsersResponse {
-  duration: string;
-
-  blocks: BlockedUserResponse[];
-}
-
-export interface GetFeedGroupsResponse {
-  duration: string;
-
-  feed_groups: Record<string, FeedGroupResponse>;
-}
-
-export interface GetFeedResponse {
-  duration: string;
-
-  feed: Feed;
-}
-
-export interface GetFollowedFeedsResponse {
-  duration: string;
-
-  followed_feeds: FollowRelationship[];
+  suggestions: Feed[];
 
   next?: string;
 
   prev?: string;
 }
 
-export interface GetFollowingFeedsResponse {
-  duration: string;
+export interface FollowUpdatedEvent {
+  created_at: Date;
 
-  followers: FollowRelationship[];
-}
-
-export interface GetOGResponse {
-  duration: string;
+  fid: string;
 
   custom: Record<string, any>;
 
-  asset_url?: string;
+  follow: Follow;
 
-  author_icon?: string;
+  type: string;
 
-  author_link?: string;
+  received_at?: Date;
 
-  author_name?: string;
-
-  color?: string;
-
-  fallback?: string;
-
-  footer?: string;
-
-  footer_icon?: string;
-
-  image_url?: string;
-
-  latitude?: number;
-
-  longitude?: number;
-
-  og_scrape_url?: string;
-
-  original_height?: number;
-
-  original_width?: number;
-
-  pretext?: string;
-
-  stopped_sharing?: boolean;
-
-  text?: string;
-
-  thumb_url?: string;
-
-  title?: string;
-
-  title_link?: string;
-
-  type?: string;
-
-  actions?: Action[];
-
-  fields?: Field[];
-
-  giphy?: Images;
+  user?: UserResponseCommonFields;
 }
 
-export interface GetOrCreateFeedRequest {
-  visibility_level?: 'public' | 'visible' | 'followers' | 'private';
+export interface GetActivityResponse {
+  duration: string;
 
-  watch?: boolean;
+  activity: Activity;
+}
 
-  invites?: FeedMember[];
+export interface GetFeedResponse {
+  duration: string;
+
+  activities: Activity[];
+
+  feed: Feed;
+
+  group: FeedGroup;
+
+  own_feed_follow: Follow;
+
+  own_feed_membership: FeedMember;
+
+  next?: string;
+
+  prev?: string;
+
+  aggregated_activities?: AggregatedActivity[];
+
+  followers?: Follow[];
+
+  following?: Follow[];
 
   members?: FeedMember[];
 
-  custom?: Record<string, any>;
+  pinned_activities?: ActivityPin[];
+
+  followers_pagination?: PagerResponse;
+
+  following_pagination?: PagerResponse;
+
+  member_pagination?: PagerResponse;
+
+  notification_status?: NotificationStatus;
 }
 
-export interface GetOrCreateFeedResponse {
-  duration: string;
+export interface MarkActivityRequest {
+  mark_all_read?: boolean;
 
-  feed: Feed;
+  mark_all_seen?: boolean;
+
+  mark_read?: string[];
+
+  mark_watched?: string[];
 }
 
-export interface ImageData {
-  frames: string;
+export interface Moderation {}
 
-  height: string;
+export interface NotificationConfig {
+  track_read: boolean;
 
-  size: string;
-
-  url: string;
-
-  width: string;
+  track_seen: boolean;
 }
 
-export interface Images {
-  fixed_height: ImageData;
+export interface NotificationStatus {
+  unread: number;
 
-  fixed_height_downsampled: ImageData;
+  unseen: number;
 
-  fixed_height_still: ImageData;
+  last_seen_at?: Date;
 
-  fixed_width: ImageData;
-
-  fixed_width_downsampled: ImageData;
-
-  fixed_width_still: ImageData;
-
-  original: ImageData;
-}
-
-export interface LabelThresholds {
-  block?: number;
-
-  flag?: number;
-}
-
-export interface ListBlockListResponse {
-  duration: string;
-
-  blocklists: BlockListResponse[];
-}
-
-export interface ListDevicesResponse {
-  duration: string;
-
-  devices: DeviceResponse[];
-}
-
-export interface NotificationFeedMemberAddedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  feed: Feed;
-
-  member: FeedMember;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface NotificationFeedMemberInvitedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  feed: Feed;
-
-  member: FeedMember;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface NotificationFeedMemberRemovedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  feed: Feed;
-
-  member: FeedMember;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface NotificationFollowEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  source_feed: Feed;
-
-  target_feed: Feed;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface NotificationFollowRequestEvent {
-  created_at: Date;
-
-  fid: string;
-
-  status: string;
-
-  custom: Record<string, any>;
-
-  source_feed: Feed;
-
-  target_feed: Feed;
-
-  type: string;
-
-  received_at?: Date;
-}
-
-export interface NotificationUnfollowEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  source_feed: Feed;
-
-  target_feed: Feed;
-
-  type: string;
-
-  received_at?: Date;
+  read_activities?: string[];
 }
 
 export interface PagerResponse {
@@ -1426,13 +966,25 @@ export interface PagerResponse {
   prev?: string;
 }
 
-export interface PrivacySettingsResponse {
-  read_receipts?: ReadReceiptsResponse;
+export interface PinActivityRequest {}
 
-  typing_indicators?: TypingIndicatorsResponse;
+export interface PinActivityResponse {
+  activity_id: string;
+
+  created_at: Date;
+
+  duration: string;
+
+  fid: string;
+
+  user_id: string;
 }
 
 export interface QueryActivitiesRequest {
+  comment_limit?: number;
+
+  comment_sort?: 'first' | 'last' | 'popular';
+
   limit?: number;
 
   next?: string;
@@ -1461,9 +1013,13 @@ export interface QueryCommentsRequest {
 
   prev?: string;
 
-  sort?: SortParamRequest[];
+  sort?: 'first' | 'last' | 'reaction_count';
 
-  filter?: Record<string, any>;
+  user_id?: string;
+
+  activity_ids?: string[];
+
+  parent_ids?: string[];
 }
 
 export interface QueryCommentsResponse {
@@ -1471,21 +1027,9 @@ export interface QueryCommentsResponse {
 
   comments: Comment[];
 
-  pager: PagerResponse;
-}
-
-export interface QueryFeedsRequest {
-  limit?: number;
-
   next?: string;
 
   prev?: string;
-
-  watch?: boolean;
-
-  sort?: SortParamRequest[];
-
-  filter?: Record<string, any>;
 }
 
 export interface QueryFeedsResponse {
@@ -1493,12 +1037,10 @@ export interface QueryFeedsResponse {
 
   feeds: Feed[];
 
-  next?: string;
-
-  prev?: string;
+  pager: PagerResponse;
 }
 
-export interface QueryFollowRequestsRequest {
+export interface QueryFollowsRequest {
   limit?: number;
 
   next?: string;
@@ -1510,115 +1052,131 @@ export interface QueryFollowRequestsRequest {
   filter?: Record<string, any>;
 }
 
-export interface QueryFollowRequestsResponse {
+export interface QueryFollowsResponse {
   duration: string;
 
-  follow_requests: FeedFollowRequest[];
+  follows: Follow[];
 
   next?: string;
 
   prev?: string;
 }
 
-export interface QueryReactionsRequest {
-  limit?: number;
-
-  next?: string;
-
-  prev?: string;
-
-  sort?: SortParamRequest[];
-
-  filter?: Record<string, any>;
-}
-
-export interface QueryReactionsResponse {
-  duration: string;
-
-  reactions: Reaction[];
-
-  next?: string;
-
-  prev?: string;
-}
-
-export interface QueryUsersPayload {
-  filter_conditions: Record<string, any>;
-
-  include_deactivated_users?: boolean;
-
-  limit?: number;
-
-  offset?: number;
-
-  presence?: boolean;
-
-  sort?: SortParamRequest[];
-}
-
-export interface QueryUsersResponse {
-  duration: string;
-
-  users: FullUserResponse[];
-}
-
-export interface Reaction {
-  created_at: Date;
-
-  entity_id: string;
-
-  entity_type: string;
-
-  score: number;
-
+export interface RankingConfig {
   type: string;
 
-  updated_at: Date;
+  decay_factor?: number;
 
-  user_id: string;
+  recency_weight?: number;
+
+  score?: string;
+
+  defaults?: Record<string, any>;
+
+  functions?: Record<string, DecayFunctionConfig>;
+}
+
+export interface ReactionAddedEvent {
+  created_at: Date;
+
+  fid: string;
 
   custom: Record<string, any>;
 
-  user: UserResponse;
+  reaction: ActivityReaction;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
-export interface ReactionGroupResponse {
+export interface ReactionGroup {
   count: number;
 
   first_reaction_at: Date;
 
   last_reaction_at: Date;
-
-  sum_scores: number;
 }
 
-export interface ReadFlatFeedResponse {
+export interface ReactionRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  reaction: ActivityReaction;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface RejectFeedMemberRequest {
+  user_id: string;
+}
+
+export interface RejectFeedMemberResponse {
   duration: string;
 
-  activities: Activity[];
-
-  feed: Feed;
+  feed_member: FeedMember;
 }
 
-export interface ReadNotificationFeedResponse {
+export interface RejectFollowRequest {
+  source_fid: string;
+
+  target_fid: string;
+}
+
+export interface RejectFollowResponse {
   duration: string;
 
-  unread: number;
-
-  unseen: number;
-
-  groups: AggregatedActivities[];
+  follow: Follow;
 }
 
-export interface ReadReceiptsResponse {
-  enabled: boolean;
+export interface RemoveActivitiesRequest {
+  activity_ids: string[];
+
+  hard_delete?: boolean;
 }
 
-export interface RemoveActivityFromFeedResponse {
+export interface RemoveActivitiesResponse {
   duration: string;
+
+  removed_activity_ids: string[];
+}
+
+export interface RemoveActivityReactionResponse {
+  activity_id: string;
+
+  duration: string;
+
+  type: string;
+
+  user_id: string;
+}
+
+export interface RemoveActivityResponse {
+  duration: string;
+}
+
+export interface RemoveBookmarkResponse {
+  duration: string;
+
+  bookmark: Bookmark;
 }
 
 export interface RemoveCommentResponse {
+  duration: string;
+
+  comment: Comment;
+}
+
+export interface RemoveFeedResponse {
   duration: string;
 }
 
@@ -1632,82 +1190,54 @@ export interface SortParamRequest {
   field?: string;
 }
 
-export interface Thresholds {
-  explicit?: LabelThresholds;
+export interface StoriesConfig {
+  expiration_behaviour?: string;
 
-  spam?: LabelThresholds;
-
-  toxic?: LabelThresholds;
-}
-
-export interface TypingIndicatorsResponse {
-  enabled: boolean;
-}
-
-export interface UnblockUsersRequest {
-  blocked_user_id: string;
-}
-
-export interface UnblockUsersResponse {
-  duration: string;
-}
-
-export interface UnfollowRequest {
-  target_group: string;
-
-  target_id: string;
-
-  keep_history?: boolean;
+  skip_watched?: boolean;
 }
 
 export interface UnfollowResponse {
   duration: string;
-
-  unfollowed: boolean;
 }
 
-export interface UpdateActivityRequest {
-  object?: string;
+export interface UnpinActivityResponse {
+  activity_id: string;
 
-  verb?: string;
+  duration: string;
 
-  add_to_targets?: string[];
+  fid: string;
 
-  remove_to_targets?: string[];
-
-  replace_to_targets?: string[];
-
-  custom?: Record<string, any>;
+  user_id: string;
 }
 
-export interface UpdateActivityResponse {
+export interface UpdateActivityPartialRequest {
+  unset?: string[];
+
+  set?: Record<string, any>;
+}
+
+export interface UpdateActivityPartialResponse {
   duration: string;
 
   activity: Activity;
 }
 
-export interface UpdateBlockListRequest {
-  team?: string;
+export interface UpdateBookmarkRequest {
+  feed_id: string;
 
-  words?: string[];
+  feed_type: string;
+
+  custom?: Record<string, any>;
 }
 
-export interface UpdateBlockListResponse {
+export interface UpdateBookmarkResponse {
   duration: string;
 
-  blocklist?: BlockListResponse;
+  bookmark: Bookmark;
 }
 
 export interface UpdateCommentRequest {
-  text: string;
-
-  pin_expires?: Date;
-
-  pinned_at?: Date;
-
-  pinned_by_id?: string;
-
-  mentioned_user_ids?: string[];
+  comment?: string;
 
   custom?: Record<string, any>;
 }
@@ -1718,102 +1248,28 @@ export interface UpdateCommentResponse {
   comment: Comment;
 }
 
-export interface UpdateFeedRequest {
-  accept_invite?: boolean;
+export interface UpdateFeedMembersRequest {
+  operation: 'add' | 'remove' | 'set';
 
-  max_activity_copy_limit_for_invites?: number;
+  limit?: number;
 
-  reject_invite?: boolean;
+  next?: string;
 
-  accepted_follow_requests?: string[];
+  prev?: string;
 
-  add_members?: FeedMember[];
+  members?: FeedMemberPayload[];
+}
 
-  assign_roles?: FeedMember[];
-
-  cancelled_pending_follow_requests?: string[];
-
-  invited_follow_requests?: string[];
-
-  invites?: FeedMember[];
-
-  rejected_follow_requests?: string[];
-
-  rejected_invite_follow_requests?: string[];
-
-  remove_members?: string[];
-
-  revoked_follow_requests?: string[];
+export interface UpdateFollowRequest {
+  push_preference?: string;
 
   custom?: Record<string, any>;
 }
 
-export interface UpdateFeedResponse {
+export interface UpdateFollowResponse {
   duration: string;
 
-  feed: Feed;
-}
-
-export interface UpdateUserPartialRequest {
-  id: string;
-
-  unset?: string[];
-
-  set?: Record<string, any>;
-}
-
-export interface UpdateUsersPartialRequest {
-  users: UpdateUserPartialRequest[];
-}
-
-export interface UpdateUsersRequest {
-  users: Record<string, UserRequest>;
-}
-
-export interface UpdateUsersResponse {
-  duration: string;
-
-  membership_deletion_task_id: string;
-
-  users: Record<string, FullUserResponse>;
-}
-
-export interface UpsertFeedGroupRequest {
-  feed_group: FeedGroupInput;
-}
-
-export interface UpsertFeedGroupResponse {
-  duration: string;
-
-  feed_group?: FeedGroupResponse;
-}
-
-export interface UserMuteResponse {
-  created_at: Date;
-
-  updated_at: Date;
-
-  expires?: Date;
-
-  target?: UserResponse;
-
-  user?: UserResponse;
-}
-
-export interface UserRequest {
-  id: string;
-
-  image?: string;
-
-  invisible?: boolean;
-
-  language?: string;
-
-  name?: string;
-
-  custom?: Record<string, any>;
-
-  privacy_settings?: PrivacySettingsResponse;
+  follow: Follow;
 }
 
 export interface UserResponse {
@@ -1848,47 +1304,82 @@ export interface UserResponse {
   name?: string;
 
   revoke_tokens_issued_before?: Date;
+
+  teams_role?: Record<string, string>;
 }
 
-export interface WSAuthMessage {
-  token: string;
+export interface UserResponseCommonFields {
+  banned: boolean;
 
-  user_details: ConnectUserDetailsRequest;
+  created_at: Date;
 
-  products?: string[];
+  id: string;
+
+  language: string;
+
+  online: boolean;
+
+  role: string;
+
+  updated_at: Date;
+
+  blocked_user_ids: string[];
+
+  teams: string[];
+
+  custom: Record<string, any>;
+
+  deactivated_at?: Date;
+
+  deleted_at?: Date;
+
+  image?: string;
+
+  last_active?: Date;
+
+  name?: string;
+
+  revoke_tokens_issued_before?: Date;
+
+  teams_role?: Record<string, string>;
 }
+
+export type WSClientEvent =
+  | ({ type: 'activity.added' } & ActivityAddedEvent)
+  | ({ type: 'activity.reaction.added' } & ReactionAddedEvent)
+  | ({ type: 'activity.reaction.removed' } & ReactionRemovedEvent)
+  | ({ type: 'activity.removed' } & ActivityRemovedEvent)
+  | ({ type: 'activity.updated' } & ActivityUpdatedEvent)
+  | ({ type: 'bookmark.added' } & BookmarkAddedEvent)
+  | ({ type: 'bookmark.removed' } & BookmarkRemovedEvent)
+  | ({ type: 'bookmark.updated' } & BookmarkUpdatedEvent)
+  | ({ type: 'comment.added' } & CommentAddedEvent)
+  | ({ type: 'comment.removed' } & CommentRemovedEvent)
+  | ({ type: 'comment.updated' } & CommentUpdatedEvent)
+  | ({ type: 'feed.created' } & FeedCreatedEvent)
+  | ({ type: 'feed.removed' } & FeedRemovedEvent)
+  | ({ type: 'feed_group.changed' } & FeedGroupChangedEvent)
+  | ({ type: 'feed_group.removed' } & FeedGroupRemovedEvent)
+  | ({ type: 'follow.added' } & FollowAddedEvent)
+  | ({ type: 'follow.removed' } & FollowRemovedEvent)
+  | ({ type: 'follow.updated' } & FollowUpdatedEvent);
 
 export type WSEvent =
-  | ({ type: 'feeds.activity_added' } & ActivityAddedEvent)
-  | ({ type: 'feeds.activity_comment_new' } & CommentAddedEvent)
-  | ({ type: 'feeds.activity_comment_removed' } & CommentRemovedEvent)
-  | ({ type: 'feeds.activity_comment_updated' } & CommentUpdatedEvent)
-  | ({ type: 'feeds.activity_reaction_deleted' } & ActivityReactionDeletedEvent)
-  | ({ type: 'feeds.activity_reaction_new' } & ActivityReactionNewEvent)
-  | ({ type: 'feeds.activity_reaction_updated' } & ActivityReactionUpdatedEvent)
-  | ({ type: 'feeds.activity_removed' } & ActivityRemovedEvent)
-  | ({ type: 'feeds.activity_updated' } & ActivityUpdatedEvent)
-  | ({ type: 'feeds.comment_reaction_deleted' } & CommentReactionDeletedEvent)
-  | ({ type: 'feeds.comment_reaction_new' } & CommentReactionNewEvent)
-  | ({ type: 'feeds.comment_reaction_updated' } & CommentReactionUpdatedEvent)
-  | ({ type: 'feeds.feed_deleted' } & FeedDeletedEvent)
-  | ({ type: 'feeds.member_added' } & FeedMemberAddedEvent)
-  | ({ type: 'feeds.member_removed' } & FeedMemberRemovedEvent)
-  | ({ type: 'feeds.member_updated' } & FeedMemberUpdatedEvent)
-  | ({ type: 'feeds.notification.follow' } & NotificationFollowEvent)
-  | ({
-      type: 'feeds.notification.follow_request_created';
-    } & NotificationFollowRequestEvent)
-  | ({
-      type: 'feeds.notification.follow_request_updated';
-    } & NotificationFollowRequestEvent)
-  | ({
-      type: 'feeds.notification.member_added';
-    } & NotificationFeedMemberAddedEvent)
-  | ({
-      type: 'feeds.notification.member_invited';
-    } & NotificationFeedMemberInvitedEvent)
-  | ({
-      type: 'feeds.notification.member_removed';
-    } & NotificationFeedMemberRemovedEvent)
-  | ({ type: 'feeds.notification.unfollow' } & NotificationUnfollowEvent);
+  | ({ type: 'activity.added' } & ActivityAddedEvent)
+  | ({ type: 'activity.reaction.added' } & ReactionAddedEvent)
+  | ({ type: 'activity.reaction.removed' } & ReactionRemovedEvent)
+  | ({ type: 'activity.removed' } & ActivityRemovedEvent)
+  | ({ type: 'activity.updated' } & ActivityUpdatedEvent)
+  | ({ type: 'bookmark.added' } & BookmarkAddedEvent)
+  | ({ type: 'bookmark.removed' } & BookmarkRemovedEvent)
+  | ({ type: 'bookmark.updated' } & BookmarkUpdatedEvent)
+  | ({ type: 'comment.added' } & CommentAddedEvent)
+  | ({ type: 'comment.removed' } & CommentRemovedEvent)
+  | ({ type: 'comment.updated' } & CommentUpdatedEvent)
+  | ({ type: 'feed.created' } & FeedCreatedEvent)
+  | ({ type: 'feed.removed' } & FeedRemovedEvent)
+  | ({ type: 'feed_group.changed' } & FeedGroupChangedEvent)
+  | ({ type: 'feed_group.removed' } & FeedGroupRemovedEvent)
+  | ({ type: 'follow.added' } & FollowAddedEvent)
+  | ({ type: 'follow.removed' } & FollowRemovedEvent)
+  | ({ type: 'follow.updated' } & FollowUpdatedEvent);
