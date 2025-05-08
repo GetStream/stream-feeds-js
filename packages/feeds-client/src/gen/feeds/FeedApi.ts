@@ -1,134 +1,99 @@
-import { StreamResponse, StreamFeedsClient } from '../../gen-imports';
+import { StreamResponse, FeedsApi } from '../../gen-imports';
 import {
-  AddActivityRequest,
-  AddActivityResponse,
-  DeleteFeedResponse,
-  FollowRequest,
-  FollowResponse,
+  AcceptFeedMemberRequest,
+  AcceptFeedMemberResponse,
   GetFeedResponse,
-  GetFollowedFeedsResponse,
-  GetFollowingFeedsResponse,
-  GetOrCreateFeedRequest,
-  GetOrCreateFeedResponse,
-  ReadFlatFeedResponse,
-  ReadNotificationFeedResponse,
-  RemoveActivityFromFeedResponse,
-  UnfollowRequest,
-  UnfollowResponse,
-  UpdateFeedRequest,
-  UpdateFeedResponse,
+  MarkActivityRequest,
+  PinActivityRequest,
+  PinActivityResponse,
+  RejectFeedMemberRequest,
+  RejectFeedMemberResponse,
+  RemoveFeedResponse,
+  Response,
+  UnpinActivityResponse,
+  UpdateFeedMembersRequest,
 } from '../models';
 
-export class StreamFeedApi {
+export class FeedApi {
   constructor(
-    protected client: StreamFeedsClient,
+    protected feedsApi: FeedsApi,
     public readonly group: string,
     public readonly id: string,
   ) {}
 
-  delete(): Promise<StreamResponse<DeleteFeedResponse>> {
-    return this.client.deleteFeed({ id: this.id, group: this.group });
+  remove(): Promise<StreamResponse<RemoveFeedResponse>> {
+    return this.feedsApi.removeFeed({
+      feed_id: this.id,
+      feed_group_id: this.group,
+    });
   }
 
-  get(): Promise<StreamResponse<GetFeedResponse>> {
-    return this.client.getFeed({ id: this.id, group: this.group });
-  }
-
-  update(
-    request?: UpdateFeedRequest,
-  ): Promise<StreamResponse<UpdateFeedResponse>> {
-    return this.client.updateFeed({
-      id: this.id,
-      group: this.group,
+  get(request?: {
+    connection_id?: string;
+  }): Promise<StreamResponse<GetFeedResponse>> {
+    return this.feedsApi.getFeed({
+      feed_id: this.id,
+      feed_group_id: this.group,
       ...request,
     });
   }
 
-  getOrCreate(
-    request?: GetOrCreateFeedRequest & { connection_id?: string },
-  ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
-    return this.client.getOrCreateFeed({
-      id: this.id,
-      group: this.group,
+  markActivity(
+    request?: MarkActivityRequest,
+  ): Promise<StreamResponse<Response>> {
+    return this.feedsApi.markActivity({
+      feed_id: this.id,
+      feed_group_id: this.group,
       ...request,
     });
   }
 
-  addActivity(
-    request: AddActivityRequest,
-  ): Promise<StreamResponse<AddActivityResponse>> {
-    return this.client.addActivity({
-      id: this.id,
-      group: this.group,
-      ...request,
-    });
-  }
-
-  readFlat(request: {
-    limit: number;
-    offset: number;
-  }): Promise<StreamResponse<ReadFlatFeedResponse>> {
-    return this.client.readFlatFeed({
-      id: this.id,
-      group: this.group,
-      ...request,
-    });
-  }
-
-  follow(request: FollowRequest): Promise<StreamResponse<FollowResponse>> {
-    return this.client.follow({ id: this.id, group: this.group, ...request });
-  }
-
-  getFollowingFeeds(request: {
-    limit: number;
-    offset: number;
-    filter?: string[];
-  }): Promise<StreamResponse<GetFollowingFeedsResponse>> {
-    return this.client.getFollowingFeeds({
-      id: this.id,
-      group: this.group,
-      ...request,
-    });
-  }
-
-  getFollowedFeeds(request?: {
-    limit?: number;
-    next?: string;
-    prev?: string;
-    filter?: string[];
-  }): Promise<StreamResponse<GetFollowedFeedsResponse>> {
-    return this.client.getFollowedFeeds({
-      id: this.id,
-      group: this.group,
-      ...request,
-    });
-  }
-
-  readNotification(request: {
-    limit: number;
-    offset: number;
-    mark_seen?: string;
-    mark_read?: string;
-  }): Promise<StreamResponse<ReadNotificationFeedResponse>> {
-    return this.client.readNotificationFeed({
-      id: this.id,
-      group: this.group,
-      ...request,
-    });
-  }
-
-  unfollow(
-    request: UnfollowRequest,
-  ): Promise<StreamResponse<UnfollowResponse>> {
-    return this.client.unfollow({ id: this.id, group: this.group, ...request });
-  }
-
-  removeActivityFrom(request: {
+  unpinActivity(request: {
     activity_id: string;
-  }): Promise<StreamResponse<RemoveActivityFromFeedResponse>> {
-    return this.client.removeActivityFromFeed({
-      id: this.id,
-      group: this.group,
+  }): Promise<StreamResponse<UnpinActivityResponse>> {
+    return this.feedsApi.unpinActivity({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
+
+  pinActivity(
+    request: PinActivityRequest & { activity_id: string },
+  ): Promise<StreamResponse<PinActivityResponse>> {
+    return this.feedsApi.pinActivity({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
+
+  updateFeedMembers(
+    request: UpdateFeedMembersRequest,
+  ): Promise<StreamResponse<Response>> {
+    return this.feedsApi.updateFeedMembers({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
+
+  acceptFeedMember(
+    request: AcceptFeedMemberRequest,
+  ): Promise<StreamResponse<AcceptFeedMemberResponse>> {
+    return this.feedsApi.acceptFeedMember({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
+
+  rejectFeedMember(
+    request: RejectFeedMemberRequest,
+  ): Promise<StreamResponse<RejectFeedMemberResponse>> {
+    return this.feedsApi.rejectFeedMember({
+      feed_id: this.id,
+      feed_group_id: this.group,
       ...request,
     });
   }

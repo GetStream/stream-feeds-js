@@ -1,7 +1,3 @@
-export type {
-  ApiClient,
-  StreamClient,
-  StreamResponse,
-} from '@stream-io/common';
-export { CommonApiWrapper } from '@stream-io/common';
-export { StreamFeedsClient } from './StreamFeedsClient';
+export type { ApiClient } from './common/ApiClient';
+export type { StreamResponse } from './common/types';
+export { FeedsApi } from './gen/feeds/FeedsApi';

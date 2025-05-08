@@ -5,8 +5,8 @@ export const addMemberToState = (
   members: FeedMember[],
   invites: FeedMember[],
 ) => {
-  const memberIndex = members.findIndex((m) => m.user_id === member.user_id);
-  const inviteIndex = invites.findIndex((i) => i.user_id === member.user_id);
+  const memberIndex = members.findIndex((m) => m.user?.id === member?.user?.id);
+  const inviteIndex = invites.findIndex((i) => i.user?.id === member?.user?.id);
   const result = { changed: false, members, invites };
 
   if (memberIndex === -1 && member.status !== 'rejected') {
@@ -32,8 +32,8 @@ export const updateMemberInState = (
   members: FeedMember[],
   invites: FeedMember[],
 ) => {
-  const memberIndex = members.findIndex((m) => m.user_id === member.user_id);
-  const inviteIndex = invites.findIndex((i) => i.user_id === member.user_id);
+  const memberIndex = members.findIndex((m) => m.user?.id === member.user?.id);
+  const inviteIndex = invites.findIndex((i) => i.user?.id === member.user?.id);
   const result = { changed: false, members, invites };
 
   if (memberIndex === -1 && member.status !== 'rejected') {
@@ -81,7 +81,7 @@ export const removeMemberFromState = (
   member: FeedMember,
   members: FeedMember[],
 ) => {
-  const memberIndex = members.findIndex((m) => m.user_id === member.user_id);
+  const memberIndex = members.findIndex((m) => m.user?.id === member.user?.id);
   if (memberIndex === -1) {
     return { changed: false, members };
   } else {
