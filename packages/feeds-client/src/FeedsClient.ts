@@ -91,7 +91,6 @@ export class FeedsClient extends FeedsApi {
           feed.handleWSEvent(event as unknown as WSEvent);
         }
       }
-      this.eventDispatcher.dispatch(event);
     });
   }
 
