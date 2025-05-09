@@ -1,4 +1,4 @@
-export type ClientOptions = {
+export type FeedsClientOptions = {
   base_url?: string;
   timeout?: number;
 };

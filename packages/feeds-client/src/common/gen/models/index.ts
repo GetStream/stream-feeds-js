@@ -1,3 +1,5 @@
+import { SortParamRequest, UserResponse } from '../../../gen/models';
+
 export interface AIImageConfig {
   enabled: boolean;
 
@@ -24,24 +26,6 @@ export interface AIVideoConfig {
   rules: AWSRekognitionRule[];
 
   async?: boolean;
-}
-
-export interface APIError {
-  code: number;
-
-  duration: string;
-
-  message: string;
-
-  more_info: string;
-
-  status_code: number;
-
-  details: number[];
-
-  unrecoverable?: boolean;
-
-  exception_fields?: Record<string, string>;
 }
 
 export interface AWSRekognitionRule {
@@ -1906,10 +1890,6 @@ export interface ReadReceiptsResponse {
   enabled: boolean;
 }
 
-export interface Response {
-  duration: string;
-}
-
 export interface RestoreActionRequest {}
 
 export interface ReviewQueueItem {
@@ -2018,12 +1998,6 @@ export interface ReviewQueueItemResponse {
   message?: MessageResponse;
 
   moderation_payload?: ModerationPayload;
-}
-
-export interface SortParamRequest {
-  direction?: number;
-
-  field?: string;
 }
 
 export interface SubmitActionRequest {
@@ -2242,40 +2216,6 @@ export interface UserRequest {
   privacy_settings?: PrivacySettingsResponse;
 }
 
-export interface UserResponse {
-  banned: boolean;
-
-  created_at: Date;
-
-  id: string;
-
-  language: string;
-
-  online: boolean;
-
-  role: string;
-
-  updated_at: Date;
-
-  blocked_user_ids: string[];
-
-  teams: string[];
-
-  custom: Record<string, any>;
-
-  deactivated_at?: Date;
-
-  deleted_at?: Date;
-
-  image?: string;
-
-  last_active?: Date;
-
-  name?: string;
-
-  revoke_tokens_issued_before?: Date;
-}
-
 export interface VelocityFilterConfig {
   cascading_actions: boolean;
 
@@ -2322,7 +2262,7 @@ export interface WSAuthMessage {
   products?: string[];
 }
 
-export type WSEvent =
+export type WSEventCommon =
   | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
   | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
   | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);

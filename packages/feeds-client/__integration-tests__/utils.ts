@@ -1,13 +1,13 @@
 import { FeedsClient } from '../src/FeedsClient';
 import { UserRequest } from '../src/common/gen/models';
-import { ClientOptions } from '../src/common/types';
+import { FeedsClientOptions } from '../src/common/types';
 import { FeedsEvent } from '../src/types';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 const tokenUrl = import.meta.env.VITE_STREAM_TOKEN_URL;
 const baseUrl = import.meta.env.VITE_API_URL;
 
-export const createTestClient = (options?: ClientOptions) => {
+export const createTestClient = (options?: FeedsClientOptions) => {
   if (!apiKey) {
     throw new Error('Provide an api key, check .env-example for details');
   }

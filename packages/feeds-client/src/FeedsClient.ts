@@ -32,7 +32,6 @@ import {
   OwnUser,
   QueryUsersPayload,
   QueryUsersResponse,
-  Response,
   UnblockUsersRequest,
   UnblockUsersResponse,
   UpdateBlockListRequest,
@@ -44,7 +43,7 @@ import {
 } from './common/gen/models';
 import { decoders } from './gen/model-decoders/decoders';
 import {
-  ClientOptions,
+  FeedsClientOptions,
   StreamResponse,
   NetworkChangedEvent,
 } from './common/types';
@@ -69,7 +68,7 @@ export class FeedsClient extends FeedsApi {
 
   private activeFeeds: Record<FID, StreamFeedClient> = {};
 
-  constructor(apiKey: string, options?: ClientOptions) {
+  constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
     const connectionIdManager = new ConnectionIdManager();
     const apiClient = new ApiClient(

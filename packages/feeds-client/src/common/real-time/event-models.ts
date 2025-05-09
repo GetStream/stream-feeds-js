@@ -1,4 +1,5 @@
-import { APIError, OwnUser, User, UserResponse } from '../gen/models';
+import { APIError, UserResponse } from '../../gen/models';
+import { OwnUser, User } from '../gen/models';
 
 /**
  * This event is sent when the WS connection fails
