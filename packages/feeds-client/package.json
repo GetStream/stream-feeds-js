@@ -14,7 +14,8 @@
     "build": "yarn clean && rollup -c",
     "test": "vitest",
     "clean:docs": "rimraf generated-docs",
-    "test-ci": "vitest --coverage"
+    "test-ci": "vitest --coverage",
+    "postinstall": "yarn build"
   },
   "dependencies": {
     "@rollup/plugin-replace": "^6.0.1",
