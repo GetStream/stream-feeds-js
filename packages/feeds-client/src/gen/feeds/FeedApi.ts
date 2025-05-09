@@ -2,7 +2,8 @@ import { StreamResponse, FeedsApi } from '../../gen-imports';
 import {
   AcceptFeedMemberRequest,
   AcceptFeedMemberResponse,
-  GetFeedResponse,
+  GetOrCreateFeedRequest,
+  GetOrCreateFeedResponse,
   MarkActivityRequest,
   PinActivityRequest,
   PinActivityResponse,
@@ -28,10 +29,10 @@ export class FeedApi {
     });
   }
 
-  get(request?: {
-    connection_id?: string;
-  }): Promise<StreamResponse<GetFeedResponse>> {
-    return this.feedsApi.getFeed({
+  getOrCreate(
+    request?: GetOrCreateFeedRequest & { connection_id?: string },
+  ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
+    return this.feedsApi.getOrCreateFeed({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,

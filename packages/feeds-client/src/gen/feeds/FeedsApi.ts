@@ -14,8 +14,6 @@ import {
   AddReactionResponse,
   CreateActivitiesBatchRequest,
   CreateActivitiesBatchResponse,
-  CreateFeedRequest,
-  CreateFeedResponse,
   CreateManyFeedsRequest,
   CreateManyFeedsResponse,
   FollowManyRequest,
@@ -24,7 +22,8 @@ import {
   FollowResponse,
   FollowSuggestionsResponse,
   GetActivityResponse,
-  GetFeedResponse,
+  GetOrCreateFeedRequest,
+  GetOrCreateFeedResponse,
   MarkActivityRequest,
   PinActivityRequest,
   PinActivityResponse,
@@ -414,34 +413,6 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async createFeed(
-    request: CreateFeedRequest & { feed_group_id: string },
-  ): Promise<StreamResponse<CreateFeedResponse>> {
-    const pathParams = {
-      feed_group_id: request?.feed_group_id,
-    };
-    const body = {
-      feed_id: request?.feed_id,
-      visibility: request?.visibility,
-      members: request?.members,
-      custom: request?.custom,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<CreateFeedResponse>
-    >(
-      'POST',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds',
-      pathParams,
-      undefined,
-      body,
-    );
-
-    decoders.CreateFeedResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
   async removeFeed(request: {
     feed_group_id: string;
     feed_id: string;
@@ -465,11 +436,13 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async getFeed(request: {
-    feed_group_id: string;
-    feed_id: string;
-    connection_id?: string;
-  }): Promise<StreamResponse<GetFeedResponse>> {
+  async getOrCreateFeed(
+    request: GetOrCreateFeedRequest & {
+      feed_group_id: string;
+      feed_id: string;
+      connection_id?: string;
+    },
+  ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
     const queryParams = {
       connection_id: request?.connection_id,
     };
@@ -477,17 +450,35 @@ export class FeedsApi {
       feed_group_id: request?.feed_group_id,
       feed_id: request?.feed_id,
     };
+    const body = {
+      comment_limit: request?.comment_limit,
+      comment_sort: request?.comment_sort,
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      view: request?.view,
+      visibility: request?.visibility,
+      watch: request?.watch,
+      members: request?.members,
+      custom: request?.custom,
+      external_ranking: request?.external_ranking,
+      filter: request?.filter,
+      follower_pagination: request?.follower_pagination,
+      following_pagination: request?.following_pagination,
+      member_pagination: request?.member_pagination,
+    };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<GetFeedResponse>
+      StreamResponse<GetOrCreateFeedResponse>
     >(
-      'GET',
+      'POST',
       '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
       pathParams,
       queryParams,
+      body,
     );
 
-    decoders.GetFeedResponse?.(response.body);
+    decoders.GetOrCreateFeedResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

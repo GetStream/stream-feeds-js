@@ -562,24 +562,6 @@ export interface CreateActivitiesBatchResponse {
   activities: Activity[];
 }
 
-export interface CreateFeedRequest {
-  feed_id: string;
-
-  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
-
-  members?: FeedMemberPayload[];
-
-  custom?: Record<string, any>;
-}
-
-export interface CreateFeedResponse {
-  duration: string;
-
-  feed: Feed;
-
-  members?: FeedMember[];
-}
-
 export interface CreateManyFeedsRequest {
   feeds: FeedPayload[];
 }
@@ -896,7 +878,39 @@ export interface GetActivityResponse {
   activity: Activity;
 }
 
-export interface GetFeedResponse {
+export interface GetOrCreateFeedRequest {
+  comment_limit?: number;
+
+  comment_sort?: 'first' | 'last' | 'popular';
+
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  view?: string;
+
+  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+
+  watch?: boolean;
+
+  members?: FeedMemberPayload[];
+
+  custom?: Record<string, any>;
+
+  external_ranking?: Record<string, any>;
+
+  filter?: Record<string, any>;
+
+  follower_pagination?: PagerRequest;
+
+  following_pagination?: PagerRequest;
+
+  member_pagination?: PagerRequest;
+}
+
+export interface GetOrCreateFeedResponse {
   duration: string;
 
   activities: Activity[];
@@ -958,6 +972,14 @@ export interface NotificationStatus {
   last_seen_at?: Date;
 
   read_activities?: string[];
+}
+
+export interface PagerRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
 }
 
 export interface PagerResponse {

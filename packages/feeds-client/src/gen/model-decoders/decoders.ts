@@ -319,15 +319,6 @@ decoders.CreateActivitiesBatchResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.CreateFeedResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    feed: { type: 'Feed', isSingle: true },
-
-    members: { type: 'FeedMember', isSingle: false },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.CreateManyFeedsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     feeds: { type: 'Feed', isSingle: false },
@@ -494,7 +485,7 @@ decoders.GetActivityResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.GetFeedResponse = (input?: Record<string, any>) => {
+decoders.GetOrCreateFeedResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activities: { type: 'Activity', isSingle: false },
 

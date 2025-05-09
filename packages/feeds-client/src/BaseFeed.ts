@@ -19,7 +19,8 @@ import {
   FollowUpdatedEvent,
   ReactionAddedEvent,
   ReactionRemovedEvent,
-  GetFeedResponse,
+  GetOrCreateFeedResponse,
+  GetOrCreateFeedRequest,
 } from './gen/models';
 import { FeedsClient } from './FeedsClient';
 import { StateStore } from './common/StateStore';
@@ -29,7 +30,7 @@ import { FeedApi } from './gen/feeds/FeedApi';
 // TODO: since generated models use snake_case we have to use snake_case in state as well
 // Maybe we should do a transformation in the generated code and use camelCase?
 export type BaseFeedState = Partial<
-  Omit<GetFeedResponse, 'duration' | 'feed'>
+  Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
 > &
   Partial<{
     [key in keyof Feed]: Feed[key];
@@ -186,8 +187,8 @@ export abstract class BaseFeed<
     return `${this.group}:${this.id}`;
   }
 
-  async get() {
-    const response = await super.get();
+  async getOrCreate(request?: GetOrCreateFeedRequest) {
+    const response = await super.getOrCreate(request);
     this.feedUpdated(response.feed);
 
     return response;

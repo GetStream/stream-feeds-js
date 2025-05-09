@@ -20,12 +20,7 @@ describe('Feeds API dummy test', () => {
   });
 
   it('create feed', async () => {
-    await client.createFeed({
-      feed_id: feed.id,
-      feed_group_id: feed.group,
-      visibility: 'public',
-    });
-    const response = await feed.get();
+    const response = await feed.getOrCreate({ visibility: 'public' });
 
     expect(response.feed.id).toBe(feed.id);
 
