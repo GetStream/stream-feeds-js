@@ -1,5 +1,5 @@
 import { APIError, UserResponse } from '../../gen/models';
-import { OwnUser, User } from '../gen/models';
+import { OwnUser, User, UserResponsePrivacyFields } from '../gen/models';
 
 /**
  * This event is sent when the WS connection fails
@@ -428,7 +428,7 @@ export interface UserUpdatedEvent {
    * @type {User}
    * @memberof UserUpdatedEvent
    */
-  user?: User;
+  user?: UserResponsePrivacyFields;
 }
 
 // TODO: this should be generated

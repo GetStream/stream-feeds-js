@@ -2216,6 +2216,28 @@ export interface UserRequest {
   privacy_settings?: PrivacySettingsResponse;
 }
 
+export interface UserResponsePrivacyFields {
+  banned: boolean;
+  created_at: Date;
+  id: string;
+  language: string;
+  online: boolean;
+  role: string;
+  updated_at: Date;
+  blocked_user_ids: string[];
+  teams: string[];
+  custom: Record<string, any>;
+  deactivated_at?: Date;
+  deleted_at?: Date;
+  image?: string;
+  invisible?: boolean;
+  last_active?: Date;
+  name?: string;
+  revoke_tokens_issued_before?: Date;
+  privacy_settings?: PrivacySettingsResponse;
+  teams_role?: Record<string, string>;
+}
+
 export interface VelocityFilterConfig {
   cascading_actions: boolean;
 
