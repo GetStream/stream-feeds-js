@@ -215,11 +215,11 @@ export interface ActivityRequest {
 export interface ActivitySelectorConfig {
   cutoff_time: Date;
 
-  type: string;
-
   min_popularity?: number;
 
   tag_filter_type?: string;
+
+  type?: string;
 
   tags?: string[];
 }
@@ -341,7 +341,7 @@ export interface AggregatedActivity {
 }
 
 export interface AggregationConfig {
-  format: string;
+  format?: string;
 }
 
 export interface BaseActivity {
@@ -388,6 +388,10 @@ export interface BaseActivity {
   latest_reactions?: ActivityReaction[];
 
   mentioned_users?: UserResponse[];
+
+  own_bookmarks?: Bookmark[];
+
+  own_reactions?: ActivityReaction[];
 
   current_feed?: Feed;
 
@@ -573,17 +577,17 @@ export interface CreateManyFeedsResponse {
 }
 
 export interface DecayFunctionConfig {
-  base?: string;
+  base: string;
 
-  decay?: string;
+  decay: string;
 
-  direction?: string;
+  direction: string;
 
-  offset?: string;
+  offset: string;
 
-  origin?: string;
+  origin: string;
 
-  scale?: string;
+  scale: string;
 }
 
 export interface Feed {
@@ -631,23 +635,25 @@ export interface FeedCreatedEvent {
 }
 
 export interface FeedGroup {
+  app_pk: number;
+
   created_at: Date;
 
-  group_id: string;
+  default_visibility: string;
 
   id: string;
 
   updated_at: Date;
 
-  default_visibility?: string;
+  activity_analysers: ActivityAnalyserConfig[];
 
-  activity_analysers?: ActivityAnalyserConfig[];
+  activity_selectors: ActivitySelectorConfig[];
 
-  activity_selectors?: ActivitySelectorConfig[];
+  custom: Record<string, any>;
+
+  deleted_at?: Date;
 
   aggregation?: AggregationConfig;
-
-  custom?: Record<string, any>;
 
   notification?: NotificationConfig;
 
@@ -686,10 +692,24 @@ export interface FeedGroupRemovedEvent {
   received_at?: Date;
 }
 
+export interface FeedInput {
+  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+
+  members?: FeedMemberPayload[];
+
+  custom?: Record<string, any>;
+}
+
 export interface FeedMember {
   created_at: Date;
 
+  role: string;
+
+  status: string;
+
   updated_at: Date;
+
+  user: UserResponse;
 
   request?: boolean;
 
@@ -697,15 +717,7 @@ export interface FeedMember {
 
   request_rejected_at?: Date;
 
-  role?: string;
-
-  status?: string;
-
   custom?: Record<string, any>;
-
-  feed?: Feed;
-
-  user?: UserResponse;
 }
 
 export interface FeedMemberPayload {
@@ -891,13 +903,9 @@ export interface GetOrCreateFeedRequest {
 
   view?: string;
 
-  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
-
   watch?: boolean;
 
-  members?: FeedMemberPayload[];
-
-  custom?: Record<string, any>;
+  data?: FeedInput;
 
   external_ranking?: Record<string, any>;
 
@@ -915,27 +923,21 @@ export interface GetOrCreateFeedResponse {
 
   activities: Activity[];
 
+  aggregated_activities: AggregatedActivity[];
+
+  followers: Follow[];
+
+  following: Follow[];
+
+  members: FeedMember[];
+
+  pinned_activities: ActivityPin[];
+
   feed: Feed;
-
-  group: FeedGroup;
-
-  own_feed_follow: Follow;
-
-  own_feed_membership: FeedMember;
 
   next?: string;
 
   prev?: string;
-
-  aggregated_activities?: AggregatedActivity[];
-
-  followers?: Follow[];
-
-  following?: Follow[];
-
-  members?: FeedMember[];
-
-  pinned_activities?: ActivityPin[];
 
   followers_pagination?: PagerResponse;
 
@@ -944,6 +946,10 @@ export interface GetOrCreateFeedResponse {
   member_pagination?: PagerResponse;
 
   notification_status?: NotificationStatus;
+
+  own_feed_follow?: Follow;
+
+  own_feed_membership?: FeedMember;
 }
 
 export interface MarkActivityRequest {
@@ -959,9 +965,9 @@ export interface MarkActivityRequest {
 export interface Moderation {}
 
 export interface NotificationConfig {
-  track_read: boolean;
+  track_read?: boolean;
 
-  track_seen: boolean;
+  track_seen?: boolean;
 }
 
 export interface NotificationStatus {
@@ -1054,6 +1060,26 @@ export interface QueryCommentsResponse {
   prev?: string;
 }
 
+export interface QueryFeedMembersRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryFeedMembersResponse {
+  duration: string;
+
+  members: FeedMember[];
+
+  pagination: PagerResponse;
+}
+
 export interface QueryFeedsResponse {
   duration: string;
 
@@ -1085,17 +1111,17 @@ export interface QueryFollowsResponse {
 }
 
 export interface RankingConfig {
-  type: string;
+  score: string;
+
+  defaults: Record<string, any>;
+
+  functions: Record<string, DecayFunctionConfig>;
 
   decay_factor?: number;
 
   recency_weight?: number;
 
-  score?: string;
-
-  defaults?: Record<string, any>;
-
-  functions?: Record<string, DecayFunctionConfig>;
+  type?: string;
 }
 
 export interface ReactionAddedEvent {
@@ -1213,7 +1239,7 @@ export interface SortParamRequest {
 }
 
 export interface StoriesConfig {
-  expiration_behaviour?: string;
+  expiration_behaviour?: 'hide_for_everyone' | 'visible_for_author';
 
   skip_watched?: boolean;
 }

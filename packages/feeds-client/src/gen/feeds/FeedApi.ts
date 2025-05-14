@@ -7,6 +7,8 @@ import {
   MarkActivityRequest,
   PinActivityRequest,
   PinActivityResponse,
+  QueryFeedMembersRequest,
+  QueryFeedMembersResponse,
   RejectFeedMemberRequest,
   RejectFeedMemberResponse,
   RemoveFeedResponse,
@@ -22,10 +24,13 @@ export class FeedApi {
     public readonly id: string,
   ) {}
 
-  remove(): Promise<StreamResponse<RemoveFeedResponse>> {
+  remove(request?: {
+    hard_delete?: boolean;
+  }): Promise<StreamResponse<RemoveFeedResponse>> {
     return this.feedsApi.removeFeed({
       feed_id: this.id,
       feed_group_id: this.group,
+      ...request,
     });
   }
 
@@ -83,6 +88,16 @@ export class FeedApi {
     request: AcceptFeedMemberRequest,
   ): Promise<StreamResponse<AcceptFeedMemberResponse>> {
     return this.feedsApi.acceptFeedMember({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
+
+  queryFeedMembers(
+    request?: QueryFeedMembersRequest,
+  ): Promise<StreamResponse<QueryFeedMembersResponse>> {
+    return this.feedsApi.queryFeedMembers({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,

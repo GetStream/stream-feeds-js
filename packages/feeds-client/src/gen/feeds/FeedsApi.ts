@@ -31,6 +31,8 @@ import {
   QueryActivitiesResponse,
   QueryCommentsRequest,
   QueryCommentsResponse,
+  QueryFeedMembersRequest,
+  QueryFeedMembersResponse,
   QueryFeedsResponse,
   QueryFollowsRequest,
   QueryFollowsResponse,
@@ -416,7 +418,11 @@ export class FeedsApi {
   async removeFeed(request: {
     feed_group_id: string;
     feed_id: string;
+    hard_delete?: boolean;
   }): Promise<StreamResponse<RemoveFeedResponse>> {
+    const queryParams = {
+      hard_delete: request?.hard_delete,
+    };
     const pathParams = {
       feed_group_id: request?.feed_group_id,
       feed_id: request?.feed_id,
@@ -428,7 +434,7 @@ export class FeedsApi {
       'DELETE',
       '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
       pathParams,
-      undefined,
+      queryParams,
     );
 
     decoders.RemoveFeedResponse?.(response.body);
@@ -457,10 +463,8 @@ export class FeedsApi {
       next: request?.next,
       prev: request?.prev,
       view: request?.view,
-      visibility: request?.visibility,
       watch: request?.watch,
-      members: request?.members,
-      custom: request?.custom,
+      data: request?.data,
       external_ranking: request?.external_ranking,
       filter: request?.filter,
       follower_pagination: request?.follower_pagination,
@@ -620,6 +624,39 @@ export class FeedsApi {
     );
 
     decoders.AcceptFeedMemberResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryFeedMembers(
+    request: QueryFeedMembersRequest & {
+      feed_group_id: string;
+      feed_id: string;
+    },
+  ): Promise<StreamResponse<QueryFeedMembersResponse>> {
+    const pathParams = {
+      feed_group_id: request?.feed_group_id,
+      feed_id: request?.feed_id,
+    };
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryFeedMembersResponse>
+    >(
+      'POST',
+      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/members/query',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.QueryFeedMembersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
