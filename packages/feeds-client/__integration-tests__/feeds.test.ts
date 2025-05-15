@@ -20,7 +20,7 @@ describe('Feeds API dummy test', () => {
   });
 
   it('create feed', async () => {
-    const response = await feed.getOrCreate({ visibility: 'public' });
+    const response = await feed.getOrCreate({ data: { visibility: 'public' } });
 
     expect(response.feed.id).toBe(feed.id);
 
@@ -29,10 +29,7 @@ describe('Feeds API dummy test', () => {
   });
 
   it('delete feed', async () => {
-    const response = await client.removeFeed({
-      feed_id: feed.id,
-      feed_group_id: feed.group,
-    });
+    const response = await feed.delete();
 
     expect(response).toBeDefined();
   });
