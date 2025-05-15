@@ -3,24 +3,26 @@ import {
   ActivityUpdatedEvent,
   Feed,
   WSEvent,
-  ActivityRemovedEvent,
   BookmarkAddedEvent,
-  BookmarkRemovedEvent,
   BookmarkUpdatedEvent,
   CommentAddedEvent,
   CommentRemovedEvent,
   CommentUpdatedEvent,
   FeedCreatedEvent,
   FeedGroupChangedEvent,
-  FeedGroupRemovedEvent,
-  FeedRemovedEvent,
   FollowAddedEvent,
   FollowRemovedEvent,
   FollowUpdatedEvent,
-  ReactionAddedEvent,
-  ReactionRemovedEvent,
   GetOrCreateFeedResponse,
   GetOrCreateFeedRequest,
+  ActivityDeletedEvent,
+  ActivityReactionAddedEvent,
+  ActivityReactionDeletedEvent,
+  ActivityRemovedFromFeedEvent,
+  BookmarkDeletedEvent,
+  FeedDeletedEvent,
+  FeedGroupDeletedEvent,
+  FeedUpdatedEvent,
 } from './gen/models';
 import { FeedsClient } from './FeedsClient';
 import { StateStore } from './common/StateStore';
@@ -57,24 +59,31 @@ export abstract class BaseFeed<
     ): void {
       throw new Error('Function not implemented.');
     },
+    'activity.deleted': function (
+      _: { type: 'activity.deleted' } & ActivityDeletedEvent & {
+          type: 'activity.deleted';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
     'activity.reaction.added': function (
-      _: { type: 'activity.reaction.added' } & ReactionAddedEvent & {
+      _: { type: 'activity.reaction.added' } & ActivityReactionAddedEvent & {
           type: 'activity.reaction.added';
         },
     ): void {
       throw new Error('Function not implemented.');
     },
-    'activity.reaction.removed': function (
-      _: { type: 'activity.reaction.removed' } & ReactionRemovedEvent & {
-          type: 'activity.reaction.removed';
-        },
+    'activity.reaction.deleted': function (
+      _: {
+        type: 'activity.reaction.deleted';
+      } & ActivityReactionDeletedEvent & { type: 'activity.reaction.deleted' },
     ): void {
       throw new Error('Function not implemented.');
     },
-    'activity.removed': function (
-      _: { type: 'activity.removed' } & ActivityRemovedEvent & {
-          type: 'activity.removed';
-        },
+    'activity.removed_from_feed': function (
+      _: {
+        type: 'activity.removed_from_feed';
+      } & ActivityRemovedFromFeedEvent & { type: 'activity.removed_from_feed' },
     ): void {
       throw new Error('Function not implemented.');
     },
@@ -92,9 +101,9 @@ export abstract class BaseFeed<
     ): void {
       throw new Error('Function not implemented.');
     },
-    'bookmark.removed': function (
-      _: { type: 'bookmark.removed' } & BookmarkRemovedEvent & {
-          type: 'bookmark.removed';
+    'bookmark.deleted': function (
+      _: { type: 'bookmark.deleted' } & BookmarkDeletedEvent & {
+          type: 'bookmark.deleted';
         },
     ): void {
       throw new Error('Function not implemented.');
@@ -128,16 +137,17 @@ export abstract class BaseFeed<
       throw new Error('Function not implemented.');
     },
     'feed.created': function (
-      _: { type: 'feed.created' } & FeedCreatedEvent & {
-          type: 'feed.created';
-        },
+      _: { type: 'feed.created' } & FeedCreatedEvent & { type: 'feed.created' },
     ): void {
       throw new Error('Function not implemented.');
     },
-    'feed.removed': function (
-      _: { type: 'feed.removed' } & FeedRemovedEvent & {
-          type: 'feed.removed';
-        },
+    'feed.deleted': function (
+      _: { type: 'feed.deleted' } & FeedDeletedEvent & { type: 'feed.deleted' },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feed.updated': function (
+      _: { type: 'feed.updated' } & FeedUpdatedEvent & { type: 'feed.updated' },
     ): void {
       throw new Error('Function not implemented.');
     },
@@ -148,17 +158,15 @@ export abstract class BaseFeed<
     ): void {
       throw new Error('Function not implemented.');
     },
-    'feed_group.removed': function (
-      _: { type: 'feed_group.removed' } & FeedGroupRemovedEvent & {
-          type: 'feed_group.removed';
+    'feed_group.deleted': function (
+      _: { type: 'feed_group.deleted' } & FeedGroupDeletedEvent & {
+          type: 'feed_group.deleted';
         },
     ): void {
       throw new Error('Function not implemented.');
     },
     'follow.added': function (
-      _: { type: 'follow.added' } & FollowAddedEvent & {
-          type: 'follow.added';
-        },
+      _: { type: 'follow.added' } & FollowAddedEvent & { type: 'follow.added' },
     ): void {
       throw new Error('Function not implemented.');
     },
