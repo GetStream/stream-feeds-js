@@ -7,14 +7,17 @@ const eventDecoderMapping: {
   'activity.added': (data: Record<string, any>) =>
     decoders.ActivityAddedEvent(data),
 
+  'activity.deleted': (data: Record<string, any>) =>
+    decoders.ActivityDeletedEvent(data),
+
   'activity.reaction.added': (data: Record<string, any>) =>
-    decoders.ReactionAddedEvent(data),
+    decoders.ActivityReactionAddedEvent(data),
 
-  'activity.reaction.removed': (data: Record<string, any>) =>
-    decoders.ReactionRemovedEvent(data),
+  'activity.reaction.deleted': (data: Record<string, any>) =>
+    decoders.ActivityReactionDeletedEvent(data),
 
-  'activity.removed': (data: Record<string, any>) =>
-    decoders.ActivityRemovedEvent(data),
+  'activity.removed_from_feed': (data: Record<string, any>) =>
+    decoders.ActivityRemovedFromFeedEvent(data),
 
   'activity.updated': (data: Record<string, any>) =>
     decoders.ActivityUpdatedEvent(data),
@@ -22,8 +25,8 @@ const eventDecoderMapping: {
   'bookmark.added': (data: Record<string, any>) =>
     decoders.BookmarkAddedEvent(data),
 
-  'bookmark.removed': (data: Record<string, any>) =>
-    decoders.BookmarkRemovedEvent(data),
+  'bookmark.deleted': (data: Record<string, any>) =>
+    decoders.BookmarkDeletedEvent(data),
 
   'bookmark.updated': (data: Record<string, any>) =>
     decoders.BookmarkUpdatedEvent(data),
@@ -40,14 +43,17 @@ const eventDecoderMapping: {
   'feed.created': (data: Record<string, any>) =>
     decoders.FeedCreatedEvent(data),
 
-  'feed.removed': (data: Record<string, any>) =>
-    decoders.FeedRemovedEvent(data),
+  'feed.deleted': (data: Record<string, any>) =>
+    decoders.FeedDeletedEvent(data),
+
+  'feed.updated': (data: Record<string, any>) =>
+    decoders.FeedUpdatedEvent(data),
 
   'feed_group.changed': (data: Record<string, any>) =>
     decoders.FeedGroupChangedEvent(data),
 
-  'feed_group.removed': (data: Record<string, any>) =>
-    decoders.FeedGroupRemovedEvent(data),
+  'feed_group.deleted': (data: Record<string, any>) =>
+    decoders.FeedGroupDeletedEvent(data),
 
   'follow.added': (data: Record<string, any>) =>
     decoders.FollowAddedEvent(data),

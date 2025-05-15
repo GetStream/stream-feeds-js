@@ -16,6 +16,10 @@ import {
   CreateActivitiesBatchResponse,
   CreateManyFeedsRequest,
   CreateManyFeedsResponse,
+  DeleteActivityReactionResponse,
+  DeleteActivityResponse,
+  DeleteBookmarkResponse,
+  DeleteFeedResponse,
   FollowManyRequest,
   FollowManyResponse,
   FollowRequest,
@@ -42,11 +46,7 @@ import {
   RejectFollowResponse,
   RemoveActivitiesRequest,
   RemoveActivitiesResponse,
-  RemoveActivityReactionResponse,
-  RemoveActivityResponse,
-  RemoveBookmarkResponse,
   RemoveCommentResponse,
-  RemoveFeedResponse,
   Response,
   UnfollowResponse,
   UnpinActivityResponse,
@@ -57,6 +57,8 @@ import {
   UpdateCommentRequest,
   UpdateCommentResponse,
   UpdateFeedMembersRequest,
+  UpdateFeedRequest,
+  UpdateFeedResponse,
   UpdateFollowRequest,
   UpdateFollowResponse,
 } from '../models';
@@ -150,18 +152,22 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async removeActivity(request: {
+  async deleteActivity(request: {
     activity_id: string;
-  }): Promise<StreamResponse<RemoveActivityResponse>> {
+    hard_delete?: boolean;
+  }): Promise<StreamResponse<DeleteActivityResponse>> {
+    const queryParams = {
+      hard_delete: request?.hard_delete,
+    };
     const pathParams = {
       activity_id: request?.activity_id,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveActivityResponse>
-    >('DELETE', '/feeds/v3/activities/{activity_id}', pathParams, undefined);
+      StreamResponse<DeleteActivityResponse>
+    >('DELETE', '/feeds/v3/activities/{activity_id}', pathParams, queryParams);
 
-    decoders.RemoveActivityResponse?.(response.body);
+    decoders.DeleteActivityResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -208,15 +214,15 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async removeBookmark(request: {
+  async deleteBookmark(request: {
     activity_id: string;
-  }): Promise<StreamResponse<RemoveBookmarkResponse>> {
+  }): Promise<StreamResponse<DeleteBookmarkResponse>> {
     const pathParams = {
       activity_id: request?.activity_id,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveBookmarkResponse>
+      StreamResponse<DeleteBookmarkResponse>
     >(
       'DELETE',
       '/feeds/v3/activities/{activity_id}/bookmarks',
@@ -224,7 +230,7 @@ export class FeedsApi {
       undefined,
     );
 
-    decoders.RemoveBookmarkResponse?.(response.body);
+    decoders.DeleteBookmarkResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -310,15 +316,15 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async removeActivityReaction(request: {
+  async deleteActivityReaction(request: {
     activity_id: string;
-  }): Promise<StreamResponse<RemoveActivityReactionResponse>> {
+  }): Promise<StreamResponse<DeleteActivityReactionResponse>> {
     const pathParams = {
       activity_id: request?.activity_id,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveActivityReactionResponse>
+      StreamResponse<DeleteActivityReactionResponse>
     >(
       'DELETE',
       '/feeds/v3/activities/{activity_id}/reactions',
@@ -326,7 +332,7 @@ export class FeedsApi {
       undefined,
     );
 
-    decoders.RemoveActivityReactionResponse?.(response.body);
+    decoders.DeleteActivityReactionResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -415,11 +421,11 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async removeFeed(request: {
+  async deleteFeed(request: {
     feed_group_id: string;
     feed_id: string;
     hard_delete?: boolean;
-  }): Promise<StreamResponse<RemoveFeedResponse>> {
+  }): Promise<StreamResponse<DeleteFeedResponse>> {
     const queryParams = {
       hard_delete: request?.hard_delete,
     };
@@ -429,7 +435,7 @@ export class FeedsApi {
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveFeedResponse>
+      StreamResponse<DeleteFeedResponse>
     >(
       'DELETE',
       '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
@@ -437,7 +443,33 @@ export class FeedsApi {
       queryParams,
     );
 
-    decoders.RemoveFeedResponse?.(response.body);
+    decoders.DeleteFeedResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateFeed(
+    request: UpdateFeedRequest & { feed_group_id: string; feed_id: string },
+  ): Promise<StreamResponse<UpdateFeedResponse>> {
+    const pathParams = {
+      feed_group_id: request?.feed_group_id,
+      feed_id: request?.feed_id,
+    };
+    const body = {
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateFeedResponse>
+    >(
+      'PATCH',
+      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.UpdateFeedResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

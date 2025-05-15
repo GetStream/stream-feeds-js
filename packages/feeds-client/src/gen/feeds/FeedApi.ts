@@ -2,6 +2,7 @@ import { StreamResponse, FeedsApi } from '../../gen-imports';
 import {
   AcceptFeedMemberRequest,
   AcceptFeedMemberResponse,
+  DeleteFeedResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   MarkActivityRequest,
@@ -11,10 +12,11 @@ import {
   QueryFeedMembersResponse,
   RejectFeedMemberRequest,
   RejectFeedMemberResponse,
-  RemoveFeedResponse,
   Response,
   UnpinActivityResponse,
   UpdateFeedMembersRequest,
+  UpdateFeedRequest,
+  UpdateFeedResponse,
 } from '../models';
 
 export class FeedApi {
@@ -24,10 +26,20 @@ export class FeedApi {
     public readonly id: string,
   ) {}
 
-  remove(request?: {
+  delete(request?: {
     hard_delete?: boolean;
-  }): Promise<StreamResponse<RemoveFeedResponse>> {
-    return this.feedsApi.removeFeed({
+  }): Promise<StreamResponse<DeleteFeedResponse>> {
+    return this.feedsApi.deleteFeed({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
+
+  update(
+    request?: UpdateFeedRequest,
+  ): Promise<StreamResponse<UpdateFeedResponse>> {
+    return this.feedsApi.updateFeed({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,

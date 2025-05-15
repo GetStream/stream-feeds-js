@@ -132,6 +132,20 @@ export interface ActivityAttachment {
   custom?: Record<string, any>;
 }
 
+export interface ActivityDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface ActivityLocation {
   lat: number;
 
@@ -164,7 +178,39 @@ export interface ActivityReaction {
   custom?: Record<string, any>;
 }
 
-export interface ActivityRemovedEvent {
+export interface ActivityReactionAddedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  reaction: ActivityReaction;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface ActivityReactionDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  reaction: ActivityReaction;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface ActivityRemovedFromFeedEvent {
   created_at: Date;
 
   fid: string;
@@ -436,19 +482,7 @@ export interface BookmarkAddedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface BookmarkFolder {
-  created_at: Date;
-
-  id: string;
-
-  name: string;
-
-  updated_at: Date;
-
-  custom?: Record<string, any>;
-}
-
-export interface BookmarkRemovedEvent {
+export interface BookmarkDeletedEvent {
   created_at: Date;
 
   fid: string;
@@ -462,6 +496,18 @@ export interface BookmarkRemovedEvent {
   received_at?: Date;
 
   user?: UserResponseCommonFields;
+}
+
+export interface BookmarkFolder {
+  created_at: Date;
+
+  id: string;
+
+  name: string;
+
+  updated_at: Date;
+
+  custom?: Record<string, any>;
 }
 
 export interface BookmarkUpdatedEvent {
@@ -590,6 +636,30 @@ export interface DecayFunctionConfig {
   scale: string;
 }
 
+export interface DeleteActivityReactionResponse {
+  activity_id: string;
+
+  duration: string;
+
+  type: string;
+
+  user_id: string;
+}
+
+export interface DeleteActivityResponse {
+  duration: string;
+}
+
+export interface DeleteBookmarkResponse {
+  duration: string;
+
+  bookmark: Bookmark;
+}
+
+export interface DeleteFeedResponse {
+  duration: string;
+}
+
 export interface Feed {
   created_at: Date;
 
@@ -623,13 +693,29 @@ export interface FeedCreatedEvent {
 
   fid: string;
 
+  members: FeedMember[];
+
+  custom: Record<string, any>;
+
+  feed: Feed;
+
+  user: UserResponseCommonFields;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface FeedDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
   custom: Record<string, any>;
 
   type: string;
 
   received_at?: Date;
-
-  feed?: Feed;
 
   user?: UserResponseCommonFields;
 }
@@ -678,7 +764,7 @@ export interface FeedGroupChangedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface FeedGroupRemovedEvent {
+export interface FeedGroupDeletedEvent {
   created_at: Date;
 
   fid: string;
@@ -744,18 +830,20 @@ export interface FeedPayload {
   custom?: Record<string, any>;
 }
 
-export interface FeedRemovedEvent {
+export interface FeedUpdatedEvent {
   created_at: Date;
 
   fid: string;
 
   custom: Record<string, any>;
 
+  feed: Feed;
+
+  user: UserResponseCommonFields;
+
   type: string;
 
   received_at?: Date;
-
-  user?: UserResponseCommonFields;
 }
 
 export interface Follow {
@@ -1124,44 +1212,12 @@ export interface RankingConfig {
   type?: string;
 }
 
-export interface ReactionAddedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  reaction: ActivityReaction;
-
-  type: string;
-
-  received_at?: Date;
-
-  user?: UserResponseCommonFields;
-}
-
 export interface ReactionGroup {
   count: number;
 
   first_reaction_at: Date;
 
   last_reaction_at: Date;
-}
-
-export interface ReactionRemovedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  reaction: ActivityReaction;
-
-  type: string;
-
-  received_at?: Date;
-
-  user?: UserResponseCommonFields;
 }
 
 export interface RejectFeedMemberRequest {
@@ -1198,34 +1254,10 @@ export interface RemoveActivitiesResponse {
   removed_activity_ids: string[];
 }
 
-export interface RemoveActivityReactionResponse {
-  activity_id: string;
-
-  duration: string;
-
-  type: string;
-
-  user_id: string;
-}
-
-export interface RemoveActivityResponse {
-  duration: string;
-}
-
-export interface RemoveBookmarkResponse {
-  duration: string;
-
-  bookmark: Bookmark;
-}
-
 export interface RemoveCommentResponse {
   duration: string;
 
   comment: Comment;
-}
-
-export interface RemoveFeedResponse {
-  duration: string;
 }
 
 export interface Response {
@@ -1306,6 +1338,16 @@ export interface UpdateFeedMembersRequest {
   prev?: string;
 
   members?: FeedMemberPayload[];
+}
+
+export interface UpdateFeedRequest {
+  custom?: Record<string, any>;
+}
+
+export interface UpdateFeedResponse {
+  duration: string;
+
+  feed: Feed;
 }
 
 export interface UpdateFollowRequest {
@@ -1394,40 +1436,44 @@ export interface UserResponseCommonFields {
 
 export type WSClientEvent =
   | ({ type: 'activity.added' } & ActivityAddedEvent)
-  | ({ type: 'activity.reaction.added' } & ReactionAddedEvent)
-  | ({ type: 'activity.reaction.removed' } & ReactionRemovedEvent)
-  | ({ type: 'activity.removed' } & ActivityRemovedEvent)
+  | ({ type: 'activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'activity.reaction.added' } & ActivityReactionAddedEvent)
+  | ({ type: 'activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+  | ({ type: 'activity.removed_from_feed' } & ActivityRemovedFromFeedEvent)
   | ({ type: 'activity.updated' } & ActivityUpdatedEvent)
   | ({ type: 'bookmark.added' } & BookmarkAddedEvent)
-  | ({ type: 'bookmark.removed' } & BookmarkRemovedEvent)
+  | ({ type: 'bookmark.deleted' } & BookmarkDeletedEvent)
   | ({ type: 'bookmark.updated' } & BookmarkUpdatedEvent)
   | ({ type: 'comment.added' } & CommentAddedEvent)
   | ({ type: 'comment.removed' } & CommentRemovedEvent)
   | ({ type: 'comment.updated' } & CommentUpdatedEvent)
   | ({ type: 'feed.created' } & FeedCreatedEvent)
-  | ({ type: 'feed.removed' } & FeedRemovedEvent)
+  | ({ type: 'feed.deleted' } & FeedDeletedEvent)
+  | ({ type: 'feed.updated' } & FeedUpdatedEvent)
   | ({ type: 'feed_group.changed' } & FeedGroupChangedEvent)
-  | ({ type: 'feed_group.removed' } & FeedGroupRemovedEvent)
+  | ({ type: 'feed_group.deleted' } & FeedGroupDeletedEvent)
   | ({ type: 'follow.added' } & FollowAddedEvent)
   | ({ type: 'follow.removed' } & FollowRemovedEvent)
   | ({ type: 'follow.updated' } & FollowUpdatedEvent);
 
 export type WSEvent =
   | ({ type: 'activity.added' } & ActivityAddedEvent)
-  | ({ type: 'activity.reaction.added' } & ReactionAddedEvent)
-  | ({ type: 'activity.reaction.removed' } & ReactionRemovedEvent)
-  | ({ type: 'activity.removed' } & ActivityRemovedEvent)
+  | ({ type: 'activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'activity.reaction.added' } & ActivityReactionAddedEvent)
+  | ({ type: 'activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+  | ({ type: 'activity.removed_from_feed' } & ActivityRemovedFromFeedEvent)
   | ({ type: 'activity.updated' } & ActivityUpdatedEvent)
   | ({ type: 'bookmark.added' } & BookmarkAddedEvent)
-  | ({ type: 'bookmark.removed' } & BookmarkRemovedEvent)
+  | ({ type: 'bookmark.deleted' } & BookmarkDeletedEvent)
   | ({ type: 'bookmark.updated' } & BookmarkUpdatedEvent)
   | ({ type: 'comment.added' } & CommentAddedEvent)
   | ({ type: 'comment.removed' } & CommentRemovedEvent)
   | ({ type: 'comment.updated' } & CommentUpdatedEvent)
   | ({ type: 'feed.created' } & FeedCreatedEvent)
-  | ({ type: 'feed.removed' } & FeedRemovedEvent)
+  | ({ type: 'feed.deleted' } & FeedDeletedEvent)
+  | ({ type: 'feed.updated' } & FeedUpdatedEvent)
   | ({ type: 'feed_group.changed' } & FeedGroupChangedEvent)
-  | ({ type: 'feed_group.removed' } & FeedGroupRemovedEvent)
+  | ({ type: 'feed_group.deleted' } & FeedGroupDeletedEvent)
   | ({ type: 'follow.added' } & FollowAddedEvent)
   | ({ type: 'follow.removed' } & FollowRemovedEvent)
   | ({ type: 'follow.updated' } & FollowUpdatedEvent);
