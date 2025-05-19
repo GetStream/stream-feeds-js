@@ -137,6 +137,8 @@ export interface ActivityDeletedEvent {
 
   fid: string;
 
+  activity: Activity;
+
   custom: Record<string, any>;
 
   type: string;
