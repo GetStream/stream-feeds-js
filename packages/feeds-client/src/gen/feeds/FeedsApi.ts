@@ -52,6 +52,8 @@ import {
   UnpinActivityResponse,
   UpdateActivityPartialRequest,
   UpdateActivityPartialResponse,
+  UpdateActivityRequest,
+  UpdateActivityResponse,
   UpdateBookmarkRequest,
   UpdateBookmarkResponse,
   UpdateCommentRequest,
@@ -77,7 +79,6 @@ export class FeedsApi {
       id: request?.id,
       parent_id: request?.parent_id,
       text: request?.text,
-      user_id: request?.user_id,
       visibility: request?.visibility,
       attachments: request?.attachments,
       filter_tags: request?.filter_tags,
@@ -210,6 +211,32 @@ export class FeedsApi {
     );
 
     decoders.UpdateActivityPartialResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateActivity(
+    request: UpdateActivityRequest & { activity_id: string },
+  ): Promise<StreamResponse<UpdateActivityResponse>> {
+    const pathParams = {
+      activity_id: request?.activity_id,
+    };
+    const body = {
+      expires_at: request?.expires_at,
+      text: request?.text,
+      visibility: request?.visibility,
+      attachments: request?.attachments,
+      filter_tags: request?.filter_tags,
+      interest_tags: request?.interest_tags,
+      custom: request?.custom,
+      location: request?.location,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateActivityResponse>
+    >('PUT', '/feeds/v3/activities/{activity_id}', pathParams, undefined, body);
+
+    decoders.UpdateActivityResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

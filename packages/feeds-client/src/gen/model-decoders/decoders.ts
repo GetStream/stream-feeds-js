@@ -54,14 +54,6 @@ decoders.Activity = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
-    user: { type: 'UserResponse', isSingle: true },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    edited_at: { type: 'DatetimeType', isSingle: true },
-
-    expires_at: { type: 'DatetimeType', isSingle: true },
-
     comments: { type: 'Comment', isSingle: false },
 
     latest_reactions: { type: 'ActivityReaction', isSingle: false },
@@ -72,11 +64,17 @@ decoders.Activity = (input?: Record<string, any>) => {
 
     own_reactions: { type: 'ActivityReaction', isSingle: false },
 
-    current_feed: { type: 'Feed', isSingle: true },
+    reaction_groups: { type: 'ReactionGroup', isSingle: false },
+
+    user: { type: 'UserResponse', isSingle: true },
+
+    deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    edited_at: { type: 'DatetimeType', isSingle: true },
+
+    expires_at: { type: 'DatetimeType', isSingle: true },
 
     parent: { type: 'BaseActivity', isSingle: true },
-
-    reaction_groups: { type: 'ReactionGroup', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -212,14 +210,6 @@ decoders.BaseActivity = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
-    user: { type: 'UserResponse', isSingle: true },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    edited_at: { type: 'DatetimeType', isSingle: true },
-
-    expires_at: { type: 'DatetimeType', isSingle: true },
-
     comments: { type: 'Comment', isSingle: false },
 
     latest_reactions: { type: 'ActivityReaction', isSingle: false },
@@ -230,9 +220,15 @@ decoders.BaseActivity = (input?: Record<string, any>) => {
 
     own_reactions: { type: 'ActivityReaction', isSingle: false },
 
-    current_feed: { type: 'Feed', isSingle: true },
-
     reaction_groups: { type: 'ReactionGroup', isSingle: false },
+
+    user: { type: 'UserResponse', isSingle: true },
+
+    deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    edited_at: { type: 'DatetimeType', isSingle: true },
+
+    expires_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -609,6 +605,13 @@ decoders.RemoveCommentResponse = (input?: Record<string, any>) => {
 };
 
 decoders.UpdateActivityPartialResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    activity: { type: 'Activity', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpdateActivityResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activity: { type: 'Activity', isSingle: true },
   };

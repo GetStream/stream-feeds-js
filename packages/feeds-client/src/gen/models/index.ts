@@ -45,9 +45,11 @@ export interface Activity {
 
   created_at: Date;
 
+  current_feed: string;
+
   id: string;
 
-  text: string;
+  share_count: number;
 
   type: string;
 
@@ -55,7 +57,29 @@ export interface Activity {
 
   visibility: string;
 
+  attachments: ActivityAttachment[];
+
+  comments: Comment[];
+
   feeds: string[];
+
+  filter_tags: string[];
+
+  interest_tags: string[];
+
+  latest_reactions: ActivityReaction[];
+
+  mentioned_users: UserResponse[];
+
+  own_bookmarks: Bookmark[];
+
+  own_reactions: ActivityReaction[];
+
+  custom: Record<string, any>;
+
+  reaction_groups: Record<string, ReactionGroup>;
+
+  search_data: Record<string, any>;
 
   user: UserResponse;
 
@@ -69,35 +93,11 @@ export interface Activity {
 
   score?: number;
 
-  share_count?: number;
-
-  attachments?: ActivityAttachment[];
-
-  comments?: Comment[];
-
-  filter_tags?: string[];
-
-  interest_tags?: string[];
-
-  latest_reactions?: ActivityReaction[];
-
-  mentioned_users?: UserResponse[];
-
-  own_bookmarks?: Bookmark[];
-
-  own_reactions?: ActivityReaction[];
-
-  current_feed?: Feed;
-
-  custom?: Record<string, any>;
+  text?: string;
 
   location?: ActivityLocation;
 
   parent?: BaseActivity;
-
-  reaction_groups?: Record<string, ReactionGroup>;
-
-  search_data?: Record<string, any>;
 }
 
 export interface ActivityAddedEvent {
@@ -239,9 +239,7 @@ export interface ActivityRequest {
 
   text?: string;
 
-  user_id?: string;
-
-  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+  visibility?: 'public' | 'private' | 'tag:<tag_name>';
 
   attachments?: ActivityAttachment[];
 
@@ -299,9 +297,7 @@ export interface AddActivityRequest {
 
   text?: string;
 
-  user_id?: string;
-
-  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+  visibility?: string;
 
   attachments?: ActivityAttachment[];
 
@@ -397,9 +393,11 @@ export interface BaseActivity {
 
   created_at: Date;
 
+  current_feed: string;
+
   id: string;
 
-  text: string;
+  share_count: number;
 
   type: string;
 
@@ -407,7 +405,29 @@ export interface BaseActivity {
 
   visibility: string;
 
+  attachments: ActivityAttachment[];
+
+  comments: Comment[];
+
   feeds: string[];
+
+  filter_tags: string[];
+
+  interest_tags: string[];
+
+  latest_reactions: ActivityReaction[];
+
+  mentioned_users: UserResponse[];
+
+  own_bookmarks: Bookmark[];
+
+  own_reactions: ActivityReaction[];
+
+  custom: Record<string, any>;
+
+  reaction_groups: Record<string, ReactionGroup>;
+
+  search_data: Record<string, any>;
 
   user: UserResponse;
 
@@ -421,35 +441,11 @@ export interface BaseActivity {
 
   score?: number;
 
-  share_count?: number;
-
-  attachments?: ActivityAttachment[];
-
-  comments?: Comment[];
-
-  filter_tags?: string[];
-
-  interest_tags?: string[];
-
-  latest_reactions?: ActivityReaction[];
-
-  mentioned_users?: UserResponse[];
-
-  own_bookmarks?: Bookmark[];
-
-  own_reactions?: ActivityReaction[];
-
-  current_feed?: Feed;
-
-  custom?: Record<string, any>;
+  text?: string;
 
   location?: ActivityLocation;
 
   moderation?: Moderation;
-
-  reaction_groups?: Record<string, ReactionGroup>;
-
-  search_data?: Record<string, any>;
 }
 
 export interface Bookmark {
@@ -1297,6 +1293,30 @@ export interface UpdateActivityPartialRequest {
 }
 
 export interface UpdateActivityPartialResponse {
+  duration: string;
+
+  activity: Activity;
+}
+
+export interface UpdateActivityRequest {
+  expires_at?: Date;
+
+  text?: string;
+
+  visibility?: string;
+
+  attachments?: ActivityAttachment[];
+
+  filter_tags?: string[];
+
+  interest_tags?: string[];
+
+  custom?: Record<string, any>;
+
+  location?: ActivityLocation;
+}
+
+export interface UpdateActivityResponse {
   duration: string;
 
   activity: Activity;
