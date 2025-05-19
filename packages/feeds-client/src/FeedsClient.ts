@@ -87,7 +87,18 @@ export class FeedsClient extends FeedsApi {
       if (Object.hasOwn(event, 'fid')) {
         const feed = this.activeFeeds[(event as unknown as WSEvent).fid];
         if (feed) {
-          feed.handleWSEvent(event as unknown as WSEvent);
+          {
+            feed.handleWSEvent(event as unknown as WSEvent);
+            if (event.type === 'feed.deleted') {
+              delete this.activeFeeds[(event as unknown as WSEvent).fid];
+            }
+          }
+        } else if (event.type === 'feed.created') {
+          this.getOrCreateActiveFeed(
+            event.feed.group_id,
+            event.feed.id,
+            event.feed,
+          );
         }
       }
     });

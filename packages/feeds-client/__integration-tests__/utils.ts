@@ -1,6 +1,8 @@
 import { FeedsClient } from '../src/FeedsClient';
+import { FlatFeed } from '../src/FlatFeed';
 import { UserRequest } from '../src/common/gen/models';
 import { FeedsClientOptions } from '../src/common/types';
+import { WSEvent } from '../src/gen/models';
 import { FeedsEvent } from '../src/types';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
@@ -40,11 +42,12 @@ export const getTestUser = () => {
 };
 
 export const waitForEvent = (
-  client: FeedsClient,
-  type: FeedsEvent['type'],
+  client: FeedsClient | FlatFeed,
+  type: FeedsEvent['type'] | WSEvent['type'],
   timeoutMs = 3000,
 ) => {
   return new Promise((resolve) => {
+    // @ts-expect-error
     client.on(type, () => {
       resolve(undefined);
       clearTimeout(timeout);

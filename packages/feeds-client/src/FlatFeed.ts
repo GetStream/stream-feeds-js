@@ -107,20 +107,16 @@ export class FlatFeed extends FeedApi {
     ): void {
       throw new Error('Function not implemented.');
     },
-    'feed.created': function (
-      _: { type: 'feed.created' } & FeedCreatedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
+    'feed.created': (_: { type: 'feed.created' } & FeedCreatedEvent): void => {
+      // nothing to do
     },
-    'feed.deleted': function (
-      _: { type: 'feed.deleted' } & FeedDeletedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
+    'feed.deleted': (_: { type: 'feed.deleted' } & FeedDeletedEvent): void => {
+      // nothing to do
     },
-    'feed.updated': function (
-      _: { type: 'feed.updated' } & FeedUpdatedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
+    'feed.updated': (
+      event: { type: 'feed.updated' } & FeedUpdatedEvent,
+    ): void => {
+      this.state.partialNext({ ...event.feed });
     },
     'feed_group.changed': function (
       _: { type: 'feed_group.changed' } & FeedGroupChangedEvent,
