@@ -1,6 +1,6 @@
 import { FeedsApi } from './gen/feeds/FeedsApi';
 import { Feed, WSEvent } from './gen/models';
-import { FeedsEvent, StreamFeedClient } from './types';
+import { FeedsEvent } from './types';
 import { StateStore } from './common/StateStore';
 import { ModerationClient } from './common/ModerationClient';
 import { TokenManager } from './common/TokenManager';
@@ -14,7 +14,6 @@ import {
 } from './common/utils';
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
 import { FlatFeed } from './FlatFeed';
-import { NotificationFeed } from './NotificationFeed';
 import {
   UserRequest,
   BlockUsersRequest,
@@ -66,7 +65,7 @@ export class FeedsClient extends FeedsApi {
     FeedsEvent
   > = new EventDispatcher<FeedsEvent['type'], FeedsEvent>();
 
-  private activeFeeds: Record<FID, StreamFeedClient> = {};
+  private activeFeeds: Record<FID, FlatFeed> = {};
 
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
@@ -156,23 +155,14 @@ export class FeedsClient extends FeedsApi {
   off = this.eventDispatcher.off;
 
   feed = (group: string, id: string) => {
-    return this.getOrCreateActiveFeed(group, id, 'flat') as FlatFeed;
-  };
-
-  notificationFeed = (group: string, id: string) => {
-    return this.getOrCreateActiveFeed(
-      group,
-      id,
-      'notification',
-    ) as NotificationFeed;
+    return this.getOrCreateActiveFeed(group, id);
   };
 
   async queryFeeds(request?: { connection_id?: string }) {
     const response = await this.feedsQueryFeeds(request);
 
-    // TODO: we need type here
     const feeds = response.feeds.map((f) =>
-      this.getOrCreateActiveFeed(f.group_id, f.id, 'flat', f),
+      this.getOrCreateActiveFeed(f.group_id, f.id),
     );
 
     return {
@@ -187,25 +177,13 @@ export class FeedsClient extends FeedsApi {
   private readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
-    type: 'flat' | 'notification',
     data?: Feed,
   ) => {
     const fid = `${group}:${id}`;
     if (this.activeFeeds[fid]) {
       return this.activeFeeds[fid];
     } else {
-      let feed: StreamFeedClient;
-      switch (type) {
-        case 'flat':
-          feed = new FlatFeed(this, group, id, data);
-          break;
-        case 'notification':
-          feed = new NotificationFeed(this, group, id, data);
-          break;
-        default:
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          throw new Error(`This SDK doesn't yet support ${type} type`);
-      }
+      const feed = new FlatFeed(this, group, id, data);
       this.activeFeeds[fid] = feed;
       return feed;
     }

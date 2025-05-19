@@ -1,19 +1,179 @@
-import { Feed } from './gen/models';
-import { BaseFeed, BaseFeedState } from './BaseFeed';
+import {
+  ActivityAddedEvent,
+  ActivityDeletedEvent,
+  ActivityReactionAddedEvent,
+  ActivityReactionDeletedEvent,
+  ActivityRemovedFromFeedEvent,
+  ActivityUpdatedEvent,
+  BookmarkAddedEvent,
+  BookmarkDeletedEvent,
+  BookmarkUpdatedEvent,
+  CommentAddedEvent,
+  CommentRemovedEvent,
+  CommentUpdatedEvent,
+  Feed,
+  FeedCreatedEvent,
+  FeedDeletedEvent,
+  FeedGroupChangedEvent,
+  FeedGroupDeletedEvent,
+  FeedUpdatedEvent,
+  FollowAddedEvent,
+  FollowRemovedEvent,
+  FollowUpdatedEvent,
+  GetOrCreateFeedRequest,
+  GetOrCreateFeedResponse,
+  WSEvent,
+} from './gen/models';
+import { StateStore } from './common/StateStore';
+import { EventDispatcher } from './common/EventDispatcher';
+import { FeedApi } from './gen/feeds/FeedApi';
+import { FeedsClient } from './FeedsClient';
 
-export type FlatFeedState = BaseFeedState;
+export type FeedState = Partial<
+  Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
+> &
+  Partial<{
+    [key in keyof Feed]: Feed[key];
+  }>;
 
-export class FlatFeed extends BaseFeed<{
-  [key in keyof FlatFeedState]: FlatFeedState[key];
-}> {
-  type = 'flat' as const;
-  protected getInitialState(feed?: Feed) {
-    const defaultState: FlatFeedState = {};
+export class FlatFeed extends FeedApi {
+  readonly state: StateStore<FeedState>;
+  private readonly eventHandlers: {
+    [key in WSEvent['type']]: (_: WSEvent & { type: key }) => void;
+  } = {
+    'activity.added': function (
+      _: { type: 'activity.added' } & ActivityAddedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'activity.deleted': function (
+      _: { type: 'activity.deleted' } & ActivityDeletedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'activity.reaction.added': function (
+      _: { type: 'activity.reaction.added' } & ActivityReactionAddedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'activity.reaction.deleted': function (
+      _: {
+        type: 'activity.reaction.deleted';
+      } & ActivityReactionDeletedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'activity.removed_from_feed': function (
+      _: {
+        type: 'activity.removed_from_feed';
+      } & ActivityRemovedFromFeedEvent & { type: 'activity.removed_from_feed' },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'activity.updated': function (
+      _: { type: 'activity.updated' } & ActivityUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'bookmark.added': function (
+      _: { type: 'bookmark.added' } & BookmarkAddedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'bookmark.deleted': function (
+      _: { type: 'bookmark.deleted' } & BookmarkDeletedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'bookmark.updated': function (
+      _: { type: 'bookmark.updated' } & BookmarkUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'comment.added': function (
+      _: { type: 'comment.added' } & CommentAddedEvent & {
+          type: 'comment.added';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'comment.removed': function (
+      _: { type: 'comment.removed' } & CommentRemovedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'comment.updated': function (
+      _: { type: 'comment.updated' } & CommentUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feed.created': function (
+      _: { type: 'feed.created' } & FeedCreatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feed.deleted': function (
+      _: { type: 'feed.deleted' } & FeedDeletedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feed.updated': function (
+      _: { type: 'feed.updated' } & FeedUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feed_group.changed': function (
+      _: { type: 'feed_group.changed' } & FeedGroupChangedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feed_group.deleted': function (
+      _: { type: 'feed_group.deleted' } & FeedGroupDeletedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'follow.added': function (
+      _: { type: 'follow.added' } & FollowAddedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'follow.removed': function (
+      _: { type: 'follow.removed' } & FollowRemovedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'follow.updated': function (
+      _: { type: 'follow.updated' } & FollowUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+  };
 
-    return { ...defaultState, ...feed };
+  protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
+    new EventDispatcher<WSEvent['type'], WSEvent>();
+
+  constructor(client: FeedsClient, group: string, id: string, feed?: Feed) {
+    super(client, group, id);
+    this.state = new StateStore<FeedState>(feed ?? {});
   }
 
-  protected feedUpdated(feed: Partial<Feed>): void {
-    this.state.partialNext({ ...feed });
+  get fid() {
+    return `${this.group}:${this.id}`;
+  }
+
+  async getOrCreate(request?: GetOrCreateFeedRequest) {
+    const response = await super.getOrCreate(request);
+    this.state.next({ ...response.feed });
+
+    return response;
+  }
+
+  on = this.eventDispatcher.on;
+  off = this.eventDispatcher.off;
+
+  handleWSEvent(event: WSEvent) {
+    // @ts-expect-error TODO: why?
+    this.eventHandlers[event.type](event);
+    this.eventDispatcher.dispatch(event);
   }
 }
