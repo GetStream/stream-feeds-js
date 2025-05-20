@@ -342,13 +342,6 @@ decoders.CommentUpdatedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.CreateActivitiesBatchResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    activities: { type: 'Activity', isSingle: false },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.CreateManyFeedsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     feeds: { type: 'Feed', isSingle: false },
@@ -648,6 +641,13 @@ decoders.UpdateFeedResponse = (input?: Record<string, any>) => {
 decoders.UpdateFollowResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     follow: { type: 'Follow', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpsertActivitiesResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    activities: { type: 'Activity', isSingle: false },
   };
   return decode(typeMappings, input);
 };

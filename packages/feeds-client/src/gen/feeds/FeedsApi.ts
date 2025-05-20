@@ -12,8 +12,6 @@ import {
   AddCommentResponse,
   AddReactionRequest,
   AddReactionResponse,
-  CreateActivitiesBatchRequest,
-  CreateActivitiesBatchResponse,
   CreateManyFeedsRequest,
   CreateManyFeedsResponse,
   DeleteActivityReactionResponse,
@@ -63,6 +61,8 @@ import {
   UpdateFeedResponse,
   UpdateFollowRequest,
   UpdateFollowResponse,
+  UpsertActivitiesRequest,
+  UpsertActivitiesResponse,
 } from '../models';
 import { decoders } from '../model-decoders/decoders';
 
@@ -99,17 +99,17 @@ export class FeedsApi {
   }
 
   async upsertActivities(
-    request: CreateActivitiesBatchRequest,
-  ): Promise<StreamResponse<CreateActivitiesBatchResponse>> {
+    request: UpsertActivitiesRequest,
+  ): Promise<StreamResponse<UpsertActivitiesResponse>> {
     const body = {
       activities: request?.activities,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<CreateActivitiesBatchResponse>
+      StreamResponse<UpsertActivitiesResponse>
     >('POST', '/feeds/v3/activities/batch', undefined, undefined, body);
 
-    decoders.CreateActivitiesBatchResponse?.(response.body);
+    decoders.UpsertActivitiesResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

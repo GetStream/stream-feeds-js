@@ -28,6 +28,11 @@ import { StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
 import { FeedApi } from './gen/feeds/FeedApi';
 import { FeedsClient } from './FeedsClient';
+import {
+  addActivitiesToState,
+  updateActivityInState,
+  removeActivityFromState,
+} from './state-updates/activity-utils';
 
 export type FeedState = Partial<
   Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
@@ -41,15 +46,32 @@ export class FlatFeed extends FeedApi {
   private readonly eventHandlers: {
     [key in WSEvent['type']]: (_: WSEvent & { type: key }) => void;
   } = {
-    'activity.added': function (
-      _: { type: 'activity.added' } & ActivityAddedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
+    'activity.added': (
+      event: { type: 'activity.added' } & ActivityAddedEvent,
+    ) => {
+      const currentActivities = this.state.getLatestValue().activities;
+      const result = addActivitiesToState(
+        [event.activity],
+        currentActivities,
+        'start',
+      );
+      if (result.changed) {
+        this.state.partialNext({ activities: result.activities });
+      }
     },
-    'activity.deleted': function (
-      _: { type: 'activity.deleted' } & ActivityDeletedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
+    'activity.deleted': (
+      event: { type: 'activity.deleted' } & ActivityDeletedEvent,
+    ) => {
+      const currentActivities = this.state.getLatestValue().activities;
+      if (currentActivities) {
+        const result = removeActivityFromState(
+          event.activity,
+          currentActivities,
+        );
+        if (result.changed) {
+          this.state.partialNext({ activities: result.activities });
+        }
+      }
     },
     'activity.reaction.added': function (
       _: { type: 'activity.reaction.added' } & ActivityReactionAddedEvent,
@@ -70,10 +92,16 @@ export class FlatFeed extends FeedApi {
     ): void {
       throw new Error('Function not implemented.');
     },
-    'activity.updated': function (
-      _: { type: 'activity.updated' } & ActivityUpdatedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
+    'activity.updated': (
+      event: { type: 'activity.updated' } & ActivityUpdatedEvent,
+    ) => {
+      const currentActivities = this.state.getLatestValue().activities;
+      if (currentActivities) {
+        const result = updateActivityInState(event.activity, currentActivities);
+        if (result.changed) {
+          this.state.partialNext({ activities: result.activities });
+        }
+      }
     },
     'bookmark.added': function (
       _: { type: 'bookmark.added' } & BookmarkAddedEvent,

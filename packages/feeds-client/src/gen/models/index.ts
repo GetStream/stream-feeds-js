@@ -600,16 +600,6 @@ export interface CommentUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface CreateActivitiesBatchRequest {
-  activities: ActivityRequest[];
-}
-
-export interface CreateActivitiesBatchResponse {
-  duration: string;
-
-  activities: Activity[];
-}
-
 export interface CreateManyFeedsRequest {
   feeds: FeedPayload[];
 }
@@ -1382,6 +1372,16 @@ export interface UpdateFollowResponse {
   duration: string;
 
   follow: Follow;
+}
+
+export interface UpsertActivitiesRequest {
+  activities: ActivityRequest[];
+}
+
+export interface UpsertActivitiesResponse {
+  duration: string;
+
+  activities: Activity[];
 }
 
 export interface UserResponse {
