@@ -25,12 +25,16 @@ describe('Activity state updates via WebSocket events', () => {
     client = createTestClient();
     await client.connectUser(user, createTestTokenGenerator(user));
     feed = client.feed(feedGroup, feedId);
-    await feed.getOrCreate({ watch: true });
+    await feed.getOrCreate({
+      watch: true,
+      member_pagination: { limit: 25 },
+      limit: 25,
+    });
   });
 
   it('should add activity to feed in response to activity.added event', async () => {
     // Initial state has no activities
-    expect(feed.state.getLatestValue().activities).toBeUndefined();
+    expect(feed.state.getLatestValue().activities?.length).toBe(0);
 
     // Create a spy for the activity.added event
     const addSpy = vi.fn();

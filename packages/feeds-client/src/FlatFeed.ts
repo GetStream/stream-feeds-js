@@ -187,7 +187,24 @@ export class FlatFeed extends FeedApi {
 
   async getOrCreate(request?: GetOrCreateFeedRequest) {
     const response = await super.getOrCreate(request);
-    this.state.next({ ...response.feed });
+    const responseCopy = {
+      ...response,
+    };
+    const feed = responseCopy.feed;
+    // @ts-expect-error feed is removed from the response, it's spread out in the state
+    delete responseCopy.feed;
+    // @ts-expect-error
+    delete responseCopy.metadata;
+    const nextState: FeedState = { ...responseCopy, ...feed };
+
+    if (!request?.follower_pagination?.limit) {
+      delete nextState.followers;
+    }
+    if (!request?.following_pagination?.limit) {
+      delete nextState.following;
+    }
+
+    this.state.next({ ...nextState });
 
     return response;
   }
