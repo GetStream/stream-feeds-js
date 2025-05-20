@@ -475,32 +475,6 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async updateFeed(
-    request: UpdateFeedRequest & { feed_group_id: string; feed_id: string },
-  ): Promise<StreamResponse<UpdateFeedResponse>> {
-    const pathParams = {
-      feed_group_id: request?.feed_group_id,
-      feed_id: request?.feed_id,
-    };
-    const body = {
-      custom: request?.custom,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<UpdateFeedResponse>
-    >(
-      'PATCH',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
-      pathParams,
-      undefined,
-      body,
-    );
-
-    decoders.UpdateFeedResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
   async getOrCreateFeed(
     request: GetOrCreateFeedRequest & {
       feed_group_id: string;
@@ -542,6 +516,32 @@ export class FeedsApi {
     );
 
     decoders.GetOrCreateFeedResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateFeed(
+    request: UpdateFeedRequest & { feed_group_id: string; feed_id: string },
+  ): Promise<StreamResponse<UpdateFeedResponse>> {
+    const pathParams = {
+      feed_group_id: request?.feed_group_id,
+      feed_id: request?.feed_id,
+    };
+    const body = {
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateFeedResponse>
+    >(
+      'PUT',
+      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.UpdateFeedResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

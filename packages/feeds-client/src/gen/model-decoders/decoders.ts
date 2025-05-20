@@ -74,6 +74,8 @@ decoders.Activity = (input?: Record<string, any>) => {
 
     expires_at: { type: 'DatetimeType', isSingle: true },
 
+    current_feed: { type: 'Feed', isSingle: true },
+
     parent: { type: 'BaseActivity', isSingle: true },
   };
   return decode(typeMappings, input);
@@ -231,6 +233,8 @@ decoders.BaseActivity = (input?: Record<string, any>) => {
     edited_at: { type: 'DatetimeType', isSingle: true },
 
     expires_at: { type: 'DatetimeType', isSingle: true },
+
+    current_feed: { type: 'Feed', isSingle: true },
   };
   return decode(typeMappings, input);
 };

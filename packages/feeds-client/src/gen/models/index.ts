@@ -45,8 +45,6 @@ export interface Activity {
 
   created_at: Date;
 
-  current_feed: string;
-
   id: string;
 
   share_count: number;
@@ -94,6 +92,8 @@ export interface Activity {
   score?: number;
 
   text?: string;
+
+  current_feed?: Feed;
 
   location?: ActivityLocation;
 
@@ -395,8 +395,6 @@ export interface BaseActivity {
 
   created_at: Date;
 
-  current_feed: string;
-
   id: string;
 
   share_count: number;
@@ -444,6 +442,8 @@ export interface BaseActivity {
   score?: number;
 
   text?: string;
+
+  current_feed?: Feed;
 
   location?: ActivityLocation;
 

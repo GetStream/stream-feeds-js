@@ -36,20 +36,20 @@ export class FeedApi {
     });
   }
 
-  update(
-    request?: UpdateFeedRequest,
-  ): Promise<StreamResponse<UpdateFeedResponse>> {
-    return this.feedsApi.updateFeed({
+  getOrCreate(
+    request?: GetOrCreateFeedRequest & { connection_id?: string },
+  ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
+    return this.feedsApi.getOrCreateFeed({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,
     });
   }
 
-  getOrCreate(
-    request?: GetOrCreateFeedRequest & { connection_id?: string },
-  ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
-    return this.feedsApi.getOrCreateFeed({
+  update(
+    request?: UpdateFeedRequest,
+  ): Promise<StreamResponse<UpdateFeedResponse>> {
+    return this.feedsApi.updateFeed({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,
