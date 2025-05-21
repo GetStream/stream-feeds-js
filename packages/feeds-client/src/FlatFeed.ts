@@ -9,7 +9,9 @@ import {
   BookmarkDeletedEvent,
   BookmarkUpdatedEvent,
   CommentAddedEvent,
-  CommentRemovedEvent,
+  CommentDeletedEvent,
+  CommentReactionAddedEvent,
+  CommentReactionRemovedEvent,
   CommentUpdatedEvent,
   Feed,
   FeedCreatedEvent,
@@ -125,8 +127,8 @@ export class FlatFeed extends FeedApi {
     ): void {
       throw new Error('Function not implemented.');
     },
-    'comment.removed': function (
-      _: { type: 'comment.removed' } & CommentRemovedEvent,
+    'comment.deleted': function (
+      _: { type: 'comment.deleted' } & CommentDeletedEvent,
     ): void {
       throw new Error('Function not implemented.');
     },
@@ -168,6 +170,20 @@ export class FlatFeed extends FeedApi {
     },
     'follow.updated': function (
       _: { type: 'follow.updated' } & FollowUpdatedEvent,
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'comment.reaction.added': function (
+      _: { type: 'comment.reaction.added' } & CommentReactionAddedEvent & {
+          type: 'comment.reaction.added';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'comment.reaction.removed': function (
+      _: { type: 'comment.reaction.removed' } & CommentReactionRemovedEvent & {
+          type: 'comment.reaction.removed';
+        },
     ): void {
       throw new Error('Function not implemented.');
     },

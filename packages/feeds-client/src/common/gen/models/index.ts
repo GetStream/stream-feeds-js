@@ -1,4 +1,8 @@
-import { SortParamRequest, UserResponse } from '../../../gen/models';
+import {
+  Attachment,
+  SortParamRequest,
+  UserResponse,
+} from '../../../gen/models';
 
 export interface AIImageConfig {
   enabled: boolean;
@@ -116,58 +120,6 @@ export interface AppResponseFields {
   file_upload_config: FileUploadConfig;
 
   image_upload_config: FileUploadConfig;
-}
-
-export interface Attachment {
-  custom: Record<string, any>;
-
-  asset_url?: string;
-
-  author_icon?: string;
-
-  author_link?: string;
-
-  author_name?: string;
-
-  color?: string;
-
-  fallback?: string;
-
-  footer?: string;
-
-  footer_icon?: string;
-
-  image_url?: string;
-
-  latitude?: number;
-
-  longitude?: number;
-
-  og_scrape_url?: string;
-
-  original_height?: number;
-
-  original_width?: number;
-
-  pretext?: string;
-
-  stopped_sharing?: boolean;
-
-  text?: string;
-
-  thumb_url?: string;
-
-  title?: string;
-
-  title_link?: string;
-
-  type?: string;
-
-  actions?: Action[];
-
-  fields?: Field[];
-
-  giphy?: Images;
 }
 
 export interface AutomodPlatformCircumventionConfig {
