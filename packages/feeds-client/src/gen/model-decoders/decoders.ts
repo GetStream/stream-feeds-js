@@ -584,11 +584,11 @@ decoders.GetOrCreateFeedResponse = (input?: Record<string, any>) => {
 
     feed: { type: 'Feed', isSingle: true },
 
+    own_follows: { type: 'Follow', isSingle: false },
+
     notification_status: { type: 'NotificationStatus', isSingle: true },
 
-    own_feed_follow: { type: 'Follow', isSingle: true },
-
-    own_feed_membership: { type: 'FeedMember', isSingle: true },
+    own_membership: { type: 'FeedMember', isSingle: true },
   };
   return decode(typeMappings, input);
 };

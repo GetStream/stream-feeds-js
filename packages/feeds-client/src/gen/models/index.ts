@@ -120,20 +120,6 @@ export interface ActivityAddedEvent {
 
 export interface ActivityAnalyserConfig {}
 
-export interface ActivityAttachment {
-  asset_url?: string;
-
-  image_url?: string;
-
-  live_call_cid?: string;
-
-  type?: string;
-
-  url?: string;
-
-  custom?: Record<string, any>;
-}
-
 export interface ActivityDeletedEvent {
   created_at: Date;
 
@@ -1135,6 +1121,8 @@ export interface GetOrCreateFeedResponse {
 
   prev?: string;
 
+  own_follows?: Follow[];
+
   followers_pagination?: PagerResponse;
 
   following_pagination?: PagerResponse;
@@ -1143,9 +1131,7 @@ export interface GetOrCreateFeedResponse {
 
   notification_status?: NotificationStatus;
 
-  own_feed_follow?: Follow;
-
-  own_feed_membership?: FeedMember;
+  own_membership?: FeedMember;
 }
 
 export interface MarkActivityRequest {
@@ -1463,7 +1449,7 @@ export interface UpdateActivityRequest {
 
   visibility?: string;
 
-  attachments?: ActivityAttachment[];
+  attachments?: Attachment[];
 
   filter_tags?: string[];
 
