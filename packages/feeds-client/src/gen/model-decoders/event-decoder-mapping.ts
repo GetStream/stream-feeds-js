@@ -34,8 +34,14 @@ const eventDecoderMapping: {
   'comment.added': (data: Record<string, any>) =>
     decoders.CommentAddedEvent(data),
 
-  'comment.removed': (data: Record<string, any>) =>
-    decoders.CommentRemovedEvent(data),
+  'comment.deleted': (data: Record<string, any>) =>
+    decoders.CommentDeletedEvent(data),
+
+  'comment.reaction.added': (data: Record<string, any>) =>
+    decoders.CommentReactionAddedEvent(data),
+
+  'comment.reaction.removed': (data: Record<string, any>) =>
+    decoders.CommentReactionRemovedEvent(data),
 
   'comment.updated': (data: Record<string, any>) =>
     decoders.CommentUpdatedEvent(data),
