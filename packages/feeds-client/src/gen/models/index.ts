@@ -793,6 +793,8 @@ export interface FeedDeletedEvent {
 }
 
 export interface FeedGroup {
+  aggregation_version: number;
+
   app_pk: number;
 
   created_at: Date;
@@ -810,6 +812,8 @@ export interface FeedGroup {
   custom: Record<string, any>;
 
   deleted_at?: Date;
+
+  last_feed_get_at?: Date;
 
   aggregation?: AggregationConfig;
 
