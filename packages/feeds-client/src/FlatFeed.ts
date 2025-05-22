@@ -75,25 +75,19 @@ export class FlatFeed extends FeedApi {
         }
       }
     },
-    'activity.reaction.added': function (
+    'activity.reaction.added': (
       _: { type: 'activity.reaction.added' } & ActivityReactionAddedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'activity.reaction.deleted': function (
+    ) => {},
+    'activity.reaction.deleted': (
       _: {
         type: 'activity.reaction.deleted';
       } & ActivityReactionDeletedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'activity.removed_from_feed': function (
+    ) => {},
+    'activity.removed_from_feed': (
       _: {
         type: 'activity.removed_from_feed';
       } & ActivityRemovedFromFeedEvent & { type: 'activity.removed_from_feed' },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
+    ) => {},
     'activity.updated': (
       event: { type: 'activity.updated' } & ActivityUpdatedEvent,
     ) => {
@@ -105,88 +99,58 @@ export class FlatFeed extends FeedApi {
         }
       }
     },
-    'bookmark.added': function (
+    'bookmark.added': (
       _: { type: 'bookmark.added' } & BookmarkAddedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'bookmark.deleted': function (
+    ) => {},
+    'bookmark.deleted': (
       _: { type: 'bookmark.deleted' } & BookmarkDeletedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'bookmark.updated': function (
+    ) => {},
+    'bookmark.updated': (
       _: { type: 'bookmark.updated' } & BookmarkUpdatedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'comment.added': function (
+    ) => {},
+    'comment.added': (
       _: { type: 'comment.added' } & CommentAddedEvent & {
           type: 'comment.added';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'comment.deleted': function (
+    ) => {},
+    'comment.deleted': (
       _: { type: 'comment.deleted' } & CommentDeletedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'comment.updated': function (
+    ) => {},
+    'comment.updated': (
       _: { type: 'comment.updated' } & CommentUpdatedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'feed.created': (_: { type: 'feed.created' } & FeedCreatedEvent): void => {
+    ) => {},
+    'feed.created': (_: { type: 'feed.created' } & FeedCreatedEvent) => {
       // nothing to do
     },
-    'feed.deleted': (_: { type: 'feed.deleted' } & FeedDeletedEvent): void => {
+    'feed.deleted': (_: { type: 'feed.deleted' } & FeedDeletedEvent) => {
       // nothing to do
     },
-    'feed.updated': (
-      event: { type: 'feed.updated' } & FeedUpdatedEvent,
-    ): void => {
+    'feed.updated': (event: { type: 'feed.updated' } & FeedUpdatedEvent) => {
       this.state.partialNext({ ...event.feed });
     },
-    'feed_group.changed': function (
+    'feed_group.changed': (
       _: { type: 'feed_group.changed' } & FeedGroupChangedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'feed_group.deleted': function (
+    ) => {},
+    'feed_group.deleted': (
       _: { type: 'feed_group.deleted' } & FeedGroupDeletedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'follow.added': function (
-      _: { type: 'follow.added' } & FollowAddedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'follow.removed': function (
+    ) => {},
+    'follow.added': (_: { type: 'follow.added' } & FollowAddedEvent) => {},
+    'follow.removed': (
       _: { type: 'follow.removed' } & FollowRemovedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'follow.updated': function (
+    ) => {},
+    'follow.updated': (
       _: { type: 'follow.updated' } & FollowUpdatedEvent,
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'comment.reaction.added': function (
+    ) => {},
+    'comment.reaction.added': (
       _: { type: 'comment.reaction.added' } & CommentReactionAddedEvent & {
           type: 'comment.reaction.added';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'comment.reaction.removed': function (
+    ) => {},
+    'comment.reaction.removed': (
       _: { type: 'comment.reaction.removed' } & CommentReactionRemovedEvent & {
           type: 'comment.reaction.removed';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
+    ) => {},
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
