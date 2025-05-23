@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { Activity, ActivityReaction } from '../gen/models';
+import { ActivityResponse, ActivityReactionResponse } from '../gen/models';
 import {
   addActivitiesToState,
   updateActivityInState,
   removeActivityFromState,
 } from './activity-utils';
 
-const createMockActivity = (id: string, text?: string): Activity =>
+const createMockActivity = (id: string, text?: string): ActivityResponse =>
   ({
     id,
     type: 'test',
@@ -43,7 +43,7 @@ const createMockActivity = (id: string, text?: string): Activity =>
       teams: [],
       custom: {},
     },
-  }) as Activity;
+  }) as ActivityResponse;
 
 describe('activity-utils', () => {
   describe('addActivitiesToState', () => {
@@ -157,7 +157,7 @@ describe('activity-utils', () => {
           updated_at: new Date(),
         },
       ];
-      originalActivity.latest_reactions = {} as ActivityReaction[];
+      originalActivity.latest_reactions = {} as ActivityReactionResponse[];
       (originalActivity.latest_reactions as any)['like'] = [
         {
           type: 'like',
@@ -246,7 +246,7 @@ describe('activity-utils', () => {
 
     it('should handle empty activities array', () => {
       const activity = createMockActivity('activity1');
-      const activities: Activity[] = [];
+      const activities: ActivityResponse[] = [];
 
       const result = removeActivityFromState(activity, activities);
 

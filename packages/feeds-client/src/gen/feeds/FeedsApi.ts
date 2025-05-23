@@ -18,15 +18,15 @@ import {
   AddReactionResponse,
   CreateManyFeedsRequest,
   CreateManyFeedsResponse,
+  DeleteActivitiesRequest,
+  DeleteActivitiesResponse,
   DeleteActivityReactionResponse,
   DeleteActivityResponse,
   DeleteBookmarkResponse,
   DeleteCommentResponse,
   DeleteFeedResponse,
-  FollowManyRequest,
-  FollowManyResponse,
-  FollowRequest,
-  FollowResponse,
+  FollowBatchRequest,
+  FollowBatchResponse,
   GetActivityResponse,
   GetCommentRepliesResponse,
   GetCommentResponse,
@@ -50,10 +50,10 @@ import {
   RejectFeedMemberResponse,
   RejectFollowRequest,
   RejectFollowResponse,
-  RemoveActivitiesRequest,
-  RemoveActivitiesResponse,
   RemoveCommentReactionResponse,
   Response,
+  SingleFollowRequest,
+  SingleFollowResponse,
   UnfollowResponse,
   UnpinActivityResponse,
   UpdateActivityPartialRequest,
@@ -123,6 +123,23 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async removeActivities(
+    request: DeleteActivitiesRequest,
+  ): Promise<StreamResponse<DeleteActivitiesResponse>> {
+    const body = {
+      activity_ids: request?.activity_ids,
+      hard_delete: request?.hard_delete,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteActivitiesResponse>
+    >('POST', '/feeds/v3/activities/delete', undefined, undefined, body);
+
+    decoders.DeleteActivitiesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async queryActivities(
     request?: QueryActivitiesRequest,
   ): Promise<StreamResponse<QueryActivitiesResponse>> {
@@ -141,23 +158,6 @@ export class FeedsApi {
     >('POST', '/feeds/v3/activities/query', undefined, undefined, body);
 
     decoders.QueryActivitiesResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async removeActivities(
-    request: RemoveActivitiesRequest,
-  ): Promise<StreamResponse<RemoveActivitiesResponse>> {
-    const body = {
-      activity_ids: request?.activity_ids,
-      hard_delete: request?.hard_delete,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveActivitiesResponse>
-    >('POST', '/feeds/v3/activities/remove', undefined, undefined, body);
-
-    decoders.RemoveActivitiesResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -377,6 +377,7 @@ export class FeedsApi {
     object_type: string;
     depth?: number;
     sort?: string;
+    replies_limit?: number;
     limit?: number;
     prev?: string;
     next?: string;
@@ -386,6 +387,7 @@ export class FeedsApi {
       object_type: request?.object_type,
       depth: request?.depth,
       sort: request?.sort,
+      replies_limit: request?.replies_limit,
       limit: request?.limit,
       prev: request?.prev,
       next: request?.next,
@@ -920,7 +922,7 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async createManyFeeds(
+  async createFeedsBatch(
     request: CreateManyFeedsRequest,
   ): Promise<StreamResponse<CreateManyFeedsResponse>> {
     const body = {
@@ -970,8 +972,8 @@ export class FeedsApi {
   }
 
   async follow(
-    request: FollowRequest,
-  ): Promise<StreamResponse<FollowResponse>> {
+    request: SingleFollowRequest,
+  ): Promise<StreamResponse<SingleFollowResponse>> {
     const body = {
       source: request?.source,
       target: request?.target,
@@ -981,10 +983,10 @@ export class FeedsApi {
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<FollowResponse>
+      StreamResponse<SingleFollowResponse>
     >('POST', '/feeds/v3/follows', undefined, undefined, body);
 
-    decoders.FollowResponse?.(response.body);
+    decoders.SingleFollowResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -1006,18 +1008,18 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async followMany(
-    request: FollowManyRequest,
-  ): Promise<StreamResponse<FollowManyResponse>> {
+  async followBatch(
+    request: FollowBatchRequest,
+  ): Promise<StreamResponse<FollowBatchResponse>> {
     const body = {
       follows: request?.follows,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<FollowManyResponse>
+      StreamResponse<FollowBatchResponse>
     >('POST', '/feeds/v3/follows/batch', undefined, undefined, body);
 
-    decoders.FollowManyResponse?.(response.body);
+    decoders.FollowBatchResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -1059,18 +1061,10 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async unfollow(request: {
-    source: string;
-    target: string;
-  }): Promise<StreamResponse<UnfollowResponse>> {
-    const pathParams = {
-      source: request?.source,
-      target: request?.target,
-    };
-
+  async unfollow(): Promise<StreamResponse<UnfollowResponse>> {
     const response = await this.apiClient.sendRequest<
       StreamResponse<UnfollowResponse>
-    >('DELETE', '/feeds/v3/follows/{source}/{target}', pathParams, undefined);
+    >('DELETE', '/feeds/v3/follows/{source}/{target}', undefined, undefined);
 
     decoders.UnfollowResponse?.(response.body);
 

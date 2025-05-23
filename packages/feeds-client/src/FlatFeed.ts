@@ -13,11 +13,11 @@ import {
   CommentReactionAddedEvent,
   CommentReactionRemovedEvent,
   CommentUpdatedEvent,
-  Feed,
   FeedCreatedEvent,
   FeedDeletedEvent,
   FeedGroupChangedEvent,
   FeedGroupDeletedEvent,
+  FeedResponse,
   FeedUpdatedEvent,
   FollowAddedEvent,
   FollowRemovedEvent,
@@ -40,7 +40,7 @@ export type FeedState = Partial<
   Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
 > &
   Partial<{
-    [key in keyof Feed]: Feed[key];
+    [key in keyof FeedResponse]: FeedResponse[key];
   }>;
 
 export class FlatFeed extends FeedApi {
@@ -156,9 +156,14 @@ export class FlatFeed extends FeedApi {
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
     new EventDispatcher<WSEvent['type'], WSEvent>();
 
-  constructor(client: FeedsClient, group: string, id: string, feed?: Feed) {
+  constructor(
+    client: FeedsClient,
+    group: string,
+    id: string,
+    data?: FeedResponse,
+  ) {
     super(client, group, id);
-    this.state = new StateStore<FeedState>(feed ?? {});
+    this.state = new StateStore<FeedState>(data ?? {});
   }
 
   get fid() {

@@ -1,5 +1,5 @@
 import { FeedsApi } from './gen/feeds/FeedsApi';
-import { Feed, WSEvent } from './gen/models';
+import { FeedResponse, WSEvent } from './gen/models';
 import { FeedsEvent } from './types';
 import { StateStore } from './common/StateStore';
 import { ModerationClient } from './common/ModerationClient';
@@ -188,7 +188,7 @@ export class FeedsClient extends FeedsApi {
   private readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
-    data?: Feed,
+    data?: FeedResponse,
   ) => {
     const fid = `${group}:${id}`;
     if (this.activeFeeds[fid]) {

@@ -1,5 +1,6 @@
 import {
   Attachment,
+  ReactionGroupResponse,
   SortParamRequest,
   UserResponse,
 } from '../../../gen/models';
@@ -1804,16 +1805,6 @@ export interface Reaction {
   user_id?: string;
 
   user?: User;
-}
-
-export interface ReactionGroupResponse {
-  count: number;
-
-  first_reaction_at: Date;
-
-  last_reaction_at: Date;
-
-  sum_scores: number;
 }
 
 export interface ReactionResponse {
