@@ -43,7 +43,7 @@ export type FeedState = Partial<
     [key in keyof FeedResponse]: FeedResponse[key];
   }>;
 
-export class FlatFeed extends FeedApi {
+export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private readonly eventHandlers: {
     [key in WSEvent['type']]: (_: WSEvent & { type: key }) => void;

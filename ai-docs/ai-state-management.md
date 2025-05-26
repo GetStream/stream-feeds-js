@@ -3,11 +3,11 @@
 State updates happen in response to WebSocket events. There are two main classes that do state management:
 
 - `FeedsClient`
-- `FlatFeed`
+- `Feed`
 
 ## WebSocket event handlers
 
-For the `FlatFeed` class there is an `eventHandlers` property that watches for all feed related events. We need to add a handler which will call the state update method (unless state update is trivial, in which case we do it inline).
+For the `Feed` class there is an `eventHandlers` property that watches for all feed related events. We need to add a handler which will call the state update method (unless state update is trivial, in which case we do it inline).
 
 ## State store
 

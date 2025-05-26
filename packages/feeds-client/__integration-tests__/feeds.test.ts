@@ -6,12 +6,12 @@ import {
   getTestUser,
 } from './utils';
 import { FeedsClient } from '../src/FeedsClient';
-import { FlatFeed } from '../src/FlatFeed';
+import { Feed } from '../src/Feed';
 
 describe('Feeds API dummy test', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
-  let feed: FlatFeed;
+  let feed: Feed;
 
   beforeAll(async () => {
     client = createTestClient();

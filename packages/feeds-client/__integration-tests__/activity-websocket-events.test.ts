@@ -12,14 +12,14 @@ import {
   ActivityUpdatedEvent,
   ActivityDeletedEvent,
 } from '../src/gen/models';
-import { FlatFeed } from '../src/FlatFeed';
+import { Feed } from '../src/Feed';
 
 describe('Activity state updates via WebSocket events', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
   const feedGroup = 'user';
   const feedId = crypto.randomUUID();
-  let feed: FlatFeed;
+  let feed: Feed;
 
   beforeAll(async () => {
     client = createTestClient();

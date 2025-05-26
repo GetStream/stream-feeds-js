@@ -13,7 +13,7 @@ import {
   removeConnectionEventListeners,
 } from './common/utils';
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
-import { FlatFeed } from './FlatFeed';
+import { Feed } from './Feed';
 import {
   UserRequest,
   BlockUsersRequest,
@@ -65,7 +65,7 @@ export class FeedsClient extends FeedsApi {
     FeedsEvent
   > = new EventDispatcher<FeedsEvent['type'], FeedsEvent>();
 
-  private activeFeeds: Record<FID, FlatFeed> = {};
+  private activeFeeds: Record<FID, Feed> = {};
 
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
@@ -194,7 +194,7 @@ export class FeedsClient extends FeedsApi {
     if (this.activeFeeds[fid]) {
       return this.activeFeeds[fid];
     } else {
-      const feed = new FlatFeed(this, group, id, data);
+      const feed = new Feed(this, group, id, data);
       this.activeFeeds[fid] = feed;
       return feed;
     }

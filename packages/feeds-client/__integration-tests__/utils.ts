@@ -1,5 +1,5 @@
 import { FeedsClient } from '../src/FeedsClient';
-import { FlatFeed } from '../src/FlatFeed';
+import { Feed } from '../src/Feed';
 import { UserRequest } from '../src/common/gen/models';
 import { FeedsClientOptions } from '../src/common/types';
 import { WSEvent } from '../src/gen/models';
@@ -42,7 +42,7 @@ export const getTestUser = () => {
 };
 
 export const waitForEvent = (
-  client: FeedsClient | FlatFeed,
+  client: FeedsClient | Feed,
   type: FeedsEvent['type'] | WSEvent['type'],
   timeoutMs = 3000,
 ) => {
