@@ -987,6 +987,10 @@ export interface FollowRemovedEvent {
 }
 
 export interface FollowRequest {
+  source: string;
+
+  target: string;
+
   push_preference?: string;
 
   request?: boolean;
@@ -1356,7 +1360,9 @@ export interface Response {
 
 export interface SingleFollowRequest {
   source: string;
+
   target: string;
+
   push_preference?: string;
 
   request?: boolean;

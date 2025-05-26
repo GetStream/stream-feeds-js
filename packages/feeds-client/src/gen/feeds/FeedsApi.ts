@@ -970,9 +970,11 @@ export class FeedsApi {
   }
 
   async follow(
-    request?: SingleFollowRequest,
+    request: SingleFollowRequest,
   ): Promise<StreamResponse<SingleFollowResponse>> {
     const body = {
+      source: request?.source,
+      target: request?.target,
       push_preference: request?.push_preference,
       request: request?.request,
       custom: request?.custom,
