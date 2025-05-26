@@ -441,16 +441,14 @@ export class FeedsApi {
   }
 
   async queryComments(
-    request?: QueryCommentsRequest,
+    request: QueryCommentsRequest,
   ): Promise<StreamResponse<QueryCommentsResponse>> {
     const body = {
+      filter: request?.filter,
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,
       sort: request?.sort,
-      user_id: request?.user_id,
-      activity_ids: request?.activity_ids,
-      parent_ids: request?.parent_ids,
     };
 
     const response = await this.apiClient.sendRequest<
@@ -972,11 +970,9 @@ export class FeedsApi {
   }
 
   async follow(
-    request: SingleFollowRequest,
+    request?: SingleFollowRequest,
   ): Promise<StreamResponse<SingleFollowResponse>> {
     const body = {
-      source: request?.source,
-      target: request?.target,
       push_preference: request?.push_preference,
       request: request?.request,
       custom: request?.custom,
@@ -1061,10 +1057,18 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async unfollow(): Promise<StreamResponse<UnfollowResponse>> {
+  async unfollow(request: {
+    source: string;
+    target: string;
+  }): Promise<StreamResponse<UnfollowResponse>> {
+    const pathParams = {
+      source: request?.source,
+      target: request?.target,
+    };
+
     const response = await this.apiClient.sendRequest<
       StreamResponse<UnfollowResponse>
-    >('DELETE', '/feeds/v3/follows/{source}/{target}', undefined, undefined);
+    >('DELETE', '/feeds/v3/follows/{source}/{target}', pathParams, undefined);
 
     decoders.UnfollowResponse?.(response.body);
 

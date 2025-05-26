@@ -631,7 +631,11 @@ export interface CommentReactionRemovedEvent {
 }
 
 export interface CommentResponse {
+  confidence_score: number;
+
   created_at: Date;
+
+  downvote_count: number;
 
   id: string;
 
@@ -643,7 +647,13 @@ export interface CommentResponse {
 
   reply_count: number;
 
+  score: number;
+
+  status: string;
+
   updated_at: Date;
+
+  upvote_count: number;
 
   latest_reactions: ActivityReactionResponse[];
 
@@ -977,10 +987,6 @@ export interface FollowRemovedEvent {
 }
 
 export interface FollowRequest {
-  source: string;
-
-  target: string;
-
   push_preference?: string;
 
   request?: boolean;
@@ -1215,19 +1221,15 @@ export interface QueryActivitiesResponse {
 }
 
 export interface QueryCommentsRequest {
+  filter: Record<string, any>;
+
   limit?: number;
 
   next?: string;
 
   prev?: string;
 
-  sort?: 'first' | 'last' | 'reaction_count';
-
-  user_id?: string;
-
-  activity_ids?: string[];
-
-  parent_ids?: string[];
+  sort?: SortParamRequest[];
 }
 
 export interface QueryCommentsResponse {
@@ -1353,10 +1355,6 @@ export interface Response {
 }
 
 export interface SingleFollowRequest {
-  source: string;
-
-  target: string;
-
   push_preference?: string;
 
   request?: boolean;
@@ -1383,7 +1381,11 @@ export interface StoriesConfig {
 }
 
 export interface ThreadedCommentResponse {
+  confidence_score: number;
+
   created_at: Date;
+
+  downvote_count: number;
 
   id: string;
 
@@ -1395,7 +1397,13 @@ export interface ThreadedCommentResponse {
 
   reply_count: number;
 
+  score: number;
+
+  status: string;
+
   updated_at: Date;
+
+  upvote_count: number;
 
   latest_reactions: ActivityReactionResponse[];
 
