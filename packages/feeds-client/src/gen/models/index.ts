@@ -38,6 +38,18 @@ export interface AcceptFollowResponse {
   follow: FollowResponse;
 }
 
+export interface Action {
+  name: string;
+
+  text: string;
+
+  type: string;
+
+  style?: string;
+
+  value?: string;
+}
+
 export interface ActivityAddedEvent {
   created_at: Date;
 
@@ -351,7 +363,7 @@ export interface AddCommentRequest {
 
   parent_id?: string;
 
-  attachment?: Attachment[];
+  attachments?: Attachment[];
 
   mentioned_user_ids?: string[];
 
@@ -413,17 +425,55 @@ export interface AggregationConfig {
 }
 
 export interface Attachment {
-  type: string;
-
-  url: string;
+  custom: Record<string, any>;
 
   asset_url?: string;
 
+  author_icon?: string;
+
+  author_link?: string;
+
+  author_name?: string;
+
+  color?: string;
+
+  fallback?: string;
+
+  footer?: string;
+
+  footer_icon?: string;
+
   image_url?: string;
 
-  live_call_cid?: string;
+  latitude?: number;
 
-  custom?: Record<string, any>;
+  longitude?: number;
+
+  og_scrape_url?: string;
+
+  original_height?: number;
+
+  original_width?: number;
+
+  pretext?: string;
+
+  stopped_sharing?: boolean;
+
+  text?: string;
+
+  thumb_url?: string;
+
+  title?: string;
+
+  title_link?: string;
+
+  type?: string;
+
+  actions?: Action[];
+
+  fields?: Field[];
+
+  giphy?: Images;
 }
 
 export interface BaseActivityResponse {
@@ -655,8 +705,6 @@ export interface CommentResponse {
 
   upvote_count: number;
 
-  latest_reactions: ActivityReactionResponse[];
-
   user: UserResponse;
 
   deleted_at?: Date;
@@ -666,6 +714,8 @@ export interface CommentResponse {
   text?: string;
 
   attachments?: Attachment[];
+
+  latest_reactions?: ActivityReactionResponse[];
 
   mentioned_user_ids?: string[];
 
@@ -849,7 +899,7 @@ export interface FeedGroupDeletedEvent {
 }
 
 export interface FeedInput {
-  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
   members?: FeedMemberRequest[];
 
@@ -893,7 +943,7 @@ export interface FeedRequest {
 
   created_by_id?: string;
 
-  visibility?: 'public' | 'visible' | 'followers' | 'private' | 'restricted';
+  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
   members?: FeedMemberRequest[];
 
@@ -942,6 +992,14 @@ export interface FeedUpdatedEvent {
   type: string;
 
   received_at?: Date;
+}
+
+export interface Field {
+  short: boolean;
+
+  title: string;
+
+  value: string;
 }
 
 export interface FollowAddedEvent {
@@ -1140,6 +1198,34 @@ export interface GetOrCreateFeedResponse {
   notification_status?: NotificationStatusResponse;
 
   own_membership?: FeedMemberResponse;
+}
+
+export interface ImageData {
+  frames: string;
+
+  height: string;
+
+  size: string;
+
+  url: string;
+
+  width: string;
+}
+
+export interface Images {
+  fixed_height: ImageData;
+
+  fixed_height_downsampled: ImageData;
+
+  fixed_height_still: ImageData;
+
+  fixed_width: ImageData;
+
+  fixed_width_downsampled: ImageData;
+
+  fixed_width_still: ImageData;
+
+  original: ImageData;
 }
 
 export interface MarkActivityRequest {
@@ -1413,8 +1499,6 @@ export interface ThreadedCommentResponse {
 
   upvote_count: number;
 
-  latest_reactions: ActivityReactionResponse[];
-
   user: UserResponse;
 
   deleted_at?: Date;
@@ -1424,6 +1508,8 @@ export interface ThreadedCommentResponse {
   text?: string;
 
   attachments?: Attachment[];
+
+  latest_reactions?: ActivityReactionResponse[];
 
   mentioned_user_ids?: string[];
 

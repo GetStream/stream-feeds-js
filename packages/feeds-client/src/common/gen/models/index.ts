@@ -1,5 +1,8 @@
 import {
+  Action,
   Attachment,
+  Field,
+  Images,
   ReactionGroupResponse,
   SortParamRequest,
   UserResponse,
@@ -45,18 +48,6 @@ export interface AWSRekognitionRule {
   label: string;
 
   min_confidence: number;
-}
-
-export interface Action {
-  name: string;
-
-  text: string;
-
-  type: string;
-
-  style?: string;
-
-  value?: string;
 }
 
 export interface ActionLog {
@@ -957,14 +948,6 @@ export interface EntityCreatorResponse {
   revoke_tokens_issued_before?: Date;
 }
 
-export interface Field {
-  short: boolean;
-
-  title: string;
-
-  value: string;
-}
-
 export interface FileUploadConfig {
   size_limit: number;
 
@@ -1187,34 +1170,6 @@ export interface GetOGResponse {
 
 export interface GoogleVisionConfig {
   enabled?: boolean;
-}
-
-export interface ImageData {
-  frames: string;
-
-  height: string;
-
-  size: string;
-
-  url: string;
-
-  width: string;
-}
-
-export interface Images {
-  fixed_height: ImageData;
-
-  fixed_height_downsampled: ImageData;
-
-  fixed_height_still: ImageData;
-
-  fixed_width: ImageData;
-
-  fixed_width_downsampled: ImageData;
-
-  fixed_width_still: ImageData;
-
-  original: ImageData;
 }
 
 export interface LabelThresholds {

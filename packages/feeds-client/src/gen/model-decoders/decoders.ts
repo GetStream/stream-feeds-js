@@ -354,11 +354,11 @@ decoders.CommentResponse = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
-    latest_reactions: { type: 'ActivityReactionResponse', isSingle: false },
-
     user: { type: 'UserResponse', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    latest_reactions: { type: 'ActivityReactionResponse', isSingle: false },
 
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
   };
@@ -660,11 +660,11 @@ decoders.ThreadedCommentResponse = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
-    latest_reactions: { type: 'ActivityReactionResponse', isSingle: false },
-
     user: { type: 'UserResponse', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    latest_reactions: { type: 'ActivityReactionResponse', isSingle: false },
 
     replies: { type: 'ThreadedCommentResponse', isSingle: false },
 
