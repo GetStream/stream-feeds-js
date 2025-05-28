@@ -469,7 +469,14 @@ decoders.FeedUpdatedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.FollowAddedEvent = (input?: Record<string, any>) => {
+decoders.FollowBatchResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    follows: { type: 'FollowResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.FollowCreatedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
@@ -480,14 +487,7 @@ decoders.FollowAddedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.FollowBatchResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    follows: { type: 'FollowResponse', isSingle: false },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.FollowRemovedEvent = (input?: Record<string, any>) => {
+decoders.FollowDeletedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 

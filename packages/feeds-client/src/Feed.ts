@@ -19,8 +19,8 @@ import {
   FeedGroupDeletedEvent,
   FeedResponse,
   FeedUpdatedEvent,
-  FollowAddedEvent,
-  FollowRemovedEvent,
+  FollowCreatedEvent,
+  FollowDeletedEvent,
   FollowUpdatedEvent,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
@@ -134,9 +134,11 @@ export class Feed extends FeedApi {
     'feed_group.deleted': (
       _: { type: 'feed_group.deleted' } & FeedGroupDeletedEvent,
     ) => {},
-    'follow.added': (_: { type: 'follow.added' } & FollowAddedEvent) => {},
-    'follow.removed': (
-      _: { type: 'follow.removed' } & FollowRemovedEvent,
+    'follow.created': (
+      _: { type: 'follow.created' } & FollowCreatedEvent,
+    ) => {},
+    'follow.deleted': (
+      _: { type: 'follow.deleted' } & FollowDeletedEvent,
     ) => {},
     'follow.updated': (
       _: { type: 'follow.updated' } & FollowUpdatedEvent,

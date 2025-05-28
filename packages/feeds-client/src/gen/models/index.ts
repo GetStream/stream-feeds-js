@@ -707,6 +707,8 @@ export interface CommentResponse {
 
   user: UserResponse;
 
+  controversy_score?: number;
+
   deleted_at?: Date;
 
   parent_id?: string;
@@ -987,11 +989,11 @@ export interface FeedUpdatedEvent {
 
   feed: FeedResponse;
 
-  user: UserResponseCommonFields;
-
   type: string;
 
   received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
 export interface Field {
@@ -1000,22 +1002,6 @@ export interface Field {
   title: string;
 
   value: string;
-}
-
-export interface FollowAddedEvent {
-  created_at: Date;
-
-  fid: string;
-
-  custom: Record<string, any>;
-
-  follow: FollowResponse;
-
-  type: string;
-
-  received_at?: Date;
-
-  user?: UserResponseCommonFields;
 }
 
 export interface FollowBatchRequest {
@@ -1028,7 +1014,7 @@ export interface FollowBatchResponse {
   follows: FollowResponse[];
 }
 
-export interface FollowRemovedEvent {
+export interface FollowCreatedEvent {
   created_at: Date;
 
   fid: string;
@@ -1040,8 +1026,20 @@ export interface FollowRemovedEvent {
   type: string;
 
   received_at?: Date;
+}
 
-  user?: UserResponseCommonFields;
+export interface FollowDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  follow: FollowResponse;
+
+  type: string;
+
+  received_at?: Date;
 }
 
 export interface FollowRequest {
@@ -1096,8 +1094,6 @@ export interface FollowUpdatedEvent {
   type: string;
 
   received_at?: Date;
-
-  user?: UserResponseCommonFields;
 }
 
 export interface GetActivityResponse {
@@ -1501,6 +1497,8 @@ export interface ThreadedCommentResponse {
 
   user: UserResponse;
 
+  controversy_score?: number;
+
   deleted_at?: Date;
 
   parent_id?: string;
@@ -1611,6 +1609,8 @@ export interface UpdateFeedMembersRequest {
 }
 
 export interface UpdateFeedRequest {
+  created_by_id?: string;
+
   custom?: Record<string, any>;
 }
 
@@ -1734,8 +1734,8 @@ export type WSClientEvent =
   | ({ type: 'feed.updated' } & FeedUpdatedEvent)
   | ({ type: 'feed_group.changed' } & FeedGroupChangedEvent)
   | ({ type: 'feed_group.deleted' } & FeedGroupDeletedEvent)
-  | ({ type: 'follow.added' } & FollowAddedEvent)
-  | ({ type: 'follow.removed' } & FollowRemovedEvent)
+  | ({ type: 'follow.created' } & FollowCreatedEvent)
+  | ({ type: 'follow.deleted' } & FollowDeletedEvent)
   | ({ type: 'follow.updated' } & FollowUpdatedEvent);
 
 export type WSEvent =
@@ -1758,6 +1758,6 @@ export type WSEvent =
   | ({ type: 'feed.updated' } & FeedUpdatedEvent)
   | ({ type: 'feed_group.changed' } & FeedGroupChangedEvent)
   | ({ type: 'feed_group.deleted' } & FeedGroupDeletedEvent)
-  | ({ type: 'follow.added' } & FollowAddedEvent)
-  | ({ type: 'follow.removed' } & FollowRemovedEvent)
+  | ({ type: 'follow.created' } & FollowCreatedEvent)
+  | ({ type: 'follow.deleted' } & FollowDeletedEvent)
   | ({ type: 'follow.updated' } & FollowUpdatedEvent);
