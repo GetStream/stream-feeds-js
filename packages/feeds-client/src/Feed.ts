@@ -41,7 +41,16 @@ export type FeedState = Partial<
 > &
   Partial<{
     [key in keyof FeedResponse]: FeedResponse[key];
-  }>;
+  }> & {
+    /**
+     * True when loading state using `getOrCreate`
+     */
+    is_loading: boolean;
+    /**
+     * True when loading activities using `getOrCreate` or `getNextPage`
+     */
+    is_loading_activities: boolean;
+  };
 
 export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
@@ -165,7 +174,11 @@ export class Feed extends FeedApi {
     data?: FeedResponse,
   ) {
     super(client, group, id);
-    this.state = new StateStore<FeedState>(data ?? {});
+    this.state = new StateStore<FeedState>({
+      ...(data ?? {}),
+      is_loading: false,
+      is_loading_activities: false,
+    });
   }
 
   get fid() {
@@ -173,25 +186,81 @@ export class Feed extends FeedApi {
   }
 
   async getOrCreate(request?: GetOrCreateFeedRequest) {
-    const response = await super.getOrCreate(request);
-    const responseCopy = {
-      ...response,
-    };
-    const feed = responseCopy.feed;
-    // @ts-expect-error feed is removed from the response, it's spread out in the state
-    delete responseCopy.feed;
-    // @ts-expect-error
-    delete responseCopy.metadata;
-    const nextState: FeedState = { ...responseCopy, ...feed };
-
-    if (!request?.follower_pagination?.limit) {
-      delete nextState.followers;
+    if (this.state.getLatestValue().is_loading_activities) {
+      throw new Error('Only one getOrCreate call is allowed at a time');
     }
-    if (!request?.following_pagination?.limit) {
-      delete nextState.following;
-    }
+    this.state.partialNext({
+      is_loading: !request?.next,
+      is_loading_activities: true,
+    });
 
-    this.state.next({ ...nextState });
+    try {
+      const response = await super.getOrCreate(request);
+      if (request?.next) {
+        const currentState = this.state.getLatestValue();
+        const currentActivities = currentState.activities || [];
+        const result = addActivitiesToState(
+          response.activities,
+          currentActivities,
+          'end',
+        );
+
+        if (result.changed) {
+          this.state.partialNext({
+            activities: result.activities,
+            next: response.next,
+            prev: response.prev,
+          });
+        }
+      } else {
+        const responseCopy = {
+          ...response,
+        };
+        const feed = responseCopy.feed;
+        // @ts-expect-error feed is removed from the response, it's spread out in the state
+        delete responseCopy.feed;
+        // @ts-expect-error
+        delete responseCopy.metadata;
+        const nextState: FeedState = {
+          ...responseCopy,
+          ...feed,
+          isLoading: false,
+          isLoadingActivities: false,
+        };
+
+        if (!request?.follower_pagination?.limit) {
+          delete nextState.followers;
+        }
+        if (!request?.following_pagination?.limit) {
+          delete nextState.following;
+        }
+
+        this.state.next({ ...nextState });
+      }
+
+      return response;
+    } finally {
+      this.state.partialNext({
+        isLoading: false,
+        isLoadingActivities: false,
+      });
+    }
+  }
+
+  async getNextPage() {
+    const currentState = this.state.getLatestValue();
+    const response = await this.getOrCreate({
+      member_pagination: {
+        limit: 0,
+      },
+      follower_pagination: {
+        limit: 0,
+      },
+      following_pagination: {
+        limit: 0,
+      },
+      next: currentState.next,
+    });
 
     return response;
   }

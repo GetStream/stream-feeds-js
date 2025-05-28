@@ -1,9 +1,15 @@
 # State management
 
-State updates happen in response to WebSocket events. There are two main classes that do state management:
+State updates mostly happen in response to WebSocket events. There are two main classes that do state management:
 
 - `FeedsClient`
 - `Feed`
+
+Other state updates:
+
+- when calling `getOrCreate` method
+- when calling `queryFeeds` methid
+- when paginating, like `feed.getNextPage`
 
 ## WebSocket event handlers
 
