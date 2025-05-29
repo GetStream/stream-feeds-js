@@ -1621,6 +1621,10 @@ export interface UpdateFeedResponse {
 }
 
 export interface UpdateFollowRequest {
+  source: string;
+
+  target: string;
+
   push_preference?: string;
 
   custom?: Record<string, any>;

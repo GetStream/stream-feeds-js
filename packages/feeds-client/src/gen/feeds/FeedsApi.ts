@@ -954,9 +954,11 @@ export class FeedsApi {
   }
 
   async updateFollow(
-    request?: UpdateFollowRequest,
+    request: UpdateFollowRequest,
   ): Promise<StreamResponse<UpdateFollowResponse>> {
     const body = {
+      source: request?.source,
+      target: request?.target,
       push_preference: request?.push_preference,
       custom: request?.custom,
     };
