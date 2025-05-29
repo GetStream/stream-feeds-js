@@ -4,6 +4,7 @@ import {
   ActivityReactionAddedEvent,
   ActivityReactionDeletedEvent,
   ActivityRemovedFromFeedEvent,
+  ActivityRequest,
   ActivityUpdatedEvent,
   BookmarkAddedEvent,
   BookmarkDeletedEvent,
@@ -224,8 +225,8 @@ export class Feed extends FeedApi {
         const nextState: FeedState = {
           ...responseCopy,
           ...feed,
-          isLoading: false,
-          isLoadingActivities: false,
+          is_loading: false,
+          is_loading_activities: false,
         };
 
         if (!request?.follower_pagination?.limit) {
@@ -241,8 +242,8 @@ export class Feed extends FeedApi {
       return response;
     } finally {
       this.state.partialNext({
-        isLoading: false,
-        isLoadingActivities: false,
+        is_loading: false,
+        is_loading_activities: false,
       });
     }
   }
@@ -263,6 +264,13 @@ export class Feed extends FeedApi {
     });
 
     return response;
+  }
+
+  addActivity(request: Omit<ActivityRequest, 'fids'>) {
+    return this.feedsApi.addActivity({
+      ...request,
+      fids: [this.fid],
+    });
   }
 
   on = this.eventDispatcher.on;

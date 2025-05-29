@@ -42,10 +42,15 @@ describe('Feed Pagination Integration Tests', () => {
     });
 
     // Get first page with limit 2
-    await feed.getOrCreate({ limit: 2 });
+    const request = feed.getOrCreate({ limit: 2 });
+
+    expect(feed.state.getLatestValue().is_loading_activities).toBe(true);
+
+    await request;
 
     // Verify first page state
     let state = feed.state.getLatestValue();
+    expect(state.is_loading_activities).toBe(false);
     expect(state.activities?.length).toBe(2);
     expect(state.next).toBeDefined();
     expect(state.activities?.[0].id).toBe(activity3.activity.id); // Most recent first
