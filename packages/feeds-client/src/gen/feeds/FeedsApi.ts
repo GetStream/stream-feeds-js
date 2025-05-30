@@ -43,6 +43,7 @@ import {
   QueryCommentsResponse,
   QueryFeedMembersRequest,
   QueryFeedMembersResponse,
+  QueryFeedsRequest,
   QueryFeedsResponse,
   QueryFollowsRequest,
   QueryFollowsResponse,
@@ -937,16 +938,22 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async feedsQueryFeeds(request?: {
-    connection_id?: string;
-  }): Promise<StreamResponse<QueryFeedsResponse>> {
+  async feedsQueryFeeds(
+    request?: QueryFeedsRequest & { connection_id?: string },
+  ): Promise<StreamResponse<QueryFeedsResponse>> {
     const queryParams = {
       connection_id: request?.connection_id,
+    };
+    const body = {
+      watch: request?.watch,
+      sort: request?.sort,
+      filter: request?.filter,
+      pagination: request?.pagination,
     };
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryFeedsResponse>
-    >('GET', '/feeds/v3/feeds/query', undefined, queryParams);
+    >('POST', '/feeds/v3/feeds/query', undefined, queryParams, body);
 
     decoders.QueryFeedsResponse?.(response.body);
 

@@ -1315,7 +1315,7 @@ export interface QueryCommentsRequest {
 
   prev?: string;
 
-  sort?: SortParamRequest[];
+  sort?: 'first' | 'last' | 'top' | 'best' | 'controversial';
 }
 
 export interface QueryCommentsResponse {
@@ -1346,6 +1346,16 @@ export interface QueryFeedMembersResponse {
   members: FeedMemberResponse[];
 
   pagination: PagerResponse;
+}
+
+export interface QueryFeedsRequest {
+  watch?: boolean;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+
+  pagination?: PagerRequest;
 }
 
 export interface QueryFeedsResponse {
