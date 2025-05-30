@@ -1049,8 +1049,6 @@ export interface FollowRequest {
 
   push_preference?: string;
 
-  request?: boolean;
-
   custom?: Record<string, any>;
 }
 
@@ -1059,13 +1057,7 @@ export interface FollowResponse {
 
   push_preference: string;
 
-  request: boolean;
-
-  source_fid: string;
-
   status: string;
-
-  target_fid: string;
 
   updated_at: Date;
 
@@ -1456,8 +1448,6 @@ export interface SingleFollowRequest {
   target: string;
 
   push_preference?: string;
-
-  request?: boolean;
 
   custom?: Record<string, any>;
 }

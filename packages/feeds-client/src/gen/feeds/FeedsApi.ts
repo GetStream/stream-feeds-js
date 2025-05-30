@@ -986,7 +986,6 @@ export class FeedsApi {
       source: request?.source,
       target: request?.target,
       push_preference: request?.push_preference,
-      request: request?.request,
       custom: request?.custom,
     };
 
