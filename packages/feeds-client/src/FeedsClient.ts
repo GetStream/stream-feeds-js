@@ -173,7 +173,7 @@ export class FeedsClient extends FeedsApi {
     const response = await this.feedsQueryFeeds(request);
 
     const feeds = response.feeds.map((f) =>
-      this.getOrCreateActiveFeed(f.group_id, f.id),
+      this.getOrCreateActiveFeed(f.group_id, f.id, f),
     );
 
     return {
