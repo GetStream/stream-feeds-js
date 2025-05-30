@@ -1,5 +1,5 @@
 import { FeedsApi } from './gen/feeds/FeedsApi';
-import { FeedResponse, WSEvent } from './gen/models';
+import { FeedResponse, QueryFeedsRequest, WSEvent } from './gen/models';
 import { FeedsEvent } from './types';
 import { StateStore } from './common/StateStore';
 import { ModerationClient } from './common/ModerationClient';
@@ -169,7 +169,7 @@ export class FeedsClient extends FeedsApi {
     return this.getOrCreateActiveFeed(group, id);
   };
 
-  async queryFeeds(request?: { connection_id?: string }) {
+  async queryFeeds(request?: QueryFeedsRequest) {
     const response = await this.feedsQueryFeeds(request);
 
     const feeds = response.feeds.map((f) =>
