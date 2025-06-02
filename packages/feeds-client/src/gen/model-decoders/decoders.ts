@@ -376,7 +376,7 @@ decoders.CommentUpdatedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.CreateManyFeedsResponse = (input?: Record<string, any>) => {
+decoders.CreateFeedsBatchResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     feeds: { type: 'FeedResponse', isSingle: false },
   };

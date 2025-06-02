@@ -16,8 +16,8 @@ import {
   AddCommentsBatchResponse,
   AddReactionRequest,
   AddReactionResponse,
-  CreateManyFeedsRequest,
-  CreateManyFeedsResponse,
+  CreateFeedsBatchRequest,
+  CreateFeedsBatchResponse,
   DeleteActivitiesRequest,
   DeleteActivitiesResponse,
   DeleteActivityReactionResponse,
@@ -923,17 +923,17 @@ export class FeedsApi {
   }
 
   async createFeedsBatch(
-    request: CreateManyFeedsRequest,
-  ): Promise<StreamResponse<CreateManyFeedsResponse>> {
+    request: CreateFeedsBatchRequest,
+  ): Promise<StreamResponse<CreateFeedsBatchResponse>> {
     const body = {
       feeds: request?.feeds,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<CreateManyFeedsResponse>
+      StreamResponse<CreateFeedsBatchResponse>
     >('POST', '/feeds/v3/feeds/batch', undefined, undefined, body);
 
-    decoders.CreateManyFeedsResponse?.(response.body);
+    decoders.CreateFeedsBatchResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -1004,6 +1004,7 @@ export class FeedsApi {
     const body = {
       source_fid: request?.source_fid,
       target_fid: request?.target_fid,
+      follower_role: request?.follower_role,
     };
 
     const response = await this.apiClient.sendRequest<

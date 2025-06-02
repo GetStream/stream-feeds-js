@@ -30,6 +30,8 @@ export interface AcceptFollowRequest {
   source_fid: string;
 
   target_fid: string;
+
+  follower_role?: string;
 }
 
 export interface AcceptFollowResponse {
@@ -742,11 +744,11 @@ export interface CommentUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface CreateManyFeedsRequest {
+export interface CreateFeedsBatchRequest {
   feeds: FeedRequest[];
 }
 
-export interface CreateManyFeedsResponse {
+export interface CreateFeedsBatchResponse {
   duration: string;
 
   feeds: FeedResponse[];
@@ -1047,7 +1049,7 @@ export interface FollowRequest {
 
   target: string;
 
-  push_preference?: string;
+  push_preference?: 'all' | 'none';
 
   custom?: Record<string, any>;
 }
@@ -1055,9 +1057,11 @@ export interface FollowRequest {
 export interface FollowResponse {
   created_at: Date;
 
-  push_preference: string;
+  follower_role: string;
 
-  status: string;
+  push_preference: 'all' | 'none';
+
+  status: 'accepted' | 'pending' | 'rejected';
 
   updated_at: Date;
 
@@ -1068,8 +1072,6 @@ export interface FollowResponse {
   request_accepted_at?: Date;
 
   request_rejected_at?: Date;
-
-  role?: string;
 
   custom?: Record<string, any>;
 }
@@ -1174,6 +1176,8 @@ export interface GetOrCreateFeedResponse {
   next?: string;
 
   prev?: string;
+
+  capabilities?: string[];
 
   own_follows?: FollowResponse[];
 
@@ -1447,7 +1451,7 @@ export interface SingleFollowRequest {
 
   target: string;
 
-  push_preference?: string;
+  push_preference?: 'all' | 'none';
 
   custom?: Record<string, any>;
 }
@@ -1625,7 +1629,7 @@ export interface UpdateFollowRequest {
 
   target: string;
 
-  push_preference?: string;
+  push_preference?: 'all' | 'none';
 
   custom?: Record<string, any>;
 }
