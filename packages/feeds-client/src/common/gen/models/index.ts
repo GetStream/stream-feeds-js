@@ -3,6 +3,7 @@ import {
   Attachment,
   Field,
   Images,
+  ModerationV2Response,
   ReactionGroupResponse,
   SortParamRequest,
   UserResponse,
@@ -1416,22 +1417,6 @@ export interface ModerationPayload {
   videos?: string[];
 
   custom?: Record<string, any>;
-}
-
-export interface ModerationV2Response {
-  action: string;
-
-  original_text: string;
-
-  blocklist_matched?: string;
-
-  platform_circumvented?: boolean;
-
-  semantic_filter_matched?: string;
-
-  image_harms?: string[];
-
-  text_harms?: string[];
 }
 
 export interface MuteRequest {

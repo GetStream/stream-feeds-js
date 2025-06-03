@@ -111,7 +111,7 @@ export interface ActivityReactionAddedEvent {
 
   custom: Record<string, any>;
 
-  reaction: ActivityReactionResponse;
+  reaction: FeedsReactionResponse;
 
   type: string;
 
@@ -127,27 +127,13 @@ export interface ActivityReactionDeletedEvent {
 
   custom: Record<string, any>;
 
-  reaction: ActivityReactionResponse;
+  reaction: FeedsReactionResponse;
 
   type: string;
 
   received_at?: Date;
 
   user?: UserResponseCommonFields;
-}
-
-export interface ActivityReactionResponse {
-  activity_id: string;
-
-  created_at: Date;
-
-  type: string;
-
-  updated_at: Date;
-
-  user: UserResponse;
-
-  custom?: Record<string, any>;
 }
 
 export interface ActivityRemovedFromFeedEvent {
@@ -229,13 +215,13 @@ export interface ActivityResponse {
 
   interest_tags: string[];
 
-  latest_reactions: ActivityReactionResponse[];
+  latest_reactions: FeedsReactionResponse[];
 
   mentioned_users: UserResponse[];
 
   own_bookmarks: BookmarkResponse[];
 
-  own_reactions: ActivityReactionResponse[];
+  own_reactions: FeedsReactionResponse[];
 
   custom: Record<string, any>;
 
@@ -258,6 +244,8 @@ export interface ActivityResponse {
   current_feed?: FeedResponse;
 
   location?: ActivityLocation;
+
+  moderation?: ModerationV2Response;
 
   parent?: BaseActivityResponse;
 }
@@ -353,7 +341,7 @@ export interface AddCommentReactionResponse {
 
   duration: string;
 
-  reaction: ActivityReactionResponse;
+  reaction: FeedsReactionResponse;
 }
 
 export interface AddCommentRequest {
@@ -403,7 +391,7 @@ export interface AddReactionRequest {
 export interface AddReactionResponse {
   duration: string;
 
-  reaction: ActivityReactionResponse;
+  reaction: FeedsReactionResponse;
 }
 
 export interface AggregatedActivityResponse {
@@ -509,13 +497,13 @@ export interface BaseActivityResponse {
 
   interest_tags: string[];
 
-  latest_reactions: ActivityReactionResponse[];
+  latest_reactions: FeedsReactionResponse[];
 
   mentioned_users: UserResponse[];
 
   own_bookmarks: BookmarkResponse[];
 
-  own_reactions: ActivityReactionResponse[];
+  own_reactions: FeedsReactionResponse[];
 
   custom: Record<string, any>;
 
@@ -539,7 +527,7 @@ export interface BaseActivityResponse {
 
   location?: ActivityLocation;
 
-  moderation?: Moderation;
+  moderation?: ModerationV2Response;
 }
 
 export interface BookmarkAddedEvent {
@@ -657,9 +645,11 @@ export interface CommentReactionAddedEvent {
 
   custom: Record<string, any>;
 
-  reaction: ActivityReactionResponse;
+  reaction: FeedsReactionResponse;
 
   type: string;
+
+  comment_parent_id?: string;
 
   received_at?: Date;
 
@@ -678,6 +668,8 @@ export interface CommentReactionRemovedEvent {
   custom: Record<string, any>;
 
   type: string;
+
+  comment_parent_id?: string;
 
   received_at?: Date;
 }
@@ -719,7 +711,7 @@ export interface CommentResponse {
 
   attachments?: Attachment[];
 
-  latest_reactions?: ActivityReactionResponse[];
+  latest_reactions?: FeedsReactionResponse[];
 
   mentioned_user_ids?: string[];
 
@@ -998,6 +990,22 @@ export interface FeedUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface FeedsReactionResponse {
+  activity_id: string;
+
+  created_at: Date;
+
+  type: string;
+
+  updated_at: Date;
+
+  user: UserResponse;
+
+  comment_id?: string;
+
+  custom?: Record<string, any>;
+}
+
 export interface Field {
   short: boolean;
 
@@ -1230,7 +1238,21 @@ export interface MarkActivityRequest {
   mark_watched?: string[];
 }
 
-export interface Moderation {}
+export interface ModerationV2Response {
+  action: string;
+
+  original_text: string;
+
+  blocklist_matched?: string;
+
+  platform_circumvented?: boolean;
+
+  semantic_filter_matched?: string;
+
+  image_harms?: string[];
+
+  text_harms?: string[];
+}
 
 export interface NotificationConfig {
   track_read?: boolean;
@@ -1296,6 +1318,50 @@ export interface QueryActivitiesResponse {
   duration: string;
 
   activities: ActivityResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
+export interface QueryActivityReactionsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryActivityReactionsResponse {
+  duration: string;
+
+  reactions: FeedsReactionResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
+export interface QueryCommentReactionsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryCommentReactionsResponse {
+  duration: string;
+
+  reactions: FeedsReactionResponse[];
 
   next?: string;
 
@@ -1511,7 +1577,7 @@ export interface ThreadedCommentResponse {
 
   attachments?: Attachment[];
 
-  latest_reactions?: ActivityReactionResponse[];
+  latest_reactions?: FeedsReactionResponse[];
 
   mentioned_user_ids?: string[];
 

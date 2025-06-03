@@ -39,6 +39,10 @@ import {
   PinActivityResponse,
   QueryActivitiesRequest,
   QueryActivitiesResponse,
+  QueryActivityReactionsRequest,
+  QueryActivityReactionsResponse,
+  QueryCommentReactionsRequest,
+  QueryCommentReactionsResponse,
   QueryCommentsRequest,
   QueryCommentsResponse,
   QueryFeedMembersRequest,
@@ -326,27 +330,6 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async deleteActivityReaction(request: {
-    activity_id: string;
-  }): Promise<StreamResponse<DeleteActivityReactionResponse>> {
-    const pathParams = {
-      activity_id: request?.activity_id,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<DeleteActivityReactionResponse>
-    >(
-      'DELETE',
-      '/feeds/v3/activities/{activity_id}/reactions',
-      pathParams,
-      undefined,
-    );
-
-    decoders.DeleteActivityReactionResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
   async addReaction(
     request: AddReactionRequest & { activity_id: string },
   ): Promise<StreamResponse<AddReactionResponse>> {
@@ -369,6 +352,58 @@ export class FeedsApi {
     );
 
     decoders.AddReactionResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryActivityReactions(
+    request: QueryActivityReactionsRequest & { activity_id: string },
+  ): Promise<StreamResponse<QueryActivityReactionsResponse>> {
+    const pathParams = {
+      activity_id: request?.activity_id,
+    };
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryActivityReactionsResponse>
+    >(
+      'POST',
+      '/feeds/v3/activities/{activity_id}/reactions/query',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.QueryActivityReactionsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteActivityReaction(request: {
+    activity_id: string;
+    type: string;
+  }): Promise<StreamResponse<DeleteActivityReactionResponse>> {
+    const pathParams = {
+      activity_id: request?.activity_id,
+      type: request?.type,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteActivityReactionResponse>
+    >(
+      'DELETE',
+      '/feeds/v3/activities/{activity_id}/reactions/{type}',
+      pathParams,
+      undefined,
+    );
+
+    decoders.DeleteActivityReactionResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -513,27 +548,6 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async removeCommentReaction(request: {
-    comment_id: string;
-  }): Promise<StreamResponse<RemoveCommentReactionResponse>> {
-    const pathParams = {
-      comment_id: request?.comment_id,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveCommentReactionResponse>
-    >(
-      'DELETE',
-      '/feeds/v3/comments/{comment_id}/reactions',
-      pathParams,
-      undefined,
-    );
-
-    decoders.RemoveCommentReactionResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
   async addCommentReaction(
     request: AddCommentReactionRequest & { comment_id: string },
   ): Promise<StreamResponse<AddCommentReactionResponse>> {
@@ -556,6 +570,58 @@ export class FeedsApi {
     );
 
     decoders.AddCommentReactionResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryCommentReactions(
+    request: QueryCommentReactionsRequest & { comment_id: string },
+  ): Promise<StreamResponse<QueryCommentReactionsResponse>> {
+    const pathParams = {
+      comment_id: request?.comment_id,
+    };
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryCommentReactionsResponse>
+    >(
+      'POST',
+      '/feeds/v3/comments/{comment_id}/reactions/query',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.QueryCommentReactionsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async removeCommentReaction(request: {
+    comment_id: string;
+    type: string;
+  }): Promise<StreamResponse<RemoveCommentReactionResponse>> {
+    const pathParams = {
+      comment_id: request?.comment_id,
+      type: request?.type,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<RemoveCommentReactionResponse>
+    >(
+      'DELETE',
+      '/feeds/v3/comments/{comment_id}/reactions/{type}',
+      pathParams,
+      undefined,
+    );
+
+    decoders.RemoveCommentReactionResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

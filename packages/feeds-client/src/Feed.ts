@@ -36,6 +36,10 @@ import {
   updateActivityInState,
   removeActivityFromState,
 } from './state-updates/activity-utils';
+import {
+  addReactionToActivities,
+  removeReactionFromActivities,
+} from './state-updates/activity-reaction-utils';
 
 export type FeedState = Partial<
   Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
@@ -86,13 +90,43 @@ export class Feed extends FeedApi {
       }
     },
     'activity.reaction.added': (
-      _: { type: 'activity.reaction.added' } & ActivityReactionAddedEvent,
-    ) => {},
+      event: { type: 'activity.reaction.added' } & ActivityReactionAddedEvent,
+    ) => {
+      const currentActivities = this.state.getLatestValue().activities;
+      const connectedUser = this.client.state.getLatestValue().connectedUser;
+      const isCurrentUser = Boolean(
+        connectedUser && event.reaction.user.id === connectedUser.id,
+      );
+
+      const result = addReactionToActivities(
+        event.reaction,
+        currentActivities,
+        isCurrentUser,
+      );
+      if (result.changed) {
+        this.state.partialNext({ activities: result.activities });
+      }
+    },
     'activity.reaction.deleted': (
-      _: {
+      event: {
         type: 'activity.reaction.deleted';
       } & ActivityReactionDeletedEvent,
-    ) => {},
+    ) => {
+      const currentActivities = this.state.getLatestValue().activities;
+      const connectedUser = this.client.state.getLatestValue().connectedUser;
+      const isCurrentUser = Boolean(
+        connectedUser && event.reaction.user.id === connectedUser.id,
+      );
+
+      const result = removeReactionFromActivities(
+        event.reaction,
+        currentActivities,
+        isCurrentUser,
+      );
+      if (result.changed) {
+        this.state.partialNext({ activities: result.activities });
+      }
+    },
     'activity.removed_from_feed': (
       _: {
         type: 'activity.removed_from_feed';
@@ -180,7 +214,10 @@ export class Feed extends FeedApi {
       is_loading: false,
       is_loading_activities: false,
     });
+    this.client = client;
   }
+
+  private readonly client: FeedsClient;
 
   get fid() {
     return `${this.group}:${this.id}`;
