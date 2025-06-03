@@ -12,7 +12,7 @@ import {
   CommentAddedEvent,
   CommentDeletedEvent,
   CommentReactionAddedEvent,
-  CommentReactionRemovedEvent,
+  CommentReactionDeletedEvent,
   CommentUpdatedEvent,
   FeedCreatedEvent,
   FeedDeletedEvent,
@@ -192,9 +192,9 @@ export class Feed extends FeedApi {
           type: 'comment.reaction.added';
         },
     ) => {},
-    'comment.reaction.removed': (
-      _: { type: 'comment.reaction.removed' } & CommentReactionRemovedEvent & {
-          type: 'comment.reaction.removed';
+    'comment.reaction.deleted': (
+      _: { type: 'comment.reaction.deleted' } & CommentReactionDeletedEvent & {
+          type: 'comment.reaction.deleted';
         },
     ) => {},
   };
@@ -314,8 +314,12 @@ export class Feed extends FeedApi {
   off = this.eventDispatcher.off;
 
   handleWSEvent(event: WSEvent) {
-    // @ts-expect-error TODO: why?
-    this.eventHandlers[event.type](event);
+    const eventHandler: Function = this.eventHandlers[event.type];
+    if (eventHandler) {
+      eventHandler(event);
+    } else {
+      console.warn(`Received unknown event type: ${event.type}`, event);
+    }
     this.eventDispatcher.dispatch(event);
   }
 }

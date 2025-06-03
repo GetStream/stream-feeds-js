@@ -23,6 +23,7 @@ import {
   DeleteActivityReactionResponse,
   DeleteActivityResponse,
   DeleteBookmarkResponse,
+  DeleteCommentReactionResponse,
   DeleteCommentResponse,
   DeleteFeedResponse,
   FollowBatchRequest,
@@ -55,7 +56,6 @@ import {
   RejectFeedMemberResponse,
   RejectFollowRequest,
   RejectFollowResponse,
-  RemoveCommentReactionResponse,
   Response,
   SingleFollowRequest,
   SingleFollowResponse,
@@ -606,14 +606,14 @@ export class FeedsApi {
   async removeCommentReaction(request: {
     comment_id: string;
     type: string;
-  }): Promise<StreamResponse<RemoveCommentReactionResponse>> {
+  }): Promise<StreamResponse<DeleteCommentReactionResponse>> {
     const pathParams = {
       comment_id: request?.comment_id,
       type: request?.type,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveCommentReactionResponse>
+      StreamResponse<DeleteCommentReactionResponse>
     >(
       'DELETE',
       '/feeds/v3/comments/{comment_id}/reactions/{type}',
@@ -621,7 +621,7 @@ export class FeedsApi {
       undefined,
     );
 
-    decoders.RemoveCommentReactionResponse?.(response.body);
+    decoders.DeleteCommentReactionResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

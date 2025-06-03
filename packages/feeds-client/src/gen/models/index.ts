@@ -109,6 +109,8 @@ export interface ActivityReactionAddedEvent {
 
   fid: string;
 
+  activity: ActivityResponse;
+
   custom: Record<string, any>;
 
   reaction: FeedsReactionResponse;
@@ -124,6 +126,8 @@ export interface ActivityReactionDeletedEvent {
   created_at: Date;
 
   fid: string;
+
+  activity: ActivityResponse;
 
   custom: Record<string, any>;
 
@@ -337,9 +341,9 @@ export interface AddCommentReactionRequest {
 }
 
 export interface AddCommentReactionResponse {
-  comment_id: string;
-
   duration: string;
+
+  comment: CommentResponse;
 
   reaction: FeedsReactionResponse;
 }
@@ -390,6 +394,8 @@ export interface AddReactionRequest {
 
 export interface AddReactionResponse {
   duration: string;
+
+  activity: ActivityResponse;
 
   reaction: FeedsReactionResponse;
 }
@@ -637,11 +643,11 @@ export interface CommentDeletedEvent {
 }
 
 export interface CommentReactionAddedEvent {
-  comment_id: string;
-
   created_at: Date;
 
   fid: string;
+
+  comment: CommentResponse;
 
   custom: Record<string, any>;
 
@@ -649,27 +655,23 @@ export interface CommentReactionAddedEvent {
 
   type: string;
 
-  comment_parent_id?: string;
-
   received_at?: Date;
 
   user?: UserResponseCommonFields;
 }
 
-export interface CommentReactionRemovedEvent {
-  comment_id: string;
-
+export interface CommentReactionDeletedEvent {
   created_at: Date;
 
   fid: string;
 
-  user_id: string;
+  comment: CommentResponse;
 
   custom: Record<string, any>;
 
-  type: string;
+  reaction: FeedsReactionResponse;
 
-  comment_parent_id?: string;
+  type: string;
 
   received_at?: Date;
 }
@@ -773,13 +775,11 @@ export interface DeleteActivitiesResponse {
 }
 
 export interface DeleteActivityReactionResponse {
-  activity_id: string;
-
   duration: string;
 
-  type: string;
+  activity: ActivityResponse;
 
-  user_id: string;
+  reaction: FeedsReactionResponse;
 }
 
 export interface DeleteActivityResponse {
@@ -790,6 +790,14 @@ export interface DeleteBookmarkResponse {
   duration: string;
 
   bookmark: BookmarkResponse;
+}
+
+export interface DeleteCommentReactionResponse {
+  duration: string;
+
+  comment: CommentResponse;
+
+  reaction: FeedsReactionResponse;
 }
 
 export interface DeleteCommentResponse {
@@ -1494,10 +1502,6 @@ export interface RejectFollowResponse {
   follow: FollowResponse;
 }
 
-export interface RemoveCommentReactionResponse {
-  duration: string;
-}
-
 export interface RepliesMeta {
   depth_truncated: boolean;
 
@@ -1801,7 +1805,7 @@ export type WSClientEvent =
   | ({ type: 'comment.added' } & CommentAddedEvent)
   | ({ type: 'comment.deleted' } & CommentDeletedEvent)
   | ({ type: 'comment.reaction.added' } & CommentReactionAddedEvent)
-  | ({ type: 'comment.reaction.removed' } & CommentReactionRemovedEvent)
+  | ({ type: 'comment.reaction.deleted' } & CommentReactionDeletedEvent)
   | ({ type: 'comment.updated' } & CommentUpdatedEvent)
   | ({ type: 'feed.created' } & FeedCreatedEvent)
   | ({ type: 'feed.deleted' } & FeedDeletedEvent)
@@ -1825,7 +1829,7 @@ export type WSEvent =
   | ({ type: 'comment.added' } & CommentAddedEvent)
   | ({ type: 'comment.deleted' } & CommentDeletedEvent)
   | ({ type: 'comment.reaction.added' } & CommentReactionAddedEvent)
-  | ({ type: 'comment.reaction.removed' } & CommentReactionRemovedEvent)
+  | ({ type: 'comment.reaction.deleted' } & CommentReactionDeletedEvent)
   | ({ type: 'comment.updated' } & CommentUpdatedEvent)
   | ({ type: 'feed.created' } & FeedCreatedEvent)
   | ({ type: 'feed.deleted' } & FeedDeletedEvent)
