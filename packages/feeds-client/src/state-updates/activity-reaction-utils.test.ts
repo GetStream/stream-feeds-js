@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ActivityResponse, ActivityReactionResponse } from '../gen/models';
+import { ActivityResponse, FeedsReactionResponse } from '../gen/models';
 import {
   addReactionToActivity,
   removeReactionFromActivity,
@@ -48,7 +48,7 @@ const createMockReaction = (
   type: string,
   userId: string,
   activityId: string,
-): ActivityReactionResponse => ({
+): FeedsReactionResponse => ({
   type,
   user: {
     id: userId,
