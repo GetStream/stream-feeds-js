@@ -357,6 +357,8 @@ decoders.CommentResponse = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
+    mentioned_users: { type: 'UserResponse', isSingle: false },
+
     user: { type: 'UserResponse', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
@@ -705,6 +707,8 @@ decoders.ThreadedCommentResponse = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
+
+    mentioned_users: { type: 'UserResponse', isSingle: false },
 
     user: { type: 'UserResponse', isSingle: true },
 

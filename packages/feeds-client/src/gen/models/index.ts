@@ -701,6 +701,8 @@ export interface CommentResponse {
 
   upvote_count: number;
 
+  mentioned_users: UserResponse[];
+
   user: UserResponse;
 
   controversy_score?: number;
@@ -715,9 +717,9 @@ export interface CommentResponse {
 
   latest_reactions?: FeedsReactionResponse[];
 
-  mentioned_user_ids?: string[];
-
   custom?: Record<string, any>;
+
+  moderation?: ModerationV2Response;
 
   reaction_groups?: Record<string, ReactionGroupResponse>;
 }
@@ -1569,6 +1571,8 @@ export interface ThreadedCommentResponse {
 
   upvote_count: number;
 
+  mentioned_users: UserResponse[];
+
   user: UserResponse;
 
   controversy_score?: number;
@@ -1583,13 +1587,13 @@ export interface ThreadedCommentResponse {
 
   latest_reactions?: FeedsReactionResponse[];
 
-  mentioned_user_ids?: string[];
-
   replies?: ThreadedCommentResponse[];
 
   custom?: Record<string, any>;
 
   meta?: RepliesMeta;
+
+  moderation?: ModerationV2Response;
 
   reaction_groups?: Record<string, ReactionGroupResponse>;
 }
