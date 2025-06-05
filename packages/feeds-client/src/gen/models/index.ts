@@ -250,6 +250,8 @@ export interface ActivityResponse {
   moderation?: ModerationV2Response;
 
   parent?: BaseActivityResponse;
+
+  poll?: PollResponseData;
 }
 
 export interface ActivitySelectorConfig {
@@ -532,6 +534,8 @@ export interface BaseActivityResponse {
   location?: ActivityLocation;
 
   moderation?: ModerationV2Response;
+
+  poll?: PollResponseData;
 }
 
 export interface BookmarkAddedEvent {
@@ -606,6 +610,10 @@ export interface BookmarkUpdatedEvent {
   received_at?: Date;
 
   user?: UserResponseCommonFields;
+}
+
+export interface CastPollVoteRequest {
+  vote?: VoteData;
 }
 
 export interface CommentAddedEvent {
@@ -746,6 +754,38 @@ export interface CreateFeedsBatchResponse {
   duration: string;
 
   feeds: FeedResponse[];
+}
+
+export interface CreatePollOptionRequest {
+  text: string;
+
+  position?: number;
+
+  custom?: Record<string, any>;
+}
+
+export interface CreatePollRequest {
+  name: string;
+
+  allow_answers?: boolean;
+
+  allow_user_suggested_options?: boolean;
+
+  description?: string;
+
+  enforce_unique_vote?: boolean;
+
+  id?: string;
+
+  is_closed?: boolean;
+
+  max_votes_allowed?: number;
+
+  voting_visibility?: 'anonymous' | 'public';
+
+  options?: PollOptionInput[];
+
+  custom?: Record<string, any>;
 }
 
 export interface DecayFunctionConfig {
@@ -1354,6 +1394,168 @@ export interface PinActivityResponse {
   user_id: string;
 }
 
+export interface PollClosedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  type: string;
+
+  cid?: string;
+
+  message_id?: string;
+
+  received_at?: Date;
+}
+
+export interface PollDeletedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  type: string;
+
+  cid?: string;
+
+  message_id?: string;
+
+  received_at?: Date;
+}
+
+export interface PollOptionInput {
+  text?: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface PollOptionRequest {
+  id: string;
+
+  text?: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface PollOptionResponse {
+  duration: string;
+
+  poll_option: PollOptionResponseData;
+}
+
+export interface PollOptionResponseData {
+  id: string;
+
+  text: string;
+
+  custom: Record<string, any>;
+}
+
+export interface PollResponse {
+  duration: string;
+
+  poll: PollResponseData;
+}
+
+export interface PollResponseData {
+  allow_answers: boolean;
+
+  allow_user_suggested_options: boolean;
+
+  answers_count: number;
+
+  created_at: Date;
+
+  created_by_id: string;
+
+  description: string;
+
+  enforce_unique_vote: boolean;
+
+  id: string;
+
+  name: string;
+
+  updated_at: Date;
+
+  vote_count: number;
+
+  voting_visibility: string;
+
+  latest_answers: PollVoteResponseData[];
+
+  options: PollOptionResponseData[];
+
+  own_votes: PollVoteResponseData[];
+
+  custom: Record<string, any>;
+
+  latest_votes_by_option: Record<string, PollVoteResponseData[]>;
+
+  vote_counts_by_option: Record<string, number>;
+
+  is_closed?: boolean;
+
+  max_votes_allowed?: number;
+
+  created_by?: UserResponse;
+}
+
+export interface PollUpdatedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  type: string;
+
+  cid?: string;
+
+  message_id?: string;
+
+  received_at?: Date;
+}
+
+export interface PollVoteResponse {
+  duration: string;
+
+  vote?: PollVoteResponseData;
+}
+
+export interface PollVoteResponseData {
+  created_at: Date;
+
+  id: string;
+
+  option_id: string;
+
+  poll_id: string;
+
+  updated_at: Date;
+
+  answer_text?: string;
+
+  is_answer?: boolean;
+
+  user_id?: string;
+
+  user?: UserResponse;
+}
+
+export interface PollVotesResponse {
+  duration: string;
+
+  votes: PollVoteResponseData[];
+
+  next?: string;
+
+  prev?: string;
+}
+
 export interface QueryActivitiesRequest {
   comment_limit?: number;
 
@@ -1500,6 +1702,40 @@ export interface QueryFollowsResponse {
   duration: string;
 
   follows: FollowResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
+export interface QueryPollVotesRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryPollsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryPollsResponse {
+  duration: string;
+
+  polls: PollResponseData[];
 
   next?: string;
 
@@ -1768,6 +2004,44 @@ export interface UpdateFollowResponse {
   follow: FollowResponse;
 }
 
+export interface UpdatePollOptionRequest {
+  id: string;
+
+  text: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface UpdatePollPartialRequest {
+  unset?: string[];
+
+  set?: Record<string, any>;
+}
+
+export interface UpdatePollRequest {
+  id: string;
+
+  name: string;
+
+  allow_answers?: boolean;
+
+  allow_user_suggested_options?: boolean;
+
+  description?: string;
+
+  enforce_unique_vote?: boolean;
+
+  is_closed?: boolean;
+
+  max_votes_allowed?: number;
+
+  voting_visibility?: 'anonymous' | 'public';
+
+  options?: PollOptionRequest[];
+
+  custom?: Record<string, any>;
+}
+
 export interface UpsertActivitiesRequest {
   activities: ActivityRequest[];
 }
@@ -1850,6 +2124,14 @@ export interface UserResponseCommonFields {
   teams_role?: Record<string, string>;
 }
 
+export interface VoteData {
+  answer_text?: string;
+
+  option_id?: string;
+
+  option?: PollOptionResponseData;
+}
+
 export type WSClientEvent =
   | ({ type: 'activity.added' } & ActivityAddedEvent)
   | ({ type: 'activity.deleted' } & ActivityDeletedEvent)
@@ -1875,7 +2157,10 @@ export type WSClientEvent =
   | ({ type: 'feed_member.updated' } & FeedMemberUpdatedEvent)
   | ({ type: 'follow.created' } & FollowCreatedEvent)
   | ({ type: 'follow.deleted' } & FollowDeletedEvent)
-  | ({ type: 'follow.updated' } & FollowUpdatedEvent);
+  | ({ type: 'follow.updated' } & FollowUpdatedEvent)
+  | ({ type: 'poll.closed' } & PollClosedEvent)
+  | ({ type: 'poll.deleted' } & PollDeletedEvent)
+  | ({ type: 'poll.updated' } & PollUpdatedEvent);
 
 export type WSEvent =
   | ({ type: 'activity.added' } & ActivityAddedEvent)
@@ -1902,4 +2187,7 @@ export type WSEvent =
   | ({ type: 'feed_member.updated' } & FeedMemberUpdatedEvent)
   | ({ type: 'follow.created' } & FollowCreatedEvent)
   | ({ type: 'follow.deleted' } & FollowDeletedEvent)
-  | ({ type: 'follow.updated' } & FollowUpdatedEvent);
+  | ({ type: 'follow.updated' } & FollowUpdatedEvent)
+  | ({ type: 'poll.closed' } & PollClosedEvent)
+  | ({ type: 'poll.deleted' } & PollDeletedEvent)
+  | ({ type: 'poll.updated' } & PollUpdatedEvent);

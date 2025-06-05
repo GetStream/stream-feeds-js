@@ -147,6 +147,8 @@ decoders.ActivityResponse = (input?: Record<string, any>) => {
     current_feed: { type: 'FeedResponse', isSingle: true },
 
     parent: { type: 'BaseActivityResponse', isSingle: true },
+
+    poll: { type: 'PollResponseData', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -246,6 +248,8 @@ decoders.BaseActivityResponse = (input?: Record<string, any>) => {
     expires_at: { type: 'DatetimeType', isSingle: true },
 
     current_feed: { type: 'FeedResponse', isSingle: true },
+
+    poll: { type: 'PollResponseData', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -668,6 +672,86 @@ decoders.PinActivityResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.PollClosedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    poll: { type: 'PollResponseData', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.PollDeletedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    poll: { type: 'PollResponseData', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.PollResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    poll: { type: 'PollResponseData', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.PollResponseData = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    latest_answers: { type: 'PollVoteResponseData', isSingle: false },
+
+    own_votes: { type: 'PollVoteResponseData', isSingle: false },
+
+    created_by: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.PollUpdatedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    poll: { type: 'PollResponseData', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.PollVoteResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    vote: { type: 'PollVoteResponseData', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.PollVoteResponseData = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.PollVotesResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    votes: { type: 'PollVoteResponseData', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.QueryActivitiesResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activities: { type: 'ActivityResponse', isSingle: false },
@@ -699,6 +783,13 @@ decoders.QueryCommentsResponse = (input?: Record<string, any>) => {
 decoders.QueryFollowsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     follows: { type: 'FollowResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.QueryPollsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    polls: { type: 'PollResponseData', isSingle: false },
   };
   return decode(typeMappings, input);
 };

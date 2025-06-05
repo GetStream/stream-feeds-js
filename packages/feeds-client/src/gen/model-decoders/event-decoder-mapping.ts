@@ -78,6 +78,14 @@ const eventDecoderMapping: {
 
   'follow.updated': (data: Record<string, any>) =>
     decoders.FollowUpdatedEvent(data),
+
+  'poll.closed': (data: Record<string, any>) => decoders.PollClosedEvent(data),
+
+  'poll.deleted': (data: Record<string, any>) =>
+    decoders.PollDeletedEvent(data),
+
+  'poll.updated': (data: Record<string, any>) =>
+    decoders.PollUpdatedEvent(data),
 };
 
 export const decodeWSEvent = (data: { type: string } & Record<string, any>) => {
