@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { ActivityResponse, FeedsReactionResponse } from '../gen/models';
+import {
+  ActivityReactionAddedEvent,
+  ActivityReactionDeletedEvent,
+  ActivityResponse,
+  FeedsReactionResponse,
+} from '../gen/models';
 import {
   addReactionToActivity,
   removeReactionFromActivity,
@@ -67,14 +72,47 @@ const createMockReaction = (
   updated_at: new Date(),
 });
 
+const createMockAddedEvent = (
+  reaction: FeedsReactionResponse,
+  activity: ActivityResponse,
+): ActivityReactionAddedEvent => ({
+  fid: 'test-fid',
+  reaction,
+  activity,
+  created_at: new Date(),
+  custom: {},
+  type: 'reaction.added',
+});
+
+const createMockDeletedEvent = (
+  reaction: FeedsReactionResponse,
+  activity: ActivityResponse,
+): ActivityReactionDeletedEvent => ({
+  fid: 'test-fid',
+  reaction,
+  activity,
+  created_at: new Date(),
+  custom: {},
+  type: 'reaction.deleted',
+});
+
 describe('activity-reaction-utils', () => {
   describe('addReactionToActivity', () => {
     it('should add reaction to own_reactions when from current user', () => {
       const activity = createMockActivity('activity1');
       const reaction = createMockReaction('like', 'user1', 'activity1');
+      const eventActivity = { ...activity };
+      eventActivity.latest_reactions = [reaction];
+      eventActivity.reaction_groups = {
+        [reaction.type]: {
+          count: 1,
+          first_reaction_at: reaction.created_at,
+          last_reaction_at: reaction.created_at,
+        },
+      };
 
-      const result = addReactionToActivity(reaction, activity, true);
-
+      const event = createMockAddedEvent(reaction, eventActivity);
+      const result = addReactionToActivity(event, activity, true);
       expect(result.changed).toBe(true);
       expect(result.own_reactions).toHaveLength(1);
       expect(result.own_reactions[0]).toEqual(reaction);
@@ -90,8 +128,18 @@ describe('activity-reaction-utils', () => {
     it('should not add reaction to own_reactions when not from current user', () => {
       const activity = createMockActivity('activity1');
       const reaction = createMockReaction('like', 'user2', 'activity1');
+      const eventActivity = { ...activity };
+      eventActivity.latest_reactions = [reaction];
+      eventActivity.reaction_groups = {
+        [reaction.type]: {
+          count: 1,
+          first_reaction_at: reaction.created_at,
+          last_reaction_at: reaction.created_at,
+        },
+      };
+      const event = createMockAddedEvent(reaction, eventActivity);
 
-      const result = addReactionToActivity(reaction, activity, false);
+      const result = addReactionToActivity(event, activity, false);
 
       expect(result.changed).toBe(true);
       expect(result.own_reactions).toHaveLength(0);
@@ -103,32 +151,30 @@ describe('activity-reaction-utils', () => {
         last_reaction_at: reaction.created_at,
       });
     });
-
-    it('should increment reaction count in reaction_groups', () => {
-      const activity = createMockActivity('activity1');
-      const reaction1 = createMockReaction('like', 'user1', 'activity1');
-      const reaction2 = createMockReaction('like', 'user2', 'activity1');
-
-      const result1 = addReactionToActivity(reaction1, activity, true);
-      const result2 = addReactionToActivity(reaction2, result1, false);
-
-      expect(result2.changed).toBe(true);
-      expect(result2.reaction_groups['like'].count).toBe(2);
-    });
   });
 
   describe('removeReactionFromActivity', () => {
     it('should remove reaction from own_reactions when from current user', () => {
       const activity = createMockActivity('activity1');
       const reaction = createMockReaction('like', 'user1', 'activity1');
-      const activityWithReaction = addReactionToActivity(
-        reaction,
-        activity,
-        true,
-      );
+      const eventActivity = { ...activity };
+      eventActivity.latest_reactions = [reaction];
+      eventActivity.reaction_groups = {
+        [reaction.type]: {
+          count: 1,
+          first_reaction_at: reaction.created_at,
+          last_reaction_at: reaction.created_at,
+        },
+      };
+      const event = createMockAddedEvent(reaction, eventActivity);
+      const activityWithReaction = addReactionToActivity(event, activity, true);
 
+      const deleteEventActivity = { ...activityWithReaction };
+      deleteEventActivity.latest_reactions = [];
+      deleteEventActivity.reaction_groups = {};
+      const deleteEvent = createMockDeletedEvent(reaction, deleteEventActivity);
       const result = removeReactionFromActivity(
-        reaction,
+        deleteEvent,
         activityWithReaction,
         true,
       );
@@ -142,14 +188,24 @@ describe('activity-reaction-utils', () => {
     it('should not remove reaction from own_reactions when not from current user', () => {
       const activity = createMockActivity('activity1');
       const reaction = createMockReaction('like', 'user1', 'activity1');
-      const activityWithReaction = addReactionToActivity(
-        reaction,
-        activity,
-        true,
-      );
+      const eventActivity = { ...activity };
+      eventActivity.latest_reactions = [reaction];
+      eventActivity.reaction_groups = {
+        [reaction.type]: {
+          count: 1,
+          first_reaction_at: reaction.created_at,
+          last_reaction_at: reaction.created_at,
+        },
+      };
+      const event = createMockAddedEvent(reaction, eventActivity);
+      const activityWithReaction = addReactionToActivity(event, activity, true);
 
+      const deleteEventActivity = { ...activityWithReaction };
+      deleteEventActivity.latest_reactions = [];
+      deleteEventActivity.reaction_groups = {};
+      const deleteEvent = createMockDeletedEvent(reaction, deleteEventActivity);
       const result = removeReactionFromActivity(
-        reaction,
+        deleteEvent,
         activityWithReaction,
         false,
       );
@@ -159,26 +215,6 @@ describe('activity-reaction-utils', () => {
       expect(result.latest_reactions).toHaveLength(0);
       expect(result.reaction_groups['like']).toBeUndefined();
     });
-
-    it('should decrement reaction count in reaction_groups', () => {
-      const activity = createMockActivity('activity1');
-      const reaction1 = createMockReaction('like', 'user1', 'activity1');
-      const reaction2 = createMockReaction('like', 'user2', 'activity1');
-      const activityWithReactions = addReactionToActivity(
-        reaction2,
-        addReactionToActivity(reaction1, activity, true),
-        false,
-      );
-
-      const result = removeReactionFromActivity(
-        reaction1,
-        activityWithReactions,
-        true,
-      );
-
-      expect(result.changed).toBe(true);
-      expect(result.reaction_groups['like'].count).toBe(1);
-    });
   });
 
   describe('addReactionToActivities', () => {
@@ -186,8 +222,18 @@ describe('activity-reaction-utils', () => {
       const activity = createMockActivity('activity1');
       const activities = [activity];
       const reaction = createMockReaction('like', 'user1', 'activity1');
+      const eventActivity = { ...activity };
+      eventActivity.latest_reactions = [reaction];
+      eventActivity.reaction_groups = {
+        [reaction.type]: {
+          count: 1,
+          first_reaction_at: reaction.created_at,
+          last_reaction_at: reaction.created_at,
+        },
+      };
+      const event = createMockAddedEvent(reaction, eventActivity);
 
-      const result = addReactionToActivities(reaction, activities, true);
+      const result = addReactionToActivities(event, activities, true);
 
       expect(result.changed).toBe(true);
       expect(result.activities).toHaveLength(1);
@@ -199,17 +245,39 @@ describe('activity-reaction-utils', () => {
       const activity = createMockActivity('activity1');
       const activities = [activity];
       const reaction = createMockReaction('like', 'user1', 'activity2');
+      const eventActivity = createMockActivity('activity2');
+      eventActivity.latest_reactions = [reaction];
+      eventActivity.reaction_groups = {
+        [reaction.type]: {
+          count: 1,
+          first_reaction_at: reaction.created_at,
+          last_reaction_at: reaction.created_at,
+        },
+      };
+      const event = createMockAddedEvent(reaction, eventActivity);
 
-      const result = addReactionToActivities(reaction, activities, true);
+      const result = addReactionToActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
       expect(result.activities).toBe(activities);
     });
 
     it('should handle undefined activities', () => {
+      const activity = createMockActivity('activity1');
       const reaction = createMockReaction('like', 'user1', 'activity1');
+      const eventActivity = { ...activity };
+      eventActivity.own_reactions = [reaction];
+      eventActivity.latest_reactions = [reaction];
+      eventActivity.reaction_groups = {
+        [reaction.type]: {
+          count: 1,
+          first_reaction_at: reaction.created_at,
+          last_reaction_at: reaction.created_at,
+        },
+      };
+      const event = createMockAddedEvent(reaction, eventActivity);
 
-      const result = addReactionToActivities(reaction, undefined, true);
+      const result = addReactionToActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
       expect(result.activities).toEqual([]);
@@ -220,14 +288,28 @@ describe('activity-reaction-utils', () => {
     it('should remove reaction from activity in activities array', () => {
       const activity = createMockActivity('activity1');
       const reaction = createMockReaction('like', 'user1', 'activity1');
-      const activityWithReaction = addReactionToActivity(
-        reaction,
-        activity,
-        true,
-      );
+      const eventActivity = { ...activity };
+      eventActivity.latest_reactions = [reaction];
+      eventActivity.reaction_groups = {
+        [reaction.type]: {
+          count: 1,
+          first_reaction_at: reaction.created_at,
+          last_reaction_at: reaction.created_at,
+        },
+      };
+      const event = createMockAddedEvent(reaction, eventActivity);
+      const activityWithReaction = addReactionToActivity(event, activity, true);
       const activities = [activityWithReaction];
 
-      const result = removeReactionFromActivities(reaction, activities, true);
+      const deleteEventActivity = { ...activityWithReaction };
+      deleteEventActivity.latest_reactions = [];
+      deleteEventActivity.reaction_groups = {};
+      const deleteEvent = createMockDeletedEvent(reaction, deleteEventActivity);
+      const result = removeReactionFromActivities(
+        deleteEvent,
+        activities,
+        true,
+      );
 
       expect(result.changed).toBe(true);
       expect(result.activities).toHaveLength(1);
@@ -238,17 +320,26 @@ describe('activity-reaction-utils', () => {
       const activity = createMockActivity('activity1');
       const activities = [activity];
       const reaction = createMockReaction('like', 'user1', 'activity2');
+      const eventActivity = createMockActivity('activity2');
+      eventActivity.latest_reactions = [];
+      eventActivity.reaction_groups = {};
+      const event = createMockDeletedEvent(reaction, eventActivity);
 
-      const result = removeReactionFromActivities(reaction, activities, true);
+      const result = removeReactionFromActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
       expect(result.activities).toBe(activities);
     });
 
     it('should handle undefined activities', () => {
+      const activity = createMockActivity('activity1');
       const reaction = createMockReaction('like', 'user1', 'activity1');
+      const eventActivity = { ...activity };
+      eventActivity.latest_reactions = [];
+      eventActivity.reaction_groups = {};
+      const event = createMockDeletedEvent(reaction, eventActivity);
 
-      const result = removeReactionFromActivities(reaction, undefined, true);
+      const result = removeReactionFromActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
       expect(result.activities).toEqual([]);

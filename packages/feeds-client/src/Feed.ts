@@ -105,7 +105,7 @@ export class Feed extends FeedApi {
       );
 
       const result = addReactionToActivities(
-        event.reaction,
+        event,
         currentActivities,
         isCurrentUser,
       );
@@ -125,7 +125,7 @@ export class Feed extends FeedApi {
       );
 
       const result = removeReactionFromActivities(
-        event.reaction,
+        event,
         currentActivities,
         isCurrentUser,
       );
