@@ -165,6 +165,8 @@ export interface ActivityRequest {
 
   parent_id?: string;
 
+  poll_id?: string;
+
   text?: string;
 
   visibility?: 'public' | 'private' | 'tag';
@@ -292,6 +294,8 @@ export interface AddActivityRequest {
   id?: string;
 
   parent_id?: string;
+
+  poll_id?: string;
 
   text?: string;
 
@@ -1904,6 +1908,8 @@ export interface UpdateActivityPartialResponse {
 
 export interface UpdateActivityRequest {
   expires_at?: Date;
+
+  poll_id?: string;
 
   text?: string;
 
