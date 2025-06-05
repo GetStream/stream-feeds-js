@@ -1,7 +1,7 @@
 import { StreamResponse, FeedsApi } from '../../gen-imports';
 import {
-  AcceptFeedMemberRequest,
-  AcceptFeedMemberResponse,
+  AcceptFeedMemberInviteRequest,
+  AcceptFeedMemberInviteResponse,
   DeleteFeedResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
@@ -10,11 +10,12 @@ import {
   PinActivityResponse,
   QueryFeedMembersRequest,
   QueryFeedMembersResponse,
-  RejectFeedMemberRequest,
-  RejectFeedMemberResponse,
+  RejectFeedMemberInviteRequest,
+  RejectFeedMemberInviteResponse,
   Response,
   UnpinActivityResponse,
   UpdateFeedMembersRequest,
+  UpdateFeedMembersResponse,
   UpdateFeedRequest,
   UpdateFeedResponse,
 } from '../models';
@@ -88,7 +89,7 @@ export class FeedApi {
 
   updateFeedMembers(
     request: UpdateFeedMembersRequest,
-  ): Promise<StreamResponse<Response>> {
+  ): Promise<StreamResponse<UpdateFeedMembersResponse>> {
     return this.feedsApi.updateFeedMembers({
       feed_id: this.id,
       feed_group_id: this.group,
@@ -96,10 +97,10 @@ export class FeedApi {
     });
   }
 
-  acceptFeedMember(
-    request: AcceptFeedMemberRequest,
-  ): Promise<StreamResponse<AcceptFeedMemberResponse>> {
-    return this.feedsApi.acceptFeedMember({
+  acceptFeedMemberInvite(
+    request?: AcceptFeedMemberInviteRequest,
+  ): Promise<StreamResponse<AcceptFeedMemberInviteResponse>> {
+    return this.feedsApi.acceptFeedMemberInvite({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,
@@ -116,10 +117,10 @@ export class FeedApi {
     });
   }
 
-  rejectFeedMember(
-    request: RejectFeedMemberRequest,
-  ): Promise<StreamResponse<RejectFeedMemberResponse>> {
-    return this.feedsApi.rejectFeedMember({
+  rejectFeedMemberInvite(
+    request?: RejectFeedMemberInviteRequest,
+  ): Promise<StreamResponse<RejectFeedMemberInviteResponse>> {
+    return this.feedsApi.rejectFeedMemberInvite({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,

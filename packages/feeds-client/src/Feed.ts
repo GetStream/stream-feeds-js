@@ -18,6 +18,9 @@ import {
   FeedDeletedEvent,
   FeedGroupChangedEvent,
   FeedGroupDeletedEvent,
+  FeedMemberAddedEvent,
+  FeedMemberRemovedEvent,
+  FeedMemberUpdatedEvent,
   FeedResponse,
   FeedUpdatedEvent,
   FollowCreatedEvent,
@@ -197,6 +200,21 @@ export class Feed extends FeedApi {
           type: 'comment.reaction.deleted';
         },
     ) => {},
+    'feed_member.added': function (
+      _: { type: 'feed_member.added' } & FeedMemberAddedEvent & {
+          type: 'feed_member.added';
+        },
+    ): void {},
+    'feed_member.removed': function (
+      _: { type: 'feed_member.removed' } & FeedMemberRemovedEvent & {
+          type: 'feed_member.removed';
+        },
+    ): void {},
+    'feed_member.updated': function (
+      _: { type: 'feed_member.updated' } & FeedMemberUpdatedEvent & {
+          type: 'feed_member.updated';
+        },
+    ): void {},
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
