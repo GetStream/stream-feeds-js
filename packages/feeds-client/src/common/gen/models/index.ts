@@ -4,6 +4,8 @@ import {
   Field,
   Images,
   ModerationV2Response,
+  PollOptionResponseData,
+  PollResponseData,
   ReactionGroupResponse,
   SortParamRequest,
   UserResponse,
@@ -1541,58 +1543,6 @@ export interface PollOption {
   custom: Record<string, any>;
 }
 
-export interface PollOptionResponseData {
-  id: string;
-
-  text: string;
-
-  custom: Record<string, any>;
-}
-
-export interface PollResponseData {
-  allow_answers: boolean;
-
-  allow_user_suggested_options: boolean;
-
-  answers_count: number;
-
-  created_at: Date;
-
-  created_by_id: string;
-
-  description: string;
-
-  enforce_unique_vote: boolean;
-
-  id: string;
-
-  name: string;
-
-  updated_at: Date;
-
-  vote_count: number;
-
-  voting_visibility: string;
-
-  latest_answers: PollVoteResponseData[];
-
-  options: PollOptionResponseData[];
-
-  own_votes: PollVoteResponseData[];
-
-  custom: Record<string, any>;
-
-  latest_votes_by_option: Record<string, PollVoteResponseData[]>;
-
-  vote_counts_by_option: Record<string, number>;
-
-  is_closed?: boolean;
-
-  max_votes_allowed?: number;
-
-  created_by?: UserResponse;
-}
-
 export interface PollVote {
   created_at: Date;
 
@@ -1611,26 +1561,6 @@ export interface PollVote {
   user_id?: string;
 
   user?: User;
-}
-
-export interface PollVoteResponseData {
-  created_at: Date;
-
-  id: string;
-
-  option_id: string;
-
-  poll_id: string;
-
-  updated_at: Date;
-
-  answer_text?: string;
-
-  is_answer?: boolean;
-
-  user_id?: string;
-
-  user?: UserResponse;
 }
 
 export interface PrivacySettings {

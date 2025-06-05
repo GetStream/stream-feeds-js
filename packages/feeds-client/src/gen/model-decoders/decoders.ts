@@ -485,9 +485,9 @@ decoders.FeedMemberResponse = (input?: Record<string, any>) => {
 
     user: { type: 'UserResponse', isSingle: true },
 
-    request_accepted_at: { type: 'DatetimeType', isSingle: true },
+    invite_accepted_at: { type: 'DatetimeType', isSingle: true },
 
-    request_rejected_at: { type: 'DatetimeType', isSingle: true },
+    invite_rejected_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };

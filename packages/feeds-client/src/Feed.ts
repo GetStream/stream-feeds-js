@@ -28,6 +28,9 @@ import {
   FollowUpdatedEvent,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
+  PollClosedEvent,
+  PollDeletedEvent,
+  PollUpdatedEvent,
   WSEvent,
 } from './gen/models';
 import { StateStore } from './common/StateStore';
@@ -214,6 +217,15 @@ export class Feed extends FeedApi {
       _: { type: 'feed_member.updated' } & FeedMemberUpdatedEvent & {
           type: 'feed_member.updated';
         },
+    ): void {},
+    'poll.closed': function (
+      _: { type: 'poll.closed' } & PollClosedEvent & { type: 'poll.closed' },
+    ): void {},
+    'poll.deleted': function (
+      _: { type: 'poll.deleted' } & PollDeletedEvent & { type: 'poll.deleted' },
+    ): void {},
+    'poll.updated': function (
+      _: { type: 'poll.updated' } & PollUpdatedEvent & { type: 'poll.updated' },
     ): void {},
   };
 

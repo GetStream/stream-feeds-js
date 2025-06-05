@@ -62,6 +62,8 @@ import {
   QueryPollVotesRequest,
   QueryPollsRequest,
   QueryPollsResponse,
+  RejectFeedMemberInviteRequest,
+  RejectFeedMemberInviteResponse,
   RejectFollowRequest,
   RejectFollowResponse,
   Response,

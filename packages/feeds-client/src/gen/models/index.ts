@@ -997,17 +997,15 @@ export interface FeedMemberResponse {
 
   role: string;
 
-  status: string;
+  status: 'member' | 'pending' | 'rejected';
 
   updated_at: Date;
 
   user: UserResponse;
 
-  request?: boolean;
+  invite_accepted_at?: Date;
 
-  request_accepted_at?: Date;
-
-  request_rejected_at?: Date;
+  invite_rejected_at?: Date;
 
   custom?: Record<string, any>;
 }

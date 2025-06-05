@@ -85,12 +85,15 @@ export class FeedsClient extends FeedsApi {
     this.moderation = new ModerationClient(this.apiClient);
     this.on('all', (event) => {
       if (Object.hasOwn(event, 'fid')) {
-        const feed = this.activeFeeds[(event as unknown as WSEvent).fid];
+        const feed =
+          this.activeFeeds[(event as unknown as WSEvent & { fid: string }).fid];
         if (feed) {
           {
             feed.handleWSEvent(event as unknown as WSEvent);
             if (event.type === 'feed.deleted') {
-              delete this.activeFeeds[(event as unknown as WSEvent).fid];
+              delete this.activeFeeds[
+                (event as unknown as WSEvent & { fid: string }).fid
+              ];
             }
           }
         } else if (event.type === 'feed.created') {
