@@ -1,7 +1,7 @@
 import { ApiClient, StreamResponse } from '../../gen-imports';
 import {
-  AcceptFeedMemberRequest,
-  AcceptFeedMemberResponse,
+  AcceptFeedMemberInviteRequest,
+  AcceptFeedMemberInviteResponse,
   AcceptFollowRequest,
   AcceptFollowResponse,
   AddActivityRequest,
@@ -52,8 +52,8 @@ import {
   QueryFeedsResponse,
   QueryFollowsRequest,
   QueryFollowsResponse,
-  RejectFeedMemberRequest,
-  RejectFeedMemberResponse,
+  RejectFeedMemberInviteRequest,
+  RejectFeedMemberInviteResponse,
   RejectFollowRequest,
   RejectFollowResponse,
   Response,
@@ -70,6 +70,7 @@ import {
   UpdateCommentRequest,
   UpdateCommentResponse,
   UpdateFeedMembersRequest,
+  UpdateFeedMembersResponse,
   UpdateFeedRequest,
   UpdateFeedResponse,
   UpdateFollowRequest,
@@ -846,7 +847,7 @@ export class FeedsApi {
       feed_group_id: string;
       feed_id: string;
     },
-  ): Promise<StreamResponse<Response>> {
+  ): Promise<StreamResponse<UpdateFeedMembersResponse>> {
     const pathParams = {
       feed_group_id: request?.feed_group_id,
       feed_id: request?.feed_id,
@@ -859,7 +860,9 @@ export class FeedsApi {
       members: request?.members,
     };
 
-    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateFeedMembersResponse>
+    >(
       'PATCH',
       '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/members',
       pathParams,
@@ -867,27 +870,25 @@ export class FeedsApi {
       body,
     );
 
-    decoders.Response?.(response.body);
+    decoders.UpdateFeedMembersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
 
-  async acceptFeedMember(
-    request: AcceptFeedMemberRequest & {
+  async acceptFeedMemberInvite(
+    request: AcceptFeedMemberInviteRequest & {
       feed_id: string;
       feed_group_id: string;
     },
-  ): Promise<StreamResponse<AcceptFeedMemberResponse>> {
+  ): Promise<StreamResponse<AcceptFeedMemberInviteResponse>> {
     const pathParams = {
       feed_id: request?.feed_id,
       feed_group_id: request?.feed_group_id,
     };
-    const body = {
-      user_id: request?.user_id,
-    };
+    const body = {};
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<AcceptFeedMemberResponse>
+      StreamResponse<AcceptFeedMemberInviteResponse>
     >(
       'POST',
       '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/members/accept',
@@ -896,7 +897,7 @@ export class FeedsApi {
       body,
     );
 
-    decoders.AcceptFeedMemberResponse?.(response.body);
+    decoders.AcceptFeedMemberInviteResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -934,22 +935,20 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async rejectFeedMember(
-    request: RejectFeedMemberRequest & {
+  async rejectFeedMemberInvite(
+    request: RejectFeedMemberInviteRequest & {
       feed_group_id: string;
       feed_id: string;
     },
-  ): Promise<StreamResponse<RejectFeedMemberResponse>> {
+  ): Promise<StreamResponse<RejectFeedMemberInviteResponse>> {
     const pathParams = {
       feed_group_id: request?.feed_group_id,
       feed_id: request?.feed_id,
     };
-    const body = {
-      user_id: request?.user_id,
-    };
+    const body = {};
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<RejectFeedMemberResponse>
+      StreamResponse<RejectFeedMemberInviteResponse>
     >(
       'POST',
       '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/members/reject',
@@ -958,7 +957,7 @@ export class FeedsApi {
       body,
     );
 
-    decoders.RejectFeedMemberResponse?.(response.body);
+    decoders.RejectFeedMemberInviteResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

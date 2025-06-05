@@ -61,6 +61,15 @@ const eventDecoderMapping: {
   'feed_group.deleted': (data: Record<string, any>) =>
     decoders.FeedGroupDeletedEvent(data),
 
+  'feed_member.added': (data: Record<string, any>) =>
+    decoders.FeedMemberAddedEvent(data),
+
+  'feed_member.removed': (data: Record<string, any>) =>
+    decoders.FeedMemberRemovedEvent(data),
+
+  'feed_member.updated': (data: Record<string, any>) =>
+    decoders.FeedMemberUpdatedEvent(data),
+
   'follow.created': (data: Record<string, any>) =>
     decoders.FollowCreatedEvent(data),
 

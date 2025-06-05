@@ -16,14 +16,12 @@ export interface APIError {
   exception_fields?: Record<string, string>;
 }
 
-export interface AcceptFeedMemberRequest {
-  user_id: string;
-}
+export interface AcceptFeedMemberInviteRequest {}
 
-export interface AcceptFeedMemberResponse {
+export interface AcceptFeedMemberInviteResponse {
   duration: string;
 
-  feed_member: FeedMemberResponse;
+  member: FeedMemberResponse;
 }
 
 export interface AcceptFollowRequest {
@@ -912,10 +910,42 @@ export interface FeedInput {
   custom?: Record<string, any>;
 }
 
+export interface FeedMemberAddedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  member: FeedMemberResponse;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface FeedMemberRemovedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  member_id: string;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface FeedMemberRequest {
   user_id: string;
 
-  request?: boolean;
+  invite?: boolean;
 
   role?: string;
 
@@ -940,6 +970,22 @@ export interface FeedMemberResponse {
   request_rejected_at?: Date;
 
   custom?: Record<string, any>;
+}
+
+export interface FeedMemberUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  member: FeedMemberResponse;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
 export interface FeedRequest {
@@ -1482,14 +1528,12 @@ export interface ReactionGroupResponse {
   last_reaction_at: Date;
 }
 
-export interface RejectFeedMemberRequest {
-  user_id: string;
-}
+export interface RejectFeedMemberInviteRequest {}
 
-export interface RejectFeedMemberResponse {
+export interface RejectFeedMemberInviteResponse {
   duration: string;
 
-  feed_member: FeedMemberResponse;
+  member: FeedMemberResponse;
 }
 
 export interface RejectFollowRequest {
@@ -1675,7 +1719,7 @@ export interface UpdateCommentResponse {
 }
 
 export interface UpdateFeedMembersRequest {
-  operation: 'add' | 'remove' | 'set';
+  operation: 'upsert' | 'remove' | 'set';
 
   limit?: number;
 
@@ -1684,6 +1728,16 @@ export interface UpdateFeedMembersRequest {
   prev?: string;
 
   members?: FeedMemberRequest[];
+}
+
+export interface UpdateFeedMembersResponse {
+  duration: string;
+
+  added: FeedMemberResponse[];
+
+  removed_ids: string[];
+
+  updated: FeedMemberResponse[];
 }
 
 export interface UpdateFeedRequest {
@@ -1816,6 +1870,9 @@ export type WSClientEvent =
   | ({ type: 'feed.updated' } & FeedUpdatedEvent)
   | ({ type: 'feed_group.changed' } & FeedGroupChangedEvent)
   | ({ type: 'feed_group.deleted' } & FeedGroupDeletedEvent)
+  | ({ type: 'feed_member.added' } & FeedMemberAddedEvent)
+  | ({ type: 'feed_member.removed' } & FeedMemberRemovedEvent)
+  | ({ type: 'feed_member.updated' } & FeedMemberUpdatedEvent)
   | ({ type: 'follow.created' } & FollowCreatedEvent)
   | ({ type: 'follow.deleted' } & FollowDeletedEvent)
   | ({ type: 'follow.updated' } & FollowUpdatedEvent);
@@ -1840,6 +1897,9 @@ export type WSEvent =
   | ({ type: 'feed.updated' } & FeedUpdatedEvent)
   | ({ type: 'feed_group.changed' } & FeedGroupChangedEvent)
   | ({ type: 'feed_group.deleted' } & FeedGroupDeletedEvent)
+  | ({ type: 'feed_member.added' } & FeedMemberAddedEvent)
+  | ({ type: 'feed_member.removed' } & FeedMemberRemovedEvent)
+  | ({ type: 'feed_member.updated' } & FeedMemberUpdatedEvent)
   | ({ type: 'follow.created' } & FollowCreatedEvent)
   | ({ type: 'follow.deleted' } & FollowDeletedEvent)
   | ({ type: 'follow.updated' } & FollowUpdatedEvent);
