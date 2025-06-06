@@ -10,6 +10,9 @@ const eventDecoderMapping: {
   'activity.deleted': (data: Record<string, any>) =>
     decoders.ActivityDeletedEvent(data),
 
+  'activity.pinned': (data: Record<string, any>) =>
+    decoders.ActivityPinnedEvent(data),
+
   'activity.reaction.added': (data: Record<string, any>) =>
     decoders.ActivityReactionAddedEvent(data),
 
@@ -18,6 +21,9 @@ const eventDecoderMapping: {
 
   'activity.removed_from_feed': (data: Record<string, any>) =>
     decoders.ActivityRemovedFromFeedEvent(data),
+
+  'activity.unpinned': (data: Record<string, any>) =>
+    decoders.ActivityUnpinnedEvent(data),
 
   'activity.updated': (data: Record<string, any>) =>
     decoders.ActivityUpdatedEvent(data),

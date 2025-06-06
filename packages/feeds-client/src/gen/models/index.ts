@@ -91,15 +91,31 @@ export interface ActivityLocation {
 }
 
 export interface ActivityPinResponse {
-  activity_id: string;
-
   created_at: Date;
 
   feed: string;
 
   updated_at: Date;
 
+  activity: ActivityResponse;
+
   user: UserResponse;
+}
+
+export interface ActivityPinnedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: ActivityResponse;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
 export interface ActivityReactionAddedEvent {
@@ -223,8 +239,6 @@ export interface ActivityResponse {
 
   mentioned_users: UserResponse[];
 
-  own_bookmarks: BookmarkResponse[];
-
   own_reactions: FeedsReactionResponse[];
 
   custom: Record<string, any>;
@@ -251,6 +265,8 @@ export interface ActivityResponse {
 
   moderation?: ModerationV2Response;
 
+  own_bookmarks?: BookmarkResponse;
+
   parent?: BaseActivityResponse;
 
   poll?: PollResponseData;
@@ -266,6 +282,22 @@ export interface ActivitySelectorConfig {
   type?: string;
 
   tags?: string[];
+}
+
+export interface ActivityUnpinnedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: ActivityResponse;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
 export interface ActivityUpdatedEvent {
@@ -511,8 +543,6 @@ export interface BaseActivityResponse {
 
   mentioned_users: UserResponse[];
 
-  own_bookmarks: BookmarkResponse[];
-
   own_reactions: FeedsReactionResponse[];
 
   custom: Record<string, any>;
@@ -539,15 +569,17 @@ export interface BaseActivityResponse {
 
   moderation?: ModerationV2Response;
 
+  own_bookmarks?: BookmarkResponse;
+
   poll?: PollResponseData;
 }
 
 export interface BookmarkAddedEvent {
-  activity_id: string;
-
   created_at: Date;
 
   fid: string;
+
+  bookmark: BookmarkResponse;
 
   custom: Record<string, any>;
 
@@ -587,11 +619,11 @@ export interface BookmarkFolderResponse {
 }
 
 export interface BookmarkResponse {
-  activity_id: string;
-
   created_at: Date;
 
   updated_at: Date;
+
+  activity: ActivityResponse;
 
   folder: BookmarkFolderResponse;
 
@@ -1422,8 +1454,6 @@ export interface PagerResponse {
 export interface PinActivityRequest {}
 
 export interface PinActivityResponse {
-  activity_id: string;
-
   created_at: Date;
 
   duration: string;
@@ -1431,6 +1461,8 @@ export interface PinActivityResponse {
   fid: string;
 
   user_id: string;
+
+  activity: ActivityResponse;
 }
 
 export interface PollClosedEvent {
@@ -2018,13 +2050,13 @@ export interface UnfollowResponse {
 }
 
 export interface UnpinActivityResponse {
-  activity_id: string;
-
   duration: string;
 
   fid: string;
 
   user_id: string;
+
+  activity: ActivityResponse;
 }
 
 export interface UpdateActivityPartialRequest {
@@ -2066,10 +2098,6 @@ export interface UpdateActivityResponse {
 }
 
 export interface UpdateBookmarkRequest {
-  feed_id: string;
-
-  feed_type: string;
-
   custom?: Record<string, any>;
 }
 
@@ -2272,9 +2300,11 @@ export interface VoteData {
 export type WSClientEvent =
   | ({ type: 'activity.added' } & ActivityAddedEvent)
   | ({ type: 'activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'activity.pinned' } & ActivityPinnedEvent)
   | ({ type: 'activity.reaction.added' } & ActivityReactionAddedEvent)
   | ({ type: 'activity.reaction.deleted' } & ActivityReactionDeletedEvent)
   | ({ type: 'activity.removed_from_feed' } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'activity.unpinned' } & ActivityUnpinnedEvent)
   | ({ type: 'activity.updated' } & ActivityUpdatedEvent)
   | ({ type: 'bookmark.added' } & BookmarkAddedEvent)
   | ({ type: 'bookmark.deleted' } & BookmarkDeletedEvent)
@@ -2308,9 +2338,11 @@ export type WSClientEvent =
 export type WSEvent =
   | ({ type: 'activity.added' } & ActivityAddedEvent)
   | ({ type: 'activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'activity.pinned' } & ActivityPinnedEvent)
   | ({ type: 'activity.reaction.added' } & ActivityReactionAddedEvent)
   | ({ type: 'activity.reaction.deleted' } & ActivityReactionDeletedEvent)
   | ({ type: 'activity.removed_from_feed' } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'activity.unpinned' } & ActivityUnpinnedEvent)
   | ({ type: 'activity.updated' } & ActivityUpdatedEvent)
   | ({ type: 'bookmark.added' } & BookmarkAddedEvent)
   | ({ type: 'bookmark.deleted' } & BookmarkDeletedEvent)

@@ -76,7 +76,20 @@ decoders.ActivityPinResponse = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
+    activity: { type: 'ActivityResponse', isSingle: true },
+
     user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ActivityPinnedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'ActivityResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -130,8 +143,6 @@ decoders.ActivityResponse = (input?: Record<string, any>) => {
 
     mentioned_users: { type: 'UserResponse', isSingle: false },
 
-    own_bookmarks: { type: 'BookmarkResponse', isSingle: false },
-
     own_reactions: { type: 'FeedsReactionResponse', isSingle: false },
 
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
@@ -146,9 +157,22 @@ decoders.ActivityResponse = (input?: Record<string, any>) => {
 
     current_feed: { type: 'FeedResponse', isSingle: true },
 
+    own_bookmarks: { type: 'BookmarkResponse', isSingle: true },
+
     parent: { type: 'BaseActivityResponse', isSingle: true },
 
     poll: { type: 'PollResponseData', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ActivityUnpinnedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'ActivityResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -233,8 +257,6 @@ decoders.BaseActivityResponse = (input?: Record<string, any>) => {
 
     mentioned_users: { type: 'UserResponse', isSingle: false },
 
-    own_bookmarks: { type: 'BookmarkResponse', isSingle: false },
-
     own_reactions: { type: 'FeedsReactionResponse', isSingle: false },
 
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
@@ -249,6 +271,8 @@ decoders.BaseActivityResponse = (input?: Record<string, any>) => {
 
     current_feed: { type: 'FeedResponse', isSingle: true },
 
+    own_bookmarks: { type: 'BookmarkResponse', isSingle: true },
+
     poll: { type: 'PollResponseData', isSingle: true },
   };
   return decode(typeMappings, input);
@@ -257,6 +281,8 @@ decoders.BaseActivityResponse = (input?: Record<string, any>) => {
 decoders.BookmarkAddedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
+
+    bookmark: { type: 'BookmarkResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
   };
@@ -288,6 +314,8 @@ decoders.BookmarkResponse = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'ActivityResponse', isSingle: true },
 
     folder: { type: 'BookmarkFolderResponse', isSingle: true },
 
@@ -668,6 +696,8 @@ decoders.NotificationStatusResponse = (input?: Record<string, any>) => {
 decoders.PinActivityResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'ActivityResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -913,6 +943,13 @@ decoders.ThreadedCommentResponse = (input?: Record<string, any>) => {
     replies: { type: 'ThreadedCommentResponse', isSingle: false },
 
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UnpinActivityResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    activity: { type: 'ActivityResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };

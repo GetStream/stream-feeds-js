@@ -310,8 +310,6 @@ export class FeedsApi {
       activity_id: request?.activity_id,
     };
     const body = {
-      feed_id: request?.feed_id,
-      feed_type: request?.feed_type,
       custom: request?.custom,
     };
 
