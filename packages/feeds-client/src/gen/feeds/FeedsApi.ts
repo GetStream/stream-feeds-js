@@ -49,6 +49,10 @@ import {
   QueryActivitiesResponse,
   QueryActivityReactionsRequest,
   QueryActivityReactionsResponse,
+  QueryBookmarkFoldersRequest,
+  QueryBookmarkFoldersResponse,
+  QueryBookmarksRequest,
+  QueryBookmarksResponse,
   QueryCommentReactionsRequest,
   QueryCommentReactionsResponse,
   QueryCommentsRequest,
@@ -310,6 +314,7 @@ export class FeedsApi {
       activity_id: request?.activity_id,
     };
     const body = {
+      folder_id: request?.folder_id,
       custom: request?.custom,
     };
 
@@ -484,6 +489,42 @@ export class FeedsApi {
     );
 
     decoders.DeleteActivityReactionResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryBookmarkFolders(
+    request?: QueryBookmarkFoldersRequest,
+  ): Promise<StreamResponse<QueryBookmarkFoldersResponse>> {
+    const body = {
+      sort: request?.sort,
+      filter: request?.filter,
+      pagination: request?.pagination,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryBookmarkFoldersResponse>
+    >('POST', '/feeds/v3/bookmark_folders/query', undefined, undefined, body);
+
+    decoders.QueryBookmarkFoldersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryBookmarks(
+    request?: QueryBookmarksRequest,
+  ): Promise<StreamResponse<QueryBookmarksResponse>> {
+    const body = {
+      sort: request?.sort,
+      filter: request?.filter,
+      pagination: request?.pagination,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryBookmarksResponse>
+    >('POST', '/feeds/v3/bookmarks/query', undefined, undefined, body);
+
+    decoders.QueryBookmarksResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

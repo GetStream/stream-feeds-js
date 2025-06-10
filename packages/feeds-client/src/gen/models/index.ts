@@ -107,9 +107,9 @@ export interface ActivityPinnedEvent {
 
   fid: string;
 
-  activity: ActivityResponse;
-
   custom: Record<string, any>;
+
+  pinned_activity: PinActivityResponse;
 
   type: string;
 
@@ -265,7 +265,7 @@ export interface ActivityResponse {
 
   moderation?: ModerationV2Response;
 
-  own_bookmarks?: BookmarkResponse;
+  own_bookmark?: BookmarkResponse;
 
   parent?: BaseActivityResponse;
 
@@ -289,9 +289,9 @@ export interface ActivityUnpinnedEvent {
 
   fid: string;
 
-  activity: ActivityResponse;
-
   custom: Record<string, any>;
+
+  pinned_activity: PinActivityResponse;
 
   type: string;
 
@@ -569,7 +569,7 @@ export interface BaseActivityResponse {
 
   moderation?: ModerationV2Response;
 
-  own_bookmarks?: BookmarkResponse;
+  own_bookmark?: BookmarkResponse;
 
   poll?: PollResponseData;
 }
@@ -625,11 +625,11 @@ export interface BookmarkResponse {
 
   activity: ActivityResponse;
 
-  folder: BookmarkFolderResponse;
-
   user: UserResponse;
 
   custom?: Record<string, any>;
+
+  folder?: BookmarkFolderResponse;
 }
 
 export interface BookmarkUpdatedEvent {
@@ -1771,6 +1771,38 @@ export interface QueryActivityReactionsResponse {
   prev?: string;
 }
 
+export interface QueryBookmarkFoldersRequest {
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+
+  pagination?: PagerRequest;
+}
+
+export interface QueryBookmarkFoldersResponse {
+  duration: string;
+
+  bookmark_folders: BookmarkFolderResponse[];
+
+  pager: PagerResponse;
+}
+
+export interface QueryBookmarksRequest {
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+
+  pagination?: PagerRequest;
+}
+
+export interface QueryBookmarksResponse {
+  duration: string;
+
+  bookmarks: BookmarkResponse[];
+
+  pager: PagerResponse;
+}
+
 export interface QueryCommentReactionsRequest {
   limit?: number;
 
@@ -2098,6 +2130,8 @@ export interface UpdateActivityResponse {
 }
 
 export interface UpdateBookmarkRequest {
+  folder_id?: string;
+
   custom?: Record<string, any>;
 }
 
