@@ -577,8 +577,6 @@ export interface BaseActivityResponse {
 export interface BookmarkAddedEvent {
   created_at: Date;
 
-  fid: string;
-
   bookmark: BookmarkResponse;
 
   custom: Record<string, any>;
@@ -592,8 +590,6 @@ export interface BookmarkAddedEvent {
 
 export interface BookmarkDeletedEvent {
   created_at: Date;
-
-  fid: string;
 
   bookmark: BookmarkResponse;
 
@@ -634,8 +630,6 @@ export interface BookmarkResponse {
 
 export interface BookmarkUpdatedEvent {
   created_at: Date;
-
-  fid: string;
 
   bookmark: BookmarkResponse;
 
