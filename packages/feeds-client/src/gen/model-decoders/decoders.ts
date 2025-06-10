@@ -868,6 +868,20 @@ decoders.QueryActivityReactionsResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.QueryBookmarkFoldersResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    bookmark_folders: { type: 'BookmarkFolderResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.QueryBookmarksResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    bookmarks: { type: 'BookmarkResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.QueryCommentReactionsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     reactions: { type: 'FeedsReactionResponse', isSingle: false },
@@ -878,6 +892,20 @@ decoders.QueryCommentReactionsResponse = (input?: Record<string, any>) => {
 decoders.QueryCommentsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     comments: { type: 'CommentResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.QueryFeedMembersResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    members: { type: 'FeedMemberResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.QueryFeedsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    feeds: { type: 'FeedResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };

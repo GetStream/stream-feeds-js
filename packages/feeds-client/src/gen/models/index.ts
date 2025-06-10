@@ -1718,10 +1718,6 @@ export interface PollVotesResponse {
 }
 
 export interface QueryActivitiesRequest {
-  comment_limit?: number;
-
-  comment_sort?: 'first' | 'last' | 'popular';
-
   limit?: number;
 
   next?: string;
@@ -1766,11 +1762,15 @@ export interface QueryActivityReactionsResponse {
 }
 
 export interface QueryBookmarkFoldersRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
   sort?: SortParamRequest[];
 
   filter?: Record<string, any>;
-
-  pagination?: PagerRequest;
 }
 
 export interface QueryBookmarkFoldersResponse {
@@ -1778,15 +1778,21 @@ export interface QueryBookmarkFoldersResponse {
 
   bookmark_folders: BookmarkFolderResponse[];
 
-  pager: PagerResponse;
+  next?: string;
+
+  prev?: string;
 }
 
 export interface QueryBookmarksRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
   sort?: SortParamRequest[];
 
   filter?: Record<string, any>;
-
-  pagination?: PagerRequest;
 }
 
 export interface QueryBookmarksResponse {
@@ -1794,7 +1800,9 @@ export interface QueryBookmarksResponse {
 
   bookmarks: BookmarkResponse[];
 
-  pager: PagerResponse;
+  next?: string;
+
+  prev?: string;
 }
 
 export interface QueryCommentReactionsRequest {
@@ -1858,17 +1866,23 @@ export interface QueryFeedMembersResponse {
 
   members: FeedMemberResponse[];
 
-  pagination: PagerResponse;
+  next?: string;
+
+  prev?: string;
 }
 
 export interface QueryFeedsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
   watch?: boolean;
 
   sort?: SortParamRequest[];
 
   filter?: Record<string, any>;
-
-  pagination?: PagerRequest;
 }
 
 export interface QueryFeedsResponse {
@@ -1876,7 +1890,9 @@ export interface QueryFeedsResponse {
 
   feeds: FeedResponse[];
 
-  pager: PagerResponse;
+  next?: string;
+
+  prev?: string;
 }
 
 export interface QueryFollowsRequest {
@@ -2127,6 +2143,8 @@ export interface UpdateBookmarkRequest {
   folder_id?: string;
 
   custom?: Record<string, any>;
+
+  new_folder?: AddFolderRequest;
 }
 
 export interface UpdateBookmarkResponse {

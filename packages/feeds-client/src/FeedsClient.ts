@@ -181,8 +181,8 @@ export class FeedsClient extends FeedsApi {
 
     return {
       feeds,
-      next: response.pager.next,
-      prev: response.pager.prev,
+      next: response.next,
+      prev: response.prev,
       metadata: response.metadata,
       duration: response.duration,
     };

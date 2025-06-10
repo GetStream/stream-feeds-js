@@ -168,8 +168,6 @@ export class FeedsApi {
     request?: QueryActivitiesRequest,
   ): Promise<StreamResponse<QueryActivitiesResponse>> {
     const body = {
-      comment_limit: request?.comment_limit,
-      comment_sort: request?.comment_sort,
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,
@@ -316,6 +314,7 @@ export class FeedsApi {
     const body = {
       folder_id: request?.folder_id,
       custom: request?.custom,
+      new_folder: request?.new_folder,
     };
 
     const response = await this.apiClient.sendRequest<
@@ -497,9 +496,11 @@ export class FeedsApi {
     request?: QueryBookmarkFoldersRequest,
   ): Promise<StreamResponse<QueryBookmarkFoldersResponse>> {
     const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
       sort: request?.sort,
       filter: request?.filter,
-      pagination: request?.pagination,
     };
 
     const response = await this.apiClient.sendRequest<
@@ -515,9 +516,11 @@ export class FeedsApi {
     request?: QueryBookmarksRequest,
   ): Promise<StreamResponse<QueryBookmarksResponse>> {
     const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
       sort: request?.sort,
       filter: request?.filter,
-      pagination: request?.pagination,
     };
 
     const response = await this.apiClient.sendRequest<
@@ -1136,10 +1139,12 @@ export class FeedsApi {
       connection_id: request?.connection_id,
     };
     const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
       watch: request?.watch,
       sort: request?.sort,
       filter: request?.filter,
-      pagination: request?.pagination,
     };
 
     const response = await this.apiClient.sendRequest<
