@@ -1,10 +1,12 @@
 import {
   ActivityAddedEvent,
   ActivityDeletedEvent,
+  ActivityPinnedEvent,
   ActivityReactionAddedEvent,
   ActivityReactionDeletedEvent,
   ActivityRemovedFromFeedEvent,
   ActivityRequest,
+  ActivityUnpinnedEvent,
   ActivityUpdatedEvent,
   BookmarkAddedEvent,
   BookmarkDeletedEvent,
@@ -275,6 +277,16 @@ export class Feed extends FeedApi {
     ): void {
       throw new Error('Function not implemented.');
     },
+    'activity.pinned': function (
+      _: { type: 'activity.pinned' } & ActivityPinnedEvent & {
+          type: 'activity.pinned';
+        },
+    ): void {},
+    'activity.unpinned': function (
+      _: { type: 'activity.unpinned' } & ActivityUnpinnedEvent & {
+          type: 'activity.unpinned';
+        },
+    ): void {},
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
