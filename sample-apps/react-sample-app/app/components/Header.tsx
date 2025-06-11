@@ -2,22 +2,41 @@
 import Link from 'next/link';
 import { useUserContext } from '../user-context';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NotificationBell } from './notifications/NotificationBell';
+import {
+  ActivitySearchSource,
+  SearchController,
+  UserSearchSource,
+} from '@stream-io/feeds-client';
+import { Search } from './Search';
 
 export function Header() {
-  const { user, logOut } = useUserContext();
+  const { user, logOut, client } = useUserContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 
+  const sc = useMemo(() => {
+    if (!client) {
+      return undefined;
+    }
+
+    return new SearchController({
+      sources: [new ActivitySearchSource(client), new UserSearchSource(client)],
+      config: { keepSingleActiveSource: true },
+    });
+  }, [client]);
+
   return (
     <ul
-      className="flex justify-end items-center bg-blue-500 p-6 text-white"
+      className="flex justify-between items-center gap-3 bg-blue-500 p-6 text-white"
       style={{ height: '5.625rem' }}
     >
+      {sc && <Search searchController={sc} />}
+
       {user && (
-        <>
-          <li className="mr-6">
+        <div className="flex items-center gap-3">
+          <li>
             <div className="relative">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -62,10 +81,10 @@ export function Header() {
           </li>
           {user && (
             <>
-              <li className="mr-3">
-                <NotificationBell></NotificationBell>
+              <li>
+                <NotificationBell />
               </li>
-              <li className="mr-3">
+              <li>
                 <Link href={'/users/' + user.id}>
                   <img
                     className="size-8 rounded-full"
@@ -90,7 +109,7 @@ export function Header() {
               </li>
             </>
           )}
-        </>
+        </div>
       )}
     </ul>
   );

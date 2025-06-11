@@ -10,6 +10,8 @@
   "dependencies": {
     "@stream-io/feeds-client": "workspace:^",
     "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-api",
+    "clsx": "^2.1.1",
+    "lodash.uniqby": "^4.7.0",
     "material-symbols": "^0.27.1",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
@@ -17,6 +19,7 @@
     "uuid": "^11.0.3"
   },
   "devDependencies": {
+    "@types/lodash.uniqby": "^4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

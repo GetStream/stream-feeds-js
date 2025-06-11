@@ -59,9 +59,7 @@ import {
 export type FeedState = Partial<
   Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
 > &
-  Partial<{
-    [key in keyof FeedResponse]: FeedResponse[key];
-  }> & {
+  Partial<FeedResponse> & {
     /**
      * True when loading state using `getOrCreate`
      */

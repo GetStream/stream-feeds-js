@@ -3,3 +3,8 @@ export * from './src/Feed';
 export * from './src/gen/models';
 export * from './src/types';
 export * from './src/common/types';
+export * from './src/common/StateStore';
+export * from './src/common/BaseSearchSource';
+export * from './src/common/SearchController';
+export * from './src/common/ActivitySearchSource';
+export * from './src/common/UserSearchSource';
