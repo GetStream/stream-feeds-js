@@ -62,7 +62,7 @@ export const FollowInviteNotification = ({
               <span className="material-symbols-outlined">check</span>
             </button>
             <button
-              className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md rounded-md disabled:bg-blue-100 hover:bg-blue-700 focus:outline-none"
+              className="w-max flex px-1 py-0.5 bg-blue-600 text-white rounded-md disabled:bg-blue-100 hover:bg-blue-700 focus:outline-none"
               onClick={() => decline(activity)}
               disabled={!isPending}
             >

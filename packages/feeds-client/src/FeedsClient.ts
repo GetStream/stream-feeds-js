@@ -59,13 +59,11 @@ export class FeedsClient extends FeedsApi {
         const feed =
           this.activeFeeds[(event as unknown as WSEvent & { fid: string }).fid];
         if (feed) {
-          {
-            feed.handleWSEvent(event as unknown as WSEvent);
-            if (event.type === 'feeds.feed.deleted') {
-              delete this.activeFeeds[
-                (event as unknown as WSEvent & { fid: string }).fid
-              ];
-            }
+          feed.handleWSEvent(event as unknown as WSEvent);
+          if (event.type === 'feeds.feed.deleted') {
+            delete this.activeFeeds[
+              (event as unknown as WSEvent & { fid: string }).fid
+            ];
           }
         } else if (event.type === 'feeds.feed.created') {
           this.getOrCreateActiveFeed(

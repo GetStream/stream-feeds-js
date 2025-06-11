@@ -16,25 +16,20 @@ export const Activity = ({
   const { logErrorAndDisplayNotification } = useErrorContext();
   const { user, client } = useUserContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [canEdit, setCanEdit] = useState(false);
-  const [canDelete, setCanDelete] = useState(false);
-  const [canSendReaction, setCanSendReaction] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedActivityText, setEditedActivityText] = useState('');
 
-  useEffect(() => {
-    setCanEdit(
-      ownCapabilities.includes('update-any-activity') ||
-        (ownCapabilities.includes('update-own-activity') &&
-          activity.user.id === user?.id),
-    );
-    setCanDelete(
-      ownCapabilities.includes('remove-any-activity-from-feed') ||
-        (ownCapabilities.includes('remove-own-activity-from-feed') &&
-          activity.user.id === user?.id),
-    );
-    setCanSendReaction(ownCapabilities.includes('send-feed-reaction'));
-  }, [user, activity, ownCapabilities]);
+  const canEdit =
+    ownCapabilities.includes('update-any-activity') ||
+    (ownCapabilities.includes('update-own-activity') &&
+      activity.user.id === user?.id);
+
+  const canDelete =
+    ownCapabilities.includes('remove-any-activity-from-feed') ||
+    (ownCapabilities.includes('remove-own-activity-from-feed') &&
+      activity.user.id === user?.id);
+
+  const canSendReaction = ownCapabilities.includes('send-feed-reaction');
 
   const updateActivity = async () => {
     try {

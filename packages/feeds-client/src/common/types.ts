@@ -21,6 +21,7 @@ export type StreamResponse<T> = T & {
 };
 
 export class StreamApiError extends Error {
+  public name = 'StreamApiError';
   constructor(
     message: string,
     public metadata?: Partial<RequestMetadata>,

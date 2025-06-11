@@ -64,7 +64,7 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
   const renderUser = (feed: Feed) => {
     return (
       <li
-        key={feed.id}
+        key={feed.fid}
         className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
       >
         <Link href={'/users/' + feed.id}>
@@ -96,7 +96,7 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
         listContainerClassNames="divide-y divide-gray-200"
         itemsName={title.toLowerCase()}
         error={error}
-      ></PaginatedList>
+      />
     </div>
   );
 }
