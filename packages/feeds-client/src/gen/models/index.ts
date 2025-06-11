@@ -1030,6 +1030,43 @@ export interface FeedMemberUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
+export const FeedOwnCapability = {
+  ADD_ACTIVITY: 'add-activity',
+  ADD_ACTIVITY_REACTION: 'add-activity-reaction',
+  ADD_COMMENT: 'add-comment',
+  ADD_COMMENT_REACTION: 'add-comment-reaction',
+  BOOKMARK_ACTIVITY: 'bookmark-activity',
+  CREATE_FEED: 'create-feed',
+  DELETE_BOOKMARK: 'delete-bookmark',
+  DELETE_COMMENT: 'delete-comment',
+  DELETE_FEED: 'delete-feed',
+  EDIT_BOOKMARK: 'edit-bookmark',
+  FOLLOW: 'follow',
+  INVITE_FEED: 'invite-feed',
+  JOIN_FEED: 'join-feed',
+  LEAVE_FEED: 'leave-feed',
+  MANAGE_FEED_GROUP: 'manage-feed-group',
+  MARK_ACTIVITY: 'mark-activity',
+  PIN_ACTIVITY: 'pin-activity',
+  QUERY_FEED_MEMBERS: 'query-feed-members',
+  QUERY_FOLLOWS: 'query-follows',
+  READ_ACTIVITIES: 'read-activities',
+  READ_FEED: 'read-feed',
+  REMOVE_ACTIVITY: 'remove-activity',
+  REMOVE_ACTIVITY_REACTION: 'remove-activity-reaction',
+  REMOVE_COMMENT_REACTION: 'remove-comment-reaction',
+  UNFOLLOW: 'unfollow',
+  UPDATE_ACTIVITY: 'update-activity',
+  UPDATE_COMMENT: 'update-comment',
+  UPDATE_FEED: 'update-feed',
+  UPDATE_FEED_FOLLOWERS: 'update-feed-followers',
+  UPDATE_FEED_MEMBERS: 'update-feed-members',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type FeedOwnCapability =
+  (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
+
 export interface FeedRequest {
   feed_group_id: string;
 
@@ -1275,6 +1312,8 @@ export interface GetOrCreateFeedResponse {
 
   members: FeedMemberResponse[];
 
+  own_capabilities: FeedOwnCapability[];
+
   pinned_activities: ActivityPinResponse[];
 
   feed: FeedResponse;
@@ -1282,8 +1321,6 @@ export interface GetOrCreateFeedResponse {
   next?: string;
 
   prev?: string;
-
-  capabilities?: string[];
 
   own_follows?: FollowResponse[];
 
@@ -1405,9 +1442,25 @@ export interface PollClosedEvent {
 
   type: string;
 
+  activity_id?: string;
+
   cid?: string;
 
   message_id?: string;
+
+  received_at?: Date;
+}
+
+export interface PollClosedFeedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  type: string;
 
   received_at?: Date;
 }
@@ -1421,9 +1474,25 @@ export interface PollDeletedEvent {
 
   type: string;
 
+  activity_id?: string;
+
   cid?: string;
 
   message_id?: string;
+
+  received_at?: Date;
+}
+
+export interface PollDeletedFeedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  type: string;
 
   received_at?: Date;
 }
@@ -1515,9 +1584,73 @@ export interface PollUpdatedEvent {
 
   type: string;
 
+  activity_id?: string;
+
   cid?: string;
 
   message_id?: string;
+
+  received_at?: Date;
+}
+
+export interface PollUpdatedFeedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface PollVoteCastedFeedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  poll_vote: PollVoteResponseData;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface PollVoteChangedFeedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  poll_vote: PollVoteResponseData;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface PollVoteRemovedFeedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  poll: PollResponseData;
+
+  poll_vote: PollVoteResponseData;
+
+  type: string;
 
   received_at?: Date;
 }
@@ -2159,6 +2292,12 @@ export type WSClientEvent =
   | ({ type: 'feed_member.added' } & FeedMemberAddedEvent)
   | ({ type: 'feed_member.removed' } & FeedMemberRemovedEvent)
   | ({ type: 'feed_member.updated' } & FeedMemberUpdatedEvent)
+  | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
+  | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
+  | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
+  | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
+  | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
+  | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
   | ({ type: 'follow.created' } & FollowCreatedEvent)
   | ({ type: 'follow.deleted' } & FollowDeletedEvent)
   | ({ type: 'follow.updated' } & FollowUpdatedEvent)
@@ -2189,6 +2328,12 @@ export type WSEvent =
   | ({ type: 'feed_member.added' } & FeedMemberAddedEvent)
   | ({ type: 'feed_member.removed' } & FeedMemberRemovedEvent)
   | ({ type: 'feed_member.updated' } & FeedMemberUpdatedEvent)
+  | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
+  | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
+  | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
+  | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
+  | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
+  | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
   | ({ type: 'follow.created' } & FollowCreatedEvent)
   | ({ type: 'follow.deleted' } & FollowDeletedEvent)
   | ({ type: 'follow.updated' } & FollowUpdatedEvent)

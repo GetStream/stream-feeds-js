@@ -120,7 +120,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<AddActivityResponse>
-    >('POST', '/feeds/v3/activities', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/activities', undefined, undefined, body);
 
     decoders.AddActivityResponse?.(response.body);
 
@@ -136,7 +136,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<UpsertActivitiesResponse>
-    >('POST', '/feeds/v3/activities/batch', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/activities/batch', undefined, undefined, body);
 
     decoders.UpsertActivitiesResponse?.(response.body);
 
@@ -153,7 +153,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<DeleteActivitiesResponse>
-    >('POST', '/feeds/v3/activities/delete', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/activities/delete', undefined, undefined, body);
 
     decoders.DeleteActivitiesResponse?.(response.body);
 
@@ -175,7 +175,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryActivitiesResponse>
-    >('POST', '/feeds/v3/activities/query', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/activities/query', undefined, undefined, body);
 
     decoders.QueryActivitiesResponse?.(response.body);
 
@@ -195,7 +195,12 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<DeleteActivityResponse>
-    >('DELETE', '/feeds/v3/activities/{activity_id}', pathParams, queryParams);
+    >(
+      'DELETE',
+      '/api/v3/feeds/activities/{activity_id}',
+      pathParams,
+      queryParams,
+    );
 
     decoders.DeleteActivityResponse?.(response.body);
 
@@ -211,7 +216,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<GetActivityResponse>
-    >('GET', '/feeds/v3/activities/{activity_id}', pathParams, undefined);
+    >('GET', '/api/v3/feeds/activities/{activity_id}', pathParams, undefined);
 
     decoders.GetActivityResponse?.(response.body);
 
@@ -233,7 +238,7 @@ export class FeedsApi {
       StreamResponse<UpdateActivityPartialResponse>
     >(
       'PATCH',
-      '/feeds/v3/activities/{activity_id}',
+      '/api/v3/feeds/activities/{activity_id}',
       pathParams,
       undefined,
       body,
@@ -264,7 +269,13 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<UpdateActivityResponse>
-    >('PUT', '/feeds/v3/activities/{activity_id}', pathParams, undefined, body);
+    >(
+      'PUT',
+      '/api/v3/feeds/activities/{activity_id}',
+      pathParams,
+      undefined,
+      body,
+    );
 
     decoders.UpdateActivityResponse?.(response.body);
 
@@ -282,7 +293,7 @@ export class FeedsApi {
       StreamResponse<DeleteBookmarkResponse>
     >(
       'DELETE',
-      '/feeds/v3/activities/{activity_id}/bookmarks',
+      '/api/v3/feeds/activities/{activity_id}/bookmarks',
       pathParams,
       undefined,
     );
@@ -308,7 +319,7 @@ export class FeedsApi {
       StreamResponse<UpdateBookmarkResponse>
     >(
       'PATCH',
-      '/feeds/v3/activities/{activity_id}/bookmarks',
+      '/api/v3/feeds/activities/{activity_id}/bookmarks',
       pathParams,
       undefined,
       body,
@@ -335,7 +346,7 @@ export class FeedsApi {
       StreamResponse<AddBookmarkResponse>
     >(
       'POST',
-      '/feeds/v3/activities/{activity_id}/bookmarks',
+      '/api/v3/feeds/activities/{activity_id}/bookmarks',
       pathParams,
       undefined,
       body,
@@ -361,7 +372,7 @@ export class FeedsApi {
       StreamResponse<PollVoteResponse>
     >(
       'POST',
-      '/feeds/v3/activities/{activity_id}/polls/{poll_id}/vote',
+      '/api/v3/feeds/activities/{activity_id}/polls/{poll_id}/vote',
       pathParams,
       undefined,
       body,
@@ -391,7 +402,7 @@ export class FeedsApi {
       StreamResponse<PollVoteResponse>
     >(
       'DELETE',
-      '/feeds/v3/activities/{activity_id}/polls/{poll_id}/vote/{vote_id}',
+      '/api/v3/feeds/activities/{activity_id}/polls/{poll_id}/vote/{vote_id}',
       pathParams,
       queryParams,
     );
@@ -416,7 +427,7 @@ export class FeedsApi {
       StreamResponse<AddReactionResponse>
     >(
       'POST',
-      '/feeds/v3/activities/{activity_id}/reactions',
+      '/api/v3/feeds/activities/{activity_id}/reactions',
       pathParams,
       undefined,
       body,
@@ -445,7 +456,7 @@ export class FeedsApi {
       StreamResponse<QueryActivityReactionsResponse>
     >(
       'POST',
-      '/feeds/v3/activities/{activity_id}/reactions/query',
+      '/api/v3/feeds/activities/{activity_id}/reactions/query',
       pathParams,
       undefined,
       body,
@@ -469,7 +480,7 @@ export class FeedsApi {
       StreamResponse<DeleteActivityReactionResponse>
     >(
       'DELETE',
-      '/feeds/v3/activities/{activity_id}/reactions/{type}',
+      '/api/v3/feeds/activities/{activity_id}/reactions/{type}',
       pathParams,
       undefined,
     );
@@ -502,7 +513,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<GetCommentsResponse>
-    >('GET', '/feeds/v3/comments', undefined, queryParams);
+    >('GET', '/api/v3/feeds/comments', undefined, queryParams);
 
     decoders.GetCommentsResponse?.(response.body);
 
@@ -524,7 +535,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<AddCommentResponse>
-    >('POST', '/feeds/v3/comments', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/comments', undefined, undefined, body);
 
     decoders.AddCommentResponse?.(response.body);
 
@@ -540,7 +551,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<AddCommentsBatchResponse>
-    >('POST', '/feeds/v3/comments/batch', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/comments/batch', undefined, undefined, body);
 
     decoders.AddCommentsBatchResponse?.(response.body);
 
@@ -560,7 +571,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryCommentsResponse>
-    >('POST', '/feeds/v3/comments/query', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/comments/query', undefined, undefined, body);
 
     decoders.QueryCommentsResponse?.(response.body);
 
@@ -576,7 +587,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<DeleteCommentResponse>
-    >('DELETE', '/feeds/v3/comments/{comment_id}', pathParams, undefined);
+    >('DELETE', '/api/v3/feeds/comments/{comment_id}', pathParams, undefined);
 
     decoders.DeleteCommentResponse?.(response.body);
 
@@ -592,7 +603,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<GetCommentResponse>
-    >('GET', '/feeds/v3/comments/{comment_id}', pathParams, undefined);
+    >('GET', '/api/v3/feeds/comments/{comment_id}', pathParams, undefined);
 
     decoders.GetCommentResponse?.(response.body);
 
@@ -612,7 +623,13 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<UpdateCommentResponse>
-    >('PATCH', '/feeds/v3/comments/{comment_id}', pathParams, undefined, body);
+    >(
+      'PATCH',
+      '/api/v3/feeds/comments/{comment_id}',
+      pathParams,
+      undefined,
+      body,
+    );
 
     decoders.UpdateCommentResponse?.(response.body);
 
@@ -634,7 +651,7 @@ export class FeedsApi {
       StreamResponse<AddCommentReactionResponse>
     >(
       'POST',
-      '/feeds/v3/comments/{comment_id}/reactions',
+      '/api/v3/feeds/comments/{comment_id}/reactions',
       pathParams,
       undefined,
       body,
@@ -663,7 +680,7 @@ export class FeedsApi {
       StreamResponse<QueryCommentReactionsResponse>
     >(
       'POST',
-      '/feeds/v3/comments/{comment_id}/reactions/query',
+      '/api/v3/feeds/comments/{comment_id}/reactions/query',
       pathParams,
       undefined,
       body,
@@ -687,7 +704,7 @@ export class FeedsApi {
       StreamResponse<DeleteCommentReactionResponse>
     >(
       'DELETE',
-      '/feeds/v3/comments/{comment_id}/reactions/{type}',
+      '/api/v3/feeds/comments/{comment_id}/reactions/{type}',
       pathParams,
       undefined,
     );
@@ -722,7 +739,7 @@ export class FeedsApi {
       StreamResponse<GetCommentRepliesResponse>
     >(
       'GET',
-      '/feeds/v3/comments/{comment_id}/replies',
+      '/api/v3/feeds/comments/{comment_id}/replies',
       pathParams,
       queryParams,
     );
@@ -749,7 +766,7 @@ export class FeedsApi {
       StreamResponse<DeleteFeedResponse>
     >(
       'DELETE',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}',
       pathParams,
       queryParams,
     );
@@ -793,7 +810,7 @@ export class FeedsApi {
       StreamResponse<GetOrCreateFeedResponse>
     >(
       'POST',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}',
       pathParams,
       queryParams,
       body,
@@ -820,7 +837,7 @@ export class FeedsApi {
       StreamResponse<UpdateFeedResponse>
     >(
       'PUT',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}',
       pathParams,
       undefined,
       body,
@@ -847,7 +864,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
       'POST',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/activities/mark/batch',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/activities/mark/batch',
       pathParams,
       undefined,
       body,
@@ -873,7 +890,7 @@ export class FeedsApi {
       StreamResponse<UnpinActivityResponse>
     >(
       'DELETE',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/activities/{activity_id}/pin',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/activities/{activity_id}/pin',
       pathParams,
       undefined,
     );
@@ -901,7 +918,7 @@ export class FeedsApi {
       StreamResponse<PinActivityResponse>
     >(
       'POST',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/activities/{activity_id}/pin',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/activities/{activity_id}/pin',
       pathParams,
       undefined,
       body,
@@ -934,7 +951,7 @@ export class FeedsApi {
       StreamResponse<UpdateFeedMembersResponse>
     >(
       'PATCH',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/members',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/members',
       pathParams,
       undefined,
       body,
@@ -961,7 +978,7 @@ export class FeedsApi {
       StreamResponse<AcceptFeedMemberInviteResponse>
     >(
       'POST',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/members/accept',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/members/accept',
       pathParams,
       undefined,
       body,
@@ -994,7 +1011,7 @@ export class FeedsApi {
       StreamResponse<QueryFeedMembersResponse>
     >(
       'POST',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/members/query',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/members/query',
       pathParams,
       undefined,
       body,
@@ -1021,7 +1038,7 @@ export class FeedsApi {
       StreamResponse<RejectFeedMemberInviteResponse>
     >(
       'POST',
-      '/feeds/v3/feed_groups/{feed_group_id}/feeds/{feed_id}/members/reject',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/members/reject',
       pathParams,
       undefined,
       body,
@@ -1047,7 +1064,7 @@ export class FeedsApi {
       StreamResponse<GetFollowSuggestionsResponse>
     >(
       'GET',
-      '/feeds/v3/feed_groups/{feed_group_id}/follow_suggestions',
+      '/api/v3/feeds/feed_groups/{feed_group_id}/follow_suggestions',
       pathParams,
       queryParams,
     );
@@ -1066,7 +1083,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<CreateFeedsBatchResponse>
-    >('POST', '/feeds/v3/feeds/batch', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/feeds/batch', undefined, undefined, body);
 
     decoders.CreateFeedsBatchResponse?.(response.body);
 
@@ -1088,7 +1105,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryFeedsResponse>
-    >('POST', '/feeds/v3/feeds/query', undefined, queryParams, body);
+    >('POST', '/api/v3/feeds/feeds/query', undefined, queryParams, body);
 
     decoders.QueryFeedsResponse?.(response.body);
 
@@ -1107,7 +1124,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<UpdateFollowResponse>
-    >('PATCH', '/feeds/v3/follows', undefined, undefined, body);
+    >('PATCH', '/api/v3/feeds/follows', undefined, undefined, body);
 
     decoders.UpdateFollowResponse?.(response.body);
 
@@ -1126,7 +1143,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<SingleFollowResponse>
-    >('POST', '/feeds/v3/follows', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/follows', undefined, undefined, body);
 
     decoders.SingleFollowResponse?.(response.body);
 
@@ -1144,7 +1161,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<AcceptFollowResponse>
-    >('POST', '/feeds/v3/follows/accept', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/follows/accept', undefined, undefined, body);
 
     decoders.AcceptFollowResponse?.(response.body);
 
@@ -1160,7 +1177,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<FollowBatchResponse>
-    >('POST', '/feeds/v3/follows/batch', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/follows/batch', undefined, undefined, body);
 
     decoders.FollowBatchResponse?.(response.body);
 
@@ -1180,7 +1197,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryFollowsResponse>
-    >('POST', '/feeds/v3/follows/query', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/follows/query', undefined, undefined, body);
 
     decoders.QueryFollowsResponse?.(response.body);
 
@@ -1197,7 +1214,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<RejectFollowResponse>
-    >('POST', '/feeds/v3/follows/reject', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/follows/reject', undefined, undefined, body);
 
     decoders.RejectFollowResponse?.(response.body);
 
@@ -1215,7 +1232,12 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<UnfollowResponse>
-    >('DELETE', '/feeds/v3/follows/{source}/{target}', pathParams, undefined);
+    >(
+      'DELETE',
+      '/api/v3/feeds/follows/{source}/{target}',
+      pathParams,
+      undefined,
+    );
 
     decoders.UnfollowResponse?.(response.body);
 
@@ -1241,7 +1263,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<PollResponse>
-    >('POST', '/feeds/v3/polls', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/polls', undefined, undefined, body);
 
     decoders.PollResponse?.(response.body);
 
@@ -1267,7 +1289,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<PollResponse>
-    >('PUT', '/feeds/v3/polls', undefined, undefined, body);
+    >('PUT', '/api/v3/feeds/polls', undefined, undefined, body);
 
     decoders.PollResponse?.(response.body);
 
@@ -1290,7 +1312,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryPollsResponse>
-    >('POST', '/feeds/v3/polls/query', undefined, queryParams, body);
+    >('POST', '/api/v3/feeds/polls/query', undefined, queryParams, body);
 
     decoders.QueryPollsResponse?.(response.body);
 
@@ -1310,7 +1332,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
       'DELETE',
-      '/feeds/v3/polls/{poll_id}',
+      '/api/v3/feeds/polls/{poll_id}',
       pathParams,
       queryParams,
     );
@@ -1333,7 +1355,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<PollResponse>
-    >('GET', '/feeds/v3/polls/{poll_id}', pathParams, queryParams);
+    >('GET', '/api/v3/feeds/polls/{poll_id}', pathParams, queryParams);
 
     decoders.PollResponse?.(response.body);
 
@@ -1353,7 +1375,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<PollResponse>
-    >('PATCH', '/feeds/v3/polls/{poll_id}', pathParams, undefined, body);
+    >('PATCH', '/api/v3/feeds/polls/{poll_id}', pathParams, undefined, body);
 
     decoders.PollResponse?.(response.body);
 
@@ -1374,7 +1396,13 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<PollOptionResponse>
-    >('POST', '/feeds/v3/polls/{poll_id}/options', pathParams, undefined, body);
+    >(
+      'POST',
+      '/api/v3/feeds/polls/{poll_id}/options',
+      pathParams,
+      undefined,
+      body,
+    );
 
     decoders.PollOptionResponse?.(response.body);
 
@@ -1395,7 +1423,13 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<PollOptionResponse>
-    >('PUT', '/feeds/v3/polls/{poll_id}/options', pathParams, undefined, body);
+    >(
+      'PUT',
+      '/api/v3/feeds/polls/{poll_id}/options',
+      pathParams,
+      undefined,
+      body,
+    );
 
     decoders.PollOptionResponse?.(response.body);
 
@@ -1417,7 +1451,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
       'DELETE',
-      '/feeds/v3/polls/{poll_id}/options/{option_id}',
+      '/api/v3/feeds/polls/{poll_id}/options/{option_id}',
       pathParams,
       queryParams,
     );
@@ -1444,7 +1478,7 @@ export class FeedsApi {
       StreamResponse<PollOptionResponse>
     >(
       'GET',
-      '/feeds/v3/polls/{poll_id}/options/{option_id}',
+      '/api/v3/feeds/polls/{poll_id}/options/{option_id}',
       pathParams,
       queryParams,
     );
@@ -1473,7 +1507,13 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<PollVotesResponse>
-    >('POST', '/feeds/v3/polls/{poll_id}/votes', pathParams, queryParams, body);
+    >(
+      'POST',
+      '/api/v3/feeds/polls/{poll_id}/votes',
+      pathParams,
+      queryParams,
+      body,
+    );
 
     decoders.PollVotesResponse?.(response.body);
 

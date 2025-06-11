@@ -29,8 +29,14 @@ import {
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   PollClosedEvent,
+  PollClosedFeedEvent,
   PollDeletedEvent,
+  PollDeletedFeedEvent,
   PollUpdatedEvent,
+  PollUpdatedFeedEvent,
+  PollVoteCastedFeedEvent,
+  PollVoteChangedFeedEvent,
+  PollVoteRemovedFeedEvent,
   WSEvent,
 } from './gen/models';
 import { StateStore } from './common/StateStore';
@@ -227,6 +233,48 @@ export class Feed extends FeedApi {
     'poll.updated': function (
       _: { type: 'poll.updated' } & PollUpdatedEvent & { type: 'poll.updated' },
     ): void {},
+    'feeds.poll.closed': function (
+      _: { type: 'feeds.poll.closed' } & PollClosedFeedEvent & {
+          type: 'feeds.poll.closed';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.poll.deleted': function (
+      _: { type: 'feeds.poll.deleted' } & PollDeletedFeedEvent & {
+          type: 'feeds.poll.deleted';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.poll.updated': function (
+      _: { type: 'feeds.poll.updated' } & PollUpdatedFeedEvent & {
+          type: 'feeds.poll.updated';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.poll.vote_casted': function (
+      _: { type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent & {
+          type: 'feeds.poll.vote_casted';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.poll.vote_changed': function (
+      _: { type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent & {
+          type: 'feeds.poll.vote_changed';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'feeds.poll.vote_removed': function (
+      _: { type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent & {
+          type: 'feeds.poll.vote_removed';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =

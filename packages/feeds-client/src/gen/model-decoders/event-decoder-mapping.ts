@@ -70,6 +70,24 @@ const eventDecoderMapping: {
   'feed_member.updated': (data: Record<string, any>) =>
     decoders.FeedMemberUpdatedEvent(data),
 
+  'feeds.poll.closed': (data: Record<string, any>) =>
+    decoders.PollClosedFeedEvent(data),
+
+  'feeds.poll.deleted': (data: Record<string, any>) =>
+    decoders.PollDeletedFeedEvent(data),
+
+  'feeds.poll.updated': (data: Record<string, any>) =>
+    decoders.PollUpdatedFeedEvent(data),
+
+  'feeds.poll.vote_casted': (data: Record<string, any>) =>
+    decoders.PollVoteCastedFeedEvent(data),
+
+  'feeds.poll.vote_changed': (data: Record<string, any>) =>
+    decoders.PollVoteChangedFeedEvent(data),
+
+  'feeds.poll.vote_removed': (data: Record<string, any>) =>
+    decoders.PollVoteRemovedFeedEvent(data),
+
   'follow.created': (data: Record<string, any>) =>
     decoders.FollowCreatedEvent(data),
 
