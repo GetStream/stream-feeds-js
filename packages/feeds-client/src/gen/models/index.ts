@@ -239,6 +239,8 @@ export interface ActivityResponse {
 
   mentioned_users: UserResponse[];
 
+  own_bookmarks: BookmarkResponse[];
+
   own_reactions: FeedsReactionResponse[];
 
   custom: Record<string, any>;
@@ -264,8 +266,6 @@ export interface ActivityResponse {
   location?: ActivityLocation;
 
   moderation?: ModerationV2Response;
-
-  own_bookmark?: BookmarkResponse;
 
   parent?: BaseActivityResponse;
 
@@ -543,6 +543,8 @@ export interface BaseActivityResponse {
 
   mentioned_users: UserResponse[];
 
+  own_bookmarks: BookmarkResponse[];
+
   own_reactions: FeedsReactionResponse[];
 
   custom: Record<string, any>;
@@ -568,8 +570,6 @@ export interface BaseActivityResponse {
   location?: ActivityLocation;
 
   moderation?: ModerationV2Response;
-
-  own_bookmark?: BookmarkResponse;
 
   poll?: PollResponseData;
 }
@@ -2141,6 +2141,8 @@ export interface UpdateActivityResponse {
 
 export interface UpdateBookmarkRequest {
   folder_id?: string;
+
+  new_folder_id?: string;
 
   custom?: Record<string, any>;
 

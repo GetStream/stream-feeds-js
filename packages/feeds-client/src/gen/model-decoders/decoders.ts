@@ -143,6 +143,8 @@ decoders.ActivityResponse = (input?: Record<string, any>) => {
 
     mentioned_users: { type: 'UserResponse', isSingle: false },
 
+    own_bookmarks: { type: 'BookmarkResponse', isSingle: false },
+
     own_reactions: { type: 'FeedsReactionResponse', isSingle: false },
 
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
@@ -156,8 +158,6 @@ decoders.ActivityResponse = (input?: Record<string, any>) => {
     expires_at: { type: 'DatetimeType', isSingle: true },
 
     current_feed: { type: 'FeedResponse', isSingle: true },
-
-    own_bookmark: { type: 'BookmarkResponse', isSingle: true },
 
     parent: { type: 'BaseActivityResponse', isSingle: true },
 
@@ -257,6 +257,8 @@ decoders.BaseActivityResponse = (input?: Record<string, any>) => {
 
     mentioned_users: { type: 'UserResponse', isSingle: false },
 
+    own_bookmarks: { type: 'BookmarkResponse', isSingle: false },
+
     own_reactions: { type: 'FeedsReactionResponse', isSingle: false },
 
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
@@ -270,8 +272,6 @@ decoders.BaseActivityResponse = (input?: Record<string, any>) => {
     expires_at: { type: 'DatetimeType', isSingle: true },
 
     current_feed: { type: 'FeedResponse', isSingle: true },
-
-    own_bookmark: { type: 'BookmarkResponse', isSingle: true },
 
     poll: { type: 'PollResponseData', isSingle: true },
   };

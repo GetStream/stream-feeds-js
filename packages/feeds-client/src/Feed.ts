@@ -287,6 +287,36 @@ export class Feed extends FeedApi {
           type: 'activity.unpinned';
         },
     ): void {},
+    'feeds.poll.closed': function (
+      _: { type: 'feeds.poll.closed' } & PollClosedFeedEvent & {
+          type: 'feeds.poll.closed';
+        },
+    ): void {},
+    'feeds.poll.deleted': function (
+      _: { type: 'feeds.poll.deleted' } & PollDeletedFeedEvent & {
+          type: 'feeds.poll.deleted';
+        },
+    ): void {},
+    'feeds.poll.updated': function (
+      _: { type: 'feeds.poll.updated' } & PollUpdatedFeedEvent & {
+          type: 'feeds.poll.updated';
+        },
+    ): void {},
+    'feeds.poll.vote_casted': function (
+      _: { type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent & {
+          type: 'feeds.poll.vote_casted';
+        },
+    ): void {},
+    'feeds.poll.vote_changed': function (
+      _: { type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent & {
+          type: 'feeds.poll.vote_changed';
+        },
+    ): void {},
+    'feeds.poll.vote_removed': function (
+      _: { type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent & {
+          type: 'feeds.poll.vote_removed';
+        },
+    ): void {},
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =

@@ -286,7 +286,11 @@ export class FeedsApi {
 
   async deleteBookmark(request: {
     activity_id: string;
+    folder_id?: string;
   }): Promise<StreamResponse<DeleteBookmarkResponse>> {
+    const queryParams = {
+      folder_id: request?.folder_id,
+    };
     const pathParams = {
       activity_id: request?.activity_id,
     };
@@ -297,7 +301,7 @@ export class FeedsApi {
       'DELETE',
       '/api/v3/feeds/activities/{activity_id}/bookmarks',
       pathParams,
-      undefined,
+      queryParams,
     );
 
     decoders.DeleteBookmarkResponse?.(response.body);
@@ -313,6 +317,7 @@ export class FeedsApi {
     };
     const body = {
       folder_id: request?.folder_id,
+      new_folder_id: request?.new_folder_id,
       custom: request?.custom,
       new_folder: request?.new_folder,
     };
@@ -505,7 +510,13 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryBookmarkFoldersResponse>
-    >('POST', '/feeds/v3/bookmark_folders/query', undefined, undefined, body);
+    >(
+      'POST',
+      '/api/v3/feeds/bookmark_folders/query',
+      undefined,
+      undefined,
+      body,
+    );
 
     decoders.QueryBookmarkFoldersResponse?.(response.body);
 
@@ -525,7 +536,7 @@ export class FeedsApi {
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<QueryBookmarksResponse>
-    >('POST', '/feeds/v3/bookmarks/query', undefined, undefined, body);
+    >('POST', '/api/v3/feeds/bookmarks/query', undefined, undefined, body);
 
     decoders.QueryBookmarksResponse?.(response.body);
 
