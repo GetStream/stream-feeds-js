@@ -23,7 +23,7 @@ export const SearchResults = () => {
   return !isActive ? null : (
     <div
       aria-label={'aria/Search results'}
-      className="absolute mt-2 bg-white border border-gray-200 rounded-md shadow"
+      className="flex absolute overflow-y-auto w-full top-full mt-0.5 max-h-64 bg-white border border-gray-200 rounded-md shadow"
     >
       {/* <SearchResultsHeader /> */}
       {!searchQuery ? (

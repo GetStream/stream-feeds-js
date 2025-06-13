@@ -54,8 +54,8 @@ export const Search = ({
       }}
     >
       <div
-        className={clsx('text-black', {
-          'str-chat__search--active': isActive,
+        className={clsx('text-gray-900 relative flex flex-col', {
+          '': isActive,
         })}
         data-testid="search"
       >

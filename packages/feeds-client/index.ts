@@ -8,3 +8,4 @@ export * from './src/common/BaseSearchSource';
 export * from './src/common/SearchController';
 export * from './src/common/ActivitySearchSource';
 export * from './src/common/UserSearchSource';
+export * from './src/common/FeedSearchSource';

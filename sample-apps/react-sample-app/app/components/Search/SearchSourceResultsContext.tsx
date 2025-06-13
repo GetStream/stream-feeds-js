@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React, { createContext, useContext } from 'react';
-import type { SearchSource } from 'stream-chat';
+import type { SearchSource } from '@stream-io/feeds-client';
 
 export type SearchSourceResultsContextValue = {
   searchSource: SearchSource;

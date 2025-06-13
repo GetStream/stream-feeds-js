@@ -22,8 +22,9 @@ const SearchSourceFilterButton = ({
   return (
     <button
       aria-label={'aria/Search results header filter button'}
-      className={clsx('bg-white border px-1 border-blue-200 rounded-md', {
+      className={clsx(' border px-1 border-blue-200 rounded-md', {
         'bg-blue-400': isActive,
+        'bg-white': !isActive,
       })}
       key={label}
       onClick={() => {
@@ -31,8 +32,9 @@ const SearchSourceFilterButton = ({
           searchController.deactivateSource(source.type);
         } else {
           searchController.activateSource(source.type);
-          if (searchController.searchQuery && !source.items?.length)
-            source.search(searchController.searchQuery);
+          if (searchController.searchQuery && !source.items?.length) {
+            void source.search(searchController.searchQuery);
+          }
         }
       }}
     >
@@ -44,10 +46,7 @@ const SearchSourceFilterButton = ({
 export const SearchSourceFilters = () => {
   const { searchController } = useSearchContext();
   return (
-    <div
-      className="flex gap-1"
-      data-testid="filter-source-buttons"
-    >
+    <div className="flex gap-1" data-testid="filter-source-buttons">
       {searchController.sources.map((source) => (
         <SearchSourceFilterButton
           key={`search-source-filter-button-${source.type}`}

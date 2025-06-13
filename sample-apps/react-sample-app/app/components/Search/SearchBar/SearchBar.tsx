@@ -53,7 +53,7 @@ export const SearchBar = () => {
           }}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             if (event.target.value) {
-              searchController.search(event.target.value);
+              void searchController.search(event.target.value);
             } else if (!event.target.value) {
               searchController.clear();
             }

@@ -55,6 +55,7 @@ import {
   addReactionToActivities,
   removeReactionFromActivities,
 } from './state-updates/activity-reaction-utils';
+import { StreamResponse } from './gen-imports';
 
 export type FeedState = Partial<
   Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
@@ -333,6 +334,7 @@ export class Feed extends FeedApi {
     if (this.state.getLatestValue().is_loading_activities) {
       throw new Error('Only one getOrCreate call is allowed at a time');
     }
+    
     this.state.partialNext({
       is_loading: !request?.next,
       is_loading_activities: true,
@@ -357,17 +359,19 @@ export class Feed extends FeedApi {
           });
         }
       } else {
-        const responseCopy = {
+        const responseCopy: Partial<
+          StreamResponse<GetOrCreateFeedResponse>['feed'] &
+            StreamResponse<GetOrCreateFeedResponse>
+        > = {
           ...response,
+          ...response.feed,
         };
-        const feed = responseCopy.feed;
-        // @ts-expect-error feed is removed from the response, it's spread out in the state
+
         delete responseCopy.feed;
-        // @ts-expect-error
         delete responseCopy.metadata;
+
         const nextState: FeedState = {
           ...responseCopy,
-          ...feed,
           is_loading: false,
           is_loading_activities: false,
         };

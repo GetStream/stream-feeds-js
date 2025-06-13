@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import { NotificationBell } from './notifications/NotificationBell';
 import {
   ActivitySearchSource,
+  FeedSearchSource,
   SearchController,
   UserSearchSource,
 } from '@stream-io/feeds-client';
@@ -16,13 +17,17 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 
-  const sc = useMemo(() => {
+  const searchController = useMemo(() => {
     if (!client) {
       return undefined;
     }
 
     return new SearchController({
-      sources: [new ActivitySearchSource(client), new UserSearchSource(client)],
+      sources: [
+        new ActivitySearchSource(client),
+        new UserSearchSource(client),
+        new FeedSearchSource(client),
+      ],
       config: { keepSingleActiveSource: true },
     });
   }, [client]);
@@ -32,7 +37,7 @@ export function Header() {
       className="flex justify-between items-center gap-3 bg-blue-500 p-6 text-white"
       style={{ height: '5.625rem' }}
     >
-      {sc && <Search searchController={sc} />}
+      {searchController && <Search searchController={searchController} />}
 
       {user && (
         <div className="flex items-center gap-3">

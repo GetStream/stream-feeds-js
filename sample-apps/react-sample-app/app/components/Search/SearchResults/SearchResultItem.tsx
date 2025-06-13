@@ -26,13 +26,13 @@ export const UserSearchResultItem = ({ item }: UserSearchResultItemProps) => {
   return (
     <button
       aria-label={`Select User Channel: ${item.name ?? ''}`}
-      className="str-chat__search-result"
-      data-testid="search-result-user"
+      className="text-left flex gap-2 p-1 items-center rounded-md hover:bg-slate-100"
       role="option"
     >
-      <div className="str-chat__search-result--display-name">
-        {item.name ?? item.id}
+      <div className="w-5 h-5 items-center flex">
+        <img className="rounded-full" src={item.image}></img>
       </div>
+      <div className="">{item.name ?? item.id}</div>
     </button>
   );
 };
@@ -40,8 +40,8 @@ export const UserSearchResultItem = ({ item }: UserSearchResultItemProps) => {
 export const FeedSearchResultItem = ({ item }: FeedSearchResultItemProps) => {
   return (
     <button
-      className="str-chat__search-result"
-      data-testid="search-result-user"
+      className="text-left"
+      data-testid="search-result-feed"
       role="option"
     >
       <div className="str-chat__search-result--display-name">{item.fid}</div>
@@ -54,11 +54,12 @@ export const ActivitySearchResultItem = ({
 }: ActivitySearchResultItemProps) => {
   return (
     <button
-      className="str-chat__search-result"
-      data-testid="search-result-user"
+      className="text-left flex gap-2 p-1 items-center rounded-md hover:bg-slate-100"
+      data-testid="search-result-activity"
       role="option"
     >
-      <div className="str-chat__search-result--display-name">{item.text}</div>
+      <div className="">{item.text}</div>
+      <div></div>
     </button>
   );
 };

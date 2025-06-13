@@ -19,7 +19,7 @@ export const SearchSourceResultListFooter = () => {
 
   return (
     <div
-      className="str-chat__search-source-result-list__footer"
+      className="flex justify-center"
       data-testid="search-footer"
     >
       {isLoading ? (
@@ -28,7 +28,11 @@ export const SearchSourceResultListFooter = () => {
         <div className="str-chat__search-source-results---empty">
           {'All results loaded'}
         </div>
-      ) : null}
+      ) : (
+        <button onClick={() => searchSource.search()} className="text-sm px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none">
+        Load more
+        </button>
+      )}
     </div>
   );
 };

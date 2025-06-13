@@ -27,7 +27,7 @@ export const SearchSourceResults = ({
   return (
     <SearchSourceResultsContextProvider value={{ searchSource }}>
       <div
-        className="flex flex-col"
+        className="flex flex-col w-full"
         data-testid="search-source-results"
       >
         <SearchSourceResultsHeader />

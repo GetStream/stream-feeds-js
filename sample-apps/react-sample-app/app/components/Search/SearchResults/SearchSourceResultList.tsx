@@ -40,7 +40,7 @@ export const SearchSourceResultList = ({
 
   return (
     <div
-      className="flex flex-col"
+      className="flex flex-col p-2"
       data-testid="search-source-result-list"
     >
       {items?.map((item, i) => (
@@ -50,7 +50,6 @@ export const SearchSourceResultList = ({
         />
       ))}
       <SearchSourceResultListFooter />
-      <button onClick={searchSource.search}>load more</button>
     </div>
   );
 };
