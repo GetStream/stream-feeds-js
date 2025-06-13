@@ -1,76 +1,35 @@
-import { Feed } from '@stream-io/feeds-client';
+import { Feed, FeedState } from '@stream-io/feeds-client';
 import { useErrorContext } from '../error-context';
 import { useFeedContext } from '../feed-context';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useUserContext } from '../user-context';
+import { useStateStore } from '../hooks/useStateStore';
+
+const selector = ({ own_follows = [] }: FeedState) => {
+  const own_follow = own_follows.find(
+    (_) => _.source_feed.group_id === 'timeline',
+  );
+  return {
+    follow_status: own_follow?.status,
+  };
+};
 
 export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
   const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const { ownTimeline } = useFeedContext();
-  const [followStatus, setFollowStatus] = useState<
-    'rejected' | 'accepted' | 'pending'
-  >();
+  const { client } = useUserContext();
+
+  const { follow_status: followStatus } = useStateStore(feed.state, selector);
 
   const follow = async (feed: Feed) => {
-    useEffect(() => {
-      const unsubscribe = feed.state.subscribeWithSelector(
-        (s) => ({
-          followStatus: s.own_follows?.[0]?.status,
-        }),
-        (s) => {
-          setFollowStatus(
-            s.followStatus as 'rejected' | 'accepted' | 'pending',
-          );
-        },
-      );
+    if (!ownTimeline) return;
 
-      return unsubscribe;
-    }, [feed]);
-    // const visibilityLevel = feed.state.getLatestValue().visibility_level;
-    // try {
-    //   const followResponse = await ownTimeline?.follow({
-    //     target_group: feed.group,
-    //     target_id: feed.id,
-    //   });
-    //   fetch('/api/send-notification', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //       targetUserId: feed.id,
-    //       verb: visibilityLevel === 'visible' ? 'follow' : `follow-request`,
-    //       objectId: feed.fid,
-    //     }),
-    //   }).catch((err) => logError(err));
-    //   // Reinit state to include activities from newly followed user
-    //   await ownTimeline
-    //     ?.read({ limit: 30, offset: 0 })
-    //     .catch((err) => logError(err));
-    //   onStatusChange(
-    //     followResponse?.follow_request_status === 'pending'
-    //       ? 'follow-request-sent'
-    //       : 'following',
-    //   );
-    // } catch (error) {
-    //   logErrorAndDisplayNotification(error as Error, (error as Error).message);
-    // }
+    await client?.follow({ source: ownTimeline.fid, target: feed.fid });
   };
 
   const unfollow = async (feed: Feed) => {
-    // try {
-    //   await ownTimeline?.unfollow({
-    //     target_group: feed.group,
-    //     target_id: feed.id,
-    //   });
-    //   // Reinit state to exclude activities from newly unfollowed user
-    //   await ownTimeline
-    //     ?.read({ limit: 30, offset: 0 })
-    //     .catch((err) => logError(err));
-    //   onStatusChange('not-followed');
-    // } catch (error) {
-    //   logErrorAndDisplayNotification(error as Error, (error as Error).message);
-    // }
+    if (!ownTimeline) return;
+
+    await client?.unfollow({ source: ownTimeline.fid, target: feed.fid });
   };
 
   const cancelFollowRequest = async (feed: Feed) => {

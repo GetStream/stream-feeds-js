@@ -2608,7 +2608,7 @@ __metadata:
 
 "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#feeds-api":
   version: 0.4.24
-  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=efaf71d01da5a3f546d3b06d46bf5804d9202fe1"
+  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=629310b422d111d7aa1f0dffe107492952bf0be5"
   dependencies:
     "@types/jsonwebtoken": ^9.0.3
     "@types/node": ^18.3.0
@@ -2619,7 +2619,7 @@ __metadata:
   peerDependenciesMeta:
     "@stream-io/openai-realtime-api":
       optional: true
-  checksum: 639d19d15be99c13dbcba8acf5dc12fbe079a2691609b28c55b40472c19b42756d9c8c6d7cd9166f112286e34143d1823d503725e57b418f2ded894f57ca91da
+  checksum: b1af12ff4e12cebf45799658d530561bc71c14dee16f2c331bbf930f3c70e11c4b20da5a7c3bcfb9b7e4bd870fb79ddb80ea1e609fb3a380774a0cd2daa96a7b
   languageName: node
   linkType: hard
 

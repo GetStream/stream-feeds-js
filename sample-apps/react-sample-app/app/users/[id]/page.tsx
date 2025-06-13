@@ -1,13 +1,12 @@
 'use client';
 import { FeedMetadata } from '@/app/components/FeedMetadata';
 import { useFeedContext } from '../../feed-context';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useUserContext } from '@/app/user-context';
 import { useErrorContext } from '@/app/error-context';
 import { LoadingIndicator } from '@/app/components/LoadingIndicator';
 import { useParams } from 'next/navigation';
 import { NewActivity } from '@/app/components/NewActivity';
-import { Feed as StreamFeed } from '@stream-io/feeds-client';
 import { Feed } from '@/app/components/Feed';
 
 export default function ProfilePage() {
@@ -15,50 +14,29 @@ export default function ProfilePage() {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const { user, client } = useUserContext();
   const { ownFeed, ownTimeline } = useFeedContext();
-  const [feed, setFeed] = useState<StreamFeed>();
-  const [timeline, setTimeline] = useState<StreamFeed>();
 
-  useEffect(() => {
-    if (!user || !client) {
-      setFeed(undefined);
-      setTimeline(undefined);
-    } else {
-      if (user.id === params.id) {
-        setFeed(ownFeed);
-        setTimeline(ownTimeline);
-      } else {
-        // TODO: Migrate to new API
-        // client
-        //   .queryFeeds({
-        //     filter: {
-        //       feed_id: params.id,
-        //       feed_group: { $in: ['user', 'timeline'] },
-        //     },
-        //   })
-        //   .then((response) => {
-        //     response.feeds.forEach((feed) => {
-        //       if (
-        //         feed.type === 'flat' &&
-        //         feed.state.getLatestValue().group === 'user'
-        //       ) {
-        //         setFeed(feed);
-        //       } else if (
-        //         feed.type === 'flat' &&
-        //         feed.state.getLatestValue().group === 'timeline'
-        //       ) {
-        //         setTimeline(feed);
-        //       }
-        //     });
-        //   })
-        // .catch((error) => {
-        //   logErrorAndDisplayNotification(error, (error as Error).message);
-        // });
-      }
+  const feed = useMemo(() => {
+    if (!client || !user) return undefined;
+
+    if (user?.id === params.id) {
+      return ownFeed;
     }
-  }, [params.id, user, ownFeed, ownTimeline, client]);
+
+    return client?.feed('user', params.id);
+  }, [ownFeed, params.id, user?.id, client]);
+
+  const timeline = useMemo(() => {
+    if (!client || !user) return undefined;
+
+    if (user?.id === params.id) {
+      return ownTimeline;
+    }
+
+    return client?.feed('timeline', params.id);
+  }, [ownFeed, params.id, user?.id, client]);
 
   if (!feed || !timeline) {
-    return <LoadingIndicator color="blue"></LoadingIndicator>;
+    return <LoadingIndicator color="blue" />;
   }
 
   return (

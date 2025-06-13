@@ -38,7 +38,7 @@ export function PaginatedList<T>({
   return (
     <div className="w-full flex flex-col items-center">
       {isLoading && items.length === 0 && (
-        <LoadingIndicator color="blue"></LoadingIndicator>
+        <LoadingIndicator color="blue" />
       )}
       {items.length === 0 && !isLoading && !error && (
         <div className="text-center">{`No ${itemsName}`}</div>
@@ -52,7 +52,7 @@ export function PaginatedList<T>({
             onClick={() => onLoadMore()}
             disabled={isLoading}
           >
-            {isLoading ? <LoadingIndicator></LoadingIndicator> : 'Retry'}
+            {isLoading ? <LoadingIndicator /> : 'Retry'}
           </button>
         </>
       )}
@@ -68,7 +68,7 @@ export function PaginatedList<T>({
           onClick={() => onLoadMore()}
           disabled={isLoading}
         >
-          {isLoading ? <LoadingIndicator></LoadingIndicator> : 'Load more'}
+          {isLoading ? <LoadingIndicator /> : 'Load more'}
         </button>
       )}
     </div>
