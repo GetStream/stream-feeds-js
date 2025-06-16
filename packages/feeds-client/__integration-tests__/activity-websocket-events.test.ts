@@ -38,7 +38,7 @@ describe('Activity state updates via WebSocket events', () => {
 
     // Create a spy for the activity.added event
     const addSpy = vi.fn();
-    feed.on('activity.added', addSpy);
+    feed.on('feeds.activity.added', addSpy);
 
     // Create an activity
     const activityData = {
@@ -50,11 +50,11 @@ describe('Activity state updates via WebSocket events', () => {
     const activity = response.activity;
 
     // Wait for the activity.added event
-    await waitForEvent(feed, 'activity.added', 1000);
+    await waitForEvent(feed, 'feeds.activity.added', 1000);
 
     // Verify the event was received
     const addEvent = addSpy.mock.lastCall?.[0] as ActivityAddedEvent;
-    expect(addEvent?.type).toBe('activity.added');
+    expect(addEvent?.type).toBe('feeds.activity.added');
     expect(addEvent?.activity.id).toBe(activity.id);
     expect(addEvent?.fid).toBe(feed.fid);
 
@@ -69,7 +69,7 @@ describe('Activity state updates via WebSocket events', () => {
   it('should update activity in feed in response to activity.updated event', async () => {
     // Create a spy for the activity.updated event
     const updateSpy = vi.fn();
-    feed.on('activity.updated', updateSpy);
+    feed.on('feeds.activity.updated', updateSpy);
 
     // Get the existing activity from the state
     const feedActivities = feed.state.getLatestValue().activities;
@@ -85,11 +85,11 @@ describe('Activity state updates via WebSocket events', () => {
     });
 
     // Wait for the activity.updated event
-    await waitForEvent(feed, 'activity.updated', 1000);
+    await waitForEvent(feed, 'feeds.activity.updated', 1000);
 
     // Verify the event was received
     const updateEvent = updateSpy.mock.lastCall?.[0] as ActivityUpdatedEvent;
-    expect(updateEvent?.type).toBe('activity.updated');
+    expect(updateEvent?.type).toBe('feeds.activity.updated');
     expect(updateEvent?.activity.id).toBe(activityId);
     expect(updateEvent?.activity.text).toBe(updatedText);
 
@@ -104,7 +104,7 @@ describe('Activity state updates via WebSocket events', () => {
   it('should remove activity from feed in response to activity.deleted event', async () => {
     // Create a spy for the activity.deleted event
     const deleteSpy = vi.fn();
-    feed.on('activity.deleted', deleteSpy);
+    feed.on('feeds.activity.deleted', deleteSpy);
 
     // Get the existing activity from the state
     const feedActivities = feed.state.getLatestValue().activities;
@@ -118,11 +118,11 @@ describe('Activity state updates via WebSocket events', () => {
     });
 
     // Wait for the activity.deleted event
-    await waitForEvent(feed, 'activity.deleted', 1000);
+    await waitForEvent(feed, 'feeds.activity.deleted', 1000);
 
     // Verify the event was received
     const deleteEvent = deleteSpy.mock.lastCall?.[0] as ActivityDeletedEvent;
-    expect(deleteEvent?.type).toBe('activity.deleted');
+    expect(deleteEvent?.type).toBe('feeds.activity.deleted');
     expect(deleteEvent?.activity.id).toBe(activityId);
 
     // Verify the state was updated

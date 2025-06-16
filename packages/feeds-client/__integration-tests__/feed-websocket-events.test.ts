@@ -21,7 +21,7 @@ describe('Feed state updates via WebSocket events', () => {
 
   it('should create active feed in response to feed.created event', async () => {
     const createSpy = vi.fn();
-    client.on('feed.created', createSpy);
+    client.on('feeds.feed.created', createSpy);
 
     await client.getOrCreateFeed({
       feed_group_id: feedGroup,
@@ -30,7 +30,7 @@ describe('Feed state updates via WebSocket events', () => {
       watch: true,
     });
 
-    await waitForEvent(client, 'feed.created', 1000);
+    await waitForEvent(client, 'feeds.feed.created', 1000);
 
     const feed = client.feed(feedGroup, feedId);
 
@@ -39,14 +39,14 @@ describe('Feed state updates via WebSocket events', () => {
     expect(feed.state.getLatestValue().group_id).toBe(feed.group);
     expect(feed.state.getLatestValue().custom?.color).toBe('red');
 
-    expect(createSpy.mock.calls[0][0].type).toBe('feed.created');
+    expect(createSpy.mock.calls[0][0].type).toBe('feeds.feed.created');
   });
 
   it('should receive feed.updated event when updating a feed', async () => {
     const feed = client.feed(feedGroup, feedId);
 
     const updateSpy = vi.fn();
-    feed.on('feed.updated', updateSpy);
+    feed.on('feeds.feed.updated', updateSpy);
 
     await client.updateFeed({
       feed_group_id: feedGroup,
@@ -54,10 +54,10 @@ describe('Feed state updates via WebSocket events', () => {
       custom: { testField: 'updated value' },
     });
 
-    await waitForEvent(feed, 'feed.updated', 1000);
+    await waitForEvent(feed, 'feeds.feed.updated', 1000);
 
     const updateEvent = updateSpy.mock.lastCall?.[0];
-    expect(updateEvent?.type).toBe('feed.updated');
+    expect(updateEvent?.type).toBe('feeds.feed.updated');
     expect(updateEvent?.feed.id).toBe(feedId);
     expect(updateEvent?.feed.group_id).toBe(feedGroup);
 
@@ -68,21 +68,21 @@ describe('Feed state updates via WebSocket events', () => {
     const feed = client.feed(feedGroup, feedId);
 
     const deleteSpy = vi.fn();
-    feed.on('feed.deleted', deleteSpy);
+    feed.on('feeds.feed.deleted', deleteSpy);
 
     await client.deleteFeed({
       feed_group_id: feedGroup,
       feed_id: feedId,
     });
 
-    await waitForEvent(feed, 'feed.deleted', 1000);
+    await waitForEvent(feed, 'feeds.feed.deleted', 1000);
 
     const newFeed = client.feed(feedGroup, feedId);
     // testing we get a new reference to the feed
     expect(newFeed).not.toBe(feed);
 
     const deleteEvent = deleteSpy.mock.lastCall?.[0];
-    expect(deleteEvent?.type).toBe('feed.deleted');
+    expect(deleteEvent?.type).toBe('feeds.feed.deleted');
   });
 
   afterAll(async () => {

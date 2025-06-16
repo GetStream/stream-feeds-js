@@ -1,6 +1,7 @@
 import {
   ActivityAddedEvent,
   ActivityDeletedEvent,
+  ActivityMarkEvent,
   ActivityPinnedEvent,
   ActivityReactionAddedEvent,
   ActivityReactionDeletedEvent,
@@ -30,11 +31,8 @@ import {
   FollowUpdatedEvent,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
-  PollClosedEvent,
   PollClosedFeedEvent,
-  PollDeletedEvent,
   PollDeletedFeedEvent,
-  PollUpdatedEvent,
   PollUpdatedFeedEvent,
   PollVoteCastedFeedEvent,
   PollVoteChangedFeedEvent,
@@ -76,8 +74,8 @@ export class Feed extends FeedApi {
   private readonly eventHandlers: {
     [key in WSEvent['type']]: (_: WSEvent & { type: key }) => void;
   } = {
-    'activity.added': (
-      event: { type: 'activity.added' } & ActivityAddedEvent,
+    'feeds.activity.added': (
+      event: { type: 'feeds.activity.added' } & ActivityAddedEvent,
     ) => {
       const currentActivities = this.state.getLatestValue().activities;
       const result = addActivitiesToState(
@@ -89,8 +87,8 @@ export class Feed extends FeedApi {
         this.state.partialNext({ activities: result.activities });
       }
     },
-    'activity.deleted': (
-      event: { type: 'activity.deleted' } & ActivityDeletedEvent,
+    'feeds.activity.deleted': (
+      event: { type: 'feeds.activity.deleted' } & ActivityDeletedEvent,
     ) => {
       const currentActivities = this.state.getLatestValue().activities;
       if (currentActivities) {
@@ -103,8 +101,10 @@ export class Feed extends FeedApi {
         }
       }
     },
-    'activity.reaction.added': (
-      event: { type: 'activity.reaction.added' } & ActivityReactionAddedEvent,
+    'feeds.activity.reaction.added': (
+      event: {
+        type: 'feeds.activity.reaction.added';
+      } & ActivityReactionAddedEvent,
     ) => {
       const currentActivities = this.state.getLatestValue().activities;
       const connectedUser = this.client.state.getLatestValue().connectedUser;
@@ -121,9 +121,9 @@ export class Feed extends FeedApi {
         this.state.partialNext({ activities: result.activities });
       }
     },
-    'activity.reaction.deleted': (
+    'feeds.activity.reaction.deleted': (
       event: {
-        type: 'activity.reaction.deleted';
+        type: 'feeds.activity.reaction.deleted';
       } & ActivityReactionDeletedEvent,
     ) => {
       const currentActivities = this.state.getLatestValue().activities;
@@ -141,13 +141,15 @@ export class Feed extends FeedApi {
         this.state.partialNext({ activities: result.activities });
       }
     },
-    'activity.removed_from_feed': (
+    'feeds.activity.removed_from_feed': (
       _: {
-        type: 'activity.removed_from_feed';
-      } & ActivityRemovedFromFeedEvent & { type: 'activity.removed_from_feed' },
+        type: 'feeds.activity.removed_from_feed';
+      } & ActivityRemovedFromFeedEvent & {
+          type: 'feeds.activity.removed_from_feed';
+        },
     ) => {},
-    'activity.updated': (
-      event: { type: 'activity.updated' } & ActivityUpdatedEvent,
+    'feeds.activity.updated': (
+      event: { type: 'feeds.activity.updated' } & ActivityUpdatedEvent,
     ) => {
       const currentActivities = this.state.getLatestValue().activities;
       if (currentActivities) {
@@ -157,105 +159,98 @@ export class Feed extends FeedApi {
         }
       }
     },
-    'bookmark.added': (
-      _: { type: 'bookmark.added' } & BookmarkAddedEvent,
+    'feeds.bookmark.added': (
+      _: { type: 'feeds.bookmark.added' } & BookmarkAddedEvent,
     ) => {},
-    'bookmark.deleted': (
-      _: { type: 'bookmark.deleted' } & BookmarkDeletedEvent,
+    'feeds.bookmark.deleted': (
+      _: { type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent,
     ) => {},
-    'bookmark.updated': (
-      _: { type: 'bookmark.updated' } & BookmarkUpdatedEvent,
+    'feeds.bookmark.updated': (
+      _: { type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent,
     ) => {},
-    'comment.added': (
-      _: { type: 'comment.added' } & CommentAddedEvent & {
-          type: 'comment.added';
-        },
+    'feeds.comment.added': (
+      _: { type: 'feeds.comment.added' } & CommentAddedEvent,
     ) => {},
-    'comment.deleted': (
-      _: { type: 'comment.deleted' } & CommentDeletedEvent,
+    'feeds.comment.deleted': (
+      _: { type: 'feeds.comment.deleted' } & CommentDeletedEvent,
     ) => {},
-    'comment.updated': (
-      _: { type: 'comment.updated' } & CommentUpdatedEvent,
+    'feeds.comment.updated': (
+      _: { type: 'feeds.comment.updated' } & CommentUpdatedEvent,
     ) => {},
-    'feed.created': (_: { type: 'feed.created' } & FeedCreatedEvent) => {
+    'feeds.feed.created': (
+      _: { type: 'feeds.feed.created' } & FeedCreatedEvent,
+    ) => {
       // nothing to do
     },
-    'feed.deleted': (_: { type: 'feed.deleted' } & FeedDeletedEvent) => {
+    'feeds.feed.deleted': (
+      _: { type: 'feeds.feed.deleted' } & FeedDeletedEvent,
+    ) => {
       // nothing to do
     },
-    'feed.updated': (event: { type: 'feed.updated' } & FeedUpdatedEvent) => {
+    'feeds.feed.updated': (
+      event: { type: 'feeds.feed.updated' } & FeedUpdatedEvent,
+    ) => {
       this.state.partialNext({ ...event.feed });
     },
-    'feed_group.changed': (
-      _: { type: 'feed_group.changed' } & FeedGroupChangedEvent,
+    'feeds.feed_group.changed': (
+      _: { type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent,
     ) => {},
-    'feed_group.deleted': (
-      _: { type: 'feed_group.deleted' } & FeedGroupDeletedEvent,
+    'feeds.feed_group.deleted': (
+      _: { type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent,
     ) => {},
-    'follow.created': (
-      _: { type: 'follow.created' } & FollowCreatedEvent,
+    'feeds.follow.created': (
+      _: { type: 'feeds.follow.created' } & FollowCreatedEvent,
     ) => {},
-    'follow.deleted': (
-      _: { type: 'follow.deleted' } & FollowDeletedEvent,
+    'feeds.follow.deleted': (
+      _: { type: 'feeds.follow.deleted' } & FollowDeletedEvent,
     ) => {},
-    'follow.updated': (
-      _: { type: 'follow.updated' } & FollowUpdatedEvent,
+    'feeds.follow.updated': (
+      _: { type: 'feeds.follow.updated' } & FollowUpdatedEvent,
     ) => {},
-    'comment.reaction.added': (
-      _: { type: 'comment.reaction.added' } & CommentReactionAddedEvent & {
-          type: 'comment.reaction.added';
+    'feeds.comment.reaction.added': (
+      _: {
+        type: 'feeds.comment.reaction.added';
+      } & CommentReactionAddedEvent & {
+          type: 'feeds.comment.reaction.added';
         },
     ) => {},
-    'comment.reaction.deleted': (
-      _: { type: 'comment.reaction.deleted' } & CommentReactionDeletedEvent & {
-          type: 'comment.reaction.deleted';
+    'feeds.comment.reaction.deleted': (
+      _: {
+        type: 'feeds.comment.reaction.deleted';
+      } & CommentReactionDeletedEvent & {
+          type: 'feeds.comment.reaction.deleted';
         },
     ) => {},
-    'feed_member.added': function (
-      _: { type: 'feed_member.added' } & FeedMemberAddedEvent & {
-          type: 'feed_member.added';
+    'feeds.feed_member.added': function (
+      _: { type: 'feeds.feed_member.added' } & FeedMemberAddedEvent & {
+          type: 'feeds.feed_member.added';
         },
     ): void {},
-    'feed_member.removed': function (
-      _: { type: 'feed_member.removed' } & FeedMemberRemovedEvent & {
-          type: 'feed_member.removed';
+    'feeds.feed_member.removed': function (
+      _: { type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent & {
+          type: 'feeds.feed_member.removed';
         },
     ): void {},
-    'feed_member.updated': function (
-      _: { type: 'feed_member.updated' } & FeedMemberUpdatedEvent & {
-          type: 'feed_member.updated';
+    'feeds.feed_member.updated': function (
+      _: { type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent & {
+          type: 'feeds.feed_member.updated';
         },
-    ): void {},
-    'poll.closed': function (
-      _: { type: 'poll.closed' } & PollClosedEvent & { type: 'poll.closed' },
-    ): void {},
-    'poll.deleted': function (
-      _: { type: 'poll.deleted' } & PollDeletedEvent & { type: 'poll.deleted' },
-    ): void {},
-    'poll.updated': function (
-      _: { type: 'poll.updated' } & PollUpdatedEvent & { type: 'poll.updated' },
     ): void {},
     'feeds.poll.closed': function (
       _: { type: 'feeds.poll.closed' } & PollClosedFeedEvent & {
           type: 'feeds.poll.closed';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
+    ): void {},
     'feeds.poll.deleted': function (
       _: { type: 'feeds.poll.deleted' } & PollDeletedFeedEvent & {
           type: 'feeds.poll.deleted';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
+    ): void {},
     'feeds.poll.updated': function (
       _: { type: 'feeds.poll.updated' } & PollUpdatedFeedEvent & {
           type: 'feeds.poll.updated';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
+    ): void {},
     'feeds.poll.vote_casted': function (
       _: { type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent & {
           type: 'feeds.poll.vote_casted';
@@ -267,24 +262,25 @@ export class Feed extends FeedApi {
       _: { type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent & {
           type: 'feeds.poll.vote_changed';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
+    ): void {},
     'feeds.poll.vote_removed': function (
       _: { type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent & {
           type: 'feeds.poll.vote_removed';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'activity.pinned': function (
-      _: { type: 'activity.pinned' } & ActivityPinnedEvent & {
-          type: 'activity.pinned';
+    ): void {},
+    'feeds.activity.pinned': function (
+      _: { type: 'feeds.activity.pinned' } & ActivityPinnedEvent & {
+          type: 'feeds.activity.pinned';
         },
     ): void {},
-    'activity.unpinned': function (
-      _: { type: 'activity.unpinned' } & ActivityUnpinnedEvent & {
-          type: 'activity.unpinned';
+    'feeds.activity.unpinned': function (
+      _: { type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent & {
+          type: 'feeds.activity.unpinned';
+        },
+    ): void {},
+    'feeds.activity.marked': function (
+      _: { type: 'feeds.activity.marked' } & ActivityMarkEvent & {
+          type: 'feeds.activity.marked';
         },
     ): void {},
   };

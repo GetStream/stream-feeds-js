@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { FeedsClient } from '../src/FeedsClient';
-import { ActivityResponse } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,

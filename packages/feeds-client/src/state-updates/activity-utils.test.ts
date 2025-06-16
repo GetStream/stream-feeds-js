@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ActivityResponse, ActivityReactionResponse } from '../gen/models';
+import { ActivityResponse, FeedsReactionResponse } from '../gen/models';
 import {
   addActivitiesToState,
   updateActivityInState,
@@ -157,7 +157,7 @@ describe('activity-utils', () => {
           updated_at: new Date(),
         },
       ];
-      originalActivity.latest_reactions = {} as ActivityReactionResponse[];
+      originalActivity.latest_reactions = {} as FeedsReactionResponse[];
       (originalActivity.latest_reactions as any)['like'] = [
         {
           type: 'like',
