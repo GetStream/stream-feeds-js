@@ -255,9 +255,7 @@ export class Feed extends FeedApi {
       _: { type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent & {
           type: 'feeds.poll.vote_casted';
         },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
+    ): void {},
     'feeds.poll.vote_changed': function (
       _: { type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent & {
           type: 'feeds.poll.vote_changed';
