@@ -70,6 +70,15 @@ decoders.ActivityDeletedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.ActivityMarkEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.ActivityPinResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -702,29 +711,7 @@ decoders.PinActivityResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.PollClosedEvent = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    poll: { type: 'PollResponseData', isSingle: true },
-
-    received_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.PollClosedFeedEvent = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    poll: { type: 'PollResponseData', isSingle: true },
-
-    received_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.PollDeletedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
@@ -764,17 +751,6 @@ decoders.PollResponseData = (input?: Record<string, any>) => {
     own_votes: { type: 'PollVoteResponseData', isSingle: false },
 
     created_by: { type: 'UserResponse', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.PollUpdatedEvent = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    poll: { type: 'PollResponseData', isSingle: true },
-
-    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
