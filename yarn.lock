@@ -2572,7 +2572,7 @@ __metadata:
     playwright: ^1.48.1
     rimraf: ^6.0.1
     rollup: ^4.24.0
-    typescript: ^5.6.3
+    typescript: ^5.8.3
     uuid: ^11.0.2
     vite: ^5.4.8
     vitest: ^2.1.2
@@ -10315,7 +10315,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5":
+"typescript@npm:^5, typescript@npm:^5.8.3":
   version: 5.8.3
   resolution: "typescript@npm:5.8.3"
   bin:
@@ -10345,7 +10345,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^5#~builtin<compat/typescript>":
+"typescript@patch:typescript@^5#~builtin<compat/typescript>, typescript@patch:typescript@^5.8.3#~builtin<compat/typescript>":
   version: 5.8.3
   resolution: "typescript@patch:typescript@npm%3A5.8.3#~builtin<compat/typescript>::version=5.8.3&hash=85af82"
   bin:
