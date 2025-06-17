@@ -8,6 +8,7 @@ import {
 } from '../app-notifications-context';
 import { pageTitle } from '../page-title';
 import { useStateStore } from '../hooks/useStateStore';
+import { initializeFeed } from '../hooks/initializeFeed';
 
 export const Feed = ({
   feed,
@@ -35,14 +36,14 @@ export const Feed = ({
   useEffect(() => {
     const currentState = feed.state.getLatestValue();
 
-    console.log(currentState)
+    console.log(currentState);
 
     if (
       !currentState.activities &&
       !currentState.is_loading_activities &&
       ownCapabilities.includes('read-feed')
     ) {
-      void feed.getOrCreate();
+      void initializeFeed(feed, { watch: true });
     }
   }, [feed, ownCapabilities]);
 

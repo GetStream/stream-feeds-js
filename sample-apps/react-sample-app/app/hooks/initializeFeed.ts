@@ -3,17 +3,21 @@ import { Feed, FeedState } from '@stream-io/feeds-client';
 const promisesByFeedId: Record<string, Promise<FeedState>> = {};
 
 export const initializeFeed = (feed: Feed, options?: { watch?: boolean }) => {
-  const { is_loading } = feed.state.getLatestValue();
+  const currentState = feed.state.getLatestValue();
+
+  if (typeof currentState.created_at !== 'undefined') {
+    return Promise.resolve(currentState);
+  }
 
   if (typeof promisesByFeedId[feed.fid] !== 'undefined') {
     return promisesByFeedId[feed.fid];
   }
 
-  if (is_loading) {
+  if (currentState.is_loading) {
     return new Promise((resolve, reject) => {
       const t = setTimeout(() => {
         unsubscribe();
-        reject(new Error('Timed out while waiting for FeedState.is_loading'));
+        reject(new Error('Timed out while waiting for FeedState.is_loading to flip'));
       }, 5000);
 
       const unsubscribe = feed.state.subscribeWithSelector(

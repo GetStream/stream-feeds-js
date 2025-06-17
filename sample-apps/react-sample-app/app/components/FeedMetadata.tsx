@@ -7,7 +7,7 @@ import { FollowStatusButton } from './FollowStatusButton';
 import { FeedMenu } from './FeedMenu';
 import { useStateStore } from '../hooks/useStateStore';
 import { useUserContext } from '../user-context';
-// import { initializeFeed } from '../hooks/initializeFeed';
+import { initializeFeed } from '../hooks/initializeFeed';
 
 const selector = ({
   own_capabilities = [],
@@ -52,30 +52,22 @@ export const FeedMetadata = ({
 
   const canQueryFollowers = userFeedState.canQueryFollows;
   const canQueryFollowings = timelineFeedState?.canQueryFollows;
-  const followStatus = userFeedState.followStatus;
-
-  console.log({ followStatus });
 
   useEffect(() => {
     if (!timeline || !client) return;
 
-    // void initializeFeed(timeline, { watch: true });
+    void initializeFeed(timeline, { watch: true });
 
     return;
 
+    // eslint-disable-next-line no-unreachable
     Promise.allSettled([
       // followings (everything this person follows)
-      client.queryFollows({
-        filter: {
-          source_feed: timeline.fid,
-        },
+      timeline?.queryFollowings({
         limit: 10,
       }),
       // followers (everyone who follow this person)
-      client.queryFollows({
-        filter: {
-          target_feed: feed.fid,
-        },
+      feed.queryFollowers({
         limit: 10,
       }),
     ])
@@ -116,16 +108,17 @@ export const FeedMetadata = ({
           <div className="flex flex-col gap-1 items-start">
             {feed.group === 'user' && (
               <div className="text-lg text-gray-900">
-                <b>{feed.state.getLatestValue().created_by?.name}</b>
+                {/* TODO: change this to be reactive */}
+                <b>{feed.currentState.created_by?.name}</b>
               </div>
             )}
             {feed.group === 'page' && (
               <div className="flex flex-col gap-0.5">
                 <div className="text-lg text-gray-900">
-                  <b>{feed.state.getLatestValue().custom?.name}</b>
+                  <b>{feed.currentState.custom?.name}</b>
                 </div>
                 <div className="text-md text-gray-900">
-                  {feed.state.getLatestValue().custom?.description}
+                  {feed.currentState.custom?.description}
                 </div>
               </div>
             )}

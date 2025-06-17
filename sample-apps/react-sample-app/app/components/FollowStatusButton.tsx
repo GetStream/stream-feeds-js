@@ -16,20 +16,19 @@ const selector = ({ own_follows = [] }: FeedState) => {
 export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
   const { logError, logErrorAndDisplayNotification } = useErrorContext();
   const { ownTimeline } = useFeedContext();
-  const { client } = useUserContext();
 
   const { follow_status: followStatus } = useStateStore(feed.state, selector);
 
   const follow = async (feed: Feed) => {
     if (!ownTimeline) return;
 
-    await client?.follow({ source: ownTimeline.fid, target: feed.fid });
+    await ownTimeline.follow(feed);
   };
 
   const unfollow = async (feed: Feed) => {
     if (!ownTimeline) return;
 
-    await client?.unfollow({ source: ownTimeline.fid, target: feed.fid });
+    await ownTimeline.unfollow(feed);
   };
 
   const cancelFollowRequest = async (feed: Feed) => {
