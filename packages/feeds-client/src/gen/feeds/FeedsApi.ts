@@ -1445,7 +1445,6 @@ export class FeedsApi {
     };
     const body = {
       text: request?.text,
-      position: request?.position,
       custom: request?.custom,
     };
 

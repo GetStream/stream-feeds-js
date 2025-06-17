@@ -168,7 +168,7 @@ decoders.ActivityResponse = (input?: Record<string, any>) => {
 
     current_feed: { type: 'FeedResponse', isSingle: true },
 
-    parent: { type: 'BaseActivityResponse', isSingle: true },
+    parent: { type: 'ActivityResponse', isSingle: true },
 
     poll: { type: 'PollResponseData', isSingle: true },
   };
@@ -250,39 +250,6 @@ decoders.AggregatedActivityResponse = (input?: Record<string, any>) => {
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     activities: { type: 'ActivityResponse', isSingle: false },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.BaseActivityResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    comments: { type: 'CommentResponse', isSingle: false },
-
-    latest_reactions: { type: 'FeedsReactionResponse', isSingle: false },
-
-    mentioned_users: { type: 'UserResponse', isSingle: false },
-
-    own_bookmarks: { type: 'BookmarkResponse', isSingle: false },
-
-    own_reactions: { type: 'FeedsReactionResponse', isSingle: false },
-
-    reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
-
-    user: { type: 'UserResponse', isSingle: true },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    edited_at: { type: 'DatetimeType', isSingle: true },
-
-    expires_at: { type: 'DatetimeType', isSingle: true },
-
-    current_feed: { type: 'FeedResponse', isSingle: true },
-
-    poll: { type: 'PollResponseData', isSingle: true },
   };
   return decode(typeMappings, input);
 };

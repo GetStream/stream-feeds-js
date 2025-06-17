@@ -289,7 +289,7 @@ export interface ActivityResponse {
 
   moderation?: ModerationV2Response;
 
-  parent?: BaseActivityResponse;
+  parent?: ActivityResponse;
 
   poll?: PollResponseData;
 }
@@ -530,72 +530,6 @@ export interface Attachment {
   giphy?: Images;
 }
 
-export interface BaseActivityResponse {
-  bookmark_count: number;
-
-  comment_count: number;
-
-  created_at: Date;
-
-  id: string;
-
-  popularity: number;
-
-  score: number;
-
-  share_count: number;
-
-  type: string;
-
-  updated_at: Date;
-
-  visibility: 'public' | 'private' | 'tag';
-
-  attachments: Attachment[];
-
-  comments: CommentResponse[];
-
-  feeds: string[];
-
-  filter_tags: string[];
-
-  interest_tags: string[];
-
-  latest_reactions: FeedsReactionResponse[];
-
-  mentioned_users: UserResponse[];
-
-  own_bookmarks: BookmarkResponse[];
-
-  own_reactions: FeedsReactionResponse[];
-
-  custom: Record<string, any>;
-
-  reaction_groups: Record<string, ReactionGroupResponse>;
-
-  search_data: Record<string, any>;
-
-  user: UserResponse;
-
-  deleted_at?: Date;
-
-  edited_at?: Date;
-
-  expires_at?: Date;
-
-  text?: string;
-
-  visibility_tag?: string;
-
-  current_feed?: FeedResponse;
-
-  location?: ActivityLocation;
-
-  moderation?: ModerationV2Response;
-
-  poll?: PollResponseData;
-}
-
 export interface BookmarkAddedEvent {
   created_at: Date;
 
@@ -810,8 +744,6 @@ export interface CreateFeedsBatchResponse {
 
 export interface CreatePollOptionRequest {
   text: string;
-
-  position?: number;
 
   custom?: Record<string, any>;
 }
@@ -2321,8 +2253,6 @@ export interface VoteData {
   answer_text?: string;
 
   option_id?: string;
-
-  option?: PollOptionResponseData;
 }
 
 export type WSClientEvent =
