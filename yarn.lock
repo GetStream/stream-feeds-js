@@ -2572,7 +2572,7 @@ __metadata:
     playwright: ^1.48.1
     rimraf: ^6.0.1
     rollup: ^4.24.0
-    typescript: ^5.6.3
+    typescript: ^5.8.3
     uuid: ^11.0.2
     vite: ^5.4.8
     vitest: ^2.1.2
@@ -2608,7 +2608,7 @@ __metadata:
 
 "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#feeds-api":
   version: 0.4.24
-  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=efaf71d01da5a3f546d3b06d46bf5804d9202fe1"
+  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=629310b422d111d7aa1f0dffe107492952bf0be5"
   dependencies:
     "@types/jsonwebtoken": ^9.0.3
     "@types/node": ^18.3.0
@@ -2619,7 +2619,7 @@ __metadata:
   peerDependenciesMeta:
     "@stream-io/openai-realtime-api":
       optional: true
-  checksum: 639d19d15be99c13dbcba8acf5dc12fbe079a2691609b28c55b40472c19b42756d9c8c6d7cd9166f112286e34143d1823d503725e57b418f2ded894f57ca91da
+  checksum: b1af12ff4e12cebf45799658d530561bc71c14dee16f2c331bbf930f3c70e11c4b20da5a7c3bcfb9b7e4bd870fb79ddb80ea1e609fb3a380774a0cd2daa96a7b
   languageName: node
   linkType: hard
 
@@ -2786,6 +2786,22 @@ __metadata:
     "@types/ms": "*"
     "@types/node": "*"
   checksum: 9d564fc09fc83f66e319754dee0b039ae23f28fc38a9227c35283e69311ddf5a7493a060c7f956df8cd856416747c515b51fec20b8656865eacebf23b3c6bc62
+  languageName: node
+  linkType: hard
+
+"@types/lodash.uniqby@npm:^4":
+  version: 4.7.9
+  resolution: "@types/lodash.uniqby@npm:4.7.9"
+  dependencies:
+    "@types/lodash": "*"
+  checksum: 24cc8af36e0d4c52b7294c7ba7d814c89ce2c8118d94350bbed21031fef850fa1a280bfd2b30a47e0b5f7aa6ac649a36a5089aa76bc23787963a5ee6443f631e
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:*":
+  version: 4.17.17
+  resolution: "@types/lodash@npm:4.17.17"
+  checksum: cfa34a752f3c540a196e9f92dbaff93ae15fe4058da8cce1918dd9219076dc19eec33b043aae45865e2b3ef8234a845bb57366144ec8e52551e2bc3f119e04a1
   languageName: node
   linkType: hard
 
@@ -4422,6 +4438,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"clsx@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "clsx@npm:2.1.1"
+  checksum: acd3e1ab9d8a433ecb3cc2f6a05ab95fe50b4a3cfc5ba47abb6cbf3754585fcb87b84e90c822a1f256c4198e3b41c7f6c391577ffc8678ad587fc0976b24fd57
+  languageName: node
+  linkType: hard
+
 "code-block-writer@npm:^10.1.1":
   version: 10.1.1
   resolution: "code-block-writer@npm:10.1.1"
@@ -5806,10 +5829,13 @@ __metadata:
   dependencies:
     "@stream-io/feeds-client": "workspace:^"
     "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-api"
+    "@types/lodash.uniqby": ^4
     "@types/node": ^20
     "@types/react": ^18
     "@types/react-dom": ^18
+    clsx: ^2.1.1
     dotenv: ^16.4.5
+    lodash.uniqby: ^4.7.0
     material-symbols: ^0.27.1
     next: 15.0.3
     postcss: ^8
@@ -7370,6 +7396,13 @@ __metadata:
   version: 4.1.1
   resolution: "lodash.once@npm:4.1.1"
   checksum: d768fa9f9b4e1dc6453be99b753906f58990e0c45e7b2ca5a3b40a33111e5d17f6edf2f768786e2716af90a8e78f8f91431ab8435f761fef00f9b0c256f6d245
+  languageName: node
+  linkType: hard
+
+"lodash.uniqby@npm:^4.7.0":
+  version: 4.7.0
+  resolution: "lodash.uniqby@npm:4.7.0"
+  checksum: 659264545a95726d1493123345aad8cbf56e17810fa9a0b029852c6d42bc80517696af09d99b23bef1845d10d95e01b8b4a1da578f22aeba7a30d3e0022a4938
   languageName: node
   linkType: hard
 
@@ -10282,7 +10315,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5":
+"typescript@npm:^5, typescript@npm:^5.8.3":
   version: 5.8.3
   resolution: "typescript@npm:5.8.3"
   bin:
@@ -10312,7 +10345,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^5#~builtin<compat/typescript>":
+"typescript@patch:typescript@^5#~builtin<compat/typescript>, typescript@patch:typescript@^5.8.3#~builtin<compat/typescript>":
   version: 5.8.3
   resolution: "typescript@patch:typescript@npm%3A5.8.3#~builtin<compat/typescript>::version=5.8.3&hash=85af82"
   bin:

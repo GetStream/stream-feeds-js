@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 const { StreamClient } = require('@stream-io/node-sdk');
 const fs = require('node:fs/promises');
 const path = require('node:path');

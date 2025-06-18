@@ -7,6 +7,8 @@ import {
   useAppNotificationsContext,
 } from '../app-notifications-context';
 import { pageTitle } from '../page-title';
+import { useStateStore } from '../hooks/useStateStore';
+import { initializeFeed } from '../hooks/initializeFeed';
 
 export const Feed = ({
   feed,
@@ -16,24 +18,32 @@ export const Feed = ({
   onNewPost: 'show-immediately' | 'show-notification';
 }) => {
   const { showNotification } = useAppNotificationsContext();
-  const [activities, setActivities] = useState<ActivityResponse[]>([]);
   const [error, setError] = useState<Error>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
   const [newPostsNotification, setNewPostsNotification] =
     useState<AppNotificaion>();
-  const [ownCapabilities, setOwnCapabilities] = useState<string[]>([
-    'read-feed',
-  ]);
+  const [ownCapabilities] = useState<string[]>(['read-feed']);
+
+  const { hasNextPage, isLoading, activities } = useStateStore(
+    feed.state,
+    (state) => ({
+      isLoading: state.is_loading_activities,
+      hasNextPage: typeof state.next !== 'undefined',
+      activities: state.activities ?? [],
+    }),
+  );
 
   useEffect(() => {
+    const currentState = feed.state.getLatestValue();
+
+    console.log(currentState);
+
     if (
-      !feed.state.getLatestValue().activities &&
-      ownCapabilities.includes('read-feed') &&
-      !feed.state.getLatestValue().is_loading_activities
+      !currentState.activities &&
+      !currentState.is_loading_activities &&
+      ownCapabilities.includes('read-feed')
     ) {
-      void feed.getOrCreate();
+      void initializeFeed(feed, { watch: true });
     }
   }, [feed, ownCapabilities]);
 
@@ -52,7 +62,6 @@ export const Feed = ({
           activities.length <= prevActivities.length ||
           isLoading
         ) {
-          setActivities(activities);
           if (newPostsNotification) {
             newPostsNotification.hide();
             document.title = pageTitle;
@@ -63,19 +72,6 @@ export const Feed = ({
 
     return unsubscribe;
   }, [feed, isLoading, onNewPost]);
-
-  // useEffect(() => {
-  //   const unsubscribe = feed.state.subscribeWithSelector(
-  //     (state) => ({
-  //       own_capabilities: state.own_capabilities,
-  //     }),
-  //     (state) => {
-  //       setOwnCapabilities(state.own_capabilities ?? []);
-  //     },
-  //   );
-
-  //   return unsubscribe;
-  // }, [feed]);
 
   useEffect(() => {
     if (onNewPost === 'show-immediately') {
@@ -94,7 +90,6 @@ export const Feed = ({
             action: {
               label: 'Show me',
               onClick: () => {
-                setActivities(feed.state.getLatestValue().activities ?? []);
                 document.title = pageTitle;
                 setNewPostsNotification(undefined);
                 notification.hide();
@@ -113,46 +108,15 @@ export const Feed = ({
     return unsubscribe;
   }, [feed, onNewPost, activities]);
 
-  useEffect(() => {
-    const unsubscribe = feed.state.subscribeWithSelector(
-      (state) => ({ is_loading_next_page: state.is_loading_activities }),
-      ({ is_loading_next_page }) => {
-        setIsLoading(is_loading_next_page);
-      },
-    );
-
-    return unsubscribe;
-  }, [feed]);
-
-  useEffect(() => {
-    const unsubscribe = feed.state.subscribeWithSelector(
-      (state) => ({ has_next_page: !!state.next }),
-      ({ has_next_page }) => {
-        setHasNextPage(has_next_page);
-      },
-    );
-
-    return unsubscribe;
-  }, [feed]);
-
   const getNextPage = () => {
     setError(undefined);
-    setIsLoading(true);
-    feed
-      .getNextPage()
-      .catch((err) => {
-        setError(err);
-      })
-      .finally(() => setIsLoading(false));
+    feed.getNextPage().catch(setError);
   };
 
   const renderItem = (activity: ActivityResponse) => {
     return (
       <li className="w-full" key={activity.id}>
-        <Activity
-          activity={activity}
-          ownCapabilities={ownCapabilities}
-        ></Activity>
+        <Activity activity={activity} ownCapabilities={ownCapabilities} />
       </li>
     );
   };
@@ -170,6 +134,6 @@ export const Feed = ({
       onLoadMore={getNextPage}
       error={error}
       itemsName="posts"
-    ></PaginatedList>
+    />
   );
 };

@@ -55,24 +55,32 @@ export class FeedsClient extends FeedsApi {
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
     this.on('all', (event) => {
-      if (Object.hasOwn(event, 'fid')) {
-        const feed =
-          this.activeFeeds[(event as unknown as WSEvent & { fid: string }).fid];
-        if (feed) {
-          {
-            feed.handleWSEvent(event as unknown as WSEvent);
-            if (event.type === 'feeds.feed.deleted') {
-              delete this.activeFeeds[
-                (event as unknown as WSEvent & { fid: string }).fid
-              ];
-            }
-          }
-        } else if (event.type === 'feeds.feed.created') {
+      // @ts-expect-error fid may be present, type mismatch
+      const fid: unknown = event.fid;
+
+      if (typeof fid !== 'string') return;
+
+      const feed: Feed | undefined = this.activeFeeds[fid];
+
+      switch (event.type) {
+        case 'feeds.feed.created': {
+          if (feed) break;
+
           this.getOrCreateActiveFeed(
             event.feed.group_id,
             event.feed.id,
             event.feed,
           );
+
+          break;
+        }
+        case 'feeds.feed.deleted': {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete this.activeFeeds[fid];
+          break;
+        }
+        default: {
+          feed?.handleWSEvent(event as unknown as WSEvent);
         }
       }
     });
@@ -129,8 +137,8 @@ export class FeedsClient extends FeedsApi {
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
 
-  feed = (group: string, id: string) => {
-    return this.getOrCreateActiveFeed(group, id);
+  feed = (groupId: string, id: string) => {
+    return this.getOrCreateActiveFeed(groupId, id);
   };
 
   async queryFeeds(request?: QueryFeedsRequest) {

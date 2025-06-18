@@ -2,10 +2,35 @@
 import { useEffect, useState } from 'react';
 import { useUserContext } from '../user-context';
 import { useFeedContext } from '../feed-context';
-import { Feed } from '@stream-io/feeds-client';
+import { Feed, FeedState } from '@stream-io/feeds-client';
 import Link from 'next/link';
 import { PaginatedList } from '../components/PaginatedList';
 import { FollowStatusButton } from './FollowStatusButton';
+import { useStateStore } from '../hooks/useStateStore';
+
+const selector = (state: FeedState) => {
+  return {
+    createdBy: state.created_by,
+  };
+};
+
+const UserItem = ({ feed }: { feed: Feed }) => {
+  const { createdBy } = useStateStore(feed.state, selector);
+
+  return (
+    <li className="w-full h-full flex flex-row items-center justify-between gap-1 py-4">
+      <Link href={'/users/' + feed.id}>
+        <div className="flex flex-row items-center gap-1">
+          <img className="size-10 rounded-full" src={createdBy?.image} alt="" />
+          <p className="text-sm font-medium text-gray-900">
+            {createdBy?.name ?? feed.fid}
+          </p>
+        </div>
+      </Link>
+      <FollowStatusButton feed={feed}></FollowStatusButton>
+    </li>
+  );
+};
 
 export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
   const { client, user } = useUserContext();
@@ -62,26 +87,7 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
   };
 
   const renderUser = (feed: Feed) => {
-    return (
-      <li
-        key={feed.id}
-        className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
-      >
-        <Link href={'/users/' + feed.id}>
-          <div className="flex flex-row items-center gap-1">
-            <img
-              className="size-10 rounded-full"
-              src={feed.state.getLatestValue().created_by?.image}
-              alt=""
-            />
-            <p className="text-sm font-medium text-gray-900">
-              {feed.state.getLatestValue().created_by?.name}
-            </p>
-          </div>
-        </Link>
-        <FollowStatusButton feed={feed}></FollowStatusButton>
-      </li>
-    );
+    return <UserItem key={feed.fid} feed={feed} />;
   };
 
   return (
@@ -96,7 +102,7 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
         listContainerClassNames="divide-y divide-gray-200"
         itemsName={title.toLowerCase()}
         error={error}
-      ></PaginatedList>
+      />
     </div>
   );
 }
