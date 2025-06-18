@@ -31,6 +31,9 @@ import {
   FollowUpdatedEvent,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
+  ModerationCustomActionEvent,
+  ModerationFlaggedEvent,
+  ModerationMarkReviewedEvent,
   PollClosedFeedEvent,
   PollDeletedFeedEvent,
   PollUpdatedFeedEvent,
@@ -281,6 +284,27 @@ export class Feed extends FeedApi {
           type: 'feeds.activity.marked';
         },
     ): void {},
+    'moderation.custom_action': function (
+      _: { type: 'moderation.custom_action' } & ModerationCustomActionEvent & {
+          type: 'moderation.custom_action';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'moderation.flagged': function (
+      _: { type: 'moderation.flagged' } & ModerationFlaggedEvent & {
+          type: 'moderation.flagged';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'moderation.mark_reviewed': function (
+      _: { type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent & {
+          type: 'moderation.mark_reviewed';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =

@@ -16,9 +16,16 @@ import {
   AddCommentsBatchResponse,
   AddReactionRequest,
   AddReactionResponse,
+  BlockUsersRequest,
+  BlockUsersResponse,
   CastPollVoteRequest,
+  CreateBlockListRequest,
+  CreateBlockListResponse,
+  CreateDeviceRequest,
   CreateFeedsBatchRequest,
   CreateFeedsBatchResponse,
+  CreateGuestRequest,
+  CreateGuestResponse,
   CreatePollOptionRequest,
   CreatePollRequest,
   DeleteActivitiesRequest,
@@ -29,15 +36,24 @@ import {
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
   DeleteFeedResponse,
+  FileUploadRequest,
+  FileUploadResponse,
   FollowBatchRequest,
   FollowBatchResponse,
   GetActivityResponse,
+  GetApplicationResponse,
+  GetBlockedUsersResponse,
   GetCommentRepliesResponse,
   GetCommentResponse,
   GetCommentsResponse,
   GetFollowSuggestionsResponse,
+  GetOGResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
+  ImageUploadRequest,
+  ImageUploadResponse,
+  ListBlockListResponse,
+  ListDevicesResponse,
   MarkActivityRequest,
   PinActivityRequest,
   PinActivityResponse,
@@ -66,6 +82,8 @@ import {
   QueryPollVotesRequest,
   QueryPollsRequest,
   QueryPollsResponse,
+  QueryUsersPayload,
+  QueryUsersResponse,
   RejectFeedMemberInviteRequest,
   RejectFeedMemberInviteResponse,
   RejectFollowRequest,
@@ -73,12 +91,16 @@ import {
   Response,
   SingleFollowRequest,
   SingleFollowResponse,
+  UnblockUsersRequest,
+  UnblockUsersResponse,
   UnfollowResponse,
   UnpinActivityResponse,
   UpdateActivityPartialRequest,
   UpdateActivityPartialResponse,
   UpdateActivityRequest,
   UpdateActivityResponse,
+  UpdateBlockListRequest,
+  UpdateBlockListResponse,
   UpdateBookmarkRequest,
   UpdateBookmarkResponse,
   UpdateCommentRequest,
@@ -92,6 +114,9 @@ import {
   UpdatePollOptionRequest,
   UpdatePollPartialRequest,
   UpdatePollRequest,
+  UpdateUsersPartialRequest,
+  UpdateUsersRequest,
+  UpdateUsersResponse,
   UpsertActivitiesRequest,
   UpsertActivitiesResponse,
 } from '../models';
@@ -99,6 +124,616 @@ import { decoders } from '../model-decoders/decoders';
 
 export class FeedsApi {
   constructor(public readonly apiClient: ApiClient) {}
+
+  async getApp(): Promise<StreamResponse<GetApplicationResponse>> {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetApplicationResponse>
+    >('GET', '/api/v3/common/app', undefined, undefined);
+
+    decoders.GetApplicationResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async listBlockLists(request?: {
+    team?: string;
+  }): Promise<StreamResponse<ListBlockListResponse>> {
+    const queryParams = {
+      team: request?.team,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ListBlockListResponse>
+    >('GET', '/api/v3/common/blocklists', undefined, queryParams);
+
+    decoders.ListBlockListResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async createBlockList(
+    request: CreateBlockListRequest,
+  ): Promise<StreamResponse<CreateBlockListResponse>> {
+    const body = {
+      name: request?.name,
+      words: request?.words,
+      team: request?.team,
+      type: request?.type,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<CreateBlockListResponse>
+    >('POST', '/api/v3/common/blocklists', undefined, undefined, body);
+
+    decoders.CreateBlockListResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteBlockList(request: {
+    name: string;
+    team?: string;
+  }): Promise<StreamResponse<Response>> {
+    const queryParams = {
+      team: request?.team,
+    };
+    const pathParams = {
+      name: request?.name,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'DELETE',
+      '/api/v3/common/blocklists/{name}',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateBlockList(
+    request: UpdateBlockListRequest & { name: string },
+  ): Promise<StreamResponse<UpdateBlockListResponse>> {
+    const pathParams = {
+      name: request?.name,
+    };
+    const body = {
+      team: request?.team,
+      words: request?.words,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateBlockListResponse>
+    >('PUT', '/api/v3/common/blocklists/{name}', pathParams, undefined, body);
+
+    decoders.UpdateBlockListResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteDevice(request: {
+    id: string;
+  }): Promise<StreamResponse<Response>> {
+    const queryParams = {
+      id: request?.id,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'DELETE',
+      '/api/v3/common/devices',
+      undefined,
+      queryParams,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async listDevices(): Promise<StreamResponse<ListDevicesResponse>> {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ListDevicesResponse>
+    >('GET', '/api/v3/common/devices', undefined, undefined);
+
+    decoders.ListDevicesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async createDevice(
+    request: CreateDeviceRequest,
+  ): Promise<StreamResponse<Response>> {
+    const body = {
+      id: request?.id,
+      push_provider: request?.push_provider,
+      push_provider_name: request?.push_provider_name,
+      voip_token: request?.voip_token,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'POST',
+      '/api/v3/common/devices',
+      undefined,
+      undefined,
+      body,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async createGuest(
+    request: CreateGuestRequest,
+  ): Promise<StreamResponse<CreateGuestResponse>> {
+    const body = {
+      user: request?.user,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<CreateGuestResponse>
+    >('POST', '/api/v3/common/guest', undefined, undefined, body);
+
+    decoders.CreateGuestResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getOG(request: {
+    url: string;
+  }): Promise<StreamResponse<GetOGResponse>> {
+    const queryParams = {
+      url: request?.url,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetOGResponse>
+    >('GET', '/api/v3/common/og', undefined, queryParams);
+
+    decoders.GetOGResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async createPoll(
+    request: CreatePollRequest,
+  ): Promise<StreamResponse<PollResponse>> {
+    const body = {
+      name: request?.name,
+      allow_answers: request?.allow_answers,
+      allow_user_suggested_options: request?.allow_user_suggested_options,
+      description: request?.description,
+      enforce_unique_vote: request?.enforce_unique_vote,
+      id: request?.id,
+      is_closed: request?.is_closed,
+      max_votes_allowed: request?.max_votes_allowed,
+      voting_visibility: request?.voting_visibility,
+      options: request?.options,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<PollResponse>
+    >('POST', '/api/v3/common/polls', undefined, undefined, body);
+
+    decoders.PollResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updatePoll(
+    request: UpdatePollRequest,
+  ): Promise<StreamResponse<PollResponse>> {
+    const body = {
+      id: request?.id,
+      name: request?.name,
+      allow_answers: request?.allow_answers,
+      allow_user_suggested_options: request?.allow_user_suggested_options,
+      description: request?.description,
+      enforce_unique_vote: request?.enforce_unique_vote,
+      is_closed: request?.is_closed,
+      max_votes_allowed: request?.max_votes_allowed,
+      voting_visibility: request?.voting_visibility,
+      options: request?.options,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<PollResponse>
+    >('PUT', '/api/v3/common/polls', undefined, undefined, body);
+
+    decoders.PollResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryPolls(
+    request?: QueryPollsRequest & { user_id?: string },
+  ): Promise<StreamResponse<QueryPollsResponse>> {
+    const queryParams = {
+      user_id: request?.user_id,
+    };
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryPollsResponse>
+    >('POST', '/api/v3/common/polls/query', undefined, queryParams, body);
+
+    decoders.QueryPollsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deletePoll(request: {
+    poll_id: string;
+    user_id?: string;
+  }): Promise<StreamResponse<Response>> {
+    const queryParams = {
+      user_id: request?.user_id,
+    };
+    const pathParams = {
+      poll_id: request?.poll_id,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'DELETE',
+      '/api/v3/common/polls/{poll_id}',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getPoll(request: {
+    poll_id: string;
+    user_id?: string;
+  }): Promise<StreamResponse<PollResponse>> {
+    const queryParams = {
+      user_id: request?.user_id,
+    };
+    const pathParams = {
+      poll_id: request?.poll_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<PollResponse>
+    >('GET', '/api/v3/common/polls/{poll_id}', pathParams, queryParams);
+
+    decoders.PollResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updatePollPartial(
+    request: UpdatePollPartialRequest & { poll_id: string },
+  ): Promise<StreamResponse<PollResponse>> {
+    const pathParams = {
+      poll_id: request?.poll_id,
+    };
+    const body = {
+      unset: request?.unset,
+      set: request?.set,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<PollResponse>
+    >('PATCH', '/api/v3/common/polls/{poll_id}', pathParams, undefined, body);
+
+    decoders.PollResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async createPollOption(
+    request: CreatePollOptionRequest & { poll_id: string },
+  ): Promise<StreamResponse<PollOptionResponse>> {
+    const pathParams = {
+      poll_id: request?.poll_id,
+    };
+    const body = {
+      text: request?.text,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<PollOptionResponse>
+    >(
+      'POST',
+      '/api/v3/common/polls/{poll_id}/options',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.PollOptionResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updatePollOption(
+    request: UpdatePollOptionRequest & { poll_id: string },
+  ): Promise<StreamResponse<PollOptionResponse>> {
+    const pathParams = {
+      poll_id: request?.poll_id,
+    };
+    const body = {
+      id: request?.id,
+      text: request?.text,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<PollOptionResponse>
+    >(
+      'PUT',
+      '/api/v3/common/polls/{poll_id}/options',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.PollOptionResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deletePollOption(request: {
+    poll_id: string;
+    option_id: string;
+    user_id?: string;
+  }): Promise<StreamResponse<Response>> {
+    const queryParams = {
+      user_id: request?.user_id,
+    };
+    const pathParams = {
+      poll_id: request?.poll_id,
+      option_id: request?.option_id,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'DELETE',
+      '/api/v3/common/polls/{poll_id}/options/{option_id}',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getPollOption(request: {
+    poll_id: string;
+    option_id: string;
+    user_id?: string;
+  }): Promise<StreamResponse<PollOptionResponse>> {
+    const queryParams = {
+      user_id: request?.user_id,
+    };
+    const pathParams = {
+      poll_id: request?.poll_id,
+      option_id: request?.option_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<PollOptionResponse>
+    >(
+      'GET',
+      '/api/v3/common/polls/{poll_id}/options/{option_id}',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.PollOptionResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryPollVotes(
+    request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
+  ): Promise<StreamResponse<PollVotesResponse>> {
+    const queryParams = {
+      user_id: request?.user_id,
+    };
+    const pathParams = {
+      poll_id: request?.poll_id,
+    };
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<PollVotesResponse>
+    >(
+      'POST',
+      '/api/v3/common/polls/{poll_id}/votes',
+      pathParams,
+      queryParams,
+      body,
+    );
+
+    decoders.PollVotesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteFileGlobal(request?: {
+    url?: string;
+  }): Promise<StreamResponse<Response>> {
+    const queryParams = {
+      url: request?.url,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'DELETE',
+      '/api/v3/common/uploads/file',
+      undefined,
+      queryParams,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async uploadFileGlobal(
+    request?: FileUploadRequest,
+  ): Promise<StreamResponse<FileUploadResponse>> {
+    const body = {
+      file: request?.file,
+      user: request?.user,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<FileUploadResponse>
+    >('POST', '/api/v3/common/uploads/file', undefined, undefined, body);
+
+    decoders.FileUploadResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteImageGlobal(request?: {
+    url?: string;
+  }): Promise<StreamResponse<Response>> {
+    const queryParams = {
+      url: request?.url,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'DELETE',
+      '/api/v3/common/uploads/image',
+      undefined,
+      queryParams,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async uploadImageGlobal(
+    request?: ImageUploadRequest,
+  ): Promise<StreamResponse<ImageUploadResponse>> {
+    const body = {
+      file: request?.file,
+      upload_sizes: request?.upload_sizes,
+      user: request?.user,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ImageUploadResponse>
+    >('POST', '/api/v3/common/uploads/image', undefined, undefined, body);
+
+    decoders.ImageUploadResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryUsers(request?: {
+    payload?: QueryUsersPayload;
+  }): Promise<StreamResponse<QueryUsersResponse>> {
+    const queryParams = {
+      payload: request?.payload,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryUsersResponse>
+    >('GET', '/api/v3/common/users', undefined, queryParams);
+
+    decoders.QueryUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateUsersPartial(
+    request: UpdateUsersPartialRequest,
+  ): Promise<StreamResponse<UpdateUsersResponse>> {
+    const body = {
+      users: request?.users,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateUsersResponse>
+    >('PATCH', '/api/v3/common/users', undefined, undefined, body);
+
+    decoders.UpdateUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateUsers(
+    request: UpdateUsersRequest,
+  ): Promise<StreamResponse<UpdateUsersResponse>> {
+    const body = {
+      users: request?.users,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateUsersResponse>
+    >('POST', '/api/v3/common/users', undefined, undefined, body);
+
+    decoders.UpdateUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getBlockedUsers(): Promise<StreamResponse<GetBlockedUsersResponse>> {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetBlockedUsersResponse>
+    >('GET', '/api/v3/common/users/block', undefined, undefined);
+
+    decoders.GetBlockedUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async blockUsers(
+    request: BlockUsersRequest,
+  ): Promise<StreamResponse<BlockUsersResponse>> {
+    const body = {
+      blocked_user_id: request?.blocked_user_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<BlockUsersResponse>
+    >('POST', '/api/v3/common/users/block', undefined, undefined, body);
+
+    decoders.BlockUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async unblockUsers(
+    request: UnblockUsersRequest,
+  ): Promise<StreamResponse<UnblockUsersResponse>> {
+    const body = {
+      blocked_user_id: request?.blocked_user_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UnblockUsersResponse>
+    >('POST', '/api/v3/common/users/unblock', undefined, undefined, body);
+
+    decoders.UnblockUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
 
   async addActivity(
     request: AddActivityRequest,
@@ -1295,281 +1930,6 @@ export class FeedsApi {
     );
 
     decoders.UnfollowResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async createPoll(
-    request: CreatePollRequest,
-  ): Promise<StreamResponse<PollResponse>> {
-    const body = {
-      name: request?.name,
-      allow_answers: request?.allow_answers,
-      allow_user_suggested_options: request?.allow_user_suggested_options,
-      description: request?.description,
-      enforce_unique_vote: request?.enforce_unique_vote,
-      id: request?.id,
-      is_closed: request?.is_closed,
-      max_votes_allowed: request?.max_votes_allowed,
-      voting_visibility: request?.voting_visibility,
-      options: request?.options,
-      custom: request?.custom,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<PollResponse>
-    >('POST', '/api/v3/feeds/polls', undefined, undefined, body);
-
-    decoders.PollResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async updatePoll(
-    request: UpdatePollRequest,
-  ): Promise<StreamResponse<PollResponse>> {
-    const body = {
-      id: request?.id,
-      name: request?.name,
-      allow_answers: request?.allow_answers,
-      allow_user_suggested_options: request?.allow_user_suggested_options,
-      description: request?.description,
-      enforce_unique_vote: request?.enforce_unique_vote,
-      is_closed: request?.is_closed,
-      max_votes_allowed: request?.max_votes_allowed,
-      voting_visibility: request?.voting_visibility,
-      options: request?.options,
-      custom: request?.custom,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<PollResponse>
-    >('PUT', '/api/v3/feeds/polls', undefined, undefined, body);
-
-    decoders.PollResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async queryPolls(
-    request?: QueryPollsRequest & { user_id?: string },
-  ): Promise<StreamResponse<QueryPollsResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
-    const body = {
-      limit: request?.limit,
-      next: request?.next,
-      prev: request?.prev,
-      sort: request?.sort,
-      filter: request?.filter,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<QueryPollsResponse>
-    >('POST', '/api/v3/feeds/polls/query', undefined, queryParams, body);
-
-    decoders.QueryPollsResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async deletePoll(request: {
-    poll_id: string;
-    user_id?: string;
-  }): Promise<StreamResponse<Response>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
-    const pathParams = {
-      poll_id: request?.poll_id,
-    };
-
-    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
-      'DELETE',
-      '/api/v3/feeds/polls/{poll_id}',
-      pathParams,
-      queryParams,
-    );
-
-    decoders.Response?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async getPoll(request: {
-    poll_id: string;
-    user_id?: string;
-  }): Promise<StreamResponse<PollResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
-    const pathParams = {
-      poll_id: request?.poll_id,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<PollResponse>
-    >('GET', '/api/v3/feeds/polls/{poll_id}', pathParams, queryParams);
-
-    decoders.PollResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async updatePollPartial(
-    request: UpdatePollPartialRequest & { poll_id: string },
-  ): Promise<StreamResponse<PollResponse>> {
-    const pathParams = {
-      poll_id: request?.poll_id,
-    };
-    const body = {
-      unset: request?.unset,
-      set: request?.set,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<PollResponse>
-    >('PATCH', '/api/v3/feeds/polls/{poll_id}', pathParams, undefined, body);
-
-    decoders.PollResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async createPollOption(
-    request: CreatePollOptionRequest & { poll_id: string },
-  ): Promise<StreamResponse<PollOptionResponse>> {
-    const pathParams = {
-      poll_id: request?.poll_id,
-    };
-    const body = {
-      text: request?.text,
-      custom: request?.custom,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<PollOptionResponse>
-    >(
-      'POST',
-      '/api/v3/feeds/polls/{poll_id}/options',
-      pathParams,
-      undefined,
-      body,
-    );
-
-    decoders.PollOptionResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async updatePollOption(
-    request: UpdatePollOptionRequest & { poll_id: string },
-  ): Promise<StreamResponse<PollOptionResponse>> {
-    const pathParams = {
-      poll_id: request?.poll_id,
-    };
-    const body = {
-      id: request?.id,
-      text: request?.text,
-      custom: request?.custom,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<PollOptionResponse>
-    >(
-      'PUT',
-      '/api/v3/feeds/polls/{poll_id}/options',
-      pathParams,
-      undefined,
-      body,
-    );
-
-    decoders.PollOptionResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async deletePollOption(request: {
-    poll_id: string;
-    option_id: string;
-    user_id?: string;
-  }): Promise<StreamResponse<Response>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
-    const pathParams = {
-      poll_id: request?.poll_id,
-      option_id: request?.option_id,
-    };
-
-    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
-      'DELETE',
-      '/api/v3/feeds/polls/{poll_id}/options/{option_id}',
-      pathParams,
-      queryParams,
-    );
-
-    decoders.Response?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async getPollOption(request: {
-    poll_id: string;
-    option_id: string;
-    user_id?: string;
-  }): Promise<StreamResponse<PollOptionResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
-    const pathParams = {
-      poll_id: request?.poll_id,
-      option_id: request?.option_id,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<PollOptionResponse>
-    >(
-      'GET',
-      '/api/v3/feeds/polls/{poll_id}/options/{option_id}',
-      pathParams,
-      queryParams,
-    );
-
-    decoders.PollOptionResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
-  async queryPollVotes(
-    request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
-  ): Promise<StreamResponse<PollVotesResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
-    const pathParams = {
-      poll_id: request?.poll_id,
-    };
-    const body = {
-      limit: request?.limit,
-      next: request?.next,
-      prev: request?.prev,
-      sort: request?.sort,
-      filter: request?.filter,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<PollVotesResponse>
-    >(
-      'POST',
-      '/api/v3/feeds/polls/{poll_id}/votes',
-      pathParams,
-      queryParams,
-      body,
-    );
-
-    decoders.PollVotesResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

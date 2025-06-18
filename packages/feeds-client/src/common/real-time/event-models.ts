@@ -1,5 +1,6 @@
 import { APIError, UserResponse } from '../../gen/models';
-import { OwnUser, User, UserResponsePrivacyFields } from '../gen/models';
+import { User } from '../../gen/models';
+import { OwnUser, UserResponsePrivacyFields } from '../../types';
 
 /**
  * This event is sent when the WS connection fails

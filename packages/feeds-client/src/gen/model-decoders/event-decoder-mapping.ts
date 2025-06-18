@@ -105,6 +105,15 @@ const eventDecoderMapping: {
 
   'feeds.poll.vote_removed': (data: Record<string, any>) =>
     decoders.PollVoteRemovedFeedEvent(data),
+
+  'moderation.custom_action': (data: Record<string, any>) =>
+    decoders.ModerationCustomActionEvent(data),
+
+  'moderation.flagged': (data: Record<string, any>) =>
+    decoders.ModerationFlaggedEvent(data),
+
+  'moderation.mark_reviewed': (data: Record<string, any>) =>
+    decoders.ModerationMarkReviewedEvent(data),
 };
 
 export const decodeWSEvent = (data: { type: string } & Record<string, any>) => {
