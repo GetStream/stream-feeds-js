@@ -4,6 +4,8 @@ import { decoders } from '../model-decoders/decoders';
 const eventDecoderMapping: {
   [key in WSEvent['type']]: (data: Record<string, any>) => WSEvent;
 } = {
+  'app.updated': (data: Record<string, any>) => decoders.AppUpdatedEvent(data),
+
   'feeds.activity.added': (data: Record<string, any>) =>
     decoders.ActivityAddedEvent(data),
 
@@ -106,6 +108,9 @@ const eventDecoderMapping: {
   'feeds.poll.vote_removed': (data: Record<string, any>) =>
     decoders.PollVoteRemovedFeedEvent(data),
 
+  'health.check': (data: Record<string, any>) =>
+    decoders.HealthCheckEvent(data),
+
   'moderation.custom_action': (data: Record<string, any>) =>
     decoders.ModerationCustomActionEvent(data),
 
@@ -114,6 +119,19 @@ const eventDecoderMapping: {
 
   'moderation.mark_reviewed': (data: Record<string, any>) =>
     decoders.ModerationMarkReviewedEvent(data),
+
+  'user.banned': (data: Record<string, any>) => decoders.UserBannedEvent(data),
+
+  'user.deactivated': (data: Record<string, any>) =>
+    decoders.UserDeactivatedEvent(data),
+
+  'user.muted': (data: Record<string, any>) => decoders.UserMutedEvent(data),
+
+  'user.reactivated': (data: Record<string, any>) =>
+    decoders.UserReactivatedEvent(data),
+
+  'user.updated': (data: Record<string, any>) =>
+    decoders.UserUpdatedEvent(data),
 };
 
 export const decodeWSEvent = (data: { type: string } & Record<string, any>) => {

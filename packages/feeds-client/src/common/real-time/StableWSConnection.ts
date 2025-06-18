@@ -10,9 +10,8 @@ import type { LogLevel } from '../types';
 import type { UserRequest } from '../../gen/models';
 import { TokenManager } from '../TokenManager';
 import { EventDispatcher } from '../EventDispatcher';
-import { ConnectedEvent } from './event-models';
 import { ConnectionIdManager } from '../ConnectionIdManager';
-import { WSAuthMessage } from '../../types';
+import { ConnectedEvent } from './event-models';
 
 // Type guards to check WebSocket error type
 const isCloseEvent = (
@@ -469,7 +468,7 @@ export class StableWSConnection {
       return;
     }
 
-    const authMessage: WSAuthMessage = {
+    const authMessage = {
       token,
       user_details: {
         id: user.id,
