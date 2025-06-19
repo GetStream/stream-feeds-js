@@ -1,3 +1,33 @@
+export interface AIImageConfig {
+  enabled: boolean;
+
+  ocr_rules: OCRRule[];
+
+  rules: AWSRekognitionRule[];
+
+  async?: boolean;
+}
+
+export interface AITextConfig {
+  enabled: boolean;
+
+  profile: string;
+
+  rules: BodyguardRule[];
+
+  severity_rules: BodyguardSeverityRule[];
+
+  async?: boolean;
+}
+
+export interface AIVideoConfig {
+  enabled: boolean;
+
+  rules: AWSRekognitionRule[];
+
+  async?: boolean;
+}
+
 export interface APIError {
   code: number;
 
@@ -28,6 +58,20 @@ export interface APNS {
   sound?: string;
 
   data?: Record<string, any>;
+}
+
+export interface AWSRekognitionRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
+
+  label: string;
+
+  min_confidence: number;
 }
 
 export interface AcceptFeedMemberInviteRequest {}
@@ -86,6 +130,44 @@ export interface ActionLog {
   target_user?: User;
 
   user?: User;
+}
+
+export interface ActionLogResponse {
+  created_at: Date;
+
+  id: string;
+
+  reason: string;
+
+  target_user_id: string;
+
+  type: string;
+
+  user_id: string;
+
+  custom: Record<string, any>;
+
+  review_queue_item?: ReviewQueueItem;
+
+  target_user?: UserResponse;
+
+  user?: UserResponse;
+}
+
+export interface ActionSequence {
+  action: string;
+
+  blur: boolean;
+
+  cooldown_period: number;
+
+  threshold: number;
+
+  time_window: number;
+
+  warning: boolean;
+
+  warning_text: string;
 }
 
 export interface ActivityAddedEvent {
@@ -337,11 +419,11 @@ export interface ActivitySelectorConfig {
 
   min_popularity?: number;
 
-  tag_filter_type?: string;
-
   type?: string;
 
-  tags?: string[];
+  sort?: SortParam[];
+
+  filter?: Record<string, any>;
 }
 
 export interface ActivityUnpinnedEvent {
@@ -516,6 +598,18 @@ export interface AggregationConfig {
   format?: string;
 }
 
+export interface AppEventResponse {
+  auto_translation_enabled: boolean;
+
+  name: string;
+
+  async_url_enrich_enabled?: boolean;
+
+  file_upload_config?: FileUploadConfig;
+
+  image_upload_config?: FileUploadConfig;
+}
+
 export interface AppResponseFields {
   async_url_enrich_enabled: boolean;
 
@@ -526,6 +620,18 @@ export interface AppResponseFields {
   file_upload_config: FileUploadConfig;
 
   image_upload_config: FileUploadConfig;
+}
+
+export interface AppUpdatedEvent {
+  created_at: Date;
+
+  app: AppEventResponse;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
 }
 
 export interface Attachment {
@@ -596,7 +702,75 @@ export interface AudioSettings {
   noise_cancellation?: NoiseCancellationSettings;
 }
 
+export interface AudioSettingsResponse {
+  access_request_enabled: boolean;
+
+  default_device: 'speaker' | 'earpiece';
+
+  mic_default_on: boolean;
+
+  opus_dtx_enabled: boolean;
+
+  redundant_coding_enabled: boolean;
+
+  speaker_default_on: boolean;
+
+  noise_cancellation?: NoiseCancellationSettings;
+}
+
+export interface AutomodPlatformCircumventionConfig {
+  enabled: boolean;
+
+  rules: AutomodRule[];
+
+  async?: boolean;
+}
+
+export interface AutomodRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
+
+  label: string;
+
+  threshold: number;
+}
+
+export interface AutomodSemanticFiltersConfig {
+  enabled: boolean;
+
+  rules: AutomodSemanticFiltersRule[];
+
+  async?: boolean;
+}
+
+export interface AutomodSemanticFiltersRule {
+  action: 'flag' | 'shadow' | 'remove';
+
+  name: string;
+
+  threshold: number;
+}
+
+export interface AutomodToxicityConfig {
+  enabled: boolean;
+
+  rules: AutomodRule[];
+
+  async?: boolean;
+}
+
 export interface BackstageSettings {
+  enabled: boolean;
+
+  join_ahead_time_seconds?: number;
+}
+
+export interface BackstageSettingsResponse {
   enabled: boolean;
 
   join_ahead_time_seconds?: number;
@@ -616,6 +790,52 @@ export interface Ban {
   created_by?: User;
 
   target?: User;
+}
+
+export interface BanActionRequest {
+  channel_ban_only?: boolean;
+
+  delete_messages?: 'soft' | 'pruning' | 'hard';
+
+  ip_ban?: boolean;
+
+  reason?: string;
+
+  shadow?: boolean;
+
+  timeout?: number;
+}
+
+export interface BanRequest {
+  target_user_id: string;
+
+  banned_by_id?: string;
+
+  channel_cid?: string;
+
+  delete_messages?: 'soft' | 'pruning' | 'hard';
+
+  ip_ban?: boolean;
+
+  reason?: string;
+
+  shadow?: boolean;
+
+  timeout?: number;
+
+  banned_by?: UserRequest;
+}
+
+export interface BanResponse {
+  duration: string;
+}
+
+export interface BlockListConfig {
+  enabled: boolean;
+
+  rules: BlockListRule[];
+
+  async?: boolean;
 }
 
 export interface BlockListOptions {
@@ -638,6 +858,21 @@ export interface BlockListResponse {
   team?: string;
 
   updated_at?: Date;
+}
+
+export interface BlockListRule {
+  action:
+    | 'flag'
+    | 'mask_flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
+
+  name: string;
+
+  team: string;
 }
 
 export interface BlockUsersRequest {
@@ -664,6 +899,32 @@ export interface BlockedUserResponse {
   blocked_user: UserResponse;
 
   user: UserResponse;
+}
+
+export interface BodyguardRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
+
+  label: string;
+
+  severity_rules: BodyguardSeverityRule[];
+}
+
+export interface BodyguardSeverityRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
+
+  severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface BookmarkAddedEvent {
@@ -740,6 +1001,14 @@ export interface BroadcastSettings {
   hls?: HLSSettings;
 
   rtmp?: RTMPSettings;
+}
+
+export interface BroadcastSettingsResponse {
+  enabled: boolean;
+
+  hls: HLSSettingsResponse;
+
+  rtmp: RTMPSettingsResponse;
 }
 
 export interface Call {
@@ -830,6 +1099,10 @@ export interface CallEgress {
   config?: EgressTaskConfig;
 }
 
+export interface CallIngressResponse {
+  rtmp: RTMPIngress;
+}
+
 export interface CallMember {
   created_at: Date;
 
@@ -888,6 +1161,64 @@ export interface CallParticipant {
   privacy_settings?: PrivacySettings;
 }
 
+export interface CallParticipantResponse {
+  joined_at: Date;
+
+  role: string;
+
+  user_session_id: string;
+
+  user: UserResponse;
+}
+
+export interface CallResponse {
+  backstage: boolean;
+
+  captioning: boolean;
+
+  cid: string;
+
+  created_at: Date;
+
+  current_session_id: string;
+
+  id: string;
+
+  recording: boolean;
+
+  transcribing: boolean;
+
+  type: string;
+
+  updated_at: Date;
+
+  blocked_user_ids: string[];
+
+  created_by: UserResponse;
+
+  custom: Record<string, any>;
+
+  egress: EgressResponse;
+
+  ingress: CallIngressResponse;
+
+  settings: CallSettingsResponse;
+
+  channel_cid?: string;
+
+  ended_at?: Date;
+
+  join_ahead_time_seconds?: number;
+
+  starts_at?: Date;
+
+  team?: string;
+
+  session?: CallSessionResponse;
+
+  thumbnails?: ThumbnailResponse;
+}
+
 export interface CallSession {
   anonymous_participant_count: number;
 
@@ -932,6 +1263,32 @@ export interface CallSession {
   timer_ends_at?: Date;
 }
 
+export interface CallSessionResponse {
+  anonymous_participant_count: number;
+
+  id: string;
+
+  participants: CallParticipantResponse[];
+
+  accepted_by: Record<string, Date>;
+
+  missed_by: Record<string, Date>;
+
+  participants_count_by_role: Record<string, number>;
+
+  rejected_by: Record<string, Date>;
+
+  ended_at?: Date;
+
+  live_ended_at?: Date;
+
+  live_started_at?: Date;
+
+  started_at?: Date;
+
+  timer_ends_at?: Date;
+}
+
 export interface CallSettings {
   audio?: AudioSettings;
 
@@ -958,6 +1315,34 @@ export interface CallSettings {
   transcription?: TranscriptionSettings;
 
   video?: VideoSettings;
+}
+
+export interface CallSettingsResponse {
+  audio: AudioSettingsResponse;
+
+  backstage: BackstageSettingsResponse;
+
+  broadcasting: BroadcastSettingsResponse;
+
+  frame_recording: FrameRecordingSettingsResponse;
+
+  geofencing: GeofenceSettingsResponse;
+
+  limits: LimitsSettingsResponse;
+
+  recording: RecordSettingsResponse;
+
+  ring: RingSettingsResponse;
+
+  screensharing: ScreensharingSettingsResponse;
+
+  session: SessionSettingsResponse;
+
+  thumbnails: ThumbnailsSettingsResponse;
+
+  transcription: TranscriptionSettingsResponse;
+
+  video: VideoSettingsResponse;
 }
 
 export interface CallType {
@@ -1482,6 +1867,52 @@ export interface ConfigOverrides {
   user_message_reminders?: boolean;
 }
 
+export interface ConfigResponse {
+  async: boolean;
+
+  created_at: Date;
+
+  key: string;
+
+  team: string;
+
+  updated_at: Date;
+
+  ai_image_config?: AIImageConfig;
+
+  ai_text_config?: AITextConfig;
+
+  ai_video_config?: AIVideoConfig;
+
+  automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
+
+  automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
+
+  automod_toxicity_config?: AutomodToxicityConfig;
+
+  block_list_config?: BlockListConfig;
+
+  velocity_filter_config?: VelocityFilterConfig;
+
+  video_call_rule_config?: VideoCallRuleConfig;
+}
+
+export interface ConnectUserDetailsRequest {
+  id: string;
+
+  image?: string;
+
+  invisible?: boolean;
+
+  language?: string;
+
+  name?: string;
+
+  custom?: Record<string, any>;
+
+  privacy_settings?: PrivacySettingsResponse;
+}
+
 export interface CreateBlockListRequest {
   name: string;
 
@@ -1560,6 +1991,12 @@ export interface CreatePollRequest {
   custom?: Record<string, any>;
 }
 
+export interface CustomActionRequest {
+  id?: string;
+
+  options?: Record<string, any>;
+}
+
 export interface Data {
   id: string;
 }
@@ -1598,6 +2035,10 @@ export interface DeleteActivityReactionResponse {
   reaction: FeedsReactionResponse;
 }
 
+export interface DeleteActivityRequest {
+  hard_delete?: boolean;
+}
+
 export interface DeleteActivityResponse {
   duration: string;
 }
@@ -1624,6 +2065,46 @@ export interface DeleteFeedResponse {
   duration: string;
 }
 
+export interface DeleteMessageRequest {
+  hard_delete?: boolean;
+}
+
+export interface DeleteModerationConfigResponse {
+  duration: string;
+}
+
+export interface DeleteReactionRequest {
+  hard_delete?: boolean;
+}
+
+export interface DeleteUserRequest {
+  delete_conversation_channels?: boolean;
+
+  delete_feeds_content?: boolean;
+
+  hard_delete?: boolean;
+
+  mark_messages_deleted?: boolean;
+}
+
+export interface Device {
+  created_at: Date;
+
+  id: string;
+
+  push_provider: 'firebase' | 'apn' | 'huawei' | 'xiaomi';
+
+  user_id: string;
+
+  disabled?: boolean;
+
+  disabled_reason?: string;
+
+  push_provider_name?: string;
+
+  voip?: boolean;
+}
+
 export interface DeviceResponse {
   created_at: Date;
 
@@ -1640,6 +2121,76 @@ export interface DeviceResponse {
   push_provider_name?: string;
 
   voip?: boolean;
+}
+
+export interface DraftPayloadResponse {
+  id: string;
+
+  text: string;
+
+  custom: Record<string, any>;
+
+  html?: string;
+
+  mml?: string;
+
+  parent_id?: string;
+
+  poll_id?: string;
+
+  quoted_message_id?: string;
+
+  show_in_channel?: boolean;
+
+  silent?: boolean;
+
+  type?: string;
+
+  attachments?: Attachment[];
+
+  mentioned_users?: UserResponse[];
+}
+
+export interface DraftResponse {
+  channel_cid: string;
+
+  created_at: Date;
+
+  message: DraftPayloadResponse;
+
+  parent_id?: string;
+
+  channel?: ChannelResponse;
+
+  parent_message?: MessageResponse;
+
+  quoted_message?: MessageResponse;
+}
+
+export interface EgressHLSResponse {
+  playlist_url: string;
+
+  status: string;
+}
+
+export interface EgressRTMPResponse {
+  name: string;
+
+  started_at: Date;
+
+  stream_key?: string;
+
+  stream_url?: string;
+}
+
+export interface EgressResponse {
+  broadcasting: boolean;
+
+  rtmps: EgressRTMPResponse[];
+
+  frame_recording?: FrameRecordingResponse;
+
+  hls?: EgressHLSResponse;
 }
 
 export interface EgressTaskConfig {
@@ -1684,8 +2235,6 @@ export interface EnrichedActivity {
   reaction_counts?: Record<string, number>;
 
   target?: Data;
-
-  time?: Time;
 }
 
 export interface EnrichedReaction {
@@ -1756,6 +2305,48 @@ export interface EntityCreator {
   teams?: string[];
 
   privacy_settings?: PrivacySettings;
+}
+
+export interface EntityCreatorResponse {
+  ban_count: number;
+
+  banned: boolean;
+
+  created_at: Date;
+
+  deleted_content_count: number;
+
+  flagged_count: number;
+
+  id: string;
+
+  language: string;
+
+  online: boolean;
+
+  role: string;
+
+  updated_at: Date;
+
+  blocked_user_ids: string[];
+
+  teams: string[];
+
+  custom: Record<string, any>;
+
+  deactivated_at?: Date;
+
+  deleted_at?: Date;
+
+  image?: string;
+
+  last_active?: Date;
+
+  name?: string;
+
+  revoke_tokens_issued_before?: Date;
+
+  teams_role?: Record<string, string>;
 }
 
 export interface EventNotificationSettings {
@@ -2167,6 +2758,26 @@ export interface Flag {
   user?: User;
 }
 
+export interface FlagRequest {
+  entity_id: string;
+
+  entity_type: string;
+
+  entity_creator_id?: string;
+
+  reason?: string;
+
+  custom?: Record<string, any>;
+
+  moderation_payload?: ModerationPayload;
+}
+
+export interface FlagResponse {
+  duration: string;
+
+  item_id: string;
+}
+
 export interface FollowBatchRequest {
   follows: FollowRequest[];
 }
@@ -2269,6 +2880,18 @@ export interface FrameRecordingEgressConfig {
   quality?: Quality;
 }
 
+export interface FrameRecordingResponse {
+  status: string;
+}
+
+export interface FrameRecordingSettingsResponse {
+  capture_interval_in_seconds: number;
+
+  mode: 'available' | 'disabled' | 'auto-on';
+
+  quality?: string;
+}
+
 export interface FullUserResponse {
   banned: boolean;
 
@@ -2333,6 +2956,10 @@ export interface GeofenceSettings {
   names: string[];
 }
 
+export interface GeofenceSettingsResponse {
+  names: string[];
+}
+
 export interface GetActivityResponse {
   duration: string;
 
@@ -2375,6 +3002,12 @@ export interface GetCommentsResponse {
   next?: string;
 
   prev?: string;
+}
+
+export interface GetConfigResponse {
+  duration: string;
+
+  config?: ConfigResponse;
 }
 
 export interface GetFollowSuggestionsResponse {
@@ -2452,6 +3085,8 @@ export interface GetOrCreateFeedRequest {
 
   watch?: boolean;
 
+  activity_selector_options?: Record<string, any>;
+
   data?: FeedInput;
 
   external_ranking?: Record<string, any>;
@@ -2501,6 +3136,10 @@ export interface GetOrCreateFeedResponse {
   own_membership?: FeedMemberResponse;
 }
 
+export interface GoogleVisionConfig {
+  enabled?: boolean;
+}
+
 export interface HLSEgressConfig {
   playlist_url?: string;
 
@@ -2519,6 +3158,36 @@ export interface HLSSettings {
   quality_tracks: string[];
 
   layout?: LayoutSettings;
+}
+
+export interface HLSSettingsResponse {
+  auto_on: boolean;
+
+  enabled: boolean;
+
+  quality_tracks: string[];
+}
+
+export interface HarmConfig {
+  severity: number;
+
+  action_sequences: ActionSequence[];
+}
+
+export interface HealthCheckEvent {
+  connection_id: string;
+
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  cid?: string;
+
+  received_at?: Date;
+
+  me?: OwnUserResponse;
 }
 
 export interface ImageData {
@@ -2601,6 +3270,12 @@ export interface LimitsSettings {
   max_participants?: number;
 }
 
+export interface LimitsSettingsResponse {
+  max_duration_seconds?: number;
+
+  max_participants?: number;
+}
+
 export interface ListBlockListResponse {
   duration: string;
 
@@ -2621,6 +3296,12 @@ export interface MarkActivityRequest {
   mark_read?: string[];
 
   mark_watched?: string[];
+}
+
+export interface MarkReviewedRequest {
+  content_to_mark_as_reviewed_limit?: number;
+
+  disable_marking_content_as_reviewed?: boolean;
 }
 
 export interface MemberLookup {
@@ -2733,6 +3414,104 @@ export interface MessageReminder {
   user?: User;
 }
 
+export interface MessageResponse {
+  cid: string;
+
+  created_at: Date;
+
+  deleted_reply_count: number;
+
+  html: string;
+
+  id: string;
+
+  pinned: boolean;
+
+  reply_count: number;
+
+  shadowed: boolean;
+
+  silent: boolean;
+
+  text: string;
+
+  type: 'regular' | 'ephemeral' | 'error' | 'reply' | 'system' | 'deleted';
+
+  updated_at: Date;
+
+  attachments: Attachment[];
+
+  latest_reactions: ReactionResponse[];
+
+  mentioned_users: UserResponse[];
+
+  own_reactions: ReactionResponse[];
+
+  restricted_visibility: string[];
+
+  custom: Record<string, any>;
+
+  reaction_counts: Record<string, number>;
+
+  reaction_scores: Record<string, number>;
+
+  user: UserResponse;
+
+  command?: string;
+
+  deleted_at?: Date;
+
+  message_text_updated_at?: Date;
+
+  mml?: string;
+
+  parent_id?: string;
+
+  pin_expires?: Date;
+
+  pinned_at?: Date;
+
+  poll_id?: string;
+
+  quoted_message_id?: string;
+
+  show_in_channel?: boolean;
+
+  thread_participants?: UserResponse[];
+
+  draft?: DraftResponse;
+
+  i18n?: Record<string, string>;
+
+  image_labels?: Record<string, string[]>;
+
+  moderation?: ModerationV2Response;
+
+  pinned_by?: UserResponse;
+
+  poll?: PollResponseData;
+
+  quoted_message?: MessageResponse;
+
+  reaction_groups?: Record<string, ReactionGroupResponse>;
+
+  reminder?: ReminderResponseData;
+}
+
+export interface ModerationActionConfig {
+  action: string;
+
+  description: string;
+
+  entity_type: string;
+
+  icon: string;
+
+  order: number;
+
+  custom: Record<string, any>;
+}
+
 export interface ModerationCustomActionEvent {
   created_at: Date;
 
@@ -2795,6 +3574,22 @@ export interface ModerationV2Response {
   text_harms?: string[];
 }
 
+export interface MuteRequest {
+  target_ids: string[];
+
+  timeout?: number;
+}
+
+export interface MuteResponse {
+  duration: string;
+
+  mutes?: UserMute[];
+
+  non_existing_users?: string[];
+
+  own_user?: OwnUser;
+}
+
 export interface NoiseCancellationSettings {
   mode: 'available' | 'disabled' | 'auto-on';
 }
@@ -2831,8 +3626,132 @@ export interface NotificationStatusResponse {
 
 export interface NullTime {}
 
+export interface OCRRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
+
+  label: string;
+}
+
 export interface OnlyUserID {
   id: string;
+}
+
+export interface OwnUser {
+  banned: boolean;
+
+  created_at: Date;
+
+  id: string;
+
+  language: string;
+
+  online: boolean;
+
+  role: string;
+
+  total_unread_count: number;
+
+  unread_channels: number;
+
+  unread_count: number;
+
+  unread_threads: number;
+
+  updated_at: Date;
+
+  channel_mutes: ChannelMute[];
+
+  devices: Device[];
+
+  mutes: UserMute[];
+
+  custom: Record<string, any>;
+
+  deactivated_at?: Date;
+
+  deleted_at?: Date;
+
+  invisible?: boolean;
+
+  last_active?: Date;
+
+  last_engaged_at?: Date;
+
+  blocked_user_ids?: string[];
+
+  latest_hidden_channels?: string[];
+
+  teams?: string[];
+
+  privacy_settings?: PrivacySettings;
+
+  push_preferences?: PushPreferences;
+
+  teams_role?: Record<string, string>;
+}
+
+export interface OwnUserResponse {
+  banned: boolean;
+
+  created_at: Date;
+
+  id: string;
+
+  invisible: boolean;
+
+  language: string;
+
+  online: boolean;
+
+  role: string;
+
+  total_unread_count: number;
+
+  unread_channels: number;
+
+  unread_count: number;
+
+  unread_threads: number;
+
+  updated_at: Date;
+
+  channel_mutes: ChannelMute[];
+
+  devices: DeviceResponse[];
+
+  mutes: UserMuteResponse[];
+
+  teams: string[];
+
+  custom: Record<string, any>;
+
+  deactivated_at?: Date;
+
+  deleted_at?: Date;
+
+  image?: string;
+
+  last_active?: Date;
+
+  name?: string;
+
+  revoke_tokens_issued_before?: Date;
+
+  blocked_user_ids?: string[];
+
+  latest_hidden_channels?: string[];
+
+  privacy_settings?: PrivacySettingsResponse;
+
+  push_preferences?: PushPreferences;
+
+  teams_role?: Record<string, string>;
 }
 
 export interface PagerRequest {
@@ -3151,6 +4070,14 @@ export interface PrivacySettingsResponse {
   typing_indicators?: TypingIndicatorsResponse;
 }
 
+export interface PushPreferences {
+  call_level?: string;
+
+  chat_level?: string;
+
+  disabled_until?: Date;
+}
+
 export interface Quality {
   bitdepth?: number;
 
@@ -3365,6 +4292,28 @@ export interface QueryFollowsResponse {
   prev?: string;
 }
 
+export interface QueryModerationConfigsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryModerationConfigsResponse {
+  duration: string;
+
+  configs: ConfigResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
 export interface QueryPollVotesRequest {
   limit?: number;
 
@@ -3399,6 +4348,40 @@ export interface QueryPollsResponse {
   prev?: string;
 }
 
+export interface QueryReviewQueueRequest {
+  limit?: number;
+
+  lock_count?: number;
+
+  lock_duration?: number;
+
+  lock_items?: boolean;
+
+  next?: string;
+
+  prev?: string;
+
+  stats_only?: boolean;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryReviewQueueResponse {
+  duration: string;
+
+  items: ReviewQueueItemResponse[];
+
+  action_config: Record<string, ModerationActionConfig[]>;
+
+  stats: Record<string, any>;
+
+  next?: string;
+
+  prev?: string;
+}
+
 export interface QueryUsersPayload {
   filter_conditions: Record<string, any>;
 
@@ -3427,6 +4410,10 @@ export interface RTMPEgressConfig {
   quality?: Quality;
 }
 
+export interface RTMPIngress {
+  address: string;
+}
+
 export interface RTMPLocation {
   name: string;
 
@@ -3445,16 +4432,18 @@ export interface RTMPSettings {
   location?: RTMPLocation;
 }
 
+export interface RTMPSettingsResponse {
+  enabled: boolean;
+
+  quality: string;
+}
+
 export interface RankingConfig {
   score: string;
 
   defaults: Record<string, any>;
 
   functions: Record<string, DecayFunctionConfig>;
-
-  decay_factor?: number;
-
-  recency_weight?: number;
 
   type?: string;
 }
@@ -3483,6 +4472,26 @@ export interface ReactionGroupResponse {
   first_reaction_at: Date;
 
   last_reaction_at: Date;
+
+  sum_scores: number;
+}
+
+export interface ReactionResponse {
+  created_at: Date;
+
+  message_id: string;
+
+  score: number;
+
+  type: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  custom: Record<string, any>;
+
+  user: UserResponse;
 }
 
 export interface ReadReceipts {
@@ -3501,6 +4510,14 @@ export interface RecordSettings {
   quality?: string;
 
   layout?: LayoutSettings;
+}
+
+export interface RecordSettingsResponse {
+  audio_only: boolean;
+
+  mode: string;
+
+  quality: string;
 }
 
 export interface RecordingEgressConfig {
@@ -3537,6 +4554,26 @@ export interface RejectFollowResponse {
   follow: FollowResponse;
 }
 
+export interface ReminderResponseData {
+  channel_cid: string;
+
+  created_at: Date;
+
+  message_id: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  remind_at?: Date;
+
+  channel?: ChannelResponse;
+
+  message?: Message;
+
+  user?: User;
+}
+
 export interface RepliesMeta {
   depth_truncated: boolean;
 
@@ -3550,6 +4587,8 @@ export interface RepliesMeta {
 export interface Response {
   duration: string;
 }
+
+export interface RestoreActionRequest {}
 
 export interface ReviewQueueItem {
   ai_text_severity: string;
@@ -3598,8 +4637,6 @@ export interface ReviewQueueItem {
 
   teams: string[];
 
-  completed_at: NullTime;
-
   reviewed_at: NullTime;
 
   activity?: EnrichedActivity;
@@ -3621,12 +4658,122 @@ export interface ReviewQueueItem {
   reaction?: Reaction;
 }
 
+export interface ReviewQueueItemResponse {
+  ai_text_severity: string;
+
+  created_at: Date;
+
+  entity_id: string;
+
+  entity_type: string;
+
+  flags_count: number;
+
+  id: string;
+
+  recommended_action: string;
+
+  reviewed_by: string;
+
+  severity: number;
+
+  status: string;
+
+  updated_at: Date;
+
+  actions: ActionLogResponse[];
+
+  bans: Ban[];
+
+  flags: FlagResponse[];
+
+  languages: string[];
+
+  completed_at?: Date;
+
+  config_key?: string;
+
+  entity_creator_id?: string;
+
+  reviewed_at?: Date;
+
+  teams?: string[];
+
+  activity?: EnrichedActivity;
+
+  assigned_to?: UserResponse;
+
+  call?: CallResponse;
+
+  entity_creator?: EntityCreatorResponse;
+
+  feeds_v2_activity?: EnrichedActivity;
+
+  feeds_v2_reaction?: Reaction;
+
+  message?: MessageResponse;
+
+  moderation_payload?: ModerationPayload;
+
+  reaction?: Reaction;
+}
+
 export interface RingSettings {
   auto_cancel_timeout_ms: number;
 
   incoming_call_timeout_ms: number;
 
   missed_call_timeout_ms: number;
+}
+
+export interface RingSettingsResponse {
+  auto_cancel_timeout_ms: number;
+
+  incoming_call_timeout_ms: number;
+
+  missed_call_timeout_ms: number;
+}
+
+export interface RuleBuilderAction {
+  duration?: number;
+
+  ip_ban?: boolean;
+
+  reason?: string;
+
+  shadow_ban?: boolean;
+
+  type?: string;
+}
+
+export interface RuleBuilderCondition {
+  provider?: string;
+
+  threshold?: number;
+
+  time_window?: string;
+
+  labels?: string[];
+}
+
+export interface RuleBuilderConfig {
+  async?: boolean;
+
+  enabled?: boolean;
+
+  rules?: RuleBuilderRule[];
+}
+
+export interface RuleBuilderRule {
+  enabled?: boolean;
+
+  id?: string;
+
+  name?: string;
+
+  conditions?: RuleBuilderCondition[];
+
+  action?: RuleBuilderAction;
 }
 
 export interface SFUIDLastSeen {
@@ -3663,9 +4810,23 @@ export interface ScreensharingSettings {
   target_resolution?: TargetResolution;
 }
 
+export interface ScreensharingSettingsResponse {
+  access_request_enabled: boolean;
+
+  enabled: boolean;
+
+  target_resolution?: TargetResolution;
+}
+
 export interface SessionSettings {
   inactivity_timeout_seconds: number;
 }
+
+export interface SessionSettingsResponse {
+  inactivity_timeout_seconds: number;
+}
+
+export interface ShadowBlockActionRequest {}
 
 export interface SingleFollowRequest {
   source: string;
@@ -3683,6 +4844,12 @@ export interface SingleFollowResponse {
   follow: FollowResponse;
 }
 
+export interface SortParam {
+  direction: number;
+
+  field: string;
+}
+
 export interface SortParamRequest {
   direction?: number;
 
@@ -3693,6 +4860,47 @@ export interface StoriesConfig {
   expiration_behaviour?: 'hide_for_everyone' | 'visible_for_author';
 
   skip_watched?: boolean;
+}
+
+export interface SubmitActionRequest {
+  action_type:
+    | 'mark_reviewed'
+    | 'delete_message'
+    | 'delete_activity'
+    | 'delete_reaction'
+    | 'ban'
+    | 'custom'
+    | 'unban'
+    | 'restore'
+    | 'delete_user'
+    | 'unblock'
+    | 'shadow_block'
+    | 'kick_user'
+    | 'end_call';
+
+  item_id: string;
+
+  ban?: BanActionRequest;
+
+  custom?: CustomActionRequest;
+
+  delete_activity?: DeleteActivityRequest;
+
+  delete_message?: DeleteMessageRequest;
+
+  delete_reaction?: DeleteReactionRequest;
+
+  delete_user?: DeleteUserRequest;
+
+  mark_reviewed?: MarkReviewedRequest;
+
+  unban?: UnbanActionRequest;
+}
+
+export interface SubmitActionResponse {
+  duration: string;
+
+  item?: ReviewQueueItem;
 }
 
 export interface TargetResolution {
@@ -3763,13 +4971,66 @@ export interface Thresholds {
   toxic?: LabelThresholds;
 }
 
+export interface ThumbnailResponse {
+  image_url: string;
+}
+
 export interface ThumbnailsSettings {
+  enabled: boolean;
+}
+
+export interface ThumbnailsSettingsResponse {
   enabled: boolean;
 }
 
 export interface Time {}
 
 export interface TranscriptionSettings {
+  closed_caption_mode: 'available' | 'disabled' | 'auto-on';
+
+  language:
+    | 'auto'
+    | 'en'
+    | 'fr'
+    | 'es'
+    | 'de'
+    | 'it'
+    | 'nl'
+    | 'pt'
+    | 'pl'
+    | 'ca'
+    | 'cs'
+    | 'da'
+    | 'el'
+    | 'fi'
+    | 'id'
+    | 'ja'
+    | 'ru'
+    | 'sv'
+    | 'ta'
+    | 'th'
+    | 'tr'
+    | 'hu'
+    | 'ro'
+    | 'zh'
+    | 'ar'
+    | 'tl'
+    | 'he'
+    | 'hi'
+    | 'hr'
+    | 'ko'
+    | 'ms'
+    | 'no'
+    | 'uk'
+    | 'bg'
+    | 'et'
+    | 'sl'
+    | 'sk';
+
+  mode: 'available' | 'disabled' | 'auto-on';
+}
+
+export interface TranscriptionSettingsResponse {
   closed_caption_mode: 'available' | 'disabled' | 'auto-on';
 
   language:
@@ -3821,6 +5082,10 @@ export interface TypingIndicators {
 export interface TypingIndicatorsResponse {
   enabled: boolean;
 }
+
+export interface UnbanActionRequest {}
+
+export interface UnblockActionRequest {}
 
 export interface UnblockUsersRequest {
   blocked_user_id: string;
@@ -4044,6 +5309,46 @@ export interface UpsertActivitiesResponse {
   activities: ActivityResponse[];
 }
 
+export interface UpsertConfigRequest {
+  key: string;
+
+  async?: boolean;
+
+  team?: string;
+
+  ai_image_config?: AIImageConfig;
+
+  ai_text_config?: AITextConfig;
+
+  ai_video_config?: AIVideoConfig;
+
+  automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
+
+  automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
+
+  automod_toxicity_config?: AutomodToxicityConfig;
+
+  aws_rekognition_config?: AIImageConfig;
+
+  block_list_config?: BlockListConfig;
+
+  bodyguard_config?: AITextConfig;
+
+  google_vision_config?: GoogleVisionConfig;
+
+  rule_builder_config?: RuleBuilderConfig;
+
+  velocity_filter_config?: VelocityFilterConfig;
+
+  video_call_rule_config?: VideoCallRuleConfig;
+}
+
+export interface UpsertConfigResponse {
+  duration: string;
+
+  config?: ConfigResponse;
+}
+
 export interface User {
   banned: boolean;
 
@@ -4082,6 +5387,52 @@ export interface User {
   privacy_settings?: PrivacySettings;
 }
 
+export interface UserBannedEvent {
+  channel_id: string;
+
+  channel_type: string;
+
+  cid: string;
+
+  created_at: Date;
+
+  shadow: boolean;
+
+  created_by: User;
+
+  type: string;
+
+  expiration?: Date;
+
+  reason?: string;
+
+  team?: string;
+
+  user?: User;
+}
+
+export interface UserDeactivatedEvent {
+  created_at: Date;
+
+  created_by: User;
+
+  type: string;
+
+  user?: User;
+}
+
+export interface UserMute {
+  created_at: Date;
+
+  updated_at: Date;
+
+  expires?: Date;
+
+  target?: User;
+
+  user?: User;
+}
+
 export interface UserMuteResponse {
   created_at: Date;
 
@@ -4092,6 +5443,26 @@ export interface UserMuteResponse {
   target?: UserResponse;
 
   user?: UserResponse;
+}
+
+export interface UserMutedEvent {
+  created_at: Date;
+
+  type: string;
+
+  target_user?: string;
+
+  target_users?: string[];
+
+  user?: User;
+}
+
+export interface UserReactivatedEvent {
+  created_at: Date;
+
+  type: string;
+
+  user?: User;
 }
 
 export interface UserRequest {
@@ -4182,11 +5553,129 @@ export interface UserResponseCommonFields {
   teams_role?: Record<string, string>;
 }
 
+export interface UserResponsePrivacyFields {
+  banned: boolean;
+
+  created_at: Date;
+
+  id: string;
+
+  language: string;
+
+  online: boolean;
+
+  role: string;
+
+  updated_at: Date;
+
+  blocked_user_ids: string[];
+
+  teams: string[];
+
+  custom: Record<string, any>;
+
+  deactivated_at?: Date;
+
+  deleted_at?: Date;
+
+  image?: string;
+
+  invisible?: boolean;
+
+  last_active?: Date;
+
+  name?: string;
+
+  revoke_tokens_issued_before?: Date;
+
+  privacy_settings?: PrivacySettingsResponse;
+
+  teams_role?: Record<string, string>;
+}
+
+export interface UserUpdatedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  user: UserResponsePrivacyFields;
+
+  type: string;
+
+  received_at?: Date;
+}
+
+export interface VelocityFilterConfig {
+  advanced_filters: boolean;
+
+  cascading_actions: boolean;
+
+  cids_per_user: number;
+
+  enabled: boolean;
+
+  first_message_only: boolean;
+
+  rules: VelocityFilterConfigRule[];
+
+  async?: boolean;
+}
+
+export interface VelocityFilterConfigRule {
+  action: 'flag' | 'shadow' | 'remove' | 'ban';
+
+  ban_duration: number;
+
+  cascading_action: 'flag' | 'shadow' | 'remove' | 'ban';
+
+  cascading_threshold: number;
+
+  check_message_context: boolean;
+
+  fast_spam_threshold: number;
+
+  fast_spam_ttl: number;
+
+  ip_ban: boolean;
+
+  probation_period: number;
+
+  shadow_ban: boolean;
+
+  slow_spam_threshold: number;
+
+  slow_spam_ttl: number;
+
+  url_only: boolean;
+
+  slow_spam_ban_duration?: number;
+}
+
+export interface VideoCallRuleConfig {
+  rules: Record<string, HarmConfig>;
+}
+
+export interface VideoEndCallRequest {}
+
+export interface VideoKickUserRequest {}
+
 export interface VideoOrientation {
   orientation?: number;
 }
 
 export interface VideoSettings {
+  access_request_enabled: boolean;
+
+  camera_default_on: boolean;
+
+  camera_facing: 'front' | 'back' | 'external';
+
+  enabled: boolean;
+
+  target_resolution: TargetResolution;
+}
+
+export interface VideoSettingsResponse {
   access_request_enabled: boolean;
 
   camera_default_on: boolean;
@@ -4204,45 +5693,16 @@ export interface VoteData {
   option_id?: string;
 }
 
-export type WSClientEvent =
-  | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
-  | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
-  | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
-  | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
-  | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
-  | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
-  | ({
-      type: 'feeds.activity.removed_from_feed';
-    } & ActivityRemovedFromFeedEvent)
-  | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
-  | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
-  | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
-  | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
-  | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
-  | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
-  | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
-  | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
-  | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
-  | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
-  | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
-  | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
-  | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
-  | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
-  | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
-  | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
-  | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
-  | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
-  | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
-  | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
-  | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
-  | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
-  | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
-  | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
-  | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
-  | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
-  | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent);
+export interface WSAuthMessage {
+  token: string;
 
-export type WSEvent =
+  user_details: ConnectUserDetailsRequest;
+
+  products?: string[];
+}
+
+export type WSClientEvent =
+  | ({ type: 'app.updated' } & AppUpdatedEvent)
   | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
   | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
   | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
@@ -4279,6 +5739,53 @@ export type WSEvent =
   | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
   | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
   | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
+  | ({ type: 'health.check' } & HealthCheckEvent)
+  | ({ type: 'user.updated' } & UserUpdatedEvent);
+
+export type WSEvent =
+  | ({ type: 'app.updated' } & AppUpdatedEvent)
+  | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
+  | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
+  | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
+  | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
+  | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+  | ({
+      type: 'feeds.activity.removed_from_feed';
+    } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
+  | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
+  | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
+  | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
+  | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
+  | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
+  | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
+  | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
+  | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
+  | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
+  | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
+  | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
+  | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
+  | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
+  | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
+  | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
+  | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
+  | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
+  | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
+  | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
+  | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
+  | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
+  | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
+  | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
+  | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
+  | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
+  | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
+  | ({ type: 'health.check' } & HealthCheckEvent)
   | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
   | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
-  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent);
+  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
+  | ({ type: 'user.banned' } & UserBannedEvent)
+  | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
+  | ({ type: 'user.muted' } & UserMutedEvent)
+  | ({ type: 'user.reactivated' } & UserReactivatedEvent)
+  | ({ type: 'user.updated' } & UserUpdatedEvent);

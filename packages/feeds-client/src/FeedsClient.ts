@@ -1,11 +1,12 @@
 import { FeedsApi } from './gen/feeds/FeedsApi';
 import {
   FeedResponse,
+  OwnUser,
   QueryFeedsRequest,
   UserRequest,
   WSEvent,
 } from './gen/models';
-import { FeedsEvent, OwnUser } from './types';
+import { FeedsEvent } from './types';
 import { StateStore } from './common/StateStore';
 import { TokenManager } from './common/TokenManager';
 import { ConnectionIdManager } from './common/ConnectionIdManager';

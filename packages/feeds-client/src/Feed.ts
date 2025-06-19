@@ -1,9 +1,16 @@
 import {
   ActivityRequest,
+  AppUpdatedEvent,
   FeedResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   QueryFollowsRequest,
+  HealthCheckEvent,
+  UserBannedEvent,
+  UserDeactivatedEvent,
+  UserMutedEvent,
+  UserReactivatedEvent,
+  UserUpdatedEvent,
   WSEvent,
 } from './gen/models';
 import { StateStore } from './common/StateStore';
@@ -215,6 +222,45 @@ export class Feed extends FeedApi {
     'moderation.custom_action': Feed.noop,
     'moderation.flagged': Feed.noop,
     'moderation.mark_reviewed': Feed.noop,
+    'health.check': function (
+      _: { type: 'health.check' } & HealthCheckEvent & { type: 'health.check' },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'app.updated': function (
+      _: { type: 'app.updated' } & AppUpdatedEvent & { type: 'app.updated' },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'user.banned': function (
+      _: { type: 'user.banned' } & UserBannedEvent & { type: 'user.banned' },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'user.deactivated': function (
+      _: { type: 'user.deactivated' } & UserDeactivatedEvent & {
+          type: 'user.deactivated';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'user.muted': function (
+      _: { type: 'user.muted' } & UserMutedEvent & { type: 'user.muted' },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'user.reactivated': function (
+      _: { type: 'user.reactivated' } & UserReactivatedEvent & {
+          type: 'user.reactivated';
+        },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
+    'user.updated': function (
+      _: { type: 'user.updated' } & UserUpdatedEvent & { type: 'user.updated' },
+    ): void {
+      throw new Error('Function not implemented.');
+    },
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
