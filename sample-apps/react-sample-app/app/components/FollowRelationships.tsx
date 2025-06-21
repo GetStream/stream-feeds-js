@@ -1,109 +1,79 @@
-import { FollowRelationship, StreamFeedClient } from '@stream-io/feeds-client';
-import { useEffect, useState } from 'react';
+import { Feed, FeedState, FollowResponse } from '@stream-io/feeds-client';
+import { useCallback, useEffect, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
+import { useStateStore } from '../hooks/useStateStore';
 
 export const FollowRelationships = ({
   type,
   feed,
-  timeline,
 }: {
   type: 'followers' | 'following';
-  feed: StreamFeedClient;
-  timeline?: StreamFeedClient;
+  feed: Feed;
 }) => {
-  const [relationships, setRelationships] = useState<FollowRelationship[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error>();
-  const [next, setNext] = useState<string | undefined | number>(undefined);
+
+  const selector = useCallback(
+    ({
+      followers_pagination,
+      followers,
+      following_pagination,
+      following,
+    }: FeedState) => {
+      if (type === 'followers') {
+        return {
+          pagination: followers_pagination,
+          rel: followers,
+        };
+      }
+
+      return {
+        pagination: following_pagination,
+        rel: following,
+      };
+    },
+    [type],
+  );
+  const { rel = [], pagination } = useStateStore(feed.state, selector);
 
   useEffect(() => {
-    void loadMore();
-  }, [feed, timeline, type]);
+    if (
+      (type === 'followers' && !feed.currentState.followers?.length) ||
+      (type === 'following' && !feed.currentState.following?.length)
+    )
+      void loadMore();
+  }, [feed, type]);
 
   const loadMore = async () => {
-    setIsLoading(true);
     setError(undefined);
-    const limit = 30;
     try {
-      let newRelationships: FollowRelationship[] = [];
       if (type === 'followers') {
-        const offset = (next as number) ?? 0;
-        const response = await feed.getFollowingFeeds({ limit, offset });
-        newRelationships = response.followers.filter(
-          (f) => f.feed.fid !== timeline?.fid,
-        );
-        setNext(newRelationships.length < limit ? undefined : offset + limit);
+        feed.loadNextPageFollowers({ limit: 1 });
       } else if (type === 'following') {
-        if (!timeline) {
-          throw new Error(
-            'Provide timeline if you want to list following relationships',
-          );
-        }
-        const response = await timeline.getFollowedFeeds({
-          limit,
-          next: next as string | undefined,
-        });
-        newRelationships = response.followed_feeds.filter(
-          (f) => f.feed.fid !== feed.fid,
-        );
-        setNext(response.next);
+        feed.loadNextPageFollowing({ limit: 1 });
       }
-      setRelationships([...relationships, ...newRelationships]);
     } catch (error) {
       setError(error as Error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const renderItem = (relationship: FollowRelationship) => {
-    switch (relationship.feed.group) {
-      case 'page':
-        return renderPage(relationship);
-      case 'user':
-        return renderUser(relationship);
-      case 'timeline':
-        return renderUser(relationship);
-      default:
-        throw new Error('Not supported feed in feed list');
-    }
-  };
+  const renderItem = (follow: FollowResponse) => {
+    const image =
+      type === 'followers'
+        ? follow.source_feed.created_by.image
+        : follow.target_feed.created_by.image;
+    const name =
+      type === 'followers'
+        ? follow.source_feed.created_by.name
+        : follow.target_feed.created_by.name;
 
-  const renderUser = (relationship: FollowRelationship) => {
     return (
       <li
-        key={relationship.feed.created_by.id}
+        key={`${follow.source_feed.fid}_${follow.target_feed.fid}`}
         className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
       >
         <div className="flex flex-row items-center gap-1">
-          <img
-            className="size-10 rounded-full"
-            src={relationship.feed.created_by.image}
-            alt=""
-          />
-          <p className="text-sm font-medium text-gray-900">
-            {relationship.feed.created_by.name}
-          </p>
-        </div>
-      </li>
-    );
-  };
-
-  const renderPage = (relationship: FollowRelationship) => {
-    return (
-      <li
-        key={relationship.feed.created_by.id}
-        className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
-      >
-        <div className="flex flex-row items-center gap-1">
-          <img
-            className="size-10 rounded-full"
-            src={relationship.feed.custom?.image}
-            alt=""
-          />
-          <p className="text-sm font-medium text-gray-900">
-            {relationship.feed.custom?.name}
-          </p>
+          <img className="size-10 rounded-full" src={image} alt="" />
+          <p className="text-sm font-medium text-gray-900">{name}</p>
         </div>
       </li>
     );
@@ -111,13 +81,13 @@ export const FollowRelationships = ({
 
   return (
     <PaginatedList
-      items={relationships}
-      isLoading={isLoading}
-      hasNext={!!next}
+      items={rel}
+      isLoading={pagination?.loading_next_page ?? false}
+      hasNext={pagination?.next !== 'eol'}
       renderItem={renderItem}
       onLoadMore={loadMore}
       error={error}
       itemsName={type === 'followers' ? 'followers' : 'following users'}
-    ></PaginatedList>
+    />
   );
 };

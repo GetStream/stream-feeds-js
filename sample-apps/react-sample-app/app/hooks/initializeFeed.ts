@@ -2,7 +2,10 @@ import { Feed, FeedState } from '@stream-io/feeds-client';
 
 const promisesByFeedId: Record<string, Promise<FeedState>> = {};
 
-export const initializeFeed = (feed: Feed, options?: { watch?: boolean }) => {
+export const initializeFeed = (
+  feed: Feed,
+  options?: { watch?: boolean },
+): Promise<FeedState> => {
   const currentState = feed.state.getLatestValue();
 
   if (typeof currentState.created_at !== 'undefined') {
@@ -17,7 +20,9 @@ export const initializeFeed = (feed: Feed, options?: { watch?: boolean }) => {
     return new Promise((resolve, reject) => {
       const t = setTimeout(() => {
         unsubscribe();
-        reject(new Error('Timed out while waiting for FeedState.is_loading to flip'));
+        reject(
+          new Error('Timed out while waiting for FeedState.is_loading to flip'),
+        );
       }, 5000);
 
       const unsubscribe = feed.state.subscribeWithSelector(
@@ -33,10 +38,6 @@ export const initializeFeed = (feed: Feed, options?: { watch?: boolean }) => {
     });
   }
 
-  promisesByFeedId[feed.fid] = feed
-    .getOrCreate({ watch: options?.watch })
-    .then(() => feed.state.getLatestValue());
-
   const removePromise = () => {
     if (typeof promisesByFeedId[feed.fid] !== 'undefined') {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -44,5 +45,10 @@ export const initializeFeed = (feed: Feed, options?: { watch?: boolean }) => {
     }
   };
 
-  return promisesByFeedId[feed.fid].finally(removePromise);
+  promisesByFeedId[feed.fid] = feed
+    .getOrCreate({ watch: options?.watch })
+    .then(() => feed.state.getLatestValue())
+    .finally(removePromise);
+
+  return promisesByFeedId[feed.fid];
 };

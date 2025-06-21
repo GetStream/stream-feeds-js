@@ -1,10 +1,12 @@
-import { ActivityResponse } from '@stream-io/feeds-client';
+import { ActivityResponse, FeedOwnCapability } from '@stream-io/feeds-client';
 import { Reactions } from './reactions/Reactions';
 import { useUserContext } from '../user-context';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useErrorContext } from '../error-context';
 import { ActivityComposer } from './ActivityComposer';
 import Link from 'next/link';
+import { Dialog } from './Dialog';
+import { ActivityCommentSection } from './comments/ActivityCommentSection';
 
 export const Activity = ({
   activity,
@@ -14,22 +16,18 @@ export const Activity = ({
   ownCapabilities: string[];
 }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
-  const { user, client } = useUserContext();
+  const { client } = useUserContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedActivityText, setEditedActivityText] = useState('');
 
-  const canEdit =
-    ownCapabilities.includes('update-any-activity') ||
-    (ownCapabilities.includes('update-own-activity') &&
-      activity.user.id === user?.id);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
-  const canDelete =
-    ownCapabilities.includes('remove-any-activity-from-feed') ||
-    (ownCapabilities.includes('remove-own-activity-from-feed') &&
-      activity.user.id === user?.id);
-
-  const canSendReaction = ownCapabilities.includes('send-feed-reaction');
+  const canEdit = ownCapabilities.includes(FeedOwnCapability.UPDATE_ACTIVITY);
+  const canDelete = ownCapabilities.includes(FeedOwnCapability.REMOVE_ACTIVITY);
+  const canSendReaction = ownCapabilities.includes(
+    FeedOwnCapability.ADD_ACTIVITY_REACTION,
+  );
 
   const updateActivity = async () => {
     try {
@@ -66,7 +64,7 @@ export const Activity = ({
         <div className="flex items-center gap-1">
           <Link href={'/users/' + activity.user.id}>
             <img
-              className="size-12 rounded-full"
+              className="w-16 rounded-full"
               src={activity.user.image}
               alt=""
             />
@@ -77,7 +75,6 @@ export const Activity = ({
             </Link>
             <div className="text-sm text-gray-700 flex items-center gap-1">
               <div>{activity.created_at.toLocaleString()}</div>
-              /* TODO: no edited at */
               {/* {activity.custom?.edited_at && (
                 <div>
                   - edited at{' '}
@@ -146,23 +143,36 @@ export const Activity = ({
           <ActivityComposer
             text={editedActivityText}
             onChange={(text) => setEditedActivityText(text)}
-          ></ActivityComposer>
+          />
         )}
-        <div className="flex items-center gap-3">
-          <Reactions
-            type="dislike"
-            activity={activity}
-            canReact={canSendReaction}
-            showCounter={false}
-          />
-          <Reactions
-            type="like"
-            activity={activity}
-            canReact={canSendReaction}
-            showCounter={true}
-          />
+        <div className="flex justify-between">
+          <div className="flex items-center gap-3">
+            <Reactions
+              type="dislike"
+              activity={activity}
+              canReact={canSendReaction}
+              showCounter={false}
+            />
+            <Reactions
+              type="like"
+              activity={activity}
+              canReact={canSendReaction}
+              showCounter={true}
+            />
+          </div>
+
+          <button
+            onClick={() => dialogRef.current?.showModal()}
+            className="text-sm px-1"
+          >
+            view comments ({activity.comment_count})
+          </button>
         </div>
       </div>
+
+      <Dialog ref={dialogRef}>
+        <ActivityCommentSection activity={activity} />
+      </Dialog>
     </>
   );
 };

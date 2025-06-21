@@ -45,7 +45,7 @@ export default function ProfilePage() {
         <div className="w-full">
           <FeedMetadata feed={feed} timeline={timeline}></FeedMetadata>
         </div>
-        <NewActivity feed={feed}></NewActivity>
+        <NewActivity feed={feed} />
         <Feed feed={feed} onNewPost="show-immediately"></Feed>
       </div>
     </>

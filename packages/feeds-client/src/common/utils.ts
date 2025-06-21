@@ -188,3 +188,7 @@ export const debounce = <T extends (...args: any[]) => any>(
   };
   return debouncedFn;
 };
+
+export const capitalize = <T extends string>(s: T) => {
+  return `${s.charAt(0).toLocaleUpperCase()}${s.slice(1)}` as Capitalize<T>;
+};

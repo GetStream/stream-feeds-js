@@ -1,25 +1,20 @@
-import { Feed } from '@stream-io/feeds-client';
+import { Feed, FeedState } from '@stream-io/feeds-client';
 import { useErrorContext } from '../error-context';
-import { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useState } from 'react';
 import { ActivityComposer } from './ActivityComposer';
 import { LoadingIndicator } from './LoadingIndicator';
+import { useStateStore } from '../hooks/useStateStore';
+
+const selector = ({ own_capabilities = [] }: FeedState) => ({
+  canPost: own_capabilities.includes('add-activity'),
+});
 
 export const NewActivity = ({ feed }: { feed: Feed }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const [isSending, setIsSending] = useState<boolean>(false);
   const [activityText, setActivityText] = useState('');
-  const [canPost, setCanPost] = useState(false);
 
-  useEffect(() => {
-    return feed.state.subscribeWithSelector(
-      (s) => ({
-        // TODO: proper permissions
-        isAllowedToPost: true,
-      }),
-      ({ isAllowedToPost }) => setCanPost(isAllowedToPost),
-    );
-  }, [feed]);
+  const { canPost } = useStateStore(feed.state, selector);
 
   const sendActivity = async () => {
     setIsSending(true);
@@ -30,7 +25,9 @@ export const NewActivity = ({ feed }: { feed: Feed }) => {
       });
       setActivityText('');
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      if (error instanceof Error) {
+        logErrorAndDisplayNotification(error, error.message);
+      }
     } finally {
       setIsSending(false);
     }
@@ -42,17 +39,14 @@ export const NewActivity = ({ feed }: { feed: Feed }) => {
 
   return (
     <div className="w-full flex flex-col items-start gap-1">
-      <ActivityComposer
-        text={activityText}
-        onChange={setActivityText}
-      ></ActivityComposer>
+      <ActivityComposer text={activityText} onChange={setActivityText} />
       <button
         type="submit"
         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
         onClick={() => sendActivity()}
         disabled={isSending || activityText === ''}
       >
-        {isSending ? <LoadingIndicator></LoadingIndicator> : 'Post'}
+        {isSending ? <LoadingIndicator /> : 'Post'}
       </button>
     </div>
   );

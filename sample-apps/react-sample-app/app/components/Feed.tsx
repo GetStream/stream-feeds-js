@@ -1,4 +1,8 @@
-import { ActivityResponse, Feed as StreamFeed } from '@stream-io/feeds-client';
+import {
+  ActivityResponse,
+  FeedOwnCapability,
+  Feed as StreamFeed,
+} from '@stream-io/feeds-client';
 import { useEffect, useState } from 'react';
 import { Activity } from './Activity';
 import { PaginatedList } from './PaginatedList';
@@ -22,26 +26,26 @@ export const Feed = ({
 
   const [newPostsNotification, setNewPostsNotification] =
     useState<AppNotificaion>();
-  const [ownCapabilities] = useState<string[]>(['read-feed']);
 
-  const { hasNextPage, isLoading, activities } = useStateStore(
-    feed.state,
-    (state) => ({
-      isLoading: state.is_loading_activities,
-      hasNextPage: typeof state.next !== 'undefined',
-      activities: state.activities ?? [],
-    }),
-  );
+  const {
+    hasNextPage,
+    isLoading,
+    activities,
+    ownCapabilities = [],
+  } = useStateStore(feed.state, (state) => ({
+    isLoading: state.is_loading_activities,
+    hasNextPage: typeof state.next !== 'undefined',
+    activities: state.activities ?? [],
+    ownCapabilities: state.own_capabilities,
+  }));
 
   useEffect(() => {
     const currentState = feed.state.getLatestValue();
 
-    console.log(currentState);
-
     if (
       !currentState.activities &&
       !currentState.is_loading_activities &&
-      ownCapabilities.includes('read-feed')
+      ownCapabilities.includes(FeedOwnCapability.READ_FEED)
     ) {
       void initializeFeed(feed, { watch: true });
     }
@@ -77,7 +81,7 @@ export const Feed = ({
     if (onNewPost === 'show-immediately') {
       return;
     }
-    const unsubscribe = feed.on('activity.added', () => {
+    const unsubscribe = feed.on('feeds.activity.added', () => {
       const numberOfNewPosts =
         (feed.state.getLatestValue().activities?.length ?? 0) -
         activities.length;

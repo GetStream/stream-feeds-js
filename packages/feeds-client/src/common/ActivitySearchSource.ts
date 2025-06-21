@@ -37,3 +37,10 @@ export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
     return items;
   }
 }
+
+
+  // filter: { 
+  //   'feed.name': { $autocomplete: searchQuery } 
+  //   'feed.description': { $autocomplete: searchQuery } 
+  //   'created_by.name': { $autocomplete: searchQuery } 
+  // },

@@ -1,5 +1,5 @@
 import { Feed } from '@stream-io/feeds-client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useUserContext } from '../user-context';
 
 type Action = 'null';

@@ -8,6 +8,7 @@ import { FeedMenu } from './FeedMenu';
 import { useStateStore } from '../hooks/useStateStore';
 import { useUserContext } from '../user-context';
 import { initializeFeed } from '../hooks/initializeFeed';
+import { Dialog } from './Dialog';
 
 const selector = ({
   own_capabilities = [],
@@ -33,12 +34,11 @@ export const FeedMetadata = ({
   timeline,
 }: {
   feed: Feed;
-  timeline?: Feed;
+  timeline: Feed;
 }) => {
   const { logError } = useErrorContext();
 
   const { client } = useUserContext();
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [selectedRelationship, setSelectedRelationship] = useState<
     'followers' | 'following'
@@ -83,17 +83,11 @@ export const FeedMetadata = ({
   });
 
   const openDialog = () => {
-    if (dialogRef.current) {
-      dialogRef.current.showModal();
-      setIsDialogOpen(true);
-    }
+    dialogRef.current?.showModal();
   };
 
   const closeDialog = () => {
-    if (dialogRef.current) {
-      dialogRef.current.close();
-      setIsDialogOpen(false);
-    }
+    dialogRef.current?.close();
   };
 
   return (
@@ -106,22 +100,9 @@ export const FeedMetadata = ({
             alt=""
           />
           <div className="flex flex-col gap-1 items-start">
-            {feed.group === 'user' && (
-              <div className="text-lg text-gray-900">
-                {/* TODO: change this to be reactive */}
-                <b>{feed.currentState.created_by?.name}</b>
-              </div>
-            )}
-            {feed.group === 'page' && (
-              <div className="flex flex-col gap-0.5">
-                <div className="text-lg text-gray-900">
-                  <b>{feed.currentState.custom?.name}</b>
-                </div>
-                <div className="text-md text-gray-900">
-                  {feed.currentState.custom?.description}
-                </div>
-              </div>
-            )}
+            <div className="text-lg text-gray-900">
+              <b>{userFeedState.createdBy?.name}</b>
+            </div>
             <div className="text-md flex gap-3">
               <div className="text-md">
                 {followerCount === undefined && (
@@ -147,7 +128,7 @@ export const FeedMetadata = ({
                     disabled={!canQueryFollowings}
                     className={`no-underline ${canQueryFollowings ? 'hover:underline' : ''}`}
                     onClick={() => {
-                      setSelectedRelationship('followers');
+                      setSelectedRelationship('following');
                       openDialog();
                     }}
                   >
@@ -161,21 +142,17 @@ export const FeedMetadata = ({
         </div>
         <FeedMenu feed={feed} />
       </div>
-      <dialog
-        className={`w-6/12 h-3/6 rounded-lg p-6 bg-white shadow-lg flex flex-col ${isDialogOpen ? '' : 'hidden'}`}
-        ref={dialogRef}
-      >
-        <button className="self-end" onClick={() => closeDialog()}>
-          <span className="material-symbols-outlined">close</span>
-        </button>
-        {isDialogOpen && (
+      <Dialog ref={dialogRef}>
+        <div className="flex flex-col">
+          <button className="self-end" onClick={() => closeDialog()}>
+            <span className="material-symbols-outlined">close</span>
+          </button>
           <FollowRelationships
-            feed={feed}
-            timeline={timeline}
+            feed={selectedRelationship === 'followers' ? feed : timeline}
             type={selectedRelationship}
           />
-        )}
-      </dialog>
+        </div>
+      </Dialog>
     </>
   );
 };

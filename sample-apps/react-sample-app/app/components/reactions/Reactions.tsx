@@ -1,8 +1,9 @@
 import { useUserContext } from '@/app/user-context';
 import { ActivityResponse } from '@stream-io/feeds-client';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { ReactionsList } from './ReactionsList';
 import { useErrorContext } from '@/app/error-context';
+import { Dialog } from '../Dialog';
 
 const emojiMapping: Record<string, string> = {
   like: 'thumb_up',
@@ -21,34 +22,15 @@ export const Reactions = ({
   canReact: boolean;
 }) => {
   const { logError, logErrorAndDisplayNotification } = useErrorContext();
-  const [counts, setCounts] = useState(0);
-  const [hasOwnReaction, setHasOwnReaction] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { client } = useUserContext();
 
-  useEffect(() => {
-    setCounts(activity.reaction_groups[type]?.count ?? 0);
-    setHasOwnReaction(!!activity.own_reactions.find((r) => r.type === type));
-  }, [activity, type]);
+  const counts = activity.reaction_groups[type]?.count ?? 0;
+  const hasOwnReaction = !!activity.own_reactions.find((r) => r.type === type);
 
   const addReaction = async () => {
     try {
-      await client?.addReaction({
-        type,
-        activity_id: activity.id,
-      });
-      void fetch('/api/send-notification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          targetUserId: activity.user.id,
-          verb: type,
-          objectId: activity.id,
-        }),
-      }).catch((err) => logError(err));
+      await client?.addReaction({ activity_id: activity.id, type });
     } catch (error) {
       logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
@@ -56,25 +38,21 @@ export const Reactions = ({
 
   const removeReaction = async () => {
     try {
-      // @ts-expect-error API spec issue
-      await client?.deleteActivityReaction({ type, activity_id: activity.id });
+      await client?.deleteActivityReaction({
+        activity_id: activity.id,
+        type,
+      });
     } catch (error) {
       logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 
   const openDialog = () => {
-    if (dialogRef.current) {
-      dialogRef.current.showModal();
-      setIsDialogOpen(true);
-    }
+    dialogRef.current?.showModal();
   };
 
   const closeDialog = () => {
-    if (dialogRef.current) {
-      dialogRef.current.close();
-      setIsDialogOpen(false);
-    }
+    dialogRef.current?.close();
   };
 
   return (
@@ -108,17 +86,12 @@ export const Reactions = ({
           </div>
         </button>
       )}
-      <dialog
-        className={`w-6/12 h-3/6 rounded-lg p-6 bg-white shadow-lg flex flex-col ${isDialogOpen ? '' : 'hidden'}`}
-        ref={dialogRef}
-      >
+      <Dialog ref={dialogRef}>
         <button className="self-end" onClick={() => closeDialog()}>
           <span className="material-symbols-outlined">close</span>
         </button>
-        {isDialogOpen && (
-          <ReactionsList type="like" activity={activity}></ReactionsList>
-        )}
-      </dialog>
+        <ReactionsList type="like" activity={activity} />
+      </Dialog>
     </div>
   );
 };

@@ -27,6 +27,7 @@ import {
   removeReactionFromActivities,
 } from './state-updates/activity-reaction-utils';
 import { StreamResponse } from './gen-imports';
+import { capitalize } from './common/utils';
 
 export type FeedState = Partial<
   Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
@@ -40,7 +41,17 @@ export type FeedState = Partial<
      * True when loading activities using `getOrCreate` or `getNextPage`
      */
     is_loading_activities: boolean;
+
+    followers_pagination?: {
+      loading_next_page?: boolean;
+    };
+
+    following_pagination?: {
+      loading_next_page?: boolean;
+    };
   };
+
+const END_OF_LIST = 'eol' as const;
 
 type EventHandlerByEventType = {
   [Key in NonNullable<WSEvent['type']>]: Key extends Extract<
@@ -135,15 +146,21 @@ export class Feed extends FeedApi {
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
     'feeds.follow.created': (event) => {
+      // TODO: consider followers and followings not loaded (if not loaded, skip adding)
+      // TODO: followers and followings should be extended only with accepted follows (same for counts)
+      // if (event.follow.status !== 'accepted') return;
+
       if (event.follow.source_feed.fid === this.fid) {
         // this feed followed someone
-        this.state.next((currentState) => ({
-          ...currentState,
-          following_count: (currentState.following_count ?? 0) + 1,
-          following: currentState.following
-            ? currentState.following.concat(event.follow)
-            : [event.follow],
-        }));
+        if (this.followingInitialized) {
+          this.state.next((currentState) => ({
+            ...currentState,
+            following_count: (currentState.following_count ?? 0) + 1,
+            following: currentState.following
+              ? currentState.following.concat(event.follow)
+              : [event.follow],
+          }));
+        }
 
         // add own follow to the target feed
         const target = event.follow.target_feed;
@@ -155,7 +172,10 @@ export class Feed extends FeedApi {
             ? currentState.own_follows.concat(event.follow)
             : [event.follow],
         }));
-      } else if (event.follow.target_feed.fid === this.fid) {
+      } else if (
+        event.follow.target_feed.fid === this.fid &&
+        this.followersInitialized
+      ) {
         // someone followed this feed
         this.state.next((currentState) => ({
           ...currentState,
@@ -294,6 +314,22 @@ export class Feed extends FeedApi {
     return this.state.getLatestValue();
   }
 
+  private get followersInitialized() {
+    const followersPagination = this.currentState.followers_pagination;
+
+    if (!followersPagination) return false;
+
+    return Object.hasOwn(followersPagination, 'next');
+  }
+
+  private get followingInitialized() {
+    const followingPagination = this.currentState.following_pagination;
+
+    if (!followingPagination) return false;
+
+    return Object.hasOwn(followingPagination, 'next');
+  }
+
   async getOrCreate(request?: GetOrCreateFeedRequest) {
     if (this.state.getLatestValue().is_loading_activities) {
       throw new Error('Only one getOrCreate call is allowed at a time');
@@ -360,16 +396,83 @@ export class Feed extends FeedApi {
     }
   }
 
+  private async loadNextPageFollows(
+    type: 'followers' | 'following',
+    request: Pick<QueryFollowsRequest, 'limit'>,
+  ) {
+    const paginationKey = `${type}_pagination` as const;
+    const method = `query${capitalize(type)}` as const;
+
+    const currentNextCursor = this.currentState[paginationKey]?.next;
+    const isLoading = this.currentState[paginationKey]?.loading_next_page;
+
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    if (isLoading || currentNextCursor === END_OF_LIST) return;
+
+    try {
+      this.state.next((currentState) => {
+        return {
+          ...currentState,
+          [paginationKey]: {
+            ...currentState[paginationKey],
+            loading_next_page: true,
+          },
+        };
+      });
+
+      const { next: newNextCursor = END_OF_LIST, follows } = await this[method](
+        {
+          ...request,
+          next: currentNextCursor,
+        },
+      );
+
+      this.state.next((currentState) => ({
+        ...currentState,
+        [type]: currentState[type]
+          ? currentState[type].concat(follows)
+          : follows,
+        [paginationKey]: {
+          ...currentState[paginationKey],
+          next: newNextCursor,
+        },
+      }));
+    } catch (error) {
+      console.error(error);
+      // TODO: figure out how to handle errorss
+    } finally {
+      this.state.next((currentState) => {
+        return {
+          ...currentState,
+          [paginationKey]: {
+            ...currentState[paginationKey],
+            loading_next_page: false,
+          },
+        };
+      });
+    }
+  }
+
+  async loadNextPageFollowers(request: Pick<QueryFollowsRequest, 'limit'>) {
+    await this.loadNextPageFollows('followers', request);
+  }
+
+  async loadNextPageFollowing(request: Pick<QueryFollowsRequest, 'limit'>) {
+    await this.loadNextPageFollows('following', request);
+  }
+
   /**
    * Method which queries followers of this feed (feeds which target this feed).
    *
    * _Note: Useful only for feeds with `groupId` of `user` value._
    */
   async queryFollowers(request: Omit<QueryFollowsRequest, 'filter'>) {
+    const filter: QueryFollowsRequest['filter'] = {
+      target_feed: this.fid,
+    };
+
     const response = await this.client.queryFollows({
-      filter: {
-        target_feed: this.fid,
-      },
+      filter,
       ...request,
     });
 
@@ -377,15 +480,17 @@ export class Feed extends FeedApi {
   }
 
   /**
-   * Method which queries followings of this feed (target feeds of this feed).
+   * Method which queries following of this feed (target feeds of this feed).
    *
    * _Note: Useful only for feeds with `groupId` of `timeline` value._
    */
-  async queryFollowings(request: Omit<QueryFollowsRequest, 'filter'>) {
+  async queryFollowing(request: Omit<QueryFollowsRequest, 'filter'>) {
+    const filter: QueryFollowsRequest['filter'] = {
+      source_feed: this.fid,
+    };
+
     const response = await this.client.queryFollows({
-      filter: {
-        source_feed: this.fid,
-      },
+      filter,
       ...request,
     });
 
