@@ -46,7 +46,7 @@ export const initializeFeed = (
   };
 
   promisesByFeedId[feed.fid] = feed
-    .getOrCreate({ watch: options?.watch })
+    .getOrCreate({ watch: options?.watch, comment_limit: 20, comment_sort: 'first' })
     .then(() => feed.state.getLatestValue())
     .finally(removePromise);
 

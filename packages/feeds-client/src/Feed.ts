@@ -1,19 +1,16 @@
 import {
   ActivityRequest,
-  AppUpdatedEvent,
   FeedResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   QueryFollowsRequest,
-  HealthCheckEvent,
-  UserBannedEvent,
-  UserDeactivatedEvent,
-  UserMutedEvent,
-  UserReactivatedEvent,
-  UserUpdatedEvent,
   WSEvent,
+  ActivityResponse,
+  CommentResponse,
+  PagerResponse,
+  ThreadedCommentResponse,
 } from './gen/models';
-import { StateStore } from './common/StateStore';
+import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
 import { FeedApi } from './gen/feeds/FeedApi';
 import { FeedsClient } from './FeedsClient';
@@ -28,30 +25,48 @@ import {
 } from './state-updates/activity-reaction-utils';
 import { StreamResponse } from './gen-imports';
 import { capitalize } from './common/utils';
+import type {
+  ActivityIdOrCommentId,
+  GetCommentsRepliesRequest,
+  GetCommentsRequest,
+  LoadingStates,
+  PagerResponseWithLoadingStates,
+} from './types';
+import type { FromArray } from './types-internal';
 
-export type FeedState = Partial<
-  Omit<GetOrCreateFeedResponse, 'duration' | 'feed'>
-> &
-  Partial<FeedResponse> & {
-    /**
-     * True when loading state using `getOrCreate`
-     */
-    is_loading: boolean;
-    /**
-     * True when loading activities using `getOrCreate` or `getNextPage`
-     */
-    is_loading_activities: boolean;
+export type FeedState = Omit<
+  Partial<GetOrCreateFeedResponse & FeedResponse>,
+  'feed' | 'duration'
+> & {
+  /**
+   * True when loading state using `getOrCreate`
+   */
+  is_loading: boolean;
+  /**
+   * True when loading activities using `getOrCreate` or `getNextPage`
+   */
+  is_loading_activities: boolean;
 
-    followers_pagination?: {
-      loading_next_page?: boolean;
-    };
+  comments_by_entity_id: Record<
+    ActivityIdOrCommentId,
+    | {
+        pagination?: PagerResponseWithLoadingStates & {
+          // registered on first pagination attempt and then used for real-time updates
+          sort?: string;
+        };
+        parent_id?: ActivityIdOrCommentId; // for traversing upwards
+        comments?: ThreadedCommentResponse[];
+      }
+    | undefined
+  >;
 
-    following_pagination?: {
-      loading_next_page?: boolean;
-    };
-  };
+  followers_pagination?: LoadingStates;
+
+  following_pagination?: LoadingStates;
+};
 
 const END_OF_LIST = 'eol' as const;
+const DEFAULT_COMMENT_PAGINATION = 'first' as const;
 
 type EventHandlerByEventType = {
   [Key in NonNullable<WSEvent['type']>]: Key extends Extract<
@@ -68,7 +83,7 @@ export class Feed extends FeedApi {
 
   private readonly eventHandlers: EventHandlerByEventType = {
     'feeds.activity.added': (event) => {
-      const currentActivities = this.state.getLatestValue().activities;
+      const currentActivities = this.currentState.activities;
       const result = addActivitiesToState(
         [event.activity],
         currentActivities,
@@ -79,7 +94,7 @@ export class Feed extends FeedApi {
       }
     },
     'feeds.activity.deleted': (event) => {
-      const currentActivities = this.state.getLatestValue().activities;
+      const currentActivities = this.currentState.activities;
       if (currentActivities) {
         const result = removeActivityFromState(
           event.activity,
@@ -91,7 +106,7 @@ export class Feed extends FeedApi {
       }
     },
     'feeds.activity.reaction.added': (event) => {
-      const currentActivities = this.state.getLatestValue().activities;
+      const currentActivities = this.currentState.activities;
       const connectedUser = this.client.state.getLatestValue().connectedUser;
       const isCurrentUser = Boolean(
         connectedUser && event.reaction.user.id === connectedUser.id,
@@ -107,7 +122,7 @@ export class Feed extends FeedApi {
       }
     },
     'feeds.activity.reaction.deleted': (event) => {
-      const currentActivities = this.state.getLatestValue().activities;
+      const currentActivities = this.currentState.activities;
       const connectedUser = this.client.state.getLatestValue().connectedUser;
       const isCurrentUser = Boolean(
         connectedUser && event.reaction.user.id === connectedUser.id,
@@ -124,7 +139,8 @@ export class Feed extends FeedApi {
     },
     'feeds.activity.removed_from_feed': Feed.noop,
     'feeds.activity.updated': (event) => {
-      const currentActivities = this.state.getLatestValue().activities;
+      // TODO: fix, use this.updateActivityInState instead
+      const currentActivities = this.currentState.activities;
       if (currentActivities) {
         const result = updateActivityInState(event.activity, currentActivities);
         if (result.changed) {
@@ -135,9 +151,68 @@ export class Feed extends FeedApi {
     'feeds.bookmark.added': Feed.noop,
     'feeds.bookmark.deleted': Feed.noop,
     'feeds.bookmark.updated': Feed.noop,
-    'feeds.comment.added': Feed.noop,
+    'feeds.comment.added': (event) => {
+      const { comment } = event;
+      const forId = comment.parent_id ?? comment.object_id;
+
+      this.state.next((currentState) => {
+        const entityState = currentState.comments_by_entity_id[forId];
+        const newComments = entityState?.comments?.concat([]) ?? [];
+
+        if (
+          entityState?.pagination?.sort === 'last' &&
+          entityState?.pagination.next === END_OF_LIST
+        ) {
+          newComments.unshift(comment);
+        } else if (entityState?.pagination?.sort === 'first') {
+          newComments.push(comment);
+        } else {
+          // no other sorting option is supported yet
+          return currentState;
+        }
+
+        return {
+          ...currentState,
+          comments_by_entity_id: {
+            ...currentState.comments_by_entity_id,
+            [forId]: {
+              ...currentState.comments_by_entity_id[forId],
+              comments: newComments,
+            },
+          },
+        };
+      });
+    },
     'feeds.comment.deleted': Feed.noop,
-    'feeds.comment.updated': Feed.noop,
+    'feeds.comment.updated': (event) => {
+      const { comment } = event;
+      const forId = comment.parent_id ?? comment.object_id;
+
+      this.state.next((currentState) => {
+        const entityState = currentState.comments_by_entity_id[forId];
+
+        if (!entityState?.comments?.length) return currentState;
+
+        const index = this.getCommentIndex(comment, currentState);
+
+        if (index === -1) return currentState;
+
+        const newComments = [...entityState.comments];
+
+        newComments[index] = comment;
+
+        return {
+          ...currentState,
+          comments_by_entity_id: {
+            ...currentState.comments_by_entity_id,
+            [forId]: {
+              ...currentState.comments_by_entity_id[forId],
+              comments: newComments,
+            },
+          },
+        };
+      });
+    },
     'feeds.feed.created': Feed.noop,
     'feeds.feed.deleted': Feed.noop,
     'feeds.feed.updated': (event) => {
@@ -242,45 +317,13 @@ export class Feed extends FeedApi {
     'moderation.custom_action': Feed.noop,
     'moderation.flagged': Feed.noop,
     'moderation.mark_reviewed': Feed.noop,
-    'health.check': function (
-      _: { type: 'health.check' } & HealthCheckEvent & { type: 'health.check' },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'app.updated': function (
-      _: { type: 'app.updated' } & AppUpdatedEvent & { type: 'app.updated' },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'user.banned': function (
-      _: { type: 'user.banned' } & UserBannedEvent & { type: 'user.banned' },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'user.deactivated': function (
-      _: { type: 'user.deactivated' } & UserDeactivatedEvent & {
-          type: 'user.deactivated';
-        },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'user.muted': function (
-      _: { type: 'user.muted' } & UserMutedEvent & { type: 'user.muted' },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'user.reactivated': function (
-      _: { type: 'user.reactivated' } & UserReactivatedEvent & {
-          type: 'user.reactivated';
-        },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
-    'user.updated': function (
-      _: { type: 'user.updated' } & UserUpdatedEvent & { type: 'user.updated' },
-    ): void {
-      throw new Error('Function not implemented.');
-    },
+    'health.check': Feed.noop,
+    'app.updated': Feed.noop,
+    'user.banned': Feed.noop,
+    'user.deactivated': Feed.noop,
+    'user.muted': Feed.noop,
+    'user.reactivated': Feed.noop,
+    'user.updated': Feed.noop,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -300,6 +343,7 @@ export class Feed extends FeedApi {
       ...(data ?? {}),
       is_loading: false,
       is_loading_activities: false,
+      comments_by_entity_id: {},
     });
     this.client = client;
   }
@@ -331,7 +375,7 @@ export class Feed extends FeedApi {
   }
 
   async getOrCreate(request?: GetOrCreateFeedRequest) {
-    if (this.state.getLatestValue().is_loading_activities) {
+    if (this.currentState.is_loading_activities) {
       throw new Error('Only one getOrCreate call is allowed at a time');
     }
 
@@ -343,8 +387,7 @@ export class Feed extends FeedApi {
     try {
       const response = await super.getOrCreate(request);
       if (request?.next) {
-        const { activities: currentActivities = [] } =
-          this.state.getLatestValue();
+        const { activities: currentActivities = [] } = this.currentState;
 
         const result = addActivitiesToState(
           response.activities,
@@ -371,20 +414,21 @@ export class Feed extends FeedApi {
         delete responseCopy.feed;
         delete responseCopy.metadata;
 
-        const nextState: FeedState = {
-          ...responseCopy,
-          is_loading: false,
-          is_loading_activities: false,
-        };
+        this.state.next((currentState) => {
+          const nextState: FeedState = {
+            ...currentState,
+            ...responseCopy,
+          };
 
-        if (!request?.follower_pagination?.limit) {
-          delete nextState.followers;
-        }
-        if (!request?.following_pagination?.limit) {
-          delete nextState.following;
-        }
+          if (!request?.follower_pagination?.limit) {
+            delete nextState.followers;
+          }
+          if (!request?.following_pagination?.limit) {
+            delete nextState.following;
+          }
 
-        this.state.next({ ...nextState });
+          return nextState;
+        });
       }
 
       return response;
@@ -394,6 +438,208 @@ export class Feed extends FeedApi {
         is_loading_activities: false,
       });
     }
+  }
+
+  /**
+   * Returns index of the provided comment object.
+   */
+  private getCommentIndex(comment: CommentResponse, state?: FeedState) {
+    const { comments_by_entity_id = {} } = state ?? this.currentState;
+
+    const currentComments =
+      comments_by_entity_id[comment.parent_id ?? comment.object_id]?.comments;
+
+    if (!currentComments?.length) {
+      return -1;
+    }
+
+    let commentIndex = currentComments.indexOf(comment);
+
+    // fast lookup failed, try slower approach
+    if (commentIndex === -1) {
+      commentIndex = currentComments.findIndex(
+        (comment_) => comment_.id === comment.id,
+      );
+    }
+
+    return commentIndex;
+  }
+
+  private getActivityIndex(activity: ActivityResponse, state?: FeedState) {
+    const { activities } = state ?? this.currentState;
+
+    if (!activities) {
+      return -1;
+    }
+
+    let activityIndex = activities.indexOf(activity);
+
+    // fast lookup failed, try slower approach
+    if (activityIndex === -1) {
+      activityIndex = activities.findIndex(
+        (activity_) => activity_.id === activity.id,
+      );
+    }
+
+    return activityIndex;
+  }
+
+  private updateActivityInState(
+    activity: ActivityResponse,
+    patch: Patch<FromArray<FeedState['activities']>>,
+  ) {
+    this.state.next((currentState) => {
+      const activityIndex = this.getActivityIndex(activity, currentState);
+
+      if (activityIndex === -1) return currentState;
+
+      const nextActivities = [...currentState.activities!];
+
+      nextActivities[activityIndex] = patch(
+        currentState.activities![activityIndex],
+      );
+
+      return {
+        ...currentState,
+        activities: nextActivities,
+      };
+    });
+  }
+
+  private async loadNextPageComments({
+    forId,
+    base,
+    sort,
+    parentId,
+  }: {
+    parentId?: string;
+    forId: string;
+    sort: string;
+    base: () => Promise<PagerResponse & { comments: CommentResponse[] }>;
+  }) {
+    try {
+      this.state.next((currentState) => ({
+        ...currentState,
+        comments_by_entity_id: {
+          ...currentState.comments_by_entity_id,
+          [forId]: {
+            ...currentState.comments_by_entity_id[forId],
+            pagination: {
+              ...currentState.comments_by_entity_id[forId]?.pagination,
+              loading_next_page: true,
+            },
+          },
+        },
+      }));
+
+      const { next: newNextCursor = END_OF_LIST, comments } = await base();
+
+      this.state.next((currentState) => {
+        const newPagination = {
+          ...currentState.comments_by_entity_id[forId]?.pagination,
+          next: newNextCursor,
+        };
+
+        if (typeof newPagination.sort === 'undefined') {
+          newPagination.sort = sort;
+        }
+
+        return {
+          ...currentState,
+          comments_by_entity_id: {
+            ...currentState.comments_by_entity_id,
+            [forId]: {
+              ...currentState.comments_by_entity_id[forId],
+              parent_id: parentId,
+              pagination: newPagination,
+              comments: currentState.comments_by_entity_id[forId]?.comments
+                ? currentState.comments_by_entity_id[forId].comments?.concat(
+                    comments,
+                  )
+                : comments,
+            },
+          },
+        };
+      });
+    } catch (error) {
+      console.error(error);
+      // TODO: figure out how to handle errorss
+    } finally {
+      this.state.next((currentState) => ({
+        ...currentState,
+        comments_by_entity_id: {
+          ...currentState.comments_by_entity_id,
+          [forId]: {
+            ...currentState.comments_by_entity_id[forId],
+            pagination: {
+              ...currentState.comments_by_entity_id[forId]?.pagination,
+              loading_next_page: false,
+            },
+          },
+        },
+      }));
+    }
+  }
+
+  public async loadNextPageActivityComments(
+    activity: ActivityResponse,
+    request?: Partial<
+      Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
+    >,
+  ) {
+    const pagination =
+      this.currentState.comments_by_entity_id[activity.id]?.pagination;
+    const currentNextCursor = pagination?.next;
+    const currentSort = pagination?.sort;
+    const isLoading = pagination?.loading_next_page;
+
+    const sort = currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION;
+
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    if (isLoading || currentNextCursor === END_OF_LIST) return;
+
+    await this.loadNextPageComments({
+      forId: activity.id,
+      base: () =>
+        this.client.getComments({
+          ...request,
+          sort,
+          object_id: activity.id,
+          object_type: 'activity',
+          next: currentNextCursor,
+        }),
+      sort,
+    });
+  }
+
+  public async loadNextPageCommentReplies(
+    comment: CommentResponse,
+    request?: Partial<Omit<GetCommentsRepliesRequest, 'comment_id' | 'next'>>,
+  ) {
+    const pagination =
+      this.currentState.comments_by_entity_id[comment.id]?.pagination;
+    const currentNextCursor = pagination?.next;
+    const currentSort = pagination?.sort;
+    const isLoading = pagination?.loading_next_page;
+
+    const sort = currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION;
+
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    if (isLoading || currentNextCursor === END_OF_LIST) return;
+
+    await this.loadNextPageComments({
+      forId: comment.id,
+      base: () =>
+        this.client.getCommentReplies({
+          ...request,
+          comment_id: comment.id,
+          // use known sort first (prevents broken pagination)
+          sort: currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION,
+          next: currentNextCursor,
+        }),
+      parentId: comment.parent_id ?? comment.object_id,
+      sort,
+    });
   }
 
   private async loadNextPageFollows(
@@ -520,7 +766,7 @@ export class Feed extends FeedApi {
   }
 
   async getNextPage() {
-    const currentState = this.state.getLatestValue();
+    const currentState = this.currentState;
     const response = await this.getOrCreate({
       member_pagination: {
         limit: 0,
@@ -551,10 +797,12 @@ export class Feed extends FeedApi {
     const eventHandler = this.eventHandlers[event.type];
 
     // no need to run noop function
-    if (typeof eventHandler === 'function' && eventHandler !== Feed.noop) {
-      // @ts-expect-error eventHandler's event parameter is not "never", TS is having a seizure for some reason
-      eventHandler(event);
-    } else if (typeof eventHandler !== 'function') {
+    if (eventHandler !== Feed.noop) {
+      // @ts-expect-error intersection of handler arguments results to never
+      eventHandler?.(event);
+    }
+
+    if (typeof eventHandler === 'undefined') {
       console.warn(`Received unknown event type: ${event.type}`, event);
     }
 

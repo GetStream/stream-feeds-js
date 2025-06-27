@@ -40,15 +40,8 @@ export const Feed = ({
   }));
 
   useEffect(() => {
-    const currentState = feed.state.getLatestValue();
-
-    if (
-      !currentState.activities &&
-      !currentState.is_loading_activities &&
-      ownCapabilities.includes(FeedOwnCapability.READ_FEED)
-    ) {
-      void initializeFeed(feed, { watch: true });
-    }
+    // TODO: handle unreadable (FeedOwnCapabilities.READ_FEED)
+    void initializeFeed(feed, { watch: true });
   }, [feed, ownCapabilities]);
 
   useEffect(() => {
@@ -120,7 +113,11 @@ export const Feed = ({
   const renderItem = (activity: ActivityResponse) => {
     return (
       <li className="w-full" key={activity.id}>
-        <Activity activity={activity} ownCapabilities={ownCapabilities} />
+        <Activity
+          feed={feed}
+          activity={activity}
+          ownCapabilities={ownCapabilities}
+        />
       </li>
     );
   };

@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { useErrorContext } from '../error-context';
 
@@ -9,6 +9,7 @@ export function PaginatedList<T>({
   renderItem,
   items,
   onLoadMore,
+  renderNoItems,
   listContainerClassNames = '',
   itemsName = 'items',
 }: {
@@ -16,7 +17,8 @@ export function PaginatedList<T>({
   isLoading: boolean;
   error?: Error;
   items: T[];
-  renderItem: (item: T, index: number) => ReactElement;
+  renderItem: (item: T, index: number) => ReactNode;
+  renderNoItems?: () => ReactNode;
   onLoadMore: () => void;
   listContainerClassNames?: string;
   itemsName?: string;
@@ -37,12 +39,15 @@ export function PaginatedList<T>({
   }, [error, items]);
   return (
     <div className="w-full flex flex-col items-center">
-      {isLoading && items.length === 0 && (
-        <LoadingIndicator color="blue" />
-      )}
-      {items.length === 0 && !isLoading && !error && (
-        <div className="text-center">{`No ${itemsName}`}</div>
-      )}
+      {isLoading && items.length === 0 && <LoadingIndicator color="blue" />}
+      {items.length === 0 &&
+        !isLoading &&
+        !error &&
+        (renderNoItems ? (
+          renderNoItems()
+        ) : (
+          <div className="text-center">{`No ${itemsName}`}</div>
+        ))}
       {items.length === 0 && !isLoading && error && (
         <>
           <div>{`Failed to load ${itemsName}`}</div>

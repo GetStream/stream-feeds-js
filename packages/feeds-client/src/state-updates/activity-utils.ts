@@ -51,12 +51,12 @@ export const updateActivityInState = (
   );
   if (index !== -1) {
     const newActivities = [...activities];
-    const activitiy = activities[index];
+    const activity = activities[index];
     newActivities[index] = {
       ...updatedActivityResponse,
-      own_reactions: activitiy.own_reactions,
-      latest_reactions: activitiy.latest_reactions,
-      reaction_groups: activitiy.reaction_groups,
+      own_reactions: activity.own_reactions,
+      latest_reactions: activity.latest_reactions,
+      reaction_groups: activity.reaction_groups,
     };
     return { changed: true, activities: newActivities };
   } else {

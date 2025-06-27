@@ -1,4 +1,8 @@
-import { ActivityResponse, FeedOwnCapability } from '@stream-io/feeds-client';
+import {
+  ActivityResponse,
+  Feed,
+  FeedOwnCapability,
+} from '@stream-io/feeds-client';
 import { Reactions } from './reactions/Reactions';
 import { useUserContext } from '../user-context';
 import { useEffect, useRef, useState } from 'react';
@@ -11,7 +15,9 @@ import { ActivityCommentSection } from './comments/ActivityCommentSection';
 export const Activity = ({
   activity,
   ownCapabilities,
+  feed,
 }: {
+  feed: Feed;
   activity: ActivityResponse;
   ownCapabilities: string[];
 }) => {
@@ -171,7 +177,7 @@ export const Activity = ({
       </div>
 
       <Dialog ref={dialogRef}>
-        <ActivityCommentSection activity={activity} />
+        <ActivityCommentSection feed={feed} activity={activity} />
       </Dialog>
     </>
   );
