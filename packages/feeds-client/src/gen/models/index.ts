@@ -186,8 +186,6 @@ export interface ActivityAddedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface ActivityAnalyserConfig {}
-
 export interface ActivityDeletedEvent {
   created_at: Date;
 
@@ -414,18 +412,6 @@ export interface ActivityResponse {
   poll?: PollResponseData;
 }
 
-export interface ActivitySelectorConfig {
-  cutoff_time: Date;
-
-  min_popularity?: number;
-
-  type?: string;
-
-  sort?: SortParam[];
-
-  filter?: Record<string, any>;
-}
-
 export interface ActivityUnpinnedEvent {
   created_at: Date;
 
@@ -592,10 +578,6 @@ export interface AggregatedActivityResponse {
   user_count: number;
 
   activities: ActivityResponse[];
-}
-
-export interface AggregationConfig {
-  format?: string;
 }
 
 export interface AppEventResponse {
@@ -2001,20 +1983,6 @@ export interface Data {
   id: string;
 }
 
-export interface DecayFunctionConfig {
-  base: string;
-
-  decay: string;
-
-  direction: string;
-
-  offset: string;
-
-  origin: string;
-
-  scale: string;
-}
-
 export interface DeleteActivitiesRequest {
   activity_ids: string[];
 
@@ -2422,11 +2390,11 @@ export interface FeedDeletedEvent {
 }
 
 export interface FeedGroup {
-  aggregation_version: number;
-
   app_pk: number;
 
   created_at: Date;
+
+  default_view_id: string;
 
   default_visibility: string;
 
@@ -2434,21 +2402,13 @@ export interface FeedGroup {
 
   updated_at: Date;
 
-  activity_analysers: ActivityAnalyserConfig[];
-
-  activity_selectors: ActivitySelectorConfig[];
-
   custom: Record<string, any>;
 
   deleted_at?: Date;
 
   last_feed_get_at?: Date;
 
-  aggregation?: AggregationConfig;
-
   notification?: NotificationConfig;
-
-  ranking?: RankingConfig;
 
   stories?: StoriesConfig;
 }
@@ -3071,10 +3031,6 @@ export interface GetOGResponse {
 }
 
 export interface GetOrCreateFeedRequest {
-  comment_limit?: number;
-
-  comment_sort?: 'first' | 'last' | 'popular';
-
   limit?: number;
 
   next?: string;
@@ -3097,10 +3053,14 @@ export interface GetOrCreateFeedRequest {
 
   following_pagination?: PagerRequest;
 
+  interest_weights?: Record<string, number>;
+
   member_pagination?: PagerRequest;
 }
 
 export interface GetOrCreateFeedResponse {
+  created: boolean;
+
   duration: string;
 
   activities: ActivityResponse[];
@@ -3265,15 +3225,23 @@ export interface LayoutSettings {
 }
 
 export interface LimitsSettings {
+  max_participants_exclude_roles: string[];
+
   max_duration_seconds?: number;
 
   max_participants?: number;
+
+  max_participants_exclude_owner?: boolean;
 }
 
 export interface LimitsSettingsResponse {
+  max_participants_exclude_roles: string[];
+
   max_duration_seconds?: number;
 
   max_participants?: number;
+
+  max_participants_exclude_owner?: boolean;
 }
 
 export interface ListBlockListResponse {
@@ -4438,16 +4406,6 @@ export interface RTMPSettingsResponse {
   quality: string;
 }
 
-export interface RankingConfig {
-  score: string;
-
-  defaults: Record<string, any>;
-
-  functions: Record<string, DecayFunctionConfig>;
-
-  type?: string;
-}
-
 export interface Reaction {
   created_at: Date;
 
@@ -4842,12 +4800,6 @@ export interface SingleFollowResponse {
   duration: string;
 
   follow: FollowResponse;
-}
-
-export interface SortParam {
-  direction: number;
-
-  field: string;
 }
 
 export interface SortParamRequest {
