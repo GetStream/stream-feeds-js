@@ -1,0 +1,38 @@
+[
+  {
+    "id": "susan",
+    "name": "Susan",
+    "image": "https://randomuser.me/api/portraits/women/47.jpg",
+    "visibility_level": "visible"
+  },
+  {
+    "id": "adam",
+    "name": "Adam",
+    "image": "https://randomuser.me/api/portraits/men/38.jpg",
+    "visibility_level": "visible"
+  },
+  {
+    "id": "thomas",
+    "name": "Thomas",
+    "image": "https://randomuser.me/api/portraits/men/42.jpg",
+    "visibility_level": "followers"
+  },
+  {
+    "id": "sloan",
+    "name": "Sloan",
+    "image": "https://randomuser.me/api/portraits/women/60.jpg",
+    "visibility_level": "followers"
+  },
+  {
+    "id": "tiffany",
+    "name": "Tiffany",
+    "image": "https://randomuser.me/api/portraits/women/40.jpg",
+    "visibility_level": "private"
+  },
+  {
+    "id": "jack",
+    "name": "Jack",
+    "image": "https://randomuser.me/api/portraits/men/54.jpg",
+    "visibility_level": "followers"
+  }
+]

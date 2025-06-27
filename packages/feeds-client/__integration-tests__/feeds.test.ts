@@ -6,12 +6,12 @@ import {
   getTestUser,
 } from './utils';
 import { FeedsClient } from '../src/FeedsClient';
-import { FlatFeed } from '../src/FlatFeed';
+import { Feed } from '../src/Feed';
 
 describe('Feeds API dummy test', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
-  let feed: FlatFeed;
+  let feed: Feed;
 
   beforeAll(async () => {
     client = createTestClient();
@@ -20,21 +20,21 @@ describe('Feeds API dummy test', () => {
   });
 
   it('create feed', async () => {
-    await client.createFeed({
-      feed_id: feed.id,
-      feed_group_id: feed.group,
-      visibility: 'public',
-    });
-    const response = await feed.get();
+    const request = feed.getOrCreate({ data: { visibility: 'public' } });
+
+    expect(feed.state.getLatestValue().is_loading).toBe(true);
+
+    const response = await request;
 
     expect(response.feed.id).toBe(feed.id);
+
+    // check date decoding
+    expect(Date.now() - response.feed.created_at.getTime()).toBeLessThan(3000);
+    expect(feed.state.getLatestValue().is_loading).toBe(false);
   });
 
   it('delete feed', async () => {
-    const response = await client.removeFeed({
-      feed_id: feed.id,
-      feed_group_id: feed.group,
-    });
+    const response = await feed.delete();
 
     expect(response).toBeDefined();
   });

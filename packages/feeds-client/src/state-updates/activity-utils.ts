@@ -1,12 +1,12 @@
-import { Activity } from '../gen/models';
+import { ActivityResponse } from '../gen/models';
 import { UpdateStateResult } from '../types-internal';
 
 export const addActivitiesToState = (
-  newActivities: Activity[],
-  activities: Activity[] | undefined,
+  newActivities: ActivityResponse[],
+  activities: ActivityResponse[] | undefined,
   position: 'start' | 'end',
 ) => {
-  let result: UpdateStateResult<{ activities: Activity[] }>;
+  let result: UpdateStateResult<{ activities: ActivityResponse[] }>;
   if (activities === undefined) {
     activities = [];
     result = {
@@ -20,11 +20,11 @@ export const addActivitiesToState = (
     };
   }
 
-  const newActivitiesDeduplicated: Activity[] = [];
-  newActivities.forEach((newActivity) => {
-    const index = activities.findIndex((a) => a.id === newActivity.id);
+  const newActivitiesDeduplicated: ActivityResponse[] = [];
+  newActivities.forEach((newActivityResponse) => {
+    const index = activities.findIndex((a) => a.id === newActivityResponse.id);
     if (index === -1) {
-      newActivitiesDeduplicated.push(newActivity);
+      newActivitiesDeduplicated.push(newActivityResponse);
     }
   });
 
@@ -43,15 +43,17 @@ export const addActivitiesToState = (
 };
 
 export const updateActivityInState = (
-  updatedActivity: Activity,
-  activities: Activity[],
+  updatedActivityResponse: ActivityResponse,
+  activities: ActivityResponse[],
 ) => {
-  const index = activities.findIndex((a) => a.id === updatedActivity.id);
+  const index = activities.findIndex(
+    (a) => a.id === updatedActivityResponse.id,
+  );
   if (index !== -1) {
     const newActivities = [...activities];
     const activitiy = activities[index];
     newActivities[index] = {
-      ...updatedActivity,
+      ...updatedActivityResponse,
       own_reactions: activitiy.own_reactions,
       latest_reactions: activitiy.latest_reactions,
       reaction_groups: activitiy.reaction_groups,
@@ -63,10 +65,10 @@ export const updateActivityInState = (
 };
 
 export const removeActivityFromState = (
-  activity: Activity,
-  activities: Activity[],
+  ActivityResponse: ActivityResponse,
+  activities: ActivityResponse[],
 ) => {
-  const index = activities.findIndex((a) => a.id === activity.id);
+  const index = activities.findIndex((a) => a.id === ActivityResponse.id);
   if (index !== -1) {
     const newActivities = [...activities];
     newActivities.splice(index, 1);

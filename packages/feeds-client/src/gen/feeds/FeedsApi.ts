@@ -1026,6 +1026,8 @@ export class FeedsApi {
       feed_id: request?.feed_id,
     };
     const body = {
+      comment_limit: request?.comment_limit,
+      comment_sort: request?.comment_sort,
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,
@@ -1037,7 +1039,6 @@ export class FeedsApi {
       filter: request?.filter,
       follower_pagination: request?.follower_pagination,
       following_pagination: request?.following_pagination,
-      interest_weights: request?.interest_weights,
       member_pagination: request?.member_pagination,
     };
 
@@ -1355,7 +1356,6 @@ export class FeedsApi {
     const body = {
       source: request?.source,
       target: request?.target,
-      follower_role: request?.follower_role,
       push_preference: request?.push_preference,
       custom: request?.custom,
     };
@@ -1989,7 +1989,7 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async deleteFile(request?: {
+  async deleteFileGlobal(request?: {
     url?: string;
   }): Promise<StreamResponse<Response>> {
     const queryParams = {
@@ -2008,7 +2008,7 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async uploadFile(
+  async uploadFileGlobal(
     request?: FileUploadRequest,
   ): Promise<StreamResponse<FileUploadResponse>> {
     const body = {
@@ -2025,7 +2025,7 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async deleteImage(request?: {
+  async deleteImageGlobal(request?: {
     url?: string;
   }): Promise<StreamResponse<Response>> {
     const queryParams = {
@@ -2044,7 +2044,7 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async uploadImage(
+  async uploadImageGlobal(
     request?: ImageUploadRequest,
   ): Promise<StreamResponse<ImageUploadResponse>> {
     const body = {

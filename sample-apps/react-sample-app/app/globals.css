@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'material-symbols';
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.fill.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+}
+
+::backdrop {
+  @apply backdrop-blur-sm bg-black/25  transition-all duration-300;
+}

@@ -4,7 +4,7 @@ import axios, {
   AxiosResponse,
   RawAxiosRequestHeaders,
 } from 'axios';
-import { RequestMetadata, StreamApiError, ClientOptions } from './types';
+import { RequestMetadata, StreamApiError, FeedsClientOptions } from './types';
 import { getRateLimitFromResponseHeader } from './rate-limit';
 import { KnownCodes, randomId } from './utils';
 import { TokenManager } from './TokenManager';
@@ -18,7 +18,7 @@ export class ApiClient {
     public readonly apiKey: string,
     private readonly tokenManager: TokenManager,
     private readonly connectionIdManager: ConnectionIdManager,
-    options?: ClientOptions,
+    options?: FeedsClientOptions,
   ) {
     this.baseUrl = options?.base_url ?? 'https://video.stream-io-api.com';
     this.axiosInstance = axios.create({

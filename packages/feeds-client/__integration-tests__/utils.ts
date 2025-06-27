@@ -1,13 +1,15 @@
 import { FeedsClient } from '../src/FeedsClient';
+import { Feed } from '../src/Feed';
 import { UserRequest } from '../src/common/gen/models';
-import { ClientOptions } from '../src/common/types';
+import { FeedsClientOptions } from '../src/common/types';
+import { WSEvent } from '../src/gen/models';
 import { FeedsEvent } from '../src/types';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 const tokenUrl = import.meta.env.VITE_STREAM_TOKEN_URL;
 const baseUrl = import.meta.env.VITE_API_URL;
 
-export const createTestClient = (options?: ClientOptions) => {
+export const createTestClient = (options?: FeedsClientOptions) => {
   if (!apiKey) {
     throw new Error('Provide an api key, check .env-example for details');
   }
@@ -40,11 +42,12 @@ export const getTestUser = () => {
 };
 
 export const waitForEvent = (
-  client: FeedsClient,
-  type: FeedsEvent['type'],
+  client: FeedsClient | Feed,
+  type: FeedsEvent['type'] | WSEvent['type'],
   timeoutMs = 3000,
 ) => {
   return new Promise((resolve) => {
+    // @ts-expect-error
     client.on(type, () => {
       resolve(undefined);
       clearTimeout(timeout);
