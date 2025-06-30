@@ -1,13 +1,16 @@
 import clsx from 'clsx';
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import type {
-  ActivityResponse,
-  CommentResponse,
+import {
   Feed,
+  FeedOwnCapability,
+  FeedState,
+  type ActivityResponse,
+  type CommentResponse,
 } from '@stream-io/feeds-client';
 import { useUserContext } from '@/app/user-context';
 import { useComments } from '@/app/hooks/useComments';
 import { PaginatedList } from '../PaginatedList';
+import { useStateStore } from '@/app/hooks/useStateStore';
 
 const DEFAULT_PAGINATION_SORT = 'first' as const;
 
@@ -45,10 +48,13 @@ export const ActivityCommentSection = ({
     if (!element) {
       return;
     }
+
     element.classList.add('bg-blue-50');
+
     setTimeout(() => {
       element.classList.remove('bg-blue-50');
     }, 1500);
+
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
@@ -165,6 +171,30 @@ const Comment = ({
   setParent: (c: CommentResponse) => void;
   feed: Feed;
 }) => {
+  const { client, user } = useUserContext();
+  const selector = useCallback(
+    (state: FeedState) => ({
+      canEdit:
+        (state.own_capabilities?.includes(FeedOwnCapability.UPDATE_COMMENT) ??
+          false) &&
+        comment.user.id === user?.id,
+      canDelete:
+        (state.own_capabilities?.includes(FeedOwnCapability.DELETE_COMMENT) ??
+          false) &&
+        comment.user.id === user?.id,
+      canAddCommentReaction:
+        state.own_capabilities?.includes(
+          FeedOwnCapability.ADD_COMMENT_REACTION,
+        ) ?? false,
+      canRemoveCommentReaction:
+        state.own_capabilities?.includes(
+          FeedOwnCapability.REMOVE_COMMENT_REACTION,
+        ) ?? false,
+    }),
+    [comment, user],
+  );
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { canDelete, canEdit } = useStateStore(feed.state, selector);
   const { comments, commentPagination } = useComments(feed, comment);
 
   return (
@@ -195,40 +225,43 @@ const Comment = ({
               </time>
             </p>
           </div>
-          <button
-            id="dropdownComment1Button"
-            data-dropdown-toggle="dropdownComment1"
-            className="inline-flex items-center p-2 text-sm font-medium text-center text-gray-500 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-50"
-            type="button"
-          >
-            <span className="material-symbols-outlined">more_horiz</span>
-            <span className="sr-only">Comment settings</span>
-          </button>
-          <div
-            id="dropdownComment1"
-            className="hidden z-10 w-36 bg-white rounded divide-y divide-gray-100 shadow"
-          >
-            <ul
-              className="py-1 text-sm text-gray-700"
-              aria-labelledby="dropdownMenuIconHorizontalButton"
-            >
-              <li>
-                <a href="#" className="block py-2 px-4 hover:bg-gray-100">
-                  Edit
-                </a>
-              </li>
-              <li>
-                <a href="#" className="block py-2 px-4 hover:bg-gray-100">
-                  Remove
-                </a>
-              </li>
-              <li>
-                <a href="#" className="block py-2 px-4 hover:bg-gray-100">
-                  Report
-                </a>
-              </li>
-            </ul>
-          </div>
+          {(canDelete || canEdit) && (
+            <div className="relative">
+              <button
+                className="text-gray-400 flex"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <span className="material-symbols-outlined">more_horiz</span>
+              </button>
+              <div
+                className={`absolute rounded-md right-0 w-48 bg-white shadow-lg flex flex-col items-stretch ${isMenuOpen ? '' : 'hidden'}`}
+              >
+                {canEdit && (
+                  <button
+                    className="text-gray-700 flex gap-1 p-3 items-center rounded-md hover:bg-gray-100"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      console.log('TODO: Edit comment', comment.id);
+                    }}
+                  >
+                    <span className="material-symbols-outlined">edit</span>
+                    <div>Edit</div>
+                  </button>
+                )}
+                {canDelete && (
+                  <button
+                    className="text-red-700 flex gap-1 p-3 items-center rounded-md hover:bg-gray-100"
+                    onClick={() =>
+                      client?.deleteComment({ comment_id: comment.id })
+                    }
+                  >
+                    <span className="material-symbols-outlined">delete</span>
+                    <div>Delete</div>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </footer>
         <p className="text-gray-500">{comment.text}</p>
         <div className="flex items-center mt-4 space-x-4">

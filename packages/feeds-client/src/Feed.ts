@@ -8,7 +8,6 @@ import {
   ActivityResponse,
   CommentResponse,
   PagerResponse,
-  ThreadedCommentResponse,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -54,8 +53,41 @@ export type FeedState = Omit<
           // registered on first pagination attempt and then used for real-time updates
           sort?: string;
         };
-        parent_id?: ActivityIdOrCommentId; // for traversing upwards
-        comments?: ThreadedCommentResponse[];
+        /**
+         * Id of the "store" where the actual parent is stored in the comments array.
+         *
+         * Example:
+         * ```
+         * // top-level comment:
+         * const comment1 = {
+         *   id: 'comment-1',
+         *   object_id: 'activity-1',
+         * }
+         * // child comment:
+         * const comment2 = {
+         *   id: 'comment-2',
+         *   object_id: 'activity-1',
+         *   parent_id: 'comment-1',
+         * }
+         * ```
+         * When these comments are loaded, they're stored in the state like this:
+         * ```
+         * {
+         *   comments_by_entity_id: {
+         *     'activity-1': {
+         *       comments: [comment1],
+         *       parent_id: undefined,
+         *     },
+         *     'comment-1': {
+         *       comments: [comment2],
+         *       parent_id: 'activity-1', // parent store where "comment-1" is located in "comments" array
+         *     }
+         *   }
+         * }
+         * ```
+         */
+        parent_id?: ActivityIdOrCommentId;
+        comments?: CommentResponse[];
       }
     | undefined
   >;
@@ -183,7 +215,36 @@ export class Feed extends FeedApi {
         };
       });
     },
-    'feeds.comment.deleted': Feed.noop,
+    'feeds.comment.deleted': ({ comment }) => {
+      const forId = comment.parent_id ?? comment.object_id;
+
+      this.state.next((currentState) => {
+        const newCommentsByEntityId = {
+          ...currentState.comments_by_entity_id,
+          [forId]: {
+            ...currentState.comments_by_entity_id[forId],
+          },
+        };
+
+        const index = this.getCommentIndex(comment, currentState);
+
+        if (newCommentsByEntityId?.[forId]?.comments?.length && index !== -1) {
+          newCommentsByEntityId[forId].comments = [
+            ...newCommentsByEntityId[forId].comments,
+          ];
+
+          newCommentsByEntityId[forId]?.comments?.splice(index, 1);
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete newCommentsByEntityId[comment.id];
+
+        return {
+          ...currentState,
+          comments_by_entity_id: newCommentsByEntityId,
+        };
+      });
+    },
     'feeds.comment.updated': (event) => {
       const { comment } = event;
       const forId = comment.parent_id ?? comment.object_id;
@@ -413,6 +474,7 @@ export class Feed extends FeedApi {
 
         delete responseCopy.feed;
         delete responseCopy.metadata;
+        delete responseCopy.duration;
 
         this.state.next((currentState) => {
           const nextState: FeedState = {
@@ -443,7 +505,10 @@ export class Feed extends FeedApi {
   /**
    * Returns index of the provided comment object.
    */
-  private getCommentIndex(comment: CommentResponse, state?: FeedState) {
+  private getCommentIndex(
+    comment: Pick<CommentResponse, 'object_id' | 'parent_id' | 'id'>,
+    state?: FeedState,
+  ) {
     const { comments_by_entity_id = {} } = state ?? this.currentState;
 
     const currentComments =
@@ -453,6 +518,7 @@ export class Feed extends FeedApi {
       return -1;
     }
 
+    // @ts-expect-error this will just fail if the comment is not object from state
     let commentIndex = currentComments.indexOf(comment);
 
     // fast lookup failed, try slower approach
