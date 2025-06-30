@@ -147,7 +147,7 @@ export interface ActionLogResponse {
 
   custom: Record<string, any>;
 
-  review_queue_item?: ReviewQueueItem;
+  review_queue_item?: ReviewQueueItemResponse;
 
   target_user?: UserResponse;
 
@@ -185,8 +185,6 @@ export interface ActivityAddedEvent {
 
   user?: UserResponseCommonFields;
 }
-
-export interface ActivityAnalyserConfig {}
 
 export interface ActivityDeletedEvent {
   created_at: Date;
@@ -414,18 +412,6 @@ export interface ActivityResponse {
   poll?: PollResponseData;
 }
 
-export interface ActivitySelectorConfig {
-  cutoff_time: Date;
-
-  min_popularity?: number;
-
-  type?: string;
-
-  sort?: SortParam[];
-
-  filter?: Record<string, any>;
-}
-
 export interface ActivityUnpinnedEvent {
   created_at: Date;
 
@@ -592,10 +578,6 @@ export interface AggregatedActivityResponse {
   user_count: number;
 
   activities: ActivityResponse[];
-}
-
-export interface AggregationConfig {
-  format?: string;
 }
 
 export interface AppEventResponse {
@@ -2001,20 +1983,6 @@ export interface Data {
   id: string;
 }
 
-export interface DecayFunctionConfig {
-  base?: string;
-
-  decay?: string;
-
-  direction?: string;
-
-  offset?: string;
-
-  origin?: string;
-
-  scale?: string;
-}
-
 export interface DeleteActivitiesRequest {
   activity_ids: string[];
 
@@ -2422,11 +2390,11 @@ export interface FeedDeletedEvent {
 }
 
 export interface FeedGroup {
-  aggregation_version: number;
-
   app_pk: number;
 
   created_at: Date;
+
+  default_view_id: string;
 
   default_visibility: string;
 
@@ -2434,21 +2402,13 @@ export interface FeedGroup {
 
   updated_at: Date;
 
-  activity_analysers: ActivityAnalyserConfig[];
-
-  activity_selectors: ActivitySelectorConfig[];
-
   custom: Record<string, any>;
 
   deleted_at?: Date;
 
   last_feed_get_at?: Date;
 
-  aggregation?: AggregationConfig;
-
   notification?: NotificationConfig;
-
-  ranking?: RankingConfig;
 
   stories?: StoriesConfig;
 }
@@ -4446,16 +4406,6 @@ export interface RTMPSettingsResponse {
   quality: string;
 }
 
-export interface RankingConfig {
-  score?: string;
-
-  type?: string;
-
-  defaults?: Record<string, any>;
-
-  functions?: Record<string, DecayFunctionConfig>;
-}
-
 export interface Reaction {
   created_at: Date;
 
@@ -4644,6 +4594,8 @@ export interface ReviewQueueItem {
   languages: string[];
 
   teams: string[];
+
+  completed_at: NullTime;
 
   reviewed_at: NullTime;
 
@@ -4852,12 +4804,6 @@ export interface SingleFollowResponse {
   follow: FollowResponse;
 }
 
-export interface SortParam {
-  direction: number;
-
-  field: string;
-}
-
 export interface SortParamRequest {
   direction?: number;
 
@@ -4908,7 +4854,7 @@ export interface SubmitActionRequest {
 export interface SubmitActionResponse {
   duration: string;
 
-  item?: ReviewQueueItem;
+  item?: ReviewQueueItemResponse;
 }
 
 export interface TargetResolution {

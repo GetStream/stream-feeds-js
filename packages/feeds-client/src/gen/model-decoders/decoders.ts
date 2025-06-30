@@ -48,24 +48,11 @@ decoders.AcceptFollowResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.ActionLog = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    review_queue_item: { type: 'ReviewQueueItem', isSingle: true },
-
-    target_user: { type: 'User', isSingle: true },
-
-    user: { type: 'User', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.ActionLogResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
-    review_queue_item: { type: 'ReviewQueueItem', isSingle: true },
+    review_queue_item: { type: 'ReviewQueueItemResponse', isSingle: true },
 
     target_user: { type: 'UserResponse', isSingle: true },
 
@@ -388,84 +375,6 @@ decoders.BookmarkUpdatedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.Call = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    blocked_users: { type: 'User', isSingle: false },
-
-    egresses: { type: 'CallEgress', isSingle: false },
-
-    members: { type: 'CallMember', isSingle: false },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    egress_updated_at: { type: 'DatetimeType', isSingle: true },
-
-    ended_at: { type: 'DatetimeType', isSingle: true },
-
-    last_heartbeat_at: { type: 'DatetimeType', isSingle: true },
-
-    starts_at: { type: 'DatetimeType', isSingle: true },
-
-    call_type: { type: 'CallType', isSingle: true },
-
-    created_by: { type: 'User', isSingle: true },
-
-    session: { type: 'CallSession', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.CallEgress = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    started_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    stopped_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.CallMember = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'User', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.CallParticipant = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    joined_at: { type: 'DatetimeType', isSingle: true },
-
-    ban_expires: { type: 'DatetimeType', isSingle: true },
-
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    deactivated_at: { type: 'DatetimeType', isSingle: true },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    last_active: { type: 'DatetimeType', isSingle: true },
-
-    last_engaged_at: { type: 'DatetimeType', isSingle: true },
-
-    revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.CallParticipantResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     joined_at: { type: 'DatetimeType', isSingle: true },
@@ -492,37 +401,6 @@ decoders.CallResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.CallSession = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    active_sf_us: { type: 'SFUIDLastSeen', isSingle: false },
-
-    participants: { type: 'CallParticipant', isSingle: false },
-
-    accepted_by: { type: 'DatetimeType', isSingle: false },
-
-    missed_by: { type: 'DatetimeType', isSingle: false },
-
-    rejected_by: { type: 'DatetimeType', isSingle: false },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    ended_at: { type: 'DatetimeType', isSingle: true },
-
-    live_ended_at: { type: 'DatetimeType', isSingle: true },
-
-    live_started_at: { type: 'DatetimeType', isSingle: true },
-
-    ring_at: { type: 'DatetimeType', isSingle: true },
-
-    started_at: { type: 'DatetimeType', isSingle: true },
-
-    timer_ends_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.CallSessionResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     participants: { type: 'CallParticipantResponse', isSingle: false },
@@ -542,15 +420,6 @@ decoders.CallSessionResponse = (input?: Record<string, any>) => {
     started_at: { type: 'DatetimeType', isSingle: true },
 
     timer_ends_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.CallType = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -848,27 +717,6 @@ decoders.EgressRTMPResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.EntityCreator = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    ban_expires: { type: 'DatetimeType', isSingle: true },
-
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    deactivated_at: { type: 'DatetimeType', isSingle: true },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    last_active: { type: 'DatetimeType', isSingle: true },
-
-    last_engaged_at: { type: 'DatetimeType', isSingle: true },
-
-    revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.EntityCreatorResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -1003,19 +851,6 @@ decoders.FeedsReactionResponse = (input?: Record<string, any>) => {
     updated_at: { type: 'DatetimeType', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.Flag = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    review_queue_item: { type: 'ReviewQueueItem', isSingle: true },
-
-    user: { type: 'User', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1299,8 +1134,6 @@ decoders.ModerationCustomActionEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
-    item: { type: 'ReviewQueueItem', isSingle: true },
-
     message: { type: 'Message', isSingle: true },
 
     user: { type: 'User', isSingle: true },
@@ -1320,8 +1153,6 @@ decoders.ModerationFlaggedEvent = (input?: Record<string, any>) => {
 decoders.ModerationMarkReviewedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
-
-    item: { type: 'ReviewQueueItem', isSingle: true },
 
     message: { type: 'Message', isSingle: true },
 
@@ -1685,33 +1516,6 @@ decoders.ReminderResponseData = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.ReviewQueueItem = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    actions: { type: 'ActionLog', isSingle: false },
-
-    bans: { type: 'Ban', isSingle: false },
-
-    flags: { type: 'Flag', isSingle: false },
-
-    assigned_to: { type: 'User', isSingle: true },
-
-    call: { type: 'Call', isSingle: true },
-
-    entity_creator: { type: 'EntityCreator', isSingle: true },
-
-    feeds_v2_reaction: { type: 'Reaction', isSingle: true },
-
-    message: { type: 'Message', isSingle: true },
-
-    reaction: { type: 'Reaction', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -1741,13 +1545,6 @@ decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.SFUIDLastSeen = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    last_seen: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.SingleFollowResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     follow: { type: 'FollowResponse', isSingle: true },
@@ -1757,7 +1554,7 @@ decoders.SingleFollowResponse = (input?: Record<string, any>) => {
 
 decoders.SubmitActionResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
-    item: { type: 'ReviewQueueItem', isSingle: true },
+    item: { type: 'ReviewQueueItemResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
