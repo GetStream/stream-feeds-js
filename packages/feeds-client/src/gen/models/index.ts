@@ -2002,17 +2002,17 @@ export interface Data {
 }
 
 export interface DecayFunctionConfig {
-  base: string;
+  base?: string;
 
-  decay: string;
+  decay?: string;
 
-  direction: string;
+  direction?: string;
 
-  offset: string;
+  offset?: string;
 
-  origin: string;
+  origin?: string;
 
-  scale: string;
+  scale?: string;
 }
 
 export interface DeleteActivitiesRequest {
@@ -3071,10 +3071,6 @@ export interface GetOGResponse {
 }
 
 export interface GetOrCreateFeedRequest {
-  comment_limit?: number;
-
-  comment_sort?: 'first' | 'last' | 'popular';
-
   limit?: number;
 
   next?: string;
@@ -3097,10 +3093,14 @@ export interface GetOrCreateFeedRequest {
 
   following_pagination?: PagerRequest;
 
+  interest_weights?: Record<string, number>;
+
   member_pagination?: PagerRequest;
 }
 
 export interface GetOrCreateFeedResponse {
+  created: boolean;
+
   duration: string;
 
   activities: ActivityResponse[];
@@ -3265,15 +3265,23 @@ export interface LayoutSettings {
 }
 
 export interface LimitsSettings {
+  max_participants_exclude_roles: string[];
+
   max_duration_seconds?: number;
 
   max_participants?: number;
+
+  max_participants_exclude_owner?: boolean;
 }
 
 export interface LimitsSettingsResponse {
+  max_participants_exclude_roles: string[];
+
   max_duration_seconds?: number;
 
   max_participants?: number;
+
+  max_participants_exclude_owner?: boolean;
 }
 
 export interface ListBlockListResponse {
@@ -4439,13 +4447,13 @@ export interface RTMPSettingsResponse {
 }
 
 export interface RankingConfig {
-  score: string;
-
-  defaults: Record<string, any>;
-
-  functions: Record<string, DecayFunctionConfig>;
+  score?: string;
 
   type?: string;
+
+  defaults?: Record<string, any>;
+
+  functions?: Record<string, DecayFunctionConfig>;
 }
 
 export interface Reaction {
@@ -5225,6 +5233,8 @@ export interface UpdateFollowRequest {
   source: string;
 
   target: string;
+
+  follower_role?: string;
 
   push_preference?: 'all' | 'none';
 
