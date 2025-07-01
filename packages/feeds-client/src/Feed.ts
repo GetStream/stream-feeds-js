@@ -122,6 +122,7 @@ export class Feed extends FeedApi {
         'start',
       );
       if (result.changed) {
+        this.client.hydratePollCache([event.activity]);
         this.state.partialNext({ activities: result.activities });
       }
     },
@@ -366,6 +367,7 @@ export class Feed extends FeedApi {
     'feeds.feed_member.added': Feed.noop,
     'feeds.feed_member.removed': Feed.noop,
     'feeds.feed_member.updated': Feed.noop,
+    // the poll events should be removed from here
     'feeds.poll.closed': Feed.noop,
     'feeds.poll.deleted': Feed.noop,
     'feeds.poll.updated': Feed.noop,
@@ -492,6 +494,8 @@ export class Feed extends FeedApi {
           return nextState;
         });
       }
+
+      this.client.hydratePollCache(response.activities);
 
       return response;
     } finally {

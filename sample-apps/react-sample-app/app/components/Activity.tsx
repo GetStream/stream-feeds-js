@@ -11,6 +11,7 @@ import { ActivityComposer } from './ActivityComposer';
 import Link from 'next/link';
 import { Dialog } from './Dialog';
 import { ActivityCommentSection } from './comments/ActivityCommentSection';
+import { Poll } from '@/app/components/Poll';
 
 export const Activity = ({
   activity,
@@ -63,6 +64,9 @@ export const Activity = ({
       setEditedActivityText(activity?.text ?? '');
     }
   }, [isEditing]);
+
+  const poll =
+    activity.poll && client ? client.pollFromState(activity.poll.id) : null;
 
   return (
     <>
@@ -151,6 +155,7 @@ export const Activity = ({
             onChange={(text) => setEditedActivityText(text)}
           />
         )}
+        {poll ? <Poll poll={poll} activity={activity} /> : null}
         <div className="flex justify-between">
           <div className="flex items-center gap-3">
             <Reactions

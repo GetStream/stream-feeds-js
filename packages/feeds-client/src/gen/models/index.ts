@@ -5316,7 +5316,7 @@ export interface User {
 
   custom: Record<string, any>;
 
-  teams_role: Record<string, string>;
+  teams_role?: Record<string, string>;
 
   ban_expires?: Date;
 
