@@ -160,7 +160,6 @@ export class FeedsClient extends FeedsApi {
       const pollFromCache = this.pollFromState(pollResponse.id);
       if (!pollFromCache) {
         const poll = new StreamPoll({ client: this, poll: pollResponse });
-        console.log('CREATING NEW FOR ID: ', pollResponse.id, pollFromCache, poll.iid)
         this.polls_by_id.set(poll.id, poll);
       } else {
         pollFromCache.reinitializeState(pollResponse);

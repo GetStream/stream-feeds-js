@@ -177,6 +177,7 @@ export class Feed extends FeedApi {
       if (currentActivities) {
         const result = updateActivityInState(event.activity, currentActivities);
         if (result.changed) {
+          this.client.hydratePollCache([event.activity]);
           this.state.partialNext({ activities: result.activities });
         }
       }
