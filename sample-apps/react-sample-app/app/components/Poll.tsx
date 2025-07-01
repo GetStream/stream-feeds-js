@@ -4,9 +4,9 @@ import {
   PollState,
   PollOption as StreamPollOption,
 } from '@stream-io/feeds-client';
-import { useStateStore } from '@/app/hooks/useStateStore';
 import { useUserContext } from '@/app/user-context';
 import { PollContextProvider, usePollContext } from '@/app/poll-context';
+import { usePollStateStore } from '@/app/hooks/usePollStateStore';
 
 export const Poll = ({ activity }: { activity: ActivityResponse }) => {
   if (!activity.poll) {
@@ -20,11 +20,16 @@ export const Poll = ({ activity }: { activity: ActivityResponse }) => {
   );
 };
 
+const pollSelector = (state: PollState) => ({
+  name: state.name,
+});
+
 const PollUI = () => {
+  const { name } = usePollStateStore(pollSelector);
   return (
     <div className="bg-[#1c1c1e] text-white rounded-xl p-4 w-64 space-y-4 shadow-lg">
       <div>
-        <h2 className="text-sm font-semibold">Testing something for polls</h2>
+        <h2 className="text-sm font-semibold">{name}</h2>
       </div>
 
       <PollOptions />
@@ -83,8 +88,7 @@ const pollOptionsSelector = (state: PollState) => ({
 });
 
 const PollOptions = () => {
-  const { poll } = usePollContext();
-  const { options } = useStateStore(poll.state, pollOptionsSelector);
+  const { options } = usePollStateStore(pollOptionsSelector);
 
   return (
     <div className="space-y-3">
@@ -113,7 +117,7 @@ const PollOption = ({
     }),
     [option.id],
   );
-  const { isClosed, voteCount, ownVote } = useStateStore(poll.state, selector);
+  const { isClosed, voteCount, ownVote } = usePollStateStore(selector);
   const changePollVote = useCallback(
     () =>
       ownVote
