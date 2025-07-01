@@ -8,6 +8,7 @@ import {
   ActivityResponse,
   CommentResponse,
   PagerResponse,
+  SingleFollowRequest,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -809,12 +810,16 @@ export class Feed extends FeedApi {
     return response;
   }
 
-  async follow(feedOrFid: Feed | string) {
+  async follow(
+    feedOrFid: Feed | string,
+    options?: Omit<SingleFollowRequest, 'source' | 'target'>,
+  ) {
     const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.fid;
 
     const response = await this.client.follow({
       source: this.fid,
       target: fid,
+      ...options,
     });
 
     return response;
