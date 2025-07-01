@@ -65,9 +65,6 @@ export const Activity = ({
     }
   }, [isEditing]);
 
-  const poll =
-    activity.poll && client ? client.pollFromState(activity.poll.id) : null;
-
   return (
     <>
       <div className="w-full p-3 border border-gray-300 gap-3 flex flex-col rounded-md">
@@ -155,7 +152,7 @@ export const Activity = ({
             onChange={(text) => setEditedActivityText(text)}
           />
         )}
-        {poll ? <Poll poll={poll} activity={activity} /> : null}
+        {activity.poll ? <Poll activity={activity} /> : null}
         <div className="flex justify-between">
           <div className="flex items-center gap-3">
             <Reactions

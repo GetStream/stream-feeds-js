@@ -1,41 +1,42 @@
 import React, { useCallback } from 'react';
 import {
   ActivityResponse,
-  StreamPoll,
   PollState,
   PollOption as StreamPollOption,
 } from '@stream-io/feeds-client';
 import { useStateStore } from '@/app/hooks/useStateStore';
 import { useUserContext } from '@/app/user-context';
+import { PollContextProvider, usePollContext } from '@/app/poll-context';
 
-export const Poll = ({
-  poll,
-  activity,
-}: {
-  poll: StreamPoll;
-  activity: ActivityResponse;
-}) => {
+export const Poll = ({ activity }: { activity: ActivityResponse }) => {
+  if (!activity.poll) {
+    return null;
+  }
+
+  return (
+    <PollContextProvider activity={activity} poll={activity.poll}>
+      <PollUI />
+    </PollContextProvider>
+  );
+};
+
+const PollUI = () => {
   return (
     <div className="bg-[#1c1c1e] text-white rounded-xl p-4 w-64 space-y-4 shadow-lg">
       <div>
         <h2 className="text-sm font-semibold">Testing something for polls</h2>
       </div>
 
-      <PollOptions poll={poll} activity={activity} />
+      <PollOptions />
 
-      <PollButtons poll={poll} activity={activity} />
+      <PollButtons />
     </div>
   );
 };
 
-const PollButtons = ({
-  poll,
-  activity,
-}: {
-  poll: StreamPoll;
-  activity: ActivityResponse;
-}) => {
+const PollButtons = () => {
   const { client } = useUserContext();
+  const { poll, activity } = usePollContext();
   const handleSuggestOption = useCallback(
     () =>
       client?.createPollOption({
@@ -81,13 +82,8 @@ const pollOptionsSelector = (state: PollState) => ({
   options: state.options ?? [],
 });
 
-const PollOptions = ({
-  poll,
-  activity,
-}: {
-  poll: StreamPoll;
-  activity: ActivityResponse;
-}) => {
+const PollOptions = () => {
+  const { poll } = usePollContext();
   const { options } = useStateStore(poll.state, pollOptionsSelector);
 
   return (
@@ -95,8 +91,6 @@ const PollOptions = ({
       {options.map((option) => (
         <PollOption
           key={option.id}
-          poll={poll}
-          activity={activity}
           option={option}
         />
       ))}
@@ -105,15 +99,12 @@ const PollOptions = ({
 };
 
 const PollOption = ({
-  poll,
   option,
-  activity,
 }: {
-  poll: StreamPoll;
   option: StreamPollOption;
-  activity: ActivityResponse;
 }) => {
   const { client } = useUserContext();
+  const { poll, activity } = usePollContext();
   const selector = useCallback(
     (state: PollState) => ({
       isClosed: state.is_closed,
