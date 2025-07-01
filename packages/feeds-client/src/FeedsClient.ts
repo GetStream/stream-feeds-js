@@ -20,6 +20,7 @@ import {
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
 import { Feed } from './Feed';
 import { FeedsClientOptions, NetworkChangedEvent } from './common/types';
+import { ModerationClient } from './ModerationClient';
 
 export type FeedsClientState = {
   connectedUser: OwnUser | undefined;
@@ -29,6 +30,7 @@ type FID = string;
 
 export class FeedsClient extends FeedsApi {
   readonly state: StateStore<FeedsClientState>;
+  readonly moderation: ModerationClient;
 
   private readonly tokenManager: TokenManager;
   private wsConnection?: StableWSConnection;
@@ -53,6 +55,7 @@ export class FeedsClient extends FeedsApi {
     this.state = new StateStore<FeedsClientState>({
       connectedUser: undefined,
     });
+    this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
     this.on('all', (event) => {
