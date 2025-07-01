@@ -1677,6 +1677,17 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  closePoll(request: {
+    poll_id: string;
+  }): Promise<StreamResponse<PollResponse>> {
+    return this.updatePollPartial({
+      poll_id: request.poll_id,
+      set: {
+        is_closed: true,
+      },
+    });
+  }
+
   async createPollOption(
     request: CreatePollOptionRequest & { poll_id: string },
   ): Promise<StreamResponse<PollOptionResponse>> {
