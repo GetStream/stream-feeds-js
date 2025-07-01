@@ -12,7 +12,6 @@ import type {
   PollResponseData,
   Poll as PollType,
 } from '../gen/models';
-import { generateUUIDv4 } from './utils';
 
 const isPollUpdatedEvent = (
   e: WSEvent,
@@ -57,12 +56,10 @@ export class StreamPoll {
   public readonly state: StateStore<PollState>;
   public id: string;
   private readonly client: FeedsClient;
-  public iid: string;
 
   constructor({ client, poll }: PollInitOptions) {
     this.client = client;
     this.id = poll.id;
-    this.iid = generateUUIDv4();
 
     this.state = new StateStore<PollState>(
       this.getInitialStateFromPollResponse(poll),
