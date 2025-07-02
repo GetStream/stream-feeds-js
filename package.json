@@ -7,7 +7,8 @@
   "license": "See license in LICENSE",
   "workspaces": [
     "packages/*",
-    "sample-apps/*"
+    "sample-apps/*",
+    "sample-apps/react-native/*"
   ],
   "scripts": {
     "build:all": "yarn workspaces foreach -v --topological-dev run build",
