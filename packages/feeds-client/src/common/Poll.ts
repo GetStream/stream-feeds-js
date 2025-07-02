@@ -41,10 +41,10 @@ export type PollAnswersQueryParams = QueryPollVotesRequest & { poll_id: string; 
 type OptionId = string;
 
 export type PollState = Omit<PollType, 'own_votes' | 'id'> & {
-  lastActivityAt: Date;
-  maxVotedOptionIds: OptionId[];
-  ownVotesByOptionId: Record<OptionId, PollVote>;
-  ownAnswer?: PollVote; // each user can have only one answer
+  last_activity_at: Date;
+  max_voted_option_ids: OptionId[];
+  own_votes_by_option_id: Record<OptionId, PollVote>;
+  own_answer?: PollVote; // each user can have only one answer
 };
 
 type PollInitOptions = {
@@ -86,12 +86,12 @@ export class StreamPoll {
 
     return {
       ...pollResponseForState,
-      lastActivityAt: new Date(),
-      maxVotedOptionIds: getMaxVotedOptionIds(
+      last_activity_at: new Date(),
+      max_voted_option_ids: getMaxVotedOptionIds(
         pollResponseForState.vote_counts_by_option,
       ),
-      ownAnswer,
-      ownVotesByOptionId: getOwnVotesByOptionId(ownVotes),
+      own_answer: ownAnswer,
+      own_votes_by_option_id: getOwnVotesByOptionId(ownVotes),
     };
   };
 
@@ -110,7 +110,7 @@ export class StreamPoll {
     const { id, ...pollData } = event.poll;
     this.state.partialNext({
       ...pollData,
-      lastActivityAt: new Date(event.created_at),
+      last_activity_at: new Date(event.created_at),
     });
   };
 
@@ -119,7 +119,7 @@ export class StreamPoll {
     if (!isPollClosedEventEvent(event as WSEvent)) return;
     this.state.partialNext({
       is_closed: true,
-      lastActivityAt: new Date(event.created_at),
+      last_activity_at: new Date(event.created_at),
     });
   };
 
@@ -129,9 +129,9 @@ export class StreamPoll {
     const currentState = this.data;
     const isOwnVote = event.poll_vote.user_id === this.client.state.getLatestValue().connectedUser?.id;
     let latestAnswers = [...currentState.latest_answers];
-    let ownAnswer = currentState.ownAnswer;
-    const ownVotesByOptionId = currentState.ownVotesByOptionId;
-    let maxVotedOptionIds = currentState.maxVotedOptionIds;
+    let ownAnswer = currentState.own_answer;
+    const ownVotesByOptionId = currentState.own_votes_by_option_id;
+    let maxVotedOptionIds = currentState.max_voted_option_ids;
 
     if (isOwnVote) {
       if (isVoteAnswer(event.poll_vote)) {
@@ -156,10 +156,10 @@ export class StreamPoll {
       vote_count,
       vote_counts_by_option,
       latest_answers: latestAnswers,
-      lastActivityAt: new Date(event.created_at),
-      ownAnswer,
-      ownVotesByOptionId,
-      maxVotedOptionIds,
+      last_activity_at: new Date(event.created_at),
+      own_answer: ownAnswer,
+      own_votes_by_option_id: ownVotesByOptionId,
+      max_voted_option_ids: maxVotedOptionIds,
     });
   };
 
@@ -170,9 +170,9 @@ export class StreamPoll {
     const currentState = this.data;
     const isOwnVote = event.poll_vote.user_id === this.client.state.getLatestValue().connectedUser?.id;
     let latestAnswers = [...currentState.latest_answers];
-    let ownAnswer = currentState.ownAnswer;
-    let ownVotesByOptionId = currentState.ownVotesByOptionId;
-    let maxVotedOptionIds = currentState.maxVotedOptionIds;
+    let ownAnswer = currentState.own_answer;
+    let ownVotesByOptionId = currentState.own_votes_by_option_id;
+    let maxVotedOptionIds = currentState.max_voted_option_ids;
 
     if (isOwnVote) {
       if (isVoteAnswer(event.poll_vote)) {
@@ -222,10 +222,10 @@ export class StreamPoll {
       vote_count,
       vote_counts_by_option,
       latest_answers: latestAnswers,
-      lastActivityAt: new Date(event.created_at),
-      ownAnswer,
-      ownVotesByOptionId,
-      maxVotedOptionIds,
+      last_activity_at: new Date(event.created_at),
+      own_answer: ownAnswer,
+      own_votes_by_option_id:ownVotesByOptionId,
+      max_voted_option_ids: maxVotedOptionIds,
     });
   };
 
@@ -235,9 +235,9 @@ export class StreamPoll {
     const currentState = this.data;
     const isOwnVote = event.poll_vote.user_id === this.client.state.getLatestValue().connectedUser?.id;
     let latestAnswers = [...currentState.latest_answers];
-    let ownAnswer = currentState.ownAnswer;
-    const ownVotesByOptionId = { ...currentState.ownVotesByOptionId };
-    let maxVotedOptionIds = currentState.maxVotedOptionIds;
+    let ownAnswer = currentState.own_answer;
+    const ownVotesByOptionId = { ...currentState.own_votes_by_option_id };
+    let maxVotedOptionIds = currentState.max_voted_option_ids;
 
     if (isVoteAnswer(event.poll_vote)) {
       latestAnswers = latestAnswers.filter(
@@ -263,10 +263,10 @@ export class StreamPoll {
       vote_count,
       vote_counts_by_option,
       latest_answers: latestAnswers,
-      lastActivityAt: new Date(event.created_at),
-      ownAnswer,
-      ownVotesByOptionId,
-      maxVotedOptionIds,
+      last_activity_at: new Date(event.created_at),
+      own_answer: ownAnswer,
+      own_votes_by_option_id: ownVotesByOptionId,
+      max_voted_option_ids: maxVotedOptionIds,
     });
   };
 }

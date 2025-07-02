@@ -113,7 +113,7 @@ const PollOption = ({
     (state: PollState) => ({
       isClosed: state.is_closed,
       voteCount: state.vote_counts_by_option?.[option.id] ?? 0,
-      ownVote: state.ownVotesByOptionId?.[option.id] ?? undefined,
+      ownVote: state.own_votes_by_option_id?.[option.id] ?? undefined,
     }),
     [option.id],
   );
