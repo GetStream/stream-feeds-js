@@ -2565,11 +2565,13 @@ __metadata:
   dependencies:
     "@rollup/plugin-replace": ^6.0.1
     "@rollup/plugin-typescript": ^12.1.0
+    "@types/react": ^19.1.8
     "@vitest/browser": ^2.1.3
     "@vitest/coverage-v8": ^2.1.2
     axios: ^1.7.7
     dotenv: ^16.4.5
     playwright: ^1.48.1
+    react: 19.0.0
     rimraf: ^6.0.1
     rollup: ^4.24.0
     typescript: ^5.8.3
@@ -2577,6 +2579,11 @@ __metadata:
     vite: ^5.4.8
     vitest: ^2.1.2
     vitest-mock-extended: ^2.0.2
+  peerDependencies:
+    react: ^17 || ^18 || ^19
+  peerDependenciesMeta:
+    react:
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -2885,6 +2892,15 @@ __metadata:
     "@types/prop-types": "*"
     csstype: ^3.0.2
   checksum: d781257d42bf3c66f4bcd21e76a86cd9b6e21fbaf377fe0f840f1ff35049efa59491aa6a4dcf2b3db42af4ab085acebe185f0ae28b7c36d60be5e9094c707bdd
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^19.1.8":
+  version: 19.1.8
+  resolution: "@types/react@npm:19.1.8"
+  dependencies:
+    csstype: ^3.0.2
+  checksum: 17e0c74d9c01214938fa805aaa8b97925bf3c5514e88fdf94bec42c0a6d4abbc63d4e30255db176f46fd7f0aa89f8085b9b2b2fa5abaffbbf7e5009386ada892
   languageName: node
   linkType: hard
 
@@ -8917,6 +8933,13 @@ __metadata:
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
   checksum: e72d0ba81b5922759e4aff17e0252bd29988f9642ed817f56b25a3e217e13eea8a7f2322af99a06edb779da12d5d636e9fda473d620df9a3da0df2a74141d53e
+  languageName: node
+  linkType: hard
+
+"react@npm:19.0.0":
+  version: 19.0.0
+  resolution: "react@npm:19.0.0"
+  checksum: 86de15d85b2465feb40297a90319c325cb07cf27191a361d47bcfe8c6126c973d660125aa67b8f4cbbe39f15a2f32efd0c814e98196d8e5b68c567ba40a399c6
   languageName: node
   linkType: hard
 
