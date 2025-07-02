@@ -52,7 +52,7 @@ const PollButtons = () => {
   );
   const handleAddAnswer = useCallback(
     () =>
-      client?.addPollAnswer({
+      client?.castPollVote({
         activity_id: activity.id,
         poll_id: poll.id,
         vote: {

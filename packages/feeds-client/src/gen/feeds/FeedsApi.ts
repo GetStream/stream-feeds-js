@@ -557,16 +557,6 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async addPollAnswer(
-    request: CastPollVoteRequest & {
-      vote: VoteData & { answer_text: VoteData['answer_text'] };
-      activity_id: string;
-      poll_id: string;
-    },
-  ): Promise<StreamResponse<PollVoteResponse>> {
-    return await this.castPollVote(request);
-  }
-
   async removePollVote(request: {
     activity_id: string;
     poll_id: string;
@@ -594,15 +584,6 @@ export class FeedsApi {
     decoders.PollVoteResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  }
-
-  async removePollAnswer(request: {
-    activity_id: string;
-    poll_id: string;
-    vote_id: string;
-    user_id?: string;
-  }): Promise<StreamResponse<PollVoteResponse>> {
-    return await this.removePollVote(request);
   }
 
   async addReaction(
@@ -1677,17 +1658,6 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  closePoll(request: {
-    poll_id: string;
-  }): Promise<StreamResponse<PollResponse>> {
-    return this.updatePollPartial({
-      poll_id: request.poll_id,
-      set: {
-        is_closed: true,
-      },
-    });
-  }
-
   async createPollOption(
     request: CreatePollOptionRequest & { poll_id: string },
   ): Promise<StreamResponse<PollOptionResponse>> {
@@ -1805,33 +1775,6 @@ export class FeedsApi {
     decoders.PollVotesResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
-  }
-
-  async queryPollAnswers(
-    request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
-  ): Promise<StreamResponse<PollVotesResponse>> {
-    const filter = request.filter ?? {};
-    const queryPollAnswersFilter = {
-      ...filter,
-      is_answer: true,
-    };
-
-    const queryPollAnswersRequest = {
-      ...request,
-      filter: queryPollAnswersFilter,
-    };
-
-    return await this.queryPollVotes(queryPollAnswersRequest);
-  }
-
-  async queryPollOptionVotes(
-    request: QueryPollVotesRequest & {
-      filter: QueryPollVotesRequest['filter'] & { option_id: string };
-      poll_id: string;
-      user_id?: string;
-    },
-  ): Promise<StreamResponse<PollVotesResponse>> {
-    return await this.queryPollVotes(request);
   }
 
   async deleteFile(request?: {

@@ -2,8 +2,8 @@ import { FeedsApi } from './gen/feeds/FeedsApi';
 import {
   ActivityResponse,
   FeedResponse,
-  OwnUser,
-  QueryFeedsRequest,
+  OwnUser, PollResponse, PollVotesResponse,
+  QueryFeedsRequest, QueryPollVotesRequest,
   UserRequest,
   WSEvent,
 } from './gen/models';
@@ -20,7 +20,11 @@ import {
 } from './common/utils';
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
 import { Feed } from './Feed';
-import { FeedsClientOptions, NetworkChangedEvent } from './common/types';
+import {
+  FeedsClientOptions,
+  NetworkChangedEvent,
+  StreamResponse,
+} from './common/types';
 import { ModerationClient } from './ModerationClient';
 import { StreamPoll } from './common/Poll';
 
@@ -201,6 +205,44 @@ export class FeedsClient extends FeedsApi {
       throw err;
     }
   };
+
+  closePoll = async (request: {
+    poll_id: string;
+  }): Promise<StreamResponse<PollResponse>> => {
+    return await this.updatePollPartial({
+      poll_id: request.poll_id,
+      set: {
+        is_closed: true,
+      },
+    });
+  }
+
+  queryPollAnswers = async (
+    request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
+  ): Promise<StreamResponse<PollVotesResponse>> => {
+    const filter = request.filter ?? {};
+    const queryPollAnswersFilter = {
+      ...filter,
+      is_answer: true,
+    };
+
+    const queryPollAnswersRequest = {
+      ...request,
+      filter: queryPollAnswersFilter,
+    };
+
+    return await this.queryPollVotes(queryPollAnswersRequest);
+  }
+
+  queryPollOptionVotes = async (
+    request: QueryPollVotesRequest & {
+      filter: QueryPollVotesRequest['filter'] & { option_id: string };
+      poll_id: string;
+      user_id?: string;
+    },
+  ): Promise<StreamResponse<PollVotesResponse>> => {
+    return await this.queryPollVotes(request);
+  }
 
   disconnectUser = async () => {
     if (this.wsConnection) {
