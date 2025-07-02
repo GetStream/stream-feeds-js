@@ -49,9 +49,14 @@ export class TokenManager {
   // Fetches a token from tokenProvider function and sets in tokenManager.
   // In case of static token, it will simply resolve to static token.
   loadToken = () => {
+    if (this.loadTokenPromise) {
+      return this.loadTokenPromise;
+    }
+
     // eslint-disable-next-line no-async-promise-executor
     this.loadTokenPromise = new Promise(async (resolve, reject) => {
       if (this.type === 'static') {
+        this.loadTokenPromise = null;
         return resolve(this.token!);
       }
 
@@ -60,12 +65,12 @@ export class TokenManager {
         const tokenProvider = this.tokenProvider;
         const loadTokenWithRetries = async (previousFailuresCount = 0) => {
           try {
-            // TODO: make sure we can't start two parallel token renew requests
             this.token = await tokenProvider();
           } catch (e) {
             const numberOfFailures = ++previousFailuresCount;
             await sleep(retryInterval(numberOfFailures));
             if (numberOfFailures === 3) {
+              this.loadTokenPromise = null;
               return reject(
                 new Error(
                   /* eslint-disable-next-line @typescript-eslint/restrict-template-expressions */
@@ -77,6 +82,7 @@ export class TokenManager {
               return await loadTokenWithRetries(numberOfFailures);
             }
           }
+          this.loadTokenPromise = null;
           resolve(this.token);
         };
         return await loadTokenWithRetries();
