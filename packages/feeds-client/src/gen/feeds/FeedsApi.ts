@@ -120,7 +120,6 @@ import {
   UpsertActivitiesRequest,
   UpsertActivitiesResponse,
   WSAuthMessage,
-  VoteData,
 } from '../models';
 import { decoders } from '../model-decoders/decoders';
 

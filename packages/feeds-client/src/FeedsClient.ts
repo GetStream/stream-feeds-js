@@ -2,8 +2,11 @@ import { FeedsApi } from './gen/feeds/FeedsApi';
 import {
   ActivityResponse,
   FeedResponse,
-  OwnUser, PollResponse, PollVotesResponse,
-  QueryFeedsRequest, QueryPollVotesRequest,
+  OwnUser,
+  PollResponse,
+  PollVotesResponse,
+  QueryFeedsRequest,
+  QueryPollVotesRequest,
   UserRequest,
   WSEvent,
 } from './gen/models';
@@ -109,10 +112,10 @@ export class FeedsClient extends FeedsApi {
                 let changed = false;
                 for (const activity of currentActivities) {
                   if (activity.poll?.id === event.poll.id) {
-                    delete activity.poll
+                    delete activity.poll;
                     changed = true;
                   }
-                  newActivities.push(activity)
+                  newActivities.push(activity);
                 }
                 if (changed) {
                   feed.state.partialNext({ activities: newActivities });
@@ -163,9 +166,11 @@ export class FeedsClient extends FeedsApi {
       const pollResponse = activity.poll;
       const pollFromCache = this.pollFromState(pollResponse.id);
       if (!pollFromCache) {
+        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         const poll = new StreamPoll({ client: this, poll: pollResponse });
         this.polls_by_id.set(poll.id, poll);
       } else {
+        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         pollFromCache.reinitializeState(pollResponse);
       }
     }
@@ -215,7 +220,7 @@ export class FeedsClient extends FeedsApi {
         is_closed: true,
       },
     });
-  }
+  };
 
   queryPollAnswers = async (
     request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
@@ -232,7 +237,7 @@ export class FeedsClient extends FeedsApi {
     };
 
     return await this.queryPollVotes(queryPollAnswersRequest);
-  }
+  };
 
   queryPollOptionVotes = async (
     request: QueryPollVotesRequest & {
@@ -242,7 +247,7 @@ export class FeedsClient extends FeedsApi {
     },
   ): Promise<StreamResponse<PollVotesResponse>> => {
     return await this.queryPollVotes(request);
-  }
+  };
 
   disconnectUser = async () => {
     if (this.wsConnection) {

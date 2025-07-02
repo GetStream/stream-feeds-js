@@ -108,6 +108,7 @@ export class StreamPoll {
     if (!isPollUpdatedEvent(event as WSEvent)) return;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars,unused-imports/no-unused-vars
     const { id, ...pollData } = event.poll;
+    // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
     this.state.partialNext({
       ...pollData,
       last_activity_at: new Date(event.created_at),
@@ -134,14 +135,19 @@ export class StreamPoll {
     let maxVotedOptionIds = currentState.max_voted_option_ids;
 
     if (isOwnVote) {
+      // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
       if (isVoteAnswer(event.poll_vote)) {
+        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         ownAnswer = event.poll_vote;
       } else if (event.poll_vote.option_id) {
+        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         ownVotesByOptionId[event.poll_vote.option_id] = event.poll_vote;
       }
     }
 
+    // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
     if (isVoteAnswer(event.poll_vote)) {
+      // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
       latestAnswers = [event.poll_vote, ...latestAnswers];
     } else {
       maxVotedOptionIds = getMaxVotedOptionIds(
@@ -152,6 +158,7 @@ export class StreamPoll {
     const { answers_count, latest_votes_by_option, vote_count, vote_counts_by_option } = event.poll;
     this.state.partialNext({
       answers_count,
+      // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
       latest_votes_by_option,
       vote_count,
       vote_counts_by_option,
@@ -175,14 +182,18 @@ export class StreamPoll {
     let maxVotedOptionIds = currentState.max_voted_option_ids;
 
     if (isOwnVote) {
+      // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
       if (isVoteAnswer(event.poll_vote)) {
         latestAnswers = [
+          // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
           event.poll_vote,
           ...latestAnswers.filter((answer) => answer.id !== event.poll_vote.id),
         ];
+        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         ownAnswer = event.poll_vote;
       } else if (event.poll_vote.option_id) {
         if (event.poll.enforce_unique_vote) {
+          // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
           ownVotesByOptionId = { [event.poll_vote.option_id]: event.poll_vote };
         } else {
           ownVotesByOptionId = Object.entries(ownVotesByOptionId).reduce<
@@ -197,6 +208,7 @@ export class StreamPoll {
             acc[optionId] = vote;
             return acc;
           }, {});
+          // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
           ownVotesByOptionId[event.poll_vote.option_id] = event.poll_vote;
         }
 
@@ -207,7 +219,9 @@ export class StreamPoll {
           event.poll.vote_counts_by_option,
         );
       }
+      // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
     } else if (isVoteAnswer(event.poll_vote)) {
+      // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
       latestAnswers = [event.poll_vote, ...latestAnswers];
     } else {
       maxVotedOptionIds = getMaxVotedOptionIds(
@@ -218,6 +232,7 @@ export class StreamPoll {
     const { answers_count, latest_votes_by_option, vote_count, vote_counts_by_option } = event.poll;
     this.state.partialNext({
       answers_count,
+      // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
       latest_votes_by_option,
       vote_count,
       vote_counts_by_option,
@@ -239,6 +254,7 @@ export class StreamPoll {
     const ownVotesByOptionId = { ...currentState.own_votes_by_option_id };
     let maxVotedOptionIds = currentState.max_voted_option_ids;
 
+    // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
     if (isVoteAnswer(event.poll_vote)) {
       latestAnswers = latestAnswers.filter(
         (answer) => answer.id !== event.poll_vote.id,
@@ -259,6 +275,7 @@ export class StreamPoll {
     const { answers_count, latest_votes_by_option, vote_count, vote_counts_by_option } = event.poll;
     this.state.partialNext({
       answers_count,
+      // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
       latest_votes_by_option,
       vote_count,
       vote_counts_by_option,
