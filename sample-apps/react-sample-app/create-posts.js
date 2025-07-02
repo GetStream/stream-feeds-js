@@ -48,21 +48,13 @@ require('dotenv').config();
     const createdPoll = await client.createPoll({ ...poll, user_id: user.id });
     const userFeed = client.feeds.feed('user', user.id);
 
-    const createdActivity = await client.feeds.addActivity({
+    await client.feeds.addActivity({
       type: 'post',
       fids: [userFeed.fid],
       text: post,
       user_id: user.id,
-    })
-
-    // Currently there's a BE bug with adding an activity with a poll_id serverside, so we use this workaround.
-    // This can be moved into activity creation when the bug is fixed.
-
-    await client.feeds.updateActivity({
-      activity_id: createdActivity.activity.id,
       poll_id: createdPoll.poll.id,
-      user_id: user.id,
-    })
+    });
   }
 
   console.log('Finished');
