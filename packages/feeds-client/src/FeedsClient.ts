@@ -91,6 +91,7 @@ export class FeedsClient extends FeedsApi {
           break;
         }
         case 'feeds.feed.deleted': {
+          feed?.handleWSEvent(event as unknown as WSEvent);
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete this.activeFeeds[fid];
           break;
