@@ -63,7 +63,7 @@ export const FeedMetadata = ({
     // eslint-disable-next-line no-unreachable
     Promise.allSettled([
       // followings (everything this person follows)
-      timeline?.queryFollowings({
+      timeline?.queryFollowing({
         limit: 10,
       }),
       // followers (everyone who follow this person)

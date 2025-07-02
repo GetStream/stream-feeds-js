@@ -9,3 +9,4 @@ export * from './src/common/SearchController';
 export * from './src/common/ActivitySearchSource';
 export * from './src/common/UserSearchSource';
 export * from './src/common/FeedSearchSource';
+export * from './src/common/Poll';

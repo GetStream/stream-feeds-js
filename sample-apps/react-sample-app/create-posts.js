@@ -16,8 +16,8 @@ require('dotenv').config();
   const posts = JSON.parse(
     await fs.readFile(path.resolve('posts.json'), 'utf-8'),
   );
-  const pages = JSON.parse(
-    await fs.readFile(path.resolve('pages.json'), 'utf-8'),
+  const polls = JSON.parse(
+    await fs.readFile(path.resolve('polls.json'), 'utf-8'),
   );
 
   const client = new StreamClient(key, secret, { basePath: url });
@@ -28,29 +28,32 @@ require('dotenv').config();
     const post = posts[i];
     const user = users[Math.floor(Math.random() * users.length)];
 
-    await client.feeds.feed('user', user.id).addActivity({
-      verb: 'post',
-      object: uuidv4(),
-      custom: {
-        text: post,
-      },
-      user: { id: user.id },
+    const userFeed = client.feeds.feed('user', user.id);
+
+    await client.feeds.addActivity({
+      type: 'post',
+      fids: [userFeed.fid],
+      text: post,
+      user_id: user.id,
     });
   }
 
-  console.log('Creating activities for pages...');
+  console.log('Creating activities with polls for users...');
 
   for (let i = 0; i < posts.length; i++) {
     const post = posts[i];
-    const page = pages[Math.floor(Math.random() * pages.length)];
+    const user = users[Math.floor(Math.random() * users.length)];
+    const poll = polls[Math.floor(Math.random() * polls.length)];
 
-    await client.feeds.feed('page', page.id).addActivity({
-      verb: 'post',
-      object: uuidv4(),
-      custom: {
-        text: post,
-      },
-      user_id: page.owner_id,
+    const createdPoll = await client.createPoll({ ...poll, user_id: user.id });
+    const userFeed = client.feeds.feed('user', user.id);
+
+    await client.feeds.addActivity({
+      type: 'post',
+      fids: [userFeed.fid],
+      text: post,
+      user_id: user.id,
+      poll_id: createdPoll.poll.id,
     });
   }
 

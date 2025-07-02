@@ -1,8 +1,12 @@
 import { FeedsApi } from './gen/feeds/FeedsApi';
 import {
+  ActivityResponse,
   FeedResponse,
   OwnUser,
+  PollResponse,
+  PollVotesResponse,
   QueryFeedsRequest,
+  QueryPollVotesRequest,
   UserRequest,
   WSEvent,
 } from './gen/models';
@@ -19,8 +23,13 @@ import {
 } from './common/utils';
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
 import { Feed } from './Feed';
-import { FeedsClientOptions, NetworkChangedEvent } from './common/types';
+import {
+  FeedsClientOptions,
+  NetworkChangedEvent,
+  StreamResponse,
+} from './common/types';
 import { ModerationClient } from './ModerationClient';
+import { StreamPoll } from './common/Poll';
 
 export type FeedsClientState = {
   connectedUser: OwnUser | undefined;
@@ -40,6 +49,8 @@ export class FeedsClient extends FeedsApi {
     FeedsEvent
   > = new EventDispatcher<FeedsEvent['type'], FeedsEvent>();
 
+  private readonly polls_by_id: Map<string, StreamPoll>;
+
   private activeFeeds: Record<FID, Feed> = {};
 
   constructor(apiKey: string, options?: FeedsClientOptions) {
@@ -58,6 +69,7 @@ export class FeedsClient extends FeedsApi {
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
+    this.polls_by_id = new Map();
     this.on('all', (event) => {
       // @ts-expect-error fid may be present, type mismatch
       const fid: unknown = event.fid;
@@ -83,11 +95,85 @@ export class FeedsClient extends FeedsApi {
           delete this.activeFeeds[fid];
           break;
         }
+        case 'feeds.poll.closed': {
+          if (event.poll?.id) {
+            this.pollFromState(event.poll.id)?.handlePollClosed(event);
+          }
+          break;
+        }
+        case 'feeds.poll.deleted': {
+          if (event.poll?.id) {
+            this.polls_by_id.delete(event.poll.id);
+
+            for (const feed of Object.values(this.activeFeeds)) {
+              const currentActivities = feed.currentState.activities;
+              if (currentActivities) {
+                const newActivities = [];
+                let changed = false;
+                for (const activity of currentActivities) {
+                  if (activity.poll?.id === event.poll.id) {
+                    delete activity.poll;
+                    changed = true;
+                  }
+                  newActivities.push(activity);
+                }
+                if (changed) {
+                  feed.state.partialNext({ activities: newActivities });
+                }
+              }
+            }
+          }
+          break;
+        }
+        case 'feeds.poll.updated': {
+          if (event.poll?.id) {
+            this.pollFromState(event.poll.id)?.handlePollUpdated(event);
+          }
+          break;
+        }
+        case 'feeds.poll.vote_casted': {
+          if (event.poll?.id) {
+            this.pollFromState(event.poll.id)?.handleVoteCasted(event);
+          }
+          break;
+        }
+        case 'feeds.poll.vote_changed': {
+          if (event.poll?.id) {
+            this.pollFromState(event.poll.id)?.handleVoteChanged(event);
+          }
+          break;
+        }
+        case 'feeds.poll.vote_removed': {
+          if (event.poll?.id) {
+            this.pollFromState(event.poll.id)?.handleVoteRemoved(event);
+          }
+          break;
+        }
         default: {
           feed?.handleWSEvent(event as unknown as WSEvent);
         }
       }
     });
+  }
+
+  public pollFromState = (id: string) => this.polls_by_id.get(id);
+
+  public hydratePollCache(activities: ActivityResponse[]) {
+    for (const activity of activities) {
+      if (!activity.poll) {
+        continue;
+      }
+      const pollResponse = activity.poll;
+      const pollFromCache = this.pollFromState(pollResponse.id);
+      if (!pollFromCache) {
+        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
+        const poll = new StreamPoll({ client: this, poll: pollResponse });
+        this.polls_by_id.set(poll.id, poll);
+      } else {
+        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
+        pollFromCache.reinitializeState(pollResponse);
+      }
+    }
   }
 
   connectUser = async (
@@ -123,6 +209,44 @@ export class FeedsClient extends FeedsApi {
       await this.disconnectUser();
       throw err;
     }
+  };
+
+  closePoll = async (request: {
+    poll_id: string;
+  }): Promise<StreamResponse<PollResponse>> => {
+    return await this.updatePollPartial({
+      poll_id: request.poll_id,
+      set: {
+        is_closed: true,
+      },
+    });
+  };
+
+  queryPollAnswers = async (
+    request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
+  ): Promise<StreamResponse<PollVotesResponse>> => {
+    const filter = request.filter ?? {};
+    const queryPollAnswersFilter = {
+      ...filter,
+      is_answer: true,
+    };
+
+    const queryPollAnswersRequest = {
+      ...request,
+      filter: queryPollAnswersFilter,
+    };
+
+    return await this.queryPollVotes(queryPollAnswersRequest);
+  };
+
+  queryPollOptionVotes = async (
+    request: QueryPollVotesRequest & {
+      filter: QueryPollVotesRequest['filter'] & { option_id: string };
+      poll_id: string;
+      user_id?: string;
+    },
+  ): Promise<StreamResponse<PollVotesResponse>> => {
+    return await this.queryPollVotes(request);
   };
 
   disconnectUser = async () => {
