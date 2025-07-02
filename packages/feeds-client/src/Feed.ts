@@ -9,6 +9,9 @@ import {
   CommentResponse,
   PagerResponse,
   SingleFollowRequest,
+  ReactionResponse,
+  CommentReactionAddedEvent,
+  CommentReactionDeletedEvent,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -172,7 +175,6 @@ export class Feed extends FeedApi {
     },
     'feeds.activity.removed_from_feed': Feed.noop,
     'feeds.activity.updated': (event) => {
-      // TODO: fix, use this.updateActivityInState instead
       const currentActivities = this.currentState.activities;
       if (currentActivities) {
         const result = updateActivityInState(event.activity, currentActivities);
@@ -283,44 +285,56 @@ export class Feed extends FeedApi {
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
     'feeds.follow.created': (event) => {
-      // TODO: consider followers and followings not loaded (if not loaded, skip adding)
-      // TODO: followers and followings should be extended only with accepted follows (same for counts)
-      // if (event.follow.status !== 'accepted') return;
+      // TODO: consider followers and followings not loaded (sort key missing from pagination object)
+      // adjust followingInitialized & followersInitialized, follow comments behavior
 
+      // TODO: followers and followings should be extended only with accepted follows (same for counts)
+      // if (event.follow.status !== 'accepted') return; // not sure about this, needs further discussion
+
+      // this feed followed someone
       if (event.follow.source_feed.fid === this.fid) {
-        // this feed followed someone
         if (this.followingInitialized) {
           this.state.next((currentState) => ({
             ...currentState,
+            // TODO: remove once following_count is updated through feeds.feed.updated
             following_count: (currentState.following_count ?? 0) + 1,
+            // TODO: respect sort
             following: currentState.following
               ? currentState.following.concat(event.follow)
               : [event.follow],
           }));
         }
-
-        // add own follow to the target feed
-        const target = event.follow.target_feed;
-        const feed = this.client.feed(target.group_id, target.id);
-
-        feed.state.next((currentState) => ({
-          ...currentState,
-          own_follows: currentState.own_follows
-            ? currentState.own_follows.concat(event.follow)
-            : [event.follow],
-        }));
       } else if (
-        event.follow.target_feed.fid === this.fid &&
-        this.followersInitialized
-      ) {
         // someone followed this feed
-        this.state.next((currentState) => ({
-          ...currentState,
-          follower_count: (currentState.follower_count ?? 0) + 1,
-          followers: currentState.followers
-            ? currentState.followers.concat(event.follow)
-            : [event.follow],
-        }));
+        event.follow.target_feed.fid === this.fid
+      ) {
+        const source = event.follow.source_feed;
+        const connectedUser = this.client.state.getLatestValue().connectedUser;
+
+        this.state.next((currentState) => {
+          let newState: typeof currentState | null = null;
+
+          if (source.created_by.id === connectedUser?.id) {
+            newState ??= { ...currentState };
+
+            newState.own_follows = newState.own_follows
+              ? newState.own_follows.concat(event.follow)
+              : [event.follow];
+          }
+
+          if (this.followersInitialized) {
+            newState ??= { ...currentState };
+
+            // TODO: remove once follower_count is updated through feeds.feed.updated
+            newState.follower_count = (newState.follower_count ?? 0) + 1;
+            // TODO: respect sort
+            newState.followers = newState.followers
+              ? newState.followers.concat(event.follow)
+              : [event.follow];
+          }
+
+          return newState ?? currentState;
+        });
       }
     },
     'feeds.follow.deleted': (event) => {
@@ -329,6 +343,7 @@ export class Feed extends FeedApi {
         this.state.next((currentState) => {
           return {
             ...currentState,
+            // TODO: remove once following_count is updated through feeds.feed.updated
             following_count: currentState.following_count
               ? currentState.following_count - 1
               : 0,
@@ -352,6 +367,7 @@ export class Feed extends FeedApi {
         // someone unfollowed this feed
         this.state.next((currentState) => ({
           ...currentState,
+          // TODO: remove once follower_count is updated through feeds.feed.updated
           follower_count: currentState.follower_count
             ? currentState.follower_count - 1
             : 0,
@@ -362,8 +378,9 @@ export class Feed extends FeedApi {
       }
     },
     'feeds.follow.updated': Feed.noop,
-    'feeds.comment.reaction.added': Feed.noop,
-    'feeds.comment.reaction.deleted': Feed.noop,
+    'feeds.comment.reaction.added': this.handleCommentReactionEvent.bind(this),
+    'feeds.comment.reaction.deleted':
+      this.handleCommentReactionEvent.bind(this),
     'feeds.feed_member.added': Feed.noop,
     'feeds.feed_member.removed': Feed.noop,
     'feeds.feed_member.updated': Feed.noop,
@@ -418,6 +435,66 @@ export class Feed extends FeedApi {
 
   get currentState() {
     return this.state.getLatestValue();
+  }
+
+  private handleCommentReactionEvent(
+    event: (CommentReactionAddedEvent | CommentReactionDeletedEvent) & {
+      type: 'feeds.comment.reaction.added' | 'feeds.comment.reaction.deleted';
+    },
+  ) {
+    const { comment, reaction } = event;
+    const connectedUser = this.client.state.getLatestValue().connectedUser;
+
+    this.state.next((currentState) => {
+      const forId = comment.parent_id ?? comment.object_id;
+      const entityState = currentState.comments_by_entity_id[forId];
+
+      const commentIndex = this.getCommentIndex(comment, currentState);
+
+      if (commentIndex === -1) return currentState;
+
+      const newComments = entityState?.comments?.concat([]) ?? [];
+
+      const commentCopy = { ...comment };
+
+      // @ts-expect-error own_reactions are missing from CommentResponse type
+      delete commentCopy.own_reactions;
+
+      const newComment: CommentResponse = {
+        ...newComments[commentIndex],
+        ...commentCopy,
+      };
+
+      newComments[commentIndex] = newComment;
+
+      if (reaction.user.id === connectedUser?.id) {
+        if (event.type === 'feeds.comment.reaction.added') {
+          // @ts-expect-error own_reactions are missing from CommentResponse type
+          newComment.own_reactions = newComment.own_reactions?.concat(
+            reaction,
+          ) ?? [reaction];
+        } else if (event.type === 'feeds.comment.reaction.deleted') {
+          // @ts-expect-error own_reactions are missing from CommentResponse type
+          newComment.own_reactions =
+            // @ts-expect-error own_reactions are missing from CommentResponse type
+            newComment.own_reactions?.filter(
+              (r: ReactionResponse) =>
+                r.type !== reaction.type && r.user.id !== reaction.user.id,
+            ) ?? [];
+        }
+      }
+
+      return {
+        ...currentState,
+        comments_by_entity_id: {
+          ...currentState.comments_by_entity_id,
+          [forId]: {
+            ...entityState,
+            comments: newComments,
+          },
+        },
+      };
+    });
   }
 
   private get followersInitialized() {
