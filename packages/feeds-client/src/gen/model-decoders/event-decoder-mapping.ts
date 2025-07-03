@@ -24,6 +24,9 @@ const eventDecoderMapping: {
   'feeds.activity.reaction.deleted': (data: Record<string, any>) =>
     decoders.ActivityReactionDeletedEvent(data),
 
+  'feeds.activity.reaction.updated': (data: Record<string, any>) =>
+    decoders.ActivityReactionUpdatedEvent(data),
+
   'feeds.activity.removed_from_feed': (data: Record<string, any>) =>
     decoders.ActivityRemovedFromFeedEvent(data),
 
@@ -53,6 +56,9 @@ const eventDecoderMapping: {
 
   'feeds.comment.reaction.deleted': (data: Record<string, any>) =>
     decoders.CommentReactionDeletedEvent(data),
+
+  'feeds.comment.reaction.updated': (data: Record<string, any>) =>
+    decoders.CommentReactionUpdatedEvent(data),
 
   'feeds.comment.updated': (data: Record<string, any>) =>
     decoders.CommentUpdatedEvent(data),

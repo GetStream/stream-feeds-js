@@ -89,6 +89,8 @@ import {
   RejectFollowRequest,
   RejectFollowResponse,
   Response,
+  SharedLocationResponse,
+  SharedLocationsResponse,
   SingleFollowRequest,
   SingleFollowResponse,
   UnblockUsersRequest,
@@ -111,6 +113,7 @@ import {
   UpdateFeedResponse,
   UpdateFollowRequest,
   UpdateFollowResponse,
+  UpdateLiveLocationRequest,
   UpdatePollOptionRequest,
   UpdatePollPartialRequest,
   UpdatePollRequest,
@@ -1919,6 +1922,38 @@ export class FeedsApi {
     >('POST', '/api/v2/users/block', undefined, undefined, body);
 
     decoders.BlockUsersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getUserLiveLocations(): Promise<
+    StreamResponse<SharedLocationsResponse>
+  > {
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<SharedLocationsResponse>
+    >('GET', '/api/v2/users/live_locations', undefined, undefined);
+
+    decoders.SharedLocationsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateLiveLocation(
+    request: UpdateLiveLocationRequest,
+  ): Promise<StreamResponse<SharedLocationResponse>> {
+    const body = {
+      created_by_device_id: request?.created_by_device_id,
+      message_id: request?.message_id,
+      end_at: request?.end_at,
+      latitude: request?.latitude,
+      longitude: request?.longitude,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<SharedLocationResponse>
+    >('PUT', '/api/v2/users/live_locations', undefined, undefined, body);
+
+    decoders.SharedLocationResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

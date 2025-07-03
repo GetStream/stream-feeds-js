@@ -294,6 +294,24 @@ export interface ActivityReactionDeletedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface ActivityReactionUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: ActivityResponse;
+
+  custom: Record<string, any>;
+
+  reaction: FeedsReactionResponse;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface ActivityRemovedFromFeedEvent {
   created_at: Date;
 
@@ -637,10 +655,6 @@ export interface Attachment {
 
   image_url?: string;
 
-  latitude?: number;
-
-  longitude?: number;
-
   og_scrape_url?: string;
 
   original_height?: number;
@@ -648,8 +662,6 @@ export interface Attachment {
   original_width?: number;
 
   pretext?: string;
-
-  stopped_sharing?: boolean;
 
   text?: string;
 
@@ -1382,6 +1394,8 @@ export interface Channel {
 
   team?: string;
 
+  active_live_locations?: SharedLocation[];
+
   invites?: ChannelMember[];
 
   members?: ChannelMember[];
@@ -1429,6 +1443,8 @@ export interface ChannelConfig {
   replies: boolean;
 
   search: boolean;
+
+  shared_locations: boolean;
 
   skip_last_msg_update_for_system_msgs: boolean;
 
@@ -1493,6 +1509,8 @@ export interface ChannelConfigWithInfo {
   replies: boolean;
 
   search: boolean;
+
+  shared_locations: boolean;
 
   skip_last_msg_update_for_system_msgs: boolean;
 
@@ -1604,6 +1622,7 @@ export const ChannelOwnCapability = {
   SEND_RESTRICTED_VISIBILITY_MESSAGE: 'send-restricted-visibility-message',
   SEND_TYPING_EVENTS: 'send-typing-events',
   SET_CHANNEL_COOLDOWN: 'set-channel-cooldown',
+  SHARE_LOCATION: 'share-location',
   SKIP_SLOW_MODE: 'skip-slow-mode',
   SLOW_MODE: 'slow-mode',
   TYPING_EVENTS: 'typing-events',
@@ -1753,6 +1772,24 @@ export interface CommentReactionDeletedEvent {
   received_at?: Date;
 }
 
+export interface CommentReactionUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  comment: CommentResponse;
+
+  custom: Record<string, any>;
+
+  reaction: FeedsReactionResponse;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface CommentResponse {
   confidence_score: number;
 
@@ -1839,6 +1876,8 @@ export interface ConfigOverrides {
   reactions?: boolean;
 
   replies?: boolean;
+
+  shared_locations?: boolean;
 
   typing_events?: boolean;
 
@@ -2999,10 +3038,6 @@ export interface GetOGResponse {
 
   image_url?: string;
 
-  latitude?: number;
-
-  longitude?: number;
-
   og_scrape_url?: string;
 
   original_height?: number;
@@ -3010,8 +3045,6 @@ export interface GetOGResponse {
   original_width?: number;
 
   pretext?: string;
-
-  stopped_sharing?: boolean;
 
   text?: string;
 
@@ -3357,6 +3390,8 @@ export interface Message {
 
   reminder?: MessageReminder;
 
+  shared_location?: SharedLocation;
+
   user?: User;
 }
 
@@ -3464,6 +3499,8 @@ export interface MessageResponse {
   reaction_groups?: Record<string, ReactionGroupResponse>;
 
   reminder?: ReminderResponseData;
+
+  shared_location?: SharedLocationResponseData;
 }
 
 export interface ModerationActionConfig {
@@ -4788,6 +4825,86 @@ export interface SessionSettingsResponse {
 
 export interface ShadowBlockActionRequest {}
 
+export interface SharedLocation {
+  channel_cid: string;
+
+  created_at: Date;
+
+  created_by_device_id: string;
+
+  message_id: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  end_at?: Date;
+
+  latitude?: number;
+
+  longitude?: number;
+
+  channel?: Channel;
+
+  message?: Message;
+}
+
+export interface SharedLocationResponse {
+  channel_cid: string;
+
+  created_at: Date;
+
+  created_by_device_id: string;
+
+  duration: string;
+
+  latitude: number;
+
+  longitude: number;
+
+  message_id: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  end_at?: Date;
+
+  channel?: ChannelResponse;
+
+  message?: MessageResponse;
+}
+
+export interface SharedLocationResponseData {
+  channel_cid: string;
+
+  created_at: Date;
+
+  created_by_device_id: string;
+
+  latitude: number;
+
+  longitude: number;
+
+  message_id: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  end_at?: Date;
+
+  channel?: ChannelResponse;
+
+  message?: MessageResponse;
+}
+
+export interface SharedLocationsResponse {
+  duration: string;
+
+  active_live_locations: SharedLocationResponseData[];
+}
+
 export interface SingleFollowRequest {
   source: string;
 
@@ -5191,6 +5308,18 @@ export interface UpdateFollowResponse {
   duration: string;
 
   follow: FollowResponse;
+}
+
+export interface UpdateLiveLocationRequest {
+  created_by_device_id: string;
+
+  message_id: string;
+
+  end_at?: Date;
+
+  latitude?: number;
+
+  longitude?: number;
 }
 
 export interface UpdatePollOptionRequest {
@@ -5665,6 +5794,7 @@ export type WSClientEvent =
   | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
   | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
   | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+  | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent)
   | ({
       type: 'feeds.activity.removed_from_feed';
     } & ActivityRemovedFromFeedEvent)
@@ -5677,6 +5807,7 @@ export type WSClientEvent =
   | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
   | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
   | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
+  | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
   | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
   | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
   | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
@@ -5706,6 +5837,7 @@ export type WSEvent =
   | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
   | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
   | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+  | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent)
   | ({
       type: 'feeds.activity.removed_from_feed';
     } & ActivityRemovedFromFeedEvent)
@@ -5718,6 +5850,7 @@ export type WSEvent =
   | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
   | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
   | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
+  | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
   | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
   | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
   | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
