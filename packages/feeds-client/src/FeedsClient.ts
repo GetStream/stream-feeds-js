@@ -2,6 +2,8 @@ import { FeedsApi } from './gen/feeds/FeedsApi';
 import {
   ActivityResponse,
   FeedResponse,
+  FileUploadRequest,
+  ImageUploadRequest,
   OwnUser,
   PollResponse,
   PollVotesResponse,
@@ -220,6 +222,26 @@ export class FeedsClient extends FeedsApi {
       set: {
         is_closed: true,
       },
+    });
+  };
+
+  // @ts-expect-error API spec says file should be a string
+  uploadFile = (request: Omit<FileUploadRequest, 'file'> & { file: File }) => {
+    return super.uploadFile({
+      // @ts-expect-error API spec says file should be a string
+      file: request.file,
+    });
+  };
+
+  // @ts-expect-error API spec says file should be a string
+  uploadImage = (
+    request: Omit<ImageUploadRequest, 'file'> & { file: File },
+  ) => {
+    return super.uploadImage({
+      // @ts-expect-error API spec says file should be a string
+      file: request.file,
+      // @ts-expect-error form data will only work if this is a string
+      upload_sizes: JSON.stringify(request.upload_sizes),
     });
   };
 

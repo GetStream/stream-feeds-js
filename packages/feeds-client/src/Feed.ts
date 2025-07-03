@@ -26,7 +26,7 @@ import {
   addReactionToActivities,
   removeReactionFromActivities,
 } from './state-updates/activity-reaction-utils';
-import { StreamResponse } from './gen-imports';
+import { FeedsApi, StreamResponse } from './gen-imports';
 import { capitalize } from './common/utils';
 import type {
   ActivityIdOrCommentId,
@@ -417,7 +417,8 @@ export class Feed extends FeedApi {
     id: string,
     data?: FeedResponse,
   ) {
-    super(client, groupId, id);
+    // Need this ugly cast because fileUpload endpoints :(
+    super(client as unknown as FeedsApi, groupId, id);
     this.state = new StateStore<FeedState>({
       fid: `${groupId}:${id}`,
       group_id: groupId,
