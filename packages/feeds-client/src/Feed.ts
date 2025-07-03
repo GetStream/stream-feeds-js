@@ -289,10 +289,8 @@ export class Feed extends FeedApi {
     'feeds.follow.created': (event) => {
       // TODO: consider followers and followings not loaded (sort key missing from pagination object)
       // adjust followingInitialized & followersInitialized, follow comments behavior
-
       // TODO: followers and followings should be extended only with accepted follows (same for counts)
       // if (event.follow.status !== 'accepted') return; // not sure about this, needs further discussion
-
       // this feed followed someone
       if (event.follow.source_feed.fid === this.fid) {
         if (this.followingInitialized) {
@@ -406,6 +404,8 @@ export class Feed extends FeedApi {
     'user.muted': Feed.noop,
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
+    'feeds.activity.reaction.updated': undefined,
+    'feeds.comment.reaction.updated': undefined,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -563,7 +563,7 @@ export class Feed extends FeedApi {
             ...responseCopy,
           };
 
-          if (!request?.follower_pagination?.limit) {
+          if (!request?.followers_pagination?.limit) {
             delete nextState.followers;
           }
           if (!request?.following_pagination?.limit) {
@@ -924,7 +924,7 @@ export class Feed extends FeedApi {
       member_pagination: {
         limit: 0,
       },
-      follower_pagination: {
+      followers_pagination: {
         limit: 0,
       },
       following_pagination: {
