@@ -1,5 +1,5 @@
 {
-  "name": "@stream-io/react-native-sdk",
+  "name": "@stream-io/feeds-react-native-sdk",
   "packageManager": "yarn@3.5.0",
   "main": "./dist/commonjs/index.js",
   "types": "./dist/typescript/index.d.ts",

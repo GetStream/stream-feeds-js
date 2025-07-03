@@ -5,7 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { reactBindingsHookExample, reactNativeSdkHookExample } from '@stream-io/react-native-sdk';
+import { reactBindingsHookExample, reactNativeSdkHookExample } from '@stream-io/feeds-react-native-sdk';
 
 import { useColorScheme } from '@/components/useColorScheme';
 

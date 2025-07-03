@@ -5656,26 +5656,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#feeds-api":
-  version: 0.4.24
-  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=93365d4d83ade1367389fcbda027417f3104870d"
-  dependencies:
-    "@types/jsonwebtoken": ^9.0.3
-    "@types/node": ^18.3.0
-    jsonwebtoken: ^9.0.2
-    uuid: ^9.0.1
-  peerDependencies:
-    "@stream-io/openai-realtime-api": ~0.1.3
-  peerDependenciesMeta:
-    "@stream-io/openai-realtime-api":
-      optional: true
-  checksum: cf529247231f56b57b1ec431bc28232f574889b561dcf6182c42432b5a5acf8107e4de007b22f5334390ba136f8f7290c3d4da5b1a484f0f988c0552d2a20e74
-  languageName: node
-  linkType: hard
-
-"@stream-io/react-native-sdk@workspace:*, @stream-io/react-native-sdk@workspace:packages/react-native-sdk":
+"@stream-io/feeds-react-native-sdk@workspace:*, @stream-io/feeds-react-native-sdk@workspace:packages/react-native-sdk":
   version: 0.0.0-use.local
-  resolution: "@stream-io/react-native-sdk@workspace:packages/react-native-sdk"
+  resolution: "@stream-io/feeds-react-native-sdk@workspace:packages/react-native-sdk"
   dependencies:
     "@react-native-community/eslint-config": 3.2.0
     "@react-native-community/eslint-plugin": 1.3.0
@@ -5711,6 +5694,23 @@ __metadata:
       optional: true
   languageName: unknown
   linkType: soft
+
+"@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#feeds-api":
+  version: 0.4.24
+  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=93365d4d83ade1367389fcbda027417f3104870d"
+  dependencies:
+    "@types/jsonwebtoken": ^9.0.3
+    "@types/node": ^18.3.0
+    jsonwebtoken: ^9.0.2
+    uuid: ^9.0.1
+  peerDependencies:
+    "@stream-io/openai-realtime-api": ~0.1.3
+  peerDependenciesMeta:
+    "@stream-io/openai-realtime-api":
+      optional: true
+  checksum: cf529247231f56b57b1ec431bc28232f574889b561dcf6182c42432b5a5acf8107e4de007b22f5334390ba136f8f7290c3d4da5b1a484f0f988c0552d2a20e74
+  languageName: node
+  linkType: hard
 
 "@swc/counter@npm:0.1.3":
   version: 0.1.3
@@ -11343,7 +11343,7 @@ __metadata:
     "@babel/core": ^7.25.2
     "@expo/vector-icons": ^14.1.0
     "@react-navigation/native": ^7.1.6
-    "@stream-io/react-native-sdk": "workspace:*"
+    "@stream-io/feeds-react-native-sdk": "workspace:*"
     "@types/react": ~19.0.10
     expo: ~53.0.16
     expo-font: ~13.3.2
