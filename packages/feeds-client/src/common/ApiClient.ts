@@ -33,6 +33,7 @@ export class ApiClient {
     pathParams?: Record<string, string>,
     queryParams?: Record<string, any>,
     body?: any,
+    requestContentType?: string,
   ): Promise<{ body: T; metadata: RequestMetadata }> => {
     queryParams = queryParams ?? {};
     queryParams.api_key = this.apiKey;
@@ -67,9 +68,17 @@ export class ApiClient {
     const headers: RawAxiosRequestHeaders = {
       ...this.commonHeaders,
       Authorization: token,
-      'Content-Type': 'application/json',
+      'Content-Type': requestContentType ?? 'application/json',
       'x-client-request-id': client_request_id,
     };
+
+    const encodedBody =
+      requestContentType === 'multipart/form-data' ? new FormData() : body;
+    if (requestContentType === 'multipart/form-data') {
+      Object.keys(body).forEach((key) => {
+        encodedBody.append(key, body[key]);
+      });
+    }
 
     try {
       const response = await this.axiosInstance.request<T>({
@@ -77,7 +86,7 @@ export class ApiClient {
         method,
         headers,
         params: queryParams,
-        data: body,
+        data: encodedBody,
       });
 
       const metadata: RequestMetadata = this.getRequestMetadata(
