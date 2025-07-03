@@ -5698,7 +5698,7 @@ __metadata:
 
 "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#feeds-api":
   version: 0.4.24
-  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=93365d4d83ade1367389fcbda027417f3104870d"
+  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=7472f902c9c5ffa4e36504ad47bd9984ec0453ec"
   dependencies:
     "@types/jsonwebtoken": ^9.0.3
     "@types/node": ^18.3.0
@@ -5709,7 +5709,7 @@ __metadata:
   peerDependenciesMeta:
     "@stream-io/openai-realtime-api":
       optional: true
-  checksum: cf529247231f56b57b1ec431bc28232f574889b561dcf6182c42432b5a5acf8107e4de007b22f5334390ba136f8f7290c3d4da5b1a484f0f988c0552d2a20e74
+  checksum: 25fb89fba0fad54b3c37f5567579c47a3bc0897e9159535ec2d42cc46d6ee504d16f6cd80225bd145e4c357868e479ced128666f1be5a2dd6b9309f241bec3d7
   languageName: node
   linkType: hard
 
@@ -6078,11 +6078,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^18.3.0":
-  version: 18.19.112
-  resolution: "@types/node@npm:18.19.112"
+  version: 18.19.115
+  resolution: "@types/node@npm:18.19.115"
   dependencies:
     undici-types: ~5.26.4
-  checksum: 15133df218ec231c79b67db6732002873e8347438e12e885dd3f1e0c0c606aeffed0c436fcdfa1a9cab7fa2772a5ba2ff7436ad39d4012ffc7b4e94f245ad9fa
+  checksum: fc39f51a17364c00fdfda35494dc71b84d3eef2d5f8ee97103a9af55492784c20963bbc21b5b7f419b29fe97eecf9276cdf766673036efa3660b241396189a1b
   languageName: node
   linkType: hard
 
