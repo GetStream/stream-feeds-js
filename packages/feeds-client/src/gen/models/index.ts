@@ -1634,7 +1634,7 @@ export const ChannelOwnCapability = {
   UPLOAD_FILE: 'upload-file',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export type ChannelOwnCapability =
   (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
 
@@ -2603,7 +2603,7 @@ export const FeedOwnCapability = {
   UPDATE_FEED_MEMBERS: 'update-feed-members',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export type FeedOwnCapability =
   (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
 

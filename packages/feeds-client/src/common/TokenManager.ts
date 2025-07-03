@@ -53,7 +53,6 @@ export class TokenManager {
       return this.loadTokenPromise;
     }
 
-    // eslint-disable-next-line no-async-promise-executor
     this.loadTokenPromise = new Promise(async (resolve, reject) => {
       if (this.type === 'static') {
         this.loadTokenPromise = null;
@@ -73,7 +72,7 @@ export class TokenManager {
               this.loadTokenPromise = null;
               return reject(
                 new Error(
-                  /* eslint-disable-next-line @typescript-eslint/restrict-template-expressions */
+
                   `Stream error: tried to get token ${numberOfFailures} times, but it failed with ${e}. Check your token provider`,
                   { cause: e },
                 ),

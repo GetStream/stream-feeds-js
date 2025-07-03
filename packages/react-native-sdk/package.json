@@ -1,0 +1,71 @@
+{
+  "name": "@stream-io/react-native-sdk",
+  "packageManager": "yarn@3.5.0",
+  "main": "./dist/commonjs/index.js",
+  "types": "./dist/typescript/index.d.ts",
+  "exports": {
+    ".": {
+      "react-native": {
+        "import": "./dist/module/index.js",
+        "require": "./dist/commonjs/index.js"
+      },
+      "default": "./dist/module/index.js",
+      "types": "./dist/typescript/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json && rimraf dist && bob build",
+    "eslint": "eslint 'src/**/*.{js,ts,tsx}' --max-warnings 0",
+    "lint": "prettier --list-different 'src/**/*.{js,ts,tsx,json}' && yarn run eslint",
+    "lint-fix": "prettier --list-different 'src/**/*.{js,ts,tsx,json}' --write && yarn run eslint --fix",
+    "test-unit": "TZ=UTC jest"
+  },
+  "dependencies": {
+    "@stream-io/feeds-client": "workspace:*",
+    "react-native-get-random-values": "^1.11.0"
+  },
+  "peerDependencies": {
+    "@react-native-community/netinfo": ">=9.0.0",
+    "expo": ">=51.0.0",
+    "react": ">=17.0.0",
+    "react-native": ">=0.73.0"
+  },
+  "peerDependenciesMeta": {
+    "expo": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@react-native-community/eslint-config": "3.2.0",
+    "@react-native-community/eslint-plugin": "1.3.0",
+    "@react-native/babel-preset": "0.79.5",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "13.2.0",
+    "@types/eslint": "9.6.1",
+    "@types/jest": "^30.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-native-get-random-values": "^1",
+    "@types/react-test-renderer": "19.0.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-native": "^5.0.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.5.3",
+    "react": "19.0.0",
+    "react-native": "0.79.5",
+    "react-native-builder-bob": "0.40.12",
+    "react-test-renderer": "19.0.0",
+    "typescript": "5.8.3",
+    "typescript-eslint": "^8.34.0"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "dist",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
+  }
+}

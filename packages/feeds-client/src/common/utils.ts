@@ -112,7 +112,7 @@ export const streamDevToken = (userId: string) => {
   ].join('.');
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export interface DebouncedFunc<T extends (...args: any[]) => any> {
   /**
    * Call the original function, but applying the debounce rules.
@@ -139,7 +139,7 @@ export interface DebouncedFunc<T extends (...args: any[]) => any> {
    */
   flush(): ReturnType<T> | undefined;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export const debounce = <T extends (...args: any[]) => any>(
   fn: T,
   timeout = 0,

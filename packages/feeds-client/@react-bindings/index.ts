@@ -1,1 +1,1 @@
-export * from './myHook';
+export * from './reactBindingsHookExample';

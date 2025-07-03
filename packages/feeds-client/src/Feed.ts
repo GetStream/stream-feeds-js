@@ -241,7 +241,7 @@ export class Feed extends FeedApi {
           newCommentsByEntityId[forId]?.comments?.splice(index, 1);
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+         
         delete newCommentsByEntityId[comment.id];
 
         return {
@@ -744,7 +744,7 @@ export class Feed extends FeedApi {
 
     const sort = currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION;
 
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+     
     if (isLoading || currentNextCursor === END_OF_LIST) return;
 
     await this.loadNextPageComments({
@@ -773,7 +773,7 @@ export class Feed extends FeedApi {
 
     const sort = currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION;
 
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+     
     if (isLoading || currentNextCursor === END_OF_LIST) return;
 
     await this.loadNextPageComments({
@@ -801,7 +801,7 @@ export class Feed extends FeedApi {
     const currentNextCursor = this.currentState[paginationKey]?.next;
     const isLoading = this.currentState[paginationKey]?.loading_next_page;
 
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+     
     if (isLoading || currentNextCursor === END_OF_LIST) return;
 
     try {

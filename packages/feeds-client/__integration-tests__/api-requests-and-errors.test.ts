@@ -19,7 +19,7 @@ describe('API requests and error handling', () => {
 
   it('should set HTTP headers', async () => {
     let headers: Record<string, string> = {};
-    // eslint-disable-next-line @typescript-eslint/dot-notation
+     
     client['apiClient']['axiosInstance'].interceptors.request.use((config) => {
       headers = config.headers;
       return config;
@@ -91,7 +91,7 @@ describe('API requests and error handling', () => {
 
   it('should add connection id when necessary', async () => {
     let url: string | undefined;
-    // eslint-disable-next-line @typescript-eslint/dot-notation
+     
     client['apiClient']['axiosInstance'].interceptors.request.use((config) => {
       url = config.url;
       return config;

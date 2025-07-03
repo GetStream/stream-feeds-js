@@ -92,7 +92,6 @@ export class FeedsClient extends FeedsApi {
         }
         case 'feeds.feed.deleted': {
           feed?.handleWSEvent(event as unknown as WSEvent);
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete this.activeFeeds[fid];
           break;
         }
@@ -106,8 +105,8 @@ export class FeedsClient extends FeedsApi {
           if (event.poll?.id) {
             this.polls_by_id.delete(event.poll.id);
 
-            for (const feed of Object.values(this.activeFeeds)) {
-              const currentActivities = feed.currentState.activities;
+            for (const activeFeed of Object.values(this.activeFeeds)) {
+              const currentActivities = activeFeed.currentState.activities;
               if (currentActivities) {
                 const newActivities = [];
                 let changed = false;
@@ -119,7 +118,7 @@ export class FeedsClient extends FeedsApi {
                   newActivities.push(activity);
                 }
                 if (changed) {
-                  feed.state.partialNext({ activities: newActivities });
+                  activeFeed.state.partialNext({ activities: newActivities });
                 }
               }
             }

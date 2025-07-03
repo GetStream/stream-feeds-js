@@ -1,15 +1,16 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "composite": true,
-    "outDir": "./dist",
-    "rootDir": ".",
+    "outDir": "./dist/typescript",
+    "rootDir": "./src",
     "module": "ES2020",
     "target": "ES2020",
     "lib": ["esnext", "dom"],
     "noEmitOnError": true,
     "noImplicitAny": true,
     "declaration": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -22,5 +23,9 @@
     "jsx": "react-jsx"
   },
   "exclude": ["**/*.test.ts"],
-  "include": ["./src", "@react-bindings", "index.ts", "version.ts"]
+  "include": ["./src"],
+  "references": [
+    { "path": "../feeds-client" }
+  ]
 }
+
