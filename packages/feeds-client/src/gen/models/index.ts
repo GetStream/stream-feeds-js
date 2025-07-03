@@ -3082,7 +3082,7 @@ export interface GetOrCreateFeedRequest {
 
   filter?: Record<string, any>;
 
-  follower_pagination?: PagerRequest;
+  followers_pagination?: PagerRequest;
 
   following_pagination?: PagerRequest;
 
