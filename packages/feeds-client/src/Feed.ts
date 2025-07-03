@@ -26,7 +26,7 @@ import {
   addReactionToActivities,
   removeReactionFromActivities,
 } from './state-updates/activity-reaction-utils';
-import { StreamResponse } from './gen-imports';
+import { FeedsApi, StreamResponse } from './gen-imports';
 import { capitalize } from './common/utils';
 import type {
   ActivityIdOrCommentId,
@@ -289,10 +289,8 @@ export class Feed extends FeedApi {
     'feeds.follow.created': (event) => {
       // TODO: consider followers and followings not loaded (sort key missing from pagination object)
       // adjust followingInitialized & followersInitialized, follow comments behavior
-
       // TODO: followers and followings should be extended only with accepted follows (same for counts)
       // if (event.follow.status !== 'accepted') return; // not sure about this, needs further discussion
-
       // this feed followed someone
       if (event.follow.source_feed.fid === this.fid) {
         if (this.followingInitialized) {
@@ -406,6 +404,8 @@ export class Feed extends FeedApi {
     'user.muted': Feed.noop,
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
+    'feeds.activity.reaction.updated': undefined,
+    'feeds.comment.reaction.updated': undefined,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -417,7 +417,8 @@ export class Feed extends FeedApi {
     id: string,
     data?: FeedResponse,
   ) {
-    super(client, groupId, id);
+    // Need this ugly cast because fileUpload endpoints :(
+    super(client as unknown as FeedsApi, groupId, id);
     this.state = new StateStore<FeedState>({
       fid: `${groupId}:${id}`,
       group_id: groupId,
