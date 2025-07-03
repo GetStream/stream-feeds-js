@@ -24,96 +24,65 @@ const external = [
   ...Object.keys(pkg.peerDependencies || {}),
 ];
 
-/**
- * @type {import('rollup').RollupOptions}
- */
-const browserConfig = {
-  input: 'index.ts',
-  output: {
-    file: 'dist/index.browser.es.js',
-    format: 'es',
-    sourcemap: true,
-  },
-  external: external.filter((dep) => !browserIgnoredModules.includes(dep)),
-  plugins: [
-    replace({
-      preventAssignment: true,
-      'process.env.PKG_VERSION': JSON.stringify(pkg.version),
-    }),
-    browserIgnorePlugin,
-    typescript(),
-  ],
-};
-
-const reactBindingsBrowserConfig = {
-  input: '@react-bindings/index.ts',
-  output: {
-    file: 'dist/index-react-bindings.browser.es.js',
-    format: 'es',
-    sourcemap: true,
-  },
-  external: external.filter((dep) => !browserIgnoredModules.includes(dep)),
-  plugins: [
-    replace({
-      preventAssignment: true,
-      'process.env.PKG_VERSION': JSON.stringify(pkg.version),
-    }),
-    browserIgnorePlugin,
-    typescript({ tsconfig: 'tsconfig.json' }),
-  ],
-};
-
-const nodeConfig = {
-  input: 'index.ts',
-  output: [
-    {
-      file: 'dist/index.cjs.js',
-      format: 'cjs',
-      sourcemap: true,
-    },
-    {
-      file: 'dist/index.es.js',
-      format: 'es',
-      sourcemap: true,
-    },
-  ],
-  external,
-  plugins: [
-    replace({
-      preventAssignment: true,
-      'process.env.PKG_VERSION': JSON.stringify(pkg.version),
-    }),
-    typescript(),
-  ],
-};
-
-const reactBindingsNodeConfig = {
-  input: '@react-bindings/index.ts',
-  output: [
-    {
-      file: 'dist/index-react-bindings.cjs.js',
-      format: 'cjs',
-      sourcemap: true,
-    },
-    {
-      file: 'dist/index-react-bindings.es.js',
-      format: 'es',
-      sourcemap: true,
-    },
-  ],
-  external,
-  plugins: [
-    replace({
-      preventAssignment: true,
-      'process.env.PKG_VERSION': JSON.stringify(pkg.version),
-    }),
-    typescript(),
-  ],
-};
-
-export default [
-  browserConfig,
-  nodeConfig,
-  reactBindingsBrowserConfig,
-  reactBindingsNodeConfig,
+const namespacedPackages = [
+  { input: 'index.ts', indexFileName: 'index' },
+  { input: '@react-bindings/index.ts', indexFileName: 'index-react-bindings' },
 ];
+
+const configs = namespacedPackages.map(({ input, indexFileName }) => {
+  /**
+   * @type {import('rollup').RollupOptions}
+   */
+  const browserConfig = {
+    input,
+    output: [
+      {
+        file: `dist/${indexFileName}.browser.js`,
+        format: 'es',
+        sourcemap: true,
+      },
+      {
+        file: `dist/${indexFileName}.browser.cjs`,
+        format: 'cjs',
+        sourcemap: true,
+      },
+    ],
+    external: external.filter((dep) => !browserIgnoredModules.includes(dep)),
+    plugins: [
+      replace({
+        preventAssignment: true,
+        'process.env.PKG_VERSION': JSON.stringify(pkg.version),
+      }),
+      browserIgnorePlugin,
+      typescript(),
+    ],
+  };
+
+  const nodeConfig = {
+    input,
+    output: [
+      {
+        file: `dist/${indexFileName}.node.cjs`,
+        format: 'cjs',
+        sourcemap: true,
+      },
+      {
+        file: `dist/${indexFileName}.node.js`,
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    external,
+    plugins: [
+      replace({
+        preventAssignment: true,
+        'process.env.PKG_VERSION': JSON.stringify(pkg.version),
+      }),
+      typescript(),
+    ],
+  };
+
+  return [browserConfig, nodeConfig];
+}).flat()
+
+export default configs;

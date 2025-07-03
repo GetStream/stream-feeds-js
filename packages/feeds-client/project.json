@@ -1,0 +1,6 @@
+{
+  "name": "@stream-io/feeds-client",
+  "projectType": "application",
+  "sourceRoot": "packages/feeds-client",
+  "targets": {}
+}

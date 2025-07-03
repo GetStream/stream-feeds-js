@@ -2,25 +2,42 @@
   "name": "@stream-io/feeds-client",
   "version": "0.0.0",
   "packageManager": "yarn@3.2.4",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.es.js",
+  "main": "./dist/index.node.js",
   "exports": {
     ".": {
-      "react-native": "./dist/index.browser.es.js",
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.cjs.js",
-      "browser": "./dist/index.browser.es.js"
+      "types": "./dist/index.d.ts",
+      "react-native": {
+        "import": "./dist/index.browser.js",
+        "require": "./dist/index.browser.cjs"
+      },
+      "browser": {
+        "import": "./dist/index.browser.js",
+        "require": "./dist/index.browser.cjs"
+      },
+      "node": {
+        "import": "./dist/index.node.js",
+        "require": "./dist/index.node.cjs"
+      },
+      "default": "./dist/index.node.js"
     },
     "./react-bindings": {
-      "react-native": "./dist/index-react-bindings.browser.es.js",
-      "import": "./dist/index-react-bindings.es.js",
-      "require": "./dist/index-react-bindings.cjs.js",
-      "browser": "./dist/index-react-bindings.browser.es.js"
+      "types": "./dist/@react-bindings/index.d.ts",
+      "react-native": {
+        "import": "./dist/index-react-bindings.browser.js",
+        "require": "./dist/index-react-bindings.browser.cjs"
+      },
+      "browser": {
+        "import": "./dist/index-react-bindings.browser.js",
+        "require": "./dist/index-react-bindings.browser.cjs"
+      },
+      "node": {
+        "import": "./dist/index-react-bindings.node.js",
+        "require": "./dist/index-react-bindings.node.cjs"
+      },
+      "default": "./dist/index-react-bindings.node.js"
     }
   },
-  "browser": "dist/index.browser.es.js",
-  "react-native": "dist/index.browser.es.js",
-  "types": "dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "license": "See license in LICENSE",
   "scripts": {
     "clean": "rimraf dist",

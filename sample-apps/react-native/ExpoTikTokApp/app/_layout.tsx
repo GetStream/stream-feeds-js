@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { myHookTest } from '@stream-io/feeds-client/react-bindings';
 
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -26,6 +27,8 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
+
+  myHookTest();
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {

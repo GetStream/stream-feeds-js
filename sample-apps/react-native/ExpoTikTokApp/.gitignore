@@ -36,7 +36,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-
-
+# nx
 .nx/cache
 .nx/workspace-data
+
+# build
+ios
+android

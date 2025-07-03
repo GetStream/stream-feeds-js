@@ -1,0 +1,11 @@
+{
+  "name": "expo-tiktok-app",
+  "projectType": "application",
+  "sourceRoot": "sample-apps/react-native/expo-tiktok-app",
+  "targets": {
+    "start": {
+      "executor": "@nx/expo:start",
+      "options": {}
+    }
+  }
+}
