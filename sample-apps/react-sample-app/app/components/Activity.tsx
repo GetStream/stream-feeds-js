@@ -82,12 +82,11 @@ export const Activity = ({
             </Link>
             <div className="text-sm text-gray-700 flex items-center gap-1">
               <div>{activity.created_at.toLocaleString()}</div>
-              {/* {activity.custom?.edited_at && (
+              {activity.edited_at && (
                 <div>
-                  - edited at{' '}
-                  {new Date(activity.custom.edited_at).toLocaleString()}
+                  - edited at {new Date(activity.edited_at).toLocaleString()}
                 </div>
-              )} */}
+              )}
             </div>
           </div>
           {(canEdit || canDelete) && (
@@ -152,6 +151,21 @@ export const Activity = ({
             onChange={(text) => setEditedActivityText(text)}
           />
         )}
+        {activity.attachments?.map((attachment, index) => (
+          <div key={`activity-attachment-${activity.id}-${index}`}>
+            {attachment.type === 'image' && (
+              <img className="max-h-48" src={attachment.image_url} alt="" />
+            )}
+            {attachment.type === 'file' && (
+              <div className="flex items-center gap-1">
+                <span className="material-symbols-outlined">attach_file</span>
+                <a href={attachment.asset_url} target="_blank">
+                  File attachment
+                </a>
+              </div>
+            )}
+          </div>
+        ))}
         {activity.poll ? <Poll activity={activity} /> : null}
         <div className="flex justify-between">
           <div className="flex items-center gap-3">
