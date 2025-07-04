@@ -14,7 +14,7 @@ type DebouncedExecQueryFunction = DebouncedFunc<
   (searchString?: string) => Promise<void>
 >;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export interface SearchSource<T = any> {
   activate(): void;
 
@@ -46,7 +46,7 @@ export interface SearchSource<T = any> {
   readonly type: SearchSourceType;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export type SearchSourceState<T = any> = {
   hasNext: boolean;
   isActive: boolean;

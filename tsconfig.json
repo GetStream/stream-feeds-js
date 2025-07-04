@@ -1,12 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "module": "ES2015",
     "target": "ES2015",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "esnext"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "esnext"],
     "declaration": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
@@ -17,5 +14,10 @@
     "strict": true,
     "strictNullChecks": true,
     "sourceMap": true,
+    "paths": {
+      "@stream-io/feeds-client": ["packages/feeds-client/index.ts"],
+      "@stream-io/feeds-client/react-bindings": ["packages/feeds-client/@react-bindings/index.ts"],
+      "@stream-io/feeds-react-native-sdk": ["packages/react-native-sdk/src/index.ts"]
+    }
   }
 }

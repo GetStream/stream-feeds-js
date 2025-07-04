@@ -65,10 +65,10 @@ export const updateActivityInState = (
 };
 
 export const removeActivityFromState = (
-  ActivityResponse: ActivityResponse,
+  activityResponse: ActivityResponse,
   activities: ActivityResponse[],
 ) => {
-  const index = activities.findIndex((a) => a.id === ActivityResponse.id);
+  const index = activities.findIndex((a) => a.id === activityResponse.id);
   if (index !== -1) {
     const newActivities = [...activities];
     newActivities.splice(index, 1);

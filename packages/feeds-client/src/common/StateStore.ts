@@ -9,7 +9,7 @@ export type Preprocessor<T> = Handler<T>;
 export const isPatch = <T>(value: ValueOrPatch<T>): value is Patch<T> =>
   typeof value === 'function';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
+ 
 const noop = () => {};
 
 export class StateStore<T extends Record<string, unknown>> {
@@ -23,7 +23,7 @@ export class StateStore<T extends Record<string, unknown>> {
    * @experimental
    * This method is experimental and may change in future versions.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   public merge<Q extends StateStore<any>>(
     stateStore: Q extends StateStore<infer L>
       ? Extract<keyof T, keyof L> extends never

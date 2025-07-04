@@ -1,0 +1,8 @@
+{
+  "name": "@stream-io/feeds-react-native-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/react-native-sdk/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {}
+}
