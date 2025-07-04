@@ -390,9 +390,47 @@ export class Feed extends FeedApi {
     'feeds.comment.reaction.deleted':
       this.handleCommentReactionEvent.bind(this),
     'feeds.comment.reaction.updated': Feed.noop,
-    'feeds.feed_member.added': Feed.noop,
-    'feeds.feed_member.removed': Feed.noop,
-    'feeds.feed_member.updated': Feed.noop,
+    'feeds.feed_member.added': (event) => {
+      const { member } = event;
+      this.state.next((currentState) => {
+        return {
+          ...currentState,
+          members: currentState.members
+            ? currentState.members.concat(member)
+            : [member],
+        };
+      });
+    },
+    'feeds.feed_member.removed': (event) => {
+      this.state.next((currentState) => {
+        return {
+          ...currentState,
+          members: currentState.members?.filter(
+            (member) => member.user.id !== event.user?.id,
+          ),
+        };
+      });
+    },
+    'feeds.feed_member.updated': (event) => {
+      this.state.next((currentState) => {
+        const memberIndex =
+          currentState.members?.findIndex(
+            (member) => member.user.id === event.member.user.id,
+          ) ?? -1;
+
+        if (memberIndex !== -1) {
+          const newMembers = [...currentState.members!];
+          newMembers[memberIndex] = event.member;
+
+          return {
+            ...currentState,
+            members: newMembers,
+          };
+        }
+
+        return currentState;
+      });
+    },
     // the poll events should be removed from here
     'feeds.poll.closed': Feed.noop,
     'feeds.poll.deleted': Feed.noop,
