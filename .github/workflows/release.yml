@@ -1,5 +1,8 @@
 name: Version and Release
 
+on:
+  workflow_dispatch:
+
 concurrency:
   group: version-and-release-${{ github.ref }}
   cancel-in-progress: true
