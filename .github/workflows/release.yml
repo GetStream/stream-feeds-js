@@ -52,10 +52,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
-          yarn release --skip-publish
+          yarn version
 
       - name: Publish Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
-          yarn release publish --tag "alpha"
+          yarn publish --tag "alpha"
