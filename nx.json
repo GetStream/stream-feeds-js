@@ -1,9 +1,76 @@
 {
   "defaultBase": "main",
   "release": {
+    "projects": ["@stream-io/feeds-client"],
     "projectsRelationship": "independent",
+    "conventionalCommits": {
+      "enabled": true,
+      "types": {
+        "feat": {
+          "semverBump": "minor",
+          "changelog": {
+            "title": "Features"
+          }
+        },
+        "fix": {
+          "semverBump": "patch",
+          "changelog": {
+            "title": "Bug Fixes"
+          }
+        },
+        "chore": {
+          "semverBump": "patch",
+          "changelog": {
+            "title": "Other"
+          }
+        },
+        "docs": {
+          "changelog": false,
+          "semverBump": "none"
+        },
+        "style": {
+          "changelog": false,
+          "semverBump": "minor"
+        },
+        "refactor": {
+          "changelog": false,
+          "semverBump": "minor"
+        },
+        "perf": {
+          "semverBump": "minor",
+          "changelog": {
+            "title": "Performance"
+          }
+        },
+        "test": {
+          "changelog": false,
+          "semverBump": "none"
+        }
+      }
+    },
     "version": {
-      "conventionalCommits": true
+      "manifestRootsToUpdate": ["packages/feeds-client"],
+      "currentVersionResolver": "git-tag",
+      "specifierSource": "conventional-commits",
+      "preserveLocalDependencyProtocols": false
+    },
+    "targetDefaults": {
+      "nx-release-publish": {
+        "options": {
+          "packageRoot": "packages/{projectName}"
+        }
+      }
+    },
+    "changelog": {
+      "projectChangelogs": {
+        "renderOptions": {
+          "authors": false,
+          "commitReferences": true,
+          "versionTitleDate": true,
+          "applyUsernameToAuthors": false
+        },
+        "createRelease": "github"
+      }
     }
   }
 }
