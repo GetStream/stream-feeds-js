@@ -27,7 +27,6 @@ export const Activity = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedActivityText, setEditedActivityText] = useState('');
-
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const canEdit = ownCapabilities.includes(FeedOwnCapability.UPDATE_ACTIVITY);
@@ -35,12 +34,15 @@ export const Activity = ({
   const canSendReaction = ownCapabilities.includes(
     FeedOwnCapability.ADD_ACTIVITY_REACTION,
   );
+  const hasOwnBookmark = activity.own_bookmarks?.length > 0;
 
   const updateActivity = async () => {
     try {
-      await client?.updateActivity({
+      await client?.updateActivityPartial({
         activity_id: activity.id,
-        text: editedActivityText,
+        set: {
+          text: editedActivityText,
+        },
       });
       setIsEditing(false);
     } catch (error) {
@@ -54,6 +56,18 @@ export const Activity = ({
         activity_id: activity.id,
       });
       setIsMenuOpen(false);
+    } catch (error) {
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+    }
+  };
+
+  const toggleBookmark = async () => {
+    try {
+      if (hasOwnBookmark) {
+        await client?.deleteBookmark({ activity_id: activity.id });
+      } else {
+        await client?.addBookmark({ activity_id: activity.id });
+      }
     } catch (error) {
       logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
@@ -183,12 +197,24 @@ export const Activity = ({
             />
           </div>
 
-          <button
-            onClick={() => dialogRef.current?.showModal()}
-            className="text-sm px-1"
-          >
-            view comments ({activity.comment_count})
-          </button>
+          <div className="flex items-center gap-1 text-sm px-1">
+            <div className="flex items-center gap-1">
+              <button
+                className="flex items-center"
+                onClick={() => toggleBookmark()}
+              >
+                <span
+                  className={`material-symbols-outlined ${hasOwnBookmark ? 'fill' : ''}`}
+                >
+                  bookmark
+                </span>
+              </button>
+              <div>{activity.bookmark_count} bookmark(s)</div>
+            </div>
+            <button onClick={() => dialogRef.current?.showModal()}>
+              view comments ({activity.comment_count})
+            </button>
+          </div>
         </div>
       </div>
 

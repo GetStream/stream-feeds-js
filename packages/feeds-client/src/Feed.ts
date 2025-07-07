@@ -9,9 +9,12 @@ import {
   CommentResponse,
   PagerResponse,
   SingleFollowRequest,
-  ReactionResponse,
   CommentReactionAddedEvent,
   CommentReactionDeletedEvent,
+  BookmarkAddedEvent,
+  BookmarkDeletedEvent,
+  BookmarkUpdatedEvent,
+  FeedsReactionResponse,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -26,6 +29,11 @@ import {
   addReactionToActivities,
   removeReactionFromActivities,
 } from './state-updates/activity-reaction-utils';
+import {
+  addBookmarkToActivities,
+  removeBookmarkFromActivities,
+  updateBookmarkInActivities,
+} from './state-updates/bookmark-utils';
 import { FeedsApi, StreamResponse } from './gen-imports';
 import { capitalize } from './common/utils';
 import type {
@@ -479,8 +487,7 @@ export class Feed extends FeedApi {
         } else if (event.type === 'feeds.comment.reaction.deleted') {
           newComment.own_reactions =
             newComment.own_reactions?.filter(
-              // @ts-expect-error own_reactions are missing from CommentResponse type
-              (r: ReactionResponse) => r.type !== reaction.type,
+              (r: FeedsReactionResponse) => r.type !== reaction.type,
             ) ?? [];
         }
       }
@@ -589,6 +596,57 @@ export class Feed extends FeedApi {
         is_loading: false,
         is_loading_activities: false,
       });
+    }
+  }
+
+  bookmarkAdded(event: BookmarkAddedEvent) {
+    const currentActivities = this.currentState.activities;
+    const connectedUser = this.client.state.getLatestValue().connectedUser;
+    const isCurrentUser = !!(
+      connectedUser && event.bookmark.user.id === connectedUser.id
+    );
+
+    const result = addBookmarkToActivities(
+      event,
+      currentActivities,
+      isCurrentUser,
+    );
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
+    }
+  }
+
+  bookmarkDeleted(event: BookmarkDeletedEvent) {
+    const currentActivities = this.currentState.activities;
+    const connectedUser = this.client.state.getLatestValue().connectedUser;
+    const isCurrentUser = !!(
+      connectedUser && event.bookmark.user.id === connectedUser.id
+    );
+
+    const result = removeBookmarkFromActivities(
+      event,
+      currentActivities,
+      isCurrentUser,
+    );
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
+    }
+  }
+
+  bookmarkUpdated(event: BookmarkUpdatedEvent) {
+    const currentActivities = this.currentState.activities;
+    const connectedUser = this.client.state.getLatestValue().connectedUser;
+    const isCurrentUser = !!(
+      connectedUser && event.bookmark.user.id === connectedUser.id
+    );
+
+    const result = updateBookmarkInActivities(
+      event,
+      currentActivities,
+      isCurrentUser,
+    );
+    if (result.changed) {
+      this.state.partialNext({ activities: result.activities });
     }
   }
 
