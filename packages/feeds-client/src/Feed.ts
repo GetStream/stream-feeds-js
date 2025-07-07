@@ -14,7 +14,6 @@ import {
   BookmarkAddedEvent,
   BookmarkDeletedEvent,
   BookmarkUpdatedEvent,
-  FeedsReactionResponse,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -467,9 +466,8 @@ export class Feed extends FeedApi {
 
       const newComments = entityState?.comments?.concat([]) ?? [];
 
-      const commentCopy = { ...comment };
+      const commentCopy: Partial<CommentResponse> = { ...comment };
 
-      // @ts-expect-error own_reactions are missing from CommentResponse type
       delete commentCopy.own_reactions;
 
       const newComment: CommentResponse = {
@@ -481,14 +479,13 @@ export class Feed extends FeedApi {
 
       if (reaction.user.id === connectedUser?.id) {
         if (event.type === 'feeds.comment.reaction.added') {
-          newComment.own_reactions = newComment.own_reactions?.concat(
+          newComment.own_reactions = newComment.own_reactions.concat(
             reaction,
           ) ?? [reaction];
         } else if (event.type === 'feeds.comment.reaction.deleted') {
-          newComment.own_reactions =
-            newComment.own_reactions?.filter(
-              (r: FeedsReactionResponse) => r.type !== reaction.type,
-            ) ?? [];
+          newComment.own_reactions = newComment.own_reactions.filter(
+            (r) => r.type !== reaction.type,
+          );
         }
       }
 

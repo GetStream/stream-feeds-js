@@ -11,7 +11,6 @@ import { useStateStore } from '@/app/hooks/useStateStore';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { DEFAULT_PAGINATION_SORT } from './ActivityCommentSection';
-import { ReactionResponse } from '@stream-io/node-sdk';
 
 const levels = ['ml-6', 'ml-10', 'ml-14', 'ml-16'];
 
@@ -46,7 +45,7 @@ export const Comment = ({
           FeedOwnCapability.REMOVE_COMMENT_REACTION,
         ) ?? false,
     }),
-    [comment, user],
+    [comment.user.id, user?.id],
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { canDelete, canEdit } = useStateStore(feed.state, selector);
@@ -54,16 +53,9 @@ export const Comment = ({
 
   const hasReaction = useCallback(
     (type: 'upvote' | 'downvote') => {
-      const reactions =
-        // @ts-expect-error remove once own_reactions is typed
-        (comment.own_reactions ??
-          comment.latest_reactions) as ReactionResponse[];
-
-      return reactions?.some(
-        (reaction) => reaction.type === type && reaction.user.id === user?.id,
-      );
+      return comment.own_reactions.some((reaction) => reaction.type === type);
     },
-    [comment, user],
+    [comment],
   );
 
   const toggleReaction = useCallback(
@@ -71,7 +63,7 @@ export const Comment = ({
       const hr = hasReaction(type);
 
       if (hr) {
-        client?.removeCommentReaction({
+        client?.deleteCommentReaction({
           comment_id: comment.id,
           type,
         });
@@ -82,7 +74,7 @@ export const Comment = ({
         });
       }
     },
-    [client, comment.id, user?.id, hasReaction],
+    [client, comment.id, hasReaction],
   );
 
   return (
