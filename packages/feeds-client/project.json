@@ -7,7 +7,7 @@
     "version": {
       "executor": "@jscutlery/semver:version",
       "options": {
-        "dryRun": true,
+        "dryRun": false,
         "baseBranch": "main",
         "preset": {
           "name": "conventionalcommits",
@@ -46,7 +46,6 @@
     "github": {
       "executor": "@jscutlery/semver:github",
       "options": {
-        "dryRun": true,
         "tag": "${tag}",
         "notes": "${notes}"
       }
