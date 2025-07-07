@@ -41,7 +41,7 @@ jobs:
 
       - name: Configure Yarn and Git
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.STREAM_CI_TOKEN }}
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
@@ -51,13 +51,13 @@ jobs:
 
       - name: Version Packages
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.STREAM_CI_TOKEN }}
         run:
           yarn version
 
       - name: Publish Packages
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.STREAM_CI_TOKEN }}
 #        run:
 #          yarn publish --tag "alpha"
         run:
