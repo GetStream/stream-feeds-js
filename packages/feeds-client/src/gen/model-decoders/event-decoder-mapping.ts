@@ -1,9 +1,10 @@
 import { WSEvent } from '../models';
 import { decoders } from '../model-decoders/decoders';
 
-const eventDecoderMapping: {
-  [key in WSEvent['type']]: (data: Record<string, any>) => WSEvent;
-} = {
+const eventDecoderMapping: Record<
+  WSEvent['type'],
+  (data: Record<string, any>) => WSEvent
+> = {
   'app.updated': (data: Record<string, any>) => decoders.AppUpdatedEvent(data),
 
   'feeds.activity.added': (data: Record<string, any>) =>

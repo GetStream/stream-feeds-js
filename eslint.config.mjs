@@ -4,6 +4,7 @@ import tsEsLint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import importPlugin from 'eslint-plugin-import';
+import unusedImports from 'eslint-plugin-unused-imports';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -18,6 +19,7 @@ export default [
     plugins: {
       import: importPlugin,
       'react-hooks': reactHooksPlugin,
+      'unused-imports': unusedImports,
     },
     settings: {
       react: { version: 'detect' },
@@ -25,10 +27,14 @@ export default [
   },
   {
     rules: {
+      'dot-notation': 'error',
+      'unused-imports/no-unused-imports': 'error',
       'no-async-promise-executor': 'off',
       'no-empty-pattern': 'off',
       'no-empty': 'off',
       'prefer-const': 'warn',
+      '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
+      '@typescript-eslint/consistent-indexed-object-style': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -38,14 +44,14 @@ export default [
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
-          "args": "all",
-          "argsIgnorePattern": "^_",
-          "caughtErrors": "all",
-          "caughtErrorsIgnorePattern": "^_",
-          "destructuredArrayIgnorePattern": "^_",
-          "varsIgnorePattern": "^_",
-          "ignoreRestSiblings": true
-        }
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
       ],
       'import/no-extraneous-dependencies': 'error',
       'react/no-children-prop': 'off',

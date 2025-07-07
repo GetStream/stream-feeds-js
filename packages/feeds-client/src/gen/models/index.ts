@@ -1634,7 +1634,6 @@ export const ChannelOwnCapability = {
   UPLOAD_FILE: 'upload-file',
 } as const;
 
- 
 export type ChannelOwnCapability =
   (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
 
@@ -1816,6 +1815,8 @@ export interface CommentResponse {
   upvote_count: number;
 
   mentioned_users: UserResponse[];
+
+  own_reactions: FeedsReactionResponse[];
 
   user: UserResponse;
 
@@ -2603,7 +2604,6 @@ export const FeedOwnCapability = {
   UPDATE_FEED_MEMBERS: 'update-feed-members',
 } as const;
 
- 
 export type FeedOwnCapability =
   (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
 
@@ -5008,6 +5008,8 @@ export interface ThreadedCommentResponse {
   upvote_count: number;
 
   mentioned_users: UserResponse[];
+
+  own_reactions: FeedsReactionResponse[];
 
   user: UserResponse;
 
