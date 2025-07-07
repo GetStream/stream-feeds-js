@@ -2,6 +2,17 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.2...@stream-io/feeds-client-0.2.0) (2025-07-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* simulate breaking change in llc
+
+### Features
+
+* simulate breaking change in llc ([fd9b2cf](https://github.com/GetStream/stream-feeds-js/commit/fd9b2cf858a5073571a0ad4cd7d3df329f845622))
+
 ## [0.1.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.1...@stream-io/feeds-client-0.1.2) (2025-07-07)
 
 
