@@ -23,7 +23,7 @@
     "test:ci:libs": "yarn workspaces foreach -vt --no-private run test-ci",
     "generate": "./generate-openapi.sh",
     "lint:gen": "eslint --fix packages/**/src/gen/**/*ts && prettier packages/**/src/gen/**/*ts --write",
-    "release": "nx run @stream-io/feeds-client:version --verbose",
+    "release": "nx run-many --target version --parallel=1",
     "release:client": "yarn workspace @stream-io/feeds-client npm publish --access=public --tag=alpha",
     "release:react-native-sdk": "yarn workspace @stream-io/feeds-react-native-sdk npm publish --access=public --tag=alpha",
     "postinstall": "patch-package"
