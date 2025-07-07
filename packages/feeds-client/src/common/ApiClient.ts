@@ -50,7 +50,6 @@ export class ApiClient {
       queryParams.connection_id = connectionId;
     }
 
-    const encodedParams = this.queryParamsStringify(queryParams);
     let requestUrl = url;
     if (pathParams) {
       Object.keys(pathParams).forEach((paramName) => {
@@ -60,7 +59,6 @@ export class ApiClient {
         );
       });
     }
-    requestUrl += `?${encodedParams}`;
     const client_request_id = randomId();
 
     const token = await this.tokenManager.getToken();
@@ -86,6 +84,7 @@ export class ApiClient {
         method,
         headers,
         params: queryParams,
+        paramsSerializer: params => this.queryParamsStringify(params),
         data: encodedBody,
       });
 
