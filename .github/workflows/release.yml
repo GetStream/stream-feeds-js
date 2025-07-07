@@ -39,7 +39,7 @@ jobs:
 #        run: yarn test:ci:libs
         run: echo "Tests not run; uncomment the line above to fix this."
 
-      - name: Configure Yarn and Git
+      - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -48,17 +48,4 @@ jobs:
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           yarn config set npmRegistryServer https://registry.npmjs.org/
           yarn config set npmAuthToken ${{ secrets.NPM_TOKEN }}
-
-      - name: Version Packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run:
-          yarn version
-
-      - name: Publish Packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run:
-#          yarn publish --tag "alpha"
-        run:
-          echo "Publish stub called, will not publish."
+          yarn release
