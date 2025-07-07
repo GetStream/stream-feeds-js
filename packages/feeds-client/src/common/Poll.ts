@@ -67,7 +67,6 @@ export class StreamPoll {
   }
 
   private readonly getInitialStateFromPollResponse = (poll: PollInitOptions['poll']) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { own_votes, id, ...pollResponseForState } = poll;
     const { ownAnswer, ownVotes } = own_votes?.reduce<{
       ownVotes: PollVote[];
@@ -106,7 +105,6 @@ export class StreamPoll {
   public handlePollUpdated = (event: PollUpdatedFeedEvent) => {
     if (event.poll?.id && event.poll.id !== this.id) return;
     if (!isPollUpdatedEvent(event as WSEvent)) return;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, ...pollData } = event.poll;
     // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
     this.state.partialNext({
@@ -267,7 +265,7 @@ export class StreamPoll {
         event.poll.vote_counts_by_option,
       );
       if (isOwnVote && event.poll_vote.option_id) {
-         
+
         delete ownVotesByOptionId[event.poll_vote.option_id];
       }
     }

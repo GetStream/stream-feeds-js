@@ -311,7 +311,7 @@ export class StableWSConnection {
       this._log(`_connect() - waiting for token`);
       await this.tokenManager.getToken();
       isTokenReady = true;
-    } catch (e) {
+    } catch (_) {
       // token provider has failed before, so try again
     }
 
@@ -698,7 +698,7 @@ export class StableWSConnection {
         this.ws.onopen = () => {};
         this.ws.close();
       }
-    } catch (e) {
+    } catch (_) {
       // we don't care
     }
   }
@@ -730,7 +730,7 @@ export class StableWSConnection {
       // try to send on the connection
       try {
         this.ws?.send(JSON.stringify(data));
-      } catch (e) {
+      } catch (_) {
         // error will already be detected elsewhere
       }
     }, this.pingInterval);
