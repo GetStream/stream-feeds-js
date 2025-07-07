@@ -1,7 +1,8 @@
 {
-  "name": "expo-tiktok-app",
+  "name": "@stream-io/expo-tiktok-app",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "sourceRoot": "sample-apps/react-native/expo-tiktok-app",
+  "sourceRoot": "sample-apps/react-native/ExpoTikTokApp",
   "targets": {
     "start": {
       "executor": "@nx/expo:start",

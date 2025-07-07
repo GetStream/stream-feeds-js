@@ -20,7 +20,9 @@
     "test:ci:all": "yarn workspaces foreach -vt run test-ci",
     "test:ci:libs": "yarn workspaces foreach -vt --no-private run test-ci",
     "generate": "./generate-openapi.sh",
-    "lint:gen": "eslint --fix packages/**/src/gen/**/*ts && prettier packages/**/src/gen/**/*ts --write"
+    "lint:gen": "eslint --fix packages/**/src/gen/**/*ts && prettier packages/**/src/gen/**/*ts --write",
+    "version": "nx release --dry-run --skip-publish",
+    "publish": "nx release publish"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
