@@ -20,7 +20,7 @@ describe('API requests and error handling', () => {
   it('should set HTTP headers', async () => {
     let headers: Record<string, string> = {};
      
-    client['apiClient']['axiosInstance'].interceptors.request.use((config) => {
+    client.apiClient.axiosInstance.interceptors.request.use((config) => {
       headers = config.headers;
       return config;
     });
@@ -92,7 +92,7 @@ describe('API requests and error handling', () => {
   it('should add connection id when necessary', async () => {
     let url: string | undefined;
      
-    client['apiClient']['axiosInstance'].interceptors.request.use((config) => {
+    client.apiClient.axiosInstance.interceptors.request.use((config) => {
       url = config.url;
       return config;
     });

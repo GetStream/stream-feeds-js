@@ -118,7 +118,7 @@ describe('activity-reaction-utils', () => {
       expect(result.own_reactions[0]).toEqual(reaction);
       expect(result.latest_reactions).toHaveLength(1);
       expect(result.latest_reactions[0]).toEqual(reaction);
-      expect(result.reaction_groups['like']).toEqual({
+      expect(result.reaction_groups.like).toEqual({
         count: 1,
         first_reaction_at: reaction.created_at,
         last_reaction_at: reaction.created_at,
@@ -145,7 +145,7 @@ describe('activity-reaction-utils', () => {
       expect(result.own_reactions).toHaveLength(0);
       expect(result.latest_reactions).toHaveLength(1);
       expect(result.latest_reactions[0]).toEqual(reaction);
-      expect(result.reaction_groups['like']).toEqual({
+      expect(result.reaction_groups.like).toEqual({
         count: 1,
         first_reaction_at: reaction.created_at,
         last_reaction_at: reaction.created_at,
@@ -182,7 +182,7 @@ describe('activity-reaction-utils', () => {
       expect(result.changed).toBe(true);
       expect(result.own_reactions).toHaveLength(0);
       expect(result.latest_reactions).toHaveLength(0);
-      expect(result.reaction_groups['like']).toBeUndefined();
+      expect(result.reaction_groups.like).toBeUndefined();
     });
 
     it('should not remove reaction from own_reactions when not from current user', () => {
@@ -213,7 +213,7 @@ describe('activity-reaction-utils', () => {
       expect(result.changed).toBe(true);
       expect(result.own_reactions).toHaveLength(1);
       expect(result.latest_reactions).toHaveLength(0);
-      expect(result.reaction_groups['like']).toBeUndefined();
+      expect(result.reaction_groups.like).toBeUndefined();
     });
   });
 

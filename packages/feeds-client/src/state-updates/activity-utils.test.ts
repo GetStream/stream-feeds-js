@@ -158,7 +158,7 @@ describe('activity-utils', () => {
         },
       ];
       originalActivity.latest_reactions = {} as FeedsReactionResponse[];
-      (originalActivity.latest_reactions as any)['like'] = [
+      (originalActivity.latest_reactions as any).like = [
         {
           type: 'like',
           user: {
