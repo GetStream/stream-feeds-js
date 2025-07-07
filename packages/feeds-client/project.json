@@ -10,7 +10,7 @@
         "dryRun": true,
         "baseBranch": "main",
         "preset": {
-          "name": "conventionalcommits",
+          "name": "angular",
           "preMajor": true,
           "types": [
             { "type": "feat", "section": "Features" },
