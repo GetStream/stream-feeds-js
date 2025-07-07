@@ -23,7 +23,8 @@
   },
   "dependencies": {
     "@stream-io/feeds-client": "workspace:*",
-    "react-native-get-random-values": "^1.11.0"
+    "react-native-get-random-values": "^1.11.0",
+    "rimraf": "^6.0.1"
   },
   "peerDependencies": {
     "@react-native-community/netinfo": ">=9.0.0",
