@@ -473,15 +473,13 @@ export class Feed extends FeedApi {
 
       if (reaction.user.id === connectedUser?.id) {
         if (event.type === 'feeds.comment.reaction.added') {
-          // @ts-expect-error own_reactions are missing from CommentResponse type
           newComment.own_reactions = newComment.own_reactions?.concat(
             reaction,
           ) ?? [reaction];
         } else if (event.type === 'feeds.comment.reaction.deleted') {
-          // @ts-expect-error own_reactions are missing from CommentResponse type
           newComment.own_reactions =
-            // @ts-expect-error own_reactions are missing from CommentResponse type
             newComment.own_reactions?.filter(
+              // @ts-expect-error own_reactions are missing from CommentResponse type
               (r: ReactionResponse) => r.type !== reaction.type,
             ) ?? [];
         }
