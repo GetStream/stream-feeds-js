@@ -30,7 +30,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Lint Packages
-        run: yarn lint:all
+        run: yarn lint:libs
 
       - name: Build packages
         run: NODE_ENV=production yarn build:libs
