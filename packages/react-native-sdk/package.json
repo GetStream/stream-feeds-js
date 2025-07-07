@@ -22,7 +22,7 @@
     "test-unit": "TZ=UTC jest"
   },
   "dependencies": {
-    "@stream-io/feeds-client": "0.2.0-0",
+    "@stream-io/feeds-client": "workspace:*",
     "react-native-get-random-values": "^1.11.0",
     "rimraf": "^6.0.1"
   },
