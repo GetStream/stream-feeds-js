@@ -14,6 +14,8 @@
   "scripts": {
     "build:all": "yarn workspaces foreach -v --topological-dev run build",
     "build:libs": "yarn workspaces foreach -v --topological-dev --no-private run build",
+    "build:client": "yarn workspace @stream-io/feeds-client run build",
+    "build:react-native-sdk": "yarn workspace @stream-io/feeds-react-native-sdk run build",
     "clean:all": "yarn workspaces foreach -vt run clean",
     "lint:all": "eslint --max-warnings=0 --cache 'packages/**/*.{ts,tsx}'",
     "lint:all:fix": "eslint --max-warnings=0 'packages/**/*.{ts,tsx}' --fix",
@@ -21,11 +23,13 @@
     "test:ci:libs": "yarn workspaces foreach -vt --no-private run test-ci",
     "generate": "./generate-openapi.sh",
     "lint:gen": "eslint --fix packages/**/src/gen/**/*ts && prettier packages/**/src/gen/**/*ts --write",
-    "version": "nx release preminor --skip-publish",
-    "publish": "nx release publish"
+    "release": "nx run @stream-io/feeds-client:version --dry-run --verbose",
+    "release:client": "yarn workspace @stream-io/feeds-client npm publish --access=public --tag=alpha",
+    "release:react-native-sdk": "yarn workspace @stream-io/feeds-react-native-sdk npm publish --access=public --tag=alpha"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
+    "@jscutlery/semver": "^5.6.0",
     "@nx/js": "^21.2.2",
     "@types/eslint": "^8.56.10",
     "@typescript-eslint/eslint-plugin": "6.4",
