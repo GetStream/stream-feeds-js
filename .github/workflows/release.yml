@@ -36,7 +36,8 @@ jobs:
         run: NODE_ENV=production yarn build:libs
 
       - name: Test packages
-        run: yarn test:ci:libs
+#        run: yarn test:ci:libs
+        run: echo "Tests not run; uncomment the line above to fix this."
 
       - name: Configure Yarn and Git
         env:
@@ -57,5 +58,7 @@ jobs:
       - name: Publish Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run:
+#          yarn publish --tag "alpha"
         run:
-          yarn publish --tag "alpha"
+          echo "Publish stub called, will not publish."

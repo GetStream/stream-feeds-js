@@ -7,7 +7,7 @@
       "enabled": true,
       "types": {
         "feat": {
-          "semverBump": "minor",
+          "semverBump": "patch",
           "changelog": {
             "title": "Features"
           }
@@ -30,14 +30,14 @@
         },
         "style": {
           "changelog": false,
-          "semverBump": "minor"
+          "semverBump": "patch"
         },
         "refactor": {
           "changelog": false,
-          "semverBump": "minor"
+          "semverBump": "patch"
         },
         "perf": {
-          "semverBump": "minor",
+          "semverBump": "patch",
           "changelog": {
             "title": "Performance"
           }
