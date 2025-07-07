@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-react-native-sdk",
-  "version": "0.0.0",
+  "version": "0.1.0-0",
   "packageManager": "yarn@3.5.0",
   "main": "./dist/commonjs/index.js",
   "types": "./dist/typescript/index.d.ts",
@@ -22,7 +22,7 @@
     "test-unit": "TZ=UTC jest"
   },
   "dependencies": {
-    "@stream-io/feeds-client": "workspace:*",
+    "@stream-io/feeds-client": "0.1.0-0",
     "react-native-get-random-values": "^1.11.0",
     "rimraf": "^6.0.1"
   },
