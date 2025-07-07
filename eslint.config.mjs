@@ -35,7 +35,18 @@ export default [
       '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-shadow': 'error',
       '@typescript-eslint/no-unsafe-function-type': 'off',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          "args": "all",
+          "argsIgnorePattern": "^_",
+          "caughtErrors": "all",
+          "caughtErrorsIgnorePattern": "^_",
+          "destructuredArrayIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "ignoreRestSiblings": true
+        }
+      ],
       'import/no-extraneous-dependencies': 'error',
       'react/no-children-prop': 'off',
       'react/no-unescaped-entities': 'off',
