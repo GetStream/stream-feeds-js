@@ -156,6 +156,36 @@ export class FeedsClient extends FeedsApi {
         }
       }
     });
+    this.on('feeds.bookmark.added', (event) => {
+      if (event.type === 'feeds.bookmark.added') {
+        if (event.user?.id !== this.state.getLatestValue().connectedUser?.id) {
+          return;
+        }
+        const activityId = event.bookmark.activity.id;
+        const feeds = this.findActiveFeedByActivityId(activityId);
+        feeds.forEach((feed) => feed.bookmarkAdded(event));
+      }
+    });
+    this.on('feeds.bookmark.deleted', (event) => {
+      if (event.type === 'feeds.bookmark.deleted') {
+        if (event.user?.id !== this.state.getLatestValue().connectedUser?.id) {
+          return;
+        }
+        const activityId = event.bookmark.activity.id;
+        const feeds = this.findActiveFeedByActivityId(activityId);
+        feeds.forEach((feed) => feed.bookmarkDeleted(event));
+      }
+    });
+    this.on('feeds.bookmark.updated', (event) => {
+      if (event.type === 'feeds.bookmark.updated') {
+        if (event.user?.id !== this.state.getLatestValue().connectedUser?.id) {
+          return;
+        }
+        const activityId = event.bookmark.activity.id;
+        const feeds = this.findActiveFeedByActivityId(activityId);
+        feeds.forEach((feed) => feed.bookmarkUpdated(event));
+      }
+    });
   }
 
   public pollFromState = (id: string) => this.polls_by_id.get(id);
@@ -331,4 +361,12 @@ export class FeedsClient extends FeedsApi {
     };
     this.eventDispatcher.dispatch(networkEvent);
   };
+
+  private findActiveFeedByActivityId(activityId: string) {
+    return Object.values(this.activeFeeds).filter((feed) =>
+      feed.currentState.activities?.some(
+        (activity) => activity.id === activityId,
+      ),
+    );
+  }
 }

@@ -55,6 +55,7 @@ export const updateActivityInState = (
     newActivities[index] = {
       ...updatedActivityResponse,
       own_reactions: activity.own_reactions,
+      own_bookmarks: activity.own_bookmarks,
       latest_reactions: activity.latest_reactions,
       reaction_groups: activity.reaction_groups,
     };
