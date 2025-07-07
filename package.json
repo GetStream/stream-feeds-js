@@ -21,7 +21,7 @@
     "test:ci:libs": "yarn workspaces foreach -vt --no-private run test-ci",
     "generate": "./generate-openapi.sh",
     "lint:gen": "eslint --fix packages/**/src/gen/**/*ts && prettier packages/**/src/gen/**/*ts --write",
-    "version": "nx release --dry-run --skip-publish",
+    "version": "nx release preminor --dry-run --skip-publish",
     "publish": "nx release publish"
   },
   "devDependencies": {

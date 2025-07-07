@@ -4,7 +4,6 @@
     "projects": ["@stream-io/feeds-client", "@stream-io/feeds-react-native-sdk"],
     "projectsRelationship": "independent",
     "conventionalCommits": {
-      "enabled": true,
       "types": {
         "feat": {
           "semverBump": "patch",
@@ -49,7 +48,6 @@
       }
     },
     "version": {
-      "manifestRootsToUpdate": ["packages/feeds-client", "packages/react-native-sdk"],
       "currentVersionResolver": "git-tag",
       "specifierSource": "conventional-commits",
       "preserveLocalDependencyProtocols": false
