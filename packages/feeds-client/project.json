@@ -9,8 +9,10 @@
       "options": {
         "dryRun": true,
         "baseBranch": "main",
+        "preid": "alpha",
+        "releaseAs": "prerelease",
         "preset": {
-          "name": "conventionalcommits",
+          "name": "angular",
           "preMajor": true,
           "types": [
             { "type": "feat", "section": "Features" },
