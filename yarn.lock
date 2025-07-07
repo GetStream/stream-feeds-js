@@ -5597,7 +5597,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stream-io/feeds-client@0.1.0-0, @stream-io/feeds-client@workspace:^, @stream-io/feeds-client@workspace:packages/feeds-client":
+"@stream-io/feeds-client@0.2.0-0, @stream-io/feeds-client@workspace:^, @stream-io/feeds-client@workspace:packages/feeds-client":
   version: 0.0.0-use.local
   resolution: "@stream-io/feeds-client@workspace:packages/feeds-client"
   dependencies:
@@ -5663,7 +5663,7 @@ __metadata:
     "@react-native-community/eslint-config": 3.2.0
     "@react-native-community/eslint-plugin": 1.3.0
     "@react-native/babel-preset": 0.79.5
-    "@stream-io/feeds-client": 0.1.0-0
+    "@stream-io/feeds-client": 0.2.0-0
     "@testing-library/jest-native": ^5.4.3
     "@testing-library/react-native": 13.2.0
     "@types/eslint": 9.6.1

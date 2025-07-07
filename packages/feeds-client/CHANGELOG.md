@@ -1,3 +1,9 @@
+## 0.2.0-0 (2025-07-07)
+
+### Bug Fixes
+
+- trigger a patch change ([438287a](https://github.com/GetStream/stream-feeds-js/commit/438287a))
+
 ## 0.1.0-0 (2025-07-07)
 
 ### Features
