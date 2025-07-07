@@ -1,0 +1,17 @@
+diff --git a/node_modules/conventional-recommended-bump/index.js b/node_modules/conventional-recommended-bump/index.js
+index d71b897..4725802 100644
+--- a/node_modules/conventional-recommended-bump/index.js
++++ b/node_modules/conventional-recommended-bump/index.js
+@@ -21,7 +21,11 @@ async function conventionalRecommendedBump (optionsArgument, parserOptsArgument)
+ 
+   let config = options.config || {}
+   if (options.preset) {
+-    config = await loadPreset(options.preset)
++    if (config) {
++      config = await loadPreset(config)
++    } else {
++      config = await loadPreset(options.preset)
++    }
+   }
+ 
+   const whatBump = options.whatBump ||

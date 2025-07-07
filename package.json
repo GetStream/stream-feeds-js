@@ -25,7 +25,8 @@
     "lint:gen": "eslint --fix packages/**/src/gen/**/*ts && prettier packages/**/src/gen/**/*ts --write",
     "release": "nx run @stream-io/feeds-client:version --dry-run --verbose",
     "release:client": "yarn workspace @stream-io/feeds-client npm publish --access=public --tag=alpha",
-    "release:react-native-sdk": "yarn workspace @stream-io/feeds-react-native-sdk npm publish --access=public --tag=alpha"
+    "release:react-native-sdk": "yarn workspace @stream-io/feeds-react-native-sdk npm publish --access=public --tag=alpha",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
@@ -48,6 +49,7 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^16.3.0",
     "nx": "^21.2.2",
+    "patch-package": "^8.0.0",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.1",
