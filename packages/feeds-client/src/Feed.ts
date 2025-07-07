@@ -174,7 +174,18 @@ export class Feed extends FeedApi {
         this.state.partialNext({ activities: result.activities });
       }
     },
-    'feeds.activity.removed_from_feed': Feed.noop,
+    'feeds.activity.removed_from_feed': (event) => {
+      const currentActivities = this.currentState.activities;
+      if (currentActivities) {
+        const result = removeActivityFromState(
+          event.activity,
+          currentActivities,
+        );
+        if (result.changed) {
+          this.state.partialNext({ activities: result.activities });
+        }
+      }
+    },
     'feeds.activity.updated': (event) => {
       const currentActivities = this.currentState.activities;
       if (currentActivities) {
@@ -241,7 +252,6 @@ export class Feed extends FeedApi {
           newCommentsByEntityId[forId]?.comments?.splice(index, 1);
         }
 
-         
         delete newCommentsByEntityId[comment.id];
 
         return {
@@ -745,7 +755,6 @@ export class Feed extends FeedApi {
 
     const sort = currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION;
 
-     
     if (isLoading || currentNextCursor === END_OF_LIST) return;
 
     await this.loadNextPageComments({
@@ -774,7 +783,6 @@ export class Feed extends FeedApi {
 
     const sort = currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION;
 
-     
     if (isLoading || currentNextCursor === END_OF_LIST) return;
 
     await this.loadNextPageComments({
@@ -802,7 +810,6 @@ export class Feed extends FeedApi {
     const currentNextCursor = this.currentState[paginationKey]?.next;
     const isLoading = this.currentState[paginationKey]?.loading_next_page;
 
-     
     if (isLoading || currentNextCursor === END_OF_LIST) return;
 
     try {

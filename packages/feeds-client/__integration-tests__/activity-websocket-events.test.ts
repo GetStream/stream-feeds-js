@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { UserRequest } from '../src/common/gen/models';
+import { ActivityRemovedFromFeedEvent, UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
@@ -131,7 +131,55 @@ describe('Activity state updates via WebSocket events', () => {
     expect(updatedActivities?.length).toBe(0);
   });
 
+  it('should remove activity from feed in response to activity.removed_from_feed event', async () => {
+    // Create a spy for the activity.removed_from_feed event
+    const removeSpy = vi.fn();
+    feed.on('feeds.activity.removed_from_feed', removeSpy);
+
+    const secondFeed = client.feed(feedGroup, crypto.randomUUID());
+    await secondFeed.getOrCreate();
+
+    const response = await client.addActivity({
+      type: 'post',
+      fids: [feed.fid, secondFeed.fid],
+      text: 'Test activity',
+    });
+
+    expect(
+      feed.state
+        .getLatestValue()
+        .activities?.find((a) => a.id === response.activity.id),
+    ).toBeDefined();
+
+    await client.upsertActivities({
+      activities: [
+        {
+          id: response.activity.id,
+          fids: [secondFeed.fid],
+          text: 'Test activity',
+          type: 'post',
+        },
+      ],
+    });
+
+    await waitForEvent(feed, 'feeds.activity.removed_from_feed', 1000);
+
+    const removeEvent = removeSpy.mock
+      .lastCall?.[0] as ActivityRemovedFromFeedEvent;
+    expect(removeEvent?.type).toBe('feeds.activity.removed_from_feed');
+    expect(removeEvent?.activity.id).toBe(response.activity.id);
+
+    expect(
+      feed.state
+        .getLatestValue()
+        .activities?.find((a) => a.id === response.activity.id),
+    ).toBeUndefined();
+
+    await secondFeed.delete({ hard_delete: true });
+  });
+
   afterAll(async () => {
+    await feed.delete({ hard_delete: true });
     await client.disconnectUser();
   });
 });
