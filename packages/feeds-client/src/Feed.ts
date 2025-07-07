@@ -54,7 +54,7 @@ export type FeedState = Omit<
     ActivityIdOrCommentId,
     | {
         pagination?: PagerResponseWithLoadingStates & {
-          // registered on first pagination attempt and then used for real-time updates
+          // registered on first pagination attempt and then used for real-time updates & subsequent pagination calls
           sort?: string;
         };
         /**
@@ -96,9 +96,9 @@ export type FeedState = Omit<
     | undefined
   >;
 
-  followers_pagination?: LoadingStates;
+  followers_pagination?: LoadingStates & { sort?: string };
 
-  following_pagination?: LoadingStates;
+  following_pagination?: LoadingStates & { sort?: string };
 };
 
 const END_OF_LIST = 'eol' as const;
@@ -174,6 +174,7 @@ export class Feed extends FeedApi {
         this.state.partialNext({ activities: result.activities });
       }
     },
+    'feeds.activity.reaction.updated': Feed.noop,
     'feeds.activity.removed_from_feed': (event) => {
       const currentActivities = this.currentState.activities;
       if (currentActivities) {
@@ -297,17 +298,15 @@ export class Feed extends FeedApi {
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
     'feeds.follow.created': (event) => {
-      // TODO: consider followers and followings not loaded (sort key missing from pagination object)
-      // adjust followingInitialized & followersInitialized, follow comments behavior
-      // TODO: followers and followings should be extended only with accepted follows (same for counts)
-      // if (event.follow.status !== 'accepted') return; // not sure about this, needs further discussion
+      // filter non-accepted follows (the way getOrCreate does by default)
+      if (event.follow.status !== 'accepted') return;
+
       // this feed followed someone
       if (event.follow.source_feed.fid === this.fid) {
-        if (this.followingInitialized) {
+        if (this.currentState.following_pagination?.next === END_OF_LIST) {
           this.state.next((currentState) => ({
             ...currentState,
-            // TODO: remove once following_count is updated through feeds.feed.updated
-            following_count: (currentState.following_count ?? 0) + 1,
+            ...event.follow.source_feed,
             // TODO: respect sort
             following: currentState.following
               ? currentState.following.concat(event.follow)
@@ -322,75 +321,68 @@ export class Feed extends FeedApi {
         const connectedUser = this.client.state.getLatestValue().connectedUser;
 
         this.state.next((currentState) => {
-          let newState: typeof currentState | null = null;
+          const newState = { ...currentState, ...event.follow.target_feed };
 
           if (source.created_by.id === connectedUser?.id) {
-            newState ??= { ...currentState };
-
             newState.own_follows = newState.own_follows
               ? newState.own_follows.concat(event.follow)
               : [event.follow];
           }
 
-          if (this.followersInitialized) {
-            newState ??= { ...currentState };
-
-            // TODO: remove once follower_count is updated through feeds.feed.updated
-            newState.follower_count = (newState.follower_count ?? 0) + 1;
+          if (currentState.followers_pagination?.next === END_OF_LIST) {
             // TODO: respect sort
             newState.followers = newState.followers
               ? newState.followers.concat(event.follow)
               : [event.follow];
           }
 
-          return newState ?? currentState;
+          return newState;
         });
       }
     },
     'feeds.follow.deleted': (event) => {
+      // this feed unfollowed someone
       if (event.follow.source_feed.fid === this.fid) {
-        // this feed unfollowed someone
         this.state.next((currentState) => {
           return {
             ...currentState,
-            // TODO: remove once following_count is updated through feeds.feed.updated
-            following_count: currentState.following_count
-              ? currentState.following_count - 1
-              : 0,
+            ...event.follow.source_feed,
             following: currentState.following?.filter(
               (follow) =>
                 follow.target_feed.fid !== event.follow.target_feed.fid,
             ),
           };
         });
-
-        const target = event.follow.target_feed;
-        const feed = this.client.feed(target.group_id, target.id);
-
-        feed.state.next((currentState) => ({
-          ...currentState,
-          own_follows: currentState.own_follows?.filter(
-            (follow) => follow.target_feed.fid !== event.follow.target_feed.fid,
-          ),
-        }));
-      } else if (event.follow.target_feed.fid === this.fid) {
+      } else if (
         // someone unfollowed this feed
-        this.state.next((currentState) => ({
-          ...currentState,
-          // TODO: remove once follower_count is updated through feeds.feed.updated
-          follower_count: currentState.follower_count
-            ? currentState.follower_count - 1
-            : 0,
-          followers: currentState.followers?.filter(
+        event.follow.target_feed.fid === this.fid
+      ) {
+        const source = event.follow.source_feed;
+        const connectedUser = this.client.state.getLatestValue().connectedUser;
+
+        this.state.next((currentState) => {
+          const newState = { ...currentState, ...event.follow.target_feed };
+
+          if (source.created_by.id === connectedUser?.id) {
+            newState.own_follows = newState.own_follows?.filter(
+              (follow) =>
+                follow.source_feed.fid !== event.follow.source_feed.fid,
+            );
+          }
+
+          newState.followers = newState.followers?.filter(
             (follow) => follow.source_feed.fid !== event.follow.source_feed.fid,
-          ),
-        }));
+          );
+
+          return newState;
+        });
       }
     },
     'feeds.follow.updated': Feed.noop,
     'feeds.comment.reaction.added': this.handleCommentReactionEvent.bind(this),
     'feeds.comment.reaction.deleted':
       this.handleCommentReactionEvent.bind(this),
+    'feeds.comment.reaction.updated': Feed.noop,
     'feeds.feed_member.added': Feed.noop,
     'feeds.feed_member.removed': Feed.noop,
     'feeds.feed_member.updated': Feed.noop,
@@ -414,8 +406,6 @@ export class Feed extends FeedApi {
     'user.muted': Feed.noop,
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
-    'feeds.activity.reaction.updated': undefined,
-    'feeds.comment.reaction.updated': undefined,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -492,8 +482,7 @@ export class Feed extends FeedApi {
           newComment.own_reactions =
             // @ts-expect-error own_reactions are missing from CommentResponse type
             newComment.own_reactions?.filter(
-              (r: ReactionResponse) =>
-                r.type !== reaction.type && r.user.id !== reaction.user.id,
+              (r: ReactionResponse) => r.type !== reaction.type,
             ) ?? [];
         }
       }
@@ -511,22 +500,6 @@ export class Feed extends FeedApi {
     });
   }
 
-  private get followersInitialized() {
-    const followersPagination = this.currentState.followers_pagination;
-
-    if (!followersPagination) return false;
-
-    return Object.hasOwn(followersPagination, 'next');
-  }
-
-  private get followingInitialized() {
-    const followingPagination = this.currentState.following_pagination;
-
-    if (!followingPagination) return false;
-
-    return Object.hasOwn(followingPagination, 'next');
-  }
-
   async getOrCreate(request?: GetOrCreateFeedRequest) {
     if (this.currentState.is_loading_activities) {
       throw new Error('Only one getOrCreate call is allowed at a time');
@@ -536,6 +509,9 @@ export class Feed extends FeedApi {
       is_loading: !request?.next,
       is_loading_activities: true,
     });
+
+    // TODO: pull comments/comment_pagination from activities and comment_sort from request
+    // and pre-populate comments_by_entity_id (once comment_sort and comment_limit are supported)
 
     try {
       const response = await super.getOrCreate(request);
@@ -573,6 +549,28 @@ export class Feed extends FeedApi {
             ...currentState,
             ...responseCopy,
           };
+
+          // if there is no next cursor, set it to END_OF_LIST
+          // request has to have a limit set for this to work
+          if (
+            (request?.followers_pagination?.limit ?? 0) > 0 &&
+            typeof nextState.followers_pagination?.next === 'undefined'
+          ) {
+            nextState.followers_pagination = {
+              ...nextState.followers_pagination,
+              next: END_OF_LIST,
+            };
+          }
+
+          if (
+            (request?.following_pagination?.limit ?? 0) > 0 &&
+            typeof nextState.following_pagination?.next === 'undefined'
+          ) {
+            nextState.following_pagination = {
+              ...nextState.following_pagination,
+              next: END_OF_LIST,
+            };
+          }
 
           if (!request?.followers_pagination?.limit) {
             delete nextState.followers;
@@ -907,9 +905,9 @@ export class Feed extends FeedApi {
     const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.fid;
 
     const response = await this.client.follow({
+      ...options,
       source: this.fid,
       target: fid,
-      ...options,
     });
 
     return response;
