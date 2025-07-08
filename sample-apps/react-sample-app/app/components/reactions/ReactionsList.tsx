@@ -1,13 +1,11 @@
 import { useUserContext } from '@/app/user-context';
 import {
-  ActivityReactionResponse,
   ActivityResponse,
-  Reaction,
+  FeedsReactionResponse,
 } from '@stream-io/feeds-client';
 import React, { useEffect, useState } from 'react';
 import { PaginatedList } from '../PaginatedList';
 
-// TODO: Migrate to new API
 export const ReactionsList = ({
   type,
   activity,
@@ -15,7 +13,7 @@ export const ReactionsList = ({
   type: string;
   activity: ActivityResponse;
 }) => {
-  const [reactions, setReactions] = useState<ActivityReactionResponse[]>([]);
+  const [reactions, setReactions] = useState<FeedsReactionResponse[]>([]);
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [next, setNext] = useState<string>();
@@ -32,19 +30,14 @@ export const ReactionsList = ({
     setError(undefined);
     setIsLoading(true);
     try {
-      // TODO: no endpoint for this
-      const response: {
-        next: string;
-        reactions: ActivityReactionResponse[];
-      } = { next: '', reactions: [] };
-      // await client.queryReactions({
-      //   id: activity.id,
-      //   filter: {
-      //     type,
-      //   },
-      //   next,
-      //   sort: [{ field: 'created_at', direction: -1 }],
-      // });
+      const response = await client.queryActivityReactions({
+        activity_id: activity.id,
+        filter: {
+          reaction_type: type,
+        },
+        next,
+        sort: [{ field: 'created_at', direction: -1 }],
+      });
       setReactions([...reactions, ...response.reactions]);
       setNext(response.next);
     } catch (error) {
@@ -54,7 +47,7 @@ export const ReactionsList = ({
     }
   };
 
-  const renderItem = (reaction: ActivityReactionResponse) => {
+  const renderItem = (reaction: FeedsReactionResponse) => {
     return (
       <li
         key={reaction.user.id}

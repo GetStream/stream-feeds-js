@@ -21,7 +21,7 @@ export const Reactions = ({
   showCounter: boolean;
   canReact: boolean;
 }) => {
-  const { logError, logErrorAndDisplayNotification } = useErrorContext();
+  const { logErrorAndDisplayNotification } = useErrorContext();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { client } = useUserContext();
 
