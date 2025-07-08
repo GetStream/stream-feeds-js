@@ -55,7 +55,7 @@
       "options": {
         "commands": [
           {
-            "command": "echo \"Skip releasing client.\"",
+            "command": "yarn release:client",
             "forwardAllArgs": false
           }
         ]
