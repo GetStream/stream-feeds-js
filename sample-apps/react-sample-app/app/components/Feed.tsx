@@ -41,10 +41,6 @@ export const Feed = ({ feed }: { feed: StreamFeed }) => {
     );
   };
 
-  if (!ownCapabilities.includes('read-feed')) {
-    return `You need to be a follower to see posts`;
-  }
-
   return (
     <PaginatedList
       items={activities}
