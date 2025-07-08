@@ -14,7 +14,7 @@ export default function Timeline() {
   return (
     <div className="w-full flex flex-col items-center gap-5">
       <NewActivity feed={ownFeed}></NewActivity>
-      <Feed feed={ownTimeline} onNewPost="show-notification"></Feed>
+      <Feed feed={ownTimeline}></Feed>
     </div>
   );
 }

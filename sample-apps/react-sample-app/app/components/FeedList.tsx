@@ -33,7 +33,7 @@ const UserItem = ({ feed }: { feed: Feed }) => {
   );
 };
 
-export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
+export default function FeedList({ types }: { types: Array<'user'> }) {
   const { client, user } = useUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error>();
@@ -64,11 +64,12 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
     const limit = 30;
     try {
       const response = await client.queryFeeds({
-        // limit,
-        // filter: {
-        //   feed_group: { $in: types },
-        // },
-        // next,
+        limit,
+        watch: true,
+        filter: {
+          group_id: { $in: types },
+        },
+        next,
       });
       const newFeeds = response.feeds.filter((f) => f.id !== user.id);
       setFeeds([...feeds, ...newFeeds]);
