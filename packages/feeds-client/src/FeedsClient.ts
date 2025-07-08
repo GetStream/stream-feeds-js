@@ -46,10 +46,10 @@ export class FeedsClient extends FeedsApi {
   private readonly tokenManager: TokenManager;
   private wsConnection?: StableWSConnection;
   private readonly connectionIdManager: ConnectionIdManager;
-  private readonly eventDispatcher: EventDispatcher<
+  private readonly eventDispatcher = new EventDispatcher<
     FeedsEvent['type'],
-    FeedsEvent
-  > = new EventDispatcher<FeedsEvent['type'], FeedsEvent>();
+    FeedsEvent & { fid?: string }
+  >();
 
   private readonly polls_by_id: Map<string, StreamPoll>;
 
@@ -73,12 +73,10 @@ export class FeedsClient extends FeedsApi {
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
     this.on('all', (event) => {
-      // @ts-expect-error fid may be present, type mismatch
-      const fid: unknown = event.fid;
+      const fid = event.fid;
 
-      if (typeof fid !== 'string') return;
-
-      const feed: Feed | undefined = this.activeFeeds[fid];
+      const feed: Feed | undefined =
+        typeof fid === 'string' ? this.activeFeeds[fid] : undefined;
 
       switch (event.type) {
         case 'feeds.feed.created': {
@@ -94,7 +92,9 @@ export class FeedsClient extends FeedsApi {
         }
         case 'feeds.feed.deleted': {
           feed?.handleWSEvent(event as unknown as WSEvent);
-          delete this.activeFeeds[fid];
+          if (typeof fid === 'string') {
+            delete this.activeFeeds[fid];
+          }
           break;
         }
         case 'feeds.poll.closed': {
@@ -151,39 +151,19 @@ export class FeedsClient extends FeedsApi {
           }
           break;
         }
+        case 'feeds.bookmark.added':
+        case 'feeds.bookmark.deleted':
+        case 'feeds.bookmark.updated': {
+          const activityId = event.bookmark.activity.id;
+          // TODO: find faster way later on
+          const feeds = this.findActiveFeedByActivityId(activityId);
+          feeds.forEach((f) => f.handleWSEvent(event));
+
+          break;
+        }
         default: {
           feed?.handleWSEvent(event as unknown as WSEvent);
         }
-      }
-    });
-    this.on('feeds.bookmark.added', (event) => {
-      if (event.type === 'feeds.bookmark.added') {
-        if (event.user?.id !== this.state.getLatestValue().connectedUser?.id) {
-          return;
-        }
-        const activityId = event.bookmark.activity.id;
-        const feeds = this.findActiveFeedByActivityId(activityId);
-        feeds.forEach((feed) => feed.bookmarkAdded(event));
-      }
-    });
-    this.on('feeds.bookmark.deleted', (event) => {
-      if (event.type === 'feeds.bookmark.deleted') {
-        if (event.user?.id !== this.state.getLatestValue().connectedUser?.id) {
-          return;
-        }
-        const activityId = event.bookmark.activity.id;
-        const feeds = this.findActiveFeedByActivityId(activityId);
-        feeds.forEach((feed) => feed.bookmarkDeleted(event));
-      }
-    });
-    this.on('feeds.bookmark.updated', (event) => {
-      if (event.type === 'feeds.bookmark.updated') {
-        if (event.user?.id !== this.state.getLatestValue().connectedUser?.id) {
-          return;
-        }
-        const activityId = event.bookmark.activity.id;
-        const feeds = this.findActiveFeedByActivityId(activityId);
-        feeds.forEach((feed) => feed.bookmarkUpdated(event));
       }
     });
   }
