@@ -1,11 +1,10 @@
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
+import type { SearchControllerState } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 import { useSearchContext } from '../SearchContext';
 import { useSearchQueriesInProgress } from '../hooks';
-
-import type { SearchControllerState } from '@stream-io/feeds-client';
-import clsx from 'clsx';
-import { useStateStore } from '@/app/hooks/useStateStore';
 import { SearchSourceFilters } from '../SearchResults';
 
 const searchControllerStateSelector = (nextValue: SearchControllerState) => ({

@@ -3,7 +3,7 @@ import { useErrorContext } from '../error-context';
 import { FormEvent, useState } from 'react';
 import { ActivityComposer } from './ActivityComposer';
 import { LoadingIndicator } from './LoadingIndicator';
-import { useStateStore } from '../hooks/useStateStore';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useUserContext } from '../user-context';
 
 const selector = ({ own_capabilities = [] }: FeedState) => ({

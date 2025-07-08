@@ -1,9 +1,9 @@
 import { PollState } from '@stream-io/feeds-client';
-import { useStateStore } from '@/app/hooks/useStateStore';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { usePollContext } from '@/app/poll-context';
 
 export const usePollStateStore = <
-  T extends Readonly<Record<string, unknown> | Readonly<unknown[]>>,
+  T extends Readonly<Record<string, unknown> | readonly unknown[]>,
 >(
   selector: (nextValue: PollState) => T,
 ): T => {

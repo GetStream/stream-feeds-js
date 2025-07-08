@@ -1,8 +1,5 @@
-import {
-  ActivityResponse,
-  FeedOwnCapability,
-  Feed as StreamFeed,
-} from '@stream-io/feeds-client';
+import { ActivityResponse, Feed as StreamFeed } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useEffect, useState } from 'react';
 import { Activity } from './Activity';
 import { PaginatedList } from './PaginatedList';
@@ -11,7 +8,6 @@ import {
   useAppNotificationsContext,
 } from '../app-notifications-context';
 import { pageTitle } from '../page-title';
-import { useStateStore } from '../hooks/useStateStore';
 import { initializeFeed } from '../hooks/initializeFeed';
 
 export const Feed = ({
@@ -50,13 +46,13 @@ export const Feed = ({
         activities: state.activities,
       }),
       (state, prevState) => {
-        const activities = state.activities ?? [];
+        const currentActivities = state.activities ?? [];
         const prevActivities = prevState?.activities;
         // When we receive feeds.activity_added we won't immediately update the list, just display a notification about new activities
         if (
           onNewPost === 'show-immediately' ||
           !prevActivities ||
-          activities.length <= prevActivities.length ||
+          currentActivities.length <= prevActivities.length ||
           isLoading
         ) {
           if (newPostsNotification) {
@@ -68,7 +64,7 @@ export const Feed = ({
     );
 
     return unsubscribe;
-  }, [feed, isLoading, onNewPost]);
+  }, [feed, isLoading, newPostsNotification, onNewPost]);
 
   useEffect(() => {
     if (onNewPost === 'show-immediately') {
@@ -103,7 +99,7 @@ export const Feed = ({
     });
 
     return unsubscribe;
-  }, [feed, onNewPost, activities]);
+  }, [feed, onNewPost, activities, newPostsNotification, showNotification]);
 
   const getNextPage = () => {
     setError(undefined);

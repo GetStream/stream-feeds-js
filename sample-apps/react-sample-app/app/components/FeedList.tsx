@@ -1,12 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Feed, FeedState } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import Link from 'next/link';
+
 import { useUserContext } from '../user-context';
 import { useFeedContext } from '../feed-context';
-import { Feed, FeedState } from '@stream-io/feeds-client';
-import Link from 'next/link';
 import { PaginatedList } from '../components/PaginatedList';
 import { FollowStatusButton } from './FollowStatusButton';
-import { useStateStore } from '../hooks/useStateStore';
 
 const selector = (state: FeedState) => {
   return {
@@ -54,14 +55,7 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
     }
   }, [types]);
 
-  useEffect(() => {
-    if (!client || !user || !ownTimeline) {
-      return;
-    }
-    void loadMore();
-  }, [client, user, ownTimeline]);
-
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (!client || !user || !ownTimeline) {
       return;
     }
@@ -79,12 +73,19 @@ export default function FeedList({ types }: { types: Array<'user' | 'page'> }) {
       const newFeeds = response.feeds.filter((f) => f.id !== user.id);
       setFeeds([...feeds, ...newFeeds]);
       setNext(response.next);
-    } catch (error) {
-      setError(error as Error);
+    } catch (e) {
+      setError(e as Error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [client, feeds, ownTimeline, user]);
+
+  useEffect(() => {
+    if (!client || !user || !ownTimeline) {
+      return;
+    }
+    void loadMore();
+  }, [client, user, ownTimeline, loadMore]);
 
   const renderUser = (feed: Feed) => {
     return <UserItem key={feed.fid} feed={feed} />;

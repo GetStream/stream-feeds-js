@@ -1,11 +1,11 @@
 import React from 'react';
 import type { SearchControllerState } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 import { SearchSourceResults } from './SearchSourceResults';
 // import { SearchResultsHeader } from './SearchResultsHeader';
 import { SearchResultsPresearch } from './SearchResultsPresearch';
 import { useSearchContext } from '../SearchContext';
-import { useStateStore } from '@/app/hooks/useStateStore';
 
 const searchControllerStateSelector = (nextValue: SearchControllerState) => ({
   activeSources: nextValue.sources.filter((s) => s.isActive),

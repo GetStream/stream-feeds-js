@@ -4,12 +4,12 @@ import type {
   SearchSourceState,
   SearchSourceType,
 } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 import { DefaultSearchResultItems } from './SearchResultItem';
 import { SearchSourceResultListFooter } from './SearchSourceResultListFooter';
 import { useSearchSourceResultsContext } from '../SearchSourceResultsContext';
 import type { SearchResultItemComponents } from './SearchResultItem';
-import { useStateStore } from '@/app/hooks/useStateStore';
 
 const searchSourceStateSelector = (nextValue: SearchSourceState) => ({
   items: nextValue.items,

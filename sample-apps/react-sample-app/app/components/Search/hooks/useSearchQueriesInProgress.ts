@@ -1,4 +1,4 @@
-import { useStateStore } from '@/app/hooks/useStateStore';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useEffect, useState } from 'react';
 import type {
   SearchController,

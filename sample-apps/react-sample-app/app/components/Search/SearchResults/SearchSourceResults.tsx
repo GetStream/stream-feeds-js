@@ -1,11 +1,11 @@
 import React from 'react';
+import { SearchSource, SearchSourceState } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 import { SearchSourceResultList } from './SearchSourceResultList';
 import { SearchSourceResultsEmpty } from './SearchSourceResultsEmpty';
 import { SearchSourceResultsHeader } from './SearchSourceResultsHeader';
 import { SearchSourceResultsContextProvider } from '../SearchSourceResultsContext';
-import { useStateStore } from '@/app/hooks/useStateStore';
-import { SearchSource, SearchSourceState } from '@stream-io/feeds-client';
 
 const searchSourceStateSelector = (nextValue: SearchSourceState) => ({
   isLoading: nextValue.isLoading,

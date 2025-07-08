@@ -5,7 +5,7 @@ import { FollowRelationships } from './FollowRelationships';
 import { useErrorContext } from '../error-context';
 import { FollowStatusButton } from './FollowStatusButton';
 import { FeedMenu } from './FeedMenu';
-import { useStateStore } from '../hooks/useStateStore';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useUserContext } from '../user-context';
 import { initializeFeed } from '../hooks/initializeFeed';
 import { Dialog } from './Dialog';
