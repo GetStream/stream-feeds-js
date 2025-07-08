@@ -79,14 +79,15 @@ export default function FeedList({ types }: { types: Array<'user'> }) {
     } finally {
       setIsLoading(false);
     }
-  }, [client, feeds, ownTimeline, user]);
+  }, [client, feeds, next, ownTimeline, types, user]);
 
   useEffect(() => {
     if (!client || !user || !ownTimeline) {
       return;
     }
     void loadMore();
-  }, [client, user, ownTimeline, loadMore]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client, user, ownTimeline]);
 
   const renderUser = (feed: Feed) => {
     return <UserItem key={feed.fid} feed={feed} />;
