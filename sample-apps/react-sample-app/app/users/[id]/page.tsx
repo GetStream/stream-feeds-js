@@ -3,7 +3,6 @@ import { FeedMetadata } from '@/app/components/FeedMetadata';
 import { useFeedContext } from '../../feed-context';
 import { useMemo } from 'react';
 import { useUserContext } from '@/app/user-context';
-import { useErrorContext } from '@/app/error-context';
 import { LoadingIndicator } from '@/app/components/LoadingIndicator';
 import { useParams } from 'next/navigation';
 import { NewActivity } from '@/app/components/NewActivity';
@@ -11,7 +10,6 @@ import { Feed } from '@/app/components/Feed';
 
 export default function ProfilePage() {
   const params = useParams<{ id: string }>();
-  const { logErrorAndDisplayNotification } = useErrorContext();
   const { user, client } = useUserContext();
   const { ownFeed, ownTimeline } = useFeedContext();
 
@@ -46,7 +44,7 @@ export default function ProfilePage() {
           <FeedMetadata feed={feed} timeline={timeline}></FeedMetadata>
         </div>
         <NewActivity feed={feed} />
-        <Feed feed={feed} onNewPost="show-immediately"></Feed>
+        <Feed feed={feed}></Feed>
       </div>
     </>
   );

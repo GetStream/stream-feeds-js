@@ -1,9 +1,10 @@
 import { Feed, FeedState } from '@stream-io/feeds-client';
-import { useErrorContext } from '../error-context';
 import { useFeedContext } from '../feed-context';
 import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import { useErrorContext } from '../error-context';
 
 const selector = ({ own_follows = [] }: FeedState) => {
+  // TODO: we need to be able to get this info in queryFeeds result as well
   const own_follow = own_follows.find(
     (_) => _.source_feed.group_id === 'timeline',
   );
@@ -13,7 +14,8 @@ const selector = ({ own_follows = [] }: FeedState) => {
 };
 
 export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
-  const { logError, logErrorAndDisplayNotification } = useErrorContext();
+  const { logErrorAndDisplayNotification } = useErrorContext();
+
   const { ownTimeline } = useFeedContext();
 
   const { follow_status: followStatus } = useStateStore(feed.state, selector);
@@ -21,24 +23,21 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
   const follow = async (feed: Feed) => {
     if (!ownTimeline) return;
 
-    await ownTimeline.follow(feed);
+    try {
+      await ownTimeline.follow(feed);
+    } catch (error) {
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+    }
   };
 
   const unfollow = async (feed: Feed) => {
     if (!ownTimeline) return;
 
-    await ownTimeline.unfollow(feed);
-  };
-
-  const cancelFollowRequest = async (feed: Feed) => {
-    // try {
-    //   await ownTimeline?.update({
-    //     cancelled_pending_follow_requests: [feed.fid],
-    //   });
-    //   onStatusChange('not-followed');
-    // } catch (error) {
-    //   logErrorAndDisplayNotification(error as Error, (error as Error).message);
-    // }
+    try {
+      await ownTimeline.unfollow(feed);
+    } catch (error) {
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+    }
   };
 
   return (
@@ -48,7 +47,7 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
           <div>Follow request is waiting for approval</div>
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            onClick={() => cancelFollowRequest(feed)}
+            onClick={() => unfollow(feed)}
           >
             Cancel request
           </button>

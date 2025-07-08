@@ -1,27 +1,12 @@
 import { ActivityResponse, Feed as StreamFeed } from '@stream-io/feeds-client';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useEffect, useState } from 'react';
 import { Activity } from './Activity';
 import { PaginatedList } from './PaginatedList';
-import {
-  AppNotificaion,
-  useAppNotificationsContext,
-} from '../app-notifications-context';
-import { pageTitle } from '../page-title';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { initializeFeed } from '../hooks/initializeFeed';
 
-export const Feed = ({
-  feed,
-  onNewPost,
-}: {
-  feed: StreamFeed;
-  onNewPost: 'show-immediately' | 'show-notification';
-}) => {
-  const { showNotification } = useAppNotificationsContext();
+export const Feed = ({ feed }: { feed: StreamFeed }) => {
   const [error, setError] = useState<Error>();
-
-  const [newPostsNotification, setNewPostsNotification] =
-    useState<AppNotificaion>();
 
   const {
     hasNextPage,
@@ -36,70 +21,8 @@ export const Feed = ({
   }));
 
   useEffect(() => {
-    // TODO: handle unreadable (FeedOwnCapabilities.READ_FEED)
     void initializeFeed(feed, { watch: true });
   }, [feed, ownCapabilities]);
-
-  useEffect(() => {
-    const unsubscribe = feed.state.subscribeWithSelector(
-      (state) => ({
-        activities: state.activities,
-      }),
-      (state, prevState) => {
-        const currentActivities = state.activities ?? [];
-        const prevActivities = prevState?.activities;
-        // When we receive feeds.activity_added we won't immediately update the list, just display a notification about new activities
-        if (
-          onNewPost === 'show-immediately' ||
-          !prevActivities ||
-          currentActivities.length <= prevActivities.length ||
-          isLoading
-        ) {
-          if (newPostsNotification) {
-            newPostsNotification.hide();
-            document.title = pageTitle;
-          }
-        }
-      },
-    );
-
-    return unsubscribe;
-  }, [feed, isLoading, newPostsNotification, onNewPost]);
-
-  useEffect(() => {
-    if (onNewPost === 'show-immediately') {
-      return;
-    }
-    const unsubscribe = feed.on('feeds.activity.added', () => {
-      const numberOfNewPosts =
-        (feed.state.getLatestValue().activities?.length ?? 0) -
-        activities.length;
-      if (numberOfNewPosts > 0) {
-        document.title = `${pageTitle} (${numberOfNewPosts})`;
-        if (!newPostsNotification) {
-          const notification = showNotification({
-            message: 'There are new posts',
-            type: 'info',
-            action: {
-              label: 'Show me',
-              onClick: () => {
-                document.title = pageTitle;
-                setNewPostsNotification(undefined);
-                notification.hide();
-                // TODO this is a bit hacky
-                document
-                  .getElementById('scrollContainer')
-                  ?.scrollTo({ top: 0 });
-              },
-            },
-          });
-          setNewPostsNotification(notification);
-        }
-      }
-    });
-
-    return unsubscribe;
-  }, [feed, onNewPost, activities, newPostsNotification, showNotification]);
 
   const getNextPage = () => {
     setError(undefined);
