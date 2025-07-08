@@ -204,9 +204,9 @@ export class Feed extends FeedApi {
         }
       }
     },
-    'feeds.bookmark.added': Feed.noop,
-    'feeds.bookmark.deleted': Feed.noop,
-    'feeds.bookmark.updated': Feed.noop,
+    'feeds.bookmark.added': this.handleBookmarkAdded.bind(this),
+    'feeds.bookmark.deleted': this.handleBookmarkDeleted.bind(this),
+    'feeds.bookmark.updated': this.handleBookmarkUpdated.bind(this),
     'feeds.comment.added': (event) => {
       const { comment } = event;
       const forId = comment.parent_id ?? comment.object_id;
@@ -596,12 +596,10 @@ export class Feed extends FeedApi {
     }
   }
 
-  bookmarkAdded(event: BookmarkAddedEvent) {
+  private handleBookmarkAdded(event: BookmarkAddedEvent) {
     const currentActivities = this.currentState.activities;
-    const connectedUser = this.client.state.getLatestValue().connectedUser;
-    const isCurrentUser = !!(
-      connectedUser && event.bookmark.user.id === connectedUser.id
-    );
+    const { connectedUser } = this.client.state.getLatestValue();
+    const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = addBookmarkToActivities(
       event,
@@ -613,12 +611,10 @@ export class Feed extends FeedApi {
     }
   }
 
-  bookmarkDeleted(event: BookmarkDeletedEvent) {
+  private handleBookmarkDeleted(event: BookmarkDeletedEvent) {
     const currentActivities = this.currentState.activities;
-    const connectedUser = this.client.state.getLatestValue().connectedUser;
-    const isCurrentUser = !!(
-      connectedUser && event.bookmark.user.id === connectedUser.id
-    );
+    const { connectedUser } = this.client.state.getLatestValue();
+    const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = removeBookmarkFromActivities(
       event,
@@ -630,12 +626,10 @@ export class Feed extends FeedApi {
     }
   }
 
-  bookmarkUpdated(event: BookmarkUpdatedEvent) {
+  private handleBookmarkUpdated(event: BookmarkUpdatedEvent) {
     const currentActivities = this.currentState.activities;
-    const connectedUser = this.client.state.getLatestValue().connectedUser;
-    const isCurrentUser = !!(
-      connectedUser && event.bookmark.user.id === connectedUser.id
-    );
+    const { connectedUser } = this.client.state.getLatestValue();
+    const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = updateBookmarkInActivities(
       event,
