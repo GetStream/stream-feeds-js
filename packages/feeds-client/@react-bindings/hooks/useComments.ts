@@ -1,10 +1,12 @@
 import { useCallback } from 'react';
 import type {
-  Feed,
   ActivityResponse,
   CommentResponse,
-  FeedState,
-} from '@stream-io/feeds-client';
+} from '../../src/gen/models';
+import type {
+  Feed,
+  FeedState
+} from '../../src/Feed';
 import { useStateStore } from './useStateStore';
 
 export const useComments = (

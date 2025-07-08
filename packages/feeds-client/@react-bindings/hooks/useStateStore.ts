@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
-import type { StateStore } from '@stream-io/feeds-client';
+import type { StateStore } from '../../src/common/StateStore';
 
 const noop = () => {};
 
