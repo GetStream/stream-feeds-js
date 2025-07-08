@@ -1,23 +1,22 @@
 import { useUserContext } from '@/app/user-context';
-import { ActivityResponse } from '@stream-io/feeds-client';
+import { ActivityResponse, CommentResponse } from '@stream-io/feeds-client';
 import { useRef, useState } from 'react';
 import { ReactionsList } from './ReactionsList';
 import { useErrorContext } from '@/app/error-context';
 import { Dialog } from '../Dialog';
 
 const emojiMapping: Record<string, string> = {
-  like: 'thumb_up',
-  dislike: 'thumb_down',
+  like: 'favorite',
 };
 
 export const Reactions = ({
   type,
-  activity,
+  object,
   showCounter,
   canReact,
 }: {
   type: string;
-  activity: ActivityResponse;
+  object: ActivityResponse | CommentResponse;
   showCounter: boolean;
   canReact: boolean;
 }) => {
@@ -25,23 +24,29 @@ export const Reactions = ({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { client } = useUserContext();
 
-  const counts = activity.reaction_groups[type]?.count ?? 0;
-  const hasOwnReaction = !!activity.own_reactions.find((r) => r.type === type);
+  const counts = object.reaction_groups?.[type]?.count ?? 0;
+  const hasOwnReaction = !!object.own_reactions?.find((r) => r.type === type);
 
   const addReaction = async () => {
+    const isActivity = !('object_type' in object);
     try {
-      await client?.addReaction({ activity_id: activity.id, type });
+      await (isActivity
+        ? client?.addReaction({ activity_id: object.id, type })
+        : client?.addCommentReaction({ comment_id: object.id, type }));
     } catch (error) {
       logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
   };
 
   const removeReaction = async () => {
+    const isActivity = !('object_type' in object);
     try {
-      await client?.deleteActivityReaction({
-        activity_id: activity.id,
-        type,
-      });
+      await (isActivity
+        ? client?.deleteActivityReaction({
+            activity_id: object.id,
+            type,
+          })
+        : client?.deleteCommentReaction({ comment_id: object.id, type }));
     } catch (error) {
       logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
@@ -80,17 +85,14 @@ export const Reactions = ({
       )}
       {showCounter && (
         <button onClick={() => openDialog()}>
-          <div>
-            {counts} {type}
-            {counts !== 1 ? 's' : ''}
-          </div>
+          <div>{counts}</div>
         </button>
       )}
       <Dialog ref={dialogRef}>
         <button className="self-end" onClick={() => closeDialog()}>
           <span className="material-symbols-outlined">close</span>
         </button>
-        <ReactionsList type="like" activity={activity} />
+        <ReactionsList type="like" object={object} />
       </Dialog>
     </div>
   );

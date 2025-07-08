@@ -1,6 +1,7 @@
 import { useUserContext } from '@/app/user-context';
 import {
   ActivityResponse,
+  CommentResponse,
   FeedsReactionResponse,
 } from '@stream-io/feeds-client';
 import React, { useEffect, useState } from 'react';
@@ -8,10 +9,10 @@ import { PaginatedList } from '../PaginatedList';
 
 export const ReactionsList = ({
   type,
-  activity,
+  object,
 }: {
   type: string;
-  activity: ActivityResponse;
+  object: ActivityResponse | CommentResponse;
 }) => {
   const [reactions, setReactions] = useState<FeedsReactionResponse[]>([]);
   const [error, setError] = useState<Error>();
@@ -30,14 +31,23 @@ export const ReactionsList = ({
     setError(undefined);
     setIsLoading(true);
     try {
-      const response = await client.queryActivityReactions({
-        activity_id: activity.id,
+      const isActivity = !('object_type' in object);
+      const payload = {
         filter: {
           reaction_type: type,
         },
         next,
         sort: [{ field: 'created_at', direction: -1 }],
-      });
+      };
+      const response = await (isActivity
+        ? client.queryActivityReactions({
+            ...payload,
+            activity_id: object.id,
+          })
+        : client.queryCommentReactions({
+            ...payload,
+            comment_id: object.id,
+          }));
       setReactions([...reactions, ...response.reactions]);
       setNext(response.next);
     } catch (error) {
