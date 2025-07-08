@@ -392,9 +392,14 @@ export class Feed extends FeedApi {
     'feeds.comment.reaction.updated': Feed.noop,
     'feeds.feed_member.added': (event) => {
       const { member } = event;
+
+      // do not add a member if the pagination has reached the end of the list
+      if (this.currentState.member_pagination?.next !== END_OF_LIST) return;
+
       this.state.next((currentState) => {
         return {
           ...currentState,
+          // TODO: respect sort
           members: currentState.members
             ? currentState.members.concat(member)
             : [member],
@@ -608,6 +613,16 @@ export class Feed extends FeedApi {
           ) {
             nextState.following_pagination = {
               ...nextState.following_pagination,
+              next: END_OF_LIST,
+            };
+          }
+
+          if (
+            (request?.member_pagination?.limit ?? 0) > 0 &&
+            typeof nextState.member_pagination?.next === 'undefined'
+          ) {
+            nextState.member_pagination = {
+              ...nextState.member_pagination,
               next: END_OF_LIST,
             };
           }
