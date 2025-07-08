@@ -1,7 +1,7 @@
 import { Feed, FeedState, FollowResponse } from '@stream-io/feeds-client';
 import { useCallback, useEffect, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
-import { useStateStore } from '../hooks/useStateStore';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 export const FollowRelationships = ({
   type,
@@ -35,15 +35,7 @@ export const FollowRelationships = ({
   );
   const { rel = [], pagination } = useStateStore(feed.state, selector);
 
-  useEffect(() => {
-    if (
-      (type === 'followers' && !feed.currentState.followers?.length) ||
-      (type === 'following' && !feed.currentState.following?.length)
-    )
-      void loadMore();
-  }, [feed, type]);
-
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     setError(undefined);
     try {
       if (type === 'followers') {
@@ -51,10 +43,18 @@ export const FollowRelationships = ({
       } else if (type === 'following') {
         feed.loadNextPageFollowing({ limit: 1 });
       }
-    } catch (error) {
-      setError(error as Error);
+    } catch (e) {
+      setError(e as Error);
     }
-  };
+  }, [feed, type]);
+
+  useEffect(() => {
+    if (
+      (type === 'followers' && !feed.currentState.followers?.length) ||
+      (type === 'following' && !feed.currentState.following?.length)
+    )
+      void loadMore();
+  }, [feed, loadMore, type]);
 
   const renderItem = (follow: FollowResponse) => {
     const image =

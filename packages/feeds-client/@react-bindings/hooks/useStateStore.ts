@@ -1,20 +1,19 @@
-import { StateStore } from '@stream-io/feeds-client';
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import type { StateStore } from '../../src/common/StateStore';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => {};
 
 export function useStateStore<
   T extends Record<string, unknown>,
-  O extends Readonly<Record<string, unknown> | Readonly<unknown[]>>,
+  O extends Readonly<Record<string, unknown> | readonly unknown[]>,
 >(store: StateStore<T>, selector: (v: T) => O): O;
 export function useStateStore<
   T extends Record<string, unknown>,
-  O extends Readonly<Record<string, unknown> | Readonly<unknown[]>>,
+  O extends Readonly<Record<string, unknown> | readonly unknown[]>,
 >(store: StateStore<T> | undefined, selector: (v: T) => O): O | undefined;
 export function useStateStore<
   T extends Record<string, unknown>,
-  O extends Readonly<Record<string, unknown> | Readonly<unknown[]>>,
+  O extends Readonly<Record<string, unknown> | readonly unknown[]>,
 >(store: StateStore<T> | undefined, selector: (v: T) => O) {
   const wrappedSubscription = useCallback(
     (onStoreChange: () => void) => {

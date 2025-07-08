@@ -1,9 +1,9 @@
 import React from 'react';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import type { SearchSourceState } from '@stream-io/feeds-client';
 
 import { SearchSourceResultsLoadingIndicator } from './SearchSourceResultsLoadingIndicator';
 import { useSearchSourceResultsContext } from '../SearchSourceResultsContext';
-import { useStateStore } from '@/app/hooks/useStateStore';
 
 const searchSourceStateSelector = (value: SearchSourceState) => ({
   hasNext: value.hasNext,

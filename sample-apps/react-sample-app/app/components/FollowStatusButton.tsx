@@ -1,8 +1,7 @@
 import { Feed, FeedState } from '@stream-io/feeds-client';
 import { useErrorContext } from '../error-context';
 import { useFeedContext } from '../feed-context';
-import { useUserContext } from '../user-context';
-import { useStateStore } from '../hooks/useStateStore';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 const selector = ({ own_follows = [] }: FeedState) => {
   const own_follow = own_follows.find(

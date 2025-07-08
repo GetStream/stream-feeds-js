@@ -1,20 +1,25 @@
-import {
-  Feed,
+import { useCallback } from 'react';
+import type {
   ActivityResponse,
   CommentResponse,
-  FeedState,
-} from '@stream-io/feeds-client';
+} from '../../src/gen/models';
+import type {
+  Feed,
+  FeedState
+} from '../../src/Feed';
 import { useStateStore } from './useStateStore';
-import { useCallback } from 'react';
 
 export const useComments = (
   feed: Feed,
+  /**
+   * The parent (activity or comment) for which to fetch comments.
+   */
   parent: ActivityResponse | CommentResponse,
 ) => {
   const selector = useCallback(
     (state: FeedState) => ({
       comments: state.comments_by_entity_id?.[parent.id]?.comments ?? [],
-      commentPagination: state.comments_by_entity_id?.[parent.id]?.pagination,
+      comment_pagination: state.comments_by_entity_id?.[parent.id]?.pagination,
     }),
     [parent.id],
   );

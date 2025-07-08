@@ -6,8 +6,10 @@ import {
   FeedState,
   CommentResponse,
 } from '@stream-io/feeds-client';
-import { useComments } from '@/app/hooks/useComments';
-import { useStateStore } from '@/app/hooks/useStateStore';
+import {
+  useComments,
+  useStateStore,
+} from '@stream-io/feeds-client/react-bindings';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { DEFAULT_PAGINATION_SORT } from './ActivityCommentSection';
@@ -49,7 +51,10 @@ export const Comment = ({
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { canDelete, canEdit } = useStateStore(feed.state, selector);
-  const { comments, commentPagination } = useComments(feed, comment);
+  const { comments, comment_pagination: commentPagination } = useComments(
+    feed,
+    comment,
+  );
 
   const hasReaction = useCallback(
     (type: 'upvote' | 'downvote') => {
@@ -153,20 +158,6 @@ export const Comment = ({
             <div className="text-sm material-symbols-outlined">comment</div>
             Reply
           </button>
-          {comment.reply_count > 0 && !comments.length && (
-            <button
-              type="button"
-              className="flex items-center text-sm text-gray-500 gap-1 font-medium"
-              onClick={() =>
-                feed.loadNextPageCommentReplies(comment, {
-                  sort: DEFAULT_PAGINATION_SORT,
-                  limit: 5,
-                })
-              }
-            >
-              Load replies ({comment.reply_count})
-            </button>
-          )}
           <button
             type="button"
             className="flex items-center text-sm text-gray-500 gap-1 font-medium"
@@ -193,6 +184,20 @@ export const Comment = ({
               thumb_down
             </div>
           </button>
+          {comment.reply_count > 0 && !comments.length && (
+            <button
+              type="button"
+              className="flex items-center text-sm text-gray-500 gap-1 font-medium"
+              onClick={() =>
+                feed.loadNextPageCommentReplies(comment, {
+                  sort: DEFAULT_PAGINATION_SORT,
+                  limit: 5,
+                })
+              }
+            >
+              Load replies ({comment.reply_count})
+            </button>
+          )}
         </div>
       </article>
       <PaginatedList

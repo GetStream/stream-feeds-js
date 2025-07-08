@@ -4,11 +4,11 @@ import type {
   SearchController,
   SearchControllerState,
 } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 import { SearchBar } from './SearchBar/SearchBar';
 import { SearchResults } from './SearchResults/SearchResults';
 import { SearchContextProvider } from './SearchContext';
-import { useStateStore } from '@/app/hooks/useStateStore';
 
 type SearchControllerStateSelectorReturnValue = {
   isActive: boolean;

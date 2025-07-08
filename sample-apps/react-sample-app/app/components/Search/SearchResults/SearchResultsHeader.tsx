@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import React from 'react';
 import type { SearchSource, SearchSourceState } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 import { useSearchContext } from '../SearchContext';
-import { useStateStore } from '@/app/hooks/useStateStore';
 
 const searchSourceStateSelector = (nextValue: SearchSourceState) => ({
   isActive: nextValue.isActive,

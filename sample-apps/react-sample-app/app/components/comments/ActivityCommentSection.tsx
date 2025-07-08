@@ -4,8 +4,8 @@ import {
   type ActivityResponse,
   type CommentResponse,
 } from '@stream-io/feeds-client';
+import { useComments } from '@stream-io/feeds-client/react-bindings';
 import { useUserContext } from '@/app/user-context';
-import { useComments } from '@/app/hooks/useComments';
 import { PaginatedList } from '../PaginatedList';
 import { Comment } from './Comment';
 
@@ -21,7 +21,10 @@ export const ActivityCommentSection = ({
   const { client } = useUserContext();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const { comments, commentPagination } = useComments(feed, activity);
+  const { comments, comment_pagination: commentPagination } = useComments(
+    feed,
+    activity,
+  );
 
   const [parent, setParent] = useState<null | CommentResponse>(null);
 
@@ -37,7 +40,7 @@ export const ActivityCommentSection = ({
       sort: DEFAULT_PAGINATION_SORT,
       limit: 5,
     });
-  }, [comments]);
+  }, [activity, comments, feed]);
 
   const scrollToComment = (comment: CommentResponse) => {
     const element = document.querySelector(`[data-comment-id="${comment.id}"]`);
