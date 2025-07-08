@@ -516,6 +516,8 @@ export class Feed extends FeedApi {
       const newComment: CommentResponse = {
         ...newComments[commentIndex],
         ...commentCopy,
+        latest_reactions: commentCopy.latest_reactions ?? [],
+        reaction_groups: commentCopy.reaction_groups ?? {},
       };
 
       newComments[commentIndex] = newComment;

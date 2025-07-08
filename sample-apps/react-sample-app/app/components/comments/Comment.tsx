@@ -13,6 +13,7 @@ import {
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { DEFAULT_PAGINATION_SORT } from './ActivityCommentSection';
+import { Reactions } from '../reactions/Reactions';
 
 const levels = ['ml-6', 'ml-10', 'ml-14', 'ml-16'];
 
@@ -50,7 +51,10 @@ export const Comment = ({
     [comment.user.id, user?.id],
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { canDelete, canEdit } = useStateStore(feed.state, selector);
+  const { canDelete, canEdit, canAddCommentReaction } = useStateStore(
+    feed.state,
+    selector,
+  );
   const { comments, comment_pagination: commentPagination } = useComments(
     feed,
     comment,
@@ -158,32 +162,12 @@ export const Comment = ({
             <div className="text-sm material-symbols-outlined">comment</div>
             Reply
           </button>
-          <button
-            type="button"
-            className="flex items-center text-sm text-gray-500 gap-1 font-medium"
-            onClick={() => toggleReaction('upvote')}
-          >
-            <div
-              className={clsx('text-sm material-symbols-outlined', {
-                fill: hasReaction('upvote'),
-              })}
-            >
-              thumb_up
-            </div>
-          </button>
-          <button
-            type="button"
-            className="flex items-center text-sm text-gray-500 gap-1 font-medium"
-            onClick={() => toggleReaction('downvote')}
-          >
-            <div
-              className={clsx('text-sm material-symbols-outlined', {
-                fill: hasReaction('downvote'),
-              })}
-            >
-              thumb_down
-            </div>
-          </button>
+          <Reactions
+            type="like"
+            object={comment}
+            canReact={canAddCommentReaction}
+            showCounter={true}
+          />
           {comment.reply_count > 0 && !comments.length && (
             <button
               type="button"

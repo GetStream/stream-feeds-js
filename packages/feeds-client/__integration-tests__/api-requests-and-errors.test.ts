@@ -19,7 +19,7 @@ describe('API requests and error handling', () => {
 
   it('should set HTTP headers', async () => {
     let headers: Record<string, string> = {};
-     
+
     client.apiClient.axiosInstance.interceptors.request.use((config) => {
       headers = config.headers;
       return config;
@@ -90,22 +90,22 @@ describe('API requests and error handling', () => {
   });
 
   it('should add connection id when necessary', async () => {
-    let url: string | undefined;
-     
-    client.apiClient.axiosInstance.interceptors.request.use((config) => {
-      url = config.url;
+    let params: any;
+
+    client.apiClient['axiosInstance'].interceptors.request.use((config) => {
+      params = config.params;
       return config;
     });
 
     await client.queryUsers({ payload: { filter_conditions: {} } });
 
-    expect(url).not.toContain('connection_id=');
+    expect(params['connection_id']).toBeUndefined();
 
     await client.queryUsers({
       payload: { filter_conditions: {}, presence: true },
     });
 
-    expect(url).toContain('connection_id=');
+    expect(params['connection_id']).toBeDefined();
   });
 
   it('should give up token refresh after 3 tries', async () => {

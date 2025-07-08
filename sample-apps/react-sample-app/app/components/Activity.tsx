@@ -184,14 +184,8 @@ export const Activity = ({
         <div className="flex justify-between">
           <div className="flex items-center gap-3">
             <Reactions
-              type="dislike"
-              activity={activity}
-              canReact={canSendReaction}
-              showCounter={false}
-            />
-            <Reactions
               type="like"
-              activity={activity}
+              object={activity}
               canReact={canSendReaction}
               showCounter={true}
             />
