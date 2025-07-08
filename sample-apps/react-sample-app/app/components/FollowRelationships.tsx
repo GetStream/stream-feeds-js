@@ -2,6 +2,7 @@ import { Feed, FeedState, FollowResponse } from '@stream-io/feeds-client';
 import { useCallback, useEffect, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
 import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import { useFeedContext } from '../feed-context';
 
 export const FollowRelationships = ({
   type,
@@ -11,6 +12,7 @@ export const FollowRelationships = ({
   feed: Feed;
 }) => {
   const [error, setError] = useState<Error>();
+  const { ownTimeline, ownFeed } = useFeedContext();
 
   const selector = useCallback(
     ({
@@ -22,16 +24,16 @@ export const FollowRelationships = ({
       if (type === 'followers') {
         return {
           pagination: followers_pagination,
-          rel: followers,
+          rel: followers?.filter((f) => f.source_feed.fid !== ownTimeline?.fid),
         };
       }
 
       return {
         pagination: following_pagination,
-        rel: following,
+        rel: following?.filter((f) => f.target_feed.fid !== ownFeed?.fid),
       };
     },
-    [type],
+    [type, ownTimeline, ownFeed],
   );
   const { rel = [], pagination } = useStateStore(feed.state, selector);
 
@@ -39,9 +41,9 @@ export const FollowRelationships = ({
     setError(undefined);
     try {
       if (type === 'followers') {
-        feed.loadNextPageFollowers({ limit: 1 });
+        feed.loadNextPageFollowers({ limit: 30 });
       } else if (type === 'following') {
-        feed.loadNextPageFollowing({ limit: 1 });
+        feed.loadNextPageFollowing({ limit: 30 });
       }
     } catch (e) {
       setError(e as Error);

@@ -1,6 +1,6 @@
 import { useUserContext } from '@/app/user-context';
 import { ActivityResponse, CommentResponse } from '@stream-io/feeds-client';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { ReactionsList } from './ReactionsList';
 import { useErrorContext } from '@/app/error-context';
 import { Dialog } from '../Dialog';
