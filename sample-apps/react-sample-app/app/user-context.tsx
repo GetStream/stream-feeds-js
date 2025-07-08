@@ -62,11 +62,10 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
     setUser(user);
     try {
       const tokenProvider = async () => {
-        const url = new URL(tokenProviderURL);
-        url.searchParams.set('api_key', apiKey);
-        url.searchParams.set('user_id', user.id);
-
-        const response = await fetch(url.toString());
+        const response = await fetch('/api/create-token');
+        if (!response.ok) {
+          throw new Error(`Failed to get token: ${response.status}`);
+        }
         const data = await response.json();
         return data.token;
       };
