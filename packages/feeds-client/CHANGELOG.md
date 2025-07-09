@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.0...@stream-io/feeds-client-0.1.1) (2025-07-09)
+
+
+### Features
+
+* add useOwnCapabilities hook ([#42](https://github.com/GetStream/stream-feeds-js/issues/42)) ([cc98328](https://github.com/GetStream/stream-feeds-js/commit/cc98328d434ee1306c0d8d5d7d236626f6481431))
+
+
+### Bug Fixes
+
+* Handle missing properties in comment reaction WS event, Simplify reaction handling, fix JS tests ([#43](https://github.com/GetStream/stream-feeds-js/issues/43)) ([356e90b](https://github.com/GetStream/stream-feeds-js/commit/356e90bfd4199a7ef44c88de820f11bb52851e47))
+* lint issues ([3b87041](https://github.com/GetStream/stream-feeds-js/commit/3b870418018173ef38389dd6b7b05bbf33499c78))
+
 ## [0.1.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.0.0...@stream-io/feeds-client-0.1.0) (2025-07-08)
 
 
