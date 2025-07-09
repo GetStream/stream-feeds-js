@@ -10,7 +10,7 @@
 - React client for feeds v3 (coming soon)
 - React and React Native sample apps
 
-## Local setup
+## Local Setup
 
 ### Prerequisites
 
