@@ -2,7 +2,7 @@
 
 ⚠️ Activity feeds v3 is currently in closed alpha, not yet ready to be used in production.
 
-## What's in this repository?
+## Repository Contents
 
 - JS client for feeds v3
 - React hooks for feeds v3
