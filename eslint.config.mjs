@@ -61,4 +61,11 @@ export default [
       'react-hooks/exhaustive-deps': 'error',
     },
   },
+  {
+    // This pattern helps keep docs snippets shorter
+    files: ['**/__integration-tests__/docs-snippets/*.test.ts'],
+    rules: {
+      '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
+    },
+  },
 ];

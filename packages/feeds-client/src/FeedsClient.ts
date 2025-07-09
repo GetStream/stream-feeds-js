@@ -22,6 +22,7 @@ import { ApiClient } from './common/ApiClient';
 import {
   addConnectionEventListeners,
   removeConnectionEventListeners,
+  streamDevToken,
 } from './common/utils';
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
 import { Feed } from './Feed';
@@ -221,6 +222,10 @@ export class FeedsClient extends FeedsApi {
       await this.disconnectUser();
       throw err;
     }
+  };
+
+  devToken = (userId: string) => {
+    return streamDevToken(userId);
   };
 
   closePoll = async (request: {
