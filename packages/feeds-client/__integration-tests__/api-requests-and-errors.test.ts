@@ -92,20 +92,20 @@ describe('API requests and error handling', () => {
   it('should add connection id when necessary', async () => {
     let params: any;
 
-    client.apiClient['axiosInstance'].interceptors.request.use((config) => {
+    client.apiClient.axiosInstance.interceptors.request.use((config) => {
       params = config.params;
       return config;
     });
 
     await client.queryUsers({ payload: { filter_conditions: {} } });
 
-    expect(params['connection_id']).toBeUndefined();
+    expect(params.connection_id).toBeUndefined();
 
     await client.queryUsers({
       payload: { filter_conditions: {}, presence: true },
     });
 
-    expect(params['connection_id']).toBeDefined();
+    expect(params.connection_id).toBeDefined();
   });
 
   it('should give up token refresh after 3 tries', async () => {
