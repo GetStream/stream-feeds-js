@@ -1,13 +1,11 @@
 import { FeedOwnCapability, FeedState, Feed } from '@stream-io/feeds-client';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { FollowRelationships } from './FollowRelationships';
 import { useErrorContext } from '../error-context';
 import { FollowStatusButton } from './FollowStatusButton';
 import { FeedMenu } from './FeedMenu';
 import { useStateStore } from '@stream-io/feeds-client/react-bindings';
-import { useUserContext } from '../user-context';
-import { initializeFeed } from '../hooks/initializeFeed';
 import { Dialog } from './Dialog';
 
 const selector = ({
@@ -36,9 +34,6 @@ export const FeedMetadata = ({
   feed: Feed;
   timeline: Feed;
 }) => {
-  const { logError } = useErrorContext();
-
-  const { client } = useUserContext();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [selectedRelationship, setSelectedRelationship] = useState<
     'followers' | 'following'
@@ -52,35 +47,6 @@ export const FeedMetadata = ({
 
   const canQueryFollowers = userFeedState.canQueryFollows;
   const canQueryFollowings = timelineFeedState?.canQueryFollows;
-
-  useEffect(() => {
-    if (!timeline || !client) return;
-
-    void initializeFeed(timeline, { watch: true });
-
-    return;
-
-    // eslint-disable-next-line no-unreachable
-    Promise.allSettled([
-      // followings (everything this person follows)
-      timeline?.queryFollowing({
-        limit: 10,
-      }),
-      // followers (everyone who follow this person)
-      feed.queryFollowers({
-        limit: 10,
-      }),
-    ])
-      .then(([a, b]) => {
-        if (a.status === 'fulfilled') {
-          console.log(a.value);
-        }
-        if (b.status === 'fulfilled') {
-          console.log(b.value);
-        }
-      })
-      .catch(console.log);
-  });
 
   const openDialog = () => {
     dialogRef.current?.showModal();

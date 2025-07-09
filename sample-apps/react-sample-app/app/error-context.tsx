@@ -1,6 +1,12 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { createContext, PropsWithChildren, useContext, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useState,
+} from 'react';
 import { useAppNotificationsContext } from './app-notifications-context';
 
 type ErrorContextValue = {
@@ -32,10 +38,13 @@ export const ErrorContextProvider = ({ children }: PropsWithChildren) => {
     console.error(error);
   };
 
-  const logErrorAndDisplayNotification = (error: Error, message: string) => {
-    logError(error);
-    showNotification({ message, type: 'error' }, { hideTimeout: 10000 });
-  };
+  const logErrorAndDisplayNotification = useCallback(
+    (error: Error, message: string) => {
+      logError(error);
+      showNotification({ message, type: 'error' }, { hideTimeout: 10000 });
+    },
+    [showNotification],
+  );
 
   return (
     <ErrorContext.Provider
