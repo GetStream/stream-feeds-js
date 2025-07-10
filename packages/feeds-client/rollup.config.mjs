@@ -20,6 +20,7 @@ const browserIgnorePlugin = {
 };
 
 const external = [
+  'react/jsx-runtime',
   ...Object.keys(pkg.dependencies || {}),
   ...Object.keys(pkg.peerDependencies || {}),
 ];
