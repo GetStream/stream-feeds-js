@@ -35,9 +35,9 @@ export const FollowRequestNotification = ({
 
   const decline = async (activity: ActivityResponse) => {
     try {
-      await ownFeed?.update({
-        rejected_follow_requests: [`timeline:${activity.user.id}`],
-      });
+      // await ownFeed?.update({
+      //   rejected_follow_requests: [`timeline:${activity.user.id}`],
+      // });
       // reload state because we don't yet have WS events
       onMarkRead();
       await ownFeed?.getOrCreate();
