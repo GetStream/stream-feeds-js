@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
   try {
     // TODO: Migrate to new API
-    //   await streamServerClient.feeds
+    //   await streamServerClient().feeds
     //     .feed('notification', targetUserId)
     //     .addActivity({
     //       verb,
