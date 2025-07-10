@@ -32,14 +32,6 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function App() {
-  return (
-    <UserContextProvider>
-      <RootLayout />
-    </UserContextProvider>
-  );
-}
-
 const RootLayout = () => {
   const { userLoaded, user } = useUserContext();
   const [loaded, error] = useFonts({
@@ -93,3 +85,11 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
     </StreamFeeds>
   );
 };
+
+const App = () => (
+  <UserContextProvider>
+    <RootLayout />
+  </UserContextProvider>
+)
+
+export default App;

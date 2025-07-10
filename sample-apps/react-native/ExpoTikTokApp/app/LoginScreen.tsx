@@ -41,7 +41,7 @@ const keyExtractor = (item: LocalUser) => item.id;
 
 const Separator = () => <View style={styles.separator} />
 
-export default function LoginScreen() {
+const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Choose a user to log in</Text>
@@ -54,6 +54,8 @@ export default function LoginScreen() {
     </View>
   );
 }
+
+export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
