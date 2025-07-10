@@ -43,20 +43,6 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
     setCachedUser(user);
   };
 
-  // useEffect(() => {
-  //   const user_id = getCookieValue('user_id');
-  //   const loggedInUser = users.find((u) => u.id === user_id);
-  //   if (loggedInUser) {
-  //     logIn(loggedInUser).catch((err) => {
-  //       document.cookie = '';
-  //       console.warn(`Failed to login with user from cookie: ${user_id}`, err);
-  //       router.push('/login');
-  //     });
-  //   } else {
-  //     document.cookie = '';
-  //   }
-  // }, []);
-
   const logOut = async () => {
     await AsyncStorage.removeItem('@stream-io/login-config');
     setCachedUser(null);

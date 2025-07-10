@@ -3,10 +3,7 @@ import {
   useCreateFeedsClient
 } from '@stream-io/feeds-react-native-sdk';
 import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
-
-const apiKey = '892s22ypvt6m';
-const apiUrl = 'http://localhost:3030';
-const tokenCreationUrl = 'https://pronto-staging.getstream.io/api/auth/create-token?environment=feeds-v3'
+import { apiKey, apiUrl, tokenCreationUrl } from '@/constants/stream';
 
 const tokenProviderFactory = (userId: string) => async () => {
   const tokenGeneratorUrl = new URL(tokenCreationUrl);
