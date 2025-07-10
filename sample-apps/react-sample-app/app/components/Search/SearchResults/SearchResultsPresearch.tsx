@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { SearchSource } from '@stream-io/feeds-client';
 
 export type SearchResultsPresearchProps = {
