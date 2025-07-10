@@ -19,7 +19,9 @@ export const useClientConnectedUser = () => {
 export const useWsConnectionState = () => {
   const client = useFeedsClient();
 
-  return useStateStore(client?.state, wsConnectionStateSelector) ?? {};
+  const { isHealthy } = useStateStore(client?.state, wsConnectionStateSelector) ?? {}
+
+  return { isHealthy };
 };
 
 const clientConnectedUserSelector = (nextState: FeedsClientState) => ({

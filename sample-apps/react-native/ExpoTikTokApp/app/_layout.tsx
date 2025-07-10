@@ -18,6 +18,7 @@ import LoginScreen from '@/app/LoginScreen';
 import { useColorScheme } from '@/components/useColorScheme';
 import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
 import { useCreateClient } from '@/hook/useCreateClient';
+import { ConnectionLoadHeader } from '@/components/ConnectionLostHeader';
 
 export {
   // Catch any errors thrown by the Layout component.

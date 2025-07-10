@@ -3,6 +3,8 @@ import { useClientConnectedUser } from '@stream-io/feeds-react-native-sdk';
 
 import { Text, View } from '@/components/Themed';
 import { useUserContext } from '@/contexts/UserContext';
+import { ConnectionLoadHeader } from '@/components/ConnectionLostHeader';
+import React from 'react';
 
 export default function TabOneScreen() {
   const user = useClientConnectedUser();
@@ -10,6 +12,7 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
+      <ConnectionLoadHeader />
       <Text style={styles.title}>Stream Feeds Demo</Text>
       <View
         style={styles.separator}
