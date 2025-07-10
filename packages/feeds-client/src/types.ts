@@ -18,3 +18,7 @@ export type LoadingStates = {
   loading_next_page?: boolean;
   loading_prev_page?: boolean;
 };
+
+export type TokenOrProvider = string | TokenProvider;
+
+export type TokenProvider = () => Promise<string>;

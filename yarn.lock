@@ -4988,6 +4988,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-async-storage/async-storage@npm:2.1.2":
+  version: 2.1.2
+  resolution: "@react-native-async-storage/async-storage@npm:2.1.2"
+  dependencies:
+    merge-options: ^3.0.4
+  peerDependencies:
+    react-native: ^0.0.0-0 || >=0.65 <1.0
+  checksum: a5c4d486e7e64067ab523b980b76cc2de5bf4b86ed410de09f2a95c3410e0c5b5be46c638a74cf5b7ed6dce10031ebac54350b498a2cb17f1a1c59347e671a73
+  languageName: node
+  linkType: hard
+
 "@react-native-community/eslint-config@npm:3.2.0":
   version: 3.2.0
   resolution: "@react-native-community/eslint-config@npm:3.2.0"
@@ -5016,6 +5027,15 @@ __metadata:
   version: 1.3.0
   resolution: "@react-native-community/eslint-plugin@npm:1.3.0"
   checksum: 5e04fa161fca6453299aed691695ea071fed8166c5da36935047eb6c169bc38c9d599e1ce20402b63cbcaf086a9bb63d2e88836be142cecabf61ba36954ccaae
+  languageName: node
+  linkType: hard
+
+"@react-native-community/netinfo@npm:11.4.1":
+  version: 11.4.1
+  resolution: "@react-native-community/netinfo@npm:11.4.1"
+  peerDependencies:
+    react-native: ">=0.59"
+  checksum: d347ae522da6b8c045d6378754d4928bdf23cc85b74571b91fa8a03fa168bdac5e3c65eb97eac0dd0c7cbd20e782f99d41b090fb79ce7d815cbaf6fb5d1abe37
   languageName: node
   linkType: hard
 
@@ -5697,6 +5717,7 @@ __metadata:
   dependencies:
     "@react-native-community/eslint-config": 3.2.0
     "@react-native-community/eslint-plugin": 1.3.0
+    "@react-native-community/netinfo": 11.4.1
     "@react-native/babel-preset": 0.79.5
     "@stream-io/feeds-client": "workspace:*"
     "@testing-library/jest-native": ^5.4.3
@@ -11631,6 +11652,8 @@ __metadata:
   dependencies:
     "@babel/core": ^7.25.2
     "@expo/vector-icons": ^14.1.0
+    "@react-native-async-storage/async-storage": 2.1.2
+    "@react-native-community/netinfo": 11.4.1
     "@react-navigation/native": ^7.1.6
     "@stream-io/feeds-react-native-sdk": "workspace:*"
     "@types/react": ~19.0.10
@@ -13402,6 +13425,13 @@ __metadata:
   version: 3.0.3
   resolution: "is-path-inside@npm:3.0.3"
   checksum: abd50f06186a052b349c15e55b182326f1936c89a78bf6c8f2b707412517c097ce04bc49a0ca221787bc44e1049f51f09a2ffb63d22899051988d3a618ba13e9
+  languageName: node
+  linkType: hard
+
+"is-plain-obj@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "is-plain-obj@npm:2.1.0"
+  checksum: cec9100678b0a9fe0248a81743041ed990c2d4c99f893d935545cfbc42876cbe86d207f3b895700c690ad2fa520e568c44afc1605044b535a7820c1d40e38daa
   languageName: node
   linkType: hard
 
@@ -15528,6 +15558,15 @@ __metadata:
   version: 12.1.1
   resolution: "meow@npm:12.1.1"
   checksum: a6f3be85fbe53430ef53ab933dd790c39216eb4dbaabdbef593aa59efb40ecaa417897000175476bc33eed09e4cbce01df7ba53ba91e9a4bd84ec07024cb8914
+  languageName: node
+  linkType: hard
+
+"merge-options@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "merge-options@npm:3.0.4"
+  dependencies:
+    is-plain-obj: ^2.1.0
+  checksum: d86ddb3dd6e85d558dbf25dc944f3527b6bacb944db3fdda6e84a3f59c4e4b85231095f58b835758b9a57708342dee0f8de0dffa352974a48221487fe9f4584f
   languageName: node
   linkType: hard
 
