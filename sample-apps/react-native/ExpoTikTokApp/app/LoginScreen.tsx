@@ -17,7 +17,7 @@ type LocalUser = {
   image: string;
 };
 
-export default function LoginScreen() {
+const PredefinedUserItem = ({ item }: { item: LocalUser}) => {
   const { logIn } = useUserContext();
 
   const handleUserSelect = useCallback((user: LocalUser) => {
@@ -25,21 +25,31 @@ export default function LoginScreen() {
   }, [logIn]);
 
   return (
+    <TouchableOpacity
+      style={styles.row}
+      onPress={() => handleUserSelect(item)}
+    >
+      <Image source={{ uri: item.image }} style={styles.avatar} />
+      <Text style={styles.name}>{item.name}</Text>
+    </TouchableOpacity>
+  )
+}
+
+const renderItem = ({ item }: { item: LocalUser }) => <PredefinedUserItem item={item} />
+
+const keyExtractor = (item: LocalUser) => item.id;
+
+const Separator = () => <View style={styles.separator} />
+
+export default function LoginScreen() {
+  return (
     <View style={styles.container}>
       <Text style={styles.title}>Choose a user to log in</Text>
       <FlatList
         data={users}
-        keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.row}
-            onPress={() => handleUserSelect(item)}
-          >
-            <Image source={{ uri: item.image }} style={styles.avatar} />
-            <Text style={styles.name}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
+        keyExtractor={keyExtractor}
+        ItemSeparatorComponent={Separator}
+        renderItem={renderItem}
       />
     </View>
   );
