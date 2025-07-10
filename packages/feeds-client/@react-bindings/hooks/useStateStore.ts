@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
-import type { StateStore } from '../../src/common/StateStore';
+import { StateStore } from '../../src/common/StateStore';
 
 const noop = () => {};
 
@@ -32,24 +32,19 @@ export function useStateStore<
       if (!currentValue) return undefined;
 
       // store value hasn't changed, no need to compare individual values
-      if (cachedTuple && cachedTuple[0] === currentValue) {
+      if (cachedTuple && Object.is(cachedTuple[0], currentValue)) {
         return cachedTuple[1];
       }
 
       const newlySelected = selector(currentValue);
 
       // store value changed but selected values wouldn't have to, double-check selected
-      if (cachedTuple) {
-        let selectededAreEqualToCached = true;
+      const selectionsAreEqual = StateStore.doSelectionsEqual(
+        cachedTuple?.[1],
+        newlySelected,
+      );
 
-        for (const key in cachedTuple[1]) {
-          if (cachedTuple[1][key] === newlySelected[key]) continue;
-          selectededAreEqualToCached = false;
-          break;
-        }
-
-        if (selectededAreEqualToCached) return cachedTuple[1];
-      }
+      if (selectionsAreEqual) return cachedTuple[1];
 
       cachedTuple = [currentValue, newlySelected];
       return cachedTuple[1];

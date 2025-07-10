@@ -9,7 +9,6 @@ export type Preprocessor<T> = Handler<T>;
 export const isPatch = <T>(value: ValueOrPatch<T>): value is Patch<T> =>
   typeof value === 'function';
 
- 
 const noop = () => {};
 
 export class StateStore<T extends Record<string, unknown>> {
@@ -23,7 +22,6 @@ export class StateStore<T extends Record<string, unknown>> {
    * @experimental
    * This method is experimental and may change in future versions.
    */
-   
   public merge<Q extends StateStore<any>>(
     stateStore: Q extends StateStore<infer L>
       ? Extract<keyof T, keyof L> extends never
@@ -44,7 +42,7 @@ export class StateStore<T extends Record<string, unknown>> {
       : newValueOrPatch;
 
     // do not notify subscribers if the value hasn't changed
-    if (newValue === this.value) return;
+    if (Object.is(newValue, this.value)) return;
 
     this.preprocessors.forEach((preprocessor) =>
       preprocessor(newValue, this.value),
@@ -71,6 +69,29 @@ export class StateStore<T extends Record<string, unknown>> {
     };
   }
 
+  public static doSelectionsEqual<
+    O extends Readonly<Record<string, unknown>> | readonly unknown[],
+  >(previouslySelectedValues: O | undefined, newlySelectedValues: O): boolean {
+    let selectionsAreEqual: boolean;
+
+    if (
+      (selectionsAreEqual = typeof previouslySelectedValues !== 'undefined')
+    ) {
+      for (const key in newlySelectedValues) {
+        if (
+          Object.is(previouslySelectedValues[key], newlySelectedValues[key])
+        ) {
+          continue;
+        }
+
+        selectionsAreEqual = false;
+        break;
+      }
+    }
+
+    return selectionsAreEqual;
+  }
+
   public subscribeWithSelector = <
     O extends Readonly<Record<string, unknown>> | readonly unknown[],
   >(
@@ -83,16 +104,13 @@ export class StateStore<T extends Record<string, unknown>> {
     const wrappedHandler: Handler<T> = (nextValue) => {
       const newlySelectedValues = selector(nextValue);
 
-      let hasUpdatedValues = typeof previouslySelectedValues === 'undefined';
+      // shallow comparison of previouslySelectedValues and newlySelectedValues
+      const selectionsAreEqual = StateStore.doSelectionsEqual(
+        previouslySelectedValues,
+        newlySelectedValues,
+      );
 
-      for (const key in previouslySelectedValues) {
-        if (previouslySelectedValues[key] === newlySelectedValues[key])
-          continue;
-        hasUpdatedValues = true;
-        break;
-      }
-
-      if (!hasUpdatedValues) return;
+      if (selectionsAreEqual) return;
 
       // save a copy of previouslySelectedValues before running
       // handler - if previouslySelectedValues are set to
