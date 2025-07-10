@@ -72,7 +72,13 @@ function getRandomValuesWithMathRandom(bytes: Uint8Array): void {
 declare const msCrypto: Crypto;
 
 const getRandomValues = (() => {
-  return getRandomValuesWithMathRandom;
+  if (typeof crypto !== 'undefined' && typeof crypto?.getRandomValues !== 'undefined') {
+    return crypto.getRandomValues.bind(crypto);
+  } else if (typeof msCrypto !== 'undefined') {
+    return msCrypto.getRandomValues.bind(msCrypto);
+  } else {
+    return getRandomValuesWithMathRandom;
+  }
 })();
 
 function getRandomBytes(length: number): Uint8Array {

@@ -38,6 +38,12 @@
     }
   },
   "types": "./dist/index.d.ts",
+  "browser": {
+    "crypto": false,
+    "https": false,
+    "jsonwebtoken": false,
+    "ws": false
+  },
   "license": "See license in LICENSE",
   "scripts": {
     "clean": "rimraf dist",

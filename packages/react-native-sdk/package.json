@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@stream-io/feeds-client": "workspace:*",
-    "react-native-get-random-values": "^1.11.0",
     "rimraf": "^6.0.1"
   },
   "peerDependencies": {
@@ -47,7 +46,6 @@
     "@types/eslint": "9.6.1",
     "@types/jest": "^30.0.0",
     "@types/react": "^19.0.0",
-    "@types/react-native-get-random-values": "^1",
     "@types/react-test-renderer": "19.0.0",
     "eslint": "^9.28.0",
     "eslint-plugin-react": "^7.37.5",
