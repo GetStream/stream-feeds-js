@@ -456,6 +456,8 @@ export class Feed extends FeedApi {
     'user.muted': Feed.noop,
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
+    'feeds.bookmark_folder.deleted': undefined,
+    'feeds.bookmark_folder.updated': undefined,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -1045,10 +1047,10 @@ export class Feed extends FeedApi {
     return response;
   }
 
-  addActivity(request: Omit<ActivityRequest, 'fids'>) {
+  addActivity(request: Omit<ActivityRequest, 'feed_ids'>) {
     return this.feedsApi.addActivity({
       ...request,
-      fids: [this.fid],
+      feed_ids: [this.fid],
     });
   }
 

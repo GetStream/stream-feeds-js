@@ -32,6 +32,7 @@ import {
   DeleteActivitiesResponse,
   DeleteActivityReactionResponse,
   DeleteActivityResponse,
+  DeleteBookmarkFolderResponse,
   DeleteBookmarkResponse,
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
@@ -103,6 +104,8 @@ import {
   UpdateActivityResponse,
   UpdateBlockListRequest,
   UpdateBlockListResponse,
+  UpdateBookmarkFolderRequest,
+  UpdateBookmarkFolderResponse,
   UpdateBookmarkRequest,
   UpdateBookmarkResponse,
   UpdateCommentRequest,
@@ -289,7 +292,7 @@ export class FeedsApi {
   ): Promise<StreamResponse<AddActivityResponse>> {
     const body = {
       type: request?.type,
-      fids: request?.fids,
+      feed_ids: request?.feed_ids,
       expires_at: request?.expires_at,
       id: request?.id,
       parent_id: request?.parent_id,
@@ -739,6 +742,54 @@ export class FeedsApi {
     );
 
     decoders.QueryBookmarkFoldersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteBookmarkFolder(request: {
+    folder_id: string;
+  }): Promise<StreamResponse<DeleteBookmarkFolderResponse>> {
+    const pathParams = {
+      folder_id: request?.folder_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteBookmarkFolderResponse>
+    >(
+      'DELETE',
+      '/api/v2/feeds/bookmark_folders/{folder_id}',
+      pathParams,
+      undefined,
+    );
+
+    decoders.DeleteBookmarkFolderResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateBookmarkFolder(
+    request: UpdateBookmarkFolderRequest & { folder_id: string },
+  ): Promise<StreamResponse<UpdateBookmarkFolderResponse>> {
+    const pathParams = {
+      folder_id: request?.folder_id,
+    };
+    const body = {
+      name: request?.name,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateBookmarkFolderResponse>
+    >(
+      'PATCH',
+      '/api/v2/feeds/bookmark_folders/{folder_id}',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.UpdateBookmarkFolderResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
