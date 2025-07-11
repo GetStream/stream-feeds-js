@@ -24,13 +24,15 @@ export const FollowRelationships = ({
       if (type === 'followers') {
         return {
           pagination: followers_pagination,
-          rel: followers?.filter((f) => f.source_feed.fid !== ownTimeline?.fid),
+          rel: followers?.filter(
+            (f) => f.source_feed.feed_id !== ownTimeline?.fid,
+          ),
         };
       }
 
       return {
         pagination: following_pagination,
-        rel: following?.filter((f) => f.target_feed.fid !== ownFeed?.fid),
+        rel: following?.filter((f) => f.target_feed.feed_id !== ownFeed?.fid),
       };
     },
     [type, ownTimeline, ownFeed],
@@ -70,7 +72,7 @@ export const FollowRelationships = ({
 
     return (
       <li
-        key={`${follow.source_feed.fid}_${follow.target_feed.fid}`}
+        key={`${follow.source_feed.feed_id}_${follow.target_feed.feed_id}`}
         className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
       >
         <div className="flex flex-row items-center gap-1">

@@ -387,7 +387,7 @@ export interface ActivityResponse {
 
   comments: CommentResponse[];
 
-  feeds: string[];
+  feed_ids: string[];
 
   filter_tags: string[];
 
@@ -2666,7 +2666,7 @@ export interface FeedResponse {
 
   description: string;
 
-  fid: string;
+  feed_id: string;
 
   follower_count: number;
 
@@ -3822,7 +3822,7 @@ export interface PinActivityResponse {
 
   duration: string;
 
-  fid: string;
+  feed_id: string;
 
   user_id: string;
 
@@ -5217,7 +5217,7 @@ export interface UnfollowResponse {
 export interface UnpinActivityResponse {
   duration: string;
 
-  fid: string;
+  feed_id: string;
 
   user_id: string;
 

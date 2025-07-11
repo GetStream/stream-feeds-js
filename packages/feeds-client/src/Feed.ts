@@ -309,7 +309,7 @@ export class Feed extends FeedApi {
       if (event.follow.status !== 'accepted') return;
 
       // this feed followed someone
-      if (event.follow.source_feed.fid === this.fid) {
+      if (event.follow.source_feed.feed_id === this.fid) {
         if (this.currentState.following_pagination?.next === END_OF_LIST) {
           this.state.next((currentState) => ({
             ...currentState,
@@ -322,7 +322,7 @@ export class Feed extends FeedApi {
         }
       } else if (
         // someone followed this feed
-        event.follow.target_feed.fid === this.fid
+        event.follow.target_feed.feed_id === this.fid
       ) {
         const source = event.follow.source_feed;
         const connectedUser = this.client.state.getLatestValue().connectedUser;
@@ -349,20 +349,20 @@ export class Feed extends FeedApi {
     },
     'feeds.follow.deleted': (event) => {
       // this feed unfollowed someone
-      if (event.follow.source_feed.fid === this.fid) {
+      if (event.follow.source_feed.feed_id === this.fid) {
         this.state.next((currentState) => {
           return {
             ...currentState,
             ...event.follow.source_feed,
             following: currentState.following?.filter(
               (follow) =>
-                follow.target_feed.fid !== event.follow.target_feed.fid,
+                follow.target_feed.feed_id !== event.follow.target_feed.feed_id,
             ),
           };
         });
       } else if (
         // someone unfollowed this feed
-        event.follow.target_feed.fid === this.fid
+        event.follow.target_feed.feed_id === this.fid
       ) {
         const source = event.follow.source_feed;
         const connectedUser = this.client.state.getLatestValue().connectedUser;
@@ -373,12 +373,13 @@ export class Feed extends FeedApi {
           if (source.created_by.id === connectedUser?.id) {
             newState.own_follows = newState.own_follows?.filter(
               (follow) =>
-                follow.source_feed.fid !== event.follow.source_feed.fid,
+                follow.source_feed.feed_id !== event.follow.source_feed.feed_id,
             );
           }
 
           newState.followers = newState.followers?.filter(
-            (follow) => follow.source_feed.fid !== event.follow.source_feed.fid,
+            (follow) =>
+              follow.source_feed.feed_id !== event.follow.source_feed.feed_id,
           );
 
           return newState;
@@ -472,7 +473,7 @@ export class Feed extends FeedApi {
     // Need this ugly cast because fileUpload endpoints :(
     super(client as unknown as FeedsApi, groupId, id);
     this.state = new StateStore<FeedState>({
-      fid: `${groupId}:${id}`,
+      feed_id: `${groupId}:${id}`,
       group_id: groupId,
       id,
       ...(data ?? {}),
