@@ -38,9 +38,6 @@
     }
   },
   "types": "./dist/index.d.ts",
-  "browser": {
-    "crypto": false
-  },
   "license": "See license in LICENSE",
   "scripts": {
     "clean": "rimraf dist",
