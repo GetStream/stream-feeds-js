@@ -10,7 +10,7 @@ export async function GET() {
     });
   }
 
-  const token = streamServerClient.generateUserToken({ user_id: userId });
+  const token = streamServerClient().generateUserToken({ user_id: userId });
 
   return new Response(JSON.stringify({ token }), {
     status: 200,

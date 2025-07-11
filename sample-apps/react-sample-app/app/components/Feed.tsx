@@ -1,9 +1,8 @@
 import { ActivityResponse, Feed as StreamFeed } from '@stream-io/feeds-client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Activity } from './Activity';
 import { PaginatedList } from './PaginatedList';
 import { useStateStore } from '@stream-io/feeds-client/react-bindings';
-import { initializeFeed } from '../hooks/initializeFeed';
 
 export const Feed = ({ feed }: { feed: StreamFeed }) => {
   const [error, setError] = useState<Error>();
@@ -19,10 +18,6 @@ export const Feed = ({ feed }: { feed: StreamFeed }) => {
     activities: state.activities ?? [],
     ownCapabilities: state.own_capabilities,
   }));
-
-  useEffect(() => {
-    void initializeFeed(feed, { watch: true });
-  }, [feed, ownCapabilities]);
 
   const getNextPage = () => {
     setError(undefined);

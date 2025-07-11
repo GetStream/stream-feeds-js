@@ -1,11 +1,5 @@
 'use client';
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
 import { ActivityResponse, Poll, StreamPoll } from '@stream-io/feeds-client';
 import { useUserContext } from '@/app/user-context';
 
@@ -17,11 +11,15 @@ type PollContextValue = {
 type PollContextProps = {
   activity: ActivityResponse;
   poll: Poll;
-}
+};
 
 const PollContext = createContext<PollContextValue | undefined>(undefined);
 
-export const PollContextProvider = ({ children, activity, poll }: PropsWithChildren<PollContextProps>) => {
+export const PollContextProvider = ({
+  children,
+  activity,
+  poll,
+}: PropsWithChildren<PollContextProps>) => {
   const { client } = useUserContext();
   const pollFromState = client?.pollFromState(poll.id);
 
@@ -29,12 +27,13 @@ export const PollContextProvider = ({ children, activity, poll }: PropsWithChild
     return null;
   }
 
-  const pollContextValue = useMemo(() => ({ poll: pollFromState, activity }), [pollFromState, activity]);
+  const pollContextValue = useMemo(
+    () => ({ poll: pollFromState, activity }),
+    [pollFromState, activity],
+  );
 
   return (
-    <PollContext.Provider
-      value={pollContextValue}
-    >
+    <PollContext.Provider value={pollContextValue}>
       {children}
     </PollContext.Provider>
   );
@@ -47,4 +46,4 @@ export const usePollContext = () => {
   }
 
   return ctx;
-}
+};

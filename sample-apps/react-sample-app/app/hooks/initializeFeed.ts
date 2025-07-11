@@ -8,7 +8,8 @@ export const initializeFeed = (
 ): Promise<FeedState> => {
   const currentState = feed.state.getLatestValue();
 
-  if (typeof currentState.created_at !== 'undefined') {
+  // TODO: find another key to consider feed "initialized"
+  if (typeof currentState.activities !== 'undefined') {
     return Promise.resolve(currentState);
   }
 
@@ -17,21 +18,13 @@ export const initializeFeed = (
   }
 
   if (currentState.is_loading) {
-    return new Promise((resolve, reject) => {
-      const t = setTimeout(() => {
-        unsubscribe();
-        reject(
-          new Error('Timed out while waiting for FeedState.is_loading to flip'),
-        );
-      }, 5000);
-
+    return new Promise((resolve) => {
       const unsubscribe = feed.state.subscribeWithSelector(
         (v) => ({ is_loading: v.is_loading }),
         ({ is_loading }) => {
           if (is_loading) return;
 
           unsubscribe();
-          if (typeof t !== 'undefined') clearTimeout(t);
           resolve(feed.state.getLatestValue());
         },
       );
@@ -40,7 +33,6 @@ export const initializeFeed = (
 
   const removePromise = () => {
     if (typeof promisesByFeedId[feed.fid] !== 'undefined') {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete promisesByFeedId[feed.fid];
     }
   };

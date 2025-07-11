@@ -1,6 +1,6 @@
 import { FeedsClient } from '../src/FeedsClient';
 import { Feed } from '../src/Feed';
-import { UserRequest } from '../src/common/gen/models';
+import { UserRequest } from '../src/gen/models';
 import { FeedsClientOptions } from '../src/common/types';
 import { WSEvent } from '../src/gen/models';
 import { FeedsEvent } from '../src/types';
