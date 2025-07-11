@@ -2,6 +2,24 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.1...@stream-io/feeds-client-0.1.2) (2025-07-11)
+
+
+* run CI actions on PRs for main, and on main ([#47](https://github.com/GetStream/stream-feeds-js/issues/47)) ([1a2c35b](https://github.com/GetStream/stream-feeds-js/commit/1a2c35bb1425d6e9f897a153024fdafce7a5e9df))
+* Run tests on Node ([#50](https://github.com/GetStream/stream-feeds-js/issues/50)) ([8669bd6](https://github.com/GetStream/stream-feeds-js/commit/8669bd60be696fb40c77d5ba180c605edb660df4))
+
+
+### Features
+
+* client creation hooks, StreamFeeds wrapper, contexts ([#49](https://github.com/GetStream/stream-feeds-js/issues/49)) ([f5c6059](https://github.com/GetStream/stream-feeds-js/commit/f5c6059e83e0cd1a0ca142d5a4d9871c53b0e88d))
+* **gen:** bookmark folder stuff ([#51](https://github.com/GetStream/stream-feeds-js/issues/51)) ([eb5c5be](https://github.com/GetStream/stream-feeds-js/commit/eb5c5be1ce3302e74b0ebaf76d7050f93056d413))
+* Update to latest open API spec ([#53](https://github.com/GetStream/stream-feeds-js/issues/53)) ([e7c3f49](https://github.com/GetStream/stream-feeds-js/commit/e7c3f49f12ed19c522dede04dfa8fea8a6cf1d05))
+
+
+### Bug Fixes
+
+* update source feed on `feeds.follow.created` ([#52](https://github.com/GetStream/stream-feeds-js/issues/52)) ([e2bed97](https://github.com/GetStream/stream-feeds-js/commit/e2bed97d3b3e8b106e193d2d435468e5654c7381))
+
 ## [0.1.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.0...@stream-io/feeds-client-0.1.1) (2025-07-09)
 
 
