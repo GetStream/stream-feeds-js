@@ -46,6 +46,12 @@ const eventDecoderMapping: Record<
   'feeds.bookmark.updated': (data: Record<string, any>) =>
     decoders.BookmarkUpdatedEvent(data),
 
+  'feeds.bookmark_folder.deleted': (data: Record<string, any>) =>
+    decoders.BookmarkFolderDeletedEvent(data),
+
+  'feeds.bookmark_folder.updated': (data: Record<string, any>) =>
+    decoders.BookmarkFolderUpdatedEvent(data),
+
   'feeds.comment.added': (data: Record<string, any>) =>
     decoders.CommentAddedEvent(data),
 
