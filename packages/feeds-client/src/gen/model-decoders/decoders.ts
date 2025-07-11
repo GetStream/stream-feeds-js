@@ -353,11 +353,33 @@ decoders.BookmarkDeletedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.BookmarkFolderDeletedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    bookmark_folder: { type: 'BookmarkFolderResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.BookmarkFolderResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.BookmarkFolderUpdatedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    bookmark_folder: { type: 'BookmarkFolderResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1695,6 +1717,13 @@ decoders.UpdateActivityResponse = (input?: Record<string, any>) => {
 decoders.UpdateBlockListResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     blocklist: { type: 'BlockListResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpdateBookmarkFolderResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    bookmark_folder: { type: 'BookmarkFolderResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };

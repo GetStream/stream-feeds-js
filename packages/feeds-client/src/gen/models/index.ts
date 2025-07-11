@@ -949,6 +949,20 @@ export interface BookmarkDeletedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface BookmarkFolderDeletedEvent {
+  created_at: Date;
+
+  bookmark_folder: BookmarkFolderResponse;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface BookmarkFolderResponse {
   created_at: Date;
 
@@ -959,6 +973,20 @@ export interface BookmarkFolderResponse {
   updated_at: Date;
 
   custom?: Record<string, any>;
+}
+
+export interface BookmarkFolderUpdatedEvent {
+  created_at: Date;
+
+  bookmark_folder: BookmarkFolderResponse;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
 }
 
 export interface BookmarkResponse {
@@ -2051,6 +2079,10 @@ export interface DeleteActivityResponse {
   duration: string;
 }
 
+export interface DeleteBookmarkFolderResponse {
+  duration: string;
+}
+
 export interface DeleteBookmarkResponse {
   duration: string;
 
@@ -2490,6 +2522,8 @@ export interface FeedInput {
 
   visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
+  filter_tags?: string[];
+
   members?: FeedMemberRequest[];
 
   custom?: Record<string, any>;
@@ -2620,6 +2654,8 @@ export interface FeedRequest {
 
   visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
+  filter_tags?: string[];
+
   members?: FeedMemberRequest[];
 
   custom?: Record<string, any>;
@@ -2653,6 +2689,8 @@ export interface FeedResponse {
   deleted_at?: Date;
 
   visibility?: string;
+
+  filter_tags?: string[];
 
   custom?: Record<string, any>;
 }
@@ -3678,6 +3716,8 @@ export interface OwnUser {
 
   custom: Record<string, any>;
 
+  total_unread_count_by_team: Record<string, number>;
+
   deactivated_at?: Date;
 
   deleted_at?: Date;
@@ -3757,6 +3797,8 @@ export interface OwnUserResponse {
   push_preferences?: PushPreferences;
 
   teams_role?: Record<string, string>;
+
+  total_unread_count_by_team?: Record<string, number>;
 }
 
 export interface PagerRequest {
@@ -5232,6 +5274,18 @@ export interface UpdateBlockListResponse {
   blocklist?: BlockListResponse;
 }
 
+export interface UpdateBookmarkFolderRequest {
+  name?: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface UpdateBookmarkFolderResponse {
+  duration: string;
+
+  bookmark_folder: BookmarkFolderResponse;
+}
+
 export interface UpdateBookmarkRequest {
   folder_id?: string;
 
@@ -5805,6 +5859,8 @@ export type WSClientEvent =
   | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
   | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
   | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
+  | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent)
+  | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
   | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
   | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
   | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
@@ -5848,6 +5904,8 @@ export type WSEvent =
   | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
   | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
   | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
+  | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent)
+  | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
   | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
   | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
   | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)

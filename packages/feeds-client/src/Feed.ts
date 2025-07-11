@@ -207,6 +207,8 @@ export class Feed extends FeedApi {
     'feeds.bookmark.added': this.handleBookmarkAdded.bind(this),
     'feeds.bookmark.deleted': this.handleBookmarkDeleted.bind(this),
     'feeds.bookmark.updated': this.handleBookmarkUpdated.bind(this),
+    'feeds.bookmark_folder.deleted': Feed.noop,
+    'feeds.bookmark_folder.updated': Feed.noop,
     'feeds.comment.added': (event) => {
       const { comment } = event;
       const forId = comment.parent_id ?? comment.object_id;
