@@ -12,7 +12,7 @@ import {
   UserRequest,
   WSEvent,
 } from './gen/models';
-import { FeedsEvent } from './types';
+import { FeedsEvent, TokenOrProvider } from './types';
 import { StateStore } from './common/StateStore';
 import { TokenManager } from './common/TokenManager';
 import { ConnectionIdManager } from './common/ConnectionIdManager';
@@ -35,6 +35,7 @@ import { StreamPoll } from './common/Poll';
 
 export type FeedsClientState = {
   connectedUser: OwnUser | undefined;
+  isWsConnectionHealthy: boolean;
 };
 
 type FID = string;
@@ -67,6 +68,7 @@ export class FeedsClient extends FeedsApi {
     super(apiClient);
     this.state = new StateStore<FeedsClientState>({
       connectedUser: undefined,
+      isWsConnectionHealthy: false,
     });
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
@@ -79,6 +81,11 @@ export class FeedsClient extends FeedsApi {
         typeof fid === 'string' ? this.activeFeeds[fid] : undefined;
 
       switch (event.type) {
+        case 'connection.changed': {
+          const { online } = event;
+          this.state.partialNext({ isWsConnectionHealthy: online });
+          break;
+        }
         case 'feeds.feed.created': {
           if (feed) break;
 
@@ -188,10 +195,7 @@ export class FeedsClient extends FeedsApi {
     }
   }
 
-  connectUser = async (
-    user: UserRequest,
-    tokenProvider: string | (() => Promise<string>),
-  ) => {
+  connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
     if (
       this.state.getLatestValue().connectedUser !== undefined ||
       this.wsConnection
@@ -216,7 +220,10 @@ export class FeedsClient extends FeedsApi {
         this.eventDispatcher.dispatch(event),
       );
       const connectedEvent = await this.wsConnection.connect();
-      this.state.partialNext({ connectedUser: connectedEvent?.me });
+      this.state.partialNext({
+        connectedUser: connectedEvent?.me,
+        isWsConnectionHealthy: this.wsConnection.isHealthy,
+      });
     } catch (err) {
       await this.disconnectUser();
       throw err;
@@ -291,7 +298,7 @@ export class FeedsClient extends FeedsApi {
 
     this.connectionIdManager.reset();
     this.tokenManager.reset();
-    this.state.partialNext({ connectedUser: undefined });
+    this.state.partialNext({ connectedUser: undefined, isWsConnectionHealthy: false });
   };
 
   on = this.eventDispatcher.on;
@@ -317,6 +324,16 @@ export class FeedsClient extends FeedsApi {
     };
   }
 
+  updateNetworkConnectionStatus = (
+    event: { type: 'online' | 'offline' } | Event,
+  ) => {
+    const networkEvent: NetworkChangedEvent = {
+      type: 'network.changed',
+      online: event.type === 'online',
+    };
+    this.eventDispatcher.dispatch(networkEvent);
+  };
+
   private readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
@@ -330,16 +347,6 @@ export class FeedsClient extends FeedsApi {
       this.activeFeeds[fid] = feed;
       return feed;
     }
-  };
-
-  private readonly updateNetworkConnectionStatus = (
-    event: { type: 'online' | 'offline' } | Event,
-  ) => {
-    const networkEvent: NetworkChangedEvent = {
-      type: 'network.changed',
-      online: event.type === 'online',
-    };
-    this.eventDispatcher.dispatch(networkEvent);
   };
 
   private findActiveFeedByActivityId(activityId: string) {

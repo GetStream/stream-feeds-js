@@ -1,13 +1,24 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Text } from 'react-native';
 import 'react-native-reanimated';
-import { reactBindingsHookExample, reactNativeSdkHookExample } from '@stream-io/feeds-react-native-sdk';
+import { StreamFeeds } from '@stream-io/feeds-react-native-sdk';
+import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
+import LoginScreen from '@/app/LoginScreen';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
+import { useCreateClient } from '@/hook/useCreateClient';
+import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
+import { View } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -22,14 +33,12 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+const RootLayout = () => {
+  const { userLoaded, user } = useUserContext();
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
-
-  reactBindingsHookExample();
-  reactNativeSdkHookExample();
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -37,27 +46,59 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && userLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, userLoaded]);
 
   if (!loaded) {
     return null;
   }
 
-  return <RootLayoutNav />;
-}
+  if (userLoaded && !user) {
+    return <LoginScreen />;
+  }
 
-function RootLayoutNav() {
+  if (!user) {
+    return null;
+  }
+
+  return <RootLayoutNav user={user as UserRequest} />;
+};
+
+const RootLayoutNav = ({ user }: { user: UserRequest }) => {
   const colorScheme = useColorScheme();
 
+  const client = useCreateClient(user);
+
+  if (!client) {
+    return null;
+  }
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <StreamFeeds client={client}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+      </ThemeProvider>
+    </StreamFeeds>
   );
-}
+};
+
+const App = () => (
+  <InternalErrorBoundary
+    fallback={
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Something went wrong.</Text>
+      </View>
+    }
+  >
+    <UserContextProvider>
+      <RootLayout />
+    </UserContextProvider>
+  </InternalErrorBoundary>
+);
+
+export default App;
