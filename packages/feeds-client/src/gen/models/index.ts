@@ -373,6 +373,8 @@ export interface ActivityResponse {
 
   popularity: number;
 
+  reaction_count: number;
+
   score: number;
 
   share_count: number;
