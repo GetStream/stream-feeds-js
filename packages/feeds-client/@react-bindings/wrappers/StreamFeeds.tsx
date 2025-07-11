@@ -1,10 +1,12 @@
 import { PropsWithChildren } from 'react';
-import { StreamFeedsProvider } from '../contexts/StreamFeedsContext';
+import { StreamFeedsContext } from '../contexts/StreamFeedsContext';
 import type { StreamFeedsContextProps } from '../contexts/StreamFeedsContext';
 
-export const StreamFeeds = (props: PropsWithChildren<StreamFeedsContextProps>) => {
+export const StreamFeeds = ({ client, children }: PropsWithChildren<StreamFeedsContextProps>) => {
   return (
-    <StreamFeedsProvider {...props} />
+    <StreamFeedsContext.Provider value={client}>
+      {children}
+    </StreamFeedsContext.Provider>
   );
 };
 
