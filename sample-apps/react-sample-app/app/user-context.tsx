@@ -72,6 +72,8 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
       const _client = new FeedsClient(apiKey, { base_url: apiUrl });
       const connectPromise = _client.connectUser(user, tokenProvider);
       setClient(_client);
+      // @ts-expect-error Exposing the client to globalThis for debugging purposes
+      globalThis.client = _client;
       await connectPromise;
     } catch (error) {
       logOut().catch((err) => {

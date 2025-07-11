@@ -56,6 +56,8 @@ export class FeedsClient extends FeedsApi {
 
   private activeFeeds: Record<FID, Feed> = {};
 
+  private healthyConnectionChangedEventCount = 0;
+
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
     const connectionIdManager = new ConnectionIdManager();
@@ -84,6 +86,17 @@ export class FeedsClient extends FeedsApi {
         case 'connection.changed': {
           const { online } = event;
           this.state.partialNext({ isWsConnectionHealthy: online });
+
+          if (online) {
+            this.healthyConnectionChangedEventCount++;
+
+            // we skip the first event as we could potentially be querying twice
+            if (this.healthyConnectionChangedEventCount > 1) {
+              for (const activeFeed of Object.values(this.activeFeeds)) {
+                activeFeed.synchronize();
+              }
+            }
+          }
           break;
         }
         case 'feeds.feed.created': {
