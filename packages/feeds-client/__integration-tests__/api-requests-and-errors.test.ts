@@ -6,7 +6,7 @@ import {
 } from './utils';
 import { sleep } from '../src/common/utils';
 import { FeedsClient } from '../src/FeedsClient';
-import { UserRequest } from '../src/common/gen/models';
+import { UserRequest } from '../src/gen/models';
 
 describe('API requests and error handling', () => {
   let client: FeedsClient;
@@ -20,6 +20,7 @@ describe('API requests and error handling', () => {
   it('should set HTTP headers', async () => {
     let headers: Record<string, string> = {};
 
+    // @ts-expect-error need to access private property
     client.apiClient.axiosInstance.interceptors.request.use((config) => {
       headers = config.headers;
       return config;
@@ -92,6 +93,7 @@ describe('API requests and error handling', () => {
   it('should add connection id when necessary', async () => {
     let params: any;
 
+    // @ts-expect-error need to access private property
     client.apiClient.axiosInstance.interceptors.request.use((config) => {
       params = config.params;
       return config;
@@ -121,7 +123,7 @@ describe('API requests and error handling', () => {
     );
 
     await client.disconnectUser();
-  });
+  }, 30000);
 
   it('should handle timeout', async () => {
     client = createTestClient({ timeout: 1 });
