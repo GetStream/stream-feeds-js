@@ -1,8 +1,7 @@
 import { Feed, FeedState, FollowResponse } from '@stream-io/feeds-client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
 import { useStateStore } from '@stream-io/feeds-client/react-bindings';
-import { useFeedContext } from '../feed-context';
 
 export const FollowRelationships = ({
   type,
@@ -12,7 +11,6 @@ export const FollowRelationships = ({
   feed: Feed;
 }) => {
   const [error, setError] = useState<Error>();
-  const { ownTimeline, ownFeed } = useFeedContext();
 
   const selector = useCallback(
     ({
@@ -24,18 +22,25 @@ export const FollowRelationships = ({
       if (type === 'followers') {
         return {
           pagination: followers_pagination,
-          rel: followers?.filter((f) => f.source_feed.fid !== ownTimeline?.fid),
+          follows: followers,
         };
       }
 
       return {
         pagination: following_pagination,
-        rel: following?.filter((f) => f.target_feed.fid !== ownFeed?.fid),
+        follows: following,
       };
     },
-    [type, ownTimeline, ownFeed],
+    [type],
   );
-  const { rel = [], pagination } = useStateStore(feed.state, selector);
+  const { follows = [], pagination } = useStateStore(
+    feed.state,
+    selector,
+  );
+
+  const rel = useMemo(() => follows.filter(
+    (f) => f.source_feed.created_by.id !== f.target_feed.created_by.id,
+  ), [follows]);
 
   const loadMore = useCallback(async () => {
     setError(undefined);
@@ -51,12 +56,10 @@ export const FollowRelationships = ({
   }, [feed, type]);
 
   useEffect(() => {
-    if (
-      (type === 'followers' && !feed.currentState.followers?.length) ||
-      (type === 'following' && !feed.currentState.following?.length)
-    )
+    if (typeof pagination?.next === 'undefined') {
       void loadMore();
-  }, [feed, loadMore, type]);
+    }
+  }, [loadMore, pagination]);
 
   const renderItem = (follow: FollowResponse) => {
     const image =
