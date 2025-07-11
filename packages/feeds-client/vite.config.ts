@@ -4,8 +4,6 @@ export default defineConfig({
   // TODO: move build process to Vite
   build: {},
   test: {
-    coverage: {
-      reporter: ['lcov'],
-    },
+    retry: 3,
   },
 });

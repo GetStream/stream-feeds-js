@@ -5,7 +5,7 @@ import {
   createTestTokenGenerator,
   getTestUser,
 } from './utils';
-import { UserRequest } from '../src/common/gen/models';
+import { UserRequest } from '../src/gen/models';
 
 describe('Feed Pagination Integration Tests', () => {
   let client: FeedsClient;
