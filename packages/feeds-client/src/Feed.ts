@@ -1047,7 +1047,8 @@ export class Feed extends FeedApi {
 
   async getNextPage() {
     const currentState = this.currentState;
-    const response = await this.getOrCreate({
+
+    return await this.getOrCreate({
       member_pagination: {
         limit: 0,
       },
@@ -1058,9 +1059,8 @@ export class Feed extends FeedApi {
         limit: 0,
       },
       next: currentState.next,
+      limit: currentState.last_get_or_create_request_config?.limit ?? 20,
     });
-
-    return response;
   }
 
   addActivity(request: Omit<ActivityRequest, 'fids'>) {
