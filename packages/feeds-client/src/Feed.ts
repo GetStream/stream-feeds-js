@@ -312,16 +312,21 @@ export class Feed extends FeedApi {
 
       // this feed followed someone
       if (event.follow.source_feed.fid === this.fid) {
-        if (this.currentState.following_pagination?.next === END_OF_LIST) {
-          this.state.next((currentState) => ({
+        this.state.next((currentState) => {
+          const newState = {
             ...currentState,
             ...event.follow.source_feed,
+          };
+
+          if (currentState.following_pagination?.next === END_OF_LIST) {
             // TODO: respect sort
-            following: currentState.following
+            newState.following = currentState.following
               ? currentState.following.concat(event.follow)
-              : [event.follow],
-          }));
-        }
+              : [event.follow];
+          }
+
+          return newState;
+        });
       } else if (
         // someone followed this feed
         event.follow.target_feed.fid === this.fid
@@ -333,15 +338,15 @@ export class Feed extends FeedApi {
           const newState = { ...currentState, ...event.follow.target_feed };
 
           if (source.created_by.id === connectedUser?.id) {
-            newState.own_follows = newState.own_follows
-              ? newState.own_follows.concat(event.follow)
+            newState.own_follows = currentState.own_follows
+              ? currentState.own_follows.concat(event.follow)
               : [event.follow];
           }
 
           if (currentState.followers_pagination?.next === END_OF_LIST) {
             // TODO: respect sort
-            newState.followers = newState.followers
-              ? newState.followers.concat(event.follow)
+            newState.followers = currentState.followers
+              ? currentState.followers.concat(event.follow)
               : [event.follow];
           }
 
@@ -373,13 +378,13 @@ export class Feed extends FeedApi {
           const newState = { ...currentState, ...event.follow.target_feed };
 
           if (source.created_by.id === connectedUser?.id) {
-            newState.own_follows = newState.own_follows?.filter(
+            newState.own_follows = currentState.own_follows?.filter(
               (follow) =>
                 follow.source_feed.fid !== event.follow.source_feed.fid,
             );
           }
 
-          newState.followers = newState.followers?.filter(
+          newState.followers = currentState.followers?.filter(
             (follow) => follow.source_feed.fid !== event.follow.source_feed.fid,
           );
 
