@@ -27,10 +27,15 @@ export const useCreateClient = (user: UserRequest) => {
     return provider();
   }, [user.id]);
 
-  return useCreateFeedsClient({
+  const client = useCreateFeedsClient({
     userData: user,
     tokenOrProvider: tokenProvider,
     options: CLIENT_OPTIONS,
     apiKey,
   });
+
+  // @ts-expect-error We want to hijack globalThis for debugging purposes.
+  globalThis.client = client;
+
+  return client;
 }

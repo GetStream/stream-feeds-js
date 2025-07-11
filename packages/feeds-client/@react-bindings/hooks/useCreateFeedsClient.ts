@@ -19,10 +19,17 @@ export const useCreateFeedsClient = ({
   userData: UserRequest;
   options?: FeedsClientOptions;
 }) => {
-  const [client, setClient] = useState<FeedsClient | null>(() => new FeedsClient(apiKey, options));
+  const [client, setClient] = useState<FeedsClient | null>(
+    () => new FeedsClient(apiKey, options),
+  );
+  const [error, setError] = useState<Error | null>(null);
   const [cachedUserData, setCachedUserData] = useState(userData);
 
   const [cachedOptions] = useState(options);
+
+  if (error) {
+    throw error;
+  }
 
   if (userData.id !== cachedUserData.id) {
     setCachedUserData(userData);
@@ -30,24 +37,29 @@ export const useCreateFeedsClient = ({
 
   useEffect(() => {
     const _client = new FeedsClient(apiKey, cachedOptions);
-    let didUserConnectInterrupt = false;
 
-    const connectionPromise = _client.connectUser(
-      cachedUserData,
-      tokenOrProvider,
-    ).then(() => {
-      console.log('Successfully connected user: ', cachedUserData.id)
-    }).catch(error => {
-      if (error) throw error;
-    });
+    const connectionPromise = _client
+      .connectUser(cachedUserData, tokenOrProvider)
+      .then(() => {
+        setError(null);
+        console.log('Successfully connected user: ', cachedUserData.id);
+      })
+      .catch((err) => {
+        setError(err);
+      });
 
-    if (!didUserConnectInterrupt) setClient(_client);
+    setClient(_client);
 
     return () => {
-      didUserConnectInterrupt = true;
       setClient(null);
       connectionPromise
-        .then(() => _client.disconnectUser())
+        .then(() => {
+          setError(null);
+          return _client.disconnectUser();
+        })
+        .catch((err) => {
+          setError(err);
+        })
         .then(() => {
           console.log(
             `Connection for user "${cachedUserData.id}" has been closed`,

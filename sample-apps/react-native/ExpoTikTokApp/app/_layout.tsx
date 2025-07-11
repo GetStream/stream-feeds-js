@@ -8,17 +8,17 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Text } from 'react-native';
 import 'react-native-reanimated';
-import {
-  StreamFeeds,
-} from '@stream-io/feeds-react-native-sdk';
+import { StreamFeeds } from '@stream-io/feeds-react-native-sdk';
 import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
 import LoginScreen from '@/app/LoginScreen';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
 import { useCreateClient } from '@/hook/useCreateClient';
-import { ConnectionLoadHeader } from '@/components/ConnectionLostHeader';
+import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
+import { View } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -88,9 +88,17 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
 };
 
 const App = () => (
-  <UserContextProvider>
-    <RootLayout />
-  </UserContextProvider>
-)
+  <InternalErrorBoundary
+    fallback={
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Something went wrong.</Text>
+      </View>
+    }
+  >
+    <UserContextProvider>
+      <RootLayout />
+    </UserContextProvider>
+  </InternalErrorBoundary>
+);
 
 export default App;
