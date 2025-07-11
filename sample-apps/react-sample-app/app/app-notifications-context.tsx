@@ -1,5 +1,12 @@
 'use client';
-import { createContext, PropsWithChildren, useContext, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from 'react';
 
 export type AppNotificationType = 'info' | 'success' | 'warning' | 'error';
 
@@ -38,12 +45,10 @@ export const AppNotificationsContextProvider = ({
     Array<ReturnType<typeof setTimeout>>
   >([]);
 
-  const showNotification = (
-    notification: Omit<AppNotificaion, 'hide'>,
-    options?: {
-      hideTimeout?: number;
-    },
-  ) => {
+  const showNotificationRef =
+    useRef<AppNotificationsContextValue['showNotification']>();
+
+  showNotificationRef.current = (notification, options) => {
     const appNotficiation = { ...notification, hide: () => {} };
     const hide = () => {
       const updatedNotifications = [...notifications];
@@ -70,6 +75,12 @@ export const AppNotificationsContextProvider = ({
 
     return appNotficiation;
   };
+
+  const showNotification = useCallback<
+    AppNotificationsContextValue['showNotification']
+  >((notification, options) => {
+    return showNotificationRef.current!(notification, options);
+  }, []);
 
   const resetNotifications = () => {
     notifications.forEach((n) => n.hide());
