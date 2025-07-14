@@ -12,7 +12,7 @@ import { Text } from 'react-native';
 import 'react-native-reanimated';
 import { StreamFeeds } from '@stream-io/feeds-react-native-sdk';
 import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
-import LoginScreen from '@/app/LoginScreen';
+import LoginScreen from '@/components/LoginScreen';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
