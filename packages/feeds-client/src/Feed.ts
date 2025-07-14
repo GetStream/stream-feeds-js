@@ -14,6 +14,8 @@ import {
   BookmarkAddedEvent,
   BookmarkDeletedEvent,
   BookmarkUpdatedEvent,
+  QueryFeedMembersRequest,
+  SortParamRequest,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -104,9 +106,11 @@ export type FeedState = Omit<
     | undefined
   >;
 
-  followers_pagination?: LoadingStates & { sort?: string };
+  followers_pagination?: LoadingStates & { sort?: SortParamRequest[] };
 
-  following_pagination?: LoadingStates & { sort?: string };
+  following_pagination?: LoadingStates & { sort?: SortParamRequest[] };
+
+  member_pagination?: LoadingStates & { sort?: SortParamRequest[] };
 
   last_get_or_create_request_config?: GetOrCreateFeedRequest;
 };
@@ -219,7 +223,10 @@ export class Feed extends FeedApi {
 
         if (
           entityState?.pagination?.sort === 'last' &&
-          !checkHasAnotherPage(entityState.comments, entityState?.pagination.next)
+          !checkHasAnotherPage(
+            entityState.comments,
+            entityState?.pagination.next,
+          )
         ) {
           newComments.unshift(comment);
         } else if (entityState?.pagination?.sort === 'first') {
@@ -921,7 +928,7 @@ export class Feed extends FeedApi {
 
   private async loadNextPageFollows(
     type: 'followers' | 'following',
-    request: Pick<QueryFollowsRequest, 'limit'>,
+    request: Pick<QueryFollowsRequest, 'limit' | 'sort'>,
   ) {
     const paginationKey = `${type}_pagination` as const;
     const method = `query${capitalize(type)}` as const;
@@ -948,6 +955,7 @@ export class Feed extends FeedApi {
       const { next: newNextCursor, follows } = await this[method]({
         ...request,
         next: currentNextCursor,
+        sort: this.currentState[paginationKey]?.sort ?? request.sort,
       });
 
       this.state.next((currentState) => ({
@@ -958,6 +966,7 @@ export class Feed extends FeedApi {
         [paginationKey]: {
           ...currentState[paginationKey],
           next: newNextCursor,
+          sort: currentState[paginationKey]?.sort ?? request.sort,
         },
       }));
     } catch (error) {
@@ -982,6 +991,57 @@ export class Feed extends FeedApi {
 
   async loadNextPageFollowing(request: Pick<QueryFollowsRequest, 'limit'>) {
     await this.loadNextPageFollows('following', request);
+  }
+
+  async loadNextPageMembers(
+    request: Omit<QueryFeedMembersRequest, 'next' | 'prev'>,
+  ) {
+    const currentNextCursor = this.currentState.member_pagination?.next;
+    const isLoading = this.currentState.member_pagination?.loading_next_page;
+
+    if (isLoading || currentNextCursor === END_OF_LIST) return;
+
+    try {
+      this.state.next((currentState) => ({
+        ...currentState,
+        member_pagination: {
+          ...currentState.member_pagination,
+          loading_next_page: true,
+        },
+      }));
+
+      const { next: newNextCursor = END_OF_LIST, members } =
+        await this.client.queryFeedMembers({
+          ...request,
+          sort: this.currentState.member_pagination?.sort ?? request.sort,
+          feed_id: this.id,
+          feed_group_id: this.group,
+          next: currentNextCursor,
+        });
+
+      this.state.next((currentState) => ({
+        ...currentState,
+        members: currentState.members
+          ? currentState.members.concat(members)
+          : members,
+        member_pagination: {
+          ...currentState.member_pagination,
+          next: newNextCursor,
+          // set sort if not defined yet
+          sort: currentState.member_pagination?.sort ?? request.sort,
+        },
+      }));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.state.next((currentState) => ({
+        ...currentState,
+        member_pagination: {
+          ...currentState.member_pagination,
+          loading_next_page: false,
+        },
+      }));
+    }
   }
 
   /**
