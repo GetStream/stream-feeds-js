@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.getstream.expotiktokapp"
+      "bundleIdentifier": "io.getstream.expotiktokapp",
+      "appleTeamId": "EHV7XZLAHA"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,7 +31,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-video"
     ],
     "experiments": {
       "typedRoutes": true

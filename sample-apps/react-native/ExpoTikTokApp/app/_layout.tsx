@@ -72,7 +72,7 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
   const client = useCreateClient(user);
 
   if (!client) {
-    return null;
+    return null
   }
 
   return (
@@ -80,7 +80,6 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
       </ThemeProvider>
     </StreamFeeds>

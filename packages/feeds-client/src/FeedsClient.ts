@@ -12,7 +12,7 @@ import {
   UserRequest,
   WSEvent,
 } from './gen/models';
-import { FeedsEvent, TokenOrProvider } from './types';
+import { FeedsEvent, StreamFile, TokenOrProvider } from './types';
 import { StateStore } from './common/StateStore';
 import { TokenManager } from './common/TokenManager';
 import { ConnectionIdManager } from './common/ConnectionIdManager';
@@ -260,7 +260,7 @@ export class FeedsClient extends FeedsApi {
   };
 
   // @ts-expect-error API spec says file should be a string
-  uploadFile = (request: Omit<FileUploadRequest, 'file'> & { file: File }) => {
+  uploadFile = (request: Omit<FileUploadRequest, 'file'> & { file: StreamFile }) => {
     return super.uploadFile({
       // @ts-expect-error API spec says file should be a string
       file: request.file,
@@ -269,7 +269,7 @@ export class FeedsClient extends FeedsApi {
 
   // @ts-expect-error API spec says file should be a string
   uploadImage = (
-    request: Omit<ImageUploadRequest, 'file'> & { file: File },
+    request: Omit<ImageUploadRequest, 'file'> & { file: StreamFile },
   ) => {
     return super.uploadImage({
       // @ts-expect-error API spec says file should be a string

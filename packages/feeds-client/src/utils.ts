@@ -1,6 +1,12 @@
-export const isImageFile = (file: File) => {
+import { StreamFile } from './types';
+
+export const isImageFile = (file: StreamFile) => {
   // photoshop files begin with 'image/'
   return file.type.startsWith('image/') && !file.type.endsWith('.photoshop');
+};
+
+export const isVideoFile = (file: StreamFile) => {
+  return file.type.startsWith('video/');
 };
 
 export const checkHasAnotherPage = <T extends unknown | undefined>(

@@ -22,3 +22,5 @@ export type LoadingStates = {
 export type TokenOrProvider = string | TokenProvider;
 
 export type TokenProvider = () => Promise<string>;
+
+export type StreamFile = File | { name: string, uri: string, type: string }

@@ -11,7 +11,9 @@ export * from './hooks/useFollowers';
 // Contexts
 
 export * from './contexts/StreamFeedsContext';
+export * from './contexts/StreamFeedContext';
 
 // Wrappers
 
 export * from './wrappers/StreamFeeds';
+export * from './wrappers/StreamFeed';

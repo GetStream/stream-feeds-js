@@ -4,9 +4,8 @@ import { useClientConnectedUser } from '@stream-io/feeds-react-native-sdk';
 import { Text, View } from '@/components/Themed';
 import { useUserContext } from '@/contexts/UserContext';
 import { ConnectionLoadHeader } from '@/components/ConnectionLostHeader';
-import React from 'react';
 
-export default function TabOneScreen() {
+const TabOneScreen = () => {
   const user = useClientConnectedUser();
   const { logOut } = useUserContext();
 
@@ -35,6 +34,8 @@ export default function TabOneScreen() {
     </View>
   );
 }
+
+export default TabOneScreen;
 
 const styles = StyleSheet.create({
   container: {

@@ -15,11 +15,13 @@
     }
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json && rimraf dist && bob build",
+    "build": "tsc --project tsconfig.json && yarn clean && bob build",
     "eslint": "eslint 'src/**/*.{js,ts,tsx}' --max-warnings 0",
     "lint": "prettier --list-different 'src/**/*.{js,ts,tsx,json}' && yarn run eslint",
     "lint-fix": "prettier --list-different 'src/**/*.{js,ts,tsx,json}' --write && yarn run eslint --fix",
-    "test-unit": "TZ=UTC jest"
+    "clean": "rimraf dist",
+    "test": "vitest",
+    "test-ci": "vitest --coverage"
   },
   "dependencies": {
     "@stream-io/feeds-client": "workspace:*",
