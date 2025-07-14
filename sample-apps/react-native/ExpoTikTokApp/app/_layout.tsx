@@ -63,7 +63,7 @@ const RootLayout = () => {
     return null;
   }
 
-  return <RootLayoutNav user={user as UserRequest} />;
+  return <RootLayoutNav user={user} />;
 };
 
 const RootLayoutNav = ({ user }: { user: UserRequest }) => {
