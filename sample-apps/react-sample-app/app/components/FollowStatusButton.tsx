@@ -20,17 +20,19 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
 
   const { follow_status: followStatus } = useStateStore(feed.state, selector);
 
-  const follow = async (feed: Feed) => {
+  const follow = async () => {
     if (!ownTimeline) return;
 
     try {
       await ownTimeline.follow(feed);
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      if (error instanceof Error) {
+        logErrorAndDisplayNotification(error, error.message);
+      }
     }
   };
 
-  const unfollow = async (feed: Feed) => {
+  const unfollow = async () => {
     if (!ownTimeline) return;
 
     try {
@@ -47,7 +49,7 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
           <div>Follow request is waiting for approval</div>
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            onClick={() => unfollow(feed)}
+            onClick={() => unfollow()}
           >
             Cancel request
           </button>
@@ -56,7 +58,7 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
       {followStatus === 'accepted' && (
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-          onClick={() => unfollow(feed)}
+          onClick={() => unfollow()}
         >
           Unfollow
         </button>
@@ -64,7 +66,7 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
       {(!followStatus || followStatus === 'rejected') && (
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-          onClick={() => follow(feed)}
+          onClick={() => follow()}
         >
           Follow
         </button>
