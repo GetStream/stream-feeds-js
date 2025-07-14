@@ -106,6 +106,8 @@ export type FeedState = Omit<
   followers_pagination?: LoadingStates & { sort?: string };
 
   following_pagination?: LoadingStates & { sort?: string };
+
+  last_get_or_create_request_config?: GetOrCreateFeedRequest;
 };
 
 const END_OF_LIST = 'eol' as const;
@@ -555,6 +557,13 @@ export class Feed extends FeedApi {
     });
   }
 
+  async synchronize() {
+    const { last_get_or_create_request_config } = this.state.getLatestValue();
+    if (last_get_or_create_request_config?.watch) {
+      await this.getOrCreate(last_get_or_create_request_config);
+    }
+  }
+
   async getOrCreate(request?: GetOrCreateFeedRequest) {
     if (this.currentState.is_loading_activities) {
       throw new Error('Only one getOrCreate call is allowed at a time');
@@ -643,6 +652,8 @@ export class Feed extends FeedApi {
           if (!request?.following_pagination?.limit) {
             delete nextState.following;
           }
+
+          nextState.last_get_or_create_request_config = request;
 
           return nextState;
         });
@@ -1036,7 +1047,8 @@ export class Feed extends FeedApi {
 
   async getNextPage() {
     const currentState = this.currentState;
-    const response = await this.getOrCreate({
+
+    return await this.getOrCreate({
       member_pagination: {
         limit: 0,
       },
@@ -1047,9 +1059,8 @@ export class Feed extends FeedApi {
         limit: 0,
       },
       next: currentState.next,
+      limit: currentState.last_get_or_create_request_config?.limit ?? 20,
     });
-
-    return response;
   }
 
   addActivity(request: Omit<ActivityRequest, 'fids'>) {
