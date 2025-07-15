@@ -487,7 +487,10 @@ export class StableWSConnection {
   onmessage = (wsID: number, event: MessageEvent) => {
     if (this.wsID !== wsID) return;
 
-    this._log('onmessage() - onmessage callback', { event, wsID });
+    this._log('onmessage() - onmessage callback', {
+      event: { ...event, data: JSON.parse(event.data) },
+      wsID,
+    });
     let data = typeof event.data === 'string' ? JSON.parse(event.data) : null;
     this.decoders.forEach((decode) => {
       data = decode(data);

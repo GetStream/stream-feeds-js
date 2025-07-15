@@ -3,14 +3,24 @@ import {
   useFeedContext,
   useStateStore,
 } from '@stream-io/feeds-react-native-sdk';
-import { FlatList, StyleSheet } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  View,
+  Text,
+} from 'react-native';
 import { Activity } from '@/components/Activity';
+import { useCallback, useState } from 'react';
 
 const renderItem = ({ item }: { item: ActivityResponse }) => (
   <Activity activity={item} />
 );
 
+const keyExtractor = (item: ActivityResponse) => item.id;
+
 export const Feed = () => {
+  const [error, setError] = useState<Error | undefined>();
   const feed = useFeedContext();
   const { hasNextPage, isLoading, activities } =
     useStateStore(feed?.state, (state) => ({
@@ -18,20 +28,69 @@ export const Feed = () => {
       hasNextPage: typeof state.next !== 'undefined',
       activities: state.activities ?? [],
     })) ?? {};
+
+  const getNextPage = useCallback(() => {
+    if (!feed || !hasNextPage) {
+      return;
+    }
+    setError(undefined);
+    feed.getNextPage().catch(setError);
+  }, [hasNextPage, feed]);
+
+  const ListFooterComponent = useCallback(
+    () =>
+      isLoading && activities?.length && activities.length > 0 ? (
+        <ActivityIndicator />
+      ) : null,
+    [isLoading, activities?.length],
+  );
+
+  if (error) {
+    return (
+      <View style={styles.midScreenContainer}>
+        <Text style={styles.errorText}>
+          Something went wrong while loading activities.
+        </Text>
+      </View>
+    );
+  }
+
+  if (isLoading && activities?.length === 0) {
+    return (
+      <View style={styles.midScreenContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <FlatList
       data={activities}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id}
+      keyExtractor={keyExtractor}
       numColumns={2}
-      columnWrapperStyle={{ justifyContent: 'space-between' }}
+      onEndReachedThreshold={0.2}
+      onEndReached={getNextPage}
+      columnWrapperStyle={styles.columnWrapper}
       contentContainerStyle={styles.listContent}
+      ListFooterComponent={ListFooterComponent}
       showsVerticalScrollIndicator={false}
     />
   );
 };
 
 const styles = StyleSheet.create({
+  midScreenContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'red',
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -74,4 +133,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#dc2626',
   },
+  columnWrapper: { justifyContent: 'space-between' },
 });
