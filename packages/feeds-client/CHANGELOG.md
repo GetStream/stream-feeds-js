@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.2...@stream-io/feeds-client-0.1.3) (2025-07-15)
+
+
+### Features
+
+* reconcile watched feeds on reconnect ([#54](https://github.com/GetStream/stream-feeds-js/issues/54)) ([b00e7c7](https://github.com/GetStream/stream-feeds-js/commit/b00e7c775a7680a93ff3180944e8e340e155c55e))
+
+
+### Bug Fixes
+
+* form data undefined values ([#60](https://github.com/GetStream/stream-feeds-js/issues/60)) ([ef8c2f2](https://github.com/GetStream/stream-feeds-js/commit/ef8c2f29b53b24d291531edb1621e39650bf6109))
+* remove timeout for file uploads ([#58](https://github.com/GetStream/stream-feeds-js/issues/58)) ([56a3d7d](https://github.com/GetStream/stream-feeds-js/commit/56a3d7d8afa55fb4dedffb97b22a3863e746d13e))
+
 ## [0.1.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.1...@stream-io/feeds-client-0.1.2) (2025-07-11)
 
 
