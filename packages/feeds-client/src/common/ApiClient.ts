@@ -75,7 +75,10 @@ export class ApiClient {
       requestContentType === 'multipart/form-data' ? new FormData() : body;
     if (requestContentType === 'multipart/form-data') {
       Object.keys(body).forEach((key) => {
-        encodedBody.append(key, body[key]);
+        const value = body[key];
+        if (value) {
+          encodedBody.append(key, body[key]);
+        }
       });
     }
 
