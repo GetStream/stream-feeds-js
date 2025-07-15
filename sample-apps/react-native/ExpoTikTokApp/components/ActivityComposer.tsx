@@ -82,11 +82,16 @@ export const ActivityComposer = () => {
         type: 'post',
         text,
         attachments: fileResponses.map((response, index) => {
-          const isImage = isImageFile(files![index]);
+          const file = files![index];
+          const isImage = isImageFile(file);
+          const isVideo = isVideoFile(file);
           return {
-            type: isImage ? 'image' : 'file',
+            type: isImage ? 'image' : isVideo ? 'video' : 'file',
             [isImage ? 'image_url' : 'asset_url']: response?.file,
             custom: {},
+            ...(isVideo && response?.thumb_url
+              ? { thumb_url: response.thumb_url }
+              : {}),
           };
         }),
       });
