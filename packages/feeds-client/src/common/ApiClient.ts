@@ -13,6 +13,7 @@ import { ConnectionIdManager } from './ConnectionIdManager';
 export class ApiClient {
   public readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
+  private timeout: number;
 
   constructor(
     public readonly apiKey: string,
@@ -21,9 +22,9 @@ export class ApiClient {
     options?: FeedsClientOptions,
   ) {
     this.baseUrl = options?.base_url ?? 'https://video.stream-io-api.com';
+    this.timeout = options?.timeout ?? 3000;
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
-      timeout: options?.timeout ?? 3000,
     });
   }
 
@@ -84,8 +85,11 @@ export class ApiClient {
         method,
         headers,
         params: queryParams,
-        paramsSerializer: params => this.queryParamsStringify(params),
+        paramsSerializer: (params) => this.queryParamsStringify(params),
         data: encodedBody,
+        timeout:
+          // multipart/form-data requests should not have a timeout allowing ample time for file uploads
+          requestContentType === 'multipart/form-data' ? 0 : this.timeout,
       });
 
       const metadata: RequestMetadata = this.getRequestMetadata(
