@@ -16,7 +16,7 @@ import LoginScreen from '@/components/LoginScreen';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
-import { useCreateClient } from '@/hook/useCreateClient';
+import { useCreateClient } from '@/hooks/useCreateClient';
 import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
 import { View } from 'react-native';
 

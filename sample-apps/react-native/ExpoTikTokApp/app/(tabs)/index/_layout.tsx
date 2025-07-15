@@ -1,32 +1,19 @@
-import React, { useEffect, useMemo } from 'react';
+import React from 'react';
 import { Stack } from 'expo-router';
 import {
   StreamFeed,
-  useClientConnectedUser,
-  useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
-import { useUserContext } from '@/contexts/UserContext';
+import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
+
+const createFeedConfig = {
+  groupId: 'timeline',
+  queryOptions: {
+    watch: true
+  }
+}
 
 export default function TabOneLayout() {
-  const { user } = useUserContext();
-  const client = useFeedsClient();
-  const connectedUser = useClientConnectedUser();
-
-  const feed = useMemo(() => {
-    if (!client || !user) {
-      return;
-    }
-
-    return client.feed('timeline', user.id);
-  }, [client, user]);
-
-  useEffect(() => {
-    if (!feed || !connectedUser) {
-      return;
-    }
-
-    feed.getOrCreate({ watch: true }).catch((error) => console.error(error));
-  }, [feed, connectedUser]);
+  const feed = useCreateAndQueryFeed(createFeedConfig);
 
   if (!feed) {
     return null;
