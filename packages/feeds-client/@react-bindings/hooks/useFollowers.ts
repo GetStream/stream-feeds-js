@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Feed, FeedState } from '../../src/Feed';
 import { useStateStore } from './useStateStore';
+import { Constants } from '../../src/utils';
 
 const selector = ({
   follower_count,
@@ -12,23 +13,37 @@ const selector = ({
   followers_pagination,
 });
 
-export const useFollowers = (feed: Feed | undefined) => {
+type UseFollowersReturnType = ReturnType<typeof selector> & {
+  isLoadingNextPage: boolean;
+  hasNextPage: boolean;
+  loadNextPage: (
+    ...options: Parameters<Feed['loadNextPageFollowers']>
+  ) => Promise<void>;
+};
+
+export function useFollowers(feed: Feed): UseFollowersReturnType;
+export function useFollowers(
+  feed: Feed | undefined,
+): UseFollowersReturnType | undefined;
+export function useFollowers(feed: Feed | undefined) {
   const data = useStateStore(feed?.state, selector);
 
-  const loadNextPage = useMemo(() => {
-    if (!feed) return undefined;
-
-    return (...options: Parameters<Feed['loadNextPageFollowers']>) =>
-      feed?.loadNextPageFollowers(...options);
-  }, [feed]);
+  const loadNextPage = useCallback(
+    (...options: Parameters<Feed['loadNextPageFollowers']>) =>
+      feed?.loadNextPageFollowers(...options),
+    [feed],
+  );
 
   return useMemo(() => {
+    if (!data) {
+      return undefined;
+    }
+
     return {
-      follower_count: data?.follower_count ?? 0,
-      followers: data?.followers ?? [],
-      followers_pagination: data?.followers_pagination,
-      isLoadingNextPage: data?.followers_pagination?.loading_next_page ?? false,
+      ...data,
+      isLoadingNextPage: data.followers_pagination?.loading_next_page ?? false,
+      hasNextPage: data.followers_pagination?.next !==  Constants.END_OF_LIST,
       loadNextPage,
     };
   }, [data, loadNextPage]);
-};
+}

@@ -43,6 +43,7 @@ import type {
   PagerResponseWithLoadingStates,
 } from './types';
 import type { FromArray } from './types-internal';
+import { Constants } from './utils';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -109,9 +110,6 @@ export type FeedState = Omit<
 
   last_get_or_create_request_config?: GetOrCreateFeedRequest;
 };
-
-const END_OF_LIST = 'eol' as const;
-const DEFAULT_COMMENT_PAGINATION = 'first' as const;
 
 type EventHandlerByEventType = {
   [Key in NonNullable<WSEvent['type']>]: Key extends Extract<
@@ -221,7 +219,7 @@ export class Feed extends FeedApi {
 
         if (
           entityState?.pagination?.sort === 'last' &&
-          entityState?.pagination.next === END_OF_LIST
+          entityState?.pagination.next === Constants.END_OF_LIST
         ) {
           newComments.unshift(comment);
         } else if (entityState?.pagination?.sort === 'first') {
@@ -320,7 +318,9 @@ export class Feed extends FeedApi {
             ...event.follow.source_feed,
           };
 
-          if (currentState.following_pagination?.next === END_OF_LIST) {
+          if (
+            currentState.following_pagination?.next === Constants.END_OF_LIST
+          ) {
             // TODO: respect sort
             newState.following = currentState.following
               ? currentState.following.concat(event.follow)
@@ -345,7 +345,9 @@ export class Feed extends FeedApi {
               : [event.follow];
           }
 
-          if (currentState.followers_pagination?.next === END_OF_LIST) {
+          if (
+            currentState.followers_pagination?.next === Constants.END_OF_LIST
+          ) {
             // TODO: respect sort
             newState.followers = currentState.followers
               ? currentState.followers.concat(event.follow)
@@ -403,7 +405,9 @@ export class Feed extends FeedApi {
       const { member } = event;
 
       // do not add a member if the pagination has reached the end of the list
-      if (this.currentState.member_pagination?.next !== END_OF_LIST) return;
+      if (this.currentState.member_pagination?.next !== Constants.END_OF_LIST) {
+        return;
+      }
 
       this.state.next((currentState) => {
         return {
@@ -614,7 +618,7 @@ export class Feed extends FeedApi {
             ...responseCopy,
           };
 
-          // if there is no next cursor, set it to END_OF_LIST
+          // if there is no next cursor, set it to Constants.END_OF_LIST
           // request has to have a limit set for this to work
           if (
             (request?.followers_pagination?.limit ?? 0) > 0 &&
@@ -622,7 +626,7 @@ export class Feed extends FeedApi {
           ) {
             nextState.followers_pagination = {
               ...nextState.followers_pagination,
-              next: END_OF_LIST,
+              next: Constants.END_OF_LIST,
             };
           }
 
@@ -632,7 +636,7 @@ export class Feed extends FeedApi {
           ) {
             nextState.following_pagination = {
               ...nextState.following_pagination,
-              next: END_OF_LIST,
+              next: Constants.END_OF_LIST,
             };
           }
 
@@ -642,7 +646,7 @@ export class Feed extends FeedApi {
           ) {
             nextState.member_pagination = {
               ...nextState.member_pagination,
-              next: END_OF_LIST,
+              next: Constants.END_OF_LIST,
             };
           }
 
@@ -811,7 +815,8 @@ export class Feed extends FeedApi {
         },
       }));
 
-      const { next: newNextCursor = END_OF_LIST, comments } = await base();
+      const { next: newNextCursor = Constants.END_OF_LIST, comments } =
+        await base();
 
       this.state.next((currentState) => {
         const newPagination = {
@@ -872,9 +877,10 @@ export class Feed extends FeedApi {
     const currentSort = pagination?.sort;
     const isLoading = pagination?.loading_next_page;
 
-    const sort = currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION;
+    const sort =
+      currentSort ?? request?.sort ?? Constants.DEFAULT_COMMENT_PAGINATION;
 
-    if (isLoading || currentNextCursor === END_OF_LIST) return;
+    if (isLoading || currentNextCursor === Constants.END_OF_LIST) return;
 
     await this.loadNextPageComments({
       forId: activity.id,
@@ -900,9 +906,10 @@ export class Feed extends FeedApi {
     const currentSort = pagination?.sort;
     const isLoading = pagination?.loading_next_page;
 
-    const sort = currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION;
+    const sort =
+      currentSort ?? request?.sort ?? Constants.DEFAULT_COMMENT_PAGINATION;
 
-    if (isLoading || currentNextCursor === END_OF_LIST) return;
+    if (isLoading || currentNextCursor === Constants.END_OF_LIST) return;
 
     await this.loadNextPageComments({
       forId: comment.id,
@@ -911,7 +918,10 @@ export class Feed extends FeedApi {
           ...request,
           comment_id: comment.id,
           // use known sort first (prevents broken pagination)
-          sort: currentSort ?? request?.sort ?? DEFAULT_COMMENT_PAGINATION,
+          sort:
+            currentSort ??
+            request?.sort ??
+            Constants.DEFAULT_COMMENT_PAGINATION,
           next: currentNextCursor,
         }),
       parentId: comment.parent_id ?? comment.object_id,
@@ -929,7 +939,7 @@ export class Feed extends FeedApi {
     const currentNextCursor = this.currentState[paginationKey]?.next;
     const isLoading = this.currentState[paginationKey]?.loading_next_page;
 
-    if (isLoading || currentNextCursor === END_OF_LIST) return;
+    if (isLoading || currentNextCursor === Constants.END_OF_LIST) return;
 
     try {
       this.state.next((currentState) => {
@@ -942,12 +952,11 @@ export class Feed extends FeedApi {
         };
       });
 
-      const { next: newNextCursor = END_OF_LIST, follows } = await this[method](
-        {
+      const { next: newNextCursor = Constants.END_OF_LIST, follows } =
+        await this[method]({
           ...request,
           next: currentNextCursor,
-        },
-      );
+        });
 
       this.state.next((currentState) => ({
         ...currentState,
