@@ -786,6 +786,8 @@ export class Feed extends FeedApi {
     sort: string;
     base: () => Promise<PagerResponse & { comments: CommentResponse[] }>;
   }) {
+    let error: Error | undefined;
+
     try {
       this.state.next((currentState) => ({
         ...currentState,
@@ -830,9 +832,12 @@ export class Feed extends FeedApi {
           },
         };
       });
-    } catch (error) {
-      console.error(error);
-      // TODO: figure out how to handle errorss
+    } catch (e) {
+      if (e instanceof Error) {
+        error = e;
+      } else {
+        error = new Error(`Unexpected error: ${e}`);
+      }
     } finally {
       this.state.next((currentState) => ({
         ...currentState,
@@ -847,6 +852,10 @@ export class Feed extends FeedApi {
           },
         },
       }));
+    }
+
+    if (error) {
+      throw error;
     }
   }
 
@@ -936,6 +945,7 @@ export class Feed extends FeedApi {
     const currentFollows = this.currentState[type];
     const currentNextCursor = this.currentState[paginationKey]?.next;
     const isLoading = this.currentState[paginationKey]?.loading_next_page;
+    let error: Error | undefined;
 
     if (isLoading || !checkHasAnotherPage(currentFollows, currentNextCursor)) {
       return;
@@ -969,9 +979,12 @@ export class Feed extends FeedApi {
           sort: currentState[paginationKey]?.sort ?? request.sort,
         },
       }));
-    } catch (error) {
-      console.error(error);
-      // TODO: figure out how to handle errorss
+    } catch (e) {
+      if (e instanceof Error) {
+        error = e;
+      } else {
+        error = new Error(`Unexpected error: ${e}`);
+      }
     } finally {
       this.state.next((currentState) => {
         return {
@@ -982,6 +995,10 @@ export class Feed extends FeedApi {
           },
         };
       });
+    }
+
+    if (error) {
+      throw error;
     }
   }
 
@@ -1036,9 +1053,7 @@ export class Feed extends FeedApi {
       if (e instanceof Error) {
         error = e;
       } else {
-        error = new Error(
-          `Unexpected error: ${e}`,
-        );
+        error = new Error(`Unexpected error: ${e}`);
       }
     } finally {
       this.state.next((currentState) => ({
