@@ -2,7 +2,7 @@ import { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 // @ts-expect-error something broken with local assets, will fix later
 import postPlaceholder from '@/assets/images/post-placeholder.png';
-import { Ionicons } from '@expo/vector-icons';
+import { Reaction } from '@/components/Reaction';
 
 export const Activity = ({ activity }: { activity: ActivityResponse }) => {
   const attachment = activity.attachments.find(
@@ -18,9 +18,9 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
           style={styles.image}
           resizeMode="cover"
         />
-        <TouchableOpacity style={styles.heartIcon}>
-          <Ionicons name="heart-outline" size={20} color="white" />
-        </TouchableOpacity>
+        <View style={styles.heartIcon}>
+          <Reaction type='like' entity={activity} />
+        </View>
       </View>
       <Text style={styles.title} numberOfLines={2}>
         {activity.text}
