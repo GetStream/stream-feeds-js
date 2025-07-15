@@ -998,6 +998,7 @@ export class Feed extends FeedApi {
   ) {
     const currentNextCursor = this.currentState.member_pagination?.next;
     const isLoading = this.currentState.member_pagination?.loading_next_page;
+    let error: Error | undefined;
 
     if (isLoading || currentNextCursor === END_OF_LIST) return;
 
@@ -1031,8 +1032,14 @@ export class Feed extends FeedApi {
           sort: currentState.member_pagination?.sort ?? request.sort,
         },
       }));
-    } catch (error) {
-      console.error(error);
+    } catch (e) {
+      if (e instanceof Error) {
+        error = e;
+      } else {
+        error = new Error(
+          `Unexpected error: ${e}`,
+        );
+      }
     } finally {
       this.state.next((currentState) => ({
         ...currentState,
@@ -1041,6 +1048,10 @@ export class Feed extends FeedApi {
           loading_next_page: false,
         },
       }));
+    }
+
+    if (error) {
+      throw error;
     }
   }
 
