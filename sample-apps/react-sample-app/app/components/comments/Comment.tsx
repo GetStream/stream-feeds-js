@@ -55,36 +55,12 @@ export const Comment = ({
     feed.state,
     selector,
   );
-  const { comments, comment_pagination: commentPagination } = useComments(
-    feed,
-    comment,
-  );
-
-  const hasReaction = useCallback(
-    (type: 'upvote' | 'downvote') => {
-      return comment.own_reactions.some((reaction) => reaction.type === type);
-    },
-    [comment],
-  );
-
-  const toggleReaction = useCallback(
-    (type: 'upvote' | 'downvote') => {
-      const hr = hasReaction(type);
-
-      if (hr) {
-        client?.deleteCommentReaction({
-          comment_id: comment.id,
-          type,
-        });
-      } else {
-        client?.addCommentReaction({
-          comment_id: comment.id,
-          type,
-        });
-      }
-    },
-    [client, comment.id, hasReaction],
-  );
+  const {
+    comments = [],
+    hasNextPage,
+    isLoadingNextPage,
+    loadNextPage,
+  } = useComments(feed, comment);
 
   return (
     <>
@@ -173,7 +149,7 @@ export const Comment = ({
               type="button"
               className="flex items-center text-sm text-gray-500 gap-1 font-medium"
               onClick={() =>
-                feed.loadNextPageCommentReplies(comment, {
+                loadNextPage({
                   sort: DEFAULT_PAGINATION_SORT,
                   limit: 5,
                 })
@@ -186,8 +162,8 @@ export const Comment = ({
       </article>
       <PaginatedList
         items={comments}
-        isLoading={commentPagination?.loading_next_page ?? false}
-        hasNext={commentPagination?.next !== 'eol'}
+        isLoading={isLoadingNextPage}
+        hasNext={hasNextPage}
         renderItem={(c) => (
           <Comment
             feed={feed}
@@ -198,7 +174,7 @@ export const Comment = ({
           />
         )}
         onLoadMore={() =>
-          feed.loadNextPageCommentReplies(comment, {
+          loadNextPage({
             limit: 5,
           })
         }
