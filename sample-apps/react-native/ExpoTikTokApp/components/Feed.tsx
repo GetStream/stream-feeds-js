@@ -1,7 +1,7 @@
 import {
   ActivityResponse,
   useFeedContext,
-  useStateStore,
+  useFeedActivities,
 } from '@stream-io/feeds-react-native-sdk';
 import {
   ActivityIndicator,
@@ -22,12 +22,7 @@ const keyExtractor = (item: ActivityResponse) => item.id;
 export const Feed = () => {
   const [error, setError] = useState<Error | undefined>();
   const feed = useFeedContext();
-  const { hasNextPage, isLoading, activities } =
-    useStateStore(feed?.state, (state) => ({
-      isLoading: state.is_loading_activities,
-      hasNextPage: typeof state.next !== 'undefined',
-      activities: state.activities ?? [],
-    })) ?? {};
+  const { hasNextPage, isLoading, activities } = useFeedActivities() ?? {};
 
   const getNextPage = useCallback(() => {
     if (!feed || !hasNextPage || isLoading) {

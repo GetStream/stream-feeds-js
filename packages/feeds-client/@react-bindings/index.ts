@@ -5,6 +5,7 @@ export * from './hooks/useStateStore';
 export * from './hooks/useOwnCapabilities';
 export * from './hooks/clientStateHooks';
 export * from './hooks/useCreateFeedsClient';
+export * from './hooks/feedStateHooks';
 export * from './hooks/useFollowing';
 export * from './hooks/useFollowers';
 
