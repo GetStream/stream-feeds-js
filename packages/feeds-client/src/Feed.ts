@@ -786,7 +786,7 @@ export class Feed extends FeedApi {
     sort: string;
     base: () => Promise<PagerResponse & { comments: CommentResponse[] }>;
   }) {
-    let error: Error | undefined;
+    let error: unknown;
 
     try {
       this.state.next((currentState) => ({
@@ -833,11 +833,7 @@ export class Feed extends FeedApi {
         };
       });
     } catch (e) {
-      if (e instanceof Error) {
-        error = e;
-      } else {
-        error = new Error(`Unexpected error: ${e}`);
-      }
+      error = e;
     } finally {
       this.state.next((currentState) => ({
         ...currentState,
@@ -945,7 +941,7 @@ export class Feed extends FeedApi {
     const currentFollows = this.currentState[type];
     const currentNextCursor = this.currentState[paginationKey]?.next;
     const isLoading = this.currentState[paginationKey]?.loading_next_page;
-    let error: Error | undefined;
+    let error: unknown;
 
     if (isLoading || !checkHasAnotherPage(currentFollows, currentNextCursor)) {
       return;
@@ -980,11 +976,7 @@ export class Feed extends FeedApi {
         },
       }));
     } catch (e) {
-      if (e instanceof Error) {
-        error = e;
-      } else {
-        error = new Error(`Unexpected error: ${e}`);
-      }
+      error = e;
     } finally {
       this.state.next((currentState) => {
         return {
@@ -1015,7 +1007,7 @@ export class Feed extends FeedApi {
   ) {
     const currentNextCursor = this.currentState.member_pagination?.next;
     const isLoading = this.currentState.member_pagination?.loading_next_page;
-    let error: Error | undefined;
+    let error: unknown;
 
     if (isLoading || currentNextCursor === END_OF_LIST) return;
 
@@ -1050,11 +1042,7 @@ export class Feed extends FeedApi {
         },
       }));
     } catch (e) {
-      if (e instanceof Error) {
-        error = e;
-      } else {
-        error = new Error(`Unexpected error: ${e}`);
-      }
+      error = e;
     } finally {
       this.state.next((currentState) => ({
         ...currentState,
