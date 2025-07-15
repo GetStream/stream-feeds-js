@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Feed, FeedState } from '../../src/Feed';
 import { FeedOwnCapability } from '../../src/gen/models';
 import { useStateStore } from './useStateStore';
+import { useFeedContext } from '../contexts/StreamFeedContext';
 
 const stableEmptyArray: readonly FeedOwnCapability[] = [];
 
@@ -13,7 +14,8 @@ type KebabToCamelCase<S extends string> = S extends `${infer T}-${infer U}`
   ? `${T}${Capitalize<KebabToCamelCase<U>>}`
   : S;
 
-export const useOwnCapabilities = (feed: Feed | undefined) => {
+export const useOwnCapabilities = () => {
+  const feed = useFeedContext();
   const { oc = stableEmptyArray } = useStateStore(feed?.state, selector) ?? {};
 
   return useMemo(

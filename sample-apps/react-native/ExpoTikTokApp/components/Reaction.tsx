@@ -1,7 +1,9 @@
 import {
   ActivityResponse,
   CommentResponse,
+  FeedOwnCapability,
   useFeedsClient,
+  useOwnCapabilities,
 } from '@stream-io/feeds-react-native-sdk';
 import { useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,10 +28,21 @@ export const Reaction = ({
   isComment?: boolean;
 }) => {
   const client = useFeedsClient();
+  const ownCapabilities = useOwnCapabilities();
+
   const counts = entity.reaction_groups?.[type]?.count ?? 0;
   const hasOwnReaction = !!entity.own_reactions?.find((r) => r.type === type);
+  const canAddReaction = isComment
+    ? ownCapabilities.canAddCommentReaction
+    : ownCapabilities.canAddActivityReaction;
+  const canRemoveReaction = isComment
+    ? ownCapabilities.canRemoveCommentReaction
+    : ownCapabilities.canRemoveActivityReaction;
 
   const addReaction = useCallback(async () => {
+    if (!canAddReaction) {
+      return;
+    }
     try {
       await (isComment
         ? client?.addCommentReaction({ comment_id: entity.id, type })
@@ -37,9 +50,12 @@ export const Reaction = ({
     } catch (error) {
       console.error(error as Error);
     }
-  }, [client, entity.id, isComment, type]);
+  }, [canAddReaction, client, entity.id, isComment, type]);
 
   const removeReaction = useCallback(async () => {
+    if (!canRemoveReaction) {
+      return;
+    }
     try {
       await (isComment
         ? client?.deleteCommentReaction({ comment_id: entity.id, type })
@@ -50,7 +66,7 @@ export const Reaction = ({
     } catch (error) {
       console.error(error as Error);
     }
-  }, [client, entity.id, isComment, type]);
+  }, [canRemoveReaction, client, entity.id, isComment, type]);
 
   const toggleReaction = useCallback(async () => {
     if (hasOwnReaction) {
