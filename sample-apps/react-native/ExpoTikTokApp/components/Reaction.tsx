@@ -1,7 +1,6 @@
 import {
   ActivityResponse,
   CommentResponse,
-  FeedOwnCapability,
   useFeedsClient,
   useOwnCapabilities,
 } from '@stream-io/feeds-react-native-sdk';
