@@ -1,11 +1,11 @@
 import { Feed } from '@/components/Feed';
 import { StyleSheet, View } from 'react-native';
-import { ConnectionLoadHeader } from '@/components/ConnectionLostHeader';
+import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
 
 const TabOneScreen = () => {
   return (
     <View style={styles.container}>
-      <ConnectionLoadHeader />
+      <ConnectionLostHeader />
       <Feed />
     </View>
   );

@@ -12,7 +12,7 @@ import {
 
 const HEADER_HEIGHT = 30;
 
-export const ConnectionLoadHeader = () => {
+export const ConnectionLostHeader = () => {
   const { isHealthy } = useWsConnectionState();
   const connectedUser = useClientConnectedUser();
 

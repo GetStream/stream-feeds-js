@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet } from 'react-native';
 
 import { Text, View } from '@/components/Themed';
-import { ConnectionLoadHeader } from '@/components/ConnectionLostHeader';
+import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
 import { useClientConnectedUser} from '@stream-io/feeds-react-native-sdk';
 import { useUserContext } from '@/contexts/UserContext';
 
@@ -11,7 +11,7 @@ export default function TabTwoScreen() {
 
   return (
     <View style={styles.container}>
-      <ConnectionLoadHeader />
+      <ConnectionLostHeader />
       <Text style={styles.title}>Stream Feeds Demo</Text>
       <View
         style={styles.separator}
