@@ -30,12 +30,12 @@ export const Feed = () => {
     })) ?? {};
 
   const getNextPage = useCallback(() => {
-    if (!feed || !hasNextPage) {
+    if (!feed || !hasNextPage || isLoading) {
       return;
     }
     setError(undefined);
     feed.getNextPage().catch(setError);
-  }, [hasNextPage, feed]);
+  }, [hasNextPage, isLoading, feed]);
 
   const ListFooterComponent = useCallback(
     () =>
