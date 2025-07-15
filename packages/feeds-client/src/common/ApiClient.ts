@@ -77,7 +77,7 @@ export class ApiClient {
       Object.keys(body).forEach((key) => {
         const value = body[key];
         if (value != null) {
-          encodedBody.append(key, body[key]);
+          encodedBody.append(key, value);
         }
       });
     }
