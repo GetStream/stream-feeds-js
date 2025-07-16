@@ -2,6 +2,11 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.4](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.3...@stream-io/feeds-client-0.1.4) (2025-07-16)
+
+
+* update to latest openapi ([#62](https://github.com/GetStream/stream-feeds-js/issues/62)) ([82b39ae](https://github.com/GetStream/stream-feeds-js/commit/82b39aee0c62cd9aa1598fb42aaf6637ded83a33))
+
 ## [0.1.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.2...@stream-io/feeds-client-0.1.3) (2025-07-15)
 
 
