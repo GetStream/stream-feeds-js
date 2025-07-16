@@ -955,6 +955,7 @@ export class Feed extends FeedApi {
     const currentFollows = this.currentState[type];
     const currentNextCursor = this.currentState[paginationKey]?.next;
     const isLoading = this.currentState[paginationKey]?.loading_next_page;
+    const sort = this.currentState[paginationKey]?.sort ?? request.sort;
     let error: unknown;
 
     if (isLoading || !checkHasAnotherPage(currentFollows, currentNextCursor)) {
@@ -975,7 +976,7 @@ export class Feed extends FeedApi {
       const { next: newNextCursor, follows } = await this[method]({
         ...request,
         next: currentNextCursor,
-        sort: this.currentState[paginationKey]?.sort ?? request.sort,
+        sort,
       });
 
       this.state.next((currentState) => ({
@@ -986,7 +987,7 @@ export class Feed extends FeedApi {
         [paginationKey]: {
           ...currentState[paginationKey],
           next: newNextCursor,
-          sort: currentState[paginationKey]?.sort ?? request.sort,
+          sort,
         },
       }));
     } catch (e) {
@@ -1021,9 +1022,10 @@ export class Feed extends FeedApi {
   ) {
     const currentNextCursor = this.currentState.member_pagination?.next;
     const isLoading = this.currentState.member_pagination?.loading_next_page;
+    const sort = this.currentState.member_pagination?.sort ?? request.sort;
     let error: unknown;
 
-    if (isLoading || currentNextCursor === END_OF_LIST) return;
+    if (isLoading || currentNextCursor === Constants.END_OF_LIST) return;
 
     try {
       this.state.next((currentState) => ({
@@ -1034,10 +1036,10 @@ export class Feed extends FeedApi {
         },
       }));
 
-      const { next: newNextCursor = END_OF_LIST, members } =
+      const { next: newNextCursor = Constants.END_OF_LIST, members } =
         await this.client.queryFeedMembers({
           ...request,
-          sort: this.currentState.member_pagination?.sort ?? request.sort,
+          sort,
           feed_id: this.id,
           feed_group_id: this.group,
           next: currentNextCursor,
