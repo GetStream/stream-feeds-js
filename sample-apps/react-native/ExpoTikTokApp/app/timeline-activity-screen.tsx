@@ -8,6 +8,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   Platform,
+  Button,
 } from 'react-native';
 import {
   ActivityResponse,
@@ -21,6 +22,8 @@ import {
   useActivityPagerContext,
 } from '@/contexts/ActivityPagerContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
+import { useVideoPlayer, VideoPlayer, VideoView } from 'expo-video';
+import { useEvent } from 'expo';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -38,6 +41,15 @@ const UnmemoizedActivityItem = ({
   activity: ActivityResponse;
   isActive: boolean;
 }) => {
+  const videoAttachment = useMemo(
+    () => activity.attachments.find((a) => a.type === 'video'),
+    [activity.attachments],
+  );
+  if (videoAttachment?.asset_url) {
+    return (
+      <ActivityVideo source={videoAttachment.asset_url} isActive={isActive} />
+    );
+  }
   return (
     <View style={styles.page}>
       <View style={styles.placeholder}>
@@ -50,29 +62,51 @@ const UnmemoizedActivityItem = ({
   );
 };
 
+const videoPlayerCallback = (player: VideoPlayer) => {
+  player.loop = true;
+}
+
+const ActivityVideo = ({
+  source,
+  isActive,
+}: {
+  source: string;
+  isActive: boolean;
+}) => {
+  const player = useVideoPlayer(source, videoPlayerCallback);
+
+  useEffect(() => {
+    if (isActive) {
+      player.play();
+    } else {
+      player.pause();
+    }
+  }, [isActive, player]);
+
+  return (
+    <View style={styles.page}>
+      <VideoView
+        style={styles.video}
+        player={player}
+        nativeControls={false}
+        allowsFullscreen={false}
+        allowsPictureInPicture={false}
+      />
+    </View>
+  );
+};
+
 const ActivityItem = React.memo(UnmemoizedActivityItem);
 
-const ActivityItemWrapper = ({
-  activity,
-  index,
-}: {
-  activity: ActivityResponse;
-  index: number;
-}) => {
+const ActivityItemWrapper = ({ activity }: { activity: ActivityResponse }) => {
   const { activeId } = useActivityPagerContext();
   const isActive = activeId === activity.id;
 
   return <ActivityItem activity={activity} isActive={isActive} />;
 };
 
-const renderItem = ({
-  item,
-  index,
-}: {
-  item: ActivityResponse;
-  index: number;
-}) => {
-  return <ActivityItemWrapper activity={item} index={index} />;
+const renderItem = ({ item }: { item: ActivityResponse }) => {
+  return <ActivityItemWrapper activity={item} />;
 };
 
 const keyExtractor = (item: ActivityResponse) => item.id;
@@ -97,10 +131,7 @@ const TimelineActivityUI = () => {
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offsetY = event.nativeEvent.contentOffset.y;
       const currentIndex = Math.round(offsetY / SCREEN_HEIGHT);
-      // setCurrentIndex(currentIndex); // use container height
       setActiveId(activities?.[currentIndex]?.id);
-      console.log('Snapped to index2:', currentIndex);
-      console.log('Got activity: ', activities?.[currentIndex]);
     },
   );
 
@@ -108,17 +139,6 @@ const TimelineActivityUI = () => {
   activeIdRef.current = activeId;
 
   const flatListRef = useRef<FlatList<ActivityResponse>>(null);
-
-  const maintainVisibleContentPosition = useMemo(
-    () => ({
-      minIndexForVisible:
-        activities && activities.length && activeIdRef.current
-          ? activities?.findIndex((a) => a.id === activeIdRef.current)
-          : 0,
-      autoscrollToTopThreshold: undefined,
-    }),
-    [activities],
-  );
 
   useEffect(() => {
     if (
@@ -151,7 +171,7 @@ const TimelineActivityUI = () => {
         showsVerticalScrollIndicator={false}
         onMomentumScrollEnd={handleSnap}
         initialNumToRender={3}
-        windowSize={5}
+        windowSize={3}
         getItemLayout={getItemLayout}
         {...pagerProps}
       />
@@ -195,4 +215,18 @@ const styles = StyleSheet.create({
   },
   listStyle: { flex: 1 },
   listContentContainerStyle: { flexGrow: 1 },
+  contentContainer: {
+    flex: 1,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 50,
+  },
+  video: {
+    height: SCREEN_HEIGHT,
+    width: '100%',
+  },
+  controlsContainer: {
+    padding: 10,
+  },
 });
