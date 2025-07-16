@@ -430,6 +430,8 @@ export interface ActivityResponse {
   parent?: ActivityResponse;
 
   poll?: PollResponseData;
+
+  target?: Record<string, any>;
 }
 
 export interface ActivityUnpinnedEvent {
@@ -521,6 +523,8 @@ export interface AddBookmarkResponse {
 export interface AddCommentReactionRequest {
   type: string;
 
+  create_notification_activity?: boolean;
+
   custom?: Record<string, any>;
 }
 
@@ -538,6 +542,8 @@ export interface AddCommentRequest {
   object_id: string;
 
   object_type: string;
+
+  create_notification_activity?: boolean;
 
   parent_id?: string;
 
@@ -572,6 +578,8 @@ export interface AddFolderRequest {
 
 export interface AddReactionRequest {
   type: string;
+
+  create_notification_activity?: boolean;
 
   custom?: Record<string, any>;
 }
@@ -802,6 +810,16 @@ export interface BanActionRequest {
   timeout?: number;
 }
 
+export interface BanOptions {
+  duration: number;
+
+  ip_ban: boolean;
+
+  reason: string;
+
+  shadow_ban: boolean;
+}
+
 export interface BanRequest {
   target_user_id: string;
 
@@ -824,6 +842,10 @@ export interface BanRequest {
 
 export interface BanResponse {
   duration: string;
+}
+
+export interface BlockContentOptions {
+  reason: string;
 }
 
 export interface BlockListConfig {
@@ -1944,6 +1966,8 @@ export interface ConfigResponse {
 
   block_list_config?: BlockListConfig;
 
+  rule_builder_config?: RuleBuilderConfig;
+
   velocity_filter_config?: VelocityFilterConfig;
 
   video_call_rule_config?: VideoCallRuleConfig;
@@ -1963,6 +1987,12 @@ export interface ConnectUserDetailsRequest {
   custom?: Record<string, any>;
 
   privacy_settings?: PrivacySettingsResponse;
+}
+
+export interface ContentCountRuleParameters {
+  threshold: number;
+
+  time_window: string;
 }
 
 export interface CreateBlockListRequest {
@@ -2797,6 +2827,10 @@ export interface Flag {
   user?: User;
 }
 
+export interface FlagContentOptions {
+  reason: string;
+}
+
 export interface FlagRequest {
   entity_id: string;
 
@@ -2815,6 +2849,10 @@ export interface FlagResponse {
   duration: string;
 
   item_id: string;
+}
+
+export interface FlagUserOptions {
+  reason: string;
 }
 
 export interface FollowBatchRequest {
@@ -2859,6 +2897,8 @@ export interface FollowRequest {
   source: string;
 
   target: string;
+
+  create_notification_activity?: boolean;
 
   push_preference?: 'all' | 'none';
 
@@ -3223,6 +3263,10 @@ export interface HealthCheckEvent {
   me?: OwnUserResponse;
 }
 
+export interface ImageContentParameters {
+  harm_labels?: string[];
+}
+
 export interface ImageData {
   frames: string;
 
@@ -3233,6 +3277,14 @@ export interface ImageData {
   url: string;
 
   width: string;
+}
+
+export interface ImageRuleParameters {
+  threshold: number;
+
+  time_window: string;
+
+  harm_labels?: string[];
 }
 
 export interface ImageSize {
@@ -4776,45 +4828,71 @@ export interface RingSettingsResponse {
 }
 
 export interface RuleBuilderAction {
-  duration?: number;
+  type: string;
 
-  ip_ban?: boolean;
+  ban_options?: BanOptions;
 
-  reason?: string;
+  flag_content_options?: FlagContentOptions;
 
-  shadow_ban?: boolean;
+  flag_user_options?: FlagUserOptions;
 
-  type?: string;
+  remove_content_options?: BlockContentOptions;
 }
 
 export interface RuleBuilderCondition {
-  provider?: string;
+  type: string;
 
-  threshold?: number;
+  confidence?: number;
 
-  time_window?: string;
+  content_count_rule_params?: ContentCountRuleParameters;
 
-  labels?: string[];
+  image_content_params?: ImageContentParameters;
+
+  image_rule_params?: ImageRuleParameters;
+
+  text_content_params?: TextContentParameters;
+
+  text_rule_params?: TextRuleParameters;
+
+  user_created_within_params?: UserCreatedWithinParameters;
+
+  user_rule_params?: UserRuleParameters;
+
+  video_content_params?: VideoContentParameters;
+
+  video_rule_params?: VideoRuleParameters;
+}
+
+export interface RuleBuilderConditionGroup {
+  logic: string;
+
+  conditions: RuleBuilderCondition[];
 }
 
 export interface RuleBuilderConfig {
+  rules: RuleBuilderRule[];
+
   async?: boolean;
-
-  enabled?: boolean;
-
-  rules?: RuleBuilderRule[];
 }
 
 export interface RuleBuilderRule {
-  enabled?: boolean;
+  enabled: boolean;
 
-  id?: string;
+  id: string;
 
-  name?: string;
+  name: string;
+
+  rule_type: string;
+
+  action: RuleBuilderAction;
+
+  cooldown_period?: string;
+
+  logic?: string;
 
   conditions?: RuleBuilderCondition[];
 
-  action?: RuleBuilderAction;
+  groups?: RuleBuilderConditionGroup[];
 }
 
 export interface SFUIDLastSeen {
@@ -4954,6 +5032,8 @@ export interface SingleFollowRequest {
 
   target: string;
 
+  create_notification_activity?: boolean;
+
   push_preference?: 'all' | 'none';
 
   custom?: Record<string, any>;
@@ -5024,6 +5104,30 @@ export interface TargetResolution {
   height: number;
 
   width: number;
+}
+
+export interface TextContentParameters {
+  contains_url?: boolean;
+
+  severity?: string;
+
+  blocklist_match?: string[];
+
+  harm_labels?: string[];
+}
+
+export interface TextRuleParameters {
+  threshold: number;
+
+  time_window: string;
+
+  contains_url?: boolean;
+
+  severity?: string;
+
+  blocklist_match?: string[];
+
+  harm_labels?: string[];
 }
 
 export interface ThreadedCommentResponse {
@@ -5355,6 +5459,8 @@ export interface UpdateFollowRequest {
 
   target: string;
 
+  create_notification_activity?: boolean;
+
   follower_role?: string;
 
   push_preference?: 'all' | 'none';
@@ -5554,6 +5660,10 @@ export interface UserBannedEvent {
   user?: User;
 }
 
+export interface UserCreatedWithinParameters {
+  max_age?: string;
+}
+
 export interface UserDeactivatedEvent {
   created_at: Date;
 
@@ -5736,6 +5846,10 @@ export interface UserResponsePrivacyFields {
   teams_role?: Record<string, string>;
 }
 
+export interface UserRuleParameters {
+  max_age?: string;
+}
+
 export interface UserUpdatedEvent {
   created_at: Date;
 
@@ -5798,12 +5912,24 @@ export interface VideoCallRuleConfig {
   rules: Record<string, HarmConfig>;
 }
 
+export interface VideoContentParameters {
+  harm_labels?: string[];
+}
+
 export interface VideoEndCallRequest {}
 
 export interface VideoKickUserRequest {}
 
 export interface VideoOrientation {
   orientation?: number;
+}
+
+export interface VideoRuleParameters {
+  threshold: number;
+
+  time_window: string;
+
+  harm_labels?: string[];
 }
 
 export interface VideoSettings {
