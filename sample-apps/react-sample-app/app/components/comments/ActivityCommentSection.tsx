@@ -21,10 +21,12 @@ export const ActivityCommentSection = ({
   const { client } = useUserContext();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const { comments, comment_pagination: commentPagination } = useComments(
-    feed,
-    activity,
-  );
+  const {
+    comments = [],
+    loadNextPage,
+    isLoadingNextPage,
+    hasNextPage,
+  } = useComments(feed, activity);
 
   const [parent, setParent] = useState<null | CommentResponse>(null);
 
@@ -34,7 +36,7 @@ export const ActivityCommentSection = ({
   }, []);
 
   useEffect(() => {
-    if (comments.length) return;
+    if (comments?.length) return;
 
     void feed.loadNextPageActivityComments(activity, {
       sort: DEFAULT_PAGINATION_SORT,
@@ -135,8 +137,8 @@ export const ActivityCommentSection = ({
 
         <PaginatedList
           items={comments}
-          isLoading={commentPagination?.loading_next_page ?? false}
-          hasNext={commentPagination?.next !== 'eol'}
+          isLoading={isLoadingNextPage}
+          hasNext={hasNextPage}
           renderItem={(c) => (
             <Comment
               feed={feed}
@@ -147,7 +149,7 @@ export const ActivityCommentSection = ({
             />
           )}
           onLoadMore={() =>
-            feed.loadNextPageActivityComments(activity, {
+            loadNextPage({
               limit: 5,
             })
           }
