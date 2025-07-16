@@ -647,6 +647,7 @@ export class FeedsApi {
     };
     const body = {
       type: request?.type,
+      create_notification_activity: request?.create_notification_activity,
       custom: request?.custom,
     };
 
@@ -858,6 +859,7 @@ export class FeedsApi {
       comment: request?.comment,
       object_id: request?.object_id,
       object_type: request?.object_type,
+      create_notification_activity: request?.create_notification_activity,
       parent_id: request?.parent_id,
       attachments: request?.attachments,
       mentioned_user_ids: request?.mentioned_user_ids,
@@ -997,6 +999,7 @@ export class FeedsApi {
     };
     const body = {
       type: request?.type,
+      create_notification_activity: request?.create_notification_activity,
       custom: request?.custom,
     };
 
@@ -1497,6 +1500,7 @@ export class FeedsApi {
     const body = {
       source: request?.source,
       target: request?.target,
+      create_notification_activity: request?.create_notification_activity,
       follower_role: request?.follower_role,
       push_preference: request?.push_preference,
       custom: request?.custom,
@@ -1524,6 +1528,7 @@ export class FeedsApi {
     const body = {
       source: request?.source,
       target: request?.target,
+      create_notification_activity: request?.create_notification_activity,
       push_preference: request?.push_preference,
       custom: request?.custom,
     };
