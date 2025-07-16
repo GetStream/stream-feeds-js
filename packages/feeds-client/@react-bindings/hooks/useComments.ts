@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 import type { ActivityResponse, CommentResponse } from '../../src/gen/models';
 import { Feed, FeedState } from '../../src/Feed';
 import { useStateStore } from './useStateStore';
+import { Constants } from '../../src/utils';
 
 const isCommentResponse = (entity: any): entity is CommentResponse => {
   return typeof entity?.object_id === 'string';
@@ -69,8 +70,7 @@ export function useComments<T extends ActivityResponse | CommentResponse>(
 
     return {
       ...data,
-      // TODO: use Constants.END_OF_LIST instead of 'eol' when follows PR gets merged
-      hasNextPage: data?.comments_pagination?.next !== 'eol',
+      hasNextPage: data?.comments_pagination?.next !== Constants.END_OF_LIST,
       isLoadingNextPage: data?.comments_pagination?.loading_next_page ?? false,
       loadNextPage,
     };
