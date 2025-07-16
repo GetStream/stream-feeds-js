@@ -1,25 +1,55 @@
-import { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityResponse,
+  useFeedContext,
+} from '@stream-io/feeds-react-native-sdk';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 // @ts-expect-error something broken with local assets, will fix later
 import postPlaceholder from '@/assets/images/post-placeholder.png';
 import { Reaction } from '@/components/Reaction';
+import { useRouter } from 'expo-router';
+import FastImage from 'react-native-fast-image';
+import { useMemo } from 'react';
 
-export const Activity = ({ activity }: { activity: ActivityResponse }) => {
+export const Activity = ({
+  activity,
+  index,
+}: {
+  activity: ActivityResponse;
+  index: number;
+}) => {
+  const feed = useFeedContext();
+  const router = useRouter();
   const attachment = activity.attachments.find(
     (att) => att.type === 'video' || att.type === 'image',
   );
   const image = attachment?.image_url ?? attachment?.thumb_url;
 
+  const imageSource = useMemo(() => {
+    return image ? { uri: image } : postPlaceholder;
+  }, [image]);
+
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity
+      onPress={() =>
+        router.push({
+          pathname: '/timeline-activity-screen',
+          params: {
+            initialIndex: index,
+            groupId: feed?.group,
+            id: feed?.id,
+          },
+        })
+      }
+      style={styles.card}
+    >
       <View style={styles.imageWrapper}>
-        <Image
-          source={image ? { uri: image } : postPlaceholder}
+        <FastImage
+          source={imageSource}
           style={styles.image}
           resizeMode="cover"
         />
         <View style={styles.heartIcon}>
-          <Reaction type='like' entity={activity} />
+          <Reaction type="like" entity={activity} />
         </View>
       </View>
       <Text style={styles.title} numberOfLines={2}>

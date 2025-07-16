@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   ActivityResponse,
   useFeedContext,
@@ -13,9 +14,13 @@ import {
 import { Activity } from '@/components/Activity';
 import { useCallback, useState } from 'react';
 
-const renderItem = ({ item }: { item: ActivityResponse }) => (
-  <Activity activity={item} />
-);
+const renderItem = ({
+  item,
+  index,
+}: {
+  item: ActivityResponse;
+  index: number;
+}) => <Activity activity={item} index={index} />;
 
 const keyExtractor = (item: ActivityResponse) => item.id;
 
@@ -32,12 +37,11 @@ export const Feed = () => {
     feed.getNextPage().catch(setError);
   }, [hasNextPage, isLoading, feed]);
 
+  const hasActivities = activities?.length && activities.length > 0;
+
   const ListFooterComponent = useCallback(
-    () =>
-      isLoading && activities?.length && activities.length > 0 ? (
-        <ActivityIndicator />
-      ) : null,
-    [isLoading, activities?.length],
+    () => (isLoading && hasActivities ? <ActivityIndicator /> : null),
+    [isLoading, hasActivities],
   );
 
   if (error) {
@@ -60,6 +64,8 @@ export const Feed = () => {
 
   return (
     <FlatList
+      // @ts-expect-error Using FlatList internal
+      strictMode={true}
       data={activities}
       renderItem={renderItem}
       keyExtractor={keyExtractor}

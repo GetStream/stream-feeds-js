@@ -26,8 +26,8 @@ const external = [
 ];
 
 const namespacedPackages = [
-  { input: 'index.ts', indexFileName: 'index' },
-  { input: '@react-bindings/index.ts', indexFileName: 'index-react-bindings' },
+  { input: 'index2.ts', indexFileName: 'index' },
+  { input: '@react-bindings/index2.ts', indexFileName: 'index2-react-bindings' },
 ];
 
 const configs = namespacedPackages.map(({ input, indexFileName }) => {

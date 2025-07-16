@@ -699,7 +699,7 @@ export class Feed extends FeedApi {
   }
 
   /**
-   * Returns index of the provided comment object.
+   * Returns index2 of the provided comment object.
    */
   private getCommentIndex(
     comment: Pick<CommentResponse, 'object_id' | 'parent_id' | 'id'>,
