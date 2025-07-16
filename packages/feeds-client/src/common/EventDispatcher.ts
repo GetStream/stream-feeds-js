@@ -9,9 +9,8 @@ export class EventDispatcher<
     Record<Type | 'all', Array<(event: Event) => void> | undefined>
   > = {};
 
-  private readonly logger = (level: LogLevel, message: string, extra: any) => {
+  private readonly logger = (_: LogLevel, __: string, ___: any) => {
     // TODO implement logging
-    console.log(level, message, extra);
   };
 
   dispatch = (event: Event) => {

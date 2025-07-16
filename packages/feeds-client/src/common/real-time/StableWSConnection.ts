@@ -111,9 +111,8 @@ export class StableWSConnection {
     addConnectionEventListeners(this.onlineStatusChanged);
   }
 
-  _log = (msg: string, extra: any = {}, level: LogLevel = 'info') => {
+  _log = (_: string, __: any = {}, ___: LogLevel = 'info') => {
     // TODO: fix logging
-    console.log(msg, extra, level);
   };
 
   on = this.dispatcher.on;

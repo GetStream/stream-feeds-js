@@ -125,7 +125,7 @@ export class ApiClient {
             );
           }
           throw new StreamApiError(
-            `Stream error code ${code}: ${message}`,
+            `Stream error code ${code}: ${message}. Request ID: ${client_request_id}`,
             this.getRequestMetadata(client_request_id, error.response),
             code,
             undefined,
