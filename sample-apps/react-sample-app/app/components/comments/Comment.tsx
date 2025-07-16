@@ -151,7 +151,8 @@ export const Comment = ({
               onClick={() =>
                 loadNextPage({
                   sort: DEFAULT_PAGINATION_SORT,
-                  limit: 5,
+                  limit: 1,
+                  depth: 5
                 })
               }
             >
