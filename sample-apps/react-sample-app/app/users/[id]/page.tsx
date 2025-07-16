@@ -67,7 +67,7 @@ export default function ProfilePage() {
     <>
       <div className="w-full flex flex-col items-center gap-5">
         <div className="w-full">
-          <FeedMetadata feed={feed} timeline={timeline}></FeedMetadata>
+          <FeedMetadata userFeed={feed} timelineFeed={timeline}></FeedMetadata>
         </div>
         <NewActivity feed={feed} />
         <Feed feed={feed}></Feed>

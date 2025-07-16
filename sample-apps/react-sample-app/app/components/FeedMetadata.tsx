@@ -2,7 +2,6 @@ import { FeedOwnCapability, FeedState, Feed } from '@stream-io/feeds-client';
 import { useRef, useState } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { FollowRelationships } from './FollowRelationships';
-import { useErrorContext } from '../error-context';
 import { FollowStatusButton } from './FollowStatusButton';
 import { FeedMenu } from './FeedMenu';
 import { useStateStore } from '@stream-io/feeds-client/react-bindings';
@@ -28,19 +27,19 @@ const selector = ({
 };
 
 export const FeedMetadata = ({
-  feed,
-  timeline,
+  userFeed,
+  timelineFeed,
 }: {
-  feed: Feed;
-  timeline: Feed;
+  userFeed: Feed;
+  timelineFeed: Feed;
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [selectedRelationship, setSelectedRelationship] = useState<
     'followers' | 'following'
   >('followers');
 
-  const timelineFeedState = useStateStore(timeline?.state, selector);
-  const userFeedState = useStateStore(feed?.state, selector);
+  const timelineFeedState = useStateStore(timelineFeed?.state, selector);
+  const userFeedState = useStateStore(userFeed?.state, selector);
 
   const followerCount = userFeedState.followerCount;
   const followingCount = timelineFeedState?.followingCount;
@@ -85,7 +84,7 @@ export const FeedMetadata = ({
                   {`${followerCount} ${followerCount === 1 ? 'follower' : 'followers'}`}
                 </button>
               </div>
-              {timeline && (
+              {timelineFeed && (
                 <div className="text-md">
                   {followingCount === undefined && (
                     <LoadingIndicator color="blue" />
@@ -103,10 +102,10 @@ export const FeedMetadata = ({
                 </div>
               )}
             </div>
-            <FollowStatusButton feed={feed} />
+            <FollowStatusButton feed={userFeed} />
           </div>
         </div>
-        <FeedMenu feed={feed} />
+        <FeedMenu feed={userFeed} />
       </div>
       <Dialog ref={dialogRef}>
         <div className="flex flex-col">
@@ -114,7 +113,9 @@ export const FeedMetadata = ({
             <span className="material-symbols-outlined">close</span>
           </button>
           <FollowRelationships
-            feed={selectedRelationship === 'followers' ? feed : timeline}
+            feed={
+              selectedRelationship === 'followers' ? userFeed : timelineFeed
+            }
             type={selectedRelationship}
           />
         </div>
