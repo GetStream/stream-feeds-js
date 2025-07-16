@@ -448,23 +448,37 @@ export class Feed extends FeedApi {
       });
     },
     'feeds.feed_member.updated': (event) => {
+      const { connectedUser } = this.client.state.getLatestValue();
+
       this.state.next((currentState) => {
         const memberIndex =
           currentState.members?.findIndex(
             (member) => member.user.id === event.member.user.id,
           ) ?? -1;
 
+        let newState: FeedState | undefined;
+
         if (memberIndex !== -1) {
+          // if there's an index, there's a member to update
           const newMembers = [...currentState.members!];
           newMembers[memberIndex] = event.member;
 
-          return {
+          newState ??= {
             ...currentState,
-            members: newMembers,
           };
+
+          newState.members = newMembers;
         }
 
-        return currentState;
+        if (connectedUser?.id === event.member.user.id) {
+          newState ??= {
+            ...currentState,
+          };
+
+          newState.own_membership = event.member;
+        }
+
+        return newState ?? currentState;
       });
     },
     // the poll events should be removed from here
