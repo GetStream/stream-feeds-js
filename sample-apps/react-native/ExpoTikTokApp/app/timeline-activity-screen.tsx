@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  FlatList,
   View,
   Text,
   StyleSheet,
@@ -8,7 +7,6 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   Platform,
-  Button,
 } from 'react-native';
 import {
   ActivityResponse,
@@ -22,8 +20,8 @@ import {
   useActivityPagerContext,
 } from '@/contexts/ActivityPagerContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
-import { useVideoPlayer, VideoPlayer, VideoView } from 'expo-video';
-import { useEvent } from 'expo';
+import Video from 'react-native-video';
+import { FlashList } from '@shopify/flash-list';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -62,10 +60,6 @@ const UnmemoizedActivityItem = ({
   );
 };
 
-const videoPlayerCallback = (player: VideoPlayer) => {
-  player.loop = true;
-}
-
 const ActivityVideo = ({
   source,
   isActive,
@@ -73,24 +67,25 @@ const ActivityVideo = ({
   source: string;
   isActive: boolean;
 }) => {
-  const player = useVideoPlayer(source, videoPlayerCallback);
+  const [paused, setPaused] = useState(true);
 
   useEffect(() => {
     if (isActive) {
-      player.play();
+      setPaused(false);
     } else {
-      player.pause();
+      setPaused(true);
     }
-  }, [isActive, player]);
+  }, [isActive]);
 
   return (
     <View style={styles.page}>
-      <VideoView
+      <Video
         style={styles.video}
-        player={player}
-        nativeControls={false}
-        allowsFullscreen={false}
-        allowsPictureInPicture={false}
+        source={{ uri: source }}
+        repeat={true}
+        paused={paused}
+        resizeMode='contain'
+        controls={false}
       />
     </View>
   );
@@ -111,15 +106,6 @@ const renderItem = ({ item }: { item: ActivityResponse }) => {
 
 const keyExtractor = (item: ActivityResponse) => item.id;
 
-const getItemLayout = (
-  _: ArrayLike<ActivityResponse> | null | undefined,
-  index: number,
-) => ({
-  length: SCREEN_HEIGHT,
-  offset: SCREEN_HEIGHT * index,
-  index,
-});
-
 const TimelineActivityUI = () => {
   const { initialIndex } = useLocalSearchParams();
   const { activities } = useFeedActivities() ?? {};
@@ -138,7 +124,7 @@ const TimelineActivityUI = () => {
   const activeIdRef = useRef(activeId);
   activeIdRef.current = activeId;
 
-  const flatListRef = useRef<FlatList<ActivityResponse>>(null);
+  const flatListRef = useRef<FlashList<ActivityResponse>>(null);
 
   useEffect(() => {
     if (
@@ -156,23 +142,17 @@ const TimelineActivityUI = () => {
 
   return (
     <ActivityPagerContextProvider currentIndex={0} activeId={activeId}>
-      <FlatList
+      <FlashList
         ref={flatListRef}
-        // @ts-expect-error Using FlatList internal
-        strictMode={true}
+        estimatedItemSize={SCREEN_HEIGHT}
         data={activities}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         initialScrollIndex={Number(initialIndex)}
         snapToAlignment="start"
         decelerationRate="fast"
-        style={styles.listStyle}
-        contentContainerStyle={styles.listContentContainerStyle}
         showsVerticalScrollIndicator={false}
         onMomentumScrollEnd={handleSnap}
-        initialNumToRender={3}
-        windowSize={3}
-        getItemLayout={getItemLayout}
         {...pagerProps}
       />
     </ActivityPagerContextProvider>
@@ -223,8 +203,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
   },
   video: {
-    height: SCREEN_HEIGHT,
     width: '100%',
+    height: SCREEN_HEIGHT,
   },
   controlsContainer: {
     padding: 10,
