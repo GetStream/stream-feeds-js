@@ -108,7 +108,7 @@ describe('API requests and error handling', () => {
     });
 
     expect(params.connection_id).toBeDefined();
-  });
+  }, 10000);
 
   it('should give up token refresh after 3 tries', async () => {
     client = createTestClient();

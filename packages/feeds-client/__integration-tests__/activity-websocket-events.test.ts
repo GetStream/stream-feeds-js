@@ -145,6 +145,8 @@ describe('Activity state updates via WebSocket events', () => {
       text: 'Test activity',
     });
 
+    await waitForEvent(feed, 'feeds.activity.added', 1000);
+
     expect(
       feed.state
         .getLatestValue()
