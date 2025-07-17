@@ -40,13 +40,9 @@ export const useReactionActions = ({
       console.warn('The current user does not have the capability to add reactions.')
       return;
     }
-    try {
-      await (isComment
-        ? client?.addCommentReaction({ comment_id: entity.id, type })
-        : client?.addReaction({ activity_id: entity.id, type }));
-    } catch (error) {
-      console.error(error as Error);
-    }
+    await (isComment
+      ? client?.addCommentReaction({ comment_id: entity.id, type })
+      : client?.addReaction({ activity_id: entity.id, type }));
   }, [canAddReaction, client, isComment, entity.id, type]);
 
   const removeReaction = useCallback(async () => {
@@ -54,16 +50,12 @@ export const useReactionActions = ({
       console.warn('The current user does not have the capability to remove reactions.')
       return;
     }
-    try {
-      await (isComment
-        ? client?.deleteCommentReaction({ comment_id: entity.id, type })
-        : client?.deleteActivityReaction({
-            activity_id: entity.id,
-            type,
-          }));
-    } catch (error) {
-      console.error(error as Error);
-    }
+    await (isComment
+      ? client?.deleteCommentReaction({ comment_id: entity.id, type })
+      : client?.deleteActivityReaction({
+        activity_id: entity.id,
+        type,
+      }));
   }, [canRemoveReaction, client, isComment, entity.id, type]);
 
   const toggleReaction = useCallback(async () => {
