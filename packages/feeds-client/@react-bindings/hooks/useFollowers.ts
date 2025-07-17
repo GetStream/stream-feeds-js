@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { Feed, FeedState } from '../../src/Feed';
 import { useStateStore } from './useStateStore';
-import { Constants } from '../../src/utils';
+import { checkHasAnotherPage } from '../../src/utils';
 
 const selector = ({
   follower_count,
@@ -42,7 +42,10 @@ export function useFollowers(feed: Feed | undefined) {
     return {
       ...data,
       isLoadingNextPage: data.followers_pagination?.loading_next_page ?? false,
-      hasNextPage: data.followers_pagination?.next !==  Constants.END_OF_LIST,
+      hasNextPage: checkHasAnotherPage(
+        data.followers,
+        data.followers_pagination?.next,
+      ),
       loadNextPage,
     };
   }, [data, loadNextPage]);
