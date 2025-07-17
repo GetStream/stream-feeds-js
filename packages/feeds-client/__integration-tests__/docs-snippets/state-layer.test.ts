@@ -3,6 +3,7 @@ import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
+  waitForEvent,
 } from '../utils';
 import { FeedsClient } from '../../src/FeedsClient';
 import { Feed } from '../../src/Feed';
@@ -87,6 +88,8 @@ describe('State layer page', () => {
       type: 'post',
       poll_id: response.poll.id,
     });
+
+    await waitForEvent(feed, 'feeds.activity.added', 1000);
 
     // pollResponse object won't receive state updates
     const pollResponse = feed.state.getLatestValue().activities?.[0].poll!;
