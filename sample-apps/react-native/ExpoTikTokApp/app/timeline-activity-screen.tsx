@@ -84,7 +84,7 @@ const ActivityVideo = ({
         source={{ uri: source }}
         repeat={true}
         paused={paused}
-        resizeMode='contain'
+        resizeMode="contain"
         controls={false}
       />
     </View>
@@ -141,7 +141,7 @@ const TimelineActivityUI = () => {
   }, [activities]);
 
   return (
-    <ActivityPagerContextProvider currentIndex={0} activeId={activeId}>
+    <ActivityPagerContextProvider activeId={activeId}>
       <FlashList
         ref={flatListRef}
         estimatedItemSize={SCREEN_HEIGHT}
