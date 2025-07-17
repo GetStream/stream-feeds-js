@@ -3,7 +3,7 @@ import { StreamFeedContext } from '../contexts/StreamFeedContext';
 import type { Feed } from '../../src/Feed';
 
 /**
- * The props for the StreamFeed component. It accepts either a `Feed` instance.
+ * The props for the StreamFeed component. It accepts a `Feed` instance.
  */
 export type StreamFeedProps = {
   feed: Feed;
