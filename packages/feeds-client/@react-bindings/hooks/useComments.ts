@@ -34,14 +34,14 @@ export function useComments<T extends CommentParent>({
   feed,
   parent,
 }: {
-  feed: Feed | undefined;
+  feed?: Feed;
   parent: T;
 }): UseCommentsReturnType<T> | undefined;
 export function useComments<T extends CommentParent>({
   feed: feedFromProps,
   parent,
 }: {
-  feed: Feed | undefined;
+  feed?: Feed;
   /**
    * The parent (activity or comment) for which to fetch comments.
    */
