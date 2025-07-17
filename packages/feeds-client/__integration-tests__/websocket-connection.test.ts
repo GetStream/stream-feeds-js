@@ -23,12 +23,18 @@ describe('WebSocket connection', () => {
     const spy = vi.fn();
     client.state.subscribe(spy);
 
-    expect(spy).toHaveBeenCalledWith({ connectedUser: undefined }, undefined);
+    expect(spy).toHaveBeenCalledWith(
+      { connectedUser: undefined, isWsConnectionHealthy: false },
+      undefined,
+    );
 
     await client.connectUser(user, createTestTokenGenerator(user));
 
     const connectedUser = spy.mock.lastCall?.[0]?.connectedUser;
     expect(connectedUser?.id).toBe(user.id);
+
+    const isWsConnectionHealthy = spy.mock.lastCall?.[0]?.isWsConnectionHealthy;
+    expect(isWsConnectionHealthy).toBe(true);
   });
 
   it('should be able to watch WS events', async () => {
