@@ -3,7 +3,7 @@ import {
   useCreateFeedsClient
 } from '@stream-io/feeds-react-native-sdk';
 import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
-import { apiKey, apiUrl, tokenCreationUrl } from '@/constants/stream';
+import { apiKey, tokenCreationUrl } from '@/constants/stream';
 
 const tokenProviderFactory = (userId: string) => async () => {
   const tokenGeneratorUrl = new URL(tokenCreationUrl);
@@ -17,9 +17,7 @@ const tokenProviderFactory = (userId: string) => async () => {
   return data.token;
 };
 
-const CLIENT_OPTIONS = {
-  base_url: apiUrl,
-};
+const CLIENT_OPTIONS = {};
 
 export const useCreateClient = (user: UserRequest) => {
   const tokenProvider = useCallback(() => {
