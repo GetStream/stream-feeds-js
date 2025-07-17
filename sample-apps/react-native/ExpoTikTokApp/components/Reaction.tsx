@@ -1,11 +1,9 @@
 import {
   ActivityResponse,
   CommentResponse,
-  useFeedsClient,
-  useOwnCapabilities,
   useReactionActions,
 } from '@stream-io/feeds-react-native-sdk';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 
