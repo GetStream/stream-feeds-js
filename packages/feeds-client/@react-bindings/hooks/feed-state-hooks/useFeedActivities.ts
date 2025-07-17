@@ -1,6 +1,6 @@
-import { useFeedContext } from '../contexts/StreamFeedContext';
-import type { FeedState } from '../../src/Feed';
-import { useStateStore } from './useStateStore';
+import { useFeedContext } from '../../contexts/StreamFeedContext';
+import type { FeedState } from '../../../src/Feed';
+import { useStateStore } from '../useStateStore';
 
 /**
  * A React hook that returns a reactive object containing the current activities,
@@ -9,10 +9,10 @@ import { useStateStore } from './useStateStore';
 export const useFeedActivities = () => {
   const feed = useFeedContext();
 
-  return useStateStore(feed?.state, feedActivitiesSelector);
+  return useStateStore(feed?.state, selector);
 };
 
-const feedActivitiesSelector = (nextState: FeedState) => ({
+const selector = (nextState: FeedState) => ({
   isLoading: nextState.is_loading_activities,
   hasNextPage: typeof nextState.next !== 'undefined',
   activities: nextState.activities ?? [],
