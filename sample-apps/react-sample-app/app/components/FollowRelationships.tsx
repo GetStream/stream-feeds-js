@@ -1,7 +1,7 @@
-import { Feed, FeedState, FollowResponse } from '@stream-io/feeds-client';
+import { checkHasAnotherPage, Feed, FeedState, FollowResponse } from '@stream-io/feeds-client';
+import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 
 export const FollowRelationships = ({
   type,
@@ -88,7 +88,7 @@ export const FollowRelationships = ({
     <PaginatedList
       items={rel}
       isLoading={pagination?.loading_next_page ?? false}
-      hasNext={pagination?.next !== 'eol'}
+      hasNext={checkHasAnotherPage(rel, pagination?.next)}
       renderItem={renderItem}
       onLoadMore={loadMore}
       error={error}
