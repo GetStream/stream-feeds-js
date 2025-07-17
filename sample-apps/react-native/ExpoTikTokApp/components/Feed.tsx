@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Activity } from '@/components/Activity';
 import { useCallback, useState } from 'react';
+import { useStableCallback } from '@/hooks/useStableCallback';
 
 const renderItem = ({
   item,
@@ -26,16 +27,12 @@ const keyExtractor = (item: ActivityResponse) => item.id;
 
 export const Feed = () => {
   const [error, setError] = useState<Error | undefined>();
-  const feed = useFeedContext();
-  const { hasNextPage, isLoading, activities } = useFeedActivities() ?? {};
+  const { loadNextPage, isLoading, activities } = useFeedActivities() ?? {};
 
-  const getNextPage = useCallback(() => {
-    if (!feed || !hasNextPage || isLoading) {
-      return;
-    }
+  const getNextPage = useStableCallback(() => {
     setError(undefined);
-    feed.getNextPage().catch(setError);
-  }, [hasNextPage, isLoading, feed]);
+    loadNextPage().catch(setError);
+  })
 
   const hasActivities = activities?.length && activities.length > 0;
 
