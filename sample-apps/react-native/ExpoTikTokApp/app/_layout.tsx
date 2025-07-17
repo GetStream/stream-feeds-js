@@ -19,7 +19,6 @@ import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
 import { useCreateClient } from '@/hooks/useCreateClient';
 import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
 import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export {
   // Catch any errors thrown by the Layout component.

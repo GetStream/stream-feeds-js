@@ -1,13 +1,12 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs, useRouter } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import {
   useClientConnectedUser,
-  useFeedContext,
 } from '@stream-io/feeds-react-native-sdk';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
