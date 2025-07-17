@@ -60,7 +60,7 @@ export const Comment = ({
     hasNextPage,
     isLoadingNextPage,
     loadNextPage,
-  } = useComments(feed, comment);
+  } = useComments({ feed, parent: comment });
 
   return (
     <>

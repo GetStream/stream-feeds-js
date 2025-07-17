@@ -1,12 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import type { ActivityResponse, CommentResponse } from '../../src/gen/models';
+import type { CommentParent } from '../../src/types';
 import { Feed, FeedState } from '../../src/Feed';
 import { useStateStore } from './useStateStore';
+import { useFeedContext } from '../contexts/StreamFeedContext';
+import { isCommentResponse } from '../../src/utils';
 import { checkHasAnotherPage } from '../../src/utils';
-
-const isCommentResponse = (entity: any): entity is CommentResponse => {
-  return typeof entity?.object_id === 'string';
-};
 
 type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   comments: NonNullable<
@@ -24,21 +23,33 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   ) => Promise<void>;
 };
 
-export function useComments<T extends ActivityResponse | CommentResponse>(
-  feed: Feed,
-  parent: T,
-): UseCommentsReturnType<T>;
-export function useComments<T extends ActivityResponse | CommentResponse>(
-  feed: Feed | undefined,
-  parent: T,
-): UseCommentsReturnType<T> | undefined;
-export function useComments<T extends ActivityResponse | CommentResponse>(
-  feed: Feed | undefined,
+export function useComments<T extends CommentParent>({
+  feed,
+  parent,
+}: {
+  feed: Feed;
+  parent: T;
+}): UseCommentsReturnType<T>;
+export function useComments<T extends CommentParent>({
+  feed,
+  parent,
+}: {
+  feed: Feed | undefined;
+  parent: T;
+}): UseCommentsReturnType<T> | undefined;
+export function useComments<T extends CommentParent>({
+  feed: feedFromProps,
+  parent,
+}: {
+  feed: Feed | undefined;
   /**
    * The parent (activity or comment) for which to fetch comments.
    */
-  parent: T,
-) {
+  parent: T;
+}) {
+  const feedFromContext = useFeedContext();
+  const feed = feedFromProps ?? feedFromContext;
+
   const selector = useCallback(
     (state: FeedState) => ({
       comments: state.comments_by_entity_id?.[parent.id]?.comments,

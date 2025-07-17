@@ -1,4 +1,5 @@
-import { StreamFile } from './types';
+import { CommentParent, StreamFile } from './types';
+import type { CommentResponse } from './gen/models';
 
 export const isImageFile = (file: StreamFile) => {
   // photoshop files begin with 'image/'
@@ -15,6 +16,12 @@ export const checkHasAnotherPage = <T extends unknown | undefined>(
 ) =>
   (typeof v === 'undefined' && typeof cursor === 'undefined') ||
   typeof cursor === 'string';
+
+export const isCommentResponse = (
+  entity: CommentParent,
+): entity is CommentResponse => {
+  return typeof (entity as CommentResponse)?.object_id === 'string';
+};
 
 export const Constants = {
   DEFAULT_COMMENT_PAGINATION: 'first',
