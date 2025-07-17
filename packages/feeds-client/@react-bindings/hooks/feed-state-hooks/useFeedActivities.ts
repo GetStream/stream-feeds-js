@@ -1,5 +1,5 @@
 import { useFeedContext } from '../../contexts/StreamFeedContext';
-import type { FeedState } from '../../../src/Feed';
+import { Feed, FeedState } from '../../../src/Feed';
 import { useStateStore } from '../useStateStore';
 import { useMemo } from 'react';
 import { useStableCallback } from '../internal';
@@ -8,8 +8,9 @@ import { useStableCallback } from '../internal';
  * A React hook that returns a reactive object containing the current activities,
  * loading state and whether there is a next page to paginate to or not.
  */
-export const useFeedActivities = () => {
-  const feed = useFeedContext();
+export const useFeedActivities = (feedFromProps?: Feed) => {
+  const feedFromContext = useFeedContext();
+  const feed = feedFromProps ?? feedFromContext;
 
   const data = useStateStore(feed?.state, selector)
 
