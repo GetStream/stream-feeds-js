@@ -1,9 +1,11 @@
 import {
   ActivityResponse,
   CommentResponse,
+  useOwnCapabilities,
   useReactionActions,
+  isCommentResponse,
 } from '@stream-io/feeds-react-native-sdk';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 
@@ -23,15 +25,34 @@ export const Reaction = ({
   type: IconType;
   entity: ActivityResponse | CommentResponse;
 }) => {
+  const ownCapabilities = useOwnCapabilities();
+
+  const isComment = isCommentResponse(entity);
   const hasOwnReaction = useMemo(
     () => !!entity.own_reactions?.find((r) => r.type === type),
     [entity.own_reactions, type],
   );
 
+  const canAddReaction = isComment
+    ? ownCapabilities.canAddCommentReaction
+    : ownCapabilities.canAddActivityReaction;
+  const canRemoveReaction = isComment
+    ? ownCapabilities.canRemoveCommentReaction
+    : ownCapabilities.canRemoveActivityReaction;
+
   const { toggleReaction } = useReactionActions({ entity, type });
 
+  const handleReactionToggle = useCallback(async () => {
+    const canDoReactionAction =
+      (!hasOwnReaction && canAddReaction) ||
+      (hasOwnReaction && canRemoveReaction);
+    if (canDoReactionAction) {
+      await toggleReaction();
+    }
+  }, [hasOwnReaction, canAddReaction, canRemoveReaction, toggleReaction]);
+
   return (
-    <TouchableOpacity onPress={toggleReaction}>
+    <TouchableOpacity onPress={handleReactionToggle}>
       {iconMap[type][hasOwnReaction ? 'active' : 'inactive']}
     </TouchableOpacity>
   );

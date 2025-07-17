@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
 import { CommentParent } from '../../../src/types';
 import { isCommentResponse } from '../../../src/utils';
-import { useOwnCapabilities } from '../feed-state-hooks';
 import { useStableCallback } from '../internal';
 
 /**
@@ -21,7 +20,6 @@ export const useReactionActions = ({
   type: string;
 }) => {
   const client = useFeedsClient();
-  const ownCapabilities = useOwnCapabilities();
 
   const isComment = isCommentResponse(entity);
   const hasOwnReaction = useMemo(
@@ -29,34 +27,19 @@ export const useReactionActions = ({
     [entity.own_reactions, type],
   );
 
-  const canAddReaction = isComment
-    ? ownCapabilities.canAddCommentReaction
-    : ownCapabilities.canAddActivityReaction;
-  const canRemoveReaction = isComment
-    ? ownCapabilities.canRemoveCommentReaction
-    : ownCapabilities.canRemoveActivityReaction;
-
   const addReaction = useStableCallback(async () => {
-    if (!canAddReaction) {
-      console.warn('The current user does not have the capability to add reactions.')
-      return;
-    }
     await (isComment
       ? client?.addCommentReaction({ comment_id: entity.id, type })
       : client?.addReaction({ activity_id: entity.id, type }));
   });
 
   const removeReaction = useStableCallback(async () => {
-    if (!canRemoveReaction) {
-      console.warn('The current user does not have the capability to remove reactions.')
-      return;
-    }
     await (isComment
       ? client?.deleteCommentReaction({ comment_id: entity.id, type })
       : client?.deleteActivityReaction({
-        activity_id: entity.id,
-        type,
-      }));
+          activity_id: entity.id,
+          type,
+        }));
   });
 
   const toggleReaction = useStableCallback(async () => {
