@@ -23,17 +23,11 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   ) => Promise<void>;
 };
 
-export function useComments<T extends CommentParent>({
-  feed,
-  parent,
-}: {
+export function useComments<T extends CommentParent>(_: {
   feed: Feed;
   parent: T;
 }): UseCommentsReturnType<T>;
-export function useComments<T extends CommentParent>({
-  feed,
-  parent,
-}: {
+export function useComments<T extends CommentParent>(_: {
   feed?: Feed;
   parent: T;
 }): UseCommentsReturnType<T> | undefined;
