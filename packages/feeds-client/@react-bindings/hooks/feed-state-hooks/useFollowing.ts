@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import { Feed, FeedState } from '../../src/Feed';
-import { checkHasAnotherPage } from '../../src/utils';
-import { useStateStore } from './useStateStore';
+import { Feed, FeedState } from '../../../src/Feed';
+import { checkHasAnotherPage } from '../../../src/utils';
+import { useStateStore } from '../useStateStore';
+import { useFeedContext } from '../../contexts/StreamFeedContext';
 
 const selector = ({
   following_count,
@@ -23,9 +24,12 @@ type UseFollowingReturnType = ReturnType<typeof selector> & {
 
 export function useFollowing(feed: Feed): UseFollowingReturnType;
 export function useFollowing(
-  feed: Feed | undefined,
+  feed?: Feed,
 ): UseFollowingReturnType | undefined;
-export function useFollowing(feed: Feed | undefined) {
+export function useFollowing(feedFromProps?: Feed) {
+  const feedFromContext = useFeedContext();
+  const feed = feedFromProps ?? feedFromContext;
+
   const data = useStateStore(feed?.state, selector);
 
   const loadNextPage = useCallback(
