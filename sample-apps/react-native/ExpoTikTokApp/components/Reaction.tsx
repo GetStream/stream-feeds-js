@@ -3,8 +3,9 @@ import {
   CommentResponse,
   useFeedsClient,
   useOwnCapabilities,
+  useReactionActions,
 } from '@stream-io/feeds-react-native-sdk';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 
@@ -20,60 +21,16 @@ type IconType = keyof typeof iconMap;
 export const Reaction = ({
   type,
   entity,
-  isComment = false,
 }: {
   type: IconType;
   entity: ActivityResponse | CommentResponse;
-  isComment?: boolean;
 }) => {
-  const client = useFeedsClient();
-  const ownCapabilities = useOwnCapabilities();
+  const hasOwnReaction = useMemo(
+    () => !!entity.own_reactions?.find((r) => r.type === type),
+    [entity.own_reactions, type],
+  );
 
-  const counts = entity.reaction_groups?.[type]?.count ?? 0;
-  const hasOwnReaction = !!entity.own_reactions?.find((r) => r.type === type);
-  const canAddReaction = isComment
-    ? ownCapabilities.canAddCommentReaction
-    : ownCapabilities.canAddActivityReaction;
-  const canRemoveReaction = isComment
-    ? ownCapabilities.canRemoveCommentReaction
-    : ownCapabilities.canRemoveActivityReaction;
-
-  const addReaction = useCallback(async () => {
-    if (!canAddReaction) {
-      return;
-    }
-    try {
-      await (isComment
-        ? client?.addCommentReaction({ comment_id: entity.id, type })
-        : client?.addReaction({ activity_id: entity.id, type }));
-    } catch (error) {
-      console.error(error as Error);
-    }
-  }, [canAddReaction, client, entity.id, isComment, type]);
-
-  const removeReaction = useCallback(async () => {
-    if (!canRemoveReaction) {
-      return;
-    }
-    try {
-      await (isComment
-        ? client?.deleteCommentReaction({ comment_id: entity.id, type })
-        : client?.deleteActivityReaction({
-            activity_id: entity.id,
-            type,
-          }));
-    } catch (error) {
-      console.error(error as Error);
-    }
-  }, [canRemoveReaction, client, entity.id, isComment, type]);
-
-  const toggleReaction = useCallback(async () => {
-    if (hasOwnReaction) {
-      await removeReaction();
-    } else {
-      await addReaction();
-    }
-  }, [addReaction, hasOwnReaction, removeReaction]);
+  const { toggleReaction } = useReactionActions({ entity, type });
 
   return (
     <TouchableOpacity onPress={toggleReaction}>
