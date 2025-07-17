@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { Feed, FeedState } from '../../src/Feed';
-import { Constants } from '../../src/utils';
+import { checkHasAnotherPage } from '../../src/utils';
 import { useStateStore } from './useStateStore';
 
 const selector = ({
@@ -42,7 +42,10 @@ export function useFollowing(feed: Feed | undefined) {
     return {
       ...data,
       isLoadingNextPage: data.following_pagination?.loading_next_page ?? false,
-      hasNextPage: data.following_pagination?.next !== Constants.END_OF_LIST,
+      hasNextPage: checkHasAnotherPage(
+        data.following,
+        data.following_pagination?.next,
+      ),
       loadNextPage,
     };
   }, [data, loadNextPage]);

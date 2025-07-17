@@ -43,7 +43,7 @@ import type {
   PagerResponseWithLoadingStates,
 } from './types';
 import type { FromArray } from './types-internal';
-import { Constants } from './utils';
+import { checkHasAnotherPage, Constants } from './utils';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -219,7 +219,7 @@ export class Feed extends FeedApi {
 
         if (
           entityState?.pagination?.sort === 'last' &&
-          entityState?.pagination.next === Constants.END_OF_LIST
+          !checkHasAnotherPage(entityState.comments, entityState?.pagination.next)
         ) {
           newComments.unshift(comment);
         } else if (entityState?.pagination?.sort === 'first') {
@@ -319,7 +319,10 @@ export class Feed extends FeedApi {
           };
 
           if (
-            currentState.following_pagination?.next === Constants.END_OF_LIST
+            !checkHasAnotherPage(
+              currentState.following,
+              currentState.following_pagination?.next,
+            )
           ) {
             // TODO: respect sort
             newState.following = currentState.following
@@ -346,7 +349,10 @@ export class Feed extends FeedApi {
           }
 
           if (
-            currentState.followers_pagination?.next === Constants.END_OF_LIST
+            !checkHasAnotherPage(
+              currentState.followers,
+              currentState.followers_pagination?.next,
+            )
           ) {
             // TODO: respect sort
             newState.followers = currentState.followers
@@ -404,8 +410,13 @@ export class Feed extends FeedApi {
     'feeds.feed_member.added': (event) => {
       const { member } = event;
 
-      // do not add a member if the pagination has reached the end of the list
-      if (this.currentState.member_pagination?.next !== Constants.END_OF_LIST) {
+      // do not add a member if the pagination has not reached the end of the list
+      if (
+        checkHasAnotherPage(
+          this.currentState.members,
+          this.currentState.member_pagination?.next,
+        )
+      ) {
         return;
       }
 
@@ -618,38 +629,6 @@ export class Feed extends FeedApi {
             ...responseCopy,
           };
 
-          // if there is no next cursor, set it to Constants.END_OF_LIST
-          // request has to have a limit set for this to work
-          if (
-            (request?.followers_pagination?.limit ?? 0) > 0 &&
-            typeof nextState.followers_pagination?.next === 'undefined'
-          ) {
-            nextState.followers_pagination = {
-              ...nextState.followers_pagination,
-              next: Constants.END_OF_LIST,
-            };
-          }
-
-          if (
-            (request?.following_pagination?.limit ?? 0) > 0 &&
-            typeof nextState.following_pagination?.next === 'undefined'
-          ) {
-            nextState.following_pagination = {
-              ...nextState.following_pagination,
-              next: Constants.END_OF_LIST,
-            };
-          }
-
-          if (
-            (request?.member_pagination?.limit ?? 0) > 0 &&
-            typeof nextState.member_pagination?.next === 'undefined'
-          ) {
-            nextState.member_pagination = {
-              ...nextState.member_pagination,
-              next: Constants.END_OF_LIST,
-            };
-          }
-
           if (!request?.followers_pagination?.limit) {
             delete nextState.followers;
           }
@@ -815,8 +794,7 @@ export class Feed extends FeedApi {
         },
       }));
 
-      const { next: newNextCursor = Constants.END_OF_LIST, comments } =
-        await base();
+      const { next: newNextCursor, comments } = await base();
 
       this.state.next((currentState) => {
         const newPagination = {
@@ -871,16 +849,22 @@ export class Feed extends FeedApi {
       Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
     >,
   ) {
-    const pagination =
-      this.currentState.comments_by_entity_id[activity.id]?.pagination;
-    const currentNextCursor = pagination?.next;
-    const currentSort = pagination?.sort;
-    const isLoading = pagination?.loading_next_page;
+    const currentEntityState =
+      this.currentState.comments_by_entity_id[activity.id];
+    const currentPagination = currentEntityState?.pagination;
+    const currentNextCursor = currentPagination?.next;
+    const currentSort = currentPagination?.sort;
+    const isLoading = currentPagination?.loading_next_page;
 
     const sort =
       currentSort ?? request?.sort ?? Constants.DEFAULT_COMMENT_PAGINATION;
 
-    if (isLoading || currentNextCursor === Constants.END_OF_LIST) return;
+    if (
+      isLoading ||
+      !checkHasAnotherPage(currentEntityState?.comments, currentNextCursor)
+    ) {
+      return;
+    }
 
     await this.loadNextPageComments({
       forId: activity.id,
@@ -900,16 +884,22 @@ export class Feed extends FeedApi {
     comment: CommentResponse,
     request?: Partial<Omit<GetCommentsRepliesRequest, 'comment_id' | 'next'>>,
   ) {
-    const pagination =
-      this.currentState.comments_by_entity_id[comment.id]?.pagination;
-    const currentNextCursor = pagination?.next;
-    const currentSort = pagination?.sort;
-    const isLoading = pagination?.loading_next_page;
+    const currentEntityState =
+      this.currentState.comments_by_entity_id[comment.id];
+    const currentPagination = currentEntityState?.pagination;
+    const currentNextCursor = currentPagination?.next;
+    const currentSort = currentPagination?.sort;
+    const isLoading = currentPagination?.loading_next_page;
 
     const sort =
       currentSort ?? request?.sort ?? Constants.DEFAULT_COMMENT_PAGINATION;
 
-    if (isLoading || currentNextCursor === Constants.END_OF_LIST) return;
+    if (
+      isLoading ||
+      !checkHasAnotherPage(currentEntityState?.comments, currentNextCursor)
+    ) {
+      return;
+    }
 
     await this.loadNextPageComments({
       forId: comment.id,
@@ -936,10 +926,13 @@ export class Feed extends FeedApi {
     const paginationKey = `${type}_pagination` as const;
     const method = `query${capitalize(type)}` as const;
 
+    const currentFollows = this.currentState[type];
     const currentNextCursor = this.currentState[paginationKey]?.next;
     const isLoading = this.currentState[paginationKey]?.loading_next_page;
 
-    if (isLoading || currentNextCursor === Constants.END_OF_LIST) return;
+    if (isLoading || !checkHasAnotherPage(currentFollows, currentNextCursor)) {
+      return;
+    }
 
     try {
       this.state.next((currentState) => {
@@ -952,11 +945,10 @@ export class Feed extends FeedApi {
         };
       });
 
-      const { next: newNextCursor = Constants.END_OF_LIST, follows } =
-        await this[method]({
-          ...request,
-          next: currentNextCursor,
-        });
+      const { next: newNextCursor, follows } = await this[method]({
+        ...request,
+        next: currentNextCursor,
+      });
 
       this.state.next((currentState) => ({
         ...currentState,
