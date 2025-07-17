@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { UserRequest } from '../src/common/gen/models';
+import { UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
