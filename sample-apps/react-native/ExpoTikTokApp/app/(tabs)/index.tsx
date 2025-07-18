@@ -1,25 +1,18 @@
 import { Feed } from '@/components/Feed';
 import { StyleSheet, View } from 'react-native';
 import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
-import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
 import { StreamFeed } from '@stream-io/feeds-react-native-sdk';
-
-const createFeedConfig = {
-  groupId: 'timeline',
-  queryOptions: {
-    watch: true,
-  },
-};
+import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 
 const TimelineScreen = () => {
-  const feed = useCreateAndQueryFeed(createFeedConfig);
+  const { ownTimelineFeed } = useOwnFeedsContext();
 
-  if (!feed) {
+  if (!ownTimelineFeed) {
     return null;
   }
 
   return (
-    <StreamFeed feed={feed}>
+    <StreamFeed feed={ownTimelineFeed}>
       <View style={styles.container}>
         <ConnectionLostHeader />
         <Feed />

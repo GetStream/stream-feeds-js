@@ -7,7 +7,7 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import { useMemo } from 'react';
 
-export default function ModalScreen() {
+const ModalScreen = () => {
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
 
@@ -29,3 +29,5 @@ export default function ModalScreen() {
     </SafeAreaView>
   );
 }
+
+export default ModalScreen;

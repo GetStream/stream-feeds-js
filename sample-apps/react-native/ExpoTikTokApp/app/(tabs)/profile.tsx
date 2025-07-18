@@ -1,26 +1,22 @@
-import { Pressable, StyleSheet } from 'react-native';
-
-import { Text, View } from '@/components/Themed';
+import React from 'react';
+import { View, Text } from '@/components/Themed';
 import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
-import { useClientConnectedUser} from '@stream-io/feeds-react-native-sdk';
+import { Pressable, StyleSheet } from 'react-native';
+import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useUserContext } from '@/contexts/UserContext';
+import { Profile } from '@/components/Profile';
 
 const ProfileScreen = () => {
-  const user = useClientConnectedUser();
+  const { ownUserFeed, ownTimelineFeed } = useOwnFeedsContext();
   const { logOut } = useUserContext();
+
+  if (!ownUserFeed || !ownTimelineFeed) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
       <ConnectionLostHeader />
-      <Text style={styles.title}>Stream Feeds Demo</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-      <Text style={styles.info}>
-        {user ? `Currently connected with ${user.id}` : 'No connected user yet'}
-      </Text>
       <Pressable
         onPress={logOut}
         style={({ pressed }) => [
@@ -31,33 +27,15 @@ const ProfileScreen = () => {
         <Text style={styles.icon}>⎋</Text>
         <Text style={styles.label}>Log out</Text>
       </Pressable>
+      <Profile userFeed={ownUserFeed} timelineFeed={ownTimelineFeed} />
     </View>
   );
-}
+};
 
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-  info: {
-    fontSize: 17,
-    lineHeight: 24,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
+  container: { flex: 1, paddingTop: 16, backgroundColor: '#fff' },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -70,6 +48,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+    alignSelf: 'center',
+    marginBottom: 16,
   },
   buttonPressed: {
     opacity: 0.8,

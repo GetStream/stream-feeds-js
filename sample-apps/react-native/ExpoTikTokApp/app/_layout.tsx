@@ -19,6 +19,7 @@ import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
 import { useCreateClient } from '@/hooks/useCreateClient';
 import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
 import { View } from 'react-native';
+import { OwnFeedsContextProvider } from '@/contexts/OwnFeedsContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -76,7 +77,8 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
   }
 
   return (
-      <StreamFeeds client={client}>
+    <StreamFeeds client={client}>
+      <OwnFeedsContextProvider>
         <ThemeProvider
           value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
         >
@@ -87,6 +89,10 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
               options={{ headerShown: false }}
             />
             <Stack.Screen
+              name="user-profile-screen"
+              options={{ title: 'Profile' }}
+            />
+            <Stack.Screen
               name="create-post-modal"
               options={{
                 title: 'New Post',
@@ -94,9 +100,26 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
                 animation: 'slide_from_bottom',
               }}
             />
+            <Stack.Screen
+              name="followers-modal"
+              options={{
+                title: 'Followers',
+                presentation: 'modal',
+                animation: 'slide_from_bottom',
+              }}
+            />
+            <Stack.Screen
+              name="following-modal"
+              options={{
+                title: 'Following',
+                presentation: 'modal',
+                animation: 'slide_from_bottom',
+              }}
+            />
           </Stack>
         </ThemeProvider>
-      </StreamFeeds>
+      </OwnFeedsContextProvider>
+    </StreamFeeds>
   );
 };
 
