@@ -1020,12 +1020,15 @@ export class Feed extends FeedApi {
   async loadNextPageMembers(
     request: Omit<QueryFeedMembersRequest, 'next' | 'prev'>,
   ) {
+    const currentMembers = this.currentState.members;
     const currentNextCursor = this.currentState.member_pagination?.next;
     const isLoading = this.currentState.member_pagination?.loading_next_page;
     const sort = this.currentState.member_pagination?.sort ?? request.sort;
     let error: unknown;
 
-    if (isLoading || currentNextCursor === Constants.END_OF_LIST) return;
+    if (isLoading || !checkHasAnotherPage(currentMembers, currentNextCursor)) {
+      return;
+    }
 
     try {
       this.state.next((currentState) => ({
@@ -1036,7 +1039,7 @@ export class Feed extends FeedApi {
         },
       }));
 
-      const { next: newNextCursor = Constants.END_OF_LIST, members } =
+      const { next: newNextCursor, members } =
         await this.client.queryFeedMembers({
           ...request,
           sort,
