@@ -14,6 +14,8 @@ import {
   BookmarkAddedEvent,
   BookmarkDeletedEvent,
   BookmarkUpdatedEvent,
+  QueryFeedMembersRequest,
+  SortParamRequest,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -104,9 +106,11 @@ export type FeedState = Omit<
     | undefined
   >;
 
-  followers_pagination?: LoadingStates & { sort?: string };
+  followers_pagination?: LoadingStates & { sort?: SortParamRequest[] };
 
-  following_pagination?: LoadingStates & { sort?: string };
+  following_pagination?: LoadingStates & { sort?: SortParamRequest[] };
+
+  member_pagination?: LoadingStates & { sort?: SortParamRequest[] };
 
   last_get_or_create_request_config?: GetOrCreateFeedRequest;
 };
@@ -219,7 +223,10 @@ export class Feed extends FeedApi {
 
         if (
           entityState?.pagination?.sort === 'last' &&
-          !checkHasAnotherPage(entityState.comments, entityState?.pagination.next)
+          !checkHasAnotherPage(
+            entityState.comments,
+            entityState?.pagination.next,
+          )
         ) {
           newComments.unshift(comment);
         } else if (entityState?.pagination?.sort === 'first') {
@@ -408,56 +415,87 @@ export class Feed extends FeedApi {
       this.handleCommentReactionEvent.bind(this),
     'feeds.comment.reaction.updated': Feed.noop,
     'feeds.feed_member.added': (event) => {
-      const { member } = event;
-
-      // do not add a member if the pagination has not reached the end of the list
-      if (
-        checkHasAnotherPage(
-          this.currentState.members,
-          this.currentState.member_pagination?.next,
-        )
-      ) {
-        return;
-      }
+      const { connectedUser } = this.client.state.getLatestValue();
 
       this.state.next((currentState) => {
-        return {
-          ...currentState,
-          // TODO: respect sort
-          members: currentState.members
-            ? currentState.members.concat(member)
-            : [member],
-        };
+        let newState: FeedState | undefined;
+
+        if (
+          !checkHasAnotherPage(
+            currentState.members,
+            currentState.member_pagination?.next,
+          )
+        ) {
+          newState ??= {
+            ...currentState,
+          };
+
+          newState.members = newState.members?.concat(event.member) ?? [
+            event.member,
+          ];
+        }
+
+        if (connectedUser?.id === event.member.user.id) {
+          newState ??= {
+            ...currentState,
+          };
+
+          newState.own_membership = event.member;
+        }
+
+        return newState ?? currentState;
       });
     },
     'feeds.feed_member.removed': (event) => {
+      const { connectedUser } = this.client.state.getLatestValue();
+
       this.state.next((currentState) => {
-        return {
+        const newState = {
           ...currentState,
           members: currentState.members?.filter(
             (member) => member.user.id !== event.user?.id,
           ),
         };
+
+        if (connectedUser?.id === event.member_id) {
+          delete newState.own_membership;
+        }
+
+        return newState;
       });
     },
     'feeds.feed_member.updated': (event) => {
+      const { connectedUser } = this.client.state.getLatestValue();
+
       this.state.next((currentState) => {
         const memberIndex =
           currentState.members?.findIndex(
             (member) => member.user.id === event.member.user.id,
           ) ?? -1;
 
+        let newState: FeedState | undefined;
+
         if (memberIndex !== -1) {
+          // if there's an index, there's a member to update
           const newMembers = [...currentState.members!];
           newMembers[memberIndex] = event.member;
 
-          return {
+          newState ??= {
             ...currentState,
-            members: newMembers,
           };
+
+          newState.members = newMembers;
         }
 
-        return currentState;
+        if (connectedUser?.id === event.member.user.id) {
+          newState ??= {
+            ...currentState,
+          };
+
+          newState.own_membership = event.member;
+        }
+
+        return newState ?? currentState;
       });
     },
     // the poll events should be removed from here
@@ -779,6 +817,8 @@ export class Feed extends FeedApi {
     sort: string;
     base: () => Promise<PagerResponse & { comments: CommentResponse[] }>;
   }) {
+    let error: unknown;
+
     try {
       this.state.next((currentState) => ({
         ...currentState,
@@ -823,9 +863,8 @@ export class Feed extends FeedApi {
           },
         };
       });
-    } catch (error) {
-      console.error(error);
-      // TODO: figure out how to handle errorss
+    } catch (e) {
+      error = e;
     } finally {
       this.state.next((currentState) => ({
         ...currentState,
@@ -840,6 +879,10 @@ export class Feed extends FeedApi {
           },
         },
       }));
+    }
+
+    if (error) {
+      throw error;
     }
   }
 
@@ -921,7 +964,7 @@ export class Feed extends FeedApi {
 
   private async loadNextPageFollows(
     type: 'followers' | 'following',
-    request: Pick<QueryFollowsRequest, 'limit'>,
+    request: Pick<QueryFollowsRequest, 'limit' | 'sort'>,
   ) {
     const paginationKey = `${type}_pagination` as const;
     const method = `query${capitalize(type)}` as const;
@@ -929,6 +972,8 @@ export class Feed extends FeedApi {
     const currentFollows = this.currentState[type];
     const currentNextCursor = this.currentState[paginationKey]?.next;
     const isLoading = this.currentState[paginationKey]?.loading_next_page;
+    const sort = this.currentState[paginationKey]?.sort ?? request.sort;
+    let error: unknown;
 
     if (isLoading || !checkHasAnotherPage(currentFollows, currentNextCursor)) {
       return;
@@ -948,6 +993,7 @@ export class Feed extends FeedApi {
       const { next: newNextCursor, follows } = await this[method]({
         ...request,
         next: currentNextCursor,
+        sort,
       });
 
       this.state.next((currentState) => ({
@@ -958,11 +1004,11 @@ export class Feed extends FeedApi {
         [paginationKey]: {
           ...currentState[paginationKey],
           next: newNextCursor,
+          sort,
         },
       }));
-    } catch (error) {
-      console.error(error);
-      // TODO: figure out how to handle errorss
+    } catch (e) {
+      error = e;
     } finally {
       this.state.next((currentState) => {
         return {
@@ -974,6 +1020,10 @@ export class Feed extends FeedApi {
         };
       });
     }
+
+    if (error) {
+      throw error;
+    }
   }
 
   async loadNextPageFollowers(request: Pick<QueryFollowsRequest, 'limit'>) {
@@ -982,6 +1032,66 @@ export class Feed extends FeedApi {
 
   async loadNextPageFollowing(request: Pick<QueryFollowsRequest, 'limit'>) {
     await this.loadNextPageFollows('following', request);
+  }
+
+  async loadNextPageMembers(
+    request: Omit<QueryFeedMembersRequest, 'next' | 'prev'>,
+  ) {
+    const currentMembers = this.currentState.members;
+    const currentNextCursor = this.currentState.member_pagination?.next;
+    const isLoading = this.currentState.member_pagination?.loading_next_page;
+    const sort = this.currentState.member_pagination?.sort ?? request.sort;
+    let error: unknown;
+
+    if (isLoading || !checkHasAnotherPage(currentMembers, currentNextCursor)) {
+      return;
+    }
+
+    try {
+      this.state.next((currentState) => ({
+        ...currentState,
+        member_pagination: {
+          ...currentState.member_pagination,
+          loading_next_page: true,
+        },
+      }));
+
+      const { next: newNextCursor, members } =
+        await this.client.queryFeedMembers({
+          ...request,
+          sort,
+          feed_id: this.id,
+          feed_group_id: this.group,
+          next: currentNextCursor,
+        });
+
+      this.state.next((currentState) => ({
+        ...currentState,
+        members: currentState.members
+          ? currentState.members.concat(members)
+          : members,
+        member_pagination: {
+          ...currentState.member_pagination,
+          next: newNextCursor,
+          // set sort if not defined yet
+          sort: currentState.member_pagination?.sort ?? request.sort,
+        },
+      }));
+    } catch (e) {
+      error = e;
+    } finally {
+      this.state.next((currentState) => ({
+        ...currentState,
+        member_pagination: {
+          ...currentState.member_pagination,
+          loading_next_page: false,
+        },
+      }));
+    }
+
+    if (error) {
+      throw error;
+    }
   }
 
   /**
