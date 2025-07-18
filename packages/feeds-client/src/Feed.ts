@@ -415,36 +415,53 @@ export class Feed extends FeedApi {
       this.handleCommentReactionEvent.bind(this),
     'feeds.comment.reaction.updated': Feed.noop,
     'feeds.feed_member.added': (event) => {
-      const { member } = event;
-
-      // do not add a member if the pagination has not reached the end of the list
-      if (
-        checkHasAnotherPage(
-          this.currentState.members,
-          this.currentState.member_pagination?.next,
-        )
-      ) {
-        return;
-      }
+      const { connectedUser } = this.client.state.getLatestValue();
 
       this.state.next((currentState) => {
-        return {
-          ...currentState,
-          // TODO: respect sort
-          members: currentState.members
-            ? currentState.members.concat(member)
-            : [member],
-        };
+        let newState: FeedState | undefined;
+
+        if (
+          !checkHasAnotherPage(
+            currentState.members,
+            currentState.member_pagination?.next,
+          )
+        ) {
+          newState ??= {
+            ...currentState,
+          };
+
+          newState.members = newState.members?.concat(event.member) ?? [
+            event.member,
+          ];
+        }
+
+        if (connectedUser?.id === event.member.user.id) {
+          newState ??= {
+            ...currentState,
+          };
+
+          newState.own_membership = event.member;
+        }
+
+        return newState ?? currentState;
       });
     },
     'feeds.feed_member.removed': (event) => {
+      const { connectedUser } = this.client.state.getLatestValue();
+
       this.state.next((currentState) => {
-        return {
+        const newState = {
           ...currentState,
           members: currentState.members?.filter(
             (member) => member.user.id !== event.user?.id,
           ),
         };
+
+        if (connectedUser?.id === event.member_id) {
+          delete newState.own_membership;
+        }
+
+        return newState;
       });
     },
     'feeds.feed_member.updated': (event) => {
