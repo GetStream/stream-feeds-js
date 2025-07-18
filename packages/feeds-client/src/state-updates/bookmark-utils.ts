@@ -3,8 +3,22 @@ import {
   BookmarkDeletedEvent,
   BookmarkUpdatedEvent,
   ActivityResponse,
+  BookmarkResponse,
 } from '../gen/models';
 import { UpdateStateResult } from '../types-internal';
+
+// Helper function to check if two bookmarks are the same
+// A bookmark is identified by activity_id + folder_id + user_id
+const isSameBookmark = (
+  bookmark1: BookmarkResponse,
+  bookmark2: BookmarkResponse,
+): boolean => {
+  return (
+    bookmark1.user.id === bookmark2.user.id &&
+    bookmark1.activity.id === bookmark2.activity.id &&
+    bookmark1.folder?.id === bookmark2.folder?.id
+  );
+};
 
 const updateActivityInActivities = (
   updatedActivity: ActivityResponse,
@@ -46,9 +60,7 @@ export const removeBookmarkFromActivity = (
   // Update own_bookmarks if the bookmark is from the current user
   const ownBookmarks = isCurrentUser
     ? (activity.own_bookmarks || []).filter(
-        (bookmark) =>
-          bookmark.user.id !== event.bookmark.user.id ||
-          bookmark.activity.id !== event.bookmark.activity.id,
+        (bookmark) => !isSameBookmark(bookmark, event.bookmark),
       )
     : activity.own_bookmarks;
 
@@ -67,10 +79,8 @@ export const updateBookmarkInActivity = (
   // Update own_bookmarks if the bookmark is from the current user
   let ownBookmarks = activity.own_bookmarks || [];
   if (isCurrentUser) {
-    const bookmarkIndex = ownBookmarks.findIndex(
-      (bookmark) =>
-        bookmark.user.id === event.bookmark.user.id &&
-        bookmark.activity.id === event.bookmark.activity.id,
+    const bookmarkIndex = ownBookmarks.findIndex((bookmark) =>
+      isSameBookmark(bookmark, event.bookmark),
     );
     if (bookmarkIndex !== -1) {
       ownBookmarks = [...ownBookmarks];
