@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import { Feed, FeedState } from '../../src/Feed';
-import { useStateStore } from './useStateStore';
-import { checkHasAnotherPage } from '../../src/utils';
+import { Feed, FeedState } from '../../../src/Feed';
+import { useStateStore } from '../useStateStore';
+import { checkHasAnotherPage } from '../../../src/utils';
+import { useFeedContext } from '../../contexts/StreamFeedContext';
 
 const selector = ({
   follower_count,
@@ -22,10 +23,11 @@ type UseFollowersReturnType = ReturnType<typeof selector> & {
 };
 
 export function useFollowers(feed: Feed): UseFollowersReturnType;
-export function useFollowers(
-  feed: Feed | undefined,
-): UseFollowersReturnType | undefined;
-export function useFollowers(feed: Feed | undefined) {
+export function useFollowers(feed?: Feed): UseFollowersReturnType | undefined;
+export function useFollowers(feedFromProps?: Feed) {
+  const feedFromContext = useFeedContext();
+  const feed = feedFromProps ?? feedFromContext;
+
   const data = useStateStore(feed?.state, selector);
 
   const loadNextPage = useCallback(

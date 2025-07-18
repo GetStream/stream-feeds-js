@@ -82,9 +82,9 @@ export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
   //   }
   // };
 
-  // const renderItem = (group: AggregatedActivitiesResponse, index: number) => {
+  // const renderItem = (group: AggregatedActivitiesResponse, index2: number) => {
   //   return (
-  //     <li key={`notification:${index}`} className="w-full">
+  //     <li key={`notification:${index2}`} className="w-full">
   //       {group.activities[0]?.verb === 'follow-request' && (
   //         <FollowRequestNotification
   //           group={group}

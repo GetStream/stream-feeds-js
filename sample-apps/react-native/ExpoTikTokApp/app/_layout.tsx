@@ -7,16 +7,16 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Text } from 'react-native';
 import 'react-native-reanimated';
 import { StreamFeeds } from '@stream-io/feeds-react-native-sdk';
 import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
-import LoginScreen from '@/app/LoginScreen';
+import LoginScreen from '@/components/LoginScreen';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
-import { useCreateClient } from '@/hook/useCreateClient';
+import { useCreateClient } from '@/hooks/useCreateClient';
 import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
 import { View } from 'react-native';
 
@@ -63,7 +63,7 @@ const RootLayout = () => {
     return null;
   }
 
-  return <RootLayoutNav user={user as UserRequest} />;
+  return <RootLayoutNav user={user} />;
 };
 
 const RootLayoutNav = ({ user }: { user: UserRequest }) => {
@@ -76,14 +76,27 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
   }
 
   return (
-    <StreamFeeds client={client}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        </Stack>
-      </ThemeProvider>
-    </StreamFeeds>
+      <StreamFeeds client={client}>
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="timeline-activity-screen"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="create-post-modal"
+              options={{
+                title: 'New Post',
+                presentation: 'modal',
+                animation: 'slide_from_bottom',
+              }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </StreamFeeds>
   );
 };
 

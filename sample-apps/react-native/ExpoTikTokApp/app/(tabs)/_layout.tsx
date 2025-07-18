@@ -1,12 +1,13 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-import { ConnectionLoadHeader } from '@/components/ConnectionLostHeader';
+import {
+  useClientConnectedUser,
+} from '@stream-io/feeds-react-native-sdk';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -16,6 +17,34 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+const HeaderRight = () => {
+  const colorScheme = useColorScheme();
+  const router = useRouter();
+  const connectedUser = useClientConnectedUser();
+  return (
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: '/create-post-modal',
+          params: {
+            groupId: 'timeline',
+            id: connectedUser?.id,
+          },
+        })
+      }
+    >
+      {({ pressed }) => (
+        <FontAwesome
+          name="plus-square"
+          size={25}
+          color={Colors[colorScheme ?? 'light'].text}
+          style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+        />
+      )}
+    </Pressable>
+  );
+};
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -23,29 +52,14 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
+          title: 'Timeline',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          headerRight: () => <HeaderRight />,
         }}
       />
       <Tabs.Screen

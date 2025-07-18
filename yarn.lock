@@ -5366,6 +5366,77 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rnx-kit/console@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@rnx-kit/console@npm:2.0.0"
+  checksum: 77bd051dce4a0d51947e47474fbe1dd235be5e9860e9f6a051355520a635c10f5f5842fe222710f61c47374269a780f314ca3c7c5b4861fc96bafb91a5a9adfb
+  languageName: node
+  linkType: hard
+
+"@rnx-kit/metro-config@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@rnx-kit/metro-config@npm:2.1.0"
+  dependencies:
+    "@rnx-kit/tools-node": ^3.0.0
+    "@rnx-kit/tools-react-native": ^2.0.0
+    "@rnx-kit/tools-workspaces": ^0.2.0
+  peerDependencies:
+    "@react-native/metro-config": "*"
+    react: "*"
+    react-native: "*"
+  peerDependenciesMeta:
+    "@react-native/metro-config":
+      optional: true
+  checksum: cb4f86542b719d7106221ea068870304e9b33e64609ceb081f1da8c5cadc213ac20452ca9c228609570e114a32b57e337153100e6ba47b9bbed8b7d2d71e1f17
+  languageName: node
+  linkType: hard
+
+"@rnx-kit/metro-resolver-symlinks@npm:^0.2.5":
+  version: 0.2.5
+  resolution: "@rnx-kit/metro-resolver-symlinks@npm:0.2.5"
+  dependencies:
+    "@rnx-kit/console": ^2.0.0
+    "@rnx-kit/tools-node": ^3.0.0
+    "@rnx-kit/tools-react-native": ^2.2.0
+    enhanced-resolve: ^5.8.3
+  peerDependencies:
+    oxc-resolver: ^9.0.0
+  peerDependenciesMeta:
+    oxc-resolver:
+      optional: true
+  checksum: c5d52d376f8be524f98e48333bede4a89d5375c9cd67dfc4b413e30dc443db34d557d5c774e260afe608e3a878f8a2f962bb31c4a5aeb29cc8259271f897404c
+  languageName: node
+  linkType: hard
+
+"@rnx-kit/tools-node@npm:^3.0.0":
+  version: 3.0.2
+  resolution: "@rnx-kit/tools-node@npm:3.0.2"
+  checksum: 9ece015d4d489950916a1ba9fff91bd2751f0a2d280aaab6c4d156a7be96a1fe4b88da76499540b006c9df15f316dec3ade5de84f87f814ede67513ca5aa0b49
+  languageName: node
+  linkType: hard
+
+"@rnx-kit/tools-react-native@npm:^2.0.0, @rnx-kit/tools-react-native@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@rnx-kit/tools-react-native@npm:2.2.0"
+  dependencies:
+    "@rnx-kit/tools-node": ^3.0.0
+  checksum: f164209ec45834a67ed59e5ce0a114edf9043518bb9127598f9f839738f9e245da74a4d79c67777b51e8cdac63a50099d55de9d46cc8e126e650eaf1e1f703ef
+  languageName: node
+  linkType: hard
+
+"@rnx-kit/tools-workspaces@npm:^0.2.0":
+  version: 0.2.3
+  resolution: "@rnx-kit/tools-workspaces@npm:0.2.3"
+  dependencies:
+    fast-glob: ^3.2.7
+    find-up: ^5.0.0
+    micromatch: ^4.0.0
+    read-yaml-file: ^2.1.0
+    strip-json-comments: ^3.1.1
+  checksum: d93367822178ed97da29aba1da8efb376d9cfad3f026cfbb869232c2fde09dc9e2e873ba5b50fbb06cc4d8675fa3e5d0d146fbe5065287f4fdfc2c836fdd4b8d
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-replace@npm:^6.0.1":
   version: 6.0.1
   resolution: "@rollup/plugin-replace@npm:6.0.1"
@@ -5794,6 +5865,20 @@ __metadata:
   version: 1.1.0
   resolution: "@rtsao/scc@npm:1.1.0"
   checksum: 17d04adf404e04c1e61391ed97bca5117d4c2767a76ae3e879390d6dec7b317fcae68afbf9e98badee075d0b64fa60f287729c4942021b4d19cd01db77385c01
+  languageName: node
+  linkType: hard
+
+"@shopify/flash-list@npm:^1.8.3":
+  version: 1.8.3
+  resolution: "@shopify/flash-list@npm:1.8.3"
+  dependencies:
+    recyclerlistview: 4.2.3
+    tslib: 2.8.1
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: c055e2d2be3045aa3f862345159bc102696bdaf07f275217347ab77ece75cc8bb892d9fe338e2eb1cfe83212b2b719442503fffc6dcfb8c25da8e9044d5f1853
   languageName: node
   linkType: hard
 
@@ -10119,7 +10204,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:^5.17.1":
+"enhanced-resolve@npm:^5.17.1, enhanced-resolve@npm:^5.8.3":
   version: 5.18.2
   resolution: "enhanced-resolve@npm:5.18.2"
   dependencies:
@@ -11560,6 +11645,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-image-loader@npm:~5.1.0":
+  version: 5.1.0
+  resolution: "expo-image-loader@npm:5.1.0"
+  peerDependencies:
+    expo: "*"
+  checksum: dafd182e9cea5c6b81202f62d4016be51e5669e13f76e0a514b58b9c502c7366e5b5df02d600897e0d302acd1823eb5b2ca23a2c3f7242f173d2414caed42e1a
+  languageName: node
+  linkType: hard
+
+"expo-image-picker@npm:~16.1.4":
+  version: 16.1.4
+  resolution: "expo-image-picker@npm:16.1.4"
+  dependencies:
+    expo-image-loader: ~5.1.0
+  peerDependencies:
+    expo: "*"
+  checksum: 66fc8c4724c7b8219645259de4d9e61353120398ef2339fd8a5225e0a13a26d4a9851edd6d230086e4ff0997754eea0387d9f5f191502fb64e34228a1e65e340
+  languageName: node
+  linkType: hard
+
 "expo-keep-awake@npm:~14.1.4":
   version: 14.1.4
   resolution: "expo-keep-awake@npm:14.1.4"
@@ -11755,10 +11860,14 @@ __metadata:
     "@react-native-async-storage/async-storage": 2.1.2
     "@react-native-community/netinfo": 11.4.1
     "@react-navigation/native": ^7.1.6
+    "@rnx-kit/metro-config": ^2.1.0
+    "@rnx-kit/metro-resolver-symlinks": ^0.2.5
+    "@shopify/flash-list": ^1.8.3
     "@stream-io/feeds-react-native-sdk": "workspace:*"
     "@types/react": ~19.0.10
     expo: ~53.0.16
     expo-font: ~13.3.2
+    expo-image-picker: ~16.1.4
     expo-linking: ~7.1.6
     expo-router: ~5.1.2
     expo-splash-screen: ~0.30.9
@@ -11771,9 +11880,11 @@ __metadata:
     react: 19.0.0
     react-dom: 19.0.0
     react-native: 0.79.5
+    react-native-fast-image: ^8.6.3
     react-native-reanimated: ~3.17.4
     react-native-safe-area-context: 5.4.0
     react-native-screens: ~4.11.1
+    react-native-video: ^6.16.1
     react-native-web: ~0.20.0
     react-test-renderer: 19.0.0
     typescript: ~5.8.3
@@ -14830,7 +14941,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.1.0":
+"js-yaml@npm:^4.0.0, js-yaml@npm:^4.1.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
   dependencies:
@@ -15325,7 +15436,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.debounce@npm:^4.0.8":
+"lodash.debounce@npm:4.0.8, lodash.debounce@npm:^4.0.8":
   version: 4.0.8
   resolution: "lodash.debounce@npm:4.0.8"
   checksum: a3f527d22c548f43ae31c861ada88b2637eb48ac6aa3eb56e82d44917971b8aa96fbb37aa60efea674dc4ee8c42074f90f7b1f772e9db375435f6c83a19b3bc6
@@ -15878,6 +15989,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"micromatch@npm:^4.0.0, micromatch@npm:^4.0.8":
+  version: 4.0.8
+  resolution: "micromatch@npm:4.0.8"
+  dependencies:
+    braces: ^3.0.3
+    picomatch: ^2.3.1
+  checksum: 79920eb634e6f400b464a954fcfa589c4e7c7143209488e44baf627f9affc8b1e306f41f4f0deedde97e69cb725920879462d3e750ab3bd3c1aed675bb3a8966
+  languageName: node
+  linkType: hard
+
 "micromatch@npm:^4.0.2, micromatch@npm:^4.0.4":
   version: 4.0.5
   resolution: "micromatch@npm:4.0.5"
@@ -15885,16 +16006,6 @@ __metadata:
     braces: ^3.0.2
     picomatch: ^2.3.1
   checksum: 02a17b671c06e8fefeeb6ef996119c1e597c942e632a21ef589154f23898c9c6a9858526246abb14f8bca6e77734aa9dcf65476fca47cedfb80d9577d52843fc
-  languageName: node
-  linkType: hard
-
-"micromatch@npm:^4.0.8":
-  version: 4.0.8
-  resolution: "micromatch@npm:4.0.8"
-  dependencies:
-    braces: ^3.0.3
-    picomatch: ^2.3.1
-  checksum: 79920eb634e6f400b464a954fcfa589c4e7c7143209488e44baf627f9affc8b1e306f41f4f0deedde97e69cb725920879462d3e750ab3bd3c1aed675bb3a8966
   languageName: node
   linkType: hard
 
@@ -17680,7 +17791,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.8.1":
+"prop-types@npm:15.8.1, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -17938,6 +18049,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-fast-image@npm:^8.6.3":
+  version: 8.6.3
+  resolution: "react-native-fast-image@npm:8.6.3"
+  peerDependencies:
+    react: ^17 || ^18
+    react-native: ">=0.60.0"
+  checksum: 29289cb6b2eae0983c8922b22e2d9de3be07322bb7991c5def19f95eadefaedb0e308ff0b38cc1d0444e8bd4fe94a7621a99a2d3d9298100bcb60b3144677234
+  languageName: node
+  linkType: hard
+
 "react-native-is-edge-to-edge@npm:1.1.7":
   version: 1.1.7
   resolution: "react-native-is-edge-to-edge@npm:1.1.7"
@@ -18013,6 +18134,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 22d3c302ef90a1cb20eed8c130b32e53d49288a19eba844f506a5e38342ef2add0d4f7a2ff5501cc05052aef6bf7f180db26a067b01f70f3cc12d3e1497329d6
+  languageName: node
+  linkType: hard
+
+"react-native-video@npm:^6.16.1":
+  version: 6.16.1
+  resolution: "react-native-video@npm:6.16.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 40de297ed35527bf2cd77827c9842d51e84df78fbd0a7697235f8d0ca02de2b1a4562e9d3323391d514a9591a5078b10b26eac501ee7eb9a2a7c0c2ae45a90f5
   languageName: node
   linkType: hard
 
@@ -18167,6 +18298,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"read-yaml-file@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "read-yaml-file@npm:2.1.0"
+  dependencies:
+    js-yaml: ^4.0.0
+    strip-bom: ^4.0.0
+  checksum: 52765eb183e79466f51eebeb19b933cc0f0e907052d062d67300b97e79910064a24b370cdb0b5dd8b05afff3d0ec57282670fd9070dc608e13b11820ac79183d
+  languageName: node
+  linkType: hard
+
 "readable-stream@npm:^3.1.1, readable-stream@npm:^3.4.0, readable-stream@npm:^3.6.0":
   version: 3.6.2
   resolution: "readable-stream@npm:3.6.2"
@@ -18193,6 +18334,20 @@ __metadata:
   dependencies:
     picomatch: ^2.2.1
   checksum: 1ced032e6e45670b6d7352d71d21ce7edf7b9b928494dcaba6f11fba63180d9da6cd7061ebc34175ffda6ff529f481818c962952004d273178acd70f7059b320
+  languageName: node
+  linkType: hard
+
+"recyclerlistview@npm:4.2.3":
+  version: 4.2.3
+  resolution: "recyclerlistview@npm:4.2.3"
+  dependencies:
+    lodash.debounce: 4.0.8
+    prop-types: 15.8.1
+    ts-object-utils: 0.0.5
+  peerDependencies:
+    react: ">= 15.2.1"
+    react-native: ">= 0.30.0"
+  checksum: 847c00bdc7e22178cc20b58b8da215fb2f3f69a4edffd41db97038d0f9eb1475340793e11025f6cc160d3452967ab5724db3896920ba77d2da5208276328254f
   languageName: node
   linkType: hard
 
@@ -20394,6 +20549,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ts-object-utils@npm:0.0.5":
+  version: 0.0.5
+  resolution: "ts-object-utils@npm:0.0.5"
+  checksum: 83c48fbdaba392fb2c01cea53b267ed5538d2bb44fc6c3eecc10bcfabc1780bfa6ec8569b52bbf0140d9b521d9049d5f15884e12286918244d463d854dbc73cb
+  languageName: node
+  linkType: hard
+
 "ts-toolbelt@npm:^6.15.5":
   version: 6.15.5
   resolution: "ts-toolbelt@npm:6.15.5"
@@ -20424,17 +20586,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.8.1, tslib@npm:^2.1.0":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: e4aba30e632b8c8902b47587fd13345e2827fa639e7c3121074d5ee0880723282411a8838f830b55100cbe4517672f84a2472667d355b81e8af165a55dc6203a
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^1.8.1":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.1.0":
-  version: 2.8.1
-  resolution: "tslib@npm:2.8.1"
-  checksum: e4aba30e632b8c8902b47587fd13345e2827fa639e7c3121074d5ee0880723282411a8838f830b55100cbe4517672f84a2472667d355b81e8af165a55dc6203a
   languageName: node
   linkType: hard
 

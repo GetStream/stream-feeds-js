@@ -1,6 +1,13 @@
-export const isImageFile = (file: File) => {
+import { CommentParent, StreamFile } from './types';
+import type { CommentResponse } from './gen/models';
+
+export const isImageFile = (file: StreamFile) => {
   // photoshop files begin with 'image/'
   return file.type.startsWith('image/') && !file.type.endsWith('.photoshop');
+};
+
+export const isVideoFile = (file: StreamFile) => {
+  return file.type.startsWith('video/');
 };
 
 export const checkHasAnotherPage = <T extends unknown | undefined>(
@@ -9,6 +16,12 @@ export const checkHasAnotherPage = <T extends unknown | undefined>(
 ) =>
   (typeof v === 'undefined' && typeof cursor === 'undefined') ||
   typeof cursor === 'string';
+
+export const isCommentResponse = (
+  entity: CommentParent,
+): entity is CommentResponse => {
+  return typeof (entity as CommentResponse)?.object_id === 'string';
+};
 
 export const Constants = {
   DEFAULT_COMMENT_PAGINATION: 'first',
