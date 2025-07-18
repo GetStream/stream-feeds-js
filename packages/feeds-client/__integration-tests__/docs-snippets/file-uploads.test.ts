@@ -82,7 +82,7 @@ describe('File uploads page', () => {
         };
       }),
     });
-  });
+  }, 30000);
 
   it('Deleting Files and Images', async () => {
     await client.deleteImage({

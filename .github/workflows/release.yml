@@ -1,4 +1,7 @@
 name: Version and Release
+env:
+  VITE_STREAM_API_KEY: ${{ vars.CLIENT_TEST_API_KEY }}
+  VITE_STREAM_API_SECRET: ${{ secrets.CLIENT_TEST_SECRET }}
 
 on:
   workflow_dispatch:
@@ -13,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 22.x ]
+        node-version: [22.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -36,8 +39,10 @@ jobs:
         run: NODE_ENV=production yarn build:libs
 
       - name: Test packages
-#        run: yarn test:ci:libs
-        run: echo "Tests not run; uncomment the line above to fix this."
+        run: yarn test:ci:libs
+
+      - name: Run docs code snippets
+        run: yarn test:docs-snippets
 
       - name: Release
         env:
