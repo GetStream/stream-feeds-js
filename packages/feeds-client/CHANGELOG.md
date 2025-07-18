@@ -2,6 +2,22 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.5](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.4...@stream-io/feeds-client-0.1.5) (2025-07-18)
+
+
+### Features
+
+* add loadNextPage to useComments ([#57](https://github.com/GetStream/stream-feeds-js/issues/57)) ([fef823c](https://github.com/GetStream/stream-feeds-js/commit/fef823ceeb1d181f44607821cb46ec2458e199f3))
+* add loadNextPageMembers ([#56](https://github.com/GetStream/stream-feeds-js/issues/56)) ([104dad0](https://github.com/GetStream/stream-feeds-js/commit/104dad0c1440ad26b41b76e1402ef0635e4358ac))
+* add useFollowers & useFollowing ([#55](https://github.com/GetStream/stream-feeds-js/issues/55)) ([95bef04](https://github.com/GetStream/stream-feeds-js/commit/95bef04d2d921574fd1461cca0965963bc245910))
+* feed context, file uploads and reactions ([#66](https://github.com/GetStream/stream-feeds-js/issues/66)) ([886123a](https://github.com/GetStream/stream-feeds-js/commit/886123aeb243c04d9ae82112634e826518e61089))
+
+
+### Bug Fixes
+
+* post useComments/useFollows merge fixes ([#64](https://github.com/GetStream/stream-feeds-js/issues/64)) ([2da2670](https://github.com/GetStream/stream-feeds-js/commit/2da2670d9575aba8b3f22d4cc019ae911a92edfb))
+* replace `eol` with `checkHasAnotherPage` ([#67](https://github.com/GetStream/stream-feeds-js/issues/67)) ([f490e1f](https://github.com/GetStream/stream-feeds-js/commit/f490e1f16775adac46bccc979d5d0d2ce825f859))
+
 ## [0.1.4](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.3...@stream-io/feeds-client-0.1.4) (2025-07-16)
 
 
