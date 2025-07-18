@@ -37,6 +37,7 @@ const createMockActivity = (id: string): ActivityResponse => ({
   visibility: 'public',
   bookmark_count: 0,
   comment_count: 0,
+  reaction_count: 0,
   share_count: 0,
   attachments: [],
   comments: [],
@@ -181,6 +182,71 @@ describe('bookmark-utils', () => {
       expect(result.own_bookmarks).toHaveLength(1);
       expect(result.own_bookmarks[0]).toEqual(bookmark2);
     });
+
+    it('should correctly identify bookmarks by activity_id + folder_id + user_id', () => {
+      const activity = createMockActivity('activity1');
+      const user = createMockUser('user1');
+
+      // Create two bookmarks with same activity and user but different folders
+      const bookmark1 = {
+        ...createMockBookmark(user, activity),
+        folder: {
+          id: 'folder1',
+          name: 'Folder 1',
+          created_at: new Date(),
+          updated_at: new Date(),
+          custom: {},
+        },
+      };
+      const bookmark2 = {
+        ...createMockBookmark(user, activity),
+        folder: {
+          id: 'folder2',
+          name: 'Folder 2',
+          created_at: new Date(),
+          updated_at: new Date(),
+          custom: {},
+        },
+      };
+
+      activity.own_bookmarks = [bookmark1, bookmark2];
+
+      // Try to remove bookmark1
+      const event = createMockDeletedEvent(bookmark1);
+      const result = removeBookmarkFromActivity(event, activity, true);
+
+      expect(result.changed).toBe(true);
+      expect(result.own_bookmarks).toHaveLength(1);
+      expect(result.own_bookmarks[0]).toEqual(bookmark2);
+    });
+
+    it('should handle bookmarks without folders correctly', () => {
+      const activity = createMockActivity('activity1');
+      const user = createMockUser('user1');
+
+      // Create two bookmarks: one with folder, one without
+      const bookmarkWithFolder = {
+        ...createMockBookmark(user, activity),
+        folder: {
+          id: 'folder1',
+          name: 'Folder 1',
+          created_at: new Date(),
+          updated_at: new Date(),
+          custom: {},
+        },
+      };
+      const bookmarkWithoutFolder = createMockBookmark(user, activity);
+
+      activity.own_bookmarks = [bookmarkWithFolder, bookmarkWithoutFolder];
+
+      // Try to remove bookmark without folder
+      const event = createMockDeletedEvent(bookmarkWithoutFolder);
+      const result = removeBookmarkFromActivity(event, activity, true);
+
+      expect(result.changed).toBe(true);
+      expect(result.own_bookmarks).toHaveLength(1);
+      expect(result.own_bookmarks[0]).toEqual(bookmarkWithFolder);
+    });
   });
 
   describe('updateBookmarkInActivity', () => {
@@ -220,20 +286,80 @@ describe('bookmark-utils', () => {
       expect(result.own_bookmarks[0]).toEqual(bookmark); // unchanged
     });
 
-    it('should not update bookmark if it does not exist', () => {
+    // Test for the bug: updating bookmarks with same activity_id but different folder_id
+    it('should correctly update bookmark by activity_id + folder_id + user_id', () => {
       const activity = createMockActivity('activity1');
       const user = createMockUser('user1');
-      const bookmark = createMockBookmark(user, activity);
-      activity.own_bookmarks = [bookmark];
 
-      const differentUser = createMockUser('user2');
-      const differentBookmark = createMockBookmark(differentUser, activity);
-      const event = createMockUpdatedEvent(differentBookmark);
+      // Create two bookmarks with same activity and user but different folders
+      const bookmark1 = {
+        ...createMockBookmark(user, activity),
+        folder: {
+          id: 'folder1',
+          name: 'Folder 1',
+          created_at: new Date(),
+          updated_at: new Date(),
+          custom: {},
+        },
+      };
+      const bookmark2 = {
+        ...createMockBookmark(user, activity),
+        folder: {
+          id: 'folder2',
+          name: 'Folder 2',
+          created_at: new Date(),
+          updated_at: new Date(),
+          custom: {},
+        },
+      };
+
+      activity.own_bookmarks = [bookmark1, bookmark2];
+
+      // Update bookmark1
+      const updatedBookmark1 = {
+        ...bookmark1,
+        custom: { updated: true },
+      };
+      const event = createMockUpdatedEvent(updatedBookmark1);
       const result = updateBookmarkInActivity(event, activity, true);
 
       expect(result.changed).toBe(true);
-      expect(result.own_bookmarks).toHaveLength(1);
-      expect(result.own_bookmarks[0]).toEqual(bookmark); // unchanged
+      expect(result.own_bookmarks).toHaveLength(2);
+      expect(result.own_bookmarks).toContain(updatedBookmark1);
+      expect(result.own_bookmarks).toContain(bookmark2);
+    });
+
+    it('should handle updating bookmarks without folders correctly', () => {
+      const activity = createMockActivity('activity1');
+      const user = createMockUser('user1');
+
+      // Create two bookmarks: one with folder, one without
+      const bookmarkWithFolder = {
+        ...createMockBookmark(user, activity),
+        folder: {
+          id: 'folder1',
+          name: 'Folder 1',
+          created_at: new Date(),
+          updated_at: new Date(),
+          custom: {},
+        },
+      };
+      const bookmarkWithoutFolder = createMockBookmark(user, activity);
+
+      activity.own_bookmarks = [bookmarkWithFolder, bookmarkWithoutFolder];
+
+      // Update bookmark without folder
+      const updatedBookmarkWithoutFolder = {
+        ...bookmarkWithoutFolder,
+        custom: { updated: true },
+      };
+      const event = createMockUpdatedEvent(updatedBookmarkWithoutFolder);
+      const result = updateBookmarkInActivity(event, activity, true);
+
+      expect(result.changed).toBe(true);
+      expect(result.own_bookmarks).toHaveLength(2);
+      expect(result.own_bookmarks).toContain(bookmarkWithFolder);
+      expect(result.own_bookmarks).toContain(updatedBookmarkWithoutFolder);
     });
   });
 
