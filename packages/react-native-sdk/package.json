@@ -21,7 +21,7 @@
     "lint-fix": "prettier --list-different 'src/**/*.{js,ts,tsx,json}' --write && yarn run eslint --fix",
     "clean": "rimraf dist",
     "test": "vitest",
-    "test-ci": "vitest --coverage"
+    "test-ci": "echo 'No tests yet'"
   },
   "dependencies": {
     "@stream-io/feeds-client": "workspace:*",
