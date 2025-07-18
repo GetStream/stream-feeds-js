@@ -6,7 +6,7 @@ import {
 import { useLocalSearchParams } from 'expo-router';
 import { ActivityPager } from '@/components/ActivityPager/Pager';
 
-export default function TimelineActivityScreen() {
+const ActivityPagerScreen = () => {
   const client = useFeedsClient();
   const { groupId, id } = useLocalSearchParams();
 
@@ -25,3 +25,5 @@ export default function TimelineActivityScreen() {
     </StreamFeed>
   );
 }
+
+export default ActivityPagerScreen;

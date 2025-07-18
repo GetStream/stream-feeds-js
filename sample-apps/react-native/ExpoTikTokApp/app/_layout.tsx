@@ -83,7 +83,7 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
-              name="timeline-activity-screen"
+              name="activity-pager-screen"
               options={{ headerShown: false }}
             />
             <Stack.Screen
