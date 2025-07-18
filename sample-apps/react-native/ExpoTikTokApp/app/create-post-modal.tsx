@@ -1,21 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { Platform } from 'react-native';
 import { ActivityComposer } from '@/components/ActivityComposer';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   StreamFeed,
+  useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
-import { useLocalSearchParams } from 'expo-router';
 import { useMemo } from 'react';
 
 export default function ModalScreen() {
   const client = useFeedsClient();
-  const { groupId, id } = useLocalSearchParams();
+  const connectedUser = useClientConnectedUser();
 
   const feed = useMemo(
-    () => client?.feed(groupId as string, id as string),
-    [groupId, id, client],
+    () =>
+      connectedUser?.id ? client?.feed('user', connectedUser.id) : null,
+    [connectedUser?.id, client],
   );
 
   if (!feed) {

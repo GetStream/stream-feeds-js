@@ -11,7 +11,7 @@ const createFeedConfig = {
   },
 };
 
-const TabOneScreen = () => {
+const TimelineScreen = () => {
   const feed = useCreateAndQueryFeed(createFeedConfig);
 
   if (!feed) {
@@ -28,7 +28,7 @@ const TabOneScreen = () => {
   );
 };
 
-export default TabOneScreen;
+export default TimelineScreen;
 
 const styles = StyleSheet.create({
   container: {

@@ -5,7 +5,7 @@ import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
 import { useClientConnectedUser} from '@stream-io/feeds-react-native-sdk';
 import { useUserContext } from '@/contexts/UserContext';
 
-export default function TabTwoScreen() {
+const ExploreScreen = () => {
   const user = useClientConnectedUser();
   const { logOut } = useUserContext();
 
@@ -34,6 +34,8 @@ export default function TabTwoScreen() {
     </View>
   );
 }
+
+export default ExploreScreen;
 
 const styles = StyleSheet.create({
   container: {

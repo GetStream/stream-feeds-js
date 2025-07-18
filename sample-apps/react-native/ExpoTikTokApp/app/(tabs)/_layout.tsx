@@ -20,17 +20,10 @@ function TabBarIcon(props: {
 const HeaderRight = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const connectedUser = useClientConnectedUser();
   return (
     <Pressable
       onPress={() =>
-        router.push({
-          pathname: '/create-post-modal',
-          params: {
-            groupId: 'timeline',
-            id: connectedUser?.id,
-          },
-        })
+        router.push('/create-post-modal')
       }
     >
       {({ pressed }) => (
@@ -63,9 +56,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="explore"
         options={{
-          title: 'Tab Two',
+          title: 'Explore',
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
