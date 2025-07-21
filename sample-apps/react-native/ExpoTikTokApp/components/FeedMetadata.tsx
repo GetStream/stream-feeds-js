@@ -26,8 +26,10 @@ export const FeedMetadata = ({
 }) => {
   const router = useRouter();
   const connectedUser = useClientConnectedUser();
-  const { createdBy, followerCount = 0 } = useFeedMetadata(userFeed) ?? {};
-  const { followingCount = 0 } = useFeedMetadata(timelineFeed) ?? {};
+  const { created_by: createdBy, follower_count: followerCount = 0 } =
+    useFeedMetadata(userFeed) ?? {};
+  const { following_count: followingCount = 0 } =
+    useFeedMetadata(timelineFeed) ?? {};
   // TODO: This is not the correct number of feeds, but it'll be a placeholder until
   //       this is supported by our backend.
   const { activityCount = 0 } = useStateStore(userFeed?.state, selector) ?? {};

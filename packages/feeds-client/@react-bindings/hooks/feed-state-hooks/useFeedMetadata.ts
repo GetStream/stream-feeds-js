@@ -20,9 +20,9 @@ const selector = ({
   created_at,
   updated_at,
 }: FeedState) => ({
-  createdBy: created_by,
-  followerCount: follower_count,
-  followingCount: following_count,
-  createdAt: created_at,
-  updateAt: updated_at,
+  created_by,
+  follower_count,
+  following_count,
+  created_at,
+  updated_at,
 });
