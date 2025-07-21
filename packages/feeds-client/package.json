@@ -46,7 +46,7 @@
     "test": "vitest",
     "test:unit": "vitest --exclude '__integration-tests__/**'",
     "test-ci": "vitest --exclude '__integration-tests__/docs-snippets/**' --coverage",
-    "test-docs-snippets": "vitest --exclude '!__integration-tests__/docs-snippets/**'"
+    "test-docs-snippets": "vitest __integration-tests__/docs-snippets/**"
   },
   "files": [
     "dist",

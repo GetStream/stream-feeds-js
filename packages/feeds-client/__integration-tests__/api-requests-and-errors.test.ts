@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   createTestClient,
   createTestTokenGenerator,
@@ -11,13 +11,14 @@ import { UserRequest } from '../src/gen/models';
 describe('API requests and error handling', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
-
-  beforeAll(async () => {
-    client = createTestClient();
-    void client.connectUser(user, createTestTokenGenerator(user));
-  });
+  let connectUserPromise: Promise<void> | null;
 
   it('should set HTTP headers', async () => {
+    client = createTestClient();
+    connectUserPromise = client.connectUser(
+      user,
+      createTestTokenGenerator(user),
+    );
     let headers: Record<string, string> = {};
 
     // @ts-expect-error need to access private property
@@ -35,6 +36,12 @@ describe('API requests and error handling', () => {
   });
 
   it('should return response body', async () => {
+    client = createTestClient();
+    connectUserPromise = client.connectUser(
+      user,
+      createTestTokenGenerator(user),
+    );
+
     const response = await client.queryUsers({
       payload: { filter_conditions: {} },
     });
@@ -45,6 +52,12 @@ describe('API requests and error handling', () => {
   it.skipIf(import.meta.env.VITE_API_URL?.includes('localhost'))(
     'should return rate limit information',
     async () => {
+      client = createTestClient();
+      connectUserPromise = client.connectUser(
+        user,
+        createTestTokenGenerator(user),
+      );
+
       const response = await client.queryUsers({
         payload: { filter_conditions: {} },
       });
@@ -62,6 +75,12 @@ describe('API requests and error handling', () => {
   it.skipIf(import.meta.env.VITE_API_URL?.includes('localhost'))(
     'should handle error response from Stream API',
     async () => {
+      client = createTestClient();
+      connectUserPromise = client.connectUser(
+        user,
+        createTestTokenGenerator(user),
+      );
+
       try {
         await client.queryUsers();
         throw new Error(`Test failed because method didn't throw`);
@@ -83,7 +102,10 @@ describe('API requests and error handling', () => {
   it('should handle token expiration', async () => {
     client = createTestClient();
     const expInSecs = 2;
-    void client.connectUser(user, createTestTokenGenerator(user, expInSecs));
+    connectUserPromise = client.connectUser(
+      user,
+      createTestTokenGenerator(user, expInSecs),
+    );
 
     await sleep(expInSecs * 1000);
 
@@ -91,6 +113,12 @@ describe('API requests and error handling', () => {
   });
 
   it('should add connection id when necessary', async () => {
+    client = createTestClient();
+    connectUserPromise = client.connectUser(
+      user,
+      createTestTokenGenerator(user),
+    );
+
     let params: any;
 
     // @ts-expect-error need to access private property
@@ -110,27 +138,52 @@ describe('API requests and error handling', () => {
     expect(params.connection_id).toBeDefined();
   });
 
-  it('should give up token refresh after 3 tries', async () => {
+  it('should give up token refresh after 3 tries - WS connection', async () => {
     client = createTestClient();
+
     const tokenProvider = () =>
       Promise.reject(new Error('This is a test error'));
-    void client.connectUser(user, tokenProvider);
+
+    await expect(() =>
+      client.connectUser(user, tokenProvider),
+    ).rejects.toThrowError(
+      'Stream error: tried to get token 3 times, but it failed with Error: This is a test error. Check your token provider',
+    );
+
+    connectUserPromise = null;
+  });
+
+  it('should give up token refresh after 3 tries - API request', async () => {
+    client = createTestClient();
+
+    const tokenProvider = () =>
+      Promise.reject(new Error('This is a test error'));
+
+    connectUserPromise = client
+      .connectUser(user, tokenProvider)
+      .catch(() => {});
 
     await expect(() =>
       client.queryUsers({ payload: { filter_conditions: {} } }),
     ).rejects.toThrowError(
       'Stream error: tried to get token 3 times, but it failed with Error: This is a test error. Check your token provider',
     );
-
-    await client.disconnectUser();
   }, 30000);
 
   it('should handle timeout', async () => {
     client = createTestClient({ timeout: 1 });
-    void client.connectUser(user, createTestTokenGenerator(user));
+    connectUserPromise = client.connectUser(
+      user,
+      createTestTokenGenerator(user),
+    );
 
     await expect(() => client.getApp()).rejects.toThrowError(
       'Stream error timeout of 1ms exceeded',
     );
+  });
+
+  afterEach(async () => {
+    await connectUserPromise;
+    await client.disconnectUser();
   });
 });

@@ -5,6 +5,7 @@ import { FeedsClientOptions } from '../src/common/types';
 import { WSEvent } from '../src/gen/models';
 import { FeedsEvent } from '../src/types';
 import { StreamClient } from '@stream-io/node-sdk';
+import { randomId } from '../src/common/utils';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 const secret = import.meta.env.VITE_STREAM_API_SECRET;
@@ -56,7 +57,7 @@ export const createTestTokenGenerator = (
 };
 
 export const getTestUser = () => {
-  return { id: 'emily' };
+  return { id: `emily-${randomId()}` };
 };
 
 export const waitForEvent = (

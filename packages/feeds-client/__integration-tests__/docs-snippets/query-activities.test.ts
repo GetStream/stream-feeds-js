@@ -7,6 +7,7 @@ import {
 import { FeedsClient } from '../../src/FeedsClient';
 import { Feed } from '../../src/Feed';
 import { UserRequest } from '../../src/gen/models';
+import { randomId } from '../../../feeds-client/src/common/utils';
 
 describe('Querying Activities page', () => {
   let client: FeedsClient;
@@ -53,7 +54,7 @@ describe('Querying Activities page', () => {
 
   it(`Querying activities by search data`, async () => {
     await feed.addActivity({
-      id: 'activity-123',
+      id: randomId(),
       type: 'post',
       text: 'Check out our spring sale!',
       search_data: {
