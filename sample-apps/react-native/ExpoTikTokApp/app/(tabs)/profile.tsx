@@ -1,21 +1,34 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text } from '@/components/Themed';
 import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, Platform } from 'react-native';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useUserContext } from '@/contexts/UserContext';
 import { Profile } from '@/components/Profile';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ProfileScreen = () => {
   const { ownUserFeed, ownTimelineFeed } = useOwnFeedsContext();
   const { logOut } = useUserContext();
+  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+
+  const extraContainerStyles = useMemo(
+    () => ({
+      paddingBottom:
+        insets.bottom + tabBarHeight + (Platform.OS === 'ios' ? 0 : 80),
+    }),
+    [insets.bottom, tabBarHeight],
+  );
 
   if (!ownUserFeed || !ownTimelineFeed) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, extraContainerStyles]}>
       <ConnectionLostHeader />
       <Pressable
         onPress={logOut}
@@ -27,7 +40,9 @@ const ProfileScreen = () => {
         <Text style={styles.icon}>⎋</Text>
         <Text style={styles.label}>Log out</Text>
       </Pressable>
-      <Profile userFeed={ownUserFeed} timelineFeed={ownTimelineFeed} />
+      <View style={styles.profileContainer}>
+        <Profile userFeed={ownUserFeed} timelineFeed={ownTimelineFeed} />
+      </View>
     </View>
   );
 };
@@ -36,6 +51,7 @@ export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 16, backgroundColor: '#fff' },
+  profileContainer: { flex: 1, paddingBottom: 16 },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
