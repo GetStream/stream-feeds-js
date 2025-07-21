@@ -6,7 +6,6 @@ import {
   useFollowing,
 } from '@stream-io/feeds-react-native-sdk';
 import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { View, Text } from '@/components/Themed';
 import { useRouter } from 'expo-router';
