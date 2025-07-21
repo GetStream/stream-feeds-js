@@ -90,17 +90,17 @@ export type FeedState = Omit<
          *   comments_by_entity_id: {
          *     'activity-1': {
          *       comments: [comment1],
-         *       intermediate_parent_id: undefined,
+         *       entity_parent_id: undefined,
          *     },
          *     'comment-1': {
          *       comments: [comment2],
-         *       intermediate_parent_id: 'activity-1', // parent store where "comment-1" is located in "comments" array
+         *       entity_parent_id: 'activity-1', // parent store where "comment-1" is located in "comments" array
          *     }
          *   }
          * }
          * ```
          */
-        intermediate_parent_id?: ActivityIdOrCommentId;
+        entity_parent_id?: ActivityIdOrCommentId;
         comments?: CommentResponse[];
       }
     | undefined
@@ -824,9 +824,9 @@ export class Feed extends FeedApi {
     entityId: eid,
     base,
     sort,
-    intermediateParentId: ipid,
+    entityParentId: epid,
   }: {
-    intermediateParentId?: string;
+    entityParentId?: string;
     entityId: string;
     sort: string;
     base: () => Promise<PagerResponse & { comments: CommentResponse[] }>;
@@ -853,7 +853,7 @@ export class Feed extends FeedApi {
       const traverseArray = [
         {
           entityId: eid,
-          intermediateParentId: ipid,
+          entityParentId: epid,
           comments,
           next: newNextCursor,
         },
@@ -875,11 +875,11 @@ export class Feed extends FeedApi {
 
             traverseArray.push({
               entityId: comment.id,
-              intermediateParentId: entityId,
+              entityParentId: entityId,
               // @ts-expect-error replies are not yet typed
               comments: comment.replies,
               // @ts-expect-error reply_pagination is not yet typed
-              next: comment.reply_pagination?.next ?? Constants.END_OF_LIST,
+              next: comment.reply_pagination?.next,
             });
           });
 
@@ -887,7 +887,7 @@ export class Feed extends FeedApi {
 
           newCommentsByEntityId[entityId] = {
             ...newCommentsByEntityId[entityId],
-            intermediate_parent_id: item.intermediateParentId,
+            entity_parent_id: item.entityParentId,
             pagination: {
               ...newCommentsByEntityId[entityId]?.pagination,
               next: item.next,
@@ -998,7 +998,7 @@ export class Feed extends FeedApi {
             Constants.DEFAULT_COMMENT_PAGINATION,
           next: currentNextCursor,
         }),
-      intermediateParentId: comment.parent_id ?? comment.object_id,
+      entityParentId: comment.parent_id ?? comment.object_id,
       sort,
     });
   }
