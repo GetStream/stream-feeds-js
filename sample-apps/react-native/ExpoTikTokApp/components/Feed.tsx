@@ -27,7 +27,7 @@ const keyExtractor = (item: ActivityResponse) => item.id;
 
 export const Feed = () => {
   const [error, setError] = useState<Error | undefined>();
-  const { loadNextPage, isLoading, activities } = useFeedActivities() ?? {};
+  const { loadNextPage, is_loading: isLoading, activities } = useFeedActivities() ?? {};
 
   const getNextPage = useStableCallback(() => {
     setError(undefined);
