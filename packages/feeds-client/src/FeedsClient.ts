@@ -236,7 +236,7 @@ export class FeedsClient extends FeedsApi {
       const connectedEvent = await this.wsConnection.connect();
       this.state.partialNext({
         connected_user: connectedEvent?.me,
-        is_ws_connection_healthy: this.wsConnection.isHealthy,
+        is_ws_connection_healthy: !!this.wsConnection?.isHealthy,
       });
     } catch (err) {
       await this.disconnectUser();
