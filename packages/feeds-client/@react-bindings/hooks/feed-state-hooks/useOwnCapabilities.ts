@@ -10,8 +10,8 @@ const selector = (currentState: FeedState) => ({
   oc: currentState.own_capabilities ?? stableEmptyArray,
 });
 
-type KebabToCamelCase<S extends string> = S extends `${infer T}-${infer U}`
-  ? `${T}${Capitalize<KebabToCamelCase<U>>}`
+type KebabToSnakeCase<S extends string> = S extends `${infer T}-${infer U}`
+  ? `${T}_${KebabToSnakeCase<U>}`
   : S;
 
 export const useOwnCapabilities = (feedFromProps?: Feed) => {
@@ -23,47 +23,47 @@ export const useOwnCapabilities = (feedFromProps?: Feed) => {
   return useMemo(
     () =>
       ({
-        canAddActivity: oc.indexOf(FeedOwnCapability.ADD_ACTIVITY) > -1,
-        canAddActivityReaction:
+        can_add_activity: oc.indexOf(FeedOwnCapability.ADD_ACTIVITY) > -1,
+        can_add_activity_reaction:
           oc.indexOf(FeedOwnCapability.ADD_ACTIVITY_REACTION) > -1,
-        canAddComment: oc.indexOf(FeedOwnCapability.ADD_COMMENT) > -1,
-        canAddCommentReaction:
+        can_add_comment: oc.indexOf(FeedOwnCapability.ADD_COMMENT) > -1,
+        can_add_comment_reaction:
           oc.indexOf(FeedOwnCapability.ADD_COMMENT_REACTION) > -1,
-        canBookmarkActivity:
+        can_bookmark_activity:
           oc.indexOf(FeedOwnCapability.BOOKMARK_ACTIVITY) > -1,
-        canCreateFeed: oc.indexOf(FeedOwnCapability.CREATE_FEED) > -1,
-        canDeleteBookmark: oc.indexOf(FeedOwnCapability.DELETE_BOOKMARK) > -1,
-        canDeleteComment: oc.indexOf(FeedOwnCapability.DELETE_COMMENT) > -1,
-        canDeleteFeed: oc.indexOf(FeedOwnCapability.DELETE_FEED) > -1,
-        canEditBookmark: oc.indexOf(FeedOwnCapability.EDIT_BOOKMARK) > -1,
-        canFollow: oc.indexOf(FeedOwnCapability.FOLLOW) > -1,
-        canRemoveActivity: oc.indexOf(FeedOwnCapability.REMOVE_ACTIVITY) > -1,
-        canRemoveActivityReaction:
+        can_create_feed: oc.indexOf(FeedOwnCapability.CREATE_FEED) > -1,
+        can_delete_bookmark: oc.indexOf(FeedOwnCapability.DELETE_BOOKMARK) > -1,
+        can_delete_comment: oc.indexOf(FeedOwnCapability.DELETE_COMMENT) > -1,
+        can_delete_feed: oc.indexOf(FeedOwnCapability.DELETE_FEED) > -1,
+        can_edit_bookmark: oc.indexOf(FeedOwnCapability.EDIT_BOOKMARK) > -1,
+        can_follow: oc.indexOf(FeedOwnCapability.FOLLOW) > -1,
+        can_remove_activity: oc.indexOf(FeedOwnCapability.REMOVE_ACTIVITY) > -1,
+        can_remove_activity_reaction:
           oc.indexOf(FeedOwnCapability.REMOVE_ACTIVITY_REACTION) > -1,
-        canRemoveCommentReaction:
+        can_remove_comment_reaction:
           oc.indexOf(FeedOwnCapability.REMOVE_COMMENT_REACTION) > -1,
-        canUnfollow: oc.indexOf(FeedOwnCapability.UNFOLLOW) > -1,
-        canUpdateFeed: oc.indexOf(FeedOwnCapability.UPDATE_FEED) > -1,
-        canInviteFeed: oc.indexOf(FeedOwnCapability.INVITE_FEED) > -1,
-        canJoinFeed: oc.indexOf(FeedOwnCapability.JOIN_FEED) > -1,
-        canLeaveFeed: oc.indexOf(FeedOwnCapability.LEAVE_FEED) > -1,
-        canManageFeedGroup:
+        can_unfollow: oc.indexOf(FeedOwnCapability.UNFOLLOW) > -1,
+        can_update_feed: oc.indexOf(FeedOwnCapability.UPDATE_FEED) > -1,
+        can_invite_feed: oc.indexOf(FeedOwnCapability.INVITE_FEED) > -1,
+        can_join_feed: oc.indexOf(FeedOwnCapability.JOIN_FEED) > -1,
+        can_leave_feed: oc.indexOf(FeedOwnCapability.LEAVE_FEED) > -1,
+        can_manage_feed_group:
           oc.indexOf(FeedOwnCapability.MANAGE_FEED_GROUP) > -1,
-        canMarkActivity: oc.indexOf(FeedOwnCapability.MARK_ACTIVITY) > -1,
-        canPinActivity: oc.indexOf(FeedOwnCapability.PIN_ACTIVITY) > -1,
-        canQueryFeedMembers:
+        can_mark_activity: oc.indexOf(FeedOwnCapability.MARK_ACTIVITY) > -1,
+        can_pin_activity: oc.indexOf(FeedOwnCapability.PIN_ACTIVITY) > -1,
+        can_query_feed_members:
           oc.indexOf(FeedOwnCapability.QUERY_FEED_MEMBERS) > -1,
-        canQueryFollows: oc.indexOf(FeedOwnCapability.QUERY_FOLLOWS) > -1,
-        canReadActivities: oc.indexOf(FeedOwnCapability.READ_ACTIVITIES) > -1,
-        canReadFeed: oc.indexOf(FeedOwnCapability.READ_FEED) > -1,
-        canUpdateActivity: oc.indexOf(FeedOwnCapability.UPDATE_ACTIVITY) > -1,
-        canUpdateComment: oc.indexOf(FeedOwnCapability.UPDATE_COMMENT) > -1,
-        canUpdateFeedFollowers:
+        can_query_follows: oc.indexOf(FeedOwnCapability.QUERY_FOLLOWS) > -1,
+        can_read_activities: oc.indexOf(FeedOwnCapability.READ_ACTIVITIES) > -1,
+        can_read_feed: oc.indexOf(FeedOwnCapability.READ_FEED) > -1,
+        can_update_activity: oc.indexOf(FeedOwnCapability.UPDATE_ACTIVITY) > -1,
+        can_update_comment: oc.indexOf(FeedOwnCapability.UPDATE_COMMENT) > -1,
+        can_update_feed_followers:
           oc.indexOf(FeedOwnCapability.UPDATE_FEED_FOLLOWERS) > -1,
-        canUpdateFeedMembers:
+        can_update_feed_members:
           oc.indexOf(FeedOwnCapability.UPDATE_FEED_MEMBERS) > -1,
       }) satisfies Record<
-        `can${Capitalize<KebabToCamelCase<(typeof FeedOwnCapability)[keyof typeof FeedOwnCapability]>>}`,
+        `can_${KebabToSnakeCase<(typeof FeedOwnCapability)[keyof typeof FeedOwnCapability]>}`,
         boolean
       >,
     [oc],

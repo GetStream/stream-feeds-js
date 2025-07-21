@@ -34,11 +34,11 @@ export const Reaction = ({
   );
 
   const canAddReaction = isComment
-    ? ownCapabilities.canAddCommentReaction
-    : ownCapabilities.canAddActivityReaction;
+    ? ownCapabilities.can_add_comment_reaction
+    : ownCapabilities.can_add_activity_reaction;
   const canRemoveReaction = isComment
-    ? ownCapabilities.canRemoveCommentReaction
-    : ownCapabilities.canRemoveActivityReaction;
+    ? ownCapabilities.can_remove_comment_reaction
+    : ownCapabilities.can_remove_activity_reaction;
 
   const { toggleReaction } = useReactionActions({ entity, type });
 
