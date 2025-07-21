@@ -66,11 +66,10 @@ export const FeedList = ({ types }: { types: Array<'user'> }) => {
   const [error, setError] = useState<Error>();
   const [next, setNext] = useState<string | undefined>(undefined);
   const [feeds, setFeeds] = useState<Feed[]>([]);
-  const { ownTimelineFeed } = useOwnFeedsContext();
   const connectedUser = useClientConnectedUser();
 
   const loadMore = useStableCallback(async () => {
-    if (!client || !connectedUser || !ownTimelineFeed || isLoading) {
+    if (!client || !connectedUser || isLoading) {
       return;
     }
 
@@ -101,11 +100,11 @@ export const FeedList = ({ types }: { types: Array<'user'> }) => {
   });
 
   useEffect(() => {
-    if (!client || !connectedUser || !ownTimelineFeed) {
+    if (!client || !connectedUser) {
       return;
     }
     void loadMore();
-  }, [client, connectedUser, loadMore, ownTimelineFeed]);
+  }, [client, connectedUser, loadMore]);
 
   if (error) {
     return <ErrorIndicator context="user feeds" />;
