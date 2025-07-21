@@ -48,7 +48,8 @@ const UserItem = ({ feed }: { feed: Feed }) => {
         />
         <Text style={styles.userName}>{createdBy?.name ?? `@${createdBy?.id}`}</Text>
       </View>
-      <FollowButton feed={feed}></FollowButton>
+      {/* <FollowButton feed={feed}></FollowButton> */}
+      <View />
     </TouchableOpacity>
   );
 };
