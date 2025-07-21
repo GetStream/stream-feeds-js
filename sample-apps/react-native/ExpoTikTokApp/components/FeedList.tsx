@@ -12,6 +12,7 @@ import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { View, Text } from '@/components/Themed';
 import { useRouter } from 'expo-router';
+import { ErrorIndicator, LoadingIndicator } from '@/components/Indicators';
 
 const selector = (state: FeedState) => {
   return {
@@ -46,10 +47,11 @@ const UserItem = ({ feed }: { feed: Feed }) => {
           }}
           style={styles.avatar}
         />
-        <Text style={styles.userName}>{createdBy?.name ?? `@${createdBy?.id}`}</Text>
+        <Text style={styles.userName}>
+          {createdBy?.name ?? `@${createdBy?.id}`}
+        </Text>
       </View>
-      {/* <FollowButton feed={feed}></FollowButton> */}
-      <View />
+      <FollowButton feed={feed}></FollowButton>
     </TouchableOpacity>
   );
 };
@@ -104,6 +106,14 @@ export const FeedList = ({ types }: { types: Array<'user'> }) => {
     }
     void loadMore();
   }, [client, connectedUser, loadMore, ownTimelineFeed]);
+
+  if (error) {
+    return <ErrorIndicator context="user feeds" />;
+  }
+
+  if (isLoading && feeds.length === 0) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <View style={styles.container}>
