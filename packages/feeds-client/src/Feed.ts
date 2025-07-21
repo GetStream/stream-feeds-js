@@ -1031,7 +1031,6 @@ export class Feed extends FeedApi {
   }
 
   async loadNextPageFollowing(request: Pick<QueryFollowsRequest, 'limit'>) {
-    console.log('TEST: ', request)
     await this.loadNextPageFollows('following', request);
   }
 
