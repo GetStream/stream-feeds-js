@@ -1,4 +1,8 @@
 name: Lint and test
+env:
+  VITE_STREAM_API_KEY: ${{ vars.CLIENT_TEST_API_KEY }}
+  VITE_STREAM_API_SECRET: ${{ secrets.CLIENT_TEST_SECRET }}
+  VITE_API_URL: ${{ vars.CLIENT_TEST_API_URL }}
 
 on:
   push:
@@ -36,5 +40,4 @@ jobs:
         run: NODE_ENV=production yarn build:all
 
       - name: Test packages
-        #        run: yarn test:ci:libs
-        run: echo "Tests not run; uncomment the line above to fix this."
+        run: yarn test:ci:libs

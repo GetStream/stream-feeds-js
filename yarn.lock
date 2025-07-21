@@ -31,7 +31,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ampproject/remapping@npm:^2.2.0":
+"@ampproject/remapping@npm:^2.2.0, @ampproject/remapping@npm:^2.3.0":
   version: 2.3.0
   resolution: "@ampproject/remapping@npm:2.3.0"
   dependencies:
@@ -626,7 +626,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/parser@npm:^7.1.0, @babel/parser@npm:^7.14.7, @babel/parser@npm:^7.20.0, @babel/parser@npm:^7.20.7, @babel/parser@npm:^7.23.9, @babel/parser@npm:^7.25.3, @babel/parser@npm:^7.27.2, @babel/parser@npm:^7.28.0":
+"@babel/parser@npm:^7.1.0, @babel/parser@npm:^7.14.7, @babel/parser@npm:^7.20.0, @babel/parser@npm:^7.20.7, @babel/parser@npm:^7.23.9, @babel/parser@npm:^7.25.3, @babel/parser@npm:^7.25.4, @babel/parser@npm:^7.27.2, @babel/parser@npm:^7.28.0":
   version: 7.28.0
   resolution: "@babel/parser@npm:7.28.0"
   dependencies:
@@ -2750,6 +2750,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/types@npm:^7.25.4":
+  version: 7.28.1
+  resolution: "@babel/types@npm:7.28.1"
+  dependencies:
+    "@babel/helper-string-parser": ^7.27.1
+    "@babel/helper-validator-identifier": ^7.27.1
+  checksum: da49a23f86e36f4e4d996a648949a97b9387bae4d1fed747e9fd4bf0dd2a6d11302b6f70f2d00fe58dc12e090f47792596ee76e8def1c52f25d6806cd3a32d7f
+  languageName: node
+  linkType: hard
+
 "@babel/types@npm:^7.25.7, @babel/types@npm:^7.25.8, @babel/types@npm:^7.4.4":
   version: 7.25.8
   resolution: "@babel/types@npm:7.25.8"
@@ -2765,6 +2775,13 @@ __metadata:
   version: 0.2.3
   resolution: "@bcoe/v8-coverage@npm:0.2.3"
   checksum: 850f9305536d0f2bd13e9e0881cb5f02e4f93fad1189f7b2d4bebf694e3206924eadee1068130d43c11b750efcc9405f88a8e42ef098b6d75239c0f047de1a27
+  languageName: node
+  linkType: hard
+
+"@bcoe/v8-coverage@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@bcoe/v8-coverage@npm:1.0.2"
+  checksum: f4e6f55817645fc1b543aa0bbd6ffceb7b9ff3052e8c92c493a0a71831e6b8ae97d73e123b048cb98ef9d9e31afae018a60795f2e27a6f3e94a1ec7abedac85d
   languageName: node
   linkType: hard
 
@@ -5936,8 +5953,9 @@ __metadata:
   dependencies:
     "@rollup/plugin-replace": ^6.0.1
     "@rollup/plugin-typescript": ^12.1.0
-    "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-api"
+    "@stream-io/node-sdk": 0.5.0
     "@types/react": ^19.1.8
+    "@vitest/coverage-v8": 3.2.4
     axios: ^1.7.7
     dotenv: ^16.4.5
     react: 19.0.0
@@ -6015,6 +6033,7 @@ __metadata:
     rimraf: ^6.0.1
     typescript: 5.8.3
     typescript-eslint: ^8.34.0
+    vitest: ^3.2.1
   peerDependencies:
     "@react-native-community/netinfo": ">=9.0.0"
     expo: ">=51.0.0"
@@ -6026,9 +6045,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#feeds-api":
-  version: 0.4.26
-  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=e4168fe7c5c4e0e30667b7ec7ec6fb6e5631897a"
+"@stream-io/node-sdk@npm:0.5.0":
+  version: 0.5.0
+  resolution: "@stream-io/node-sdk@npm:0.5.0"
   dependencies:
     "@types/jsonwebtoken": ^9.0.3
     "@types/node": ^18.3.0
@@ -6039,7 +6058,7 @@ __metadata:
   peerDependenciesMeta:
     "@stream-io/openai-realtime-api":
       optional: true
-  checksum: 1516bf3a7e5d922e84e4e1a02f3672f0ae0d706101699fb3ac6bce5cde8f36ded9d75cec875c8a1f52eb6963f9633cfe995532a9b65c406cf42a9d3fb34642c7
+  checksum: 1918dfe264231ed00ce431b143d9e330d31f267bb50c6a56b3f116449000cdc5b4b0e2efce78eba55f4be1b6957729234f21aa3fc9e20872ba88df54d386eb18
   languageName: node
   linkType: hard
 
@@ -7373,6 +7392,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vitest/coverage-v8@npm:3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/coverage-v8@npm:3.2.4"
+  dependencies:
+    "@ampproject/remapping": ^2.3.0
+    "@bcoe/v8-coverage": ^1.0.2
+    ast-v8-to-istanbul: ^0.3.3
+    debug: ^4.4.1
+    istanbul-lib-coverage: ^3.2.2
+    istanbul-lib-report: ^3.0.1
+    istanbul-lib-source-maps: ^5.0.6
+    istanbul-reports: ^3.1.7
+    magic-string: ^0.30.17
+    magicast: ^0.3.5
+    std-env: ^3.9.0
+    test-exclude: ^7.0.1
+    tinyrainbow: ^2.0.0
+  peerDependencies:
+    "@vitest/browser": 3.2.4
+    vitest: 3.2.4
+  peerDependenciesMeta:
+    "@vitest/browser":
+      optional: true
+  checksum: b33d4abb32216c793b1da122254bf70578c4acddbf2011c377818cbfc9506383398a5a2eaeb70045120dac1f86a1a2511fd624050dd92ef7387b9469929ceb33
+  languageName: node
+  linkType: hard
+
 "@vitest/expect@npm:3.2.4":
   version: 3.2.4
   resolution: "@vitest/expect@npm:3.2.4"
@@ -8063,6 +8109,17 @@ __metadata:
   version: 2.0.1
   resolution: "assertion-error@npm:2.0.1"
   checksum: a0789dd882211b87116e81e2648ccb7f60340b34f19877dd020b39ebb4714e475eb943e14ba3e22201c221ef6645b7bfe10297e76b6ac95b48a9898c1211ce66
+  languageName: node
+  linkType: hard
+
+"ast-v8-to-istanbul@npm:^0.3.3":
+  version: 0.3.3
+  resolution: "ast-v8-to-istanbul@npm:0.3.3"
+  dependencies:
+    "@jridgewell/trace-mapping": ^0.3.25
+    estree-walker: ^3.0.3
+    js-tokens: ^9.0.1
+  checksum: 749bde3ec1c273797f8c6d3e5c0bcf4a29c21e2eecdc4302de980ddd4bac6bc94a3c64159e2b37e95b756203f101183905f0ead7567d40e5a4d739ac3923b94c
   languageName: node
   linkType: hard
 
@@ -11907,7 +11964,7 @@ __metadata:
   resolution: "facebook-clone@workspace:sample-apps/react-sample-app"
   dependencies:
     "@stream-io/feeds-client": "workspace:^"
-    "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-api"
+    "@stream-io/node-sdk": 0.5.0
     "@types/lodash.uniqby": ^4
     "@types/node": ^20
     "@types/react": ^18
@@ -12627,7 +12684,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^10.3.10, glob@npm:^10.4.2":
+"glob@npm:^10.3.10, glob@npm:^10.4.1, glob@npm:^10.4.2":
   version: 10.4.5
   resolution: "glob@npm:10.4.5"
   dependencies:
@@ -13830,7 +13887,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"istanbul-lib-coverage@npm:^3.2.0":
+"istanbul-lib-coverage@npm:^3.2.0, istanbul-lib-coverage@npm:^3.2.2":
   version: 3.2.2
   resolution: "istanbul-lib-coverage@npm:3.2.2"
   checksum: 2367407a8d13982d8f7a859a35e7f8dd5d8f75aae4bb5484ede3a9ea1b426dc245aff28b976a2af48ee759fdd9be374ce2bd2669b644f31e76c5f46a2e29a831
@@ -13863,7 +13920,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"istanbul-lib-report@npm:^3.0.0":
+"istanbul-lib-report@npm:^3.0.0, istanbul-lib-report@npm:^3.0.1":
   version: 3.0.1
   resolution: "istanbul-lib-report@npm:3.0.1"
   dependencies:
@@ -13885,7 +13942,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"istanbul-lib-source-maps@npm:^5.0.0":
+"istanbul-lib-source-maps@npm:^5.0.0, istanbul-lib-source-maps@npm:^5.0.6":
   version: 5.0.6
   resolution: "istanbul-lib-source-maps@npm:5.0.6"
   dependencies:
@@ -13896,7 +13953,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"istanbul-reports@npm:^3.1.3":
+"istanbul-reports@npm:^3.1.3, istanbul-reports@npm:^3.1.7":
   version: 3.1.7
   resolution: "istanbul-reports@npm:3.1.7"
   dependencies:
@@ -15625,6 +15682,17 @@ __metadata:
   dependencies:
     "@jridgewell/sourcemap-codec": ^1.5.0
   checksum: e041649453c9a3f31d2e731fc10e38604d50e20d3585cd48bc7713a6e2e1a3ad3012105929ca15750d59d0a3f1904405e4b95a23b7e69dc256db3c277a73a3ca
+  languageName: node
+  linkType: hard
+
+"magicast@npm:^0.3.5":
+  version: 0.3.5
+  resolution: "magicast@npm:0.3.5"
+  dependencies:
+    "@babel/parser": ^7.25.4
+    "@babel/types": ^7.25.4
+    source-map-js: ^1.2.0
+  checksum: 668f07ade907a44bccfc9a9321588473f6d5fa25329aa26b9ad9a3bf87cc2e6f9c482cbdd3e33c0b9ab9b79c065630c599cc055a12f881c8c924ee0d7282cdce
   languageName: node
   linkType: hard
 
@@ -19534,7 +19602,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-js@npm:^1.0.2, source-map-js@npm:^1.2.1":
+"source-map-js@npm:^1.0.2, source-map-js@npm:^1.2.0, source-map-js@npm:^1.2.1":
   version: 1.2.1
   resolution: "source-map-js@npm:1.2.1"
   checksum: 4eb0cd997cdf228bc253bcaff9340afeb706176e64868ecd20efbe6efea931465f43955612346d6b7318789e5265bdc419bc7669c1cebe3db0eb255f57efa76b
@@ -20277,6 +20345,17 @@ __metadata:
     glob: ^7.1.4
     minimatch: ^3.0.4
   checksum: 3b34a3d77165a2cb82b34014b3aba93b1c4637a5011807557dc2f3da826c59975a5ccad765721c4648b39817e3472789f9b0fa98fc854c5c1c7a1e632aacdc28
+  languageName: node
+  linkType: hard
+
+"test-exclude@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "test-exclude@npm:7.0.1"
+  dependencies:
+    "@istanbuljs/schema": ^0.1.2
+    glob: ^10.4.1
+    minimatch: ^9.0.4
+  checksum: e5a49a054bf2da74467dd8149b202166e36275c0dc2c9585f7d34de99c6d055d2287ac8d2a8e4c27c59b893acbc671af3fa869e8069a58ad117250e9c01c726b
   languageName: node
   linkType: hard
 

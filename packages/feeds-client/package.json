@@ -44,7 +44,9 @@
     "start": "rollup -w -c",
     "build": "yarn clean && rollup -c",
     "test": "vitest",
-    "test-ci": "vitest --coverage"
+    "test:unit": "vitest --exclude '__integration-tests__/**'",
+    "test-ci": "vitest --exclude '__integration-tests__/docs-snippets/**' --coverage",
+    "test-docs-snippets": "vitest __integration-tests__/docs-snippets/**"
   },
   "files": [
     "dist",
@@ -61,8 +63,9 @@
   "devDependencies": {
     "@rollup/plugin-replace": "^6.0.1",
     "@rollup/plugin-typescript": "^12.1.0",
-    "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-api",
+    "@stream-io/node-sdk": "0.5.0",
     "@types/react": "^19.1.8",
+    "@vitest/coverage-v8": "3.2.4",
     "dotenv": "^16.4.5",
     "react": "19.0.0",
     "rimraf": "^6.0.1",

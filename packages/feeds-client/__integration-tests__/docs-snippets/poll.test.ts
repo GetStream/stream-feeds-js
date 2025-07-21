@@ -3,6 +3,7 @@ import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
+  waitForEvent,
 } from '../utils';
 import { FeedsClient } from '../../src/FeedsClient';
 import { Feed } from '../../src/Feed';
@@ -96,6 +97,8 @@ describe('Polls page', () => {
         answer_text: `Let's go somewhere else`,
       },
     });
+
+    await waitForEvent(feed, 'feeds.poll.vote_casted', 1000);
   });
 
   it(`Removing a poll vote`, async () => {

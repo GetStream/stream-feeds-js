@@ -21,7 +21,7 @@ export class ApiClient {
     private readonly connectionIdManager: ConnectionIdManager,
     options?: FeedsClientOptions,
   ) {
-    this.baseUrl = options?.base_url ?? 'https://video.stream-io-api.com';
+    this.baseUrl = options?.base_url ?? 'https://feeds.stream-io-api.com';
     this.timeout = options?.timeout ?? 3000;
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,

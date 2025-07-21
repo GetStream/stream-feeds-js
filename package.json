@@ -21,6 +21,7 @@
     "lint:all:fix": "eslint --max-warnings=0 'packages/**/*.{ts,tsx}' --fix",
     "test:ci:all": "yarn workspaces foreach -vt run test-ci",
     "test:ci:libs": "yarn workspaces foreach -vt --no-private run test-ci",
+    "test:docs-snippets": "yarn workspaces foreach -vt --no-private run test-docs-snippets",
     "generate": "./generate-openapi.sh",
     "lint:gen": "eslint --fix packages/**/src/gen/**/*ts && prettier packages/**/src/gen/**/*ts --write",
     "release": "nx run-many --target version --parallel=1",

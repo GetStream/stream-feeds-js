@@ -1,4 +1,4 @@
-import { isFunction, retryInterval, sleep } from './utils';
+import { isFunction, sleep } from './utils';
 
 /**
  * TokenManager
@@ -67,12 +67,11 @@ export class TokenManager {
             this.token = await tokenProvider();
           } catch (e) {
             const numberOfFailures = ++previousFailuresCount;
-            await sleep(retryInterval(numberOfFailures));
+            await sleep(1000);
             if (numberOfFailures === 3) {
               this.loadTokenPromise = null;
               return reject(
                 new Error(
-
                   `Stream error: tried to get token ${numberOfFailures} times, but it failed with ${e}. Check your token provider`,
                   { cause: e },
                 ),
