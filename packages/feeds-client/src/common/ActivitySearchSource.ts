@@ -20,7 +20,7 @@ export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
   }
 
   protected async query(searchQuery: string) {
-    const { connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } = this.client.state.getLatestValue();
     if (!connectedUser) return { items: [] };
 
     const { activities: items, next } = await this.client.queryActivities({
@@ -39,8 +39,8 @@ export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
 }
 
 
-  // filter: { 
-  //   'feed.name': { $autocomplete: searchQuery } 
-  //   'feed.description': { $autocomplete: searchQuery } 
-  //   'created_by.name': { $autocomplete: searchQuery } 
+  // filter: {
+  //   'feed.name': { $autocomplete: searchQuery }
+  //   'feed.description': { $autocomplete: searchQuery }
+  //   'created_by.name': { $autocomplete: searchQuery }
   // },

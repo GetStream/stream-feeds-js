@@ -36,7 +36,10 @@ const isPollVoteRemovedEvent = (
 
 export const isVoteAnswer = (vote: PollVote) => !!vote?.answer_text;
 
-export type PollAnswersQueryParams = QueryPollVotesRequest & { poll_id: string; user_id?: string };
+export type PollAnswersQueryParams = QueryPollVotesRequest & {
+  poll_id: string;
+  user_id?: string;
+};
 
 type OptionId = string;
 
@@ -66,7 +69,9 @@ export class StreamPoll {
     );
   }
 
-  private readonly getInitialStateFromPollResponse = (poll: PollInitOptions['poll']) => {
+  private readonly getInitialStateFromPollResponse = (
+    poll: PollInitOptions['poll'],
+  ) => {
     const { own_votes, id, ...pollResponseForState } = poll;
     const { ownAnswer, ownVotes } = own_votes?.reduce<{
       ownVotes: PollVote[];
@@ -126,7 +131,9 @@ export class StreamPoll {
     if (event.poll?.id && event.poll.id !== this.id) return;
     if (!isPollVoteCastedEvent(event as WSEvent)) return;
     const currentState = this.data;
-    const isOwnVote = event.poll_vote.user_id === this.client.state.getLatestValue().connectedUser?.id;
+    const isOwnVote =
+      event.poll_vote.user_id ===
+      this.client.state.getLatestValue().connected_user?.id;
     let latestAnswers = [...currentState.latest_answers];
     let ownAnswer = currentState.own_answer;
     const ownVotesByOptionId = currentState.own_votes_by_option_id;
@@ -153,7 +160,12 @@ export class StreamPoll {
       );
     }
 
-    const { answers_count, latest_votes_by_option, vote_count, vote_counts_by_option } = event.poll;
+    const {
+      answers_count,
+      latest_votes_by_option,
+      vote_count,
+      vote_counts_by_option,
+    } = event.poll;
     this.state.partialNext({
       answers_count,
       // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
@@ -173,7 +185,9 @@ export class StreamPoll {
     if (event.poll?.id && event.poll.id !== this.id) return;
     if (!isPollVoteChangedEvent(event as WSEvent)) return;
     const currentState = this.data;
-    const isOwnVote = event.poll_vote.user_id === this.client.state.getLatestValue().connectedUser?.id;
+    const isOwnVote =
+      event.poll_vote.user_id ===
+      this.client.state.getLatestValue().connected_user?.id;
     let latestAnswers = [...currentState.latest_answers];
     let ownAnswer = currentState.own_answer;
     let ownVotesByOptionId = currentState.own_votes_by_option_id;
@@ -227,7 +241,12 @@ export class StreamPoll {
       );
     }
 
-    const { answers_count, latest_votes_by_option, vote_count, vote_counts_by_option } = event.poll;
+    const {
+      answers_count,
+      latest_votes_by_option,
+      vote_count,
+      vote_counts_by_option,
+    } = event.poll;
     this.state.partialNext({
       answers_count,
       // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
@@ -237,7 +256,7 @@ export class StreamPoll {
       latest_answers: latestAnswers,
       last_activity_at: new Date(event.created_at),
       own_answer: ownAnswer,
-      own_votes_by_option_id:ownVotesByOptionId,
+      own_votes_by_option_id: ownVotesByOptionId,
       max_voted_option_ids: maxVotedOptionIds,
     });
   };
@@ -246,7 +265,9 @@ export class StreamPoll {
     if (event.poll?.id && event.poll.id !== this.id) return;
     if (!isPollVoteRemovedEvent(event as WSEvent)) return;
     const currentState = this.data;
-    const isOwnVote = event.poll_vote.user_id === this.client.state.getLatestValue().connectedUser?.id;
+    const isOwnVote =
+      event.poll_vote.user_id ===
+      this.client.state.getLatestValue().connected_user?.id;
     let latestAnswers = [...currentState.latest_answers];
     let ownAnswer = currentState.own_answer;
     const ownVotesByOptionId = { ...currentState.own_votes_by_option_id };
@@ -265,12 +286,16 @@ export class StreamPoll {
         event.poll.vote_counts_by_option,
       );
       if (isOwnVote && event.poll_vote.option_id) {
-
         delete ownVotesByOptionId[event.poll_vote.option_id];
       }
     }
 
-    const { answers_count, latest_votes_by_option, vote_count, vote_counts_by_option } = event.poll;
+    const {
+      answers_count,
+      latest_votes_by_option,
+      vote_count,
+      vote_counts_by_option,
+    } = event.poll;
     this.state.partialNext({
       answers_count,
       // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed

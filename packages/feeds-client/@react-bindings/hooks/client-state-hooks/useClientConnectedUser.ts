@@ -14,5 +14,5 @@ export const useClientConnectedUser = () => {
 };
 
 const selector = (nextState: FeedsClientState) => ({
-  user: nextState.connectedUser,
+  user: nextState.connected_user,
 });

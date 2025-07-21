@@ -155,7 +155,7 @@ export class Feed extends FeedApi {
     },
     'feeds.activity.reaction.added': (event) => {
       const currentActivities = this.currentState.activities;
-      const connectedUser = this.client.state.getLatestValue().connectedUser;
+      const connectedUser = this.client.state.getLatestValue().connected_user;
       const isCurrentUser = Boolean(
         connectedUser && event.reaction.user.id === connectedUser.id,
       );
@@ -171,7 +171,7 @@ export class Feed extends FeedApi {
     },
     'feeds.activity.reaction.deleted': (event) => {
       const currentActivities = this.currentState.activities;
-      const connectedUser = this.client.state.getLatestValue().connectedUser;
+      const connectedUser = this.client.state.getLatestValue().connected_user;
       const isCurrentUser = Boolean(
         connectedUser && event.reaction.user.id === connectedUser.id,
       );
@@ -344,7 +344,7 @@ export class Feed extends FeedApi {
         event.follow.target_feed.fid === this.fid
       ) {
         const source = event.follow.source_feed;
-        const connectedUser = this.client.state.getLatestValue().connectedUser;
+        const connectedUser = this.client.state.getLatestValue().connected_user;
 
         this.state.next((currentState) => {
           const newState = { ...currentState, ...event.follow.target_feed };
@@ -389,7 +389,7 @@ export class Feed extends FeedApi {
         event.follow.target_feed.fid === this.fid
       ) {
         const source = event.follow.source_feed;
-        const connectedUser = this.client.state.getLatestValue().connectedUser;
+        const connectedUser = this.client.state.getLatestValue().connected_user;
 
         this.state.next((currentState) => {
           const newState = { ...currentState, ...event.follow.target_feed };
@@ -559,7 +559,7 @@ export class Feed extends FeedApi {
     },
   ) {
     const { comment, reaction } = event;
-    const connectedUser = this.client.state.getLatestValue().connectedUser;
+    const connectedUser = this.client.state.getLatestValue().connected_user;
 
     this.state.next((currentState) => {
       const forId = comment.parent_id ?? comment.object_id;
@@ -693,7 +693,7 @@ export class Feed extends FeedApi {
 
   private handleBookmarkAdded(event: BookmarkAddedEvent) {
     const currentActivities = this.currentState.activities;
-    const { connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } = this.client.state.getLatestValue();
     const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = addBookmarkToActivities(
@@ -708,7 +708,7 @@ export class Feed extends FeedApi {
 
   private handleBookmarkDeleted(event: BookmarkDeletedEvent) {
     const currentActivities = this.currentState.activities;
-    const { connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } = this.client.state.getLatestValue();
     const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = removeBookmarkFromActivities(
@@ -723,7 +723,7 @@ export class Feed extends FeedApi {
 
   private handleBookmarkUpdated(event: BookmarkUpdatedEvent) {
     const currentActivities = this.currentState.activities;
-    const { connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } = this.client.state.getLatestValue();
     const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = updateBookmarkInActivities(

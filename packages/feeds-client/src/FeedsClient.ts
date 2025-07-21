@@ -35,7 +35,7 @@ import { ModerationClient } from './ModerationClient';
 import { StreamPoll } from './common/Poll';
 
 export type FeedsClientState = {
-  connectedUser: OwnUser | undefined;
+  connected_user: OwnUser | undefined;
   isWsConnectionHealthy: boolean;
 };
 
@@ -70,7 +70,7 @@ export class FeedsClient extends FeedsApi {
     );
     super(apiClient);
     this.state = new StateStore<FeedsClientState>({
-      connectedUser: undefined,
+      connected_user: undefined,
       isWsConnectionHealthy: false,
     });
     this.moderation = new ModerationClient(apiClient);
@@ -211,7 +211,7 @@ export class FeedsClient extends FeedsApi {
 
   connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
     if (
-      this.state.getLatestValue().connectedUser !== undefined ||
+      this.state.getLatestValue().connected_user !== undefined ||
       this.wsConnection
     ) {
       throw new Error(`Can't connect a new user, call "disconnectUser" first`);
@@ -235,7 +235,7 @@ export class FeedsClient extends FeedsApi {
       );
       const connectedEvent = await this.wsConnection.connect();
       this.state.partialNext({
-        connectedUser: connectedEvent?.me,
+        connected_user: connectedEvent?.me,
         isWsConnectionHealthy: this.wsConnection.isHealthy,
       });
     } catch (err) {
@@ -316,7 +316,7 @@ export class FeedsClient extends FeedsApi {
 
     this.connectionIdManager.reset();
     this.tokenManager.reset();
-    this.state.partialNext({ connectedUser: undefined, isWsConnectionHealthy: false });
+    this.state.partialNext({ connected_user: undefined, isWsConnectionHealthy: false });
   };
 
   on = this.eventDispatcher.on;
