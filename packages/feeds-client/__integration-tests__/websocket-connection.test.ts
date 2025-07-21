@@ -24,7 +24,7 @@ describe('WebSocket connection', () => {
     client.state.subscribe(spy);
 
     expect(spy).toHaveBeenCalledWith(
-      { connected_user: undefined, isWsConnectionHealthy: false },
+      { connected_user: undefined, is_ws_connection_healthy: false },
       undefined,
     );
 
@@ -33,7 +33,7 @@ describe('WebSocket connection', () => {
     const connectedUser = spy.mock.lastCall?.[0]?.connected_user;
     expect(connectedUser?.id).toBe(user.id);
 
-    const isWsConnectionHealthy = spy.mock.lastCall?.[0]?.isWsConnectionHealthy;
+    const isWsConnectionHealthy = spy.mock.lastCall?.[0]?.is_ws_connection_healthy;
     expect(isWsConnectionHealthy).toBe(true);
   });
 
