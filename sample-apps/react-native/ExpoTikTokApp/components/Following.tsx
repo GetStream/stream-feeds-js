@@ -52,24 +52,27 @@ const renderItem = ({ item }: { item: FollowResponse }) => {
 
 export const Following = () => {
   const client = useFeedsClient();
-  const { ownTimelineFeed } = useOwnFeedsContext();
   const connectedUser = useClientConnectedUser();
 
-  const { following, hasNextPage, isLoadingNextPage, loadNextPage } =
-    useFollowing() ?? {};
+  const {
+    following,
+    has_next_page: hasNextPage,
+    is_loading_next_page: isLoadingNextPage,
+    loadNextPage,
+  } = useFollowing() ?? {};
 
   const loadMore = useStableCallback(async () => {
-    if (hasNextPage && loadNextPage) {
+    if (hasNextPage && loadNextPage && !isLoadingNextPage) {
       await loadNextPage({ limit: 10 });
     }
   });
 
   useEffect(() => {
-    if (!client || !connectedUser || !ownTimelineFeed || isLoadingNextPage) {
+    if (!client || !connectedUser) {
       return;
     }
     void loadMore();
-  }, [client, connectedUser, loadMore, ownTimelineFeed, isLoadingNextPage]);
+  }, [client, connectedUser, loadMore]);
 
   return (
     <View style={styles.container}>

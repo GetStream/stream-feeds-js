@@ -15,8 +15,8 @@ const selector = ({
 });
 
 type UseFollowingReturnType = ReturnType<typeof selector> & {
-  isLoadingNextPage: boolean;
-  hasNextPage: boolean;
+  is_loading_next_page: boolean;
+  has_next_page: boolean;
   loadNextPage: (
     ...options: Parameters<Feed['loadNextPageFollowers']>
   ) => Promise<void>;
@@ -45,8 +45,8 @@ export function useFollowing(feedFromProps?: Feed) {
 
     return {
       ...data,
-      isLoadingNextPage: data.following_pagination?.loading_next_page ?? false,
-      hasNextPage: checkHasAnotherPage(
+      is_loading_next_page: data.following_pagination?.loading_next_page ?? false,
+      has_next_page: checkHasAnotherPage(
         data.following,
         data.following_pagination?.next,
       ),

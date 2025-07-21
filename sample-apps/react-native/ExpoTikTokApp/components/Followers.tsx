@@ -52,7 +52,6 @@ const renderItem = ({ item }: { item: FollowResponse }) => {
 
 export const Followers = () => {
   const client = useFeedsClient();
-  const { ownTimelineFeed } = useOwnFeedsContext();
   const connectedUser = useClientConnectedUser();
 
   const {
@@ -69,11 +68,11 @@ export const Followers = () => {
   });
 
   useEffect(() => {
-    if (!client || !connectedUser || !ownTimelineFeed) {
+    if (!client || !connectedUser) {
       return;
     }
     void loadMore();
-  }, [client, connectedUser, loadMore, ownTimelineFeed]);
+  }, [client, connectedUser, loadMore]);
 
   return (
     <View style={styles.container}>
