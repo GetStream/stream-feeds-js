@@ -415,7 +415,8 @@ export class Feed extends FeedApi {
       this.handleCommentReactionEvent.bind(this),
     'feeds.comment.reaction.updated': Feed.noop,
     'feeds.feed_member.added': (event) => {
-      const { connectedUser } = this.client.state.getLatestValue();
+      const { connected_user: connectedUser } =
+        this.client.state.getLatestValue();
 
       this.state.next((currentState) => {
         let newState: FeedState | undefined;
@@ -447,7 +448,8 @@ export class Feed extends FeedApi {
       });
     },
     'feeds.feed_member.removed': (event) => {
-      const { connectedUser } = this.client.state.getLatestValue();
+      const { connected_user: connectedUser } =
+        this.client.state.getLatestValue();
 
       this.state.next((currentState) => {
         const newState = {
@@ -465,7 +467,8 @@ export class Feed extends FeedApi {
       });
     },
     'feeds.feed_member.updated': (event) => {
-      const { connectedUser } = this.client.state.getLatestValue();
+      const { connected_user: connectedUser } =
+        this.client.state.getLatestValue();
 
       this.state.next((currentState) => {
         const memberIndex =
@@ -693,7 +696,8 @@ export class Feed extends FeedApi {
 
   private handleBookmarkAdded(event: BookmarkAddedEvent) {
     const currentActivities = this.currentState.activities;
-    const { connected_user: connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } =
+      this.client.state.getLatestValue();
     const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = addBookmarkToActivities(
@@ -708,7 +712,8 @@ export class Feed extends FeedApi {
 
   private handleBookmarkDeleted(event: BookmarkDeletedEvent) {
     const currentActivities = this.currentState.activities;
-    const { connected_user: connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } =
+      this.client.state.getLatestValue();
     const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = removeBookmarkFromActivities(
@@ -723,7 +728,8 @@ export class Feed extends FeedApi {
 
   private handleBookmarkUpdated(event: BookmarkUpdatedEvent) {
     const currentActivities = this.currentState.activities;
-    const { connected_user: connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } =
+      this.client.state.getLatestValue();
     const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
 
     const result = updateBookmarkInActivities(
