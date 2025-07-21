@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   TextInput,
@@ -32,8 +32,8 @@ export const ActivityComposer = () => {
 
   const pickMedia = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsMultipleSelection: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsMultipleSelection: false,
       quality: 1,
     });
 
@@ -112,8 +112,16 @@ export const ActivityComposer = () => {
     router.back();
   }, [sendActivity]);
 
+  const submitButtonDisabled = useMemo(
+    () => isSending || media.length < 1,
+    [isSending, media.length],
+  );
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.subtitle}>
+        Upload a video and write something about it !
+      </Text>
       <TextInput
         placeholder="What's happening?"
         style={styles.input}
@@ -146,13 +154,13 @@ export const ActivityComposer = () => {
       </View>
 
       <TouchableOpacity onPress={pickMedia} style={styles.button}>
-        <Text style={styles.buttonText}>Upload Image/Video</Text>
+        <Text style={styles.buttonText}>Upload Video</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        disabled={isSending}
+        disabled={submitButtonDisabled}
         onPress={submitPressHandler}
-        style={styles.button}
+        style={submitButtonDisabled ? styles.disabledButton : styles.button}
       >
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
@@ -163,6 +171,10 @@ export const ActivityComposer = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+  },
+  subtitle: {
+    fontSize: 16,
+    marginVertical: 16,
   },
   input: {
     fontSize: 16,
@@ -175,6 +187,13 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#1DA1F2',
+    paddingVertical: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  disabledButton: {
+    backgroundColor: 'grey',
     paddingVertical: 12,
     borderRadius: 6,
     alignItems: 'center',
