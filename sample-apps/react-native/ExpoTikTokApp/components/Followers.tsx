@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   FollowResponse,
   useClientConnectedUser,
@@ -54,11 +54,21 @@ export const Followers = () => {
   const connectedUser = useClientConnectedUser();
 
   const {
-    followers,
+    followers: originalFollowers,
     has_next_page: hasNextPage,
     is_loading_next_page: isLoadingNextPage,
     loadNextPage,
   } = useFollowers() ?? {};
+
+  const followers = useMemo(() => {
+    if (!connectedUser) {
+      return originalFollowers;
+    }
+
+    return originalFollowers?.filter(
+      (f) => f.source_feed.created_by.id !== connectedUser.id,
+    );
+  }, [connectedUser, originalFollowers]);
 
   const loadMore = useStableCallback(async () => {
     if (hasNextPage && loadNextPage && !isLoadingNextPage) {
