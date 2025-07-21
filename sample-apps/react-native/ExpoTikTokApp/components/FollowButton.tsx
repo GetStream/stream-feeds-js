@@ -22,7 +22,7 @@ const getFollowStatusText = (
 
 export const FollowButton = ({ feed }: { feed: Feed }) => {
   const { ownTimelineFeed } = useOwnFeedsContext();
-  const { ownFollows } = useOwnFollows(feed) ?? {};
+  const { own_follows: ownFollows } = useOwnFollows(feed) ?? {};
   const ownFollow = useMemo(
     () =>
       ownFollows &&

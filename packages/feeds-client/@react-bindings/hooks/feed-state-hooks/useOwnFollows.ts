@@ -14,5 +14,5 @@ export const useOwnFollows = (feedFromProps?: Feed) => {
 };
 
 const selector = ({ own_follows }: FeedState) => ({
-  ownFollows: own_follows,
+  own_follows,
 });
