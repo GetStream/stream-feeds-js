@@ -4,7 +4,7 @@ import { useStateStore } from '../useStateStore';
 
 /**
  * A React hook that returns a reactive array of feeds that the current user
- * owns and are following the respective feed that we are looking at.
+ * owns and are following the respective feed that we are observing.
  */
 export const useOwnFollows = (feedFromProps?: Feed) => {
   const feedFromContext = useFeedContext();
