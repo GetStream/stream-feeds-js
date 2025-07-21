@@ -55,21 +55,25 @@ export const Followers = () => {
   const { ownTimelineFeed } = useOwnFeedsContext();
   const connectedUser = useClientConnectedUser();
 
-  const { followers, hasNextPage, isLoadingNextPage, loadNextPage } =
-    useFollowers() ?? {};
+  const {
+    followers,
+    has_next_page: hasNextPage,
+    is_loading_next_page: isLoadingNextPage,
+    loadNextPage,
+  } = useFollowers() ?? {};
 
   const loadMore = useStableCallback(async () => {
-    if (hasNextPage && loadNextPage) {
+    if (hasNextPage && loadNextPage && !isLoadingNextPage) {
       await loadNextPage({ limit: 10 });
     }
   });
 
   useEffect(() => {
-    if (!client || !connectedUser || !ownTimelineFeed || isLoadingNextPage) {
+    if (!client || !connectedUser || !ownTimelineFeed) {
       return;
     }
     void loadMore();
-  }, [client, connectedUser, loadMore, ownTimelineFeed, isLoadingNextPage]);
+  }, [client, connectedUser, loadMore, ownTimelineFeed]);
 
   return (
     <View style={styles.container}>
