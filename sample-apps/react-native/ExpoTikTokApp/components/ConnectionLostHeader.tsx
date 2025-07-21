@@ -13,7 +13,7 @@ import {
 const HEADER_HEIGHT = 30;
 
 export const ConnectionLostHeader = () => {
-  const { isHealthy } = useWsConnectionState();
+  const { is_healthy: isHealthy } = useWsConnectionState();
   const connectedUser = useClientConnectedUser();
 
   const visible = useDerivedValue(() => {

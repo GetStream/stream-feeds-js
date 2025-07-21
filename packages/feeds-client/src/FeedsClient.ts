@@ -36,7 +36,7 @@ import { StreamPoll } from './common/Poll';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
-  isWsConnectionHealthy: boolean;
+  is_ws_connection_healthy: boolean;
 };
 
 type FID = string;
@@ -71,7 +71,7 @@ export class FeedsClient extends FeedsApi {
     super(apiClient);
     this.state = new StateStore<FeedsClientState>({
       connected_user: undefined,
-      isWsConnectionHealthy: false,
+      is_ws_connection_healthy: false,
     });
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
@@ -86,7 +86,7 @@ export class FeedsClient extends FeedsApi {
       switch (event.type) {
         case 'connection.changed': {
           const { online } = event;
-          this.state.partialNext({ isWsConnectionHealthy: online });
+          this.state.partialNext({ is_ws_connection_healthy: online });
 
           if (online) {
             this.healthyConnectionChangedEventCount++;
@@ -236,7 +236,7 @@ export class FeedsClient extends FeedsApi {
       const connectedEvent = await this.wsConnection.connect();
       this.state.partialNext({
         connected_user: connectedEvent?.me,
-        isWsConnectionHealthy: this.wsConnection.isHealthy,
+        is_ws_connection_healthy: this.wsConnection.isHealthy,
       });
     } catch (err) {
       await this.disconnectUser();
@@ -260,7 +260,9 @@ export class FeedsClient extends FeedsApi {
   };
 
   // @ts-expect-error API spec says file should be a string
-  uploadFile = (request: Omit<FileUploadRequest, 'file'> & { file: StreamFile }) => {
+  uploadFile = (
+    request: Omit<FileUploadRequest, 'file'> & { file: StreamFile },
+  ) => {
     return super.uploadFile({
       // @ts-expect-error API spec says file should be a string
       file: request.file,
@@ -316,7 +318,10 @@ export class FeedsClient extends FeedsApi {
 
     this.connectionIdManager.reset();
     this.tokenManager.reset();
-    this.state.partialNext({ connected_user: undefined, isWsConnectionHealthy: false });
+    this.state.partialNext({
+      connected_user: undefined,
+      is_ws_connection_healthy: false,
+    });
   };
 
   on = this.eventDispatcher.on;
