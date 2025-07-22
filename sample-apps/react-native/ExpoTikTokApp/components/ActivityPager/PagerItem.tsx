@@ -1,6 +1,7 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
 import {
+  Alert,
   Dimensions,
   StyleSheet,
   Text,
@@ -39,7 +40,9 @@ const UnmemoizedPagerItem = ({
         <View style={styles.sidebar}>
           <View style={styles.iconContainer}>
             <Reaction type="like" entity={activity} size={32} />
-            <Text style={styles.iconLabel}>{activity.reaction_groups.like?.count ?? 0}</Text>
+            <Text style={styles.iconLabel}>
+              {activity.reaction_groups.like?.count ?? 0}
+            </Text>
           </View>
 
           <TouchableOpacity style={styles.iconContainer}>
@@ -52,7 +55,14 @@ const UnmemoizedPagerItem = ({
             <Text style={styles.iconLabel}>{activity.bookmark_count ?? 0}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconContainer}>
+          <TouchableOpacity
+            onPress={() =>
+              Alert.alert(
+                'Sharing was captured successfully, but is not implemented yet !',
+              )
+            }
+            style={styles.iconContainer}
+          >
             <Ionicons name="arrow-redo-outline" size={28} color="white" />
           </TouchableOpacity>
         </View>
