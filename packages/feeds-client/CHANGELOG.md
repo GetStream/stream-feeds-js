@@ -1,7 +1,21 @@
 # Changelog
 
-
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
+
+## [0.1.6](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.5...@stream-io/feeds-client-0.1.6) (2025-07-22)
+
+
+* Run tests on CI ([#68](https://github.com/GetStream/stream-feeds-js/issues/68)) ([89b0a4b](https://github.com/GetStream/stream-feeds-js/commit/89b0a4bbce14af563380c17c73188e7e6f688e65))
+
+
+### Features
+
+* following and user screens ([#71](https://github.com/GetStream/stream-feeds-js/issues/71)) ([7123f0a](https://github.com/GetStream/stream-feeds-js/commit/7123f0a2472ca59da697326e99253ebcbc7db147))
+
+
+### Bug Fixes
+
+* bookmark is identified by activity id and folder id ([#70](https://github.com/GetStream/stream-feeds-js/issues/70)) ([97ee937](https://github.com/GetStream/stream-feeds-js/commit/97ee937a951de0d76ebf88a6083d3c67d4cef762))
 
 ## [0.1.5](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.4...@stream-io/feeds-client-0.1.5) (2025-07-18)
 
