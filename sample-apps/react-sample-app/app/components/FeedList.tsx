@@ -65,7 +65,6 @@ export default function FeedList({ types }: { types: Array<'user'> }) {
     try {
       const response = await client.queryFeeds({
         limit,
-        watch: true,
         filter: {
           group_id: { $in: types },
         },
@@ -86,7 +85,7 @@ export default function FeedList({ types }: { types: Array<'user'> }) {
       return;
     }
     void loadMore();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, user, ownTimeline]);
 
   const renderUser = (feed: Feed) => {

@@ -3,12 +3,14 @@ import {
   ActivityResponse,
   FeedResponse,
   FileUploadRequest,
+  FollowBatchRequest,
   ImageUploadRequest,
   OwnUser,
   PollResponse,
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
+  SingleFollowRequest,
   UserRequest,
   WSEvent,
 } from './gen/models';
@@ -356,6 +358,51 @@ export class FeedsClient extends FeedsApi {
     };
     this.eventDispatcher.dispatch(networkEvent);
   };
+
+  // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
+  async follow(request: SingleFollowRequest) {
+    const response = await super.follow(request);
+
+    [response.follow.source_feed.fid, response.follow.target_feed.fid].forEach(
+      (fid) => {
+        const feed = this.activeFeeds[fid];
+        if (feed) {
+          feed.handleFollowCreated(response.follow);
+        }
+      },
+    );
+
+    return response;
+  }
+
+  async followBatch(request: FollowBatchRequest) {
+    const response = await super.followBatch(request);
+
+    response.follows.forEach((follow) => {
+      const feed = this.activeFeeds[follow.source_feed.fid];
+      if (feed) {
+        feed.handleFollowCreated(follow);
+      }
+    });
+
+    return response;
+  }
+
+  async unfollow(request: SingleFollowRequest) {
+    const response = await super.unfollow(request);
+
+    [request.source, request.target].forEach((fid) => {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        feed.handleFollowDeleted({
+          source_feed: { fid: request.source },
+          target_feed: { fid: request.target },
+        });
+      }
+    });
+
+    return response;
+  }
 
   private readonly getOrCreateActiveFeed = (
     group: string,

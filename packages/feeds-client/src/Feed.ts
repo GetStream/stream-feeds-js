@@ -16,6 +16,7 @@ import {
   BookmarkUpdatedEvent,
   QueryFeedMembersRequest,
   SortParamRequest,
+  FollowResponse,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -319,34 +320,10 @@ export class Feed extends FeedApi {
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
     'feeds.follow.created': (event) => {
-      const connectedUser = this.client.state.getLatestValue().connected_user;
-      const result = handleFollowCreated(
-        event.follow,
-        this.currentState,
-        this.fid,
-        connectedUser?.id,
-      );
-      if (result.changed) {
-        this.state.next((currentState) => ({
-          ...currentState,
-          ...result,
-        }));
-      }
+      this.handleFollowCreated(event.follow);
     },
     'feeds.follow.deleted': (event) => {
-      const connectedUser = this.client.state.getLatestValue().connected_user;
-      const result = handleFollowDeleted(
-        event.follow,
-        this.currentState,
-        this.fid,
-        connectedUser?.id,
-      );
-      if (result.changed) {
-        this.state.next((currentState) => ({
-          ...currentState,
-          ...result,
-        }));
-      }
+      this.handleFollowDeleted(event.follow);
     },
     'feeds.follow.updated': (event) => {
       const connectedUser = this.client.state.getLatestValue().connected_user;
@@ -647,6 +624,46 @@ export class Feed extends FeedApi {
     }
   }
 
+  /**
+   * @internal
+   */
+  handleFollowCreated(follow: FollowResponse) {
+    const connectedUser = this.client.state.getLatestValue().connected_user;
+    const result = handleFollowCreated(
+      follow,
+      this.currentState,
+      this.fid,
+      connectedUser?.id,
+    );
+    if (result.changed) {
+      this.state.next((currentState) => ({
+        ...currentState,
+        ...result,
+      }));
+    }
+  }
+
+  handleFollowDeleted(
+    follow:
+      | FollowResponse
+      // Backend doesn't return the follow in delete follow response https://getstream.slack.com/archives/C06RK9WCR09/p1753176937507209
+      | { source_feed: { fid: string }; target_feed: { fid: string } },
+  ) {
+    const connectedUser = this.client.state.getLatestValue().connected_user;
+    const result = handleFollowDeleted(
+      follow,
+      this.currentState,
+      this.fid,
+      connectedUser?.id,
+    );
+    if (result.changed) {
+      this.state.next((currentState) => ({
+        ...currentState,
+        ...result,
+      }));
+    }
+  }
+
   private handleBookmarkAdded(event: BookmarkAddedEvent) {
     const currentActivities = this.currentState.activities;
     const { connected_user: connectedUser } =
@@ -722,47 +739,6 @@ export class Feed extends FeedApi {
     }
 
     return commentIndex;
-  }
-
-  private getActivityIndex(activity: ActivityResponse, state?: FeedState) {
-    const { activities } = state ?? this.currentState;
-
-    if (!activities) {
-      return -1;
-    }
-
-    let activityIndex = activities.indexOf(activity);
-
-    // fast lookup failed, try slower approach
-    if (activityIndex === -1) {
-      activityIndex = activities.findIndex(
-        (activity_) => activity_.id === activity.id,
-      );
-    }
-
-    return activityIndex;
-  }
-
-  private updateActivityInState(
-    activity: ActivityResponse,
-    patch: Patch<FromArray<FeedState['activities']>>,
-  ) {
-    this.state.next((currentState) => {
-      const activityIndex = this.getActivityIndex(activity, currentState);
-
-      if (activityIndex === -1) return currentState;
-
-      const nextActivities = [...currentState.activities!];
-
-      nextActivities[activityIndex] = patch(
-        currentState.activities![activityIndex],
-      );
-
-      return {
-        ...currentState,
-        activities: nextActivities,
-      };
-    });
   }
 
   private async loadNextPageComments({
