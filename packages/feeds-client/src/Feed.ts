@@ -35,6 +35,11 @@ import {
   removeBookmarkFromActivities,
   updateBookmarkInActivities,
 } from './state-updates/bookmark-utils';
+import {
+  handleFollowCreated,
+  handleFollowDeleted,
+  handleFollowUpdated,
+} from './state-updates/follow-utils';
 import { FeedsApi, StreamResponse } from './gen-imports';
 import { capitalize } from './common/utils';
 import type {
@@ -314,102 +319,50 @@ export class Feed extends FeedApi {
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
     'feeds.follow.created': (event) => {
-      // filter non-accepted follows (the way getOrCreate does by default)
-      if (event.follow.status !== 'accepted') return;
-
-      // this feed followed someone
-      if (event.follow.source_feed.fid === this.fid) {
-        this.state.next((currentState) => {
-          const newState = {
-            ...currentState,
-            ...event.follow.source_feed,
-          };
-
-          if (
-            !checkHasAnotherPage(
-              currentState.following,
-              currentState.following_pagination?.next,
-            )
-          ) {
-            // TODO: respect sort
-            newState.following = currentState.following
-              ? currentState.following.concat(event.follow)
-              : [event.follow];
-          }
-
-          return newState;
-        });
-      } else if (
-        // someone followed this feed
-        event.follow.target_feed.fid === this.fid
-      ) {
-        const source = event.follow.source_feed;
-        const connectedUser = this.client.state.getLatestValue().connected_user;
-
-        this.state.next((currentState) => {
-          const newState = { ...currentState, ...event.follow.target_feed };
-
-          if (source.created_by.id === connectedUser?.id) {
-            newState.own_follows = currentState.own_follows
-              ? currentState.own_follows.concat(event.follow)
-              : [event.follow];
-          }
-
-          if (
-            !checkHasAnotherPage(
-              currentState.followers,
-              currentState.followers_pagination?.next,
-            )
-          ) {
-            // TODO: respect sort
-            newState.followers = currentState.followers
-              ? currentState.followers.concat(event.follow)
-              : [event.follow];
-          }
-
-          return newState;
-        });
+      const connectedUser = this.client.state.getLatestValue().connected_user;
+      const result = handleFollowCreated(
+        event,
+        this.currentState,
+        this.fid,
+        connectedUser?.id,
+      );
+      if (result.changed) {
+        this.state.next((currentState) => ({
+          ...currentState,
+          ...result,
+        }));
       }
     },
     'feeds.follow.deleted': (event) => {
-      // this feed unfollowed someone
-      if (event.follow.source_feed.fid === this.fid) {
-        this.state.next((currentState) => {
-          return {
-            ...currentState,
-            ...event.follow.source_feed,
-            following: currentState.following?.filter(
-              (follow) =>
-                follow.target_feed.fid !== event.follow.target_feed.fid,
-            ),
-          };
-        });
-      } else if (
-        // someone unfollowed this feed
-        event.follow.target_feed.fid === this.fid
-      ) {
-        const source = event.follow.source_feed;
-        const connectedUser = this.client.state.getLatestValue().connected_user;
-
-        this.state.next((currentState) => {
-          const newState = { ...currentState, ...event.follow.target_feed };
-
-          if (source.created_by.id === connectedUser?.id) {
-            newState.own_follows = currentState.own_follows?.filter(
-              (follow) =>
-                follow.source_feed.fid !== event.follow.source_feed.fid,
-            );
-          }
-
-          newState.followers = currentState.followers?.filter(
-            (follow) => follow.source_feed.fid !== event.follow.source_feed.fid,
-          );
-
-          return newState;
-        });
+      const connectedUser = this.client.state.getLatestValue().connected_user;
+      const result = handleFollowDeleted(
+        event,
+        this.currentState,
+        this.fid,
+        connectedUser?.id,
+      );
+      if (result.changed) {
+        this.state.next((currentState) => ({
+          ...currentState,
+          ...result,
+        }));
       }
     },
-    'feeds.follow.updated': Feed.noop,
+    'feeds.follow.updated': (event) => {
+      const connectedUser = this.client.state.getLatestValue().connected_user;
+      const result = handleFollowUpdated(
+        event,
+        this.currentState,
+        this.fid,
+        connectedUser?.id,
+      );
+      if (result.changed) {
+        this.state.next((currentState) => ({
+          ...currentState,
+          ...result,
+        }));
+      }
+    },
     'feeds.comment.reaction.added': this.handleCommentReactionEvent.bind(this),
     'feeds.comment.reaction.deleted':
       this.handleCommentReactionEvent.bind(this),
@@ -1002,17 +955,34 @@ export class Feed extends FeedApi {
         sort,
       });
 
-      this.state.next((currentState) => ({
-        ...currentState,
-        [type]: currentState[type]
-          ? currentState[type].concat(follows)
-          : follows,
-        [paginationKey]: {
-          ...currentState[paginationKey],
-          next: newNextCursor,
-          sort,
-        },
-      }));
+      this.state.next((currentState) => {
+        // Create a map of existing follows to avoid duplicates
+        const existingFollowsMap = new Map();
+        if (currentState[type]) {
+          currentState[type].forEach((follow) => {
+            const key = `${follow.source_feed.fid}-${follow.target_feed.fid}`;
+            existingFollowsMap.set(key, follow);
+          });
+        }
+
+        // Add new follows, avoiding duplicates
+        const newFollows = follows.filter((follow) => {
+          const key = `${follow.source_feed.fid}-${follow.target_feed.fid}`;
+          return !existingFollowsMap.has(key);
+        });
+
+        return {
+          ...currentState,
+          [type]: currentState[type]
+            ? currentState[type].concat(newFollows)
+            : newFollows,
+          [paginationKey]: {
+            ...currentState[paginationKey],
+            next: newNextCursor,
+            sort,
+          },
+        };
+      });
     } catch (e) {
       error = e;
     } finally {

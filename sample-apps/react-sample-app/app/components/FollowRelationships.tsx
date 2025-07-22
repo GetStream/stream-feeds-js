@@ -1,4 +1,9 @@
-import { checkHasAnotherPage, Feed, FeedState, FollowResponse } from '@stream-io/feeds-client';
+import {
+  checkHasAnotherPage,
+  Feed,
+  FeedState,
+  FollowResponse,
+} from '@stream-io/feeds-client';
 import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
@@ -33,14 +38,15 @@ export const FollowRelationships = ({
     },
     [type],
   );
-  const { follows = [], pagination } = useStateStore(
-    feed.state,
-    selector,
-  );
+  const { follows = [], pagination } = useStateStore(feed.state, selector);
 
-  const rel = useMemo(() => follows.filter(
-    (f) => f.source_feed.created_by.id !== f.target_feed.created_by.id,
-  ), [follows]);
+  const rel = useMemo(
+    () =>
+      follows.filter(
+        (f) => f.source_feed.created_by.id !== f.target_feed.created_by.id,
+      ),
+    [follows],
+  );
 
   const loadMore = useCallback(async () => {
     setError(undefined);

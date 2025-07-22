@@ -1,10 +1,14 @@
-import { Feed, FeedState } from '@stream-io/feeds-client';
+import {
+  Feed,
+  FeedState,
+  GetOrCreateFeedRequest,
+} from '@stream-io/feeds-client';
 
 const promisesByFeedId: Record<string, Promise<FeedState>> = {};
 
 export const initializeFeed = (
   feed: Feed,
-  options?: { watch?: boolean },
+  options?: GetOrCreateFeedRequest,
 ): Promise<FeedState> => {
   const currentState = feed.state.getLatestValue();
 
@@ -40,8 +44,8 @@ export const initializeFeed = (
   promisesByFeedId[feed.fid] = feed
     .getOrCreate({
       watch: options?.watch,
-      followers_pagination: { limit: 5 },
-      following_pagination: { limit: 5 },
+      followers_pagination: options?.followers_pagination ?? { limit: 5 },
+      following_pagination: options?.following_pagination ?? { limit: 5 },
     })
     .then(() => feed.state.getLatestValue())
     .finally(removePromise);

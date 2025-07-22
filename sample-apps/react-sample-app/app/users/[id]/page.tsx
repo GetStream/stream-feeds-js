@@ -43,18 +43,24 @@ export default function ProfilePage() {
 
     initializeFeed(feed, {
       watch: true,
+      followers_pagination: { limit: 1 },
     }).catch((error) => {
       logErrorAndDisplayNotification(
         error,
-        error instanceof Error ? error.message : `Failed to initialize feed: ${feed.fid}`,
+        error instanceof Error
+          ? error.message
+          : `Failed to initialize feed: ${feed.fid}`,
       );
     });
     initializeFeed(timeline, {
       watch: true,
+      following_pagination: { limit: 1 },
     }).catch((error) => {
       logErrorAndDisplayNotification(
         error,
-        error instanceof Error ? error.message : `Failed to initialize feed: ${timeline.fid}`,
+        error instanceof Error
+          ? error.message
+          : `Failed to initialize feed: ${timeline.fid}`,
       );
     });
   }, [feed, logErrorAndDisplayNotification, timeline]);
