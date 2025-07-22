@@ -18,6 +18,14 @@ const iconMap = {
       <Ionicons name="heart-outline" size={size} color={color} />
     ),
   },
+  downvote: {
+    active: ({ size, color }: IconProps) => (
+      <Ionicons name="thumbs-down" size={size} color={color} />
+    ),
+    inactive: ({ size, color }: IconProps) => (
+      <Ionicons name="thumbs-down-outline" size={size} color={color} />
+    ),
+  },
 };
 
 type IconType = keyof typeof iconMap;
@@ -55,7 +63,11 @@ export const Reaction = ({
       (!hasOwnReaction && canAddReaction) ||
       (hasOwnReaction && canRemoveReaction);
     if (canDoReactionAction) {
-      await toggleReaction();
+      try {
+        await toggleReaction();
+      } catch (error) {
+        console.error(error);
+      }
     }
   }, [hasOwnReaction, canAddReaction, canRemoveReaction, toggleReaction]);
 

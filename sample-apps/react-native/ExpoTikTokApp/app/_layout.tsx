@@ -116,6 +116,14 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
                 animation: 'slide_from_bottom',
               }}
             />
+            <Stack.Screen
+              name="comments-modal"
+              options={{
+                title: 'Comments',
+                presentation: 'modal',
+                animation: 'slide_from_bottom',
+              }}
+            />
           </Stack>
         </ThemeProvider>
       </OwnFeedsContextProvider>

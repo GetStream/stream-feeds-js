@@ -1,4 +1,5 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
+import { useFeedContext } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
 import {
   Alert,
@@ -13,6 +14,7 @@ import { PagerVideo } from '@/components/ActivityPager/PagerVideo';
 import { Ionicons } from '@expo/vector-icons';
 import { Reaction } from '@/components/Reaction';
 import { Bookmark } from '@/components/Bookmark';
+import { useRouter } from 'expo-router';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -23,6 +25,8 @@ const UnmemoizedPagerItem = ({
   activity: ActivityResponse;
   isActive: boolean;
 }) => {
+  const feed = useFeedContext();
+  const router = useRouter();
   const videoAttachment = useMemo(
     () => activity.attachments.find((a) => a.type === 'video'),
     [activity.attachments],
@@ -45,7 +49,18 @@ const UnmemoizedPagerItem = ({
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.iconContainer}>
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: '/comments-modal',
+                params: {
+                  feedGroupId: feed?.group,
+                  activityId: activity.id,
+                },
+              })
+            }
+            style={styles.iconContainer}
+          >
             <Ionicons name="chatbubble-outline" size={30} color="white" />
             <Text style={styles.iconLabel}>{activity.comment_count ?? 0}</Text>
           </TouchableOpacity>
