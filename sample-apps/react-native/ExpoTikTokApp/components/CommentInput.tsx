@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#ccc',
     marginRight: 8,
+    alignSelf: 'center',
   },
   inputContainer: {
     flex: 1,

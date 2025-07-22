@@ -1,14 +1,12 @@
 import {
   ActivityResponse, CommentResponse,
   useComments,
-  useFeedContext,
 } from '@stream-io/feeds-react-native-sdk';
 import {
   FlatList,
   Image,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import React, { useEffect } from 'react';
@@ -77,6 +75,8 @@ export const Comments = ({ activity }: { activity: ActivityResponse }) => {
 
   return (
     <FlatList
+      // @ts-expect-error FlatList internal, perf reasons
+      strictMode={true}
       data={comments}
       keyExtractor={keyExtractor}
       contentContainerStyle={styles.commentList}
