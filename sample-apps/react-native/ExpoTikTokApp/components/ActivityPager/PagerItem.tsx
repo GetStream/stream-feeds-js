@@ -19,7 +19,14 @@ const UnmemoizedPagerItem = ({
   );
   if (videoAttachment?.asset_url) {
     return (
-      <PagerVideo source={videoAttachment.asset_url} isActive={isActive} />
+      <View style={styles.page}>
+        <PagerVideo source={videoAttachment.asset_url} isActive={isActive} />
+
+        <View style={styles.overlay}>
+          <Text style={styles.title}>@{activity.user.id}</Text>
+          <Text style={styles.description}>{activity.text}</Text>
+        </View>
+      </View>
     );
   }
   return (
@@ -66,5 +73,21 @@ const styles = StyleSheet.create({
   },
   controlsContainer: {
     padding: 10,
+  },
+  overlay: {
+    position: 'absolute',
+    bottom: 40,
+    left: 16,
+    right: 100, // leave space if you add buttons later
+  },
+  title: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  description: {
+    color: 'white',
+    fontSize: 14,
   },
 });
