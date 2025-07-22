@@ -1415,6 +1415,31 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async stopWatchingFeed(request: {
+    feed_group_id: string;
+    feed_id: string;
+    connection_id?: string;
+  }): Promise<StreamResponse<Response>> {
+    const queryParams = {
+      connection_id: request?.connection_id,
+    };
+    const pathParams = {
+      feed_group_id: request?.feed_group_id,
+      feed_id: request?.feed_id,
+    };
+
+    const response = await this.apiClient.sendRequest<StreamResponse<Response>>(
+      'DELETE',
+      '/api/v2/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/watch',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.Response?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async getFollowSuggestions(request: {
     feed_group_id: string;
     limit?: number;

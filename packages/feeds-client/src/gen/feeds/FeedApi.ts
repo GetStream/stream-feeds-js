@@ -126,4 +126,14 @@ export class FeedApi {
       ...request,
     });
   }
+
+  stopWatching(request?: {
+    connection_id?: string;
+  }): Promise<StreamResponse<Response>> {
+    return this.feedsApi.stopWatchingFeed({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
 }
