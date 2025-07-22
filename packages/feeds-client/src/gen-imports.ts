@@ -1,3 +1,3 @@
 export type { ApiClient } from './common/ApiClient';
 export type { StreamResponse } from './common/types';
-export { FeedsApi } from './gen/feeds/FeedsApi';
+export { FeedsClient as FeedsApi } from './FeedsClient';

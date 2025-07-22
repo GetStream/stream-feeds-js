@@ -337,7 +337,7 @@ export class FeedsClient extends FeedsApi {
     const response = await this.feedsQueryFeeds(request);
 
     const feeds = response.feeds.map((f) =>
-      this.getOrCreateActiveFeed(f.group_id, f.id, f),
+      this.getOrCreateActiveFeed(f.group_id, f.id, f, request?.watch),
     );
 
     return {
@@ -404,16 +404,37 @@ export class FeedsClient extends FeedsApi {
     return response;
   }
 
+  async stopWatchingFeed(request: { feed_group_id: string; feed_id: string }) {
+    const connectionId = await this.connectionIdManager.getConnectionId();
+    const response = await super.stopWatchingFeed({
+      ...request,
+      connection_id: connectionId,
+    });
+
+    const feed =
+      this.activeFeeds[`${request.feed_group_id}:${request.feed_id}`];
+    if (feed) {
+      feed.handleWatchStopped();
+    }
+
+    return response;
+  }
+
   private readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
     data?: FeedResponse,
+    watch?: boolean,
   ) => {
     const fid = `${group}:${id}`;
     if (this.activeFeeds[fid]) {
-      return this.activeFeeds[fid];
+      const feed = this.activeFeeds[fid];
+      if (watch && !feed.currentState.watch) {
+        feed.handleWatchStarted();
+      }
+      return feed;
     } else {
-      const feed = new Feed(this, group, id, data);
+      const feed = new Feed(this, group, id, data, watch);
       this.activeFeeds[fid] = feed;
       return feed;
     }

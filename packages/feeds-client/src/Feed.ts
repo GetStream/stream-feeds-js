@@ -18,7 +18,7 @@ import {
   SortParamRequest,
   FollowResponse,
 } from './gen/models';
-import { Patch, StateStore } from './common/StateStore';
+import { StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
 import { FeedApi } from './gen/feeds/FeedApi';
 import { FeedsClient } from './FeedsClient';
@@ -50,8 +50,12 @@ import type {
   LoadingStates,
   PagerResponseWithLoadingStates,
 } from './types';
-import type { FromArray } from './types-internal';
 import { checkHasAnotherPage, Constants } from './utils';
+import {
+  getStateUpdateQueueIdForFollow,
+  getStateUpdateQueueIdForUnfollow,
+  shouldUpdateState,
+} from './state-updates/state-update-queue';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -119,6 +123,11 @@ export type FeedState = Omit<
   member_pagination?: LoadingStates & { sort?: SortParamRequest[] };
 
   last_get_or_create_request_config?: GetOrCreateFeedRequest;
+
+  /**
+   * `true` if the feed is receiving real-time updates via WebSocket
+   */
+  watch: boolean;
 };
 
 type EventHandlerByEventType = {
@@ -133,6 +142,7 @@ type EventHandlerByEventType = {
 export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private static readonly noop = () => {};
+  private stateUpdateQueue: string[] = [];
 
   private readonly eventHandlers: EventHandlerByEventType = {
     'feeds.activity.added': (event) => {
@@ -461,9 +471,9 @@ export class Feed extends FeedApi {
     groupId: 'user' | 'timeline' | (string & {}),
     id: string,
     data?: FeedResponse,
+    watch = false,
   ) {
-    // Need this ugly cast because fileUpload endpoints :(
-    super(client as unknown as FeedsApi, groupId, id);
+    super(client, groupId, id);
     this.state = new StateStore<FeedState>({
       fid: `${groupId}:${id}`,
       group_id: groupId,
@@ -472,6 +482,7 @@ export class Feed extends FeedApi {
       is_loading: false,
       is_loading_activities: false,
       comments_by_entity_id: {},
+      watch,
     });
     this.client = client;
   }
@@ -582,6 +593,8 @@ export class Feed extends FeedApi {
           });
         }
       } else {
+        // Empty queue when reinitializing the state
+        this.stateUpdateQueue = [];
         const responseCopy: Partial<
           StreamResponse<GetOrCreateFeedResponse>['feed'] &
             StreamResponse<GetOrCreateFeedResponse>
@@ -608,6 +621,7 @@ export class Feed extends FeedApi {
           }
 
           nextState.last_get_or_create_request_config = request;
+          nextState.watch = request?.watch ? request.watch : currentState.watch;
 
           return nextState;
         });
@@ -628,6 +642,15 @@ export class Feed extends FeedApi {
    * @internal
    */
   handleFollowCreated(follow: FollowResponse) {
+    if (
+      !shouldUpdateState({
+        stateUpdateId: getStateUpdateQueueIdForFollow(follow),
+        stateUpdateQueue: this.stateUpdateQueue,
+        watch: this.currentState.watch,
+      })
+    ) {
+      return;
+    }
     const connectedUser = this.client.state.getLatestValue().connected_user;
     const result = handleFollowCreated(
       follow,
@@ -636,19 +659,40 @@ export class Feed extends FeedApi {
       connectedUser?.id,
     );
     if (result.changed) {
-      this.state.next((currentState) => ({
-        ...currentState,
-        ...result,
-      }));
+      const isSourceFeed = follow.source_feed.fid === this.fid;
+      const key = isSourceFeed ? 'following_count' : 'follower_count';
+      // If we're not watching, update following/followers count
+      // If we're watching we can't do eager state update since we don't know if feed.updated event arrived or not already
+      const shouldIncrement = !this.currentState.watch;
+      this.state.next((currentState) => {
+        return {
+          ...currentState,
+          ...(shouldIncrement ? { [key]: (currentState[key] ?? 0) + 1 } : {}),
+          ...result,
+        };
+      });
     }
   }
 
+  /**
+   * @internal
+   */
   handleFollowDeleted(
     follow:
       | FollowResponse
       // Backend doesn't return the follow in delete follow response https://getstream.slack.com/archives/C06RK9WCR09/p1753176937507209
       | { source_feed: { fid: string }; target_feed: { fid: string } },
   ) {
+    if (
+      !shouldUpdateState({
+        stateUpdateId: getStateUpdateQueueIdForUnfollow(follow),
+        stateUpdateQueue: this.stateUpdateQueue,
+        watch: this.currentState.watch,
+      })
+    ) {
+      return;
+    }
+
     const connectedUser = this.client.state.getLatestValue().connected_user;
     const result = handleFollowDeleted(
       follow,
@@ -657,11 +701,35 @@ export class Feed extends FeedApi {
       connectedUser?.id,
     );
     if (result.changed) {
+      const isSourceFeed = follow.source_feed.fid === this.fid;
+      const key = isSourceFeed ? 'following_count' : 'follower_count';
+      // If we're not watching, update following/followers count
+      // If we're watching we can't do eager state update since we don't know if feed.updated event arrived or not already
+      const shouldDecrement = !this.currentState.watch;
       this.state.next((currentState) => ({
         ...currentState,
+        ...(shouldDecrement ? { [key]: (currentState[key] ?? 0) - 1 } : {}),
         ...result,
       }));
     }
+  }
+
+  /**
+   * @internal
+   */
+  handleWatchStopped() {
+    this.state.partialNext({
+      watch: false,
+    });
+  }
+
+  /**
+   * @internal
+   */
+  handleWatchStarted() {
+    this.state.partialNext({
+      watch: true,
+    });
   }
 
   private handleBookmarkAdded(event: BookmarkAddedEvent) {

@@ -8,7 +8,7 @@ import {
 import { FeedsClient } from '../src/FeedsClient';
 import { Feed } from '../src/Feed';
 
-describe('Feeds API dummy test', () => {
+describe('Feeds API basic test', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
   let feed: Feed;

@@ -63,7 +63,33 @@ export default function ProfilePage() {
           : `Failed to initialize feed: ${timeline.fid}`,
       );
     });
-  }, [feed, logErrorAndDisplayNotification, timeline]);
+
+    return () => {
+      if (
+        user &&
+        user.id !== params.id &&
+        feed &&
+        feed.state.getLatestValue().watch
+      ) {
+        client?.stopWatchingFeed({
+          feed_group_id: feed.group,
+          feed_id: feed.id,
+        });
+      }
+
+      if (
+        user &&
+        user.id !== params.id &&
+        timeline &&
+        timeline.state.getLatestValue().watch
+      ) {
+        client?.stopWatchingFeed({
+          feed_group_id: timeline.group,
+          feed_id: timeline.id,
+        });
+      }
+    };
+  }, [feed, logErrorAndDisplayNotification, timeline, user, params.id]);
 
   if (!feed || !timeline) {
     return <LoadingIndicator color="blue" />;

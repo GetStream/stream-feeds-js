@@ -1,15 +1,12 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { UserRequest } from '../src/common/gen/models';
+import { HealthCheckEvent, UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
   waitForEvent,
 } from './utils';
-import {
-  ConnectedEvent,
-  HealthCheckEvent,
-} from '../src/common/real-time/event-models';
+import { ConnectedEvent } from '../src/common/real-time/event-models';
 import { FeedsClient } from '../src/FeedsClient';
 describe('WebSocket connection', () => {
   let client: FeedsClient;
@@ -33,12 +30,14 @@ describe('WebSocket connection', () => {
     const connectedUser = spy.mock.lastCall?.[0]?.connected_user;
     expect(connectedUser?.id).toBe(user.id);
 
-    const isWsConnectionHealthy = spy.mock.lastCall?.[0]?.is_ws_connection_healthy;
+    const isWsConnectionHealthy =
+      spy.mock.lastCall?.[0]?.is_ws_connection_healthy;
     expect(isWsConnectionHealthy).toBe(true);
   });
 
   it('should be able to watch WS events', async () => {
     const spy = vi.fn();
+    // @ts-expect-error
     client.on('connection.ok', spy);
 
     await client.connectUser(user, createTestTokenGenerator(user));
