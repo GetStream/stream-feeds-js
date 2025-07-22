@@ -22,7 +22,6 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
 
   const handleSend = useStableCallback(() => {
     if (!text.trim()) return;
-    console.log('TRYING THIS');
     client?.addComment({
       comment: text as string,
       object_id: activityId,
