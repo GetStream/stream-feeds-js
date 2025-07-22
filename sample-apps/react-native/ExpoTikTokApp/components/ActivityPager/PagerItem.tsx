@@ -1,8 +1,16 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useActivityPagerContext } from '@/contexts/ActivityPagerContext';
 import { PagerVideo } from '@/components/ActivityPager/PagerVideo';
+import { Ionicons } from '@expo/vector-icons';
+import { Reaction } from '@/components/Reaction';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -18,6 +26,7 @@ const UnmemoizedPagerItem = ({
     [activity.attachments],
   );
   if (videoAttachment?.asset_url) {
+    console.log(activity.reaction_groups)
     return (
       <View style={styles.page}>
         <PagerVideo source={videoAttachment.asset_url} isActive={isActive} />
@@ -25,6 +34,26 @@ const UnmemoizedPagerItem = ({
         <View style={styles.overlay}>
           <Text style={styles.title}>@{activity.user.id}</Text>
           <Text style={styles.description}>{activity.text}</Text>
+        </View>
+
+        <View style={styles.sidebar}>
+          <View style={styles.iconContainer}>
+            <Reaction type="like" entity={activity} size={32} />
+            <Text style={styles.iconLabel}>{activity.reaction_groups.like?.count ?? 0}</Text>
+          </View>
+
+          <TouchableOpacity style={styles.iconContainer}>
+            <Ionicons name="chatbubble-outline" size={30} color="white" />
+            <Text style={styles.iconLabel}>45</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.iconContainer}>
+            <Ionicons name="bookmark-outline" size={28} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.iconContainer}>
+            <Ionicons name="arrow-redo-outline" size={28} color="white" />
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -89,5 +118,20 @@ const styles = StyleSheet.create({
   description: {
     color: 'white',
     fontSize: 14,
+  },
+  sidebar: {
+    position: 'absolute',
+    right: 16,
+    bottom: 60,
+    alignItems: 'center',
+    gap: 20,
+  },
+  iconContainer: {
+    alignItems: 'center',
+  },
+  iconLabel: {
+    fontSize: 12,
+    color: '#fff',
+    marginTop: 4,
   },
 });
