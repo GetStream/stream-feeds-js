@@ -11,6 +11,7 @@ import { useActivityPagerContext } from '@/contexts/ActivityPagerContext';
 import { PagerVideo } from '@/components/ActivityPager/PagerVideo';
 import { Ionicons } from '@expo/vector-icons';
 import { Reaction } from '@/components/Reaction';
+import { Bookmark } from '@/components/Bookmark';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -26,7 +27,6 @@ const UnmemoizedPagerItem = ({
     [activity.attachments],
   );
   if (videoAttachment?.asset_url) {
-    console.log(activity.reaction_groups)
     return (
       <View style={styles.page}>
         <PagerVideo source={videoAttachment.asset_url} isActive={isActive} />
@@ -44,11 +44,12 @@ const UnmemoizedPagerItem = ({
 
           <TouchableOpacity style={styles.iconContainer}>
             <Ionicons name="chatbubble-outline" size={30} color="white" />
-            <Text style={styles.iconLabel}>45</Text>
+            <Text style={styles.iconLabel}>{activity.comment_count ?? 0}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.iconContainer}>
-            <Ionicons name="bookmark-outline" size={28} color="white" />
+            <Bookmark activity={activity} size={28} />
+            <Text style={styles.iconLabel}>{activity.bookmark_count ?? 0}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.iconContainer}>
