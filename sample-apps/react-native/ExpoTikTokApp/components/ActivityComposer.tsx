@@ -11,6 +11,7 @@ import {
 
 import * as ImagePicker from 'expo-image-picker';
 import {
+  Attachment,
   isImageFile,
   isVideoFile,
   StreamFile,
@@ -27,7 +28,8 @@ export const ActivityComposer = () => {
   const client = useFeedsClient();
   const feed = useFeedContext();
   const [text, setText] = useState('');
-  const [media, setMedia] = useState<StreamFile[]>([]);
+  const [files, setFiles] = useState<StreamFile[]>([]);
+  const [media, setMedia] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
 
   const pickMedia = useCallback(async () => {
@@ -38,29 +40,16 @@ export const ActivityComposer = () => {
     });
 
     if (!result.canceled) {
-      setMedia((prev) => [
-        ...prev,
-        ...result.assets.map((mediaFile) => {
-          const { uri } = mediaFile;
-          return {
-            uri: mediaFile.uri,
-            name: mediaFile.fileName ?? (uri as string).split('/').reverse()[0],
-            type: mediaFile.mimeType ?? 'image/jpeg',
-          };
-        }),
-      ]);
-    }
-  }, []);
-
-  const sendActivity = useCallback(async () => {
-    if (!feed) {
-      return null;
-    }
-    setIsSending(true);
-    try {
-      const files = media;
+      const rawFiles = result.assets;
       const requests = [];
-      for (const file of [...(files ?? [])]) {
+      const localFiles: StreamFile[] = [];
+      for (const rawFile of [...(rawFiles ?? [])]) {
+        const { uri } = rawFile;
+        const file = {
+          uri: rawFile.uri,
+          name: rawFile.fileName ?? (uri as string).split('/').reverse()[0],
+          type: rawFile.mimeType ?? 'image/jpeg',
+        };
         if (isImageFile(file)) {
           requests.push(
             client?.uploadImage({
@@ -74,15 +63,17 @@ export const ActivityComposer = () => {
             }),
           );
         }
+        localFiles.push(file);
       }
+
+      setFiles((prevFiles) => [...prevFiles, ...localFiles]);
 
       const fileResponses = await Promise.all(requests);
 
-      await feed.addActivity({
-        type: 'post',
-        text,
-        attachments: fileResponses.map((response, index) => {
-          const file = files![index];
+      setMedia((prev) => [
+        ...prev,
+        ...fileResponses.map((response, index) => {
+          const file = localFiles[index];
           const isImage = isImageFile(file);
           const isVideo = isVideoFile(file);
           return {
@@ -94,6 +85,20 @@ export const ActivityComposer = () => {
               : {}),
           };
         }),
+      ]);
+    }
+  }, [client, files]);
+
+  const sendActivity = useCallback(async () => {
+    if (!feed) {
+      return null;
+    }
+    setIsSending(true);
+    try {
+      await feed.addActivity({
+        type: 'post',
+        text,
+        attachments: media,
       });
       setMedia([]);
       setText('');
@@ -105,7 +110,7 @@ export const ActivityComposer = () => {
     } finally {
       setIsSending(false);
     }
-  }, [client, feed, media, text]);
+  }, [feed, media, text]);
 
   const submitPressHandler = useCallback(async () => {
     await sendActivity();
@@ -131,20 +136,26 @@ export const ActivityComposer = () => {
       />
 
       <View style={styles.mediaPreviewContainer}>
-        {media.map((asset, index) => (
+        {files.map((asset, index) => (
           <View key={index} style={styles.previewItem}>
             {isImageFile(asset) ? (
               <Image
                 source={{
-                  // TODO: think of a better way to fix this
-                  uri: (asset as { uri: string }).uri,
+                  uri:
+                    media?.[index]?.image_url ?? (asset as { uri: string }).uri,
                 }}
                 style={styles.media}
                 resizeMode="cover"
               />
             ) : (
               <Image
-                source={isVideoFile(asset) ? videoPlaceholder : filePlaceholder}
+                source={
+                  media?.[index] && media[index].thumb_url
+                    ? { uri: media[index].thumb_url }
+                    : isVideoFile(asset)
+                      ? videoPlaceholder
+                      : filePlaceholder
+                }
                 style={styles.media}
                 resizeMode="cover"
               />
