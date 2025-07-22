@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   TextInput,
@@ -11,6 +11,7 @@ import {
 
 import * as ImagePicker from 'expo-image-picker';
 import {
+  Attachment,
   isImageFile,
   isVideoFile,
   StreamFile,
@@ -27,40 +28,28 @@ export const ActivityComposer = () => {
   const client = useFeedsClient();
   const feed = useFeedContext();
   const [text, setText] = useState('');
-  const [media, setMedia] = useState<StreamFile[]>([]);
+  const [files, setFiles] = useState<StreamFile[]>([]);
+  const [media, setMedia] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
 
   const pickMedia = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsMultipleSelection: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsMultipleSelection: false,
       quality: 1,
     });
 
     if (!result.canceled) {
-      setMedia((prev) => [
-        ...prev,
-        ...result.assets.map((mediaFile) => {
-          const { uri } = mediaFile;
-          return {
-            uri: mediaFile.uri,
-            name: mediaFile.fileName ?? (uri as string).split('/').reverse()[0],
-            type: mediaFile.mimeType ?? 'image/jpeg',
-          };
-        }),
-      ]);
-    }
-  }, []);
-
-  const sendActivity = useCallback(async () => {
-    if (!feed) {
-      return null;
-    }
-    setIsSending(true);
-    try {
-      const files = media;
+      const rawFiles = result.assets;
       const requests = [];
-      for (const file of [...(files ?? [])]) {
+      const localFiles: StreamFile[] = [];
+      for (const rawFile of [...(rawFiles ?? [])]) {
+        const { uri } = rawFile;
+        const file = {
+          uri: rawFile.uri,
+          name: rawFile.fileName ?? (uri as string).split('/').reverse()[0],
+          type: rawFile.mimeType ?? 'image/jpeg',
+        };
         if (isImageFile(file)) {
           requests.push(
             client?.uploadImage({
@@ -74,15 +63,17 @@ export const ActivityComposer = () => {
             }),
           );
         }
+        localFiles.push(file);
       }
+
+      setFiles((prevFiles) => [...prevFiles, ...localFiles]);
 
       const fileResponses = await Promise.all(requests);
 
-      await feed.addActivity({
-        type: 'post',
-        text,
-        attachments: fileResponses.map((response, index) => {
-          const file = files![index];
+      setMedia((prev) => [
+        ...prev,
+        ...fileResponses.map((response, index) => {
+          const file = localFiles[index];
           const isImage = isImageFile(file);
           const isVideo = isVideoFile(file);
           return {
@@ -94,6 +85,20 @@ export const ActivityComposer = () => {
               : {}),
           };
         }),
+      ]);
+    }
+  }, [client, files]);
+
+  const sendActivity = useCallback(async () => {
+    if (!feed) {
+      return null;
+    }
+    setIsSending(true);
+    try {
+      await feed.addActivity({
+        type: 'post',
+        text,
+        attachments: media,
       });
       setMedia([]);
       setText('');
@@ -105,15 +110,23 @@ export const ActivityComposer = () => {
     } finally {
       setIsSending(false);
     }
-  }, [client, feed, media, text]);
+  }, [feed, media, text]);
 
   const submitPressHandler = useCallback(async () => {
     await sendActivity();
     router.back();
   }, [sendActivity]);
 
+  const submitButtonDisabled = useMemo(
+    () => isSending || media.length < 1,
+    [isSending, media.length],
+  );
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.subtitle}>
+        Upload a video and write something about it !
+      </Text>
       <TextInput
         placeholder="What's happening?"
         style={styles.input}
@@ -123,20 +136,26 @@ export const ActivityComposer = () => {
       />
 
       <View style={styles.mediaPreviewContainer}>
-        {media.map((asset, index) => (
+        {files.map((asset, index) => (
           <View key={index} style={styles.previewItem}>
             {isImageFile(asset) ? (
               <Image
                 source={{
-                  // TODO: think of a better way to fix this
-                  uri: (asset as { uri: string }).uri,
+                  uri:
+                    media?.[index]?.image_url ?? (asset as { uri: string }).uri,
                 }}
                 style={styles.media}
                 resizeMode="cover"
               />
             ) : (
               <Image
-                source={isVideoFile(asset) ? videoPlaceholder : filePlaceholder}
+                source={
+                  media?.[index] && media[index].thumb_url
+                    ? { uri: media[index].thumb_url }
+                    : isVideoFile(asset)
+                      ? videoPlaceholder
+                      : filePlaceholder
+                }
                 style={styles.media}
                 resizeMode="cover"
               />
@@ -146,13 +165,13 @@ export const ActivityComposer = () => {
       </View>
 
       <TouchableOpacity onPress={pickMedia} style={styles.button}>
-        <Text style={styles.buttonText}>Upload Image/Video</Text>
+        <Text style={styles.buttonText}>Upload Video</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        disabled={isSending}
+        disabled={submitButtonDisabled}
         onPress={submitPressHandler}
-        style={styles.button}
+        style={submitButtonDisabled ? styles.disabledButton : styles.button}
       >
         <Text style={styles.buttonText}>Submit</Text>
       </TouchableOpacity>
@@ -163,6 +182,10 @@ export const ActivityComposer = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+  },
+  subtitle: {
+    fontSize: 16,
+    marginVertical: 16,
   },
   input: {
     fontSize: 16,
@@ -175,6 +198,13 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: '#1DA1F2',
+    paddingVertical: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  disabledButton: {
+    backgroundColor: 'grey',
     paddingVertical: 12,
     borderRadius: 6,
     alignItems: 'center',

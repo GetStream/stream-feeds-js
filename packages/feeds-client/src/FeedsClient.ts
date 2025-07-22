@@ -35,8 +35,8 @@ import { ModerationClient } from './ModerationClient';
 import { StreamPoll } from './common/Poll';
 
 export type FeedsClientState = {
-  connectedUser: OwnUser | undefined;
-  isWsConnectionHealthy: boolean;
+  connected_user: OwnUser | undefined;
+  is_ws_connection_healthy: boolean;
 };
 
 type FID = string;
@@ -70,8 +70,8 @@ export class FeedsClient extends FeedsApi {
     );
     super(apiClient);
     this.state = new StateStore<FeedsClientState>({
-      connectedUser: undefined,
-      isWsConnectionHealthy: false,
+      connected_user: undefined,
+      is_ws_connection_healthy: false,
     });
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
@@ -86,7 +86,7 @@ export class FeedsClient extends FeedsApi {
       switch (event.type) {
         case 'connection.changed': {
           const { online } = event;
-          this.state.partialNext({ isWsConnectionHealthy: online });
+          this.state.partialNext({ is_ws_connection_healthy: online });
 
           if (online) {
             this.healthyConnectionChangedEventCount++;
@@ -211,7 +211,7 @@ export class FeedsClient extends FeedsApi {
 
   connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
     if (
-      this.state.getLatestValue().connectedUser !== undefined ||
+      this.state.getLatestValue().connected_user !== undefined ||
       this.wsConnection
     ) {
       throw new Error(`Can't connect a new user, call "disconnectUser" first`);
@@ -235,8 +235,8 @@ export class FeedsClient extends FeedsApi {
       );
       const connectedEvent = await this.wsConnection.connect();
       this.state.partialNext({
-        connectedUser: connectedEvent?.me,
-        isWsConnectionHealthy: this.wsConnection.isHealthy,
+        connected_user: connectedEvent?.me,
+        is_ws_connection_healthy: !!this.wsConnection?.isHealthy,
       });
     } catch (err) {
       await this.disconnectUser();
@@ -260,7 +260,9 @@ export class FeedsClient extends FeedsApi {
   };
 
   // @ts-expect-error API spec says file should be a string
-  uploadFile = (request: Omit<FileUploadRequest, 'file'> & { file: StreamFile }) => {
+  uploadFile = (
+    request: Omit<FileUploadRequest, 'file'> & { file: StreamFile },
+  ) => {
     return super.uploadFile({
       // @ts-expect-error API spec says file should be a string
       file: request.file,
@@ -316,7 +318,10 @@ export class FeedsClient extends FeedsApi {
 
     this.connectionIdManager.reset();
     this.tokenManager.reset();
-    this.state.partialNext({ connectedUser: undefined, isWsConnectionHealthy: false });
+    this.state.partialNext({
+      connected_user: undefined,
+      is_ws_connection_healthy: false,
+    });
   };
 
   on = this.eventDispatcher.on;

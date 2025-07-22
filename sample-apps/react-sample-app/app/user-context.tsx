@@ -103,7 +103,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
     const _client = client;
     setClient(undefined);
     resetNotifications();
-    if (_client?.state.getLatestValue().connectedUser) {
+    if (_client?.state.getLatestValue().connected_user) {
       return _client.disconnectUser();
     } else {
       return Promise.resolve();

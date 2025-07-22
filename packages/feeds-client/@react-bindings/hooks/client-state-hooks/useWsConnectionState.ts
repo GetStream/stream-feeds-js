@@ -8,11 +8,11 @@ import { useFeedsClient } from '../../contexts/StreamFeedsContext';
 export const useWsConnectionState = () => {
   const client = useFeedsClient();
 
-  const { isHealthy } = useStateStore(client?.state, selector) ?? {}
+  const { is_healthy } = useStateStore(client?.state, selector) ?? {}
 
-  return { isHealthy };
+  return { is_healthy };
 };
 
 const selector = (nextState: FeedsClientState) => ({
-  isHealthy: nextState.isWsConnectionHealthy,
+  is_healthy: nextState.is_ws_connection_healthy,
 });

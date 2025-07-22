@@ -15,7 +15,7 @@ export const useFeedActivities = (feedFromProps?: Feed) => {
   const data = useStateStore(feed?.state, selector)
 
   const loadNextPage = useStableCallback(async () => {
-    if (!feed || !data?.hasNextPage || data?.isLoading) {
+    if (!feed || !data?.has_next_page || data?.is_loading) {
       return;
     }
 
@@ -25,8 +25,8 @@ export const useFeedActivities = (feedFromProps?: Feed) => {
   return useMemo(() => ({ ...data, loadNextPage }), [data, loadNextPage]);
 };
 
-const selector = (nextState: FeedState) => ({
-  isLoading: nextState.is_loading_activities,
-  hasNextPage: typeof nextState.next !== 'undefined',
-  activities: nextState.activities ?? [],
+const selector = ({ is_loading_activities, next, activities = [] }: FeedState) => ({
+  is_loading: is_loading_activities,
+  has_next_page: typeof next !== 'undefined',
+  activities,
 });

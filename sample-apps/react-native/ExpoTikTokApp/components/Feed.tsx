@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   ActivityResponse,
-  useFeedContext,
   useFeedActivities,
 } from '@stream-io/feeds-react-native-sdk';
 import {
@@ -14,6 +13,7 @@ import {
 import { Activity } from '@/components/Activity';
 import { useCallback, useState } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
+import { LoadingIndicator, ErrorIndicator } from '@/components/Indicators';
 
 const renderItem = ({
   item,
@@ -27,12 +27,12 @@ const keyExtractor = (item: ActivityResponse) => item.id;
 
 export const Feed = () => {
   const [error, setError] = useState<Error | undefined>();
-  const { loadNextPage, isLoading, activities } = useFeedActivities() ?? {};
+  const { loadNextPage, is_loading: isLoading, activities } = useFeedActivities() ?? {};
 
   const getNextPage = useStableCallback(() => {
     setError(undefined);
     loadNextPage().catch(setError);
-  })
+  });
 
   const hasActivities = activities?.length && activities.length > 0;
 
@@ -42,21 +42,11 @@ export const Feed = () => {
   );
 
   if (error) {
-    return (
-      <View style={styles.midScreenContainer}>
-        <Text style={styles.errorText}>
-          Something went wrong while loading activities.
-        </Text>
-      </View>
-    );
+    return <ErrorIndicator context="activities" />;
   }
 
   if (isLoading && activities?.length === 0) {
-    return (
-      <View style={styles.midScreenContainer}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return <LoadingIndicator />;
   }
 
   return (
@@ -78,17 +68,6 @@ export const Feed = () => {
 };
 
 const styles = StyleSheet.create({
-  midScreenContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'red',
-    textAlign: 'center',
-  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

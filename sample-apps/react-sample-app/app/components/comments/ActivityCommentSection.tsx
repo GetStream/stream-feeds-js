@@ -24,8 +24,8 @@ export const ActivityCommentSection = ({
   const {
     comments = [],
     loadNextPage,
-    isLoadingNextPage,
-    hasNextPage,
+    is_loading_next_page: isLoadingNextPage,
+    has_next_page: hasNextPage,
   } = useComments({ feed, parent: activity });
 
   const [parent, setParent] = useState<null | CommentResponse>(null);

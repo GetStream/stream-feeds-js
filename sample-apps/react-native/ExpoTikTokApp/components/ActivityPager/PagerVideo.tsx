@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -11,6 +11,7 @@ export const PagerVideo = ({
   source: string;
   isActive: boolean;
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [paused, setPaused] = useState(true);
 
   useEffect(() => {
@@ -30,7 +31,15 @@ export const PagerVideo = ({
         paused={paused}
         resizeMode="contain"
         controls={false}
+        onLoadStart={() => setIsLoading(true)}
+        onLoad={() => setIsLoading(false)}
       />
+
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      )}
     </View>
   );
 };
@@ -46,5 +55,11 @@ const styles = StyleSheet.create({
   video: {
     width: '100%',
     height: SCREEN_HEIGHT,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
   },
 });

@@ -32,7 +32,7 @@ export const Activity = ({
     <TouchableOpacity
       onPress={() =>
         router.push({
-          pathname: '/timeline-activity-screen',
+          pathname: '/activity-pager-screen',
           params: {
             initialIndex: index,
             groupId: feed?.group,

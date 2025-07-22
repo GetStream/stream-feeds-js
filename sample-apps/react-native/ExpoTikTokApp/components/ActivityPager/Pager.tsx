@@ -5,7 +5,8 @@ import { useStableCallback } from '@/hooks/useStableCallback';
 import {
   Dimensions,
   NativeScrollEvent,
-  NativeSyntheticEvent, Platform,
+  NativeSyntheticEvent,
+  Platform,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
@@ -29,7 +30,7 @@ const keyExtractor = (item: ActivityResponse) => item.id;
 
 export const ActivityPager = () => {
   const { initialIndex } = useLocalSearchParams();
-  const { activities } = useFeedActivities() ?? {};
+  const { activities, loadNextPage } = useFeedActivities() ?? {};
   const [activeId, setActiveId] = useState<string | undefined>(
     activities?.[Number(initialIndex)]?.id,
   );
@@ -74,6 +75,8 @@ export const ActivityPager = () => {
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
         onMomentumScrollEnd={handleSnap}
+        onEndReachedThreshold={0.2}
+        onEndReached={loadNextPage}
         {...pagerProps}
       />
     </ActivityPagerContextProvider>

@@ -1,5 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import type { ActivityResponse, CommentResponse } from '../../../src/gen/models';
+import type {
+  ActivityResponse,
+  CommentResponse,
+} from '../../../src/gen/models';
 import type { CommentParent } from '../../../src/types';
 import { Feed, FeedState } from '../../../src/Feed';
 import { useStateStore } from '../useStateStore';
@@ -14,8 +17,8 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   comments_pagination: NonNullable<
     FeedState['comments_by_entity_id'][T['id']]
   >['pagination'];
-  hasNextPage: boolean;
-  isLoadingNextPage: boolean;
+  has_next_page: boolean;
+  is_loading_next_page: boolean;
   loadNextPage: (
     request?: T extends CommentResponse
       ? Parameters<Feed['loadNextPageCommentReplies']>[1]
@@ -75,11 +78,12 @@ export function useComments<T extends CommentParent>({
 
     return {
       ...data,
-      hasNextPage: checkHasAnotherPage(
+      has_next_page: checkHasAnotherPage(
         data.comments,
         data.comments_pagination?.next,
       ),
-      isLoadingNextPage: data?.comments_pagination?.loading_next_page ?? false,
+      is_loading_next_page:
+        data?.comments_pagination?.loading_next_page ?? false,
       loadNextPage,
     };
   }, [data, loadNextPage]);

@@ -20,7 +20,7 @@ export class UserSearchSource extends BaseSearchSource<UserResponse> {
   }
 
   protected async query(searchQuery: string) {
-    const { connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } = this.client.state.getLatestValue();
     if (!connectedUser) return { items: [] };
 
     // const channelFilters: ChannelFilters = {

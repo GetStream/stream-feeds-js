@@ -25,13 +25,13 @@ describe('State layer page', () => {
     // Subscribe to changes
     const unsubscribe = client.state.subscribe((state) => {
       // It will return undefined if there is no connected user
-      console.log(state.connectedUser);
+      console.log(state.connected_user);
     });
     // Unsibscribe when you no longer need/want to receive updates
     unsubscribe();
 
     // Read current state
-    expect(client.state.getLatestValue().connectedUser).toBeDefined();
+    expect(client.state.getLatestValue().connected_user).toBeDefined();
   });
 
   it(`feed state`, async () => {
