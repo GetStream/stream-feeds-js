@@ -5,7 +5,8 @@ export default defineConfig({
   build: {},
   test: {
     retry: 0,
-    testTimeout: 10000,
+    testTimeout: 20000,
+    hookTimeout: 20000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
