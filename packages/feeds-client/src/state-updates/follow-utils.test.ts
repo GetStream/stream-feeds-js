@@ -7,8 +7,6 @@ import {
   FollowState,
 } from './follow-utils';
 import {
-  FollowCreatedEvent,
-  FollowDeletedEvent,
   FollowUpdatedEvent,
   FollowResponse,
   FeedResponse,
@@ -65,22 +63,6 @@ describe('follow-utils', () => {
     },
   };
 
-  const mockFollowCreatedEvent: FollowCreatedEvent = {
-    created_at: new Date(),
-    fid: 'user:feed-1',
-    custom: {},
-    follow: mockFollow,
-    type: 'feeds.follow.created',
-  };
-
-  const mockFollowDeletedEvent: FollowDeletedEvent = {
-    created_at: new Date(),
-    fid: 'user:feed-1',
-    custom: {},
-    follow: mockFollow,
-    type: 'feeds.follow.deleted',
-  };
-
   const mockFollowUpdatedEvent: FollowUpdatedEvent = {
     created_at: new Date(),
     fid: 'user:feed-1',
@@ -91,12 +73,9 @@ describe('follow-utils', () => {
 
   describe('handleFollowCreated', () => {
     it('should return unchanged state for non-accepted follows', () => {
-      const event: FollowCreatedEvent = {
-        ...mockFollowCreatedEvent,
-        follow: {
-          ...mockFollow,
-          status: 'pending',
-        },
+      const follow: FollowResponse = {
+        ...mockFollow,
+        status: 'pending',
       };
 
       const currentState: FollowState = {
@@ -105,7 +84,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowCreated(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -115,25 +94,22 @@ describe('follow-utils', () => {
     });
 
     it('should handle when this feed follows someone', () => {
-      const event: FollowCreatedEvent = {
-        ...mockFollowCreatedEvent,
-        follow: {
-          ...mockFollow,
-          source_feed: {
-            ...mockFeed,
-            id: 'feed-x',
-            fid: 'user:feed-x',
-            created_by: {
-              ...mockUser,
-              id: 'user-x',
-            },
+      const follow: FollowResponse = {
+        ...mockFollow,
+        source_feed: {
+          ...mockFeed,
+          id: 'feed-x',
+          fid: 'user:feed-x',
+          created_by: {
+            ...mockUser,
+            id: 'user-x',
           },
-          target_feed: {
-            ...mockFeed,
-            id: 'other-feed',
-            fid: 'user:other-feed',
-            created_by: mockUser,
-          },
+        },
+        target_feed: {
+          ...mockFeed,
+          id: 'other-feed',
+          fid: 'user:other-feed',
+          created_by: mockUser,
         },
       };
 
@@ -143,7 +119,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowCreated(
-        event,
+        follow,
         currentState,
         'user:feed-x',
         'user-1',
@@ -151,31 +127,28 @@ describe('follow-utils', () => {
 
       expect(result.changed).toBe(true);
       expect(result.following).toHaveLength(1);
-      expect(result.following?.[0]).toEqual(event.follow);
-      expect(result).toMatchObject(event.follow.source_feed);
+      expect(result.following?.[0]).toEqual(follow);
+      expect(result).toMatchObject(follow.source_feed);
       expect(result.own_follows).toBeUndefined();
     });
 
     it('should handle when someone follows this feed', () => {
-      const event: FollowCreatedEvent = {
-        ...mockFollowCreatedEvent,
-        follow: {
-          ...mockFollow,
-          source_feed: {
-            ...mockFeed,
-            id: 'other-feed',
-            fid: 'user:other-feed',
-            created_by: {
-              ...mockUser,
-              id: 'other-user',
-            },
+      const follow: FollowResponse = {
+        ...mockFollow,
+        source_feed: {
+          ...mockFeed,
+          id: 'other-feed',
+          fid: 'user:other-feed',
+          created_by: {
+            ...mockUser,
+            id: 'other-user',
           },
-          target_feed: {
-            ...mockFeed,
-            id: 'feed-1',
-            fid: 'user:feed-1',
-            created_by: mockUser,
-          },
+        },
+        target_feed: {
+          ...mockFeed,
+          id: 'feed-1',
+          fid: 'user:feed-1',
+          created_by: mockUser,
         },
       };
 
@@ -185,7 +158,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowCreated(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -193,30 +166,27 @@ describe('follow-utils', () => {
 
       expect(result.changed).toBe(true);
       expect(result.followers).toHaveLength(1);
-      expect(result.followers?.[0]).toEqual(event.follow);
-      expect(result).toMatchObject(event.follow.target_feed);
+      expect(result.followers?.[0]).toEqual(follow);
+      expect(result).toMatchObject(follow.target_feed);
       expect(result.own_follows).toBeUndefined();
     });
 
     it('should add to own_follows when connected user is the source', () => {
-      const event: FollowCreatedEvent = {
-        ...mockFollowCreatedEvent,
-        follow: {
-          ...mockFollow,
-          source_feed: {
-            ...mockFeed,
-            id: 'feed-1',
-            fid: 'user:feed-1',
-            created_by: { ...mockUser, id: 'user-1' },
-          },
-          target_feed: {
-            ...mockFeed,
-            id: 'feed-x',
-            fid: 'user:feed-x',
-            created_by: {
-              ...mockUser,
-              id: 'user-x',
-            },
+      const follow: FollowResponse = {
+        ...mockFollow,
+        source_feed: {
+          ...mockFeed,
+          id: 'feed-1',
+          fid: 'user:feed-1',
+          created_by: { ...mockUser, id: 'user-1' },
+        },
+        target_feed: {
+          ...mockFeed,
+          id: 'feed-x',
+          fid: 'user:feed-x',
+          created_by: {
+            ...mockUser,
+            id: 'user-x',
           },
         },
       };
@@ -228,7 +198,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowCreated(
-        event,
+        follow,
         currentState,
         'user:feed-x',
         'user-1',
@@ -236,26 +206,23 @@ describe('follow-utils', () => {
 
       expect(result.changed).toBe(true);
       expect(result.own_follows).toHaveLength(1);
-      expect(result.own_follows?.[0]).toEqual(event.follow);
+      expect(result.own_follows?.[0]).toEqual(follow);
     });
 
     it('should not update followers/following when they are undefined', () => {
-      const event: FollowCreatedEvent = {
-        ...mockFollowCreatedEvent,
-        follow: {
-          ...mockFollow,
-          source_feed: {
-            ...mockFeed,
-            id: 'other-feed',
-            fid: 'user:other-feed',
-            created_by: mockUser,
-          },
-          target_feed: {
-            ...mockFeed,
-            id: 'feed-1',
-            fid: 'user:feed-1',
-            created_by: mockUser,
-          },
+      const follow: FollowResponse = {
+        ...mockFollow,
+        source_feed: {
+          ...mockFeed,
+          id: 'other-feed',
+          fid: 'user:other-feed',
+          created_by: mockUser,
+        },
+        target_feed: {
+          ...mockFeed,
+          id: 'feed-1',
+          fid: 'user:feed-1',
+          created_by: mockUser,
         },
       };
 
@@ -265,7 +232,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowCreated(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -273,7 +240,7 @@ describe('follow-utils', () => {
 
       expect(result.changed).toBe(true);
       expect(result.followers).toBeUndefined();
-      expect(result).toMatchObject(event.follow.target_feed);
+      expect(result).toMatchObject(follow.target_feed);
     });
 
     it('should add new followers to the top of existing arrays', () => {
@@ -287,22 +254,19 @@ describe('follow-utils', () => {
         },
       };
 
-      const event: FollowCreatedEvent = {
-        ...mockFollowCreatedEvent,
-        follow: {
-          ...mockFollow,
-          source_feed: {
-            ...mockFeed,
-            id: 'other-feed',
-            fid: 'user:other-feed',
-            created_by: mockUser,
-          },
-          target_feed: {
-            ...mockFeed,
-            id: 'feed-1',
-            fid: 'user:feed-1',
-            created_by: mockUser,
-          },
+      const follow: FollowResponse = {
+        ...mockFollow,
+        source_feed: {
+          ...mockFeed,
+          id: 'other-feed',
+          fid: 'user:other-feed',
+          created_by: mockUser,
+        },
+        target_feed: {
+          ...mockFeed,
+          id: 'feed-1',
+          fid: 'user:feed-1',
+          created_by: mockUser,
         },
       };
 
@@ -312,7 +276,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowCreated(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -320,7 +284,7 @@ describe('follow-utils', () => {
 
       expect(result.changed).toBe(true);
       expect(result.followers).toHaveLength(2);
-      expect(result.followers?.[0]).toEqual(event.follow);
+      expect(result.followers?.[0]).toEqual(follow);
       expect(result.followers?.[1]).toEqual(existingFollow);
     });
   });
@@ -343,17 +307,14 @@ describe('follow-utils', () => {
         },
       };
 
-      const event: FollowDeletedEvent = {
-        ...mockFollowDeletedEvent,
-        follow: existingFollow,
-      };
+      const follow: FollowResponse = existingFollow;
 
       const currentState: FollowState = {
         following: [existingFollow],
       };
 
       const result = handleFollowDeleted(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -361,7 +322,7 @@ describe('follow-utils', () => {
 
       expect(result.changed).toBe(true);
       expect(result.following).toHaveLength(0);
-      expect(result).toMatchObject(event.follow.source_feed);
+      expect(result).toMatchObject(follow.source_feed);
     });
 
     it('should handle when someone unfollows this feed', () => {
@@ -384,10 +345,7 @@ describe('follow-utils', () => {
         },
       };
 
-      const event: FollowDeletedEvent = {
-        ...mockFollowDeletedEvent,
-        follow: existingFollow,
-      };
+      const follow: FollowResponse = existingFollow;
 
       const currentState: FollowState = {
         followers: [existingFollow],
@@ -395,7 +353,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowDeleted(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -404,7 +362,7 @@ describe('follow-utils', () => {
       expect(result.changed).toBe(true);
       expect(result.followers).toHaveLength(0);
       expect(result.own_follows).toEqual(currentState.own_follows);
-      expect(result).toMatchObject(event.follow.target_feed);
+      expect(result).toMatchObject(follow.target_feed);
     });
 
     it('should only remove own_follows when connected user is the source', () => {
@@ -424,10 +382,7 @@ describe('follow-utils', () => {
         },
       };
 
-      const event: FollowDeletedEvent = {
-        ...mockFollowDeletedEvent,
-        follow: existingFollow,
-      };
+      const follow: FollowResponse = existingFollow;
 
       const currentState: FollowState = {
         followers: [existingFollow],
@@ -435,7 +390,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowDeleted(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -463,10 +418,7 @@ describe('follow-utils', () => {
         },
       };
 
-      const event: FollowDeletedEvent = {
-        ...mockFollowDeletedEvent,
-        follow: existingFollow,
-      };
+      const follow: FollowResponse = existingFollow;
 
       const currentState: FollowState = {
         followers: [existingFollow],
@@ -474,7 +426,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowDeleted(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -502,10 +454,7 @@ describe('follow-utils', () => {
         },
       };
 
-      const event: FollowDeletedEvent = {
-        ...mockFollowDeletedEvent,
-        follow: existingFollow,
-      };
+      const follow: FollowResponse = existingFollow;
 
       const currentState: FollowState = {
         followers: undefined,
@@ -513,7 +462,7 @@ describe('follow-utils', () => {
       };
 
       const result = handleFollowDeleted(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',
@@ -522,7 +471,7 @@ describe('follow-utils', () => {
       expect(result.changed).toBe(true);
       expect(result.followers).toBeUndefined();
       expect(result.own_follows).toBeUndefined();
-      expect(result).toMatchObject(event.follow.target_feed);
+      expect(result).toMatchObject(follow.target_feed);
     });
 
     it('should filter out the correct follow by target feed id', () => {
@@ -558,17 +507,14 @@ describe('follow-utils', () => {
         },
       };
 
-      const event: FollowDeletedEvent = {
-        ...mockFollowDeletedEvent,
-        follow: followToRemove,
-      };
+      const follow: FollowResponse = followToRemove;
 
       const currentState: FollowState = {
         following: [followToRemove, followToKeep],
       };
 
       const result = handleFollowDeleted(
-        event,
+        follow,
         currentState,
         'user:feed-1',
         'user-1',

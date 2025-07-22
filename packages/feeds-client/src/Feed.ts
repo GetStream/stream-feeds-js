@@ -321,7 +321,7 @@ export class Feed extends FeedApi {
     'feeds.follow.created': (event) => {
       const connectedUser = this.client.state.getLatestValue().connected_user;
       const result = handleFollowCreated(
-        event,
+        event.follow,
         this.currentState,
         this.fid,
         connectedUser?.id,
@@ -336,7 +336,7 @@ export class Feed extends FeedApi {
     'feeds.follow.deleted': (event) => {
       const connectedUser = this.client.state.getLatestValue().connected_user;
       const result = handleFollowDeleted(
-        event,
+        event.follow,
         this.currentState,
         this.fid,
         connectedUser?.id,

@@ -1,9 +1,4 @@
-import {
-  FollowCreatedEvent,
-  FollowDeletedEvent,
-  FollowUpdatedEvent,
-  FollowResponse,
-} from '../gen/models';
+import { FollowUpdatedEvent, FollowResponse } from '../gen/models';
 import { UpdateStateResult } from '../types-internal';
 
 export type FollowState = {
@@ -15,49 +10,49 @@ export type FollowState = {
 };
 
 export const handleFollowCreated = (
-  event: FollowCreatedEvent,
+  follow: FollowResponse,
   currentState: FollowState,
   currentFeedId: string,
   connectedUserId?: string,
 ): UpdateStateResult<FollowState> => {
   // filter non-accepted follows (the way getOrCreate does by default)
-  if (event.follow.status !== 'accepted') {
+  if (follow.status !== 'accepted') {
     return { changed: false, ...currentState };
   }
 
   let newState: FollowState = { ...currentState };
 
   // this feed followed someone
-  if (event.follow.source_feed.fid === currentFeedId) {
+  if (follow.source_feed.fid === currentFeedId) {
     newState = {
       ...newState,
-      ...event.follow.source_feed,
+      ...follow.source_feed,
     };
 
     // Only update if following array already exists
     if (currentState.following !== undefined) {
-      newState.following = [event.follow, ...currentState.following];
+      newState.following = [follow, ...currentState.following];
     }
   } else if (
     // someone followed this feed
-    event.follow.target_feed.fid === currentFeedId
+    follow.target_feed.fid === currentFeedId
   ) {
-    const source = event.follow.source_feed;
+    const source = follow.source_feed;
 
     newState = {
       ...newState,
-      ...event.follow.target_feed,
+      ...follow.target_feed,
     };
 
     if (source.created_by.id === connectedUserId) {
       newState.own_follows = currentState.own_follows
-        ? currentState.own_follows.concat(event.follow)
-        : [event.follow];
+        ? currentState.own_follows.concat(follow)
+        : [follow];
     }
 
     // Only update if followers array already exists
     if (currentState.followers !== undefined) {
-      newState.followers = [event.follow, ...currentState.followers];
+      newState.followers = [follow, ...currentState.followers];
     }
   }
 
@@ -65,7 +60,7 @@ export const handleFollowCreated = (
 };
 
 export const handleFollowDeleted = (
-  event: FollowDeletedEvent,
+  follow: FollowResponse,
   currentState: FollowState,
   currentFeedId: string,
   connectedUserId?: string,
@@ -73,27 +68,27 @@ export const handleFollowDeleted = (
   let newState: FollowState = { ...currentState };
 
   // this feed unfollowed someone
-  if (event.follow.source_feed.fid === currentFeedId) {
+  if (follow.source_feed.fid === currentFeedId) {
     newState = {
       ...newState,
-      ...event.follow.source_feed,
+      ...follow.source_feed,
     };
 
     // Only update if following array already exists
     if (currentState.following !== undefined) {
       newState.following = currentState.following.filter(
-        (follow) => follow.target_feed.fid !== event.follow.target_feed.fid,
+        (followItem) => followItem.target_feed.fid !== follow.target_feed.fid,
       );
     }
   } else if (
     // someone unfollowed this feed
-    event.follow.target_feed.fid === currentFeedId
+    follow.target_feed.fid === currentFeedId
   ) {
-    const source = event.follow.source_feed;
+    const source = follow.source_feed;
 
     newState = {
       ...newState,
-      ...event.follow.target_feed,
+      ...follow.target_feed,
     };
 
     if (
@@ -101,14 +96,14 @@ export const handleFollowDeleted = (
       currentState.own_follows !== undefined
     ) {
       newState.own_follows = currentState.own_follows.filter(
-        (follow) => follow.source_feed.fid !== event.follow.source_feed.fid,
+        (followItem) => followItem.source_feed.fid !== follow.source_feed.fid,
       );
     }
 
     // Only update if followers array already exists
     if (currentState.followers !== undefined) {
       newState.followers = currentState.followers.filter(
-        (follow) => follow.source_feed.fid !== event.follow.source_feed.fid,
+        (followItem) => followItem.source_feed.fid !== follow.source_feed.fid,
       );
     }
   }
