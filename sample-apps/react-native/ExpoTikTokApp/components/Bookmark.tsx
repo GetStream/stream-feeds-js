@@ -5,7 +5,6 @@ import {
   ActivityResponse,
   useBookmarkActions,
 } from '@stream-io/feeds-react-native-sdk';
-import { useFeedsClient } from '@stream-io/feeds-react-native-sdk';
 
 type BookmarkIconProps = {
   size: number;
