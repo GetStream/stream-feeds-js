@@ -135,6 +135,7 @@ describe('Feed follow and unfollow', () => {
       await Promise.all([
         feed.follow(secondUserFeed.fid),
         waitForEvent(feed, 'feeds.follow.created', { shouldReject: true }),
+        waitForEvent(feed, 'feeds.feed.updated', { shouldReject: true }),
       ]);
 
       expect(feed.currentState.following).toHaveLength(1);
@@ -148,6 +149,7 @@ describe('Feed follow and unfollow', () => {
           source: secondUserTimeline.fid,
         }),
         waitForEvent(feed, 'feeds.follow.created', { shouldReject: true }),
+        waitForEvent(feed, 'feeds.feed.updated', { shouldReject: true }),
       ]);
 
       expect(feed.currentState.followers).toHaveLength(1);
@@ -158,6 +160,7 @@ describe('Feed follow and unfollow', () => {
       await Promise.all([
         feed.unfollow(secondUserFeed.fid),
         waitForEvent(feed, 'feeds.follow.deleted', { shouldReject: true }),
+        waitForEvent(feed, 'feeds.feed.updated', { shouldReject: true }),
       ]);
 
       expect(feed.currentState.following).toHaveLength(0);
@@ -170,10 +173,10 @@ describe('Feed follow and unfollow', () => {
           target: feed.fid,
           source: secondUserTimeline.fid,
         }),
-        await waitForEvent(feed, 'feeds.follow.deleted', {
+        waitForEvent(feed, 'feeds.follow.deleted', {
           shouldReject: true,
-          timeoutMs: 10000,
         }),
+        waitForEvent(feed, 'feeds.feed.updated', { shouldReject: true }),
       ]);
 
       expect(feed.currentState.following).toHaveLength(0);
