@@ -55,23 +55,23 @@ const renderItem = ({ item }: { item: CommentResponse }) => {
 const keyExtractor = (item: CommentResponse) => item.id
 
 export const Comments = ({ activity }: { activity: ActivityResponse }) => {
-  const { comments = [], loadNextPage } = useComments({ parent: activity }) ?? {};
+  const { comments = [], is_loading_next_page, has_next_page, loadNextPage } = useComments({ parent: activity }) ?? {};
 
   const loadNext = useStableCallback(() => {
-    if (!loadNextPage) {
+    if (!loadNextPage || !has_next_page || is_loading_next_page) {
       return;
     }
     loadNextPage({ sort: 'last', limit: 5 });
   })
 
   useEffect(() => {
-    if (comments?.length || !loadNextPage) return;
+    if (comments?.length || !loadNextPage || is_loading_next_page) return;
 
     void loadNextPage({
       sort: 'last',
       limit: 10,
     });
-  }, [activity, comments, loadNextPage]);
+  }, [activity, comments, is_loading_next_page, loadNextPage]);
 
   return (
     <FlatList
