@@ -502,6 +502,7 @@ export class Feed extends FeedApi {
       });
     },
     'feeds.notification_feed.updated': (event) => {
+      console.info('notification feed updated', event);
       // TODO: handle notification feed updates
     },
     // the poll events should be removed from here
