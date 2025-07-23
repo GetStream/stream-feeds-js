@@ -67,7 +67,7 @@ describe('utils', () => {
     });
 
     it('should handle empty existing array', () => {
-      const existingArray: { id: string; name: string }[] = [];
+      const existingArray: Array<{ id: string; name: string }> = [];
       const arrayToMerge = [
         { id: '1', name: 'Alice' },
         { id: '2', name: 'Bob' },
@@ -87,7 +87,7 @@ describe('utils', () => {
         { id: '1', name: 'Alice' },
         { id: '2', name: 'Bob' },
       ];
-      const arrayToMerge: { id: string; name: string }[] = [];
+      const arrayToMerge: Array<{ id: string; name: string }> = [];
       const getKey = (item: { id: string; name: string }) => item.id;
 
       const result = uniqueMerge(existingArray, arrayToMerge, getKey);
@@ -99,8 +99,8 @@ describe('utils', () => {
     });
 
     it('should handle both arrays being empty', () => {
-      const existingArray: { id: string; name: string }[] = [];
-      const arrayToMerge: { id: string; name: string }[] = [];
+      const existingArray: Array<{ id: string; name: string }> = [];
+      const arrayToMerge: Array<{ id: string; name: string }> = [];
       const getKey = (item: { id: string; name: string }) => item.id;
 
       const result = uniqueMerge(existingArray, arrayToMerge, getKey);
