@@ -43,7 +43,7 @@ export default function ProfilePage() {
 
     initializeFeed(feed, {
       watch: true,
-      followers_pagination: { limit: 1 },
+      followers_pagination: { limit: 10 },
     }).catch((error) => {
       logErrorAndDisplayNotification(
         error,
@@ -54,7 +54,7 @@ export default function ProfilePage() {
     });
     initializeFeed(timeline, {
       watch: true,
-      following_pagination: { limit: 1 },
+      following_pagination: { limit: 10 },
     }).catch((error) => {
       logErrorAndDisplayNotification(
         error,

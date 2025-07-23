@@ -115,7 +115,6 @@ describe('follow-utils', () => {
 
       const currentState: FollowState = {
         following: [],
-        following_pagination: { next: undefined },
       };
 
       const result = handleFollowCreated(
@@ -126,10 +125,10 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.following).toHaveLength(1);
-      expect(result.following?.[0]).toEqual(follow);
-      expect(result).toMatchObject(follow.source_feed);
-      expect(result.own_follows).toBeUndefined();
+      expect(result.data.following).toHaveLength(1);
+      expect(result.data.following?.[0]).toEqual(follow);
+      expect(result.data).toMatchObject(follow.source_feed);
+      expect(result.data.own_follows).toBeUndefined();
     });
 
     it('should handle when someone follows this feed', () => {
@@ -154,7 +153,6 @@ describe('follow-utils', () => {
 
       const currentState: FollowState = {
         followers: [],
-        followers_pagination: { next: undefined },
       };
 
       const result = handleFollowCreated(
@@ -165,10 +163,10 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.followers).toHaveLength(1);
-      expect(result.followers?.[0]).toEqual(follow);
-      expect(result).toMatchObject(follow.target_feed);
-      expect(result.own_follows).toBeUndefined();
+      expect(result.data.followers).toHaveLength(1);
+      expect(result.data.followers?.[0]).toEqual(follow);
+      expect(result.data).toMatchObject(follow.target_feed);
+      expect(result.data.own_follows).toBeUndefined();
     });
 
     it('should add to own_follows when connected user is the source', () => {
@@ -193,7 +191,6 @@ describe('follow-utils', () => {
 
       const currentState: FollowState = {
         followers: [],
-        followers_pagination: { next: undefined },
         own_follows: [],
       };
 
@@ -205,8 +202,8 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.own_follows).toHaveLength(1);
-      expect(result.own_follows?.[0]).toEqual(follow);
+      expect(result.data.own_follows).toHaveLength(1);
+      expect(result.data.own_follows?.[0]).toEqual(follow);
     });
 
     it('should not update followers/following when they are undefined', () => {
@@ -228,7 +225,6 @@ describe('follow-utils', () => {
 
       const currentState: FollowState = {
         followers: undefined,
-        followers_pagination: { next: 'next-cursor' },
       };
 
       const result = handleFollowCreated(
@@ -239,8 +235,8 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.followers).toBeUndefined();
-      expect(result).toMatchObject(follow.target_feed);
+      expect(result.data.followers).toBeUndefined();
+      expect(result.data).toMatchObject(follow.target_feed);
     });
 
     it('should add new followers to the top of existing arrays', () => {
@@ -272,7 +268,6 @@ describe('follow-utils', () => {
 
       const currentState: FollowState = {
         followers: [existingFollow],
-        followers_pagination: { next: 'next-cursor' },
       };
 
       const result = handleFollowCreated(
@@ -283,9 +278,9 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.followers).toHaveLength(2);
-      expect(result.followers?.[0]).toEqual(follow);
-      expect(result.followers?.[1]).toEqual(existingFollow);
+      expect(result.data.followers).toHaveLength(2);
+      expect(result.data.followers?.[0]).toEqual(follow);
+      expect(result.data.followers?.[1]).toEqual(existingFollow);
     });
   });
 
@@ -321,8 +316,8 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.following).toHaveLength(0);
-      expect(result).toMatchObject(follow.source_feed);
+      expect(result.data.following).toHaveLength(0);
+      expect(result.data).toMatchObject(follow.source_feed);
     });
 
     it('should handle when someone unfollows this feed', () => {
@@ -360,9 +355,9 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.followers).toHaveLength(0);
-      expect(result.own_follows).toEqual(currentState.own_follows);
-      expect(result).toMatchObject(follow.target_feed);
+      expect(result.data.followers).toHaveLength(0);
+      expect(result.data.own_follows).toEqual(currentState.own_follows);
+      expect(result.data).toMatchObject(follow.target_feed);
     });
 
     it('should only remove own_follows when connected user is the source', () => {
@@ -397,8 +392,8 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.followers).toHaveLength(0);
-      expect(result.own_follows).toHaveLength(0);
+      expect(result.data.followers).toHaveLength(0);
+      expect(result.data.own_follows).toHaveLength(0);
     });
 
     it('should not remove own_follows when connected user is not the source', () => {
@@ -433,8 +428,8 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.followers).toHaveLength(0);
-      expect(result.own_follows).toHaveLength(1); // Should remain unchanged
+      expect(result.data.followers).toHaveLength(0);
+      expect(result.data.own_follows).toHaveLength(1); // Should remain unchanged
     });
 
     it('should not update followers/following when they are undefined in delete', () => {
@@ -469,9 +464,9 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.followers).toBeUndefined();
-      expect(result.own_follows).toBeUndefined();
-      expect(result).toMatchObject(follow.target_feed);
+      expect(result.data.followers).toBeUndefined();
+      expect(result.data.own_follows).toBeUndefined();
+      expect(result.data).toMatchObject(follow.target_feed);
     });
 
     it('should filter out the correct follow by target feed id', () => {
@@ -521,8 +516,8 @@ describe('follow-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.following).toHaveLength(1);
-      expect(result.following?.[0]).toEqual(followToKeep);
+      expect(result.data.following).toHaveLength(1);
+      expect(result.data.following?.[0]).toEqual(followToKeep);
     });
   });
 

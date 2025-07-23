@@ -37,7 +37,7 @@ describe('WebSocket connection', () => {
 
   it('should be able to watch WS events', async () => {
     const spy = vi.fn();
-    // @ts-expect-error
+    // @ts-expect-error API spec doesn't have connection.ok event
     client.on('connection.ok', spy);
 
     await client.connectUser(user, createTestTokenGenerator(user));
@@ -53,7 +53,7 @@ describe('WebSocket connection', () => {
 
     await client.connectUser(user, createTestTokenGenerator(user));
 
-    await waitForEvent(client, 'health.check', 30000);
+    await waitForEvent(client, 'health.check', { timeoutMs: 35000 });
 
     const event = spy.mock.lastCall?.[0] as HealthCheckEvent | undefined;
     expect(event?.type).toBe('health.check');

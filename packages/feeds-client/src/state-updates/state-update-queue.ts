@@ -6,19 +6,19 @@ export const shouldUpdateState = ({
   watch,
 }: {
   stateUpdateId: string;
-  stateUpdateQueue: string[];
+  stateUpdateQueue: Set<string>;
   watch: boolean;
 }) => {
   if (!watch) {
     return true;
   }
 
-  if (watch && stateUpdateQueue.includes(stateUpdateId)) {
-    stateUpdateQueue.splice(stateUpdateQueue.indexOf(stateUpdateId), 1);
+  if (watch && stateUpdateQueue.has(stateUpdateId)) {
+    stateUpdateQueue.delete(stateUpdateId);
     return false;
   }
 
-  stateUpdateQueue.push(stateUpdateId);
+  stateUpdateQueue.add(stateUpdateId);
   return true;
 };
 

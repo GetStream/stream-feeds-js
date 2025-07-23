@@ -1,16 +1,10 @@
-import {
-  FollowUpdatedEvent,
-  FollowResponse,
-  FeedResponse,
-} from '../gen/models';
+import { FollowResponse, FeedResponse } from '../gen/models';
 import { UpdateStateResult } from '../types-internal';
 
 export type FollowState = {
   followers?: FollowResponse[];
   following?: FollowResponse[];
   own_follows?: FollowResponse[];
-  followers_pagination?: { next?: string; sort?: any };
-  following_pagination?: { next?: string; sort?: any };
 };
 
 const isFeedResponse = (
@@ -24,10 +18,10 @@ export const handleFollowCreated = (
   currentState: FollowState,
   currentFeedId: string,
   connectedUserId?: string,
-): UpdateStateResult<FollowState> => {
+): UpdateStateResult<{ data: FollowState }> => {
   // filter non-accepted follows (the way getOrCreate does by default)
   if (follow.status !== 'accepted') {
-    return { changed: false, ...currentState };
+    return { changed: false, data: currentState };
   }
 
   let newState: FollowState = { ...currentState };
@@ -66,7 +60,7 @@ export const handleFollowCreated = (
     }
   }
 
-  return { changed: true, ...newState };
+  return { changed: true, data: newState };
 };
 
 export const handleFollowDeleted = (
@@ -76,7 +70,7 @@ export const handleFollowDeleted = (
   currentState: FollowState,
   currentFeedId: string,
   connectedUserId?: string,
-): UpdateStateResult<FollowState> => {
+): UpdateStateResult<{ data: FollowState }> => {
   let newState: FollowState = { ...currentState };
 
   // this feed unfollowed someone
@@ -121,16 +115,11 @@ export const handleFollowDeleted = (
     }
   }
 
-  return { changed: true, ...newState };
+  return { changed: true, data: newState };
 };
 
-export const handleFollowUpdated = (
-  event: FollowUpdatedEvent,
-  currentState: FollowState,
-  currentFeedId: string,
-  connectedUserId?: string,
-): UpdateStateResult<FollowState> => {
+export const handleFollowUpdated = (): UpdateStateResult<FollowState> => {
   // For now, we'll treat follow updates as no-ops since the current implementation does
   // This can be enhanced later if needed
-  return { changed: false, ...currentState };
+  return { changed: false };
 };

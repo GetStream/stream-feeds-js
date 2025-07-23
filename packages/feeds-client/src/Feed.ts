@@ -41,7 +41,7 @@ import {
   handleFollowDeleted,
   handleFollowUpdated,
 } from './state-updates/follow-utils';
-import { FeedsApi, StreamResponse } from './gen-imports';
+import { StreamResponse } from './gen-imports';
 import { capitalize } from './common/utils';
 import type {
   ActivityIdOrCommentId,
@@ -142,7 +142,7 @@ type EventHandlerByEventType = {
 export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private static readonly noop = () => {};
-  private stateUpdateQueue: string[] = [];
+  private stateUpdateQueue: Set<string> = new Set();
 
   private readonly eventHandlers: EventHandlerByEventType = {
     'feeds.activity.added': (event) => {
@@ -336,13 +336,7 @@ export class Feed extends FeedApi {
       this.handleFollowDeleted(event.follow);
     },
     'feeds.follow.updated': (event) => {
-      const connectedUser = this.client.state.getLatestValue().connected_user;
-      const result = handleFollowUpdated(
-        event,
-        this.currentState,
-        this.fid,
-        connectedUser?.id,
-      );
+      const result = handleFollowUpdated();
       if (result.changed) {
         this.state.next((currentState) => ({
           ...currentState,
@@ -594,7 +588,7 @@ export class Feed extends FeedApi {
         }
       } else {
         // Empty queue when reinitializing the state
-        this.stateUpdateQueue = [];
+        this.stateUpdateQueue = new Set();
         const responseCopy: Partial<
           StreamResponse<GetOrCreateFeedResponse>['feed'] &
             StreamResponse<GetOrCreateFeedResponse>
@@ -654,7 +648,11 @@ export class Feed extends FeedApi {
     const connectedUser = this.client.state.getLatestValue().connected_user;
     const result = handleFollowCreated(
       follow,
-      this.currentState,
+      {
+        followers: this.currentState.followers,
+        following: this.currentState.following,
+        own_follows: this.currentState.own_follows,
+      },
       this.fid,
       connectedUser?.id,
     );
@@ -668,7 +666,7 @@ export class Feed extends FeedApi {
         return {
           ...currentState,
           ...(shouldIncrement ? { [key]: (currentState[key] ?? 0) + 1 } : {}),
-          ...result,
+          ...result.data,
         };
       });
     }
@@ -696,7 +694,11 @@ export class Feed extends FeedApi {
     const connectedUser = this.client.state.getLatestValue().connected_user;
     const result = handleFollowDeleted(
       follow,
-      this.currentState,
+      {
+        followers: this.currentState.followers,
+        following: this.currentState.following,
+        own_follows: this.currentState.own_follows,
+      },
       this.fid,
       connectedUser?.id,
     );
@@ -706,10 +708,11 @@ export class Feed extends FeedApi {
       // If we're not watching, update following/followers count
       // If we're watching we can't do eager state update since we don't know if feed.updated event arrived or not already
       const shouldDecrement = !this.currentState.watch;
+
       this.state.next((currentState) => ({
         ...currentState,
         ...(shouldDecrement ? { [key]: (currentState[key] ?? 0) - 1 } : {}),
-        ...result,
+        ...result.data,
       }));
     }
   }
@@ -1000,19 +1003,19 @@ export class Feed extends FeedApi {
       });
 
       this.state.next((currentState) => {
-        // Create a map of existing follows to avoid duplicates
-        const existingFollowsMap = new Map();
+        // Create a set of existing follows to avoid duplicates
+        const existingFollows = new Set<string>();
         if (currentState[type]) {
           currentState[type].forEach((follow) => {
             const key = `${follow.source_feed.fid}-${follow.target_feed.fid}`;
-            existingFollowsMap.set(key, follow);
+            existingFollows.add(key);
           });
         }
 
         // Add new follows, avoiding duplicates
         const newFollows = follows.filter((follow) => {
           const key = `${follow.source_feed.fid}-${follow.target_feed.fid}`;
-          return !existingFollowsMap.has(key);
+          return !existingFollows.has(key);
         });
 
         return {
