@@ -42,12 +42,12 @@ export const FeedContextProvider = ({ children }: PropsWithChildren) => {
       const _ownTimeline = client.feed('timeline', user.id);
       setOwnTimeline(_ownTimeline);
       _ownFeed
-        ?.getOrCreate({ watch: true, followers_pagination: { limit: 2 } })
+        ?.getOrCreate({ watch: true, followers_pagination: { limit: 30 } })
         .catch(throwUnrecoverableError);
       _ownTimeline
         ?.getOrCreate({
           watch: true,
-          following_pagination: { limit: 2 },
+          following_pagination: { limit: 30 },
         })
         .catch(throwUnrecoverableError);
     }

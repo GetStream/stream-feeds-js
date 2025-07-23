@@ -44,8 +44,6 @@ The state update util method should receive a WebSocket event (and some addition
 
 These methods should be able to do the state update both from an HTTP response or a WebSocket event. The state update util method should receive relevant objects (for example `event.follow` or `response.follow`).
 
-To avoid duplicated state updates these methods should also receive an ID, and a state update queue, to check if that specific operation was handled already or not.
-
 ## Tests
 
 Tests can be run with the `yarn test` command in `packages/feeds-client` folder.
