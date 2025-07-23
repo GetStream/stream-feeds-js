@@ -1,5 +1,6 @@
 import {
-  ActivityResponse, CommentResponse,
+  ActivityResponse,
+  CommentResponse,
   useComments,
 } from '@stream-io/feeds-react-native-sdk';
 import {
@@ -7,6 +8,7 @@ import {
   Image,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, { useEffect } from 'react';
@@ -14,15 +16,34 @@ import { Reaction } from '@/components/Reaction';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useStableCallback } from '@/hooks/useStableCallback';
 
-const Comment = ({ comment: item }: { comment: CommentResponse }) => {
-  const formattedDate = useFormatDate({ date: item.created_at });
+const Comment = ({
+  comment,
+  depth = 0,
+}: {
+  comment: CommentResponse;
+  depth?: number;
+}) => {
+  const formattedDate = useFormatDate({ date: comment.created_at });
+  const {
+    comments = [],
+    is_loading_next_page,
+    has_next_page,
+    loadNextPage,
+  } = useComments({ parent: comment }) ?? {};
+
+  const loadNext = useStableCallback(async () => {
+    if (is_loading_next_page || !loadNextPage || !has_next_page) {
+      return;
+    }
+    loadNextPage({ sort: 'last', limit: 5 });
+  });
   return (
     <View style={styles.commentBlock}>
       <View style={styles.commentRow}>
-        <Image source={{ uri: item?.user.image }} style={styles.avatar} />
+        <Image source={{ uri: comment?.user.image }} style={styles.avatar} />
         <View style={styles.commentContent}>
-          <Text style={styles.commentUser}>{item.user.id}</Text>
-          <Text style={styles.commentText}>{item.text}</Text>
+          <Text style={styles.commentUser}>{comment.user.id}</Text>
+          <Text style={styles.commentText}>{comment.text}</Text>
           <View style={styles.metaRow}>
             <Text style={styles.commentDate}>{formattedDate}</Text>
             <Text style={styles.replyText}> Reply</Text>
@@ -30,40 +51,57 @@ const Comment = ({ comment: item }: { comment: CommentResponse }) => {
         </View>
 
         <View style={styles.reactionContainer}>
-          <Reaction type="like" color="black" entity={item} />
-          <Text style={styles.reactionCount}>{item.reaction_groups?.like?.count ?? 0}</Text>
-          <Reaction type="downvote" color="black" entity={item} />
+          <Reaction type="like" color="black" entity={comment} />
+          <Text style={styles.reactionCount}>
+            {comment.reaction_groups?.like?.count ?? 0}
+          </Text>
+          <Reaction type="downvote" color="black" entity={comment} />
         </View>
       </View>
 
-      {/* Replies */}
-      {/* {item.replies && item.replies.length > 0 && ( */}
-      {/*   <TouchableOpacity style={styles.viewReplies}> */}
-      {/*     <Text style={styles.viewRepliesText}> */}
-      {/*       View {item.replies.length} replies ↓ */}
-      {/*     </Text> */}
-      {/*   </TouchableOpacity> */}
-      {/* )} */}
+      {comments?.length > 0 ? (
+        <View style={styles.replySection}>
+          {comments.map((subComment) => (
+            <Comment
+              key={subComment.id}
+              comment={subComment}
+              depth={depth + 1}
+            />
+          ))}
+        </View>
+      ) : null}
+
+      {depth < 1 && comment.reply_count > 0 && has_next_page ? (
+        <TouchableOpacity onPress={loadNext} style={styles.viewReplies}>
+          <Text style={styles.viewRepliesText}>
+            View {comment.reply_count} replies ↓
+          </Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
-  )
-}
+  );
+};
 
 const renderItem = ({ item }: { item: CommentResponse }) => {
-  return <Comment comment={item} />
-}
+  return <Comment comment={item} />;
+};
 
-const keyExtractor = (item: CommentResponse) => item.id
+const keyExtractor = (item: CommentResponse) => item.id;
 
 export const Comments = ({ activity }: { activity: ActivityResponse }) => {
-  console.log('TEST: ', activity);
-  const { comments = [], is_loading_next_page, has_next_page, loadNextPage } = useComments({ parent: activity }) ?? {};
+  const {
+    comments = [],
+    is_loading_next_page,
+    has_next_page,
+    loadNextPage,
+  } = useComments({ parent: activity }) ?? {};
 
   const loadNext = useStableCallback(() => {
     if (!loadNextPage || !has_next_page || is_loading_next_page) {
       return;
     }
     loadNextPage({ sort: 'last', limit: 5 });
-  })
+  });
 
   useEffect(() => {
     if (comments?.length || !loadNextPage || is_loading_next_page) return;
@@ -203,5 +241,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#0af',
     marginLeft: 12,
+  },
+  replySection: {
+    paddingLeft: 32,
   },
 });

@@ -17,8 +17,6 @@ const CommentsModalUI = ({ activityId }: { activityId: string }) => {
     [activities, activityId],
   );
 
-  console.log('ACTIVITY TEST: ', activities, activityId, activity);
-
   return (
     <SafeAreaView style={styles.container}>
       {activity ? <Comments activity={activity} /> : null}
