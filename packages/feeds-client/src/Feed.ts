@@ -335,7 +335,7 @@ export class Feed extends FeedApi {
     'feeds.follow.deleted': (event) => {
       this.handleFollowDeleted(event.follow);
     },
-    'feeds.follow.updated': (event) => {
+    'feeds.follow.updated': (_event) => {
       const result = handleFollowUpdated();
       if (result.changed) {
         this.state.next((currentState) => ({
