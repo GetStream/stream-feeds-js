@@ -15,6 +15,12 @@ import React, { useEffect } from 'react';
 import { Reaction } from '@/components/Reaction';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useStableCallback } from '@/hooks/useStableCallback';
+import { useCommentsInputActionsContext } from '@/contexts/CommentsInputContext';
+
+const maintainVisibleContentPosition = {
+  minIndexForVisible: 1,
+  autoscrollToTopThreshold: 10,
+};
 
 const Comment = ({
   comment,
@@ -32,12 +38,15 @@ const Comment = ({
     loadNextPage,
   } = useComments({ parent: comment }) ?? {};
 
+  const { setParent } = useCommentsInputActionsContext();
+
   const loadNext = useStableCallback(async () => {
     if (is_loading_next_page || !loadNextPage || !has_next_page) {
       return;
     }
     loadNextPage({ sort: 'last', limit: 5 });
   });
+
   return (
     <View
       style={[
@@ -55,7 +64,11 @@ const Comment = ({
           <Text style={styles.commentText}>{comment.text}</Text>
           <View style={styles.metaRow}>
             <Text style={styles.commentDate}>{formattedDate}</Text>
-            <Text style={styles.replyText}> Reply</Text>
+            {isFirstLevel ? (
+              <TouchableOpacity onPress={() => setParent(comment)}>
+                <Text style={styles.replyText}> Reply</Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
 
@@ -131,6 +144,7 @@ export const Comments = ({ activity }: { activity: ActivityResponse }) => {
       renderItem={renderItem}
       onEndReached={loadNext}
       onEndReachedThreshold={0.2}
+      maintainVisibleContentPosition={maintainVisibleContentPosition}
     />
   );
 };

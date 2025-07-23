@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,29 +14,72 @@ import {
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
+import {
+  useCommentsInputActionsContext,
+  useCommentsInputContext,
+} from '@/contexts/CommentsInputContext';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
+
+const INPUT_METADATA_HEIGHT = 25;
 
 export const CommentsInput = ({ activityId }: { activityId: string }) => {
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
   const [text, setText] = useState('');
+  const { setParent } = useCommentsInputActionsContext();
+  const { parent } = useCommentsInputContext();
+
+  const panelY = useSharedValue(0);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: panelY.value,
+  }));
+
+  const resetContextValues = useStableCallback(() => {
+    setParent(undefined);
+  });
 
   const handleSend = useStableCallback(() => {
     if (!text.trim()) return;
-    client?.addComment({
-      comment: text as string,
-      object_id: activityId,
-      object_type: 'activity',
-      // FIXME: Handle deeply nested comments too
-      // parent_id: activityId,
-    }).catch(e => console.error(e));
+    client
+      ?.addComment({
+        comment: text as string,
+        object_id: activityId,
+        object_type: 'activity',
+        // FIXME: Handle deeply nested comments too
+        parent_id: parent?.id,
+      })
+      .catch((e) => console.error(e));
+
+    // cleanup
     setText('');
+    resetContextValues();
   });
+
+  useEffect(() => {
+    if (parent) {
+      panelY.value = withTiming(INPUT_METADATA_HEIGHT, { duration: 100 });
+    } else {
+      panelY.value = 0;
+    }
+  }, [panelY, parent]);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 128 : 0}
     >
+      <Animated.View style={[styles.inputMetadataContainer, animatedStyle]}>
+        <Text style={styles.label}>{`Replying to @${parent?.user.id}`}</Text>
+        <TouchableOpacity onPress={resetContextValues} hitSlop={10}>
+          <Ionicons name="close" size={18} color="#aaa" />
+        </TouchableOpacity>
+      </Animated.View>
       <View style={styles.wrapper}>
         <Image
           source={{
@@ -107,6 +150,28 @@ const styles = StyleSheet.create({
   sendText: {
     color: '#0af',
     fontSize: 15,
+    fontWeight: '600',
+  },
+  inputMetadataContainer: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: '100%', // anchors above the parent (input bar)
+    backgroundColor: '#222',
+    borderRadius: 6,
+    // paddingVertical: 8,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    zIndex: 10,
+  },
+  label: {
+    color: '#ccc',
+    fontSize: 14,
+  },
+  username: {
+    color: '#fff',
     fontWeight: '600',
   },
 });

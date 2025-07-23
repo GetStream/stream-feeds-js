@@ -9,6 +9,7 @@ import {
   StreamFeed,
   useFeedActivities,
 } from '@stream-io/feeds-react-native-sdk';
+import { CommentsInputContextProvider } from '@/contexts/CommentsInputContext';
 
 const CommentsModalUI = ({ activityId }: { activityId: string }) => {
   const { activities } = useFeedActivities();
@@ -19,8 +20,10 @@ const CommentsModalUI = ({ activityId }: { activityId: string }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {activity ? <Comments activity={activity} /> : null}
-      <CommentsInput activityId={activityId} />
+      <CommentsInputContextProvider>
+        {activity ? <Comments activity={activity} /> : null}
+        <CommentsInput activityId={activityId} />
+      </CommentsInputContextProvider>
     </SafeAreaView>
   );
 };
