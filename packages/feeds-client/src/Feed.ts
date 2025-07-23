@@ -353,19 +353,12 @@ export class Feed extends FeedApi {
       this.state.next((currentState) => {
         let newState: FeedState | undefined;
 
-        if (
-          !checkHasAnotherPage(
-            currentState.members,
-            currentState.member_pagination?.next,
-          )
-        ) {
+        if (typeof currentState.members !== 'undefined') {
           newState ??= {
             ...currentState,
           };
 
-          newState.members = newState.members?.concat(event.member) ?? [
-            event.member,
-          ];
+          newState.members = currentState.members.concat(event.member);
         }
 
         if (connectedUser?.id === event.member.user.id) {
@@ -614,6 +607,9 @@ export class Feed extends FeedApi {
           }
           if (!request?.following_pagination?.limit) {
             delete nextState.following;
+          }
+          if (!request?.member_pagination?.limit) {
+            delete nextState.members;
           }
 
           nextState.last_get_or_create_request_config = request;
@@ -1116,7 +1112,7 @@ export class Feed extends FeedApi {
       this.state.next((currentState) => ({
         ...currentState,
         members: currentState.members
-          ? currentState.members.concat(members)
+          ? uniqueArrayMerge(currentState.members, members, ({ user }) => user.id)
           : members,
         member_pagination: {
           ...currentState.member_pagination,
