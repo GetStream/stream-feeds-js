@@ -501,6 +501,10 @@ export class Feed extends FeedApi {
         return newState ?? currentState;
       });
     },
+    'feeds.notification_feed.updated': (event) => {
+      console.info('notification feed updated', event);
+      // TODO: handle notification feed updates
+    },
     // the poll events should be removed from here
     'feeds.poll.closed': Feed.noop,
     'feeds.poll.deleted': Feed.noop,

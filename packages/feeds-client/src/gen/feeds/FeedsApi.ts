@@ -2225,7 +2225,6 @@ export class FeedsApi {
     request: UpdateLiveLocationRequest,
   ): Promise<StreamResponse<SharedLocationResponse>> {
     const body = {
-      created_by_device_id: request?.created_by_device_id,
       message_id: request?.message_id,
       end_at: request?.end_at,
       latitude: request?.latitude,

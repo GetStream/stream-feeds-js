@@ -427,11 +427,11 @@ export interface ActivityResponse {
 
   moderation?: ModerationV2Response;
 
+  object?: Record<string, any>;
+
   parent?: ActivityResponse;
 
   poll?: PollResponseData;
-
-  target?: Record<string, any>;
 }
 
 export interface ActivityUnpinnedEvent {
@@ -1181,6 +1181,8 @@ export interface CallParticipant {
   custom: Record<string, any>;
 
   teams_role: Record<string, string>;
+
+  avg_response_time?: number;
 
   ban_expires?: Date;
 
@@ -2354,6 +2356,8 @@ export interface EntityCreator {
 
   teams_role: Record<string, string>;
 
+  avg_response_time?: number;
+
   ban_expires?: Date;
 
   created_at?: Date;
@@ -2405,6 +2409,8 @@ export interface EntityCreatorResponse {
   teams: string[];
 
   custom: Record<string, any>;
+
+  avg_response_time?: number;
 
   deactivated_at?: Date;
 
@@ -3009,6 +3015,8 @@ export interface FullUserResponse {
   teams: string[];
 
   custom: Record<string, any>;
+
+  avg_response_time?: number;
 
   ban_expires?: Date;
 
@@ -3697,6 +3705,24 @@ export interface NotificationConfig {
   track_seen?: boolean;
 }
 
+export interface NotificationFeedUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  aggregated_activities?: AggregatedActivityResponse[];
+
+  notification_status?: NotificationStatusResponse;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface NotificationSettings {
   enabled: boolean;
 
@@ -3772,6 +3798,8 @@ export interface OwnUser {
 
   total_unread_count_by_team: Record<string, number>;
 
+  avg_response_time?: number;
+
   deactivated_at?: Date;
 
   deleted_at?: Date;
@@ -3829,6 +3857,8 @@ export interface OwnUserResponse {
   teams: string[];
 
   custom: Record<string, any>;
+
+  avg_response_time?: number;
 
   deactivated_at?: Date;
 
@@ -5475,8 +5505,6 @@ export interface UpdateFollowResponse {
 }
 
 export interface UpdateLiveLocationRequest {
-  created_by_device_id: string;
-
   message_id: string;
 
   end_at?: Date;
@@ -5610,6 +5638,8 @@ export interface User {
   custom: Record<string, any>;
 
   teams_role: Record<string, string>;
+
+  avg_response_time?: number;
 
   ban_expires?: Date;
 
@@ -5755,6 +5785,8 @@ export interface UserResponse {
 
   custom: Record<string, any>;
 
+  avg_response_time?: number;
+
   deactivated_at?: Date;
 
   deleted_at?: Date;
@@ -5791,6 +5823,8 @@ export interface UserResponseCommonFields {
 
   custom: Record<string, any>;
 
+  avg_response_time?: number;
+
   deactivated_at?: Date;
 
   deleted_at?: Date;
@@ -5826,6 +5860,8 @@ export interface UserResponsePrivacyFields {
   teams: string[];
 
   custom: Record<string, any>;
+
+  avg_response_time?: number;
 
   deactivated_at?: Date;
 
@@ -6006,6 +6042,7 @@ export type WSClientEvent =
   | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
   | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
   | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
+  | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent)
   | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
   | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
   | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
@@ -6051,6 +6088,7 @@ export type WSEvent =
   | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
   | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
   | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
+  | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent)
   | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
   | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
   | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
