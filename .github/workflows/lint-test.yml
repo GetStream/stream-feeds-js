@@ -37,7 +37,7 @@ jobs:
         run: yarn lint:all
 
       - name: Build packages
-        run: NODE_ENV=production yarn build:all
+        run: NODE_ENV=production yarn build:libs
 
       - name: Test packages
         run: yarn test:ci:libs
