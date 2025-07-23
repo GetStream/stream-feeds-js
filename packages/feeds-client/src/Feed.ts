@@ -1049,11 +1049,15 @@ export class Feed extends FeedApi {
     }
   }
 
-  async loadNextPageFollowers(request: Pick<QueryFollowsRequest, 'limit'>) {
+  async loadNextPageFollowers(
+    request: Pick<QueryFollowsRequest, 'limit' | 'sort'>,
+  ) {
     await this.loadNextPageFollows('followers', request);
   }
 
-  async loadNextPageFollowing(request: Pick<QueryFollowsRequest, 'limit'>) {
+  async loadNextPageFollowing(
+    request: Pick<QueryFollowsRequest, 'limit' | 'sort'>,
+  ) {
     await this.loadNextPageFollows('following', request);
   }
 
