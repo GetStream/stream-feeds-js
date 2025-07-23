@@ -61,14 +61,14 @@ export const Comments = ({ activity }: { activity: ActivityResponse }) => {
     if (!loadNextPage) {
       return;
     }
-    loadNextPage({ sort: 'first', limit: 5 });
+    loadNextPage({ sort: 'last', limit: 5 });
   })
 
   useEffect(() => {
     if (comments?.length || !loadNextPage) return;
 
     void loadNextPage({
-      sort: 'first',
+      sort: 'last',
       limit: 10,
     });
   }, [activity, comments, loadNextPage]);
