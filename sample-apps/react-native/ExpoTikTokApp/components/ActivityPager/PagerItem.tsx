@@ -54,6 +54,7 @@ const UnmemoizedPagerItem = ({
               router.push({
                 pathname: '/comments-modal',
                 params: {
+                  feedUserId: activity.user.id,
                   feedGroupId: feed?.group,
                   activityId: activity.id,
                 },

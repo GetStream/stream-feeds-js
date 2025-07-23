@@ -7,7 +7,6 @@ import { useLocalSearchParams } from 'expo-router';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
 import {
   StreamFeed,
-  useClientConnectedUser,
   useFeedActivities,
 } from '@stream-io/feeds-react-native-sdk';
 
@@ -18,6 +17,8 @@ const CommentsModalUI = ({ activityId }: { activityId: string }) => {
     [activities, activityId],
   );
 
+  console.log('ACTIVITY TEST: ', activities, activityId, activity);
+
   return (
     <SafeAreaView style={styles.container}>
       {activity ? <Comments activity={activity} /> : null}
@@ -27,16 +28,19 @@ const CommentsModalUI = ({ activityId }: { activityId: string }) => {
 };
 
 const CommentsModal = () => {
-  const connectedUser = useClientConnectedUser();
-  const { feedGroupId: feedGroupIdParam, activityId: activityIdParam } =
-    useLocalSearchParams();
+  const {
+    feedGroupId: feedGroupIdParam,
+    feedUserId: feedUserIdParam,
+    activityId: activityIdParam,
+  } = useLocalSearchParams();
 
   const feedGroupId = feedGroupIdParam as string;
   const activityId = activityIdParam as string;
+  const feedUserid = feedUserIdParam as string;
 
   const feedConfig = useMemo(
-    () => ({ userId: connectedUser?.id, groupId: feedGroupId }),
-    [connectedUser?.id, feedGroupId],
+    () => ({ userId: feedUserid, groupId: feedGroupId }),
+    [feedUserid, feedGroupId],
   );
 
   const feed = useCreateAndQueryFeed(feedConfig);

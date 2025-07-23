@@ -55,6 +55,7 @@ const renderItem = ({ item }: { item: CommentResponse }) => {
 const keyExtractor = (item: CommentResponse) => item.id
 
 export const Comments = ({ activity }: { activity: ActivityResponse }) => {
+  console.log('TEST: ', activity);
   const { comments = [], is_loading_next_page, has_next_page, loadNextPage } = useComments({ parent: activity }) ?? {};
 
   const loadNext = useStableCallback(() => {
