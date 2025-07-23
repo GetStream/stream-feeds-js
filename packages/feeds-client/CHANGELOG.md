@@ -2,6 +2,11 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.8](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.7...@stream-io/feeds-client-0.1.8) (2025-07-23)
+
+
+* [FEEDS-538] bump openapi to support notifcation event ([#73](https://github.com/GetStream/stream-feeds-js/issues/73)) ([6829746](https://github.com/GetStream/stream-feeds-js/commit/6829746dd64ac171e17133c1d1a44161346cc17b))
+
 ## [0.1.7](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.6...@stream-io/feeds-client-0.1.7) (2025-07-22)
 
 
