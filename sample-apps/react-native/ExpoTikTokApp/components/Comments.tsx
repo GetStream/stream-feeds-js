@@ -23,6 +23,7 @@ const Comment = ({
   comment: CommentResponse;
   depth?: number;
 }) => {
+  const isFirstLevel = depth === 0;
   const formattedDate = useFormatDate({ date: comment.created_at });
   const {
     comments = [],
@@ -38,9 +39,17 @@ const Comment = ({
     loadNextPage({ sort: 'last', limit: 5 });
   });
   return (
-    <View style={styles.commentBlock}>
+    <View
+      style={[
+        styles.commentBlock,
+        isFirstLevel ? styles.commentBlockBorder : {},
+      ]}
+    >
       <View style={styles.commentRow}>
-        <Image source={{ uri: comment?.user.image }} style={styles.avatar} />
+        <Image
+          source={{ uri: comment?.user.image }}
+          style={isFirstLevel ? styles.avatar : styles.replyAvatar}
+        />
         <View style={styles.commentContent}>
           <Text style={styles.commentUser}>{comment.user.id}</Text>
           <Text style={styles.commentText}>{comment.text}</Text>
@@ -71,7 +80,7 @@ const Comment = ({
         </View>
       ) : null}
 
-      {depth < 1 && comment.reply_count > 0 && has_next_page ? (
+      {isFirstLevel && comment.reply_count > 0 && has_next_page ? (
         <TouchableOpacity onPress={loadNext} style={styles.viewReplies}>
           <Text style={styles.viewRepliesText}>
             View {comment.reply_count} replies ↓
@@ -143,13 +152,15 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   commentList: {
+    paddingHorizontal: 12,
     paddingBottom: 100,
   },
-  commentBlock: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+  commentBlockBorder: {
     borderBottomColor: '#eee',
     borderBottomWidth: 1,
+  },
+  commentBlock: {
+    paddingVertical: 10,
   },
   commentRow: {
     flexDirection: 'row',
@@ -159,6 +170,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
+    backgroundColor: '#ccc',
+    marginRight: 8,
+  },
+  replyAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: '#ccc',
     marginRight: 8,
   },
