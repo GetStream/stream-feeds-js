@@ -35,6 +35,7 @@ const createMockActivity = (id: string): ActivityResponse => ({
   search_data: {},
   popularity: 0,
   score: 0,
+  reaction_count: 0,
   user: {
     id: 'user1',
     created_at: new Date(),

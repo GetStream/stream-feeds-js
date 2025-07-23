@@ -13,12 +13,8 @@ export const initializeFeed = (
   const currentState = feed.state.getLatestValue();
 
   // TODO: find another key to consider feed "initialized"
-  if (typeof currentState.activities !== 'undefined') {
+  if (currentState.watch) {
     return Promise.resolve(currentState);
-  }
-
-  if (typeof promisesByFeedId[feed.fid] !== 'undefined') {
-    return promisesByFeedId[feed.fid];
   }
 
   if (currentState.is_loading) {

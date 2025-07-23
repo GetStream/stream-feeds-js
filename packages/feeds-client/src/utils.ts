@@ -26,3 +26,19 @@ export const isCommentResponse = (
 export const Constants = {
   DEFAULT_COMMENT_PAGINATION: 'first',
 } as const;
+
+export const uniqueMerge = <T>(
+  existingArray: T[],
+  arrayToMerge: T[],
+  getKey: (v: T) => string,
+) => {
+  const keys = existingArray.map(getKey);
+  const existing = new Set<string>(keys);
+
+  const filteredArrayToMerge = arrayToMerge.filter((value) => {
+    const key = getKey(value);
+    return !existing.has(key);
+  });
+
+  return existingArray.concat(filteredArrayToMerge);
+};

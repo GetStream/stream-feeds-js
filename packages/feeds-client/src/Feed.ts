@@ -50,7 +50,7 @@ import type {
   LoadingStates,
   PagerResponseWithLoadingStates,
 } from './types';
-import { checkHasAnotherPage, Constants } from './utils';
+import { checkHasAnotherPage, Constants, uniqueMerge } from './utils';
 import {
   getStateUpdateQueueIdForFollow,
   getStateUpdateQueueIdForUnfollow,
@@ -1012,17 +1012,17 @@ export class Feed extends FeedApi {
           });
         }
 
-        // Add new follows, avoiding duplicates
-        const newFollows = follows.filter((follow) => {
-          const key = `${follow.source_feed.fid}-${follow.target_feed.fid}`;
-          return !existingFollows.has(key);
-        });
-
         return {
           ...currentState,
-          [type]: currentState[type]
-            ? currentState[type].concat(newFollows)
-            : newFollows,
+          [type]:
+            currentState[type] === undefined
+              ? follows
+              : uniqueMerge(
+                  currentState[type],
+                  follows,
+                  (follow) =>
+                    `${follow.source_feed.fid}-${follow.target_feed.fid}`,
+                ),
           [paginationKey]: {
             ...currentState[paginationKey],
             next: newNextCursor,

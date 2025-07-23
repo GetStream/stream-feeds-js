@@ -38,23 +38,27 @@ export const FollowRelationships = ({
     },
     [type],
   );
-  const { follows = [], pagination } = useStateStore(feed.state, selector);
+  const { follows, pagination } = useStateStore(feed.state, selector);
 
-  const rel = useMemo(
-    () =>
-      follows.filter(
+  const rel = useMemo(() => {
+    return (
+      follows?.filter(
         (f) => f.source_feed.created_by.id !== f.target_feed.created_by.id,
-      ),
-    [follows],
-  );
+      ) ?? []
+    );
+  }, [follows]);
 
   const loadMore = useCallback(async () => {
     setError(undefined);
     try {
       if (type === 'followers') {
-        feed.loadNextPageFollowers({ limit: 30 });
+        feed.loadNextPageFollowers({
+          limit: 30,
+        });
       } else if (type === 'following') {
-        feed.loadNextPageFollowing({ limit: 30 });
+        feed.loadNextPageFollowing({
+          limit: 30,
+        });
       }
     } catch (e) {
       setError(e as Error);
@@ -62,10 +66,10 @@ export const FollowRelationships = ({
   }, [feed, type]);
 
   useEffect(() => {
-    if (typeof pagination?.next === 'undefined') {
+    if (typeof follows === 'undefined') {
       void loadMore();
     }
-  }, [loadMore, pagination]);
+  }, [loadMore, follows]);
 
   const renderItem = (follow: FollowResponse) => {
     const image =
