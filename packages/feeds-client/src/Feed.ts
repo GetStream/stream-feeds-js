@@ -16,6 +16,7 @@ import {
   BookmarkUpdatedEvent,
   QueryFeedMembersRequest,
   SortParamRequest,
+  ThreadedCommentResponse,
 } from './gen/models';
 import { Patch, StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -548,10 +549,6 @@ export class Feed extends FeedApi {
       comments_by_entity_id: {},
     });
     this.client = client;
-    this.state.subscribeWithSelector(
-      (nv) => [nv.comments_by_entity_id],
-      ([v]) => console.log(v),
-    );
   }
 
   private readonly client: FeedsClient;
@@ -829,7 +826,11 @@ export class Feed extends FeedApi {
     entityParentId?: string;
     entityId: string;
     sort: string;
-    base: () => Promise<PagerResponse & { comments: CommentResponse[] }>;
+    base: () => Promise<
+      PagerResponse & {
+        comments: Array<CommentResponse & ThreadedCommentResponse>;
+      }
+    >;
   }) {
     let error: unknown;
 
@@ -870,20 +871,22 @@ export class Feed extends FeedApi {
           const entityId = item.entityId;
 
           item.comments.forEach((comment) => {
-            // @ts-expect-error replies are not yet typed
             if (!comment.replies?.length) return;
 
             traverseArray.push({
               entityId: comment.id,
               entityParentId: entityId,
-              // @ts-expect-error replies are not yet typed
               comments: comment.replies,
-              // @ts-expect-error reply_pagination is not yet typed
-              next: comment.reply_pagination?.next,
+              next: comment.meta?.next_cursor,
             });
           });
 
-          // TODO: remove replies & reply_pagination from the reply before adding to the state
+          // omit replies from the comments
+          const newComments = item.comments.map(
+            ({ replies: _r, meta: _m, ...restOfTheCommentResponse }) => {
+              return restOfTheCommentResponse;
+            },
+          );
 
           newCommentsByEntityId[entityId] = {
             ...newCommentsByEntityId[entityId],
@@ -894,8 +897,8 @@ export class Feed extends FeedApi {
               sort: sort,
             },
             comments: newCommentsByEntityId[entityId]?.comments
-              ? newCommentsByEntityId[entityId].comments?.concat(item.comments)
-              : item.comments,
+              ? newCommentsByEntityId[entityId].comments?.concat(newComments)
+              : newComments,
           };
         }
 

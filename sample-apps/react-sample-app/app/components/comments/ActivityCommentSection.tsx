@@ -42,6 +42,7 @@ export const ActivityCommentSection = ({
       sort: DEFAULT_PAGINATION_SORT,
       limit: 1,
       depth: 5,
+      replies_limit: 5,
     });
   }, [activity, comments, feed]);
 
