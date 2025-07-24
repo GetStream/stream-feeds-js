@@ -156,10 +156,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 12,
     right: 12,
-    bottom: '100%', // anchors above the parent (input bar)
+    bottom: '100%',
     backgroundColor: '#222',
     borderRadius: 6,
-    // paddingVertical: 8,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -169,9 +168,5 @@ const styles = StyleSheet.create({
   label: {
     color: '#ccc',
     fontSize: 14,
-  },
-  username: {
-    color: '#fff',
-    fontWeight: '600',
   },
 });
