@@ -47,6 +47,8 @@ const Comment = ({
     loadNextPage({ sort: 'last', limit: 5 });
   });
 
+  const repliesLeftToLoad = comment.reply_count - comments.length;
+
   return (
     <View
       style={[
@@ -93,10 +95,11 @@ const Comment = ({
         </View>
       ) : null}
 
-      {isFirstLevel && comment.reply_count > 0 && has_next_page ? (
+      {isFirstLevel && repliesLeftToLoad > 0 && has_next_page ? (
         <TouchableOpacity onPress={loadNext} style={styles.viewReplies}>
           <Text style={styles.viewRepliesText}>
-            View {comment.reply_count} replies ↓
+            View {repliesLeftToLoad}{' '}
+            {repliesLeftToLoad === 1 ? 'reply' : 'replies'} ↓
           </Text>
         </TouchableOpacity>
       ) : null}

@@ -17,7 +17,7 @@ const tokenProviderFactory = (userId: string) => async () => {
   return data.token;
 };
 
-const CLIENT_OPTIONS = {};
+const CLIENT_OPTIONS = { base_url: 'https://chat-edge-frankfurt-ce1.stream-io-api.com' };
 
 export const useCreateClient = (user: UserRequest) => {
   const tokenProvider = useCallback(() => {
