@@ -79,7 +79,7 @@ export const waitForEvent = (
     });
     const timeout = setTimeout(() => {
       if (shouldReject) {
-        reject(new Error('Event not received'));
+        reject(new Error(`Event not received: ${type}`));
       } else {
         resolve(undefined);
       }

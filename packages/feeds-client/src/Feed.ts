@@ -142,7 +142,7 @@ type EventHandlerByEventType = {
 export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private static readonly noop = () => {};
-  private stateUpdateQueue: Set<string> = new Set();
+  private readonly stateUpdateQueue: Set<string> = new Set();
 
   private readonly eventHandlers: EventHandlerByEventType = {
     'feeds.activity.added': (event) => {
@@ -336,12 +336,9 @@ export class Feed extends FeedApi {
       this.handleFollowDeleted(event.follow);
     },
     'feeds.follow.updated': (_event) => {
-      const result = handleFollowUpdated();
+      const result = handleFollowUpdated(this.currentState);
       if (result.changed) {
-        this.state.next((currentState) => ({
-          ...currentState,
-          ...result,
-        }));
+        this.state.next(result.data);
       }
     },
     'feeds.comment.reaction.added': this.handleCommentReactionEvent.bind(this),
@@ -588,7 +585,7 @@ export class Feed extends FeedApi {
         }
       } else {
         // Empty queue when reinitializing the state
-        this.stateUpdateQueue = new Set();
+        this.stateUpdateQueue.clear();
         const responseCopy: Partial<
           StreamResponse<GetOrCreateFeedResponse>['feed'] &
             StreamResponse<GetOrCreateFeedResponse>
@@ -648,27 +645,12 @@ export class Feed extends FeedApi {
     const connectedUser = this.client.state.getLatestValue().connected_user;
     const result = handleFollowCreated(
       follow,
-      {
-        followers: this.currentState.followers,
-        following: this.currentState.following,
-        own_follows: this.currentState.own_follows,
-      },
+      this.currentState,
       this.fid,
       connectedUser?.id,
     );
     if (result.changed) {
-      const isSourceFeed = follow.source_feed.fid === this.fid;
-      const key = isSourceFeed ? 'following_count' : 'follower_count';
-      // If we're not watching, update following/followers count
-      // If we're watching we can't do eager state update since we don't know if feed.updated event arrived or not already
-      const shouldIncrement = !this.currentState.watch;
-      this.state.next((currentState) => {
-        return {
-          ...currentState,
-          ...(shouldIncrement ? { [key]: (currentState[key] ?? 0) + 1 } : {}),
-          ...result.data,
-        };
-      });
+      this.state.next(result.data);
     }
   }
 
@@ -694,26 +676,12 @@ export class Feed extends FeedApi {
     const connectedUser = this.client.state.getLatestValue().connected_user;
     const result = handleFollowDeleted(
       follow,
-      {
-        followers: this.currentState.followers,
-        following: this.currentState.following,
-        own_follows: this.currentState.own_follows,
-      },
+      this.currentState,
       this.fid,
       connectedUser?.id,
     );
     if (result.changed) {
-      const isSourceFeed = follow.source_feed.fid === this.fid;
-      const key = isSourceFeed ? 'following_count' : 'follower_count';
-      // If we're not watching, update following/followers count
-      // If we're watching we can't do eager state update since we don't know if feed.updated event arrived or not already
-      const shouldDecrement = !this.currentState.watch;
-
-      this.state.next((currentState) => ({
-        ...currentState,
-        ...(shouldDecrement ? { [key]: (currentState[key] ?? 0) - 1 } : {}),
-        ...result.data,
-      }));
+      this.state.next(result.data);
     }
   }
 

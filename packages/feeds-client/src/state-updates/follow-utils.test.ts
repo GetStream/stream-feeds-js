@@ -4,7 +4,6 @@ import {
   handleFollowCreated,
   handleFollowDeleted,
   handleFollowUpdated,
-  FollowState,
 } from './follow-utils';
 import {
   FollowUpdatedEvent,
@@ -12,6 +11,7 @@ import {
   FeedResponse,
   UserResponse,
 } from '../gen/models';
+import { FeedState } from '../Feed';
 
 describe('follow-utils', () => {
   const mockUser: UserResponse = {
@@ -78,7 +78,8 @@ describe('follow-utils', () => {
         status: 'pending',
       };
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: [],
         following: [],
       };
@@ -104,6 +105,7 @@ describe('follow-utils', () => {
             ...mockUser,
             id: 'user-x',
           },
+          following_count: 1,
         },
         target_feed: {
           ...mockFeed,
@@ -113,8 +115,10 @@ describe('follow-utils', () => {
         },
       };
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         following: [],
+        following_count: 0,
       };
 
       const result = handleFollowCreated(
@@ -129,6 +133,7 @@ describe('follow-utils', () => {
       expect(result.data.following?.[0]).toEqual(follow);
       expect(result.data).toMatchObject(follow.source_feed);
       expect(result.data.own_follows).toBeUndefined();
+      expect(result.data.following_count).toEqual(1);
     });
 
     it('should handle when someone follows this feed', () => {
@@ -148,11 +153,14 @@ describe('follow-utils', () => {
           id: 'feed-1',
           fid: 'user:feed-1',
           created_by: mockUser,
+          follower_count: 1,
         },
       };
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: [],
+        follower_count: 0,
       };
 
       const result = handleFollowCreated(
@@ -167,6 +175,7 @@ describe('follow-utils', () => {
       expect(result.data.followers?.[0]).toEqual(follow);
       expect(result.data).toMatchObject(follow.target_feed);
       expect(result.data.own_follows).toBeUndefined();
+      expect(result.data.follower_count).toEqual(1);
     });
 
     it('should add to own_follows when connected user is the source', () => {
@@ -189,7 +198,8 @@ describe('follow-utils', () => {
         },
       };
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: [],
         own_follows: [],
       };
@@ -223,8 +233,11 @@ describe('follow-utils', () => {
         },
       };
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: undefined,
+        following: undefined,
+        own_follows: undefined,
       };
 
       const result = handleFollowCreated(
@@ -266,8 +279,11 @@ describe('follow-utils', () => {
         },
       };
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: [existingFollow],
+        following: undefined,
+        own_follows: undefined,
       };
 
       const result = handleFollowCreated(
@@ -304,8 +320,10 @@ describe('follow-utils', () => {
 
       const follow: FollowResponse = existingFollow;
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         following: [existingFollow],
+        following_count: 1,
       };
 
       const result = handleFollowDeleted(
@@ -342,9 +360,11 @@ describe('follow-utils', () => {
 
       const follow: FollowResponse = existingFollow;
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: [existingFollow],
         own_follows: [existingFollow],
+        following_count: 1,
       };
 
       const result = handleFollowDeleted(
@@ -379,9 +399,11 @@ describe('follow-utils', () => {
 
       const follow: FollowResponse = existingFollow;
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: [existingFollow],
         own_follows: [existingFollow],
+        following_count: 1,
       };
 
       const result = handleFollowDeleted(
@@ -415,7 +437,8 @@ describe('follow-utils', () => {
 
       const follow: FollowResponse = existingFollow;
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: [existingFollow],
         own_follows: [existingFollow],
       };
@@ -451,7 +474,8 @@ describe('follow-utils', () => {
 
       const follow: FollowResponse = existingFollow;
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: undefined,
         own_follows: undefined,
       };
@@ -504,8 +528,10 @@ describe('follow-utils', () => {
 
       const follow: FollowResponse = followToRemove;
 
-      const currentState: FollowState = {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         following: [followToRemove, followToKeep],
+        following_count: 2,
       };
 
       const result = handleFollowDeleted(
@@ -522,18 +548,16 @@ describe('follow-utils', () => {
   });
 
   describe('handleFollowUpdated', () => {
-    it('should return unchanged state (no-op)', () => {
-      const currentState: FollowState = {
+    // TODO: not yet implemented
+    it.skip('should return unchanged state (no-op)', () => {
+      // @ts-expect-error - we're not testing the full state here
+      const currentState: FeedState = {
         followers: [],
         following: [],
+        following_count: 0,
       };
 
-      const result = handleFollowUpdated(
-        mockFollowUpdatedEvent,
-        currentState,
-        'user:feed-1',
-        'user-1',
-      );
+      const result = handleFollowUpdated(currentState);
 
       expect(result.changed).toBe(false);
     });

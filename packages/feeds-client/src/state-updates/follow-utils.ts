@@ -1,11 +1,6 @@
+import { FeedState } from '../Feed';
 import { FollowResponse, FeedResponse } from '../gen/models';
 import { UpdateStateResult } from '../types-internal';
-
-export type FollowState = {
-  followers?: FollowResponse[];
-  following?: FollowResponse[];
-  own_follows?: FollowResponse[];
-};
 
 const isFeedResponse = (
   follow: FeedResponse | { fid: string },
@@ -15,16 +10,16 @@ const isFeedResponse = (
 
 export const handleFollowCreated = (
   follow: FollowResponse,
-  currentState: FollowState,
+  currentState: FeedState,
   currentFeedId: string,
   connectedUserId?: string,
-): UpdateStateResult<{ data: FollowState }> => {
+): UpdateStateResult<{ data: FeedState }> => {
   // filter non-accepted follows (the way getOrCreate does by default)
   if (follow.status !== 'accepted') {
     return { changed: false, data: currentState };
   }
 
-  let newState: FollowState = { ...currentState };
+  let newState: FeedState = { ...currentState };
 
   // this feed followed someone
   if (follow.source_feed.fid === currentFeedId) {
@@ -67,11 +62,11 @@ export const handleFollowDeleted = (
   follow:
     | FollowResponse
     | { source_feed: { fid: string }; target_feed: { fid: string } },
-  currentState: FollowState,
+  currentState: FeedState,
   currentFeedId: string,
   connectedUserId?: string,
-): UpdateStateResult<{ data: FollowState }> => {
-  let newState: FollowState = { ...currentState };
+): UpdateStateResult<{ data: FeedState }> => {
+  let newState: FeedState = { ...currentState };
 
   // this feed unfollowed someone
   if (follow.source_feed.fid === currentFeedId) {
@@ -118,8 +113,10 @@ export const handleFollowDeleted = (
   return { changed: true, data: newState };
 };
 
-export const handleFollowUpdated = (): UpdateStateResult<FollowState> => {
+export const handleFollowUpdated = (
+  currentState: FeedState,
+): UpdateStateResult<{ data: FeedState }> => {
   // For now, we'll treat follow updates as no-ops since the current implementation does
   // This can be enhanced later if needed
-  return { changed: false };
+  return { changed: false, data: currentState };
 };
