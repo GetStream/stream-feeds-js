@@ -2,13 +2,15 @@ import { StyleSheet } from 'react-native';
 
 import { View } from '@/components/Themed';
 import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
-import { FeedList } from '@/components/FeedList';
+// import { FeedSourceResultList } from '@/components/Search/FeedSourceResultList';
+import { Search } from '@/components/Search';
 
 const ExploreScreen = () => {
   return (
-    <View style={styles.container}>
+    <View>
       <ConnectionLostHeader />
-      <FeedList types={['user']} />
+      {/* <FeedSourceResultList types={['user']} /> */}
+      <Search />
     </View>
   );
 }
