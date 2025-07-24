@@ -51,7 +51,6 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
         comment: text as string,
         object_id: activityId,
         object_type: 'activity',
-        // FIXME: Handle deeply nested comments too
         parent_id: parent?.id,
       })
       .catch((e) => console.error(e));
