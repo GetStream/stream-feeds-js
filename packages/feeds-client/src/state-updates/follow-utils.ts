@@ -25,6 +25,7 @@ export const handleFollowCreated = (
   if (follow.source_feed.fid === currentFeedId) {
     newState = {
       ...newState,
+      // Update FeedResponse fields, that has the new follower/following count
       ...follow.source_feed,
     };
 
@@ -40,6 +41,7 @@ export const handleFollowCreated = (
 
     newState = {
       ...newState,
+      // Update FeedResponse fields, that has the new follower/following count
       ...follow.target_feed,
     };
 
@@ -72,6 +74,7 @@ export const handleFollowDeleted = (
   if (follow.source_feed.fid === currentFeedId) {
     newState = {
       ...newState,
+      // Update FeedResponse fields, that has the new follower/following count
       ...follow.source_feed,
     };
 
@@ -89,6 +92,7 @@ export const handleFollowDeleted = (
 
     newState = {
       ...newState,
+      // Update FeedResponse fields, that has the new follower/following count
       ...follow.target_feed,
     };
 
