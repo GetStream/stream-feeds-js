@@ -6,6 +6,9 @@ import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
 import { apiKey, tokenCreationUrl } from '@/constants/stream';
 
 const tokenProviderFactory = (userId: string) => async () => {
+  if (!tokenCreationUrl) {
+    throw new Error('Token creation url is missing');
+  }
   const tokenGeneratorUrl = new URL(tokenCreationUrl);
   tokenGeneratorUrl.searchParams.set('api_key', apiKey);
   tokenGeneratorUrl.searchParams.set('user_id', userId);
@@ -17,7 +20,7 @@ const tokenProviderFactory = (userId: string) => async () => {
   return data.token;
 };
 
-const CLIENT_OPTIONS = {};
+const CLIENT_OPTIONS = { base_url: process.env.EXPO_PUBLIC_BASE_URL };
 
 export const useCreateClient = (user: UserRequest) => {
   const tokenProvider = useCallback(() => {

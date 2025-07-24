@@ -9,7 +9,7 @@ import { useStableCallback } from '../internal';
  * that can then be used on the UI. The entity can be either an ActivityResponse or a CommentResponse
  * as the hook determines internally which APIs it is supposed to use, while taking the
  * correct ownCapabilities into account.
- * @param entity - The entity to which we want to add a reaction, can be either ActivityResponse or CommentResponse.
+ * @param entity - The entity to which we want to apply reaction actions, can be either ActivityResponse or CommentResponse.
  * @param type - The type of reaction we want to add or remove.
  */
 export const useReactionActions = ({
