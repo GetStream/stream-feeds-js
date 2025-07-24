@@ -79,9 +79,11 @@ export function Header() {
           </li>
           {user && (
             <>
-              {/* <li> Notification feed coming soon
-                <NotificationBell />
-              </li> */}
+              {
+                <li>
+                  <NotificationBell />
+                </li>
+              }
               <li>
                 <Link href={'/users/' + user.id}>
                   <img

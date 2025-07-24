@@ -77,6 +77,7 @@ export const ActivityCommentSection = ({
           object_id: activity.id,
           object_type: 'activity',
           parent_id: parent?.id,
+          create_notification_activity: true,
         })
         .then(() => {
           currentTarget.reset();

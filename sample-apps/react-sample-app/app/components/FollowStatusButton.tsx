@@ -24,7 +24,9 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
     if (!ownTimeline) return;
 
     try {
-      await ownTimeline.follow(feed);
+      await ownTimeline.follow(feed, {
+        create_notification_activity: true,
+      });
     } catch (error) {
       if (error instanceof Error) {
         logErrorAndDisplayNotification(error, error.message);

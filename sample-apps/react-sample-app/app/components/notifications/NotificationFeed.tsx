@@ -1,134 +1,73 @@
 import { useEffect, useState } from 'react';
 import { useFeedContext } from '../../feed-context';
 import { AggregatedActivityResponse } from '@stream-io/feeds-client';
-import { FollowRequestNotification } from './notification-types/FollowRequestNotification';
-import { SimpleNotification } from './notification-types/SimpleNotification';
-import { FollowInviteNotification } from './notification-types/FollowInviteNotification';
+import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
 
-export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
-  const { logError } = useErrorContext();
-  const { onLoadMore } = proprs;
-  const [error, setError] = useState<Error>();
-  const [groups, setGroups] = useState<AggregatedActivityResponse[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
-  // const { ownNotifications } = useFeedContext();
+export const NotificationFeed = () => {
+  const { logErrorAndDisplayNotification } = useErrorContext();
+  const [aggregatedActivities, setAggregatedActivities] = useState<
+    AggregatedActivityResponse[]
+  >([]);
+  const [readActivities, setReadActivities] = useState<string[]>([]);
+  const [lastSeenAt, setLastSeenAt] = useState<Date | undefined>(undefined);
+  const { ownNotifications } = useFeedContext();
 
-  // useEffect(() => {
-  //   if (!ownNotifications) {
-  //     return;
-  //   }
-  //   const unsubscribe = ownNotifications.state.subscribeWithSelector(
-  //     (state) => ({ groups: state.groups }),
-  //     ({ groups }) => {
-  //       setGroups(groups ?? []);
-  //     },
-  //   );
+  useEffect(() => {
+    if (!ownNotifications) {
+      return;
+    }
+    const unsubscribe = ownNotifications.state.subscribeWithSelector(
+      (state) => ({
+        aggregated_activities: state.aggregated_activities,
+        notification_status: state.notification_status,
+      }),
+      ({ aggregated_activities, notification_status }) => {
+        setAggregatedActivities(aggregated_activities ?? []);
+        setReadActivities(notification_status?.read_activities ?? []);
+        setLastSeenAt(notification_status?.last_seen_at);
+      },
+    );
 
-  //   return unsubscribe;
-  // }, [ownNotifications]);
+    return unsubscribe;
+  }, [ownNotifications]);
 
-  // useEffect(() => {
-  //   if (!ownNotifications) {
-  //     return;
-  //   }
-  //   const unsubscribe = ownNotifications.state.subscribeWithSelector(
-  //     (state) => ({ is_loading_next_page: state.is_loading_next_page }),
-  //     ({ is_loading_next_page }) => {
-  //       setIsLoading(is_loading_next_page);
-  //     },
-  //   );
+  const markRead = async (group: AggregatedActivityResponse) => {
+    try {
+      await ownNotifications?.markActivity({
+        mark_read: [group.group],
+      });
+    } catch (error) {
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+    }
+  };
 
-  //   return unsubscribe;
-  // }, [ownNotifications]);
-
-  // useEffect(() => {
-  //   if (!ownNotifications) {
-  //     return;
-  //   }
-  //   const unsubscribe = ownNotifications.state.subscribeWithSelector(
-  //     (state) => ({ has_next_page: state.has_next_page }),
-  //     ({ has_next_page }) => {
-  //       setHasNextPage(has_next_page);
-  //     },
-  //   );
-
-  //   return unsubscribe;
-  // }, [ownNotifications]);
-
-  // const getNextPage = async () => {
-  //   setError(undefined);
-  //   try {
-  //     await ownNotifications?.readNextPage();
-  //   } catch (error) {
-  //     setError(error as Error);
-  //   }
-  // };
-
-  // const markRead = async (group: AggregatedActivitiesResponse) => {
-  //   if (!group.read) {
-  //     try {
-  //       await ownNotifications?.read({
-  //         limit: 30,
-  //         offset: 0,
-  //         mark_read: group.id,
-  //       });
-  //       await ownNotifications?.read({ limit: 30, offset: 0 });
-  //     } catch (error) {
-  //       logError(error as Error);
-  //     }
-  //   }
-  // };
-
-  // const renderItem = (group: AggregatedActivitiesResponse, index2: number) => {
-  //   return (
-  //     <li key={`notification:${index2}`} className="w-full">
-  //       {group.activities[0]?.verb === 'follow-request' && (
-  //         <FollowRequestNotification
-  //           group={group}
-  //           onMarkRead={() => markRead(group)}
-  //         ></FollowRequestNotification>
-  //       )}
-  //       {group.activities[0]?.verb === 'invite' && (
-  //         <FollowInviteNotification
-  //           group={group}
-  //           onMarkRead={() => markRead(group)}
-  //         ></FollowInviteNotification>
-  //       )}
-  //       {group.activities[0]?.verb === 'added-as-member' && (
-  //         <MemberNotification
-  //           group={group}
-  //           onMarkRead={() => markRead(group)}
-  //         ></MemberNotification>
-  //       )}
-  //       {group.activities[0]?.verb !== 'invite' &&
-  //         group.activities[0]?.verb !== 'follow-request' &&
-  //         group.activities[0]?.verb !== 'added-as-member' && (
-  //           <SimpleNotification
-  //             group={group}
-  //             onMarkRead={() => markRead(group)}
-  //           ></SimpleNotification>
-  //         )}
-  //     </li>
-  //   );
-  // };
+  const renderItem = (group: AggregatedActivityResponse, index: number) => {
+    return (
+      <li key={`notification:${index}`} className="w-full">
+        <Notification
+          group={group}
+          isRead={readActivities.includes(group.group)}
+          isSeen={
+            !!(lastSeenAt && group.created_at.getTime() < lastSeenAt.getTime())
+          }
+          onMarkRead={() => markRead(group)}
+        ></Notification>
+      </li>
+    );
+  };
 
   return (
     <>
-      {/* <PaginatedList
-        items={groups}
-        hasNext={hasNextPage}
-        isLoading={isLoading}
-        onLoadMore={() => {
-          void getNextPage();
-          onLoadMore?.();
-        }}
+      <PaginatedList
+        items={aggregatedActivities}
+        hasNext={false}
+        isLoading={false}
+        onLoadMore={() => {}}
         renderItem={renderItem}
-        error={error}
         itemsName="notifications"
-      ></PaginatedList> */}
+      ></PaginatedList>
     </>
   );
 };
