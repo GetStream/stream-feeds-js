@@ -50,7 +50,7 @@ import type {
   LoadingStates,
   PagerResponseWithLoadingStates,
 } from './types';
-import { checkHasAnotherPage, Constants, uniqueMerge } from './utils';
+import { checkHasAnotherPage, Constants, uniqueArrayMerge } from './utils';
 import {
   getStateUpdateQueueIdForFollow,
   getStateUpdateQueueIdForUnfollow,
@@ -971,21 +971,12 @@ export class Feed extends FeedApi {
       });
 
       this.state.next((currentState) => {
-        // Create a set of existing follows to avoid duplicates
-        const existingFollows = new Set<string>();
-        if (currentState[type]) {
-          currentState[type].forEach((follow) => {
-            const key = `${follow.source_feed.fid}-${follow.target_feed.fid}`;
-            existingFollows.add(key);
-          });
-        }
-
         return {
           ...currentState,
           [type]:
             currentState[type] === undefined
               ? follows
-              : uniqueMerge(
+              : uniqueArrayMerge(
                   currentState[type],
                   follows,
                   (follow) =>

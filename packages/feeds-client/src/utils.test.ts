@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { uniqueMerge } from './utils';
+import { uniqueArrayMerge } from './utils';
 
 describe('utils', () => {
   describe('uniqueMerge', () => {
@@ -15,7 +15,7 @@ describe('utils', () => {
       ];
       const getKey = (item: { id: string; name: string }) => item.id;
 
-      const result = uniqueMerge(existingArray, arrayToMerge, getKey);
+      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKey);
 
       expect(result).toEqual([
         { id: '1', name: 'Alice' },
@@ -35,7 +35,7 @@ describe('utils', () => {
       ];
       const getKey = (item: { id: string; name: string }) => item.id;
 
-      const result = uniqueMerge(existingArray, arrayToMerge, getKey);
+      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKey);
 
       expect(result).toEqual([
         { id: '1', name: 'Alice' },
@@ -57,7 +57,7 @@ describe('utils', () => {
       ];
       const getKey = (item: { id: string; name: string }) => item.id;
 
-      const result = uniqueMerge(existingArray, arrayToMerge, getKey);
+      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKey);
 
       expect(result).toEqual([
         { id: '1', name: 'Alice' },
@@ -74,7 +74,7 @@ describe('utils', () => {
       ];
       const getKey = (item: { id: string; name: string }) => item.id;
 
-      const result = uniqueMerge(existingArray, arrayToMerge, getKey);
+      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKey);
 
       expect(result).toEqual([
         { id: '1', name: 'Alice' },
@@ -90,7 +90,7 @@ describe('utils', () => {
       const arrayToMerge: Array<{ id: string; name: string }> = [];
       const getKey = (item: { id: string; name: string }) => item.id;
 
-      const result = uniqueMerge(existingArray, arrayToMerge, getKey);
+      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKey);
 
       expect(result).toEqual([
         { id: '1', name: 'Alice' },
@@ -103,7 +103,7 @@ describe('utils', () => {
       const arrayToMerge: Array<{ id: string; name: string }> = [];
       const getKey = (item: { id: string; name: string }) => item.id;
 
-      const result = uniqueMerge(existingArray, arrayToMerge, getKey);
+      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKey);
 
       expect(result).toEqual([]);
     });
@@ -123,7 +123,7 @@ describe('utils', () => {
         email: string;
       }) => item.email;
 
-      const result = uniqueMerge(existingArray, arrayToMerge, getKeyByEmail);
+      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKeyByEmail);
 
       expect(result).toEqual([
         { id: '1', name: 'Alice', email: 'alice@example.com' },
@@ -146,7 +146,7 @@ describe('utils', () => {
         data: { nested: { value: string } };
       }) => item.id;
 
-      const result = uniqueMerge(existingArray, arrayToMerge, getKey);
+      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKey);
 
       expect(result).toEqual([
         { id: '1', data: { nested: { value: 'a' } } },
@@ -166,7 +166,7 @@ describe('utils', () => {
       const originalExisting = [...existingArray];
       const originalToMerge = [...arrayToMerge];
 
-      uniqueMerge(existingArray, arrayToMerge, getKey);
+      uniqueArrayMerge(existingArray, arrayToMerge, getKey);
 
       expect(existingArray).toEqual(originalExisting);
       expect(arrayToMerge).toEqual(originalToMerge);
