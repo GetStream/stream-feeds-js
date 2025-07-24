@@ -2,8 +2,10 @@ import {
   ActivityResponse,
   CommentResponse,
   useComments,
+  useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
 import {
+  Alert,
   FlatList,
   Image,
   StyleSheet,
@@ -16,6 +18,7 @@ import { Reaction } from '@/components/Reaction';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { useCommentsInputActionsContext } from '@/contexts/CommentsInputContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const maintainVisibleContentPosition = {
   minIndexForVisible: 1,
@@ -29,6 +32,7 @@ const Comment = ({
   comment: CommentResponse;
   depth?: number;
 }) => {
+  const client = useFeedsClient();
   const isFirstLevel = depth === 0;
   const formattedDate = useFormatDate({ date: comment.created_at });
   const {
@@ -45,6 +49,25 @@ const Comment = ({
       return;
     }
     loadNextPage({ sort: 'last', limit: 5 });
+  });
+
+  const handleCommentDeletion = useStableCallback(() => {
+    Alert.alert(
+      'Delete Comment',
+      'Are you sure you want to delete this comment ? The action cannot be undone.',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => client?.deleteComment({ comment_id: comment.id }),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true },
+    );
   });
 
   const repliesLeftToLoad = comment.reply_count - comments.length;
@@ -74,12 +97,21 @@ const Comment = ({
           </View>
         </View>
 
-        <View style={styles.reactionContainer}>
-          <Reaction type="like" color="black" entity={comment} />
-          <Text style={styles.reactionCount}>
-            {comment.reaction_groups?.like?.count ?? 0}
-          </Text>
-          <Reaction type="downvote" color="black" entity={comment} />
+        <View style={styles.commentActionsContainer}>
+          <View style={styles.deleteButton}>
+            <TouchableOpacity
+              onPress={handleCommentDeletion}
+            >
+              <Ionicons name="trash" color="red" size={20} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.reactionContainer}>
+            <Reaction type="like" color="black" entity={comment} />
+            <Text style={styles.reactionCount}>
+              {comment.reaction_groups?.like?.count ?? 0}
+            </Text>
+            <Reaction type="downvote" color="black" entity={comment} />
+          </View>
         </View>
       </View>
 
@@ -178,6 +210,7 @@ const styles = StyleSheet.create({
   },
   commentBlock: {
     paddingVertical: 10,
+    justifyContent: 'space-between',
   },
   commentRow: {
     flexDirection: 'row',
@@ -223,12 +256,18 @@ const styles = StyleSheet.create({
     color: '#999',
     marginLeft: 12,
   },
+  commentActionsContainer: {
+    marginLeft: 8,
+    alignItems: 'flex-end',
+    alignSelf: 'flex-end',
+  },
+  deleteButton: {
+    flex: 1,
+  },
   reactionContainer: {
     flexDirection: 'row',
-    alignSelf: 'flex-end',
-    alignItems: 'flex-start',
+    alignItems: 'flex-end',
     justifyContent: 'flex-end',
-    marginLeft: 8,
   },
   reactionIcon: {
     fontSize: 16,
