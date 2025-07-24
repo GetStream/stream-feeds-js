@@ -11,8 +11,12 @@ export * from './hooks/util';
 
 export * from './contexts/StreamFeedsContext';
 export * from './contexts/StreamFeedContext';
+export * from './contexts/StreamSearchContext';
+export * from './contexts/StreamSearchResultsContext';
 
 // Wrappers
 
 export * from './wrappers/StreamFeeds';
 export * from './wrappers/StreamFeed';
+export * from './wrappers/StreamSearch';
+export * from './wrappers/StreamSearchResults';

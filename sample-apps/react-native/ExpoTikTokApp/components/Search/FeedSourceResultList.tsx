@@ -59,7 +59,7 @@ const renderItem = ({ item }: { item: Feed }) => {
   return <UserItem feed={item} />;
 };
 
-export const FeedList = ({ types }: { types: Array<'user'> }) => {
+export const FeedSourceResultList = ({ types }: { types: Array<'user'> }) => {
   const client = useFeedsClient();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error>();
@@ -115,7 +115,6 @@ export const FeedList = ({ types }: { types: Array<'user'> }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Users</Text>
       <FlatList
         data={feeds}
         keyExtractor={keyExtractor}
