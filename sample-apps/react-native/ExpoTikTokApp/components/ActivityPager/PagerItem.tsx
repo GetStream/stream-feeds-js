@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
 import { useActivityPagerContext } from '@/contexts/ActivityPagerContext';
 import { PagerVideo } from '@/components/ActivityPager/PagerVideo';
@@ -15,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Reaction } from '@/components/Reaction';
 import { Bookmark } from '@/components/Bookmark';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -27,21 +29,29 @@ const UnmemoizedPagerItem = ({
 }) => {
   const feed = useFeedContext();
   const router = useRouter();
+
+  const insets = useSafeAreaInsets();
+  const overlayStyle = useMemo(
+    () => ({ bottom: (Platform.OS === 'android' ? insets.bottom : 0) + 60 }),
+    [insets.bottom],
+  );
+
   const videoAttachment = useMemo(
     () => activity.attachments.find((a) => a.type === 'video'),
     [activity.attachments],
   );
+
   if (videoAttachment?.asset_url) {
     return (
       <View style={styles.page}>
         <PagerVideo source={videoAttachment.asset_url} isActive={isActive} />
 
-        <View style={styles.overlay}>
+        <View style={[styles.overlay, overlayStyle]}>
           <Text style={styles.title}>@{activity.user.id}</Text>
           <Text style={styles.description}>{activity.text}</Text>
         </View>
 
-        <View style={styles.sidebar}>
+        <View style={[styles.sidebar, overlayStyle]}>
           <View style={styles.iconContainer}>
             <Reaction type="like" entity={activity} size={32} />
             <Text style={styles.iconLabel}>
@@ -132,7 +142,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     position: 'absolute',
-    bottom: 40,
     left: 16,
     right: 100, // leave space if you add buttons later
   },
@@ -149,7 +158,6 @@ const styles = StyleSheet.create({
   sidebar: {
     position: 'absolute',
     right: 16,
-    bottom: 60,
     alignItems: 'center',
     gap: 20,
   },
