@@ -5,12 +5,7 @@ import {
   handleFollowDeleted,
   handleFollowUpdated,
 } from './follow-utils';
-import {
-  FollowUpdatedEvent,
-  FollowResponse,
-  FeedResponse,
-  UserResponse,
-} from '../gen/models';
+import { FollowResponse, FeedResponse, UserResponse } from '../gen/models';
 import { FeedState } from '../Feed';
 
 describe('follow-utils', () => {
@@ -61,14 +56,6 @@ describe('follow-utils', () => {
       fid: 'user:target-feed',
       created_by: mockUser,
     },
-  };
-
-  const mockFollowUpdatedEvent: FollowUpdatedEvent = {
-    created_at: new Date(),
-    fid: 'user:feed-1',
-    custom: {},
-    follow: mockFollow,
-    type: 'feeds.follow.updated',
   };
 
   describe('handleFollowCreated', () => {
