@@ -7,20 +7,14 @@ import { ActivityResponse } from '../gen/models';
 export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
   readonly type = 'activity' as const;
   private readonly client: FeedsClient;
-  // messageSearchChannelFilters: ChannelFilters | undefined;
-  // messageSearchFilters: MessageFilters | undefined;
-  // messageSearchSort: SearchMessageSort | undefined;
-  // channelQueryFilters: ChannelFilters | undefined;
-  // channelQuerySort: ChannelSort | undefined;
-  // channelQueryOptions: Omit<ChannelOptions, 'limit' | 'offset'> | undefined;
-
   constructor(client: FeedsClient, options?: SearchSourceOptions) {
     super(options);
     this.client = client;
   }
 
   protected async query(searchQuery: string) {
-    const { connected_user: connectedUser } = this.client.state.getLatestValue();
+    const { connected_user: connectedUser } =
+      this.client.state.getLatestValue();
     if (!connectedUser) return { items: [] };
 
     const { activities: items, next } = await this.client.queryActivities({
@@ -37,10 +31,3 @@ export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
     return items;
   }
 }
-
-
-  // filter: {
-  //   'feed.name': { $autocomplete: searchQuery }
-  //   'feed.description': { $autocomplete: searchQuery }
-  //   'created_by.name': { $autocomplete: searchQuery }
-  // },

@@ -1,12 +1,10 @@
 import { StateStore } from './StateStore';
 import { debounce, type DebouncedFunc } from './utils';
 
-export type SearchSourceType =
-  | 'channels'
-  | 'users'
-  | 'messages'
-  | (string & {});
+export type SearchSourceType = 'activities' | 'users' | 'feeds' | (string & {});
+
 export type QueryReturnValue<T> = { items: T[]; next?: string | null };
+
 export type DebounceOptions = {
   debounceMs: number;
 };
@@ -14,7 +12,6 @@ type DebouncedExecQueryFunction = DebouncedFunc<
   (searchString?: string) => Promise<void>
 >;
 
- 
 export interface SearchSource<T = any> {
   activate(): void;
 
@@ -46,7 +43,6 @@ export interface SearchSource<T = any> {
   readonly type: SearchSourceType;
 }
 
- 
 export type SearchSourceState<T = any> = {
   hasNext: boolean;
   isActive: boolean;
