@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CommentsInput } from '@/components/CommentInput';
-import { Comments } from '@/components/Comments';
+import { Comments, CommentsInput } from '@/components/Comments';
 import { useLocalSearchParams } from 'expo-router';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
 import {
