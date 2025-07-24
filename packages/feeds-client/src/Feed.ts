@@ -246,11 +246,9 @@ export class Feed extends FeedApi {
           )
         ) {
           newComments.unshift(comment);
-        } else if (entityState?.pagination?.sort === 'first') {
-          newComments.push(comment);
         } else {
-          // no other sorting option is supported yet
-          return currentState;
+          // 'first' and other sort options
+          newComments.push(comment);
         }
 
         return {
