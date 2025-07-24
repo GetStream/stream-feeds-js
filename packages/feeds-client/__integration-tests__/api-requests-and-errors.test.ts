@@ -102,10 +102,10 @@ describe('API requests and error handling', () => {
   it('should handle token expiration', async () => {
     client = createTestClient();
     const expInSecs = 2;
-    connectUserPromise = client.connectUser(
-      user,
-      createTestTokenGenerator(user, expInSecs),
-    );
+    connectUserPromise = client
+      .connectUser(user, createTestTokenGenerator(user, expInSecs))
+      // Catch the error, we test queryUsers here
+      .catch(() => {});
 
     await sleep(expInSecs * 1000);
 
