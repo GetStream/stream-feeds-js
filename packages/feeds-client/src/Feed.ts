@@ -358,7 +358,7 @@ export class Feed extends FeedApi {
             ...currentState,
           };
 
-          newState.members = currentState.members.concat(event.member);
+          newState.members = [event.member, ...currentState.members];
         }
 
         if (connectedUser?.id === event.member.user.id) {
@@ -608,7 +608,7 @@ export class Feed extends FeedApi {
           if (!request?.following_pagination?.limit) {
             delete nextState.following;
           }
-          if (!request?.member_pagination?.limit) {
+          if (response.members.length === 0 && response.feed.member_count > 0) {
             delete nextState.members;
           }
 
