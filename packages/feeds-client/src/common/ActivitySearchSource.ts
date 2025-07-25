@@ -7,9 +7,11 @@ import { ActivityResponse } from '../gen/models';
 export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
   readonly type = 'activity' as const;
   private readonly client: FeedsClient;
+  private lastSearchQuery: string;
   constructor(client: FeedsClient, options?: SearchSourceOptions) {
     super(options);
     this.client = client;
+    this.lastSearchQuery = this.searchQuery;
   }
 
   protected async query(searchQuery: string) {
@@ -30,6 +32,8 @@ export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
   }
 
   protected filterQueryResults(items: ActivityResponse[]) {
-    return items;
+    const searchQueryChanged = this.lastSearchQuery !== this.searchQuery;
+    this.lastSearchQuery = this.searchQuery;
+    return searchQueryChanged ? items : [...(this.items ?? []), ...items];
   }
 }

@@ -78,7 +78,7 @@ export const FeedSourceResultList = () => {
   } = useStateStore(searchSource?.state, searchSourceSelector) ?? {};
 
   const loadMore = useStableCallback(async () => {
-    if (isLoading && hasNext) {
+    if (!isLoading && hasNext) {
       searchSource?.search(searchSource?.searchQuery);
     }
   });

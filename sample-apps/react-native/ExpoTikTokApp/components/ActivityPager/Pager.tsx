@@ -12,6 +12,7 @@ import { FlashList } from '@shopify/flash-list';
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { ActivityPagerContextProvider } from '@/contexts/ActivityPagerContext';
 import { PagerItem } from '@/components/ActivityPager/PagerItem';
+import { useInitialIndex } from '@/components/ActivityPager/hooks/useInitialIndex';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -29,7 +30,7 @@ const renderItem = ({ item }: { item: ActivityResponse }) => {
 const keyExtractor = (item: ActivityResponse) => item.id;
 
 export const ActivityPager = () => {
-  const { initialIndex } = useLocalSearchParams();
+  const initialIndex = useInitialIndex();
   const { activities, loadNextPage } = useFeedActivities() ?? {};
   const [activeId, setActiveId] = useState<string | undefined>(
     activities?.[Number(initialIndex)]?.id,
@@ -62,7 +63,7 @@ export const ActivityPager = () => {
     }
   }, [activities]);
 
-  return (
+  return initialIndex != null ? (
     <ActivityPagerContextProvider activeId={activeId}>
       <FlashList
         ref={flatListRef}
@@ -80,5 +81,5 @@ export const ActivityPager = () => {
         {...pagerProps}
       />
     </ActivityPagerContextProvider>
-  );
+  ) : null;
 };
