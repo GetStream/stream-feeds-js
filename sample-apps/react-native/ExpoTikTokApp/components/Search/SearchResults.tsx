@@ -21,8 +21,6 @@ export const SearchResults = () => {
     [sources],
   );
 
-  console.log('ACTIVE SOURCE: ', activeSource);
-
   if (!activeSource) {
     return null;
   }

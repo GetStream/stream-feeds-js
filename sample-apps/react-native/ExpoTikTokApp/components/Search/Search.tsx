@@ -6,7 +6,8 @@ import {
   StreamSearch,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
-import { SearchBar, SearchTabs } from '@/components/Search';
+import { SearchBar } from '@/components/Search/SearchBar';
+import { SearchTabs } from '@/components/Search/SearchTabs';
 import { SearchResults } from '@/components/Search/SearchResults';
 
 export const Search = () => {
