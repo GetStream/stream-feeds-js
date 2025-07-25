@@ -99,6 +99,10 @@ export class FeedsClient extends FeedsApi {
                 activeFeed.synchronize();
               }
             }
+          } else {
+            for (const activeFeed of Object.values(this.activeFeeds)) {
+              activeFeed.handleWatchStopped();
+            }
           }
           break;
         }
