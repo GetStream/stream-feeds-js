@@ -63,6 +63,8 @@ describe('Feed watch and unwatch', () => {
 
     expect(feed.currentState.watch).toBe(true);
 
+    // Accessing private property to simulate losing connection
+    // eslint-disable-next-line dot-notation
     client['eventDispatcher'].dispatch({
       type: 'connection.changed',
       online: false,
@@ -72,6 +74,8 @@ describe('Feed watch and unwatch', () => {
 
     const spy = vi.spyOn(feed, 'getOrCreate');
 
+    // Accessing private property to simulate losing connection
+    // eslint-disable-next-line dot-notation
     client['eventDispatcher'].dispatch({
       type: 'connection.changed',
       online: true,
