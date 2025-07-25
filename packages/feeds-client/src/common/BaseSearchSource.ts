@@ -69,6 +69,7 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
   state: StateStore<SearchSourceState<T>>;
   protected pageSize: number;
   protected allowEmptySearchString: boolean;
+  protected lastSearchQuery: string | undefined;
   abstract readonly type: SearchSourceType;
   protected searchDebounced!: DebouncedExecQueryFunction;
 
@@ -80,6 +81,7 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
     this.pageSize = pageSize;
     this.allowEmptySearchString = allowEmptySearchString;
     this.state = new StateStore<SearchSourceState<T>>(this.initialState);
+    this.lastSearchQuery = this.searchQuery;
     this.setDebounceOptions({ debounceMs });
   }
 
@@ -166,9 +168,6 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
   ): SearchSourceState<T> {
     return {
       ...this.initialState,
-      items: this.items,
-      hasNext: this.hasNext,
-      next: this.next,
       isActive: this.isActive,
       isLoading: true,
       searchQuery: newSearchString,
@@ -193,9 +192,10 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
 
   async executeQuery(newSearchString?: string) {
     if (!this.canExecuteQuery(newSearchString)) return;
-    const hasNewSearchQuery = typeof newSearchString !== 'undefined';
+    const hasNewSearchQuery = this.lastSearchQuery !== newSearchString;
     const searchString = newSearchString ?? this.searchQuery;
 
+    console.log('HASNEW: ', hasNewSearchQuery)
     if (hasNewSearchQuery) {
       this.state.next(this.getStateBeforeFirstQuery(newSearchString ?? ''));
     } else {
@@ -207,6 +207,7 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
       const results = await this.query(searchString);
       if (!results) return;
       const { items, next } = results;
+      console.log('TESTING: ', next, this.next);
 
       if (typeof next === 'string' || next === null) {
         stateUpdate.next = next;
@@ -216,6 +217,7 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
         stateUpdate.hasNext = items.length === this.pageSize;
       }
 
+      this.lastSearchQuery = newSearchString;
       stateUpdate.items = await this.filterQueryResults(items);
     } catch (e) {
       stateUpdate.lastQueryError = e as Error;
