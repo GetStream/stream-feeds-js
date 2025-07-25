@@ -37,6 +37,7 @@ import {
   updateBookmarkInActivities,
 } from './state-updates/bookmark-utils';
 import { updateNotificationStatusFromActivityMarked } from './state-updates/activity-marked-utils';
+import { updateNotificationFeedFromEvent } from './state-updates/notification-feed-utils';
 import { FeedsApi, StreamResponse } from './gen-imports';
 import { capitalize } from './common/utils';
 import type {
@@ -504,8 +505,12 @@ export class Feed extends FeedApi {
       });
     },
     'feeds.notification_feed.updated': (event) => {
-      console.info('notification feed updated', event);
-      // TODO: handle notification feed updates
+      const result = updateNotificationFeedFromEvent(event);
+      if (result.changed) {
+        this.state.partialNext({
+          ...result.data,
+        });
+      }
     },
     // the poll events should be removed from here
     'feeds.poll.closed': Feed.noop,
