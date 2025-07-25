@@ -18,7 +18,9 @@ export const SearchTabs = () => {
   useEffect(() => {
     if (!searchController || !activeSource) return;
     searchController?.activateSource(activeSource.type);
-    void activeSource.search(searchController.searchQuery);
+    if (!activeSource.items?.length) {
+      void activeSource.search(searchController.searchQuery);
+    }
   }, [activeSource, searchController]);
 
   return (
