@@ -236,11 +236,16 @@ export class Feed extends FeedApi {
 
       this.state.next((currentState) => {
         const entityState = currentState.comments_by_entity_id[entityId];
+
+        if (typeof entityState?.comments === 'undefined') {
+          return currentState;
+        }
+
         const newComments = entityState?.comments
           ? [...entityState.comments]
           : [];
 
-        if (entityState?.pagination?.sort === 'last') {
+        if (entityState.pagination?.sort === 'last') {
           newComments.unshift(comment);
         } else {
           // 'first' and other sort options
@@ -592,6 +597,8 @@ export class Feed extends FeedApi {
         delete responseCopy.feed;
         delete responseCopy.metadata;
         delete responseCopy.duration;
+
+        // TODO: lazy-load comments from activities when comment_sort and comment_pagination are supported
 
         this.state.next((currentState) => {
           const nextState: FeedState = {
