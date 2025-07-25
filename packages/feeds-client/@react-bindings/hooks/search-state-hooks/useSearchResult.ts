@@ -26,9 +26,14 @@ export const useSearchResult = (sourceFromProps?: SearchSource) => {
   );
 };
 
-const selector = (nextState: SearchSourceState) => ({
-  items: nextState.items,
-  isLoading: nextState.isLoading,
-  hasNext: nextState.hasNext,
-  error: nextState.lastQueryError,
+const selector = ({
+  items,
+  isLoading,
+  hasNext,
+  lastQueryError,
+}: SearchSourceState) => ({
+  items,
+  isLoading,
+  hasNext,
+  error: lastQueryError,
 });
