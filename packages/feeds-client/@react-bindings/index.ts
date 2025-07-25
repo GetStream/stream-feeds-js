@@ -5,6 +5,7 @@ export * from './hooks/useCreateFeedsClient';
 
 export * from './hooks/client-state-hooks';
 export * from './hooks/feed-state-hooks';
+export * from './hooks/search-state-hooks';
 export * from './hooks/util';
 
 // Contexts

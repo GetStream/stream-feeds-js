@@ -1,14 +1,10 @@
 import {
   Feed,
-  SearchSourceState, useFeedMetadata,
-} from '@stream-io/feeds-react-native-sdk';
-import {
-  useSearchResultsContext,
-  useStateStore,
+  useFeedMetadata,
+  useSearchResult,
 } from '@stream-io/feeds-react-native-sdk';
 import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FollowButton } from '@/components/FollowButton';
-import { useStableCallback } from '@/hooks/useStableCallback';
 import { View, Text } from '@/components/Themed';
 import { useRouter } from 'expo-router';
 import { ErrorIndicator, LoadingIndicator } from '@/components/Indicators';
@@ -53,28 +49,8 @@ const renderItem = ({ item }: { item: Feed }) => {
   return <UserItem feed={item} />;
 };
 
-const searchSourceSelector = (nextState: SearchSourceState) => ({
-  items: nextState.items,
-  isLoading: nextState.isLoading,
-  hasNext: nextState.hasNext,
-  error: nextState.lastQueryError,
-});
-
 export const FeedSourceResultList = () => {
-  const searchSource = useSearchResultsContext();
-
-  const {
-    items: feeds,
-    error,
-    isLoading,
-    hasNext,
-  } = useStateStore(searchSource?.state, searchSourceSelector) ?? {};
-
-  const loadMore = useStableCallback(async () => {
-    if (!isLoading && hasNext) {
-      searchSource?.search(searchSource?.searchQuery);
-    }
-  });
+  const { items: feeds, error, isLoading, loadMore } = useSearchResult();
 
   if (error) {
     return <ErrorIndicator context="user feeds" />;
