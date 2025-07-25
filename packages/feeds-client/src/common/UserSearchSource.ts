@@ -21,9 +21,13 @@ export class UserSearchSource extends BaseSearchSource<UserResponse> {
     const { users: items } = await this.client.queryUsers({
       payload: {
         filter_conditions: {
-          name: {
-            $autocomplete: searchQuery,
-          },
+          ...(!this.allowEmptySearchString || searchQuery.length > 0
+            ? {
+                name: {
+                  $autocomplete: searchQuery,
+                },
+              }
+            : {}),
         },
       },
     });

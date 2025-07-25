@@ -27,7 +27,7 @@ export class FeedSearchSource extends BaseSearchSource<Feed> {
     const { feeds: items, next } = await this.client.queryFeeds({
       filter: {
         ...(this.feedGroupId ? { group_id: this.feedGroupId } : {}),
-        ...(searchQuery.length > 0
+        ...(!this.allowEmptySearchString || searchQuery.length > 0
           ? {
               $or: [
                 { name: { $autocomplete: searchQuery } },
