@@ -28,7 +28,7 @@ State update code is located in the `state-updates` folder. These methods return
 
 ```ts
 {
-  activities: [{/* activity */}],
+  data: { activities: [{/* activity */}] },
   changed: true
 }
 ```
