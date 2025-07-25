@@ -63,18 +63,34 @@ describe('Notification Feed Test Setup', () => {
     await user1TimelineFeed.getOrCreate({ watch: true });
     await user2TimelineFeed.getOrCreate({ watch: true });
 
-    // User2 follows User1's user feed
-    await user2TimelineFeed.follow(user1UserFeed.fid);
-
     await user1UserFeed.addActivity({
       type: 'post',
       text: 'Hello, world!',
     });
+  });
 
-    await user2TimelineFeed.getOrCreate({ watch: true });
+  it(`user 2 follows user 1 - user 1 receives notification`, async () => {
+    await Promise.all([
+      user2TimelineFeed.follow(user1UserFeed.fid, {
+        create_notification_activity: true,
+      }),
+      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
+    ]);
+
+    expect(
+      user1NotificationFeed.state.getLatestValue().notification_status?.unseen,
+    ).toBe(1);
+    expect(
+      user1NotificationFeed.state.getLatestValue().notification_status?.unread,
+    ).toBe(1);
+    expect(
+      user1NotificationFeed.state.getLatestValue().aggregated_activities,
+    ).toHaveLength(1);
   });
 
   it(`user 2 likes user 1's post - user 1 receives notification`, async () => {
+    await user2TimelineFeed.getOrCreate({ watch: true });
+
     const activity = user2TimelineFeed.state.getLatestValue().activities?.[0]!;
 
     await Promise.all([
@@ -88,15 +104,75 @@ describe('Notification Feed Test Setup', () => {
 
     expect(
       user1NotificationFeed.state.getLatestValue().notification_status?.unseen,
-    ).toBe(1);
+    ).toBe(2);
 
     expect(
       user1NotificationFeed.state.getLatestValue().notification_status?.unread,
-    ).toBe(1);
+    ).toBe(2);
 
     expect(
       user1NotificationFeed.state.getLatestValue().aggregated_activities,
-    ).toHaveLength(1);
+    ).toHaveLength(2);
+  });
+
+  it(`user 2 adds comment to user 1's post - user 1 receives notification`, async () => {
+    const activity = user2TimelineFeed.state.getLatestValue().activities?.[0]!;
+
+    await Promise.all([
+      client2.addComment({
+        object_id: activity.id,
+        object_type: 'activity',
+        comment: 'Nice post!',
+        create_notification_activity: true,
+      }),
+      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
+    ]);
+
+    expect(
+      user1NotificationFeed.state.getLatestValue().notification_status?.unseen,
+    ).toBe(3);
+
+    expect(
+      user1NotificationFeed.state.getLatestValue().notification_status?.unread,
+    ).toBe(3);
+
+    expect(
+      user1NotificationFeed.state.getLatestValue().aggregated_activities,
+    ).toHaveLength(3);
+  });
+
+  it(`user marks notificaitons as read an seen`, async () => {
+    const firstActivity =
+      user1NotificationFeed.state.getLatestValue().aggregated_activities?.[0]!;
+
+    await Promise.all([
+      user1NotificationFeed.markActivity({
+        mark_read: [firstActivity.group],
+      }),
+      waitForEvent(user1NotificationFeed, 'feeds.activity.marked'),
+      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
+    ]);
+
+    expect(
+      user1NotificationFeed.state.getLatestValue().notification_status?.unread,
+    ).toBe(0);
+
+    expect(
+      user1NotificationFeed.state.getLatestValue().notification_status?.unseen,
+    ).toBe(0);
+
+    expect(
+      user1NotificationFeed.state.getLatestValue().notification_status
+        ?.read_activities,
+    ).toHaveLength(
+      user1NotificationFeed.state.getLatestValue().aggregated_activities
+        ?.length ?? 0,
+    );
+
+    expect(
+      user1NotificationFeed.state.getLatestValue().notification_status
+        ?.last_seen_at,
+    ).toBeDefined();
   });
 
   afterAll(async () => {
