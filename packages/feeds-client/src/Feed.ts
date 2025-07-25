@@ -16,9 +16,10 @@ import {
   BookmarkUpdatedEvent,
   QueryFeedMembersRequest,
   SortParamRequest,
+  FollowResponse,
   ThreadedCommentResponse,
 } from './gen/models';
-import { Patch, StateStore } from './common/StateStore';
+import { StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
 import { FeedApi } from './gen/feeds/FeedApi';
 import { FeedsClient } from './FeedsClient';
@@ -36,7 +37,12 @@ import {
   removeBookmarkFromActivities,
   updateBookmarkInActivities,
 } from './state-updates/bookmark-utils';
-import { FeedsApi, StreamResponse } from './gen-imports';
+import {
+  handleFollowCreated,
+  handleFollowDeleted,
+  handleFollowUpdated,
+} from './state-updates/follow-utils';
+import { StreamResponse } from './gen-imports';
 import { capitalize } from './common/utils';
 import type {
   ActivityIdOrCommentId,
@@ -45,8 +51,12 @@ import type {
   LoadingStates,
   PagerResponseWithLoadingStates,
 } from './types';
-import type { FromArray } from './types-internal';
-import { checkHasAnotherPage, Constants } from './utils';
+import { checkHasAnotherPage, Constants, uniqueArrayMerge } from './utils';
+import {
+  getStateUpdateQueueIdForFollow,
+  getStateUpdateQueueIdForUnfollow,
+  shouldUpdateState,
+} from './state-updates/state-update-queue';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -114,6 +124,11 @@ export type FeedState = Omit<
   member_pagination?: LoadingStates & { sort?: SortParamRequest[] };
 
   last_get_or_create_request_config?: GetOrCreateFeedRequest;
+
+  /**
+   * `true` if the feed is receiving real-time updates via WebSocket
+   */
+  watch: boolean;
 };
 
 type EventHandlerByEventType = {
@@ -128,6 +143,7 @@ type EventHandlerByEventType = {
 export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private static readonly noop = () => {};
+  private readonly stateUpdateQueue: Set<string> = new Set();
 
   private readonly eventHandlers: EventHandlerByEventType = {
     'feeds.activity.added': (event) => {
@@ -315,102 +331,17 @@ export class Feed extends FeedApi {
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
     'feeds.follow.created': (event) => {
-      // filter non-accepted follows (the way getOrCreate does by default)
-      if (event.follow.status !== 'accepted') return;
-
-      // this feed followed someone
-      if (event.follow.source_feed.fid === this.fid) {
-        this.state.next((currentState) => {
-          const newState = {
-            ...currentState,
-            ...event.follow.source_feed,
-          };
-
-          if (
-            !checkHasAnotherPage(
-              currentState.following,
-              currentState.following_pagination?.next,
-            )
-          ) {
-            // TODO: respect sort
-            newState.following = currentState.following
-              ? currentState.following.concat(event.follow)
-              : [event.follow];
-          }
-
-          return newState;
-        });
-      } else if (
-        // someone followed this feed
-        event.follow.target_feed.fid === this.fid
-      ) {
-        const source = event.follow.source_feed;
-        const connectedUser = this.client.state.getLatestValue().connected_user;
-
-        this.state.next((currentState) => {
-          const newState = { ...currentState, ...event.follow.target_feed };
-
-          if (source.created_by.id === connectedUser?.id) {
-            newState.own_follows = currentState.own_follows
-              ? currentState.own_follows.concat(event.follow)
-              : [event.follow];
-          }
-
-          if (
-            !checkHasAnotherPage(
-              currentState.followers,
-              currentState.followers_pagination?.next,
-            )
-          ) {
-            // TODO: respect sort
-            newState.followers = currentState.followers
-              ? currentState.followers.concat(event.follow)
-              : [event.follow];
-          }
-
-          return newState;
-        });
-      }
+      this.handleFollowCreated(event.follow);
     },
     'feeds.follow.deleted': (event) => {
-      // this feed unfollowed someone
-      if (event.follow.source_feed.fid === this.fid) {
-        this.state.next((currentState) => {
-          return {
-            ...currentState,
-            ...event.follow.source_feed,
-            following: currentState.following?.filter(
-              (follow) =>
-                follow.target_feed.fid !== event.follow.target_feed.fid,
-            ),
-          };
-        });
-      } else if (
-        // someone unfollowed this feed
-        event.follow.target_feed.fid === this.fid
-      ) {
-        const source = event.follow.source_feed;
-        const connectedUser = this.client.state.getLatestValue().connected_user;
-
-        this.state.next((currentState) => {
-          const newState = { ...currentState, ...event.follow.target_feed };
-
-          if (source.created_by.id === connectedUser?.id) {
-            newState.own_follows = currentState.own_follows?.filter(
-              (follow) =>
-                follow.source_feed.fid !== event.follow.source_feed.fid,
-            );
-          }
-
-          newState.followers = currentState.followers?.filter(
-            (follow) => follow.source_feed.fid !== event.follow.source_feed.fid,
-          );
-
-          return newState;
-        });
+      this.handleFollowDeleted(event.follow);
+    },
+    'feeds.follow.updated': (_event) => {
+      const result = handleFollowUpdated(this.currentState);
+      if (result.changed) {
+        this.state.next(result.data);
       }
     },
-    'feeds.follow.updated': Feed.noop,
     'feeds.comment.reaction.added': this.handleCommentReactionEvent.bind(this),
     'feeds.comment.reaction.deleted':
       this.handleCommentReactionEvent.bind(this),
@@ -536,9 +467,9 @@ export class Feed extends FeedApi {
     groupId: 'user' | 'timeline' | (string & {}),
     id: string,
     data?: FeedResponse,
+    watch = false,
   ) {
-    // Need this ugly cast because fileUpload endpoints :(
-    super(client as unknown as FeedsApi, groupId, id);
+    super(client, groupId, id);
     this.state = new StateStore<FeedState>({
       fid: `${groupId}:${id}`,
       group_id: groupId,
@@ -547,6 +478,7 @@ export class Feed extends FeedApi {
       is_loading: false,
       is_loading_activities: false,
       comments_by_entity_id: {},
+      watch,
     });
     this.client = client;
   }
@@ -657,6 +589,8 @@ export class Feed extends FeedApi {
           });
         }
       } else {
+        // Empty queue when reinitializing the state
+        this.stateUpdateQueue.clear();
         const responseCopy: Partial<
           StreamResponse<GetOrCreateFeedResponse>['feed'] &
             StreamResponse<GetOrCreateFeedResponse>
@@ -683,6 +617,7 @@ export class Feed extends FeedApi {
           }
 
           nextState.last_get_or_create_request_config = request;
+          nextState.watch = request?.watch ? request.watch : currentState.watch;
 
           return nextState;
         });
@@ -697,6 +632,80 @@ export class Feed extends FeedApi {
         is_loading_activities: false,
       });
     }
+  }
+
+  /**
+   * @internal
+   */
+  handleFollowCreated(follow: FollowResponse) {
+    if (
+      !shouldUpdateState({
+        stateUpdateId: getStateUpdateQueueIdForFollow(follow),
+        stateUpdateQueue: this.stateUpdateQueue,
+        watch: this.currentState.watch,
+      })
+    ) {
+      return;
+    }
+    const connectedUser = this.client.state.getLatestValue().connected_user;
+    const result = handleFollowCreated(
+      follow,
+      this.currentState,
+      this.fid,
+      connectedUser?.id,
+    );
+    if (result.changed) {
+      this.state.next(result.data);
+    }
+  }
+
+  /**
+   * @internal
+   */
+  handleFollowDeleted(
+    follow:
+      | FollowResponse
+      // Backend doesn't return the follow in delete follow response https://getstream.slack.com/archives/C06RK9WCR09/p1753176937507209
+      | { source_feed: { fid: string }; target_feed: { fid: string } },
+  ) {
+    if (
+      !shouldUpdateState({
+        stateUpdateId: getStateUpdateQueueIdForUnfollow(follow),
+        stateUpdateQueue: this.stateUpdateQueue,
+        watch: this.currentState.watch,
+      })
+    ) {
+      return;
+    }
+
+    const connectedUser = this.client.state.getLatestValue().connected_user;
+    const result = handleFollowDeleted(
+      follow,
+      this.currentState,
+      this.fid,
+      connectedUser?.id,
+    );
+    if (result.changed) {
+      this.state.next(result.data);
+    }
+  }
+
+  /**
+   * @internal
+   */
+  handleWatchStopped() {
+    this.state.partialNext({
+      watch: false,
+    });
+  }
+
+  /**
+   * @internal
+   */
+  handleWatchStarted() {
+    this.state.partialNext({
+      watch: true,
+    });
   }
 
   private handleBookmarkAdded(event: BookmarkAddedEvent) {
@@ -774,47 +783,6 @@ export class Feed extends FeedApi {
     }
 
     return commentIndex;
-  }
-
-  private getActivityIndex(activity: ActivityResponse, state?: FeedState) {
-    const { activities } = state ?? this.currentState;
-
-    if (!activities) {
-      return -1;
-    }
-
-    let activityIndex = activities.indexOf(activity);
-
-    // fast lookup failed, try slower approach
-    if (activityIndex === -1) {
-      activityIndex = activities.findIndex(
-        (activity_) => activity_.id === activity.id,
-      );
-    }
-
-    return activityIndex;
-  }
-
-  private updateActivityInState(
-    activity: ActivityResponse,
-    patch: Patch<FromArray<FeedState['activities']>>,
-  ) {
-    this.state.next((currentState) => {
-      const activityIndex = this.getActivityIndex(activity, currentState);
-
-      if (activityIndex === -1) return currentState;
-
-      const nextActivities = [...currentState.activities!];
-
-      nextActivities[activityIndex] = patch(
-        currentState.activities![activityIndex],
-      );
-
-      return {
-        ...currentState,
-        activities: nextActivities,
-      };
-    });
   }
 
   /**
@@ -1064,17 +1032,25 @@ export class Feed extends FeedApi {
         sort,
       });
 
-      this.state.next((currentState) => ({
-        ...currentState,
-        [type]: currentState[type]
-          ? currentState[type].concat(follows)
-          : follows,
-        [paginationKey]: {
-          ...currentState[paginationKey],
-          next: newNextCursor,
-          sort,
-        },
-      }));
+      this.state.next((currentState) => {
+        return {
+          ...currentState,
+          [type]:
+            currentState[type] === undefined
+              ? follows
+              : uniqueArrayMerge(
+                  currentState[type],
+                  follows,
+                  (follow) =>
+                    `${follow.source_feed.fid}-${follow.target_feed.fid}`,
+                ),
+          [paginationKey]: {
+            ...currentState[paginationKey],
+            next: newNextCursor,
+            sort,
+          },
+        };
+      });
     } catch (e) {
       error = e;
     } finally {
@@ -1094,11 +1070,15 @@ export class Feed extends FeedApi {
     }
   }
 
-  async loadNextPageFollowers(request: Pick<QueryFollowsRequest, 'limit'>) {
+  async loadNextPageFollowers(
+    request: Pick<QueryFollowsRequest, 'limit' | 'sort'>,
+  ) {
     await this.loadNextPageFollows('followers', request);
   }
 
-  async loadNextPageFollowing(request: Pick<QueryFollowsRequest, 'limit'>) {
+  async loadNextPageFollowing(
+    request: Pick<QueryFollowsRequest, 'limit' | 'sort'>,
+  ) {
     await this.loadNextPageFollows('following', request);
   }
 

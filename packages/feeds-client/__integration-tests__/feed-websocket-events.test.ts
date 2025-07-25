@@ -30,7 +30,7 @@ describe('Feed state updates via WebSocket events', () => {
       watch: true,
     });
 
-    await waitForEvent(client, 'feeds.feed.created', 1000);
+    await waitForEvent(client, 'feeds.feed.created', { timeoutMs: 1000 });
 
     const feed = client.feed(feedGroup, feedId);
 
@@ -54,7 +54,7 @@ describe('Feed state updates via WebSocket events', () => {
       custom: { testField: 'updated value' },
     });
 
-    await waitForEvent(feed, 'feeds.feed.updated', 1000);
+    await waitForEvent(feed, 'feeds.feed.updated', { timeoutMs: 1000 });
 
     const updateEvent = updateSpy.mock.lastCall?.[0];
     expect(updateEvent?.type).toBe('feeds.feed.updated');
@@ -75,7 +75,7 @@ describe('Feed state updates via WebSocket events', () => {
       feed_id: feedId,
     });
 
-    await waitForEvent(feed, 'feeds.feed.deleted', 1000);
+    await waitForEvent(feed, 'feeds.feed.deleted', { timeoutMs: 1000 });
 
     const newFeed = client.feed(feedGroup, feedId);
     // testing we get a new reference to the feed

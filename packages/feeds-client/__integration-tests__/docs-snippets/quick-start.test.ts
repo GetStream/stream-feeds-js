@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, it } from 'vitest';
 import {
   createTestClient,
   createTestTokenGenerator,
+  getServerClient,
   getTestUser,
 } from '../utils';
 import { FeedsClient } from '../../src/FeedsClient';
@@ -87,9 +88,21 @@ describe('Quick start page', () => {
   });
 
   afterAll(async () => {
-    await feed.delete({ hard_delete: true });
-    await timeline.delete({ hard_delete: true });
-    await notifications.delete({ hard_delete: true });
+    const serverClient = getServerClient();
+
+    await serverClient.feeds.deleteFeed({
+      feed_group_id: feed.group,
+      feed_id: feed.id,
+    });
+    await serverClient.feeds.deleteFeed({
+      feed_group_id: timeline.group,
+      feed_id: timeline.id,
+    });
+    await serverClient.feeds.deleteFeed({
+      feed_group_id: notifications.group,
+      feed_id: notifications.id,
+    });
+
     await client.disconnectUser();
   });
 });

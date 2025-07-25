@@ -31,6 +31,7 @@ const createMockActivity = (id: string, text?: string): ActivityResponse =>
     text: text,
     popularity: 0,
     score: 0,
+    reaction_count: 0,
     user: {
       id: 'user1',
       created_at: new Date(),
