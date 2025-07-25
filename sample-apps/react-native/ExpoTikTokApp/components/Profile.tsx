@@ -27,6 +27,6 @@ export const Profile = ({
 
 const styles = StyleSheet.create({
   feedContainer: {
-    paddingHorizontal: 16,
+    height: '100%',
   },
 });

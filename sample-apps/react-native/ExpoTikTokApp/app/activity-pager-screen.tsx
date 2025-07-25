@@ -1,19 +1,18 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   StreamFeed,
-  useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
 import { useLocalSearchParams } from 'expo-router';
 import { ActivityPager } from '@/components/ActivityPager/Pager';
+import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
 
 const ActivityPagerScreen = () => {
-  const client = useFeedsClient();
-  const { groupId, id } = useLocalSearchParams();
+  const { groupId: groupIdParam, id: idParam } = useLocalSearchParams();
 
-  const feed = useMemo(
-    () => client?.feed(groupId as string, id as string),
-    [groupId, id, client],
-  );
+  const groupId = groupIdParam as string;
+  const id = idParam as string;
+
+  const feed = useCreateAndQueryFeed({ groupId, userId: id });
 
   if (!feed) {
     return null;

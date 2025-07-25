@@ -28,16 +28,30 @@ export const Activity = ({
     return image ? { uri: image } : postPlaceholder;
   }, [image]);
 
+  const mainActivityFid = activity.feeds[0];
+
+  const routingParams = useMemo(() => {
+    if (feed) {
+      return {
+        initialIndex: index,
+        groupId: feed.group,
+        id: feed.id,
+      };
+    }
+    const [groupId, id] = mainActivityFid.split(':');
+    return {
+      activityId: activity.id,
+      groupId,
+      id,
+    };
+  }, [feed, index, mainActivityFid, activity.id]);
+
   return (
     <TouchableOpacity
       onPress={() =>
         router.push({
           pathname: '/activity-pager-screen',
-          params: {
-            initialIndex: index,
-            groupId: feed?.group,
-            id: feed?.id,
-          },
+          params: routingParams,
         })
       }
       style={styles.card}
@@ -48,9 +62,11 @@ export const Activity = ({
           style={styles.image}
           resizeMode="cover"
         />
-        <View style={styles.heartIcon}>
-          <Reaction type="like" entity={activity} />
-        </View>
+        {feed ? (
+          <View style={styles.heartIcon}>
+            <Reaction type="like" entity={activity} />
+          </View>
+        ) : null}
       </View>
       <Text style={styles.title} numberOfLines={2}>
         {activity.text}

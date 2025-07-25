@@ -1,30 +1,20 @@
-import { useEffect, useState } from 'react';
 import {
   Feed,
-  FeedState,
-  useClientConnectedUser,
-  useFeedsClient,
+  useFeedMetadata,
+  useSearchResult,
 } from '@stream-io/feeds-react-native-sdk';
-import { useStateStore } from '@stream-io/feeds-react-native-sdk';
 import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FollowButton } from '@/components/FollowButton';
-import { useStableCallback } from '@/hooks/useStableCallback';
 import { View, Text } from '@/components/Themed';
 import { useRouter } from 'expo-router';
 import { ErrorIndicator, LoadingIndicator } from '@/components/Indicators';
-
-const selector = (state: FeedState) => {
-  return {
-    createdBy: state.created_by,
-  };
-};
 
 const keyExtractor = (item: Feed) => item.id;
 
 const UserSeparator = () => <View style={styles.separator} />;
 
 const UserItem = ({ feed }: { feed: Feed }) => {
-  const { createdBy } = useStateStore(feed.state, selector);
+  const { created_by: createdBy } = useFeedMetadata(feed) ?? {};
   const router = useRouter();
 
   return (
@@ -59,63 +49,19 @@ const renderItem = ({ item }: { item: Feed }) => {
   return <UserItem feed={item} />;
 };
 
-export const FeedList = ({ types }: { types: Array<'user'> }) => {
-  const client = useFeedsClient();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error>();
-  const [next, setNext] = useState<string | undefined>(undefined);
-  const [feeds, setFeeds] = useState<Feed[]>([]);
-  const connectedUser = useClientConnectedUser();
-
-  const loadMore = useStableCallback(async () => {
-    if (!client || !connectedUser || isLoading) {
-      return;
-    }
-
-    if (feeds.length > 0 && typeof next === 'undefined') {
-      return;
-    }
-
-    setError(undefined);
-    setIsLoading(true);
-    const limit = 30;
-    try {
-      const response = await client.queryFeeds({
-        limit,
-        watch: true,
-        filter: {
-          group_id: { $in: types },
-        },
-        next,
-      });
-      const newFeeds = response.feeds.filter((f) => f.id !== connectedUser.id);
-      setFeeds([...feeds, ...newFeeds]);
-      setNext(response.next);
-    } catch (e) {
-      setError(e as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  });
-
-  useEffect(() => {
-    if (!client || !connectedUser) {
-      return;
-    }
-    void loadMore();
-  }, [client, connectedUser, loadMore]);
+export const FeedSourceResultList = () => {
+  const { items: feeds, error, isLoading, loadMore } = useSearchResult();
 
   if (error) {
     return <ErrorIndicator context="user feeds" />;
   }
 
-  if (isLoading && feeds.length === 0) {
+  if (isLoading && !feeds) {
     return <LoadingIndicator />;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Users</Text>
       <FlatList
         data={feeds}
         keyExtractor={keyExtractor}
@@ -130,7 +76,7 @@ export const FeedList = ({ types }: { types: Array<'user'> }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingTop: 50 },
+  container: { flex: 1, backgroundColor: '#fff' },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
