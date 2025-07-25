@@ -19,7 +19,7 @@ export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
 
     const { activities: items, next } = await this.client.queryActivities({
       sort: [{ direction: -1, field: 'created_at' }],
-      ...(searchQuery.length
+      ...(!this.allowEmptySearchString || searchQuery.length > 0
         ? { filter: { text: { $autocomplete: searchQuery } } }
         : {}),
       limit: 10,
