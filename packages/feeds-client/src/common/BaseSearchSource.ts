@@ -166,6 +166,9 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
   ): SearchSourceState<T> {
     return {
       ...this.initialState,
+      items: this.items,
+      hasNext: this.hasNext,
+      next: this.next,
       isActive: this.isActive,
       isLoading: true,
       searchQuery: newSearchString,
