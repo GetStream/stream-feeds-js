@@ -1,23 +1,24 @@
 import { View, TextInput, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
-  type SearchControllerState,
-  useSearchContext, useStateStore,
+  useSearchContext,
+  useSearchQuery,
 } from '@stream-io/feeds-react-native-sdk';
-
-const selector = (nextValue: SearchControllerState) => ({
-  searchQuery: nextValue.searchQuery,
-});
 
 export const SearchBar = () => {
   const searchController = useSearchContext();
-  const { searchQuery = '' } = useStateStore(searchController?.state, selector) ?? {};
+  const { searchQuery = '' } = useSearchQuery() ?? {};
 
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
         <View style={styles.searchBox}>
-          <Ionicons name="search" size={18} color="#888" style={styles.searchIcon} />
+          <Ionicons
+            name="search"
+            size={18}
+            color="#888"
+            style={styles.searchIcon}
+          />
           <TextInput
             value={searchQuery}
             onChangeText={searchController?.search}
@@ -29,14 +30,19 @@ export const SearchBar = () => {
           />
           {!!searchQuery && (
             <Pressable onPress={searchController?.clear}>
-              <Ionicons name="close" size={18} color="#888" style={styles.clearIcon} />
+              <Ionicons
+                name="close"
+                size={18}
+                color="#888"
+                style={styles.clearIcon}
+              />
             </Pressable>
           )}
         </View>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -72,5 +78,5 @@ const styles = StyleSheet.create({
   },
   clearIcon: {
     marginLeft: 8,
-  }
+  },
 });
