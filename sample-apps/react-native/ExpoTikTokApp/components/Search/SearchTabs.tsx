@@ -1,9 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  SearchControllerState,
   useSearchContext,
-  useStateStore,
+  useSearchSources,
 } from '@stream-io/feeds-react-native-sdk';
 
 const tabsNameMap = {
@@ -11,14 +10,9 @@ const tabsNameMap = {
   activity: 'Posts',
 };
 
-const selector = (nextState: SearchControllerState) => ({
-  sources: nextState.sources,
-});
-
 export const SearchTabs = () => {
   const searchController = useSearchContext();
-  const { sources = [] } =
-    useStateStore(searchController?.state, selector) ?? {};
+  const { sources = [] } = useSearchSources() ?? {};
   const [activeSource, setActiveSource] = useState(sources[0]);
 
   useEffect(() => {
