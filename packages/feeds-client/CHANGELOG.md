@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.8](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.7...@stream-io/feeds-client-0.1.8) (2025-07-23)
+
+
+* [FEEDS-538] bump openapi to support notifcation event ([#73](https://github.com/GetStream/stream-feeds-js/issues/73)) ([6829746](https://github.com/GetStream/stream-feeds-js/commit/6829746dd64ac171e17133c1d1a44161346cc17b))
+
+## [0.1.7](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.6...@stream-io/feeds-client-0.1.7) (2025-07-22)
+
+
+* increase timeouts ([55e77db](https://github.com/GetStream/stream-feeds-js/commit/55e77db1be59e6a03fcd1908db584c1c2102bbca))
+
+
+### Features
+
+* [FEEDS-588]add stopWatchingFeed endpoint ([#72](https://github.com/GetStream/stream-feeds-js/issues/72)) ([f9a7b87](https://github.com/GetStream/stream-feeds-js/commit/f9a7b87c4c9da08582941f489ee18d22e25cf81a))
+
 ## [0.1.6](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.5...@stream-io/feeds-client-0.1.6) (2025-07-22)
 
 

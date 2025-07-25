@@ -17,6 +17,7 @@ import {
   QueryFeedMembersRequest,
   SortParamRequest,
   FollowResponse,
+  ThreadedCommentResponse,
 } from './gen/models';
 import { StateStore } from './common/StateStore';
 import { EventDispatcher } from './common/EventDispatcher';
@@ -100,17 +101,17 @@ export type FeedState = Omit<
          *   comments_by_entity_id: {
          *     'activity-1': {
          *       comments: [comment1],
-         *       parent_id: undefined,
+         *       entity_parent_id: undefined,
          *     },
          *     'comment-1': {
          *       comments: [comment2],
-         *       parent_id: 'activity-1', // parent store where "comment-1" is located in "comments" array
+         *       entity_parent_id: 'activity-1', // parent store where "comment-1" is located in "comments" array
          *     }
          *   }
          * }
          * ```
          */
-        parent_id?: ActivityIdOrCommentId;
+        entity_parent_id?: ActivityIdOrCommentId;
         comments?: CommentResponse[];
       }
     | undefined
@@ -431,6 +432,10 @@ export class Feed extends FeedApi {
 
         return newState ?? currentState;
       });
+    },
+    'feeds.notification_feed.updated': (event) => {
+      console.info('notification feed updated', event);
+      // TODO: handle notification feed updates
     },
     // the poll events should be removed from here
     'feeds.poll.closed': Feed.noop,
@@ -780,16 +785,93 @@ export class Feed extends FeedApi {
     return commentIndex;
   }
 
+  /**
+   * Load child comments of entity (activity or comment) into the state, if the target entity is comment,
+   * `entityParentId` should be provided (`CommentResponse.parent_id ?? CommentResponse.object_id`).
+   */
+  private loadCommentsIntoState(data: {
+    entityParentId?: string;
+    entityId: string;
+    comments: Array<CommentResponse & ThreadedCommentResponse>;
+    next?: string;
+    sort: string;
+  }) {
+    // add initial (top level) object for processing
+    const traverseArray = [
+      {
+        entityId: data.entityId,
+        entityParentId: data.entityParentId,
+        comments: data.comments,
+        next: data.next,
+      },
+    ];
+
+    this.state.next((currentState) => {
+      const newCommentsByEntityId = {
+        ...currentState.comments_by_entity_id,
+      };
+
+      while (traverseArray.length) {
+        const item = traverseArray.pop()!;
+
+        const entityId = item.entityId;
+
+        // go over entity comments and generate new objects
+        // for further processing if there are any replies
+        item.comments.forEach((comment) => {
+          if (!comment.replies?.length) return;
+
+          traverseArray.push({
+            entityId: comment.id,
+            entityParentId: entityId,
+            comments: comment.replies,
+            next: comment.meta?.next_cursor,
+          });
+        });
+
+        // omit replies & meta from the comments (transform ThreadedCommentResponse to CommentResponse)
+        // this is somehow faster than copying the whole
+        // object and deleting the desired properties
+        const newComments: CommentResponse[] = item.comments.map(
+          ({ replies: _r, meta: _m, ...restOfTheCommentResponse }) =>
+            restOfTheCommentResponse,
+        );
+
+        newCommentsByEntityId[entityId] = {
+          ...newCommentsByEntityId[entityId],
+          entity_parent_id: item.entityParentId,
+          pagination: {
+            ...newCommentsByEntityId[entityId]?.pagination,
+            next: item.next,
+            sort: data.sort,
+          },
+          comments: newCommentsByEntityId[entityId]?.comments
+            ? newCommentsByEntityId[entityId].comments?.concat(newComments)
+            : newComments,
+        };
+      }
+
+      return {
+        ...currentState,
+        comments_by_entity_id: newCommentsByEntityId,
+      };
+    });
+  }
+
   private async loadNextPageComments({
-    forId,
+    entityId,
     base,
     sort,
-    parentId,
+    entityParentId,
   }: {
-    parentId?: string;
-    forId: string;
+    entityParentId?: string;
+    entityId: string;
     sort: string;
-    base: () => Promise<PagerResponse & { comments: CommentResponse[] }>;
+    base: () => Promise<
+      PagerResponse & {
+        comments: Array<CommentResponse & ThreadedCommentResponse>;
+      }
+    >;
   }) {
     let error: unknown;
 
@@ -798,44 +880,24 @@ export class Feed extends FeedApi {
         ...currentState,
         comments_by_entity_id: {
           ...currentState.comments_by_entity_id,
-          [forId]: {
-            ...currentState.comments_by_entity_id[forId],
+          [entityId]: {
+            ...currentState.comments_by_entity_id[entityId],
             pagination: {
-              ...currentState.comments_by_entity_id[forId]?.pagination,
+              ...currentState.comments_by_entity_id[entityId]?.pagination,
               loading_next_page: true,
             },
           },
         },
       }));
 
-      const { next: newNextCursor, comments } = await base();
+      const { next, comments } = await base();
 
-      this.state.next((currentState) => {
-        const newPagination = {
-          ...currentState.comments_by_entity_id[forId]?.pagination,
-          next: newNextCursor,
-        };
-
-        if (typeof newPagination.sort === 'undefined') {
-          newPagination.sort = sort;
-        }
-
-        return {
-          ...currentState,
-          comments_by_entity_id: {
-            ...currentState.comments_by_entity_id,
-            [forId]: {
-              ...currentState.comments_by_entity_id[forId],
-              parent_id: parentId,
-              pagination: newPagination,
-              comments: currentState.comments_by_entity_id[forId]?.comments
-                ? currentState.comments_by_entity_id[forId].comments?.concat(
-                    comments,
-                  )
-                : comments,
-            },
-          },
-        };
+      this.loadCommentsIntoState({
+        entityId,
+        comments,
+        entityParentId,
+        next,
+        sort,
       });
     } catch (e) {
       error = e;
@@ -844,10 +906,10 @@ export class Feed extends FeedApi {
         ...currentState,
         comments_by_entity_id: {
           ...currentState.comments_by_entity_id,
-          [forId]: {
-            ...currentState.comments_by_entity_id[forId],
+          [entityId]: {
+            ...currentState.comments_by_entity_id[entityId],
             pagination: {
-              ...currentState.comments_by_entity_id[forId]?.pagination,
+              ...currentState.comments_by_entity_id[entityId]?.pagination,
               loading_next_page: false,
             },
           },
@@ -884,7 +946,7 @@ export class Feed extends FeedApi {
     }
 
     await this.loadNextPageComments({
-      forId: activity.id,
+      entityId: activity.id,
       base: () =>
         this.client.getComments({
           ...request,
@@ -919,7 +981,7 @@ export class Feed extends FeedApi {
     }
 
     await this.loadNextPageComments({
-      forId: comment.id,
+      entityId: comment.id,
       base: () =>
         this.client.getCommentReplies({
           ...request,
@@ -931,7 +993,7 @@ export class Feed extends FeedApi {
             Constants.DEFAULT_COMMENT_PAGINATION,
           next: currentNextCursor,
         }),
-      parentId: comment.parent_id ?? comment.object_id,
+      entityParentId: comment.parent_id ?? comment.object_id,
       sort,
     });
   }

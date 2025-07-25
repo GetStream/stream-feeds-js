@@ -11,20 +11,36 @@ import { TouchableOpacity } from 'react-native';
 
 const iconMap = {
   like: {
-    active: <Ionicons name="heart" size={20} color="white" />,
-    inactive: <Ionicons name="heart-outline" size={20} color="white" />,
+    active: ({ size, color }: IconProps) => (
+      <Ionicons name="heart" size={size} color={color} />
+    ),
+    inactive: ({ size, color }: IconProps) => (
+      <Ionicons name="heart-outline" size={size} color={color} />
+    ),
+  },
+  downvote: {
+    active: ({ size, color }: IconProps) => (
+      <Ionicons name="thumbs-down" size={size} color={color} />
+    ),
+    inactive: ({ size, color }: IconProps) => (
+      <Ionicons name="thumbs-down-outline" size={size} color={color} />
+    ),
   },
 };
 
 type IconType = keyof typeof iconMap;
 
+type IconProps = { size: number; color: string };
+
 export const Reaction = ({
   type,
   entity,
+  size = 20,
+  color = 'white',
 }: {
   type: IconType;
   entity: ActivityResponse | CommentResponse;
-}) => {
+} & Partial<IconProps>) => {
   const ownCapabilities = useOwnCapabilities();
 
   const isComment = isCommentResponse(entity);
@@ -47,13 +63,19 @@ export const Reaction = ({
       (!hasOwnReaction && canAddReaction) ||
       (hasOwnReaction && canRemoveReaction);
     if (canDoReactionAction) {
-      await toggleReaction();
+      try {
+        await toggleReaction();
+      } catch (error) {
+        console.error(error);
+      }
     }
   }, [hasOwnReaction, canAddReaction, canRemoveReaction, toggleReaction]);
 
+  const IconComponent = iconMap[type][hasOwnReaction ? 'active' : 'inactive'];
+
   return (
     <TouchableOpacity onPress={handleReactionToggle}>
-      {iconMap[type][hasOwnReaction ? 'active' : 'inactive']}
+      <IconComponent size={size} color={color} />
     </TouchableOpacity>
   );
 };

@@ -103,6 +103,9 @@ const eventDecoderMapping: Record<
   'feeds.follow.updated': (data: Record<string, any>) =>
     decoders.FollowUpdatedEvent(data),
 
+  'feeds.notification_feed.updated': (data: Record<string, any>) =>
+    decoders.NotificationFeedUpdatedEvent(data),
+
   'feeds.poll.closed': (data: Record<string, any>) =>
     decoders.PollClosedFeedEvent(data),
 

@@ -1226,6 +1226,22 @@ decoders.MuteResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.NotificationFeedUpdatedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+
+    aggregated_activities: {
+      type: 'AggregatedActivityResponse',
+      isSingle: false,
+    },
+
+    notification_status: { type: 'NotificationStatusResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.NotificationStatusResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     last_seen_at: { type: 'DatetimeType', isSingle: true },
