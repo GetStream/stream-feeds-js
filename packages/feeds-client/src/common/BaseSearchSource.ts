@@ -195,7 +195,6 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
     const hasNewSearchQuery = this.lastSearchQuery !== newSearchString;
     const searchString = newSearchString ?? this.searchQuery;
 
-    console.log('HASNEW: ', hasNewSearchQuery)
     if (hasNewSearchQuery) {
       this.state.next(this.getStateBeforeFirstQuery(newSearchString ?? ''));
     } else {
@@ -207,7 +206,6 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
       const results = await this.query(searchString);
       if (!results) return;
       const { items, next } = results;
-      console.log('TESTING: ', next, this.next);
 
       if (typeof next === 'string' || next === null) {
         stateUpdate.next = next;
