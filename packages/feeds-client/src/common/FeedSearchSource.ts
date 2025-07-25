@@ -37,6 +37,7 @@ export class FeedSearchSource extends BaseSearchSource<Feed> {
             }
           : {}),
       },
+      next: this.next ?? undefined,
     });
 
     return { items, next };
