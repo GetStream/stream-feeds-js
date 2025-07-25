@@ -2,14 +2,12 @@ import { StyleSheet } from 'react-native';
 
 import { View } from '@/components/Themed';
 import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
-// import { FeedSourceResultList } from '@/components/Search/FeedSourceResultList';
 import { Search } from '@/components/Search';
 
 const ExploreScreen = () => {
   return (
-    <View>
+    <View style={styles.container}>
       <ConnectionLostHeader />
-      {/* <FeedSourceResultList types={['user']} /> */}
       <Search />
     </View>
   );
@@ -19,9 +17,7 @@ export default ExploreScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: '100%',
   },
   title: {
     fontSize: 20,

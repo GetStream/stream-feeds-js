@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
-import {
+import type {
   Feed,
   FeedState,
-  useClientConnectedUser,
-  useFeedsClient,
+  SearchSourceState,
 } from '@stream-io/feeds-react-native-sdk';
-import { useStateStore } from '@stream-io/feeds-react-native-sdk';
+import {
+  useSearchResultsContext,
+  useStateStore,
+} from '@stream-io/feeds-react-native-sdk';
 import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FollowButton } from '@/components/FollowButton';
 import { useStableCallback } from '@/hooks/useStableCallback';
@@ -59,57 +60,34 @@ const renderItem = ({ item }: { item: Feed }) => {
   return <UserItem feed={item} />;
 };
 
-export const FeedSourceResultList = ({ types }: { types: Array<'user'> }) => {
-  const client = useFeedsClient();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error>();
-  const [next, setNext] = useState<string | undefined>(undefined);
-  const [feeds, setFeeds] = useState<Feed[]>([]);
-  const connectedUser = useClientConnectedUser();
+const searchSourceSelector = (nextState: SearchSourceState) => ({
+  items: nextState.items,
+  isLoading: nextState.isLoading,
+  hasNext: nextState.hasNext,
+  error: nextState.lastQueryError,
+});
+
+export const FeedSourceResultList = () => {
+  const searchSource = useSearchResultsContext();
+
+  const {
+    items: feeds,
+    error,
+    isLoading,
+    hasNext,
+  } = useStateStore(searchSource?.state, searchSourceSelector) ?? {};
 
   const loadMore = useStableCallback(async () => {
-    if (!client || !connectedUser || isLoading) {
-      return;
-    }
-
-    if (feeds.length > 0 && typeof next === 'undefined') {
-      return;
-    }
-
-    setError(undefined);
-    setIsLoading(true);
-    const limit = 30;
-    try {
-      const response = await client.queryFeeds({
-        limit,
-        watch: true,
-        filter: {
-          group_id: { $in: types },
-        },
-        next,
-      });
-      const newFeeds = response.feeds.filter((f) => f.id !== connectedUser.id);
-      setFeeds([...feeds, ...newFeeds]);
-      setNext(response.next);
-    } catch (e) {
-      setError(e as Error);
-    } finally {
-      setIsLoading(false);
+    if (isLoading && hasNext) {
+      searchSource?.search(searchSource?.searchQuery);
     }
   });
-
-  useEffect(() => {
-    if (!client || !connectedUser) {
-      return;
-    }
-    void loadMore();
-  }, [client, connectedUser, loadMore]);
 
   if (error) {
     return <ErrorIndicator context="user feeds" />;
   }
 
-  if (isLoading && feeds.length === 0) {
+  if (isLoading && !feeds) {
     return <LoadingIndicator />;
   }
 
@@ -129,7 +107,7 @@ export const FeedSourceResultList = ({ types }: { types: Array<'user'> }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingTop: 50 },
+  container: { flex: 1, backgroundColor: '#fff' },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
