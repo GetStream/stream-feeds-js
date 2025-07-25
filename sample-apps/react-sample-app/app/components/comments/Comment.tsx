@@ -15,7 +15,7 @@ import { PaginatedList } from '../PaginatedList';
 import { DEFAULT_PAGINATION_SORT } from './ActivityCommentSection';
 import { Reactions } from '../reactions/Reactions';
 
-const levels = ['ml-6', 'ml-10', 'ml-14', 'ml-16'];
+const levels = ['ml-8', 'ml-16', 'ml-24', 'ml-32', 'ml-40'];
 
 export const Comment = ({
   comment,
@@ -128,11 +128,12 @@ export const Comment = ({
             </div>
           )}
         </footer>
-        <p className="text-gray-500">{comment.text}</p>
-        <div className="flex items-center mt-4 space-x-4">
+        <p className="text-gray-500 pl-8">{comment.text}</p>
+        <div className="flex items-center mt-4 space-x-4 pl-8">
           <button
             type="button"
             className="flex items-center text-sm text-gray-500 gap-1 font-medium"
+            disabled={level >= 5}
             onClick={() => setParent(comment)}
           >
             <div className="text-sm material-symbols-outlined">comment</div>
@@ -152,7 +153,7 @@ export const Comment = ({
                 loadNextPage({
                   sort: DEFAULT_PAGINATION_SORT,
                   limit: 1,
-                  depth: 5
+                  depth: 5,
                 })
               }
             >

@@ -232,33 +232,32 @@ export class Feed extends FeedApi {
     'feeds.bookmark_folder.updated': Feed.noop,
     'feeds.comment.added': (event) => {
       const { comment } = event;
-      const forId = comment.parent_id ?? comment.object_id;
+      const entityId = comment.parent_id ?? comment.object_id;
 
       this.state.next((currentState) => {
-        const entityState = currentState.comments_by_entity_id[forId];
-        const newComments = entityState?.comments?.concat([]) ?? [];
+        const entityState = currentState.comments_by_entity_id[entityId];
 
-        if (
-          entityState?.pagination?.sort === 'last' &&
-          !checkHasAnotherPage(
-            entityState.comments,
-            entityState?.pagination.next,
-          )
-        ) {
-          newComments.unshift(comment);
-        } else if (entityState?.pagination?.sort === 'first') {
-          newComments.push(comment);
-        } else {
-          // no other sorting option is supported yet
+        if (typeof entityState?.comments === 'undefined') {
           return currentState;
+        }
+
+        const newComments = entityState?.comments
+          ? [...entityState.comments]
+          : [];
+
+        if (entityState.pagination?.sort === 'last') {
+          newComments.unshift(comment);
+        } else {
+          // 'first' and other sort options
+          newComments.push(comment);
         }
 
         return {
           ...currentState,
           comments_by_entity_id: {
             ...currentState.comments_by_entity_id,
-            [forId]: {
-              ...currentState.comments_by_entity_id[forId],
+            [entityId]: {
+              ...currentState.comments_by_entity_id[entityId],
               comments: newComments,
             },
           },
@@ -266,24 +265,27 @@ export class Feed extends FeedApi {
       });
     },
     'feeds.comment.deleted': ({ comment }) => {
-      const forId = comment.parent_id ?? comment.object_id;
+      const entityId = comment.parent_id ?? comment.object_id;
 
       this.state.next((currentState) => {
         const newCommentsByEntityId = {
           ...currentState.comments_by_entity_id,
-          [forId]: {
-            ...currentState.comments_by_entity_id[forId],
+          [entityId]: {
+            ...currentState.comments_by_entity_id[entityId],
           },
         };
 
         const index = this.getCommentIndex(comment, currentState);
 
-        if (newCommentsByEntityId?.[forId]?.comments?.length && index !== -1) {
-          newCommentsByEntityId[forId].comments = [
-            ...newCommentsByEntityId[forId].comments,
+        if (
+          newCommentsByEntityId?.[entityId]?.comments?.length &&
+          index !== -1
+        ) {
+          newCommentsByEntityId[entityId].comments = [
+            ...newCommentsByEntityId[entityId].comments,
           ];
 
-          newCommentsByEntityId[forId]?.comments?.splice(index, 1);
+          newCommentsByEntityId[entityId]?.comments?.splice(index, 1);
         }
 
         delete newCommentsByEntityId[comment.id];
@@ -296,10 +298,10 @@ export class Feed extends FeedApi {
     },
     'feeds.comment.updated': (event) => {
       const { comment } = event;
-      const forId = comment.parent_id ?? comment.object_id;
+      const entityId = comment.parent_id ?? comment.object_id;
 
       this.state.next((currentState) => {
-        const entityState = currentState.comments_by_entity_id[forId];
+        const entityState = currentState.comments_by_entity_id[entityId];
 
         if (!entityState?.comments?.length) return currentState;
 
@@ -315,8 +317,8 @@ export class Feed extends FeedApi {
           ...currentState,
           comments_by_entity_id: {
             ...currentState.comments_by_entity_id,
-            [forId]: {
-              ...currentState.comments_by_entity_id[forId],
+            [entityId]: {
+              ...currentState.comments_by_entity_id[entityId],
               comments: newComments,
             },
           },
@@ -596,6 +598,8 @@ export class Feed extends FeedApi {
         delete responseCopy.metadata;
         delete responseCopy.duration;
 
+        // TODO: lazy-load comments from activities when comment_sort and comment_pagination are supported
+
         this.state.next((currentState) => {
           const nextState: FeedState = {
             ...currentState,
@@ -833,6 +837,8 @@ export class Feed extends FeedApi {
             restOfTheCommentResponse,
         );
 
+        const existingComments = newCommentsByEntityId[entityId]?.comments;
+
         newCommentsByEntityId[entityId] = {
           ...newCommentsByEntityId[entityId],
           entity_parent_id: item.entityParentId,
@@ -841,8 +847,12 @@ export class Feed extends FeedApi {
             next: item.next,
             sort: data.sort,
           },
-          comments: newCommentsByEntityId[entityId]?.comments
-            ? newCommentsByEntityId[entityId].comments?.concat(newComments)
+          comments: existingComments
+            ? uniqueArrayMerge(
+                existingComments,
+                newComments,
+                (comment) => comment.id,
+              )
             : newComments,
         };
       }
@@ -983,10 +993,7 @@ export class Feed extends FeedApi {
           ...request,
           comment_id: comment.id,
           // use known sort first (prevents broken pagination)
-          sort:
-            currentSort ??
-            request?.sort ??
-            Constants.DEFAULT_COMMENT_PAGINATION,
+          sort,
           next: currentNextCursor,
         }),
       entityParentId: comment.parent_id ?? comment.object_id,
@@ -1112,7 +1119,11 @@ export class Feed extends FeedApi {
       this.state.next((currentState) => ({
         ...currentState,
         members: currentState.members
-          ? uniqueArrayMerge(currentState.members, members, ({ user }) => user.id)
+          ? uniqueArrayMerge(
+              currentState.members,
+              members,
+              ({ user }) => user.id,
+            )
           : members,
         member_pagination: {
           ...currentState.member_pagination,

@@ -36,9 +36,10 @@ export function PaginatedList<T>({
         logErrorAndDisplayNotification(error, error.message);
       }
     }
-  }, [error, items]);
+  }, [error, items, logError, logErrorAndDisplayNotification]);
+
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="w-full flex flex-col items-center empty:hidden">
       {isLoading && items.length === 0 && <LoadingIndicator color="blue" />}
       {items.length === 0 &&
         !isLoading &&
