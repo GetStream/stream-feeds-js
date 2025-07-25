@@ -1,7 +1,6 @@
-import type {
+import {
   Feed,
-  FeedState,
-  SearchSourceState,
+  SearchSourceState, useFeedMetadata,
 } from '@stream-io/feeds-react-native-sdk';
 import {
   useSearchResultsContext,
@@ -14,18 +13,12 @@ import { View, Text } from '@/components/Themed';
 import { useRouter } from 'expo-router';
 import { ErrorIndicator, LoadingIndicator } from '@/components/Indicators';
 
-const selector = (state: FeedState) => {
-  return {
-    createdBy: state.created_by,
-  };
-};
-
 const keyExtractor = (item: Feed) => item.id;
 
 const UserSeparator = () => <View style={styles.separator} />;
 
 const UserItem = ({ feed }: { feed: Feed }) => {
-  const { createdBy } = useStateStore(feed.state, selector);
+  const { created_by: createdBy } = useFeedMetadata(feed) ?? {};
   const router = useRouter();
 
   return (
