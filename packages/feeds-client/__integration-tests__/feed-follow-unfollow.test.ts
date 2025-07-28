@@ -67,8 +67,7 @@ describe('Feed follow and unfollow', () => {
       await feed.unfollow(secondUserFeed.fid);
 
       expect(feed.currentState.following).toHaveLength(0);
-      // TODO: backend doesn't send proper response :(
-      // expect(feed.currentState.following_count).toEqual(0);
+      expect(feed.currentState.following_count).toEqual(0);
     });
 
     afterAll(async () => {
@@ -162,8 +161,7 @@ describe('Feed follow and unfollow', () => {
       ]);
 
       expect(feed.currentState.following).toHaveLength(0);
-      // TODO: if HTTP response arrives before WS event this won't be properly updated
-      // expect(feed.currentState.following_count).toEqual(0);
+      expect(feed.currentState.following_count).toEqual(0);
     });
 
     it('should update state when someone unfollows me', async () => {

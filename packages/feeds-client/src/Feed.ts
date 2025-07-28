@@ -662,12 +662,7 @@ export class Feed extends FeedApi {
   /**
    * @internal
    */
-  handleFollowDeleted(
-    follow:
-      | FollowResponse
-      // Backend doesn't return the follow in delete follow response https://getstream.slack.com/archives/C06RK9WCR09/p1753176937507209
-      | { source_feed: { fid: string }; target_feed: { fid: string } },
-  ) {
+  handleFollowDeleted(follow: FollowResponse) {
     if (
       !shouldUpdateState({
         stateUpdateId: getStateUpdateQueueIdForUnfollow(follow),
