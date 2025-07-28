@@ -2,6 +2,21 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.9](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.8...@stream-io/feeds-client-0.1.9) (2025-07-28)
+
+
+### Features
+
+* comments and activity actions ([#76](https://github.com/GetStream/stream-feeds-js/issues/76)) ([5484864](https://github.com/GetStream/stream-feeds-js/commit/54848641043c379e9c9b3d290260375dee5ccfa6))
+* consider `depth` option for `loadNextPageComments` ([#65](https://github.com/GetStream/stream-feeds-js/issues/65)) ([5ffc786](https://github.com/GetStream/stream-feeds-js/commit/5ffc78626a8415f2c77d24d234810712b2f1e52c))
+* enable queryFeeds without watch: true ([#75](https://github.com/GetStream/stream-feeds-js/issues/75)) ([fbd2851](https://github.com/GetStream/stream-feeds-js/commit/fbd285146fb4cec99711ec4fb18b22e5ae0847e6)), closes [/github.com/GetStream/stream-feeds-js/pull/75/files#diff-5fe26340feefe9212a93cb4f25c7996731c1245bb6253d4c106ef98afbcc3a17](https://github.com/GetStream//github.com/GetStream/stream-feeds-js/pull/75/files/issues/diff-5fe26340feefe9212a93cb4f25c7996731c1245bb6253d4c106ef98afbcc3a17) [/github.com/GetStream/stream-feeds-js/pull/75/files#diff-20886f4c7cbf4a14b78ed974d55bb6d44f278117f37d1864e494443c3ee8f73dR30](https://github.com/GetStream//github.com/GetStream/stream-feeds-js/pull/75/files/issues/diff-20886f4c7cbf4a14b78ed974d55bb6d44f278117f37d1864e494443c3ee8f73dR30)
+
+
+### Bug Fixes
+
+* adjust how we merge/update members ([#74](https://github.com/GetStream/stream-feeds-js/issues/74)) ([220aa07](https://github.com/GetStream/stream-feeds-js/commit/220aa07868bd56637c37f4b1434020ae548b5a9b))
+* catch irrelevant error to avoid test failiure ([#77](https://github.com/GetStream/stream-feeds-js/issues/77)) ([836a8bb](https://github.com/GetStream/stream-feeds-js/commit/836a8bbb58d4d0fe150f4c370d0a05dcc26252cb))
+
 ## [0.1.8](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.7...@stream-io/feeds-client-0.1.8) (2025-07-23)
 
 
