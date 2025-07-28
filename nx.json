@@ -1,7 +1,11 @@
 {
   "defaultBase": "main",
   "release": {
-    "projects": ["@stream-io/feeds-client", "@stream-io/feeds-react-native-sdk"],
+    "projects": [
+      "@stream-io/feeds-client",
+      "@stream-io/feeds-react-native-sdk",
+      "@stream-io/feeds-react-sdk"
+    ],
     "projectsRelationship": "independent",
     "conventionalCommits": {
       "types": {
