@@ -24,6 +24,7 @@ import videoPlaceholder from '@/assets/images/video-placeholder.png';
 // @ts-expect-error something broken with local assets, will fix later
 import filePlaceholder from '@/assets/images/file-placeholder.png';
 import { Place, PlaceSearchDropdown } from '@/components/PlaceSearchDropdown';
+import { placesApiKey } from '@/constants/stream';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
@@ -147,10 +148,9 @@ export const ActivityComposer = () => {
         onChangeText={setText}
       />
 
-      <PlaceSearchDropdown
-        apiKey={'6758e7d54b454482b4eaf7de45e60fb2'}
-        onPlaceSelected={setLocation}
-      />
+      {placesApiKey ? (
+        <PlaceSearchDropdown onPlaceSelected={setLocation} />
+      ) : null}
 
       <View style={styles.mediaPreviewContainer}>
         {files.map((asset, index) => (

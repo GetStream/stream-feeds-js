@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useStableCallback } from '@/hooks/useStableCallback';
+import { placesApiKey } from '@/constants/stream';
 
 export type Place = {
   latitude: number;
@@ -18,12 +19,10 @@ export type Place = {
 };
 
 type PlaceSearchDropdownProps = {
-  apiKey: string;
   onPlaceSelected: (place: Place | null) => void;
 };
 
 export const PlaceSearchDropdown = ({
-  apiKey,
   onPlaceSelected,
 }: PlaceSearchDropdownProps) => {
   const [query, setQuery] = useState('');
@@ -37,7 +36,7 @@ export const PlaceSearchDropdown = ({
       const res = await fetch(
         `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
           text,
-        )}&limit=3&lang=en&apiKey=${apiKey}`,
+        )}&limit=3&lang=en&apiKey=${placesApiKey}`,
       );
       const json = await res.json();
       setResults(
