@@ -1,7 +1,7 @@
 {
-  "name": "@stream-io/feeds-react-native-sdk",
+  "name": "@stream-io/feeds-react-sdk",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/react-native-sdk/src",
+  "sourceRoot": "packages/react-sdk/src",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -27,9 +27,9 @@
         "push": true,
         "skipCommitTypes": ["ci", "refactor", "test", "docs"],
         "postTargets": [
-          "@stream-io/feeds-react-native-sdk:update-version",
-          "@stream-io/feeds-react-native-sdk:github",
-          "@stream-io/feeds-react-native-sdk:publish"
+          "@stream-io/feeds-react-sdk:update-version",
+          "@stream-io/feeds-react-sdk:github",
+          "@stream-io/feeds-react-sdk:publish"
         ]
       }
     },
