@@ -23,6 +23,8 @@ export class SearchController {
   /**
    * Not intended for direct use by integrators, might be removed without notice resulting in
    * broken integrations.
+   *
+   * @internal
    */
   _internalState: StateStore<InternalSearchControllerState>;
   state: StateStore<SearchControllerState>;
