@@ -7,7 +7,7 @@ import {
   waitForEvent,
 } from './utils';
 import { ConnectedEvent } from '../src/common/real-time/event-models';
-import { FeedsClient } from '../src/FeedsClient';
+import { FeedsClient } from '../src/feeds-client';
 describe('WebSocket connection', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();

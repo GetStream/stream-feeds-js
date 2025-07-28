@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { FeedsClient } from '../../src/FeedsClient';
+import { FeedsClient } from '../../src/feeds-client';
 import type { UserRequest } from '../../src/gen/models';
 import type { TokenOrProvider } from '../../src/types';
 import type { FeedsClientOptions } from '../../src/common/types';

@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { ActivityResponse, FeedsReactionResponse } from '../gen/models';
+import { ActivityResponse, FeedsReactionResponse } from '../../../gen/models';
 import {
   addActivitiesToState,
   updateActivityInState,
   removeActivityFromState,
-} from './activity-utils';
+} from './';
 
 const createMockActivity = (id: string, text?: string): ActivityResponse =>
   ({
@@ -181,6 +181,7 @@ describe('activity-utils', () => {
       ];
       originalActivity.reaction_groups = {
         like: {
+          sum_scores: 0,
           count: 1,
           first_reaction_at: new Date(),
           last_reaction_at: new Date(),

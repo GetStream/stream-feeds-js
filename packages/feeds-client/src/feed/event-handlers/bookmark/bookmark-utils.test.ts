@@ -6,7 +6,7 @@ import {
   ActivityResponse,
   BookmarkResponse,
   UserResponse,
-} from '../gen/models';
+} from '../../../gen/models';
 import {
   addBookmarkToActivity,
   removeBookmarkFromActivity,
@@ -14,7 +14,7 @@ import {
   addBookmarkToActivities,
   removeBookmarkFromActivities,
   updateBookmarkInActivities,
-} from './bookmark-utils';
+} from './';
 
 const createMockUser = (id: string): UserResponse => ({
   id,

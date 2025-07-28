@@ -1,4 +1,4 @@
-import { Feed, FeedState } from '../../../src/Feed';
+import { Feed, FeedState } from '../../../src/feed';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useStateStore } from '../useStateStore';
 

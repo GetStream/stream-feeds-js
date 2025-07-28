@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Feed, FeedState } from '../../../src/Feed';
+import { Feed, FeedState } from '../../../src/feed';
 import { FeedOwnCapability } from '../../../src/gen/models';
 import { useStateStore } from '../useStateStore';
 import { useFeedContext } from '../../contexts/StreamFeedContext';

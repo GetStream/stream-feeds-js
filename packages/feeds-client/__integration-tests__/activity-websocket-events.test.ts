@@ -6,13 +6,13 @@ import {
   getTestUser,
   waitForEvent,
 } from './utils';
-import { FeedsClient } from '../src/FeedsClient';
+import { FeedsClient } from '../src/feeds-client';
 import {
   ActivityAddedEvent,
   ActivityUpdatedEvent,
   ActivityDeletedEvent,
 } from '../src/gen/models';
-import { Feed } from '../src/Feed';
+import { Feed } from '../src/feed';
 
 describe('Activity state updates via WebSocket events', () => {
   let client: FeedsClient;

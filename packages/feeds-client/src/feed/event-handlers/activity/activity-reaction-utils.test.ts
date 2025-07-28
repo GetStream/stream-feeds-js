@@ -4,13 +4,13 @@ import {
   ActivityReactionDeletedEvent,
   ActivityResponse,
   FeedsReactionResponse,
-} from '../gen/models';
+} from '../../../gen/models';
 import {
   addReactionToActivity,
   removeReactionFromActivity,
   addReactionToActivities,
   removeReactionFromActivities,
-} from './activity-reaction-utils';
+} from './';
 
 const createMockActivity = (id: string): ActivityResponse => ({
   id,
@@ -109,6 +109,7 @@ describe('activity-reaction-utils', () => {
           count: 1,
           first_reaction_at: reaction.created_at,
           last_reaction_at: reaction.created_at,
+          sum_scores: 0,
         },
       };
 
@@ -123,6 +124,7 @@ describe('activity-reaction-utils', () => {
         count: 1,
         first_reaction_at: reaction.created_at,
         last_reaction_at: reaction.created_at,
+        sum_scores: 0,
       });
     });
 
@@ -136,6 +138,7 @@ describe('activity-reaction-utils', () => {
           count: 1,
           first_reaction_at: reaction.created_at,
           last_reaction_at: reaction.created_at,
+          sum_scores: 0,
         },
       };
       const event = createMockAddedEvent(reaction, eventActivity);
@@ -150,6 +153,7 @@ describe('activity-reaction-utils', () => {
         count: 1,
         first_reaction_at: reaction.created_at,
         last_reaction_at: reaction.created_at,
+        sum_scores: 0,
       });
     });
   });
@@ -165,6 +169,7 @@ describe('activity-reaction-utils', () => {
           count: 1,
           first_reaction_at: reaction.created_at,
           last_reaction_at: reaction.created_at,
+          sum_scores: 0,
         },
       };
       const event = createMockAddedEvent(reaction, eventActivity);
@@ -196,6 +201,7 @@ describe('activity-reaction-utils', () => {
           count: 1,
           first_reaction_at: reaction.created_at,
           last_reaction_at: reaction.created_at,
+          sum_scores: 0,
         },
       };
       const event = createMockAddedEvent(reaction, eventActivity);
@@ -230,6 +236,7 @@ describe('activity-reaction-utils', () => {
           count: 1,
           first_reaction_at: reaction.created_at,
           last_reaction_at: reaction.created_at,
+          sum_scores: 0,
         },
       };
       const event = createMockAddedEvent(reaction, eventActivity);
@@ -253,6 +260,7 @@ describe('activity-reaction-utils', () => {
           count: 1,
           first_reaction_at: reaction.created_at,
           last_reaction_at: reaction.created_at,
+          sum_scores: 0,
         },
       };
       const event = createMockAddedEvent(reaction, eventActivity);
@@ -274,6 +282,7 @@ describe('activity-reaction-utils', () => {
           count: 1,
           first_reaction_at: reaction.created_at,
           last_reaction_at: reaction.created_at,
+          sum_scores: 0,
         },
       };
       const event = createMockAddedEvent(reaction, eventActivity);
@@ -296,6 +305,7 @@ describe('activity-reaction-utils', () => {
           count: 1,
           first_reaction_at: reaction.created_at,
           last_reaction_at: reaction.created_at,
+          sum_scores: 0,
         },
       };
       const event = createMockAddedEvent(reaction, eventActivity);

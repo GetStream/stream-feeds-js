@@ -1,7 +1,7 @@
 import { BaseSearchSource } from './BaseSearchSource';
 import type { SearchSourceOptions } from './BaseSearchSource';
 
-import { FeedsClient } from '../FeedsClient';
+import { FeedsClient } from '../feeds-client';
 import { UserResponse } from '../gen/models';
 
 export class UserSearchSource extends BaseSearchSource<UserResponse> {

@@ -1,5 +1,5 @@
-import { FeedsClient } from '../src/FeedsClient';
-import { Feed } from '../src/Feed';
+import { FeedsClient } from '../src/feeds-client';
+import { Feed } from '../src/feed';
 import { UserRequest } from '../src/gen/models';
 import { FeedsClientOptions } from '../src/common/types';
 import { WSEvent } from '../src/gen/models';

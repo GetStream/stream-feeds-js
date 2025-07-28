@@ -11,6 +11,7 @@ import {
   QueryFeedsRequest,
   QueryPollVotesRequest,
   SingleFollowRequest,
+  UpdateFollowRequest,
   UserRequest,
   WSEvent,
 } from './gen/models';
@@ -27,14 +28,19 @@ import {
   streamDevToken,
 } from './common/utils';
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
-import { Feed } from './Feed';
 import {
   FeedsClientOptions,
   NetworkChangedEvent,
   StreamResponse,
 } from './common/types';
-import { ModerationClient } from './ModerationClient';
+import { ModerationClient } from './moderation-client';
 import { StreamPoll } from './common/Poll';
+import {
+  Feed,
+  handleFollowCreated,
+  handleFollowDeleted,
+  handleFollowUpdated,
+} from './feed';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -363,6 +369,21 @@ export class FeedsClient extends FeedsApi {
     this.eventDispatcher.dispatch(networkEvent);
   };
 
+  async updateFollow(request: UpdateFollowRequest) {
+    const response = await super.updateFollow(request);
+
+    [response.follow.source_feed.fid, response.follow.target_feed.fid].forEach(
+      (fid) => {
+        const feed = this.activeFeeds[fid];
+        if (feed) {
+          handleFollowUpdated.bind(feed)(response);
+        }
+      },
+    );
+
+    return response;
+  }
+
   // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
   async follow(request: SingleFollowRequest) {
     const response = await super.follow(request);
@@ -371,7 +392,7 @@ export class FeedsClient extends FeedsApi {
       (fid) => {
         const feed = this.activeFeeds[fid];
         if (feed) {
-          feed.handleFollowCreated(response.follow);
+          handleFollowCreated.bind(feed)(response);
         }
       },
     );
@@ -385,7 +406,7 @@ export class FeedsClient extends FeedsApi {
     response.follows.forEach((follow) => {
       const feed = this.activeFeeds[follow.source_feed.fid];
       if (feed) {
-        feed.handleFollowCreated(follow);
+        handleFollowCreated.bind(feed)({ follow });
       }
     });
 
@@ -398,7 +419,7 @@ export class FeedsClient extends FeedsApi {
     [request.source, request.target].forEach((fid) => {
       const feed = this.activeFeeds[fid];
       if (feed) {
-        feed.handleFollowDeleted(response.follow);
+        handleFollowDeleted.bind(this)(response.follow);
       }
     });
 

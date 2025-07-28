@@ -1,4 +1,4 @@
-import type { FeedsClientState } from '../../../src/FeedsClient';
+import type { FeedsClientState } from '../../../src/feeds-client';
 import { useStateStore } from '../useStateStore';
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
 

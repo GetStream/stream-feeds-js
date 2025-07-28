@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 
-import { uniqueArrayMerge } from './utils';
+import { uniqueArrayMerge } from './unique-array-merge';
 
 describe('utils', () => {
-  describe('uniqueMerge', () => {
+  describe(uniqueArrayMerge.name, () => {
     it('should merge arrays with unique objects based on key', () => {
       const existingArray = [
         { id: '1', name: 'Alice' },
@@ -123,7 +123,11 @@ describe('utils', () => {
         email: string;
       }) => item.email;
 
-      const result = uniqueArrayMerge(existingArray, arrayToMerge, getKeyByEmail);
+      const result = uniqueArrayMerge(
+        existingArray,
+        arrayToMerge,
+        getKeyByEmail,
+      );
 
       expect(result).toEqual([
         { id: '1', name: 'Alice', email: 'alice@example.com' },
