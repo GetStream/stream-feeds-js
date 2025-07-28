@@ -1,7 +1,7 @@
 import { StateStore } from './StateStore';
 import { debounce, type DebouncedFunc } from './utils';
 
-export type SearchSourceType = 'activity' | 'users' | 'feeds' | (string & {});
+export type SearchSourceType = 'activity' | 'user' | 'feed' | (string & {});
 
 export type QueryReturnValue<T> = { items: T[]; next?: string | null };
 
