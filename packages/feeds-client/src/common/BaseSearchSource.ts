@@ -69,7 +69,6 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
   state: StateStore<SearchSourceState<T>>;
   protected pageSize: number;
   protected allowEmptySearchString: boolean;
-  protected lastSearchQuery: string | undefined;
   abstract readonly type: SearchSourceType;
   protected searchDebounced!: DebouncedExecQueryFunction;
 
@@ -81,7 +80,6 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
     this.pageSize = pageSize;
     this.allowEmptySearchString = allowEmptySearchString;
     this.state = new StateStore<SearchSourceState<T>>(this.initialState);
-    this.lastSearchQuery = this.searchQuery;
     this.setDebounceOptions({ debounceMs });
   }
 
@@ -192,7 +190,7 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
 
   async executeQuery(newSearchString?: string) {
     if (!this.canExecuteQuery(newSearchString)) return;
-    const hasNewSearchQuery = this.lastSearchQuery !== newSearchString;
+    const hasNewSearchQuery = typeof newSearchString !== 'undefined';
     const searchString = newSearchString ?? this.searchQuery;
 
     if (hasNewSearchQuery) {
@@ -215,7 +213,6 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
         stateUpdate.hasNext = items.length === this.pageSize;
       }
 
-      this.lastSearchQuery = newSearchString;
       stateUpdate.items = await this.filterQueryResults(items);
     } catch (e) {
       stateUpdate.lastQueryError = e as Error;
