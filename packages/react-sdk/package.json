@@ -1,0 +1,43 @@
+{
+  "name": "@stream-io/feeds-react-sdk",
+  "version": "0.0.0",
+  "description": "Feeds SDK for React",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "prepare": "yarn run build",
+    "prepack": "cp ../../LICENSE ./LICENSE",
+    "postpack": "rimraf ./LICENSE",
+    "version": "echo \"export default /$npm_package_version';\" > src/version.ts"
+  },
+  "peerDependencies": {
+    "react": "^18 || ^19"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "react",
+    "sdk",
+    "feeds",
+    "v3"
+  ],
+  "author": {
+    "name": "GetStream.io, Inc.",
+    "url": "https://getstream.io/team/"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "@stream-io/feeds-client": "workspace:*"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3"
+  }
+}
