@@ -94,6 +94,10 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
               options={{ title: 'Profile' }}
             />
             <Stack.Screen
+              name="location-map-screen"
+              options={{ title: 'Location' }}
+            />
+            <Stack.Screen
               name="create-post-modal"
               options={{
                 title: 'New Post',
