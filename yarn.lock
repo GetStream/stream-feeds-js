@@ -6052,6 +6052,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@stream-io/feeds-react-sdk@workspace:packages/react-sdk":
+  version: 0.0.0-use.local
+  resolution: "@stream-io/feeds-react-sdk@workspace:packages/react-sdk"
+  dependencies:
+    "@stream-io/feeds-client": "workspace:*"
+    rimraf: ^6.0.1
+    typescript: ^5.8.3
+  peerDependencies:
+    react: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
 "@stream-io/node-sdk@npm:0.5.0":
   version: 0.5.0
   resolution: "@stream-io/node-sdk@npm:0.5.0"
