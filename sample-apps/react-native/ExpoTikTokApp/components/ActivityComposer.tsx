@@ -23,6 +23,7 @@ import { router } from 'expo-router';
 import videoPlaceholder from '@/assets/images/video-placeholder.png';
 // @ts-expect-error something broken with local assets, will fix later
 import filePlaceholder from '@/assets/images/file-placeholder.png';
+import { Place, PlaceSearchDropdown } from '@/components/PlaceSearchDropdown';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
@@ -30,6 +31,7 @@ export const ActivityComposer = () => {
   const [text, setText] = useState('');
   const [files, setFiles] = useState<StreamFile[]>([]);
   const [media, setMedia] = useState<Attachment[]>([]);
+  const [location, setLocation] = useState<Place | null>(null);
   const [isSending, setIsSending] = useState(false);
 
   const pickMedia = useCallback(async () => {
@@ -87,7 +89,7 @@ export const ActivityComposer = () => {
         }),
       ]);
     }
-  }, [client, files]);
+  }, [client]);
 
   const sendActivity = useCallback(async () => {
     if (!feed) {
@@ -99,18 +101,28 @@ export const ActivityComposer = () => {
         type: 'post',
         text,
         attachments: media,
+        ...(location
+          ? {
+              location: {
+                lat: location.latitude,
+                lng: location.longitude,
+              },
+              custom: {
+                locationName: location.name,
+              },
+            }
+          : {}),
       });
       setMedia([]);
       setText('');
     } catch (error) {
-      console.error(error);
       if (error instanceof Error) {
         console.error(error);
       }
     } finally {
       setIsSending(false);
     }
-  }, [feed, media, text]);
+  }, [feed, location, media, text]);
 
   const submitPressHandler = useCallback(async () => {
     await sendActivity();
@@ -133,6 +145,11 @@ export const ActivityComposer = () => {
         multiline
         value={text}
         onChangeText={setText}
+      />
+
+      <PlaceSearchDropdown
+        apiKey={'6758e7d54b454482b4eaf7de45e60fb2'}
+        onPlaceSelected={setLocation}
       />
 
       <View style={styles.mediaPreviewContainer}>
@@ -230,4 +247,6 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 6,
   },
+  searchContainer: { position: 'absolute', top: 20, width: '100%', zIndex: 10 },
+  listView: { backgroundColor: 'white', height: 400 },
 });
