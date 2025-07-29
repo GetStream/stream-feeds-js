@@ -1,12 +1,16 @@
 import { PlaceSearchDropdown } from '@/components/PlaceSearchDropdown';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 const CreatePostScreen = () => {
   return (
-    <View style={{ flex: 1, backgroundColor: 'fff' }}>
+    <View style={styles.container}>
       <PlaceSearchDropdown />
     </View>
   );
 };
 
 export default CreatePostScreen;
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: 'fff' },
+});

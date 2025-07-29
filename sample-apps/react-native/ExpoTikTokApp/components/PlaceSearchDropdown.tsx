@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 export type Place = {
   latitude: number;
   longitude: number;
+  address: string;
   name: string;
   id: string;
 };
@@ -48,11 +49,14 @@ export const PlaceSearchDropdown = () => {
               city: string;
               country: string;
               place_id: string;
+              address_line1: string;
+              address_line2: string
             };
           }) => {
-            const { lat, lon, city, country, place_id } = place.properties;
+            const { lat, lon, city, country, place_id, address_line1, address_line2 } = place.properties;
 
             return {
+              address: `${address_line1}, ${address_line2}`,
               latitude: lat,
               longitude: lon,
               name: `${city}, ${country}`,

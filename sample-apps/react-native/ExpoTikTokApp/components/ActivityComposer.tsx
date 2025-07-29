@@ -224,7 +224,7 @@ export const ActivityComposer = () => {
                 {location ? location.name : 'Tag location'}
               </Text>
               <Text style={styles.locationSubtitle}>
-                {location ? 'Address 1' : 'Cities, Countries and Towns'}
+                {location ? location.address : 'Cities, Countries and Towns'}
               </Text>
             </View>
             {location ? (
