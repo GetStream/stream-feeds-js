@@ -187,7 +187,7 @@ export const ActivityComposer = () => {
           <MediaPickerRow files={files} onRemove={removeFile} />
         ) : (
           <Text style={styles.uploadHint}>
-            📘 Upload at least one photo (max 10) or a video.
+            📘 Add a video and bring your post to life !
           </Text>
         )}
       </View>
