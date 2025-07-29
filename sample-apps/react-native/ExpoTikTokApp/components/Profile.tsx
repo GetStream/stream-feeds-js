@@ -27,6 +27,6 @@ export const Profile = ({
 
 const styles = StyleSheet.create({
   feedContainer: {
-    height: '100%',
+    flex: 1,
   },
 });
