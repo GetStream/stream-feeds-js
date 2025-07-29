@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Pressable,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 
 import * as ImagePicker from 'expo-image-picker';
@@ -159,13 +160,25 @@ export const ActivityComposer = () => {
     [isSending, media.length],
   );
 
+  const uploadButtonDisabled = useMemo(
+    () => media.length >= 1 || files.length >= 1,
+    [files.length, media.length],
+  );
+
   return (
     <ScrollView
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.uploadItemsContainer}>
-        <Pressable onPress={pickMedia} style={styles.uploadContainer}>
+        <Pressable
+          disabled={uploadButtonDisabled}
+          onPress={pickMedia}
+          style={[
+            styles.uploadContainer,
+            uploadButtonDisabled ? { opacity: 0.5 } : {},
+          ]}
+        >
           <Ionicons name="add-outline" size={32} color="#888" />
           <Text style={styles.uploadText}>Add</Text>
         </Pressable>
@@ -250,7 +263,13 @@ export const MediaPickerRow = ({
   files: StreamFile[];
   onRemove: (index: number) => void;
 }) => {
-  const { media } = usePostCreationContext();
+  const renderMediaItem = useCallback(
+    ({ item, index }: { item: StreamFile; index: number }) => {
+      return <MediaThumbnail file={item} index={index} onRemove={onRemove} />;
+    },
+    [onRemove],
+  );
+
   return (
     <FlatList
       data={files}
@@ -258,39 +277,55 @@ export const MediaPickerRow = ({
       keyExtractor={(item, index) => `${item.name}_${index}`}
       contentContainerStyle={styles.listContainer}
       showsHorizontalScrollIndicator={false}
-      renderItem={({ item: asset, index }) => (
-        <View style={styles.thumbnailContainer}>
-          {isImageFile(asset) ? (
-            <Image
-              source={{
-                uri:
-                  media?.[index]?.image_url ?? (asset as { uri: string }).uri,
-              }}
-              style={styles.thumbnail}
-              resizeMode="cover"
-            />
-          ) : (
-            <Image
-              source={
-                media?.[index] && media[index].thumb_url
-                  ? { uri: media[index].thumb_url }
-                  : isVideoFile(asset)
-                    ? videoPlaceholder
-                    : filePlaceholder
-              }
-              style={styles.thumbnail}
-              resizeMode="cover"
-            />
-          )}
-          <Pressable
-            onPress={() => onRemove(index)}
-            style={styles.removeButton}
-          >
-            <Ionicons name="close" size={16} color="#fff" />
-          </Pressable>
+      renderItem={renderMediaItem}
+    />
+  );
+};
+
+const MediaThumbnail = ({
+  file,
+  index,
+  onRemove,
+}: {
+  file: StreamFile;
+  index: number;
+  onRemove: (index: number) => void;
+}) => {
+  const { media } = usePostCreationContext();
+  const asset = useMemo(() => media?.[index], [index, media]);
+  return (
+    <View style={styles.thumbnailContainer}>
+      {isImageFile(file) ? (
+        <Image
+          source={{
+            uri: asset?.image_url ?? (file as { uri: string }).uri,
+          }}
+          style={styles.thumbnail}
+          resizeMode="cover"
+        />
+      ) : asset ? (
+        <Image
+          source={
+            asset.thumb_url
+              ? { uri: asset.thumb_url }
+              : isVideoFile(file)
+                ? videoPlaceholder
+                : filePlaceholder
+          }
+          style={styles.thumbnail}
+          resizeMode="cover"
+        />
+      ) : (
+        <View style={styles.placeholderContainer}>
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size="small" color="#aaa" />
+          </View>
         </View>
       )}
-    />
+      <Pressable onPress={() => onRemove(index)} style={styles.removeButton}>
+        <Ionicons name="close" size={16} color="#fff" />
+      </Pressable>
+    </View>
   );
 };
 
@@ -416,5 +451,20 @@ const styles = StyleSheet.create({
     right: 10,
     top: '50%',
     marginTop: -10,
+  },
+  placeholderContainer: {
+    width: 70,
+    height: 70,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  spinnerContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -10 }, { translateY: -10 }],
   },
 });
