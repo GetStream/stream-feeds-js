@@ -5,7 +5,7 @@ import { Place } from '@/components/PlaceSearchDropdown';
 import { useRouter } from 'expo-router';
 
 type LocationPreviewProps = {
-  location: Omit<Place, 'id'>;
+  location: Omit<Place, 'id' | 'address'>;
 };
 
 export const LocationPreview = ({ location }: LocationPreviewProps) => {

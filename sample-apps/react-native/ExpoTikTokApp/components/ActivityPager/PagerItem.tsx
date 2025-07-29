@@ -2,7 +2,6 @@ import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { useFeedContext } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
 import {
-  Alert,
   Dimensions,
   StyleSheet,
   Text,
@@ -18,6 +17,7 @@ import { Bookmark } from '@/components/Bookmark';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationPreview } from '@/components/LocationPreview';
+import { ShareButton } from '@/components/Share';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -95,16 +95,9 @@ const UnmemoizedPagerItem = ({
             <Text style={styles.iconLabel}>{activity.bookmark_count ?? 0}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() =>
-              Alert.alert(
-                'Sharing was captured successfully, but is not implemented yet !',
-              )
-            }
-            style={styles.iconContainer}
-          >
-            <Ionicons name="arrow-redo-outline" size={28} color="white" />
-          </TouchableOpacity>
+          <View style={styles.iconContainer}>
+            <ShareButton attachment={videoAttachment} />
+          </View>
         </View>
       </View>
     );
