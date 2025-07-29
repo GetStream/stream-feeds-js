@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   TextInput,
   Text,
@@ -21,6 +21,18 @@ export type Place = {
   name: string;
   id: string;
 };
+
+const ListEmptyComponent = () => (
+  <View style={styles.emptyContainer}>
+    <Ionicons name="search-outline" size={40} color="#ccc" />
+    <Text style={styles.title}>No locations found</Text>
+    <Text style={styles.subtitle}>
+      Try searching for a place, hotel or attraction
+    </Text>
+  </View>
+);
+
+const keyExtractor = (item: Place) => item.id;
 
 export const PlaceSearchDropdown = () => {
   const [query, setQuery] = useState('');
@@ -50,10 +62,18 @@ export const PlaceSearchDropdown = () => {
               country: string;
               place_id: string;
               address_line1: string;
-              address_line2: string
+              address_line2: string;
             };
           }) => {
-            const { lat, lon, city, country, place_id, address_line1, address_line2 } = place.properties;
+            const {
+              lat,
+              lon,
+              city,
+              country,
+              place_id,
+              address_line1,
+              address_line2,
+            } = place.properties;
 
             return {
               address: `${address_line1}, ${address_line2}`,
@@ -105,6 +125,21 @@ export const PlaceSearchDropdown = () => {
     router.back();
   });
 
+  const renderItem = useCallback(
+    ({ item }: { item: Place }) => (
+      <Pressable
+        onTouchStart={() => {
+          resultPressedRef.current = true;
+        }}
+        style={styles.item}
+        onPress={() => handleSelect(item)}
+      >
+        <Text style={styles.name}>{item.name}</Text>
+      </Pressable>
+    ),
+    [handleSelect],
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -136,27 +171,9 @@ export const PlaceSearchDropdown = () => {
           data={results}
           contentContainerStyle={styles.listContainer}
           style={{ flex: 1 }}
-          renderItem={({ item }: { item: Place }) => (
-            <Pressable
-              onTouchStart={() => {
-                resultPressedRef.current = true;
-              }}
-              style={styles.item}
-              onPress={() => handleSelect(item)}
-            >
-              <Text style={styles.name}>{item.name}</Text>
-            </Pressable>
-          )}
-          keyExtractor={(item: Place) => item.id}
-          ListEmptyComponent={() => (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="search-outline" size={40} color="#ccc" />
-              <Text style={styles.title}>No locations found</Text>
-              <Text style={styles.subtitle}>
-                Try searching for a place, hotel or attraction
-              </Text>
-            </View>
-          )}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          ListEmptyComponent={ListEmptyComponent}
         />
       </View>
     </View>
