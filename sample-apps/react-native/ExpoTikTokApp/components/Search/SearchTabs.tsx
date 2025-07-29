@@ -8,6 +8,7 @@ import {
 const tabsNameMap = {
   feed: 'Users',
   activity: 'Posts',
+  'activity-location': 'Places'
 };
 
 export const SearchTabs = () => {

@@ -9,6 +9,7 @@ import {
 import { SearchBar } from '@/components/Search/SearchBar';
 import { SearchTabs } from '@/components/Search/SearchTabs';
 import { SearchResults } from '@/components/Search/SearchResults';
+import { LocationSearchSource } from '@/components/Search/sources/LocationSearchSource';
 
 export const Search = () => {
   const client = useFeedsClient();
@@ -24,6 +25,7 @@ export const Search = () => {
           groupId: 'user',
           allowEmptySearchString: true,
         }),
+        new LocationSearchSource(client, { allowEmptySearchString: true }),
       ],
       config: { keepSingleActiveSource: true },
     });

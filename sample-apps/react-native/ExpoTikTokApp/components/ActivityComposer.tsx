@@ -116,6 +116,10 @@ export const ActivityComposer = () => {
               custom: {
                 locationName: location.name,
               },
+              // So that activities can also be searched by location
+              search_data: {
+                locationName: location.name,
+              }
             }
           : {}),
       });
