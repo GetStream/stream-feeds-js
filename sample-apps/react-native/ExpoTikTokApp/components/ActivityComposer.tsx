@@ -4,9 +4,10 @@ import {
   TextInput,
   Image,
   ScrollView,
-  TouchableOpacity,
   Text,
   StyleSheet,
+  Pressable,
+  FlatList,
 } from 'react-native';
 
 import * as ImagePicker from 'expo-image-picker';
@@ -18,22 +19,26 @@ import {
   useFeedContext,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 // @ts-expect-error something broken with local assets, will fix later
 import videoPlaceholder from '@/assets/images/video-placeholder.png';
 // @ts-expect-error something broken with local assets, will fix later
 import filePlaceholder from '@/assets/images/file-placeholder.png';
-import { Place, PlaceSearchDropdown } from '@/components/PlaceSearchDropdown';
 import { placesApiKey } from '@/constants/stream';
+import { Ionicons } from '@expo/vector-icons';
+import { usePostCreationContext } from '@/contexts/PostCreationContext';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
   const feed = useFeedContext();
+  const router = useRouter();
+
   const [text, setText] = useState('');
   const [files, setFiles] = useState<StreamFile[]>([]);
   const [media, setMedia] = useState<Attachment[]>([]);
-  const [location, setLocation] = useState<Place | null>(null);
   const [isSending, setIsSending] = useState(false);
+
+  const { location, setLocation } = usePostCreationContext();
 
   const pickMedia = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -128,7 +133,7 @@ export const ActivityComposer = () => {
   const submitPressHandler = useCallback(async () => {
     await sendActivity();
     router.back();
-  }, [sendActivity]);
+  }, [router, sendActivity]);
 
   const submitButtonDisabled = useMemo(
     () => isSending || media.length < 1,
@@ -136,117 +141,259 @@ export const ActivityComposer = () => {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.subtitle}>
-        Upload a video and write something about it !
-      </Text>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.uploadItemsContainer}>
+        <Pressable onPress={pickMedia} style={styles.uploadContainer}>
+          <Ionicons name="add-outline" size={32} color="#888" />
+          <Text style={styles.uploadText}>Add</Text>
+        </Pressable>
+        {files.length > 0 ? (
+          <MediaPickerRow media={files} onRemove={() => null} />
+        ) : (
+          <Text style={styles.uploadHint}>
+            📘 Upload at least one photo (max 10) or a video.
+          </Text>
+        )}
+      </View>
+
+      <View style={styles.rewardBanner}>
+        <Text style={styles.rewardText}>
+          You have used {text.length} out of 250 characters.
+        </Text>
+      </View>
+
       <TextInput
-        placeholder="What's happening?"
-        style={styles.input}
         multiline
+        style={styles.descriptionInput}
+        placeholder="💡 Tell us more about your post."
+        placeholderTextColor="#888"
         value={text}
         onChangeText={setText}
       />
 
       {placesApiKey ? (
-        <PlaceSearchDropdown onPlaceSelected={setLocation} />
-      ) : null}
-
-      <View style={styles.mediaPreviewContainer}>
-        {files.map((asset, index) => (
-          <View key={index} style={styles.previewItem}>
-            {isImageFile(asset) ? (
-              <Image
-                source={{
-                  uri:
-                    media?.[index]?.image_url ?? (asset as { uri: string }).uri,
+        <>
+          <Pressable
+            style={styles.locationRow}
+            onPress={() => router.push('/pick-location-modal')}
+            disabled={!!location}
+          >
+            <Ionicons
+              name="location-outline"
+              size={22}
+              color="#555"
+              style={styles.locationIcon}
+            />
+            <View style={styles.locationTextContainer}>
+              <Text style={styles.locationTitle}>
+                {location ? location.name : 'Tag location'}
+              </Text>
+              <Text style={styles.locationSubtitle}>
+                {location ? 'Address 1' : 'Cities, Countries and Towns'}
+              </Text>
+            </View>
+            {location ? (
+              <Pressable
+                style={styles.cancelLocationButton}
+                onPress={() => {
+                  setLocation?.(null);
                 }}
-                style={styles.media}
-                resizeMode="cover"
-              />
+              >
+                <Ionicons name="close" size={20} color="#888" />
+              </Pressable>
             ) : (
-              <Image
-                source={
-                  media?.[index] && media[index].thumb_url
-                    ? { uri: media[index].thumb_url }
-                    : isVideoFile(asset)
-                      ? videoPlaceholder
-                      : filePlaceholder
-                }
-                style={styles.media}
-                resizeMode="cover"
-              />
+              <Ionicons name="chevron-forward" size={20} color="#999" />
             )}
-          </View>
-        ))}
-      </View>
-
-      <TouchableOpacity onPress={pickMedia} style={styles.button}>
-        <Text style={styles.buttonText}>Upload Video</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
+          </Pressable>
+        </>
+      ) : null}
+      <Pressable
         disabled={submitButtonDisabled}
         onPress={submitPressHandler}
-        style={submitButtonDisabled ? styles.disabledButton : styles.button}
+        style={[
+          styles.postButton,
+          submitButtonDisabled ? styles.disabledPostButton : {},
+        ]}
       >
-        <Text style={styles.buttonText}>Submit</Text>
-      </TouchableOpacity>
+        <Text style={styles.postButtonText}>Post</Text>
+      </Pressable>
     </ScrollView>
+  );
+};
+
+type Props = {
+  media: any[];
+  onRemove: (id: string) => void;
+};
+
+export const MediaPickerRow = ({ media, onRemove }: Props) => {
+  return (
+    <FlatList
+      data={media}
+      horizontal
+      keyExtractor={(item, index) => `${item.name}_${index}`}
+      contentContainerStyle={styles.listContainer}
+      showsHorizontalScrollIndicator={false}
+      renderItem={({ item: asset, index }) => (
+        <View style={styles.thumbnailContainer}>
+          {isImageFile(asset) ? (
+            <Image
+              source={{
+                uri:
+                  media?.[index]?.image_url ?? (asset as { uri: string }).uri,
+              }}
+              style={styles.thumbnail}
+              resizeMode="cover"
+            />
+          ) : (
+            <Image
+              source={
+                media?.[index] && media[index].thumb_url
+                  ? { uri: media[index].thumb_url }
+                  : isVideoFile(asset)
+                    ? videoPlaceholder
+                    : filePlaceholder
+              }
+              style={styles.thumbnail}
+              resizeMode="cover"
+            />
+          )}
+          <Pressable
+            onPress={() => onRemove(asset.id)}
+            style={styles.removeButton}
+          >
+            <Ionicons name="close" size={16} color="#fff" />
+          </Pressable>
+        </View>
+      )}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
   },
-  subtitle: {
-    fontSize: 16,
-    marginVertical: 16,
+  uploadItemsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
   },
-  input: {
-    fontSize: 16,
-    minHeight: 100,
+  uploadContainer: {
+    height: 90,
+    width: 90,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    marginRight: 16,
+  },
+  uploadText: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#666',
+  },
+  uploadHint: {
+    color: '#888',
+    fontSize: 15,
+    marginRight: 16,
+    flexShrink: 1,
+  },
+  rewardBanner: {
+    backgroundColor: '#004d40',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  rewardText: {
+    color: '#fff',
+    fontWeight: '500',
+    fontSize: 13,
+  },
+  descriptionInput: {
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 6,
-    padding: 12,
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 100,
+    textAlignVertical: 'top',
+    fontSize: 14,
     marginBottom: 16,
   },
-  button: {
-    backgroundColor: '#1DA1F2',
-    paddingVertical: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  disabledButton: {
-    backgroundColor: 'grey',
-    paddingVertical: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  mediaPreviewContainer: {
+  locationRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
+    paddingVertical: 14,
+    backgroundColor: '#fff',
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+  },
+  locationIcon: {
+    marginRight: 12,
+  },
+  locationTextContainer: {
+    flex: 1,
+  },
+  locationTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#222',
+  },
+  locationSubtitle: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  postButton: {
+    marginTop: 24,
+    backgroundColor: '#00d26a',
+    borderRadius: 24,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  disabledPostButton: {
+    backgroundColor: 'grey',
+  },
+  postButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  // media row
+
+  listContainer: {
+    paddingVertical: 12,
     gap: 8,
   },
-  previewItem: {
-    width: 100,
-    height: 100,
-    marginRight: 8,
-    marginBottom: 8,
+  thumbnailContainer: {
+    position: 'relative',
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  media: {
+  thumbnail: {
     width: '100%',
     height: '100%',
-    borderRadius: 6,
   },
-  searchContainer: { position: 'absolute', top: 20, width: '100%', zIndex: 10 },
-  listView: { backgroundColor: 'white', height: 400 },
+  removeButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 999,
+    padding: 2,
+  },
+  cancelLocationButton: {
+    position: 'absolute',
+    right: 10,
+    top: '50%',
+    marginTop: -10,
+  },
 });

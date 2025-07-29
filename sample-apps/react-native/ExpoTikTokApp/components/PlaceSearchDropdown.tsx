@@ -6,10 +6,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   Pressable,
+  FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { placesApiKey } from '@/constants/stream';
+import { usePostCreationContext } from '@/contexts/PostCreationContext';
+import { useRouter } from 'expo-router';
 
 export type Place = {
   latitude: number;
@@ -18,17 +21,14 @@ export type Place = {
   id: string;
 };
 
-type PlaceSearchDropdownProps = {
-  onPlaceSelected: (place: Place | null) => void;
-};
-
-export const PlaceSearchDropdown = ({
-  onPlaceSelected,
-}: PlaceSearchDropdownProps) => {
+export const PlaceSearchDropdown = () => {
   const [query, setQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [results, setResults] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const { setLocation } = usePostCreationContext();
+  const router = useRouter();
 
   const fetchPlaces = useStableCallback(async (text: string) => {
     setLoading(true);
@@ -36,7 +36,7 @@ export const PlaceSearchDropdown = ({
       const res = await fetch(
         `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
           text,
-        )}&limit=3&lang=en&apiKey=${placesApiKey}`,
+        )}&limit=10&lang=en&apiKey=${placesApiKey}`,
       );
       const json = await res.json();
       setResults(
@@ -92,98 +92,144 @@ export const PlaceSearchDropdown = ({
   const resultPressedRef = useRef(false);
 
   const handleSelect = useStableCallback((item: Place) => {
-    onPlaceSelected(item);
+    setLocation?.(item);
 
     setSelectedLocation(item.name);
     resetSearch();
     resultPressedRef.current = false;
-  });
 
-  const handleBlur = useStableCallback(() => {
-    if (resultPressedRef.current) return;
-    resetSearch();
+    router.back();
   });
 
   return (
     <View style={styles.container}>
-      <View style={styles.textInputContainer}>
-        <TextInput
-          placeholder="Search for a place..."
-          editable={!selectedLocation}
-          value={selectedLocation ?? query}
-          onChangeText={setQuery}
-          style={styles.input}
-          onBlur={handleBlur}
-        />
-        {loading && <ActivityIndicator size="small" style={styles.spinner} />}
-        {selectedLocation && (
-          <Pressable
-            style={styles.spinner}
-            onPress={() => {
-              setSelectedLocation(null);
-              onPlaceSelected(null);
-            }}
-          >
-            <Ionicons name="close" size={18} color="#888" />
-          </Pressable>
-        )}
+      <View style={styles.header}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search-outline" size={18} color="#888" />
+          <TextInput
+            placeholder="Search"
+            placeholderTextColor="#888"
+            style={styles.input}
+            value={selectedLocation ?? query}
+            onChangeText={setQuery}
+          />
+          {loading && <ActivityIndicator size="small" style={styles.spinner} />}
+          {selectedLocation && (
+            <Pressable
+              style={styles.spinner}
+              onPress={() => {
+                setSelectedLocation(null);
+                setLocation?.(null);
+              }}
+            >
+              <Ionicons name="close" size={18} color="#888" />
+            </Pressable>
+          )}
+        </View>
       </View>
       <View style={styles.dropdownContainer}>
-        {results.length > 0 && (
-          <View style={styles.dropdown}>
-            {results.map((result) => (
-              <Pressable
-                onTouchStart={() => {
-                  resultPressedRef.current = true;
-                }}
-                key={result.id}
-                style={styles.item}
-                onPress={() => handleSelect(result)}
-              >
-                <Text>{result.name}</Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
+        <FlatList
+          data={results}
+          contentContainerStyle={styles.listContainer}
+          style={{ flex: 1 }}
+          renderItem={({ item }: { item: Place }) => (
+            <Pressable
+              onTouchStart={() => {
+                resultPressedRef.current = true;
+              }}
+              style={styles.item}
+              onPress={() => handleSelect(item)}
+            >
+              <Text style={styles.name}>{item.name}</Text>
+            </Pressable>
+          )}
+          keyExtractor={(item: Place) => item.id}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="search-outline" size={40} color="#ccc" />
+              <Text style={styles.title}>No locations found</Text>
+              <Text style={styles.subtitle}>
+                Try searching for a place, hotel or attraction
+              </Text>
+            </View>
+          )}
+        />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { zIndex: 10, marginBottom: 8 },
-  input: {
-    borderWidth: 1,
+  container: { flex: 1, marginBottom: 8 },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    backgroundColor: '#fff',
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 6,
-    marginBottom: 4,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 40,
+    backgroundColor: '#fff',
+  },
+  input: {
+    flex: 1,
+    marginHorizontal: 8,
+    fontSize: 14,
+    color: '#000',
   },
   dropdownContainer: {
-    width: '100%',
-  },
-  dropdown: {
-    width: '100%',
-    maxHeight: 200,
+    flex: 1,
     backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    position: 'absolute',
+  },
+  listContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
   },
   item: {
-    padding: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: '#ccc',
+    paddingVertical: 12,
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
   },
-  textInputContainer: {
-    position: 'relative',
-    justifyContent: 'center',
+  name: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  address: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
   },
   spinner: {
     position: 'absolute',
     right: 10,
     top: '50%',
-    marginTop: -10, // half of spinner height to center vertically
+    marginTop: -10,
+  },
+  title: {
+    marginTop: 12,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#444',
+    textAlign: 'center',
+  },
+  subtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#888',
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyIcon: {
+    alignSelf: 'center',
   },
 });
