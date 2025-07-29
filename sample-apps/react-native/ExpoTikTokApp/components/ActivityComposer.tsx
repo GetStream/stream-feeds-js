@@ -22,6 +22,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { usePostCreationContext } from '@/contexts/PostCreationContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { MediaPickerRow } from '@/components/MediaPickerList';
+import { ACTIVITY_TEXT_MAX_CHARACTERS } from '@/constants/stream';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
@@ -149,9 +150,11 @@ export const ActivityComposer = () => {
     }
   });
 
+  const isTextAboveMax = text.length > ACTIVITY_TEXT_MAX_CHARACTERS;
+
   const submitButtonDisabled = useMemo(
-    () => isSending || media.length < 1,
-    [isSending, media.length],
+    () => isSending || media.length < 1 || isTextAboveMax,
+    [isSending, media.length, isTextAboveMax],
   );
 
   const uploadButtonDisabled = useMemo(
@@ -185,9 +188,15 @@ export const ActivityComposer = () => {
         )}
       </View>
 
-      <View style={styles.rewardBanner}>
+      <View
+        style={[
+          styles.rewardBanner,
+          isTextAboveMax ? { backgroundColor: 'red' } : {},
+        ]}
+      >
         <Text style={styles.rewardText}>
-          You have used {text.length} out of 250 characters.
+          You have used {text.length} out of {ACTIVITY_TEXT_MAX_CHARACTERS}{' '}
+          characters.
         </Text>
       </View>
 
