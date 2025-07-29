@@ -119,7 +119,7 @@ export const PlaceSearchDropdown = () => {
               style={styles.spinner}
               onPress={() => {
                 setSelectedLocation(null);
-                setLocation?.(null);
+                setLocation?.(undefined);
               }}
             >
               <Ionicons name="close" size={18} color="#888" />

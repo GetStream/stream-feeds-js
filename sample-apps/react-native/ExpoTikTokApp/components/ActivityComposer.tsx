@@ -12,7 +12,6 @@ import {
 
 import * as ImagePicker from 'expo-image-picker';
 import {
-  Attachment,
   isImageFile,
   isVideoFile,
   StreamFile,
@@ -27,6 +26,7 @@ import filePlaceholder from '@/assets/images/file-placeholder.png';
 import { placesApiKey } from '@/constants/stream';
 import { Ionicons } from '@expo/vector-icons';
 import { usePostCreationContext } from '@/contexts/PostCreationContext';
+import { useStableCallback } from '@/hooks/useStableCallback';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
@@ -35,10 +35,14 @@ export const ActivityComposer = () => {
 
   const [text, setText] = useState('');
   const [files, setFiles] = useState<StreamFile[]>([]);
-  const [media, setMedia] = useState<Attachment[]>([]);
   const [isSending, setIsSending] = useState(false);
 
-  const { location, setLocation } = usePostCreationContext();
+  const {
+    location,
+    media = [],
+    setLocation,
+    setMedia,
+  } = usePostCreationContext();
 
   const pickMedia = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -79,7 +83,7 @@ export const ActivityComposer = () => {
       const fileResponses = await Promise.all(requests);
 
       setMedia((prev) => [
-        ...prev,
+        ...(prev ?? []),
         ...fileResponses.map((response, index) => {
           const file = localFiles[index];
           const isImage = isImageFile(file);
@@ -95,7 +99,7 @@ export const ActivityComposer = () => {
         }),
       ]);
     }
-  }, [client]);
+  }, [client, setMedia]);
 
   const sendActivity = useCallback(async () => {
     if (!feed) {
@@ -128,12 +132,27 @@ export const ActivityComposer = () => {
     } finally {
       setIsSending(false);
     }
-  }, [feed, location, media, text]);
+  }, [feed, location, media, setMedia, text]);
 
   const submitPressHandler = useCallback(async () => {
     await sendActivity();
     router.back();
   }, [router, sendActivity]);
+
+  const removeFile = useStableCallback((index: number) => {
+    if (setMedia) {
+      setMedia((prevMedia) => {
+        const newMedia = [...(prevMedia ?? [])];
+        newMedia.splice(index, 1);
+        return newMedia;
+      });
+      setFiles((prevFiles) => {
+        const newFiles = [...(prevFiles ?? [])];
+        newFiles.splice(index, 1);
+        return newFiles;
+      });
+    }
+  });
 
   const submitButtonDisabled = useMemo(
     () => isSending || media.length < 1,
@@ -151,7 +170,7 @@ export const ActivityComposer = () => {
           <Text style={styles.uploadText}>Add</Text>
         </Pressable>
         {files.length > 0 ? (
-          <MediaPickerRow media={files} onRemove={() => null} />
+          <MediaPickerRow files={files} onRemove={removeFile} />
         ) : (
           <Text style={styles.uploadHint}>
             📘 Upload at least one photo (max 10) or a video.
@@ -199,7 +218,7 @@ export const ActivityComposer = () => {
               <Pressable
                 style={styles.cancelLocationButton}
                 onPress={() => {
-                  setLocation?.(null);
+                  setLocation?.(undefined);
                 }}
               >
                 <Ionicons name="close" size={20} color="#888" />
@@ -224,15 +243,17 @@ export const ActivityComposer = () => {
   );
 };
 
-type Props = {
-  media: any[];
-  onRemove: (id: string) => void;
-};
-
-export const MediaPickerRow = ({ media, onRemove }: Props) => {
+export const MediaPickerRow = ({
+  files,
+  onRemove,
+}: {
+  files: StreamFile[];
+  onRemove: (index: number) => void;
+}) => {
+  const { media } = usePostCreationContext();
   return (
     <FlatList
-      data={media}
+      data={files}
       horizontal
       keyExtractor={(item, index) => `${item.name}_${index}`}
       contentContainerStyle={styles.listContainer}
@@ -262,7 +283,7 @@ export const MediaPickerRow = ({ media, onRemove }: Props) => {
             />
           )}
           <Pressable
-            onPress={() => onRemove(asset.id)}
+            onPress={() => onRemove(index)}
             style={styles.removeButton}
           >
             <Ionicons name="close" size={16} color="#fff" />

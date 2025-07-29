@@ -6,21 +6,29 @@ import {
   useState,
 } from 'react';
 import { Place } from '@/components/PlaceSearchDropdown';
+import type { Attachment } from '@stream-io/feeds-react-native-sdk';
 
 type PostCreationContextValue = {
-  location?: Place | null;
-  setLocation?: (location: Place | null) => void;
+  location?: Place;
+  media?: Attachment[];
+  setLocation: React.Dispatch<React.SetStateAction<Place | undefined>>;
+  setMedia: React.Dispatch<React.SetStateAction<Attachment[] | undefined>>;
 };
 
 const PostCreationContext = createContext<PostCreationContextValue>({
-  location: null
+  setLocation: () => {},
+  setMedia: () => {},
 });
 
 export const PostCreationContextProvider = ({
   children,
 }: PropsWithChildren<PostCreationContextValue>) => {
-  const [location, setLocation] = useState<Place | null>(null);
-  const contextValue = useMemo(() => ({ location, setLocation }), [location]);
+  const [location, setLocation] = useState<Place | undefined>();
+  const [media, setMedia] = useState<Attachment[] | undefined>();
+  const contextValue = useMemo(
+    () => ({ location, media, setLocation, setMedia }),
+    [media, location],
+  );
   return (
     <PostCreationContext.Provider value={contextValue}>
       {children}
