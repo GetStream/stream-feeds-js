@@ -2,7 +2,6 @@ name: Lint and test
 env:
   VITE_STREAM_API_KEY: ${{ vars.CLIENT_TEST_API_KEY }}
   VITE_STREAM_API_SECRET: ${{ secrets.CLIENT_TEST_SECRET }}
-  VITE_API_URL: ${{ vars.CLIENT_TEST_API_URL }}
 
 on:
   push:
@@ -37,7 +36,7 @@ jobs:
         run: yarn lint:all
 
       - name: Build packages
-        run: NODE_ENV=production yarn build:all
+        run: NODE_ENV=production yarn build:libs
 
       - name: Test packages
         run: yarn test:ci:libs

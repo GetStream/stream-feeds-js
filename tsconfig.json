@@ -16,8 +16,13 @@
     "sourceMap": true,
     "paths": {
       "@stream-io/feeds-client": ["packages/feeds-client/index.ts"],
-      "@stream-io/feeds-client/react-bindings": ["packages/feeds-client/@react-bindings/index.ts"],
-      "@stream-io/feeds-react-native-sdk": ["packages/react-native-sdk/src/index.ts"]
+      "@stream-io/feeds-client/react-bindings": [
+        "packages/feeds-client/@react-bindings/index.ts"
+      ],
+      "@stream-io/feeds-react-native-sdk": [
+        "packages/react-native-sdk/src/index.ts"
+      ],
+      "@stream-io/feeds-react-sdk": ["packages/react-sdk/src/index.ts"]
     }
   }
 }

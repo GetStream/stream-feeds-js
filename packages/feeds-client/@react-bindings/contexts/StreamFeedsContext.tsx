@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { FeedsClient } from '../../src/FeedsClient';
+import type { FeedsClient } from '../../src/feeds-client';
 
 export const StreamFeedsContext = createContext<FeedsClient | undefined>(undefined);
 

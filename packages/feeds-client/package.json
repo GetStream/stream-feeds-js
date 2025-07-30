@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-client",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "packageManager": "yarn@3.2.4",
   "main": "./dist/index.node.js",
   "exports": {
@@ -67,6 +67,7 @@
     "@types/react": "^19.1.8",
     "@vitest/coverage-v8": "3.2.4",
     "dotenv": "^16.4.5",
+    "human-id": "^4.1.1",
     "react": "19.0.0",
     "rimraf": "^6.0.1",
     "rollup": "^4.24.0",

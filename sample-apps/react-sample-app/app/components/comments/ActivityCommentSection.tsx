@@ -40,7 +40,7 @@ export const ActivityCommentSection = ({
 
     void feed.loadNextPageActivityComments(activity, {
       sort: DEFAULT_PAGINATION_SORT,
-      limit: 1,
+      limit: 5,
       depth: 5,
       replies_limit: 5,
     });

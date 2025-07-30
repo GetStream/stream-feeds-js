@@ -1,4 +1,9 @@
-import { checkHasAnotherPage, Feed, FeedState, FollowResponse } from '@stream-io/feeds-client';
+import {
+  checkHasAnotherPage,
+  Feed,
+  FeedState,
+  FollowResponse,
+} from '@stream-io/feeds-client';
 import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
@@ -33,22 +38,27 @@ export const FollowRelationships = ({
     },
     [type],
   );
-  const { follows = [], pagination } = useStateStore(
-    feed.state,
-    selector,
-  );
+  const { follows, pagination } = useStateStore(feed.state, selector);
 
-  const rel = useMemo(() => follows.filter(
-    (f) => f.source_feed.created_by.id !== f.target_feed.created_by.id,
-  ), [follows]);
+  const rel = useMemo(() => {
+    return (
+      follows?.filter(
+        (f) => f.source_feed.created_by.id !== f.target_feed.created_by.id,
+      ) ?? []
+    );
+  }, [follows]);
 
   const loadMore = useCallback(async () => {
     setError(undefined);
     try {
       if (type === 'followers') {
-        feed.loadNextPageFollowers({ limit: 30 });
+        feed.loadNextPageFollowers({
+          limit: 30,
+        });
       } else if (type === 'following') {
-        feed.loadNextPageFollowing({ limit: 30 });
+        feed.loadNextPageFollowing({
+          limit: 30,
+        });
       }
     } catch (e) {
       setError(e as Error);
@@ -56,10 +66,10 @@ export const FollowRelationships = ({
   }, [feed, type]);
 
   useEffect(() => {
-    if (typeof pagination?.next === 'undefined') {
+    if (typeof follows === 'undefined') {
       void loadMore();
     }
-  }, [loadMore, pagination]);
+  }, [loadMore, follows]);
 
   const renderItem = (follow: FollowResponse) => {
     const image =

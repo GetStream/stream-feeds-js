@@ -4,12 +4,12 @@ import {
   createTestTokenGenerator,
   getTestUser,
 } from '../utils';
-import { FeedsClient } from '../../src/FeedsClient';
-import { Feed } from '../../src/Feed';
+import { FeedsClient } from '../../src/feeds-client';
+import { Feed } from '../../src/feed';
 import { UserRequest } from '../../src/gen/models';
+import { isImageFile } from '../../src/utils';
 import fs from 'fs';
 import path from 'path';
-import { isImageFile } from '../../src/utils';
 
 describe('File uploads page', () => {
   let client: FeedsClient;

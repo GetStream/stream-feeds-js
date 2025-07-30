@@ -38,8 +38,15 @@ export const FeedContextProvider = ({ children }: PropsWithChildren) => {
       setOwnFeed(_ownFeed);
       const _ownTimeline = client.feed('timeline', user.id);
       setOwnTimeline(_ownTimeline);
-      _ownFeed?.getOrCreate({ watch: true }).catch(throwUnrecoverableError);
-      _ownTimeline?.getOrCreate({ watch: true }).catch(throwUnrecoverableError);
+      _ownFeed
+        ?.getOrCreate({ watch: true, followers_pagination: { limit: 30 } })
+        .catch(throwUnrecoverableError);
+      _ownTimeline
+        ?.getOrCreate({
+          watch: true,
+          following_pagination: { limit: 30 },
+        })
+        .catch(throwUnrecoverableError);
       const _ownNotifications = client.feed('notification', user.id);
       setOwnNotifications(_ownNotifications);
       _ownNotifications

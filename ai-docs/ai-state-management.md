@@ -10,6 +10,7 @@ Other state updates:
 - when calling `getOrCreate` method
 - when calling `queryFeeds` methid
 - when paginating, like `feed.getNextPage`
+- some HTTP responses also trigger a state update: for example follow/unfollow should update the state to allow basic action on the feed without having to watch them
 
 ## WebSocket event handlers
 
@@ -34,6 +35,14 @@ State update code is located in the `state-updates` folder. These methods return
 ```
 
 When updating the state we need to change the reference of the key we want to update. For example if we add a new activity we need to return a new array, it's not enough to append the new activity for the existing array.
+
+### State update in response WebSocket event (one-way state update)
+
+The state update util method should receive a WebSocket event (and some additional info if necessary) as an input
+
+### State update in response HTTP response and WebSocket event (two-way state update)
+
+These methods should be able to do the state update both from an HTTP response or a WebSocket event. The state update util method should receive relevant objects (for example `event.follow` or `response.follow`).
 
 ## Tests
 

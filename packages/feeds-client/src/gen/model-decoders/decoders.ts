@@ -1709,6 +1709,13 @@ decoders.ThreadedCommentResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.UnfollowResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    follow: { type: 'FollowResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.UnpinActivityResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activity: { type: 'ActivityResponse', isSingle: true },

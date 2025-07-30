@@ -1,5 +1,6 @@
-import { ActivityResponse } from '../gen/models';
-import { UpdateStateResult } from '../types-internal';
+import { Feed } from '../../../feed';
+import { ActivityResponse } from '../../../gen/models';
+import { EventPayload, UpdateStateResult } from '../../../types-internal';
 
 export const addActivitiesToState = (
   newActivities: ActivityResponse[],
@@ -42,39 +43,18 @@ export const addActivitiesToState = (
   return result;
 };
 
-export const updateActivityInState = (
-  updatedActivityResponse: ActivityResponse,
-  activities: ActivityResponse[],
-) => {
-  const index = activities.findIndex(
-    (a) => a.id === updatedActivityResponse.id,
+export function handleActivityAdded(
+  this: Feed,
+  event: EventPayload<'feeds.activity.added'>,
+) {
+  const currentActivities = this.currentState.activities;
+  const result = addActivitiesToState(
+    [event.activity],
+    currentActivities,
+    'start',
   );
-  if (index !== -1) {
-    const newActivities = [...activities];
-    const activity = activities[index];
-    newActivities[index] = {
-      ...updatedActivityResponse,
-      own_reactions: activity.own_reactions,
-      own_bookmarks: activity.own_bookmarks,
-      latest_reactions: activity.latest_reactions,
-      reaction_groups: activity.reaction_groups,
-    };
-    return { changed: true, activities: newActivities };
-  } else {
-    return { changed: false, activities };
+  if (result.changed) {
+    this.client.hydratePollCache([event.activity]);
+    this.state.partialNext({ activities: result.activities });
   }
-};
-
-export const removeActivityFromState = (
-  activityResponse: ActivityResponse,
-  activities: ActivityResponse[],
-) => {
-  const index = activities.findIndex((a) => a.id === activityResponse.id);
-  if (index !== -1) {
-    const newActivities = [...activities];
-    newActivities.splice(index, 1);
-    return { changed: true, activities: newActivities };
-  } else {
-    return { changed: false, activities };
-  }
-};
+}

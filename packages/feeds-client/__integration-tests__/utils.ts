@@ -1,5 +1,5 @@
-import { FeedsClient } from '../src/FeedsClient';
-import { Feed } from '../src/Feed';
+import { FeedsClient } from '../src/feeds-client';
+import { Feed } from '../src/feed';
 import { UserRequest } from '../src/gen/models';
 import { FeedsClientOptions } from '../src/common/types';
 import { WSEvent } from '../src/gen/models';
@@ -63,14 +63,26 @@ export const getTestUser = () => {
 export const waitForEvent = (
   client: FeedsClient | Feed,
   type: FeedsEvent['type'] | WSEvent['type'],
-  timeoutMs = 3000,
+  {
+    timeoutMs = 3000,
+    shouldReject = false,
+  }: {
+    timeoutMs?: number;
+    shouldReject?: boolean;
+  } = {},
 ) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // @ts-expect-error client expects WSEvents
     client.on(type, () => {
       resolve(undefined);
       clearTimeout(timeout);
     });
-    const timeout = setTimeout(resolve, timeoutMs);
+    const timeout = setTimeout(() => {
+      if (shouldReject) {
+        reject(new Error(`Event not received: ${type}`));
+      } else {
+        resolve(undefined);
+      }
+    }, timeoutMs);
   });
 };

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { FeedsClient } from '../src/FeedsClient';
+import { FeedsClient } from '../src/feeds-client';
 import {
   createTestClient,
   createTestTokenGenerator,
@@ -21,8 +21,7 @@ describe('Feed Pagination Integration Tests', () => {
     await feed.getOrCreate();
   });
 
-  // Activity pagination is not supported yet
-  it.skip('should fetch and paginate through activities', async () => {
+  it('should fetch and paginate through activities', async () => {
     // Add 3 activities
     const activity1 = await client.addActivity({
       type: 'test',

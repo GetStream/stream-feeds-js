@@ -9,46 +9,48 @@ import {
   CommentResponse,
   PagerResponse,
   SingleFollowRequest,
-  CommentReactionAddedEvent,
-  CommentReactionDeletedEvent,
-  BookmarkAddedEvent,
-  BookmarkDeletedEvent,
-  BookmarkUpdatedEvent,
   QueryFeedMembersRequest,
   SortParamRequest,
   ThreadedCommentResponse,
-} from './gen/models';
-import { Patch, StateStore } from './common/StateStore';
-import { EventDispatcher } from './common/EventDispatcher';
-import { FeedApi } from './gen/feeds/FeedApi';
-import { FeedsClient } from './FeedsClient';
+} from '../gen/models';
+import { StreamResponse } from '../gen-imports';
+import { StateStore } from '../common/StateStore';
+import { EventDispatcher } from '../common/EventDispatcher';
+import { FeedApi } from '../gen/feeds/FeedApi';
+import { FeedsClient } from '../feeds-client';
 import {
+  handleFollowUpdated,
+  handleFollowCreated,
+  handleFollowDeleted,
+  handleCommentAdded,
+  handleCommentDeleted,
+  handleCommentUpdated,
+  handleBookmarkDeleted,
+  handleBookmarkUpdated,
+  handleActivityAdded,
   addActivitiesToState,
-  updateActivityInState,
-  removeActivityFromState,
-} from './state-updates/activity-utils';
-import {
-  addReactionToActivities,
-  removeReactionFromActivities,
-} from './state-updates/activity-reaction-utils';
-import {
-  addBookmarkToActivities,
-  removeBookmarkFromActivities,
-  updateBookmarkInActivities,
-} from './state-updates/bookmark-utils';
-import { updateNotificationStatusFromActivityMarked } from './state-updates/activity-marked-utils';
-import { updateNotificationFeedFromEvent } from './state-updates/notification-feed-utils';
-import { FeedsApi, StreamResponse } from './gen-imports';
-import { capitalize } from './common/utils';
+  handleActivityUpdated,
+  handleFeedMemberAdded,
+  handleFeedMemberRemoved,
+  handleFeedMemberUpdated,
+  handleCommentReaction,
+  handleBookmarkAdded,
+  handleActivityDeleted,
+  handleActivityRemovedFromFeed,
+  handleActivityReactionDeleted,
+  handleActivityReactionAdded,
+  handleFeedUpdated,
+  handleNotificationFeedUpdated,
+} from './event-handlers';
+import { capitalize } from '../common/utils';
 import type {
   ActivityIdOrCommentId,
   GetCommentsRepliesRequest,
   GetCommentsRequest,
   LoadingStates,
   PagerResponseWithLoadingStates,
-} from './types';
-import type { FromArray } from './types-internal';
-import { checkHasAnotherPage, Constants } from './utils';
+} from '../types';
+import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -116,6 +118,11 @@ export type FeedState = Omit<
   member_pagination?: LoadingStates & { sort?: SortParamRequest[] };
 
   last_get_or_create_request_config?: GetOrCreateFeedRequest;
+
+  /**
+   * `true` if the feed is receiving real-time updates via WebSocket
+   */
+  watch: boolean;
 };
 
 type EventHandlerByEventType = {
@@ -130,388 +137,40 @@ type EventHandlerByEventType = {
 export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private static readonly noop = () => {};
+  protected readonly stateUpdateQueue: Set<string> = new Set();
 
   private readonly eventHandlers: EventHandlerByEventType = {
-    'feeds.activity.added': (event) => {
-      const currentActivities = this.currentState.activities;
-      const result = addActivitiesToState(
-        [event.activity],
-        currentActivities,
-        'start',
-      );
-      if (result.changed) {
-        this.client.hydratePollCache([event.activity]);
-        this.state.partialNext({ activities: result.activities });
-      }
-    },
-    'feeds.activity.deleted': (event) => {
-      const currentActivities = this.currentState.activities;
-      if (currentActivities) {
-        const result = removeActivityFromState(
-          event.activity,
-          currentActivities,
-        );
-        if (result.changed) {
-          this.state.partialNext({ activities: result.activities });
-        }
-      }
-    },
-    'feeds.activity.reaction.added': (event) => {
-      const currentActivities = this.currentState.activities;
-      const connectedUser = this.client.state.getLatestValue().connected_user;
-      const isCurrentUser = Boolean(
-        connectedUser && event.reaction.user.id === connectedUser.id,
-      );
-
-      const result = addReactionToActivities(
-        event,
-        currentActivities,
-        isCurrentUser,
-      );
-      if (result.changed) {
-        this.state.partialNext({ activities: result.activities });
-      }
-    },
-    'feeds.activity.reaction.deleted': (event) => {
-      const currentActivities = this.currentState.activities;
-      const connectedUser = this.client.state.getLatestValue().connected_user;
-      const isCurrentUser = Boolean(
-        connectedUser && event.reaction.user.id === connectedUser.id,
-      );
-
-      const result = removeReactionFromActivities(
-        event,
-        currentActivities,
-        isCurrentUser,
-      );
-      if (result.changed) {
-        this.state.partialNext({ activities: result.activities });
-      }
-    },
+    'feeds.activity.added': handleActivityAdded.bind(this),
+    'feeds.activity.deleted': handleActivityDeleted.bind(this),
+    'feeds.activity.reaction.added': handleActivityReactionAdded.bind(this),
+    'feeds.activity.reaction.deleted': handleActivityReactionDeleted.bind(this),
     'feeds.activity.reaction.updated': Feed.noop,
-    'feeds.activity.removed_from_feed': (event) => {
-      const currentActivities = this.currentState.activities;
-      if (currentActivities) {
-        const result = removeActivityFromState(
-          event.activity,
-          currentActivities,
-        );
-        if (result.changed) {
-          this.state.partialNext({ activities: result.activities });
-        }
-      }
-    },
-    'feeds.activity.updated': (event) => {
-      const currentActivities = this.currentState.activities;
-      if (currentActivities) {
-        const result = updateActivityInState(event.activity, currentActivities);
-        if (result.changed) {
-          this.client.hydratePollCache([event.activity]);
-          this.state.partialNext({ activities: result.activities });
-        }
-      }
-    },
-    'feeds.bookmark.added': this.handleBookmarkAdded.bind(this),
-    'feeds.bookmark.deleted': this.handleBookmarkDeleted.bind(this),
-    'feeds.bookmark.updated': this.handleBookmarkUpdated.bind(this),
+    'feeds.activity.removed_from_feed':
+      handleActivityRemovedFromFeed.bind(this),
+    'feeds.activity.updated': handleActivityUpdated.bind(this),
+    'feeds.bookmark.added': handleBookmarkAdded.bind(this),
+    'feeds.bookmark.deleted': handleBookmarkDeleted.bind(this),
+    'feeds.bookmark.updated': handleBookmarkUpdated.bind(this),
     'feeds.bookmark_folder.deleted': Feed.noop,
     'feeds.bookmark_folder.updated': Feed.noop,
-    'feeds.comment.added': (event) => {
-      const { comment } = event;
-      const forId = comment.parent_id ?? comment.object_id;
-
-      this.state.next((currentState) => {
-        const entityState = currentState.comments_by_entity_id[forId];
-        const newComments = entityState?.comments?.concat([]) ?? [];
-
-        if (
-          entityState?.pagination?.sort === 'last' &&
-          !checkHasAnotherPage(
-            entityState.comments,
-            entityState?.pagination.next,
-          )
-        ) {
-          newComments.unshift(comment);
-        } else if (entityState?.pagination?.sort === 'first') {
-          newComments.push(comment);
-        } else {
-          // no other sorting option is supported yet
-          return currentState;
-        }
-
-        return {
-          ...currentState,
-          comments_by_entity_id: {
-            ...currentState.comments_by_entity_id,
-            [forId]: {
-              ...currentState.comments_by_entity_id[forId],
-              comments: newComments,
-            },
-          },
-        };
-      });
-    },
-    'feeds.comment.deleted': ({ comment }) => {
-      const forId = comment.parent_id ?? comment.object_id;
-
-      this.state.next((currentState) => {
-        const newCommentsByEntityId = {
-          ...currentState.comments_by_entity_id,
-          [forId]: {
-            ...currentState.comments_by_entity_id[forId],
-          },
-        };
-
-        const index = this.getCommentIndex(comment, currentState);
-
-        if (newCommentsByEntityId?.[forId]?.comments?.length && index !== -1) {
-          newCommentsByEntityId[forId].comments = [
-            ...newCommentsByEntityId[forId].comments,
-          ];
-
-          newCommentsByEntityId[forId]?.comments?.splice(index, 1);
-        }
-
-        delete newCommentsByEntityId[comment.id];
-
-        return {
-          ...currentState,
-          comments_by_entity_id: newCommentsByEntityId,
-        };
-      });
-    },
-    'feeds.comment.updated': (event) => {
-      const { comment } = event;
-      const forId = comment.parent_id ?? comment.object_id;
-
-      this.state.next((currentState) => {
-        const entityState = currentState.comments_by_entity_id[forId];
-
-        if (!entityState?.comments?.length) return currentState;
-
-        const index = this.getCommentIndex(comment, currentState);
-
-        if (index === -1) return currentState;
-
-        const newComments = [...entityState.comments];
-
-        newComments[index] = comment;
-
-        return {
-          ...currentState,
-          comments_by_entity_id: {
-            ...currentState.comments_by_entity_id,
-            [forId]: {
-              ...currentState.comments_by_entity_id[forId],
-              comments: newComments,
-            },
-          },
-        };
-      });
-    },
+    'feeds.comment.added': handleCommentAdded.bind(this),
+    'feeds.comment.deleted': handleCommentDeleted.bind(this),
+    'feeds.comment.updated': handleCommentUpdated.bind(this),
     'feeds.feed.created': Feed.noop,
     'feeds.feed.deleted': Feed.noop,
-    'feeds.feed.updated': (event) => {
-      this.state.partialNext({ ...event.feed });
-    },
+    'feeds.feed.updated': handleFeedUpdated.bind(this),
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
-    'feeds.follow.created': (event) => {
-      // filter non-accepted follows (the way getOrCreate does by default)
-      if (event.follow.status !== 'accepted') return;
-
-      // this feed followed someone
-      if (event.follow.source_feed.fid === this.fid) {
-        this.state.next((currentState) => {
-          const newState = {
-            ...currentState,
-            ...event.follow.source_feed,
-          };
-
-          if (
-            !checkHasAnotherPage(
-              currentState.following,
-              currentState.following_pagination?.next,
-            )
-          ) {
-            // TODO: respect sort
-            newState.following = currentState.following
-              ? currentState.following.concat(event.follow)
-              : [event.follow];
-          }
-
-          return newState;
-        });
-      } else if (
-        // someone followed this feed
-        event.follow.target_feed.fid === this.fid
-      ) {
-        const source = event.follow.source_feed;
-        const connectedUser = this.client.state.getLatestValue().connected_user;
-
-        this.state.next((currentState) => {
-          const newState = { ...currentState, ...event.follow.target_feed };
-
-          if (source.created_by.id === connectedUser?.id) {
-            newState.own_follows = currentState.own_follows
-              ? currentState.own_follows.concat(event.follow)
-              : [event.follow];
-          }
-
-          if (
-            !checkHasAnotherPage(
-              currentState.followers,
-              currentState.followers_pagination?.next,
-            )
-          ) {
-            // TODO: respect sort
-            newState.followers = currentState.followers
-              ? currentState.followers.concat(event.follow)
-              : [event.follow];
-          }
-
-          return newState;
-        });
-      }
-    },
-    'feeds.follow.deleted': (event) => {
-      // this feed unfollowed someone
-      if (event.follow.source_feed.fid === this.fid) {
-        this.state.next((currentState) => {
-          return {
-            ...currentState,
-            ...event.follow.source_feed,
-            following: currentState.following?.filter(
-              (follow) =>
-                follow.target_feed.fid !== event.follow.target_feed.fid,
-            ),
-          };
-        });
-      } else if (
-        // someone unfollowed this feed
-        event.follow.target_feed.fid === this.fid
-      ) {
-        const source = event.follow.source_feed;
-        const connectedUser = this.client.state.getLatestValue().connected_user;
-
-        this.state.next((currentState) => {
-          const newState = { ...currentState, ...event.follow.target_feed };
-
-          if (source.created_by.id === connectedUser?.id) {
-            newState.own_follows = currentState.own_follows?.filter(
-              (follow) =>
-                follow.source_feed.fid !== event.follow.source_feed.fid,
-            );
-          }
-
-          newState.followers = currentState.followers?.filter(
-            (follow) => follow.source_feed.fid !== event.follow.source_feed.fid,
-          );
-
-          return newState;
-        });
-      }
-    },
-    'feeds.follow.updated': Feed.noop,
-    'feeds.comment.reaction.added': this.handleCommentReactionEvent.bind(this),
-    'feeds.comment.reaction.deleted':
-      this.handleCommentReactionEvent.bind(this),
+    'feeds.follow.created': handleFollowCreated.bind(this),
+    'feeds.follow.deleted': handleFollowDeleted.bind(this),
+    'feeds.follow.updated': handleFollowUpdated.bind(this),
+    'feeds.comment.reaction.added': handleCommentReaction.bind(this),
+    'feeds.comment.reaction.deleted': handleCommentReaction.bind(this),
     'feeds.comment.reaction.updated': Feed.noop,
-    'feeds.feed_member.added': (event) => {
-      const { connected_user: connectedUser } =
-        this.client.state.getLatestValue();
-
-      this.state.next((currentState) => {
-        let newState: FeedState | undefined;
-
-        if (
-          !checkHasAnotherPage(
-            currentState.members,
-            currentState.member_pagination?.next,
-          )
-        ) {
-          newState ??= {
-            ...currentState,
-          };
-
-          newState.members = newState.members?.concat(event.member) ?? [
-            event.member,
-          ];
-        }
-
-        if (connectedUser?.id === event.member.user.id) {
-          newState ??= {
-            ...currentState,
-          };
-
-          newState.own_membership = event.member;
-        }
-
-        return newState ?? currentState;
-      });
-    },
-    'feeds.feed_member.removed': (event) => {
-      const { connected_user: connectedUser } =
-        this.client.state.getLatestValue();
-
-      this.state.next((currentState) => {
-        const newState = {
-          ...currentState,
-          members: currentState.members?.filter(
-            (member) => member.user.id !== event.user?.id,
-          ),
-        };
-
-        if (connectedUser?.id === event.member_id) {
-          delete newState.own_membership;
-        }
-
-        return newState;
-      });
-    },
-    'feeds.feed_member.updated': (event) => {
-      const { connected_user: connectedUser } =
-        this.client.state.getLatestValue();
-
-      this.state.next((currentState) => {
-        const memberIndex =
-          currentState.members?.findIndex(
-            (member) => member.user.id === event.member.user.id,
-          ) ?? -1;
-
-        let newState: FeedState | undefined;
-
-        if (memberIndex !== -1) {
-          // if there's an index, there's a member to update
-          const newMembers = [...currentState.members!];
-          newMembers[memberIndex] = event.member;
-
-          newState ??= {
-            ...currentState,
-          };
-
-          newState.members = newMembers;
-        }
-
-        if (connectedUser?.id === event.member.user.id) {
-          newState ??= {
-            ...currentState,
-          };
-
-          newState.own_membership = event.member;
-        }
-
-        return newState ?? currentState;
-      });
-    },
-    'feeds.notification_feed.updated': (event) => {
-      const result = updateNotificationFeedFromEvent(event);
-      if (result.changed) {
-        this.state.partialNext({
-          ...result.data,
-        });
-      }
-    },
+    'feeds.feed_member.added': handleFeedMemberAdded.bind(this),
+    'feeds.feed_member.removed': handleFeedMemberRemoved.bind(this),
+    'feeds.feed_member.updated': handleFeedMemberUpdated.bind(this),
+    'feeds.notification_feed.updated': handleNotificationFeedUpdated.bind(this),
     // the poll events should be removed from here
     'feeds.poll.closed': Feed.noop,
     'feeds.poll.deleted': Feed.noop,
@@ -554,9 +213,9 @@ export class Feed extends FeedApi {
     groupId: 'user' | 'timeline' | (string & {}),
     id: string,
     data?: FeedResponse,
+    watch = false,
   ) {
-    // Need this ugly cast because fileUpload endpoints :(
-    super(client as unknown as FeedsApi, groupId, id);
+    super(client, groupId, id);
     this.state = new StateStore<FeedState>({
       fid: `${groupId}:${id}`,
       group_id: groupId,
@@ -565,11 +224,12 @@ export class Feed extends FeedApi {
       is_loading: false,
       is_loading_activities: false,
       comments_by_entity_id: {},
+      watch,
     });
     this.client = client;
   }
 
-  private readonly client: FeedsClient;
+  protected readonly client: FeedsClient;
 
   get fid() {
     return `${this.group}:${this.id}`;
@@ -577,63 +237,6 @@ export class Feed extends FeedApi {
 
   get currentState() {
     return this.state.getLatestValue();
-  }
-
-  private handleCommentReactionEvent(
-    event: (CommentReactionAddedEvent | CommentReactionDeletedEvent) & {
-      type: 'feeds.comment.reaction.added' | 'feeds.comment.reaction.deleted';
-    },
-  ) {
-    const { comment, reaction } = event;
-    const connectedUser = this.client.state.getLatestValue().connected_user;
-
-    this.state.next((currentState) => {
-      const forId = comment.parent_id ?? comment.object_id;
-      const entityState = currentState.comments_by_entity_id[forId];
-
-      const commentIndex = this.getCommentIndex(comment, currentState);
-
-      if (commentIndex === -1) return currentState;
-
-      const newComments = entityState?.comments?.concat([]) ?? [];
-
-      const commentCopy: Partial<CommentResponse> = { ...comment };
-
-      delete commentCopy.own_reactions;
-
-      const newComment: CommentResponse = {
-        ...newComments[commentIndex],
-        ...commentCopy,
-        // TODO: FIXME this should be handled by the backend
-        latest_reactions: commentCopy.latest_reactions ?? [],
-        reaction_groups: commentCopy.reaction_groups ?? {},
-      };
-
-      newComments[commentIndex] = newComment;
-
-      if (reaction.user.id === connectedUser?.id) {
-        if (event.type === 'feeds.comment.reaction.added') {
-          newComment.own_reactions = newComment.own_reactions.concat(
-            reaction,
-          ) ?? [reaction];
-        } else if (event.type === 'feeds.comment.reaction.deleted') {
-          newComment.own_reactions = newComment.own_reactions.filter(
-            (r) => r.type !== reaction.type,
-          );
-        }
-      }
-
-      return {
-        ...currentState,
-        comments_by_entity_id: {
-          ...currentState.comments_by_entity_id,
-          [forId]: {
-            ...entityState,
-            comments: newComments,
-          },
-        },
-      };
-    });
   }
 
   async synchronize() {
@@ -675,6 +278,8 @@ export class Feed extends FeedApi {
           });
         }
       } else {
+        // Empty queue when reinitializing the state
+        this.stateUpdateQueue.clear();
         const responseCopy: Partial<
           StreamResponse<GetOrCreateFeedResponse>['feed'] &
             StreamResponse<GetOrCreateFeedResponse>
@@ -686,6 +291,8 @@ export class Feed extends FeedApi {
         delete responseCopy.feed;
         delete responseCopy.metadata;
         delete responseCopy.duration;
+
+        // TODO: lazy-load comments from activities when comment_sort and comment_pagination are supported
 
         this.state.next((currentState) => {
           const nextState: FeedState = {
@@ -699,8 +306,12 @@ export class Feed extends FeedApi {
           if (!request?.following_pagination?.limit) {
             delete nextState.following;
           }
+          if (response.members.length === 0 && response.feed.member_count > 0) {
+            delete nextState.members;
+          }
 
           nextState.last_get_or_create_request_config = request;
+          nextState.watch = request?.watch ? request.watch : currentState.watch;
 
           return nextState;
         });
@@ -717,58 +328,28 @@ export class Feed extends FeedApi {
     }
   }
 
-  private handleBookmarkAdded(event: BookmarkAddedEvent) {
-    const currentActivities = this.currentState.activities;
-    const { connected_user: connectedUser } =
-      this.client.state.getLatestValue();
-    const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
-
-    const result = addBookmarkToActivities(
-      event,
-      currentActivities,
-      isCurrentUser,
-    );
-    if (result.changed) {
-      this.state.partialNext({ activities: result.activities });
-    }
+  /**
+   * @internal
+   */
+  handleWatchStopped() {
+    this.state.partialNext({
+      watch: false,
+    });
   }
 
-  private handleBookmarkDeleted(event: BookmarkDeletedEvent) {
-    const currentActivities = this.currentState.activities;
-    const { connected_user: connectedUser } =
-      this.client.state.getLatestValue();
-    const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
-
-    const result = removeBookmarkFromActivities(
-      event,
-      currentActivities,
-      isCurrentUser,
-    );
-    if (result.changed) {
-      this.state.partialNext({ activities: result.activities });
-    }
-  }
-
-  private handleBookmarkUpdated(event: BookmarkUpdatedEvent) {
-    const currentActivities = this.currentState.activities;
-    const { connected_user: connectedUser } =
-      this.client.state.getLatestValue();
-    const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
-
-    const result = updateBookmarkInActivities(
-      event,
-      currentActivities,
-      isCurrentUser,
-    );
-    if (result.changed) {
-      this.state.partialNext({ activities: result.activities });
-    }
+  /**
+   * @internal
+   */
+  handleWatchStarted() {
+    this.state.partialNext({
+      watch: true,
+    });
   }
 
   /**
    * Returns index of the provided comment object.
    */
-  private getCommentIndex(
+  protected getCommentIndex(
     comment: Pick<CommentResponse, 'object_id' | 'parent_id' | 'id'>,
     state?: FeedState,
   ) {
@@ -792,47 +373,6 @@ export class Feed extends FeedApi {
     }
 
     return commentIndex;
-  }
-
-  private getActivityIndex(activity: ActivityResponse, state?: FeedState) {
-    const { activities } = state ?? this.currentState;
-
-    if (!activities) {
-      return -1;
-    }
-
-    let activityIndex = activities.indexOf(activity);
-
-    // fast lookup failed, try slower approach
-    if (activityIndex === -1) {
-      activityIndex = activities.findIndex(
-        (activity_) => activity_.id === activity.id,
-      );
-    }
-
-    return activityIndex;
-  }
-
-  private updateActivityInState(
-    activity: ActivityResponse,
-    patch: Patch<FromArray<FeedState['activities']>>,
-  ) {
-    this.state.next((currentState) => {
-      const activityIndex = this.getActivityIndex(activity, currentState);
-
-      if (activityIndex === -1) return currentState;
-
-      const nextActivities = [...currentState.activities!];
-
-      nextActivities[activityIndex] = patch(
-        currentState.activities![activityIndex],
-      );
-
-      return {
-        ...currentState,
-        activities: nextActivities,
-      };
-    });
   }
 
   /**
@@ -887,6 +427,8 @@ export class Feed extends FeedApi {
             restOfTheCommentResponse,
         );
 
+        const existingComments = newCommentsByEntityId[entityId]?.comments;
+
         newCommentsByEntityId[entityId] = {
           ...newCommentsByEntityId[entityId],
           entity_parent_id: item.entityParentId,
@@ -895,8 +437,12 @@ export class Feed extends FeedApi {
             next: item.next,
             sort: data.sort,
           },
-          comments: newCommentsByEntityId[entityId]?.comments
-            ? newCommentsByEntityId[entityId].comments?.concat(newComments)
+          comments: existingComments
+            ? uniqueArrayMerge(
+                existingComments,
+                newComments,
+                (comment) => comment.id,
+              )
             : newComments,
         };
       }
@@ -1037,10 +583,7 @@ export class Feed extends FeedApi {
           ...request,
           comment_id: comment.id,
           // use known sort first (prevents broken pagination)
-          sort:
-            currentSort ??
-            request?.sort ??
-            Constants.DEFAULT_COMMENT_PAGINATION,
+          sort,
           next: currentNextCursor,
         }),
       entityParentId: comment.parent_id ?? comment.object_id,
@@ -1082,17 +625,25 @@ export class Feed extends FeedApi {
         sort,
       });
 
-      this.state.next((currentState) => ({
-        ...currentState,
-        [type]: currentState[type]
-          ? currentState[type].concat(follows)
-          : follows,
-        [paginationKey]: {
-          ...currentState[paginationKey],
-          next: newNextCursor,
-          sort,
-        },
-      }));
+      this.state.next((currentState) => {
+        return {
+          ...currentState,
+          [type]:
+            currentState[type] === undefined
+              ? follows
+              : uniqueArrayMerge(
+                  currentState[type],
+                  follows,
+                  (follow) =>
+                    `${follow.source_feed.fid}-${follow.target_feed.fid}`,
+                ),
+          [paginationKey]: {
+            ...currentState[paginationKey],
+            next: newNextCursor,
+            sort,
+          },
+        };
+      });
     } catch (e) {
       error = e;
     } finally {
@@ -1112,11 +663,15 @@ export class Feed extends FeedApi {
     }
   }
 
-  async loadNextPageFollowers(request: Pick<QueryFollowsRequest, 'limit'>) {
+  async loadNextPageFollowers(
+    request: Pick<QueryFollowsRequest, 'limit' | 'sort'>,
+  ) {
     await this.loadNextPageFollows('followers', request);
   }
 
-  async loadNextPageFollowing(request: Pick<QueryFollowsRequest, 'limit'>) {
+  async loadNextPageFollowing(
+    request: Pick<QueryFollowsRequest, 'limit' | 'sort'>,
+  ) {
     await this.loadNextPageFollows('following', request);
   }
 
@@ -1154,7 +709,11 @@ export class Feed extends FeedApi {
       this.state.next((currentState) => ({
         ...currentState,
         members: currentState.members
-          ? currentState.members.concat(members)
+          ? uniqueArrayMerge(
+              currentState.members,
+              members,
+              ({ user }) => user.id,
+            )
           : members,
         member_pagination: {
           ...currentState.member_pagination,

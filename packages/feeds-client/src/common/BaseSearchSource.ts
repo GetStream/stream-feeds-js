@@ -1,12 +1,10 @@
 import { StateStore } from './StateStore';
 import { debounce, type DebouncedFunc } from './utils';
 
-export type SearchSourceType =
-  | 'channels'
-  | 'users'
-  | 'messages'
-  | (string & {});
+export type SearchSourceType = 'activity' | 'user' | 'feed' | (string & {});
+
 export type QueryReturnValue<T> = { items: T[]; next?: string | null };
+
 export type DebounceOptions = {
   debounceMs: number;
 };
@@ -14,7 +12,6 @@ type DebouncedExecQueryFunction = DebouncedFunc<
   (searchString?: string) => Promise<void>
 >;
 
- 
 export interface SearchSource<T = any> {
   activate(): void;
 
@@ -46,7 +43,6 @@ export interface SearchSource<T = any> {
   readonly type: SearchSourceType;
 }
 
- 
 export type SearchSourceState<T = any> = {
   hasNext: boolean;
   isActive: boolean;
@@ -61,24 +57,28 @@ export type SearchSourceOptions = {
   /** The number of milliseconds to debounce the search query. The default interval is 300ms. */
   debounceMs?: number;
   pageSize?: number;
+  allowEmptySearchString?: boolean;
 };
 const DEFAULT_SEARCH_SOURCE_OPTIONS: Required<SearchSourceOptions> = {
   debounceMs: 300,
   pageSize: 10,
+  allowEmptySearchString: false,
 } as const;
 
 export abstract class BaseSearchSource<T> implements SearchSource<T> {
   state: StateStore<SearchSourceState<T>>;
   protected pageSize: number;
+  protected allowEmptySearchString: boolean;
   abstract readonly type: SearchSourceType;
   protected searchDebounced!: DebouncedExecQueryFunction;
 
   protected constructor(options?: SearchSourceOptions) {
-    const { debounceMs, pageSize } = {
+    const { debounceMs, pageSize, allowEmptySearchString } = {
       ...DEFAULT_SEARCH_SOURCE_OPTIONS,
       ...options,
     };
     this.pageSize = pageSize;
+    this.allowEmptySearchString = allowEmptySearchString;
     this.state = new StateStore<SearchSourceState<T>>(this.initialState);
     this.setDebounceOptions({ debounceMs });
   }
@@ -157,7 +157,7 @@ export abstract class BaseSearchSource<T> implements SearchSource<T> {
       this.isActive &&
       !this.isLoading &&
       (this.hasNext || hasNewSearchQuery) &&
-      searchString
+      (this.allowEmptySearchString || searchString)
     );
   };
 

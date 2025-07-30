@@ -5,8 +5,8 @@ import {
   getServerClient,
   getTestUser,
 } from '../utils';
-import { FeedsClient } from '../../src/FeedsClient';
-import { Feed } from '../../src/Feed';
+import { FeedsClient } from '../../src/feeds-client';
+import { Feed } from '../../src/feed';
 import { UserRequest } from '../../src/gen/models';
 
 describe('Feeds page', () => {

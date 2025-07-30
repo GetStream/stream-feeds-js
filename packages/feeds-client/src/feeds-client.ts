@@ -3,12 +3,15 @@ import {
   ActivityResponse,
   FeedResponse,
   FileUploadRequest,
+  FollowBatchRequest,
   ImageUploadRequest,
   OwnUser,
   PollResponse,
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
+  SingleFollowRequest,
+  UpdateFollowRequest,
   UserRequest,
   WSEvent,
 } from './gen/models';
@@ -25,14 +28,19 @@ import {
   streamDevToken,
 } from './common/utils';
 import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
-import { Feed } from './Feed';
 import {
   FeedsClientOptions,
   NetworkChangedEvent,
   StreamResponse,
 } from './common/types';
-import { ModerationClient } from './ModerationClient';
+import { ModerationClient } from './moderation-client';
 import { StreamPoll } from './common/Poll';
+import {
+  Feed,
+  handleFollowCreated,
+  handleFollowDeleted,
+  handleFollowUpdated,
+} from './feed';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -96,6 +104,10 @@ export class FeedsClient extends FeedsApi {
               for (const activeFeed of Object.values(this.activeFeeds)) {
                 activeFeed.synchronize();
               }
+            }
+          } else {
+            for (const activeFeed of Object.values(this.activeFeeds)) {
+              activeFeed.handleWatchStopped();
             }
           }
           break;
@@ -335,7 +347,7 @@ export class FeedsClient extends FeedsApi {
     const response = await this.feedsQueryFeeds(request);
 
     const feeds = response.feeds.map((f) =>
-      this.getOrCreateActiveFeed(f.group_id, f.id, f),
+      this.getOrCreateActiveFeed(f.group_id, f.id, f, request?.watch),
     );
 
     return {
@@ -357,16 +369,94 @@ export class FeedsClient extends FeedsApi {
     this.eventDispatcher.dispatch(networkEvent);
   };
 
+  async updateFollow(request: UpdateFollowRequest) {
+    const response = await super.updateFollow(request);
+
+    [response.follow.source_feed.fid, response.follow.target_feed.fid].forEach(
+      (fid) => {
+        const feed = this.activeFeeds[fid];
+        if (feed) {
+          handleFollowUpdated.bind(feed)(response);
+        }
+      },
+    );
+
+    return response;
+  }
+
+  // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
+  async follow(request: SingleFollowRequest) {
+    const response = await super.follow(request);
+
+    [response.follow.source_feed.fid, response.follow.target_feed.fid].forEach(
+      (fid) => {
+        const feed = this.activeFeeds[fid];
+        if (feed) {
+          handleFollowCreated.bind(feed)(response);
+        }
+      },
+    );
+
+    return response;
+  }
+
+  async followBatch(request: FollowBatchRequest) {
+    const response = await super.followBatch(request);
+
+    response.follows.forEach((follow) => {
+      const feed = this.activeFeeds[follow.source_feed.fid];
+      if (feed) {
+        handleFollowCreated.bind(feed)({ follow });
+      }
+    });
+
+    return response;
+  }
+
+  async unfollow(request: SingleFollowRequest) {
+    const response = await super.unfollow(request);
+
+    [request.source, request.target].forEach((fid) => {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        handleFollowDeleted.bind(feed)(response);
+      }
+    });
+
+    return response;
+  }
+
+  async stopWatchingFeed(request: { feed_group_id: string; feed_id: string }) {
+    const connectionId = await this.connectionIdManager.getConnectionId();
+    const response = await super.stopWatchingFeed({
+      ...request,
+      connection_id: connectionId,
+    });
+
+    const feed =
+      this.activeFeeds[`${request.feed_group_id}:${request.feed_id}`];
+    if (feed) {
+      feed.handleWatchStopped();
+    }
+
+    return response;
+  }
+
   private readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
     data?: FeedResponse,
+    watch?: boolean,
   ) => {
     const fid = `${group}:${id}`;
     if (this.activeFeeds[fid]) {
-      return this.activeFeeds[fid];
+      const feed = this.activeFeeds[fid];
+      if (watch && !feed.currentState.watch) {
+        feed.handleWatchStarted();
+      }
+      return feed;
     } else {
-      const feed = new Feed(this, group, id, data);
+      const feed = new Feed(this, group, id, data, watch);
       this.activeFeeds[fid] = feed;
       return feed;
     }

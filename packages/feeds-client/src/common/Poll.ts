@@ -1,5 +1,5 @@
 import { StateStore } from './StateStore';
-import type { FeedsClient } from '../FeedsClient';
+import type { FeedsClient } from '../feeds-client';
 import type {
   PollVote,
   QueryPollVotesRequest,
