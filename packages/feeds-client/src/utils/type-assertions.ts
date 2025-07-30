@@ -1,13 +1,9 @@
-import { CommentResponse, FeedResponse, FollowResponse } from '../gen/models';
+import { CommentResponse, FollowResponse } from '../gen/models';
 import { StreamFile } from '../types';
 import { CommentParent } from '../types';
 
 export const isFollowResponse = (data: object): data is FollowResponse => {
   return 'source_feed' in data && 'target_feed' in data;
-};
-
-export const isFeedResponse = (data: object): data is FeedResponse => {
-  return 'created_by' in data;
 };
 
 export const isCommentResponse = (

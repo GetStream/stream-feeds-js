@@ -6,13 +6,10 @@ import type {
   UpdateStateResult,
 } from '../../../types-internal';
 
-import { isFeedResponse } from '../../../utils';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 
 export const updateStateFollowDeleted = (
-  follow:
-    | FollowResponse
-    | { source_feed: { fid: string }; target_feed: { fid: string } },
+  follow: FollowResponse,
   currentState: FeedState,
   currentFeedId: string,
   connectedUserId?: string,
@@ -46,7 +43,6 @@ export const updateStateFollowDeleted = (
     };
 
     if (
-      isFeedResponse(source) &&
       source.created_by.id === connectedUserId &&
       currentState.own_follows !== undefined
     ) {
@@ -68,11 +64,10 @@ export const updateStateFollowDeleted = (
 
 export function handleFollowDeleted(
   this: Feed,
-  eventOrResponse:
-    | PartializeAllBut<EventPayload<'feeds.follow.deleted'>, 'follow'>
-    | {
-        follow: { source_feed: { fid: string }; target_feed: { fid: string } };
-      },
+  eventOrResponse: PartializeAllBut<
+    EventPayload<'feeds.follow.deleted'>,
+    'follow'
+  >,
 ) {
   const follow = eventOrResponse.follow;
 
