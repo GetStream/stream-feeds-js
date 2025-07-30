@@ -54,7 +54,7 @@ export const NotificationBell = () => {
         <div
           className={`absolute right-0 mt-2 p-4 min-w-80 flex flex-col gap-3 text-gray-800 bg-white rounded-md shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
         >
-          <NotificationFeed></NotificationFeed>
+          <NotificationFeed isMenuOpen={isMenuOpen}></NotificationFeed>
         </div>
       </div>
     </>
