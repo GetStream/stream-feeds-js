@@ -4752,11 +4752,19 @@ export interface ReviewQueueItem {
 
   bans: Ban[];
 
+  flag_labels: string[];
+
+  flag_types: string[];
+
   flags: Flag[];
 
   languages: string[];
 
+  reporter_ids: string[];
+
   teams: string[];
+
+  archived_at: NullTime;
 
   completed_at: NullTime;
 
@@ -5348,6 +5356,8 @@ export interface UnblockUsersResponse {
 
 export interface UnfollowResponse {
   duration: string;
+
+  follow: FollowResponse;
 }
 
 export interface UnpinActivityResponse {

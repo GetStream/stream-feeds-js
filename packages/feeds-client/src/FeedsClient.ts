@@ -398,10 +398,7 @@ export class FeedsClient extends FeedsApi {
     [request.source, request.target].forEach((fid) => {
       const feed = this.activeFeeds[fid];
       if (feed) {
-        feed.handleFollowDeleted({
-          source_feed: { fid: request.source },
-          target_feed: { fid: request.target },
-        });
+        feed.handleFollowDeleted(response.follow);
       }
     });
 

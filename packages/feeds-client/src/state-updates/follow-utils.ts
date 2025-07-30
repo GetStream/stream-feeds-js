@@ -1,12 +1,6 @@
 import { FeedState } from '../Feed';
-import { FollowResponse, FeedResponse } from '../gen/models';
+import { FollowResponse } from '../gen/models';
 import { UpdateStateResult } from '../types-internal';
-
-const isFeedResponse = (
-  follow: FeedResponse | { fid: string },
-): follow is FeedResponse => {
-  return 'created_by' in follow;
-};
 
 export const handleFollowCreated = (
   follow: FollowResponse,
@@ -61,9 +55,7 @@ export const handleFollowCreated = (
 };
 
 export const handleFollowDeleted = (
-  follow:
-    | FollowResponse
-    | { source_feed: { fid: string }; target_feed: { fid: string } },
+  follow: FollowResponse,
   currentState: FeedState,
   currentFeedId: string,
   connectedUserId?: string,
@@ -97,7 +89,6 @@ export const handleFollowDeleted = (
     };
 
     if (
-      isFeedResponse(source) &&
       source.created_by.id === connectedUserId &&
       currentState.own_follows !== undefined
     ) {
