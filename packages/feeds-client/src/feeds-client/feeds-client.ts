@@ -41,6 +41,7 @@ import {
   handleFollowDeleted,
   handleFollowUpdated,
 } from '../feed';
+import { handleUserUpdated } from './event-handlers';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -192,6 +193,10 @@ export class FeedsClient extends FeedsApi {
           const feeds = this.findActiveFeedByActivityId(activityId);
           feeds.forEach((f) => f.handleWSEvent(event));
 
+          break;
+        }
+        case 'user.updated': {
+          handleUserUpdated.call(this, event);
           break;
         }
         default: {
