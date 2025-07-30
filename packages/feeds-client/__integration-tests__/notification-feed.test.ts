@@ -5,9 +5,10 @@ import {
   getTestUser,
   waitForEvent,
 } from './utils';
-import { FeedsClient } from '../src/FeedsClient';
-import { Feed } from '../src/Feed';
+
 import { UserRequest } from '../src/gen/models';
+import { FeedsClient } from '../src/feeds-client';
+import { Feed } from '../src/feed';
 
 describe('Notification Feed Test Setup', () => {
   let client1: FeedsClient;

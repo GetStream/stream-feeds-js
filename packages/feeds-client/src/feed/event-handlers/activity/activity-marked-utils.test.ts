@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { ActivityMarkEvent, NotificationStatusResponse } from '../gen/models';
-import { updateNotificationStatusFromActivityMarked } from './activity-marked-utils';
+import {
+  ActivityMarkEvent,
+  NotificationStatusResponse,
+} from '../../../gen/models';
+import { updateNotificationStatusFromActivityMarked } from './handle-activity-marked';
 
 const createMockActivityMarkEvent = (
   overrides: Partial<ActivityMarkEvent> = {},

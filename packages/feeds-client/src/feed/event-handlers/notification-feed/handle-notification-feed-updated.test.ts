@@ -3,8 +3,8 @@ import {
   NotificationFeedUpdatedEvent,
   NotificationStatusResponse,
   AggregatedActivityResponse,
-} from '../gen/models';
-import { updateNotificationFeedFromEvent } from './notification-feed-utils';
+} from '../../../gen/models';
+import { updateNotificationFeedFromEvent } from './handle-notification-feed-updated';
 
 const createMockNotificationFeedUpdatedEvent = (
   overrides: Partial<NotificationFeedUpdatedEvent> = {},

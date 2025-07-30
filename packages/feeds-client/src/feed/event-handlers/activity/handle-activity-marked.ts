@@ -1,5 +1,9 @@
-import { ActivityMarkEvent, NotificationStatusResponse } from '../gen/models';
-import { UpdateStateResult } from '../types-internal';
+import {
+  ActivityMarkEvent,
+  NotificationStatusResponse,
+} from '../../../gen/models';
+import { EventPayload, UpdateStateResult } from '../../../types-internal';
+import { Feed } from '../../feed';
 
 export const updateNotificationStatusFromActivityMarked = (
   event: ActivityMarkEvent,
@@ -46,3 +50,19 @@ export const updateNotificationStatusFromActivityMarked = (
     data: { notification_status: newState },
   };
 };
+
+export function handleActivityMarked(
+  this: Feed,
+  event: EventPayload<'feeds.activity.marked'>,
+) {
+  const result = updateNotificationStatusFromActivityMarked(
+    event,
+    this.currentState.notification_status,
+    this.currentState.aggregated_activities,
+  );
+  if (result.changed) {
+    this.state.partialNext({
+      notification_status: result.data?.notification_status,
+    });
+  }
+}
