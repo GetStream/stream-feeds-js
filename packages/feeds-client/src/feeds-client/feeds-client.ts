@@ -1,4 +1,4 @@
-import { FeedsApi } from './gen/feeds/FeedsApi';
+import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
   ActivityResponse,
   FeedResponse,
@@ -14,27 +14,27 @@ import {
   UpdateFollowRequest,
   UserRequest,
   WSEvent,
-} from './gen/models';
-import { FeedsEvent, StreamFile, TokenOrProvider } from './types';
-import { StateStore } from './common/StateStore';
-import { TokenManager } from './common/TokenManager';
-import { ConnectionIdManager } from './common/ConnectionIdManager';
-import { StableWSConnection } from './common/real-time/StableWSConnection';
-import { EventDispatcher } from './common/EventDispatcher';
-import { ApiClient } from './common/ApiClient';
+} from '../gen/models';
+import { FeedsEvent, StreamFile, TokenOrProvider } from '../types';
+import { StateStore } from '../common/StateStore';
+import { TokenManager } from '../common/TokenManager';
+import { ConnectionIdManager } from '../common/ConnectionIdManager';
+import { StableWSConnection } from '../common/real-time/StableWSConnection';
+import { EventDispatcher } from '../common/EventDispatcher';
+import { ApiClient } from '../common/ApiClient';
 import {
   addConnectionEventListeners,
   removeConnectionEventListeners,
   streamDevToken,
-} from './common/utils';
-import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
+} from '../common/utils';
+import { decodeWSEvent } from '../gen/model-decoders/event-decoder-mapping';
 import {
   FeedsClientOptions,
   NetworkChangedEvent,
   StreamResponse,
-} from './common/types';
-import { ModerationClient } from './moderation-client';
-import { StreamPoll } from './common/Poll';
+} from '../common/types';
+import { ModerationClient } from '../moderation-client';
+import { StreamPoll } from '../common/Poll';
 import {
   Feed,
   handleFollowCreated,
@@ -42,7 +42,7 @@ import {
   handleFollowUpdated,
   handleWatchStarted,
   handleWatchStopped,
-} from './feed';
+} from '../feed';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
