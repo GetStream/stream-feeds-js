@@ -4,11 +4,10 @@ import type {
   CommentResponse,
 } from '../../../src/gen/models';
 import type { CommentParent } from '../../../src/types';
-import { Feed, FeedState } from '../../../src/Feed';
+import { Feed, FeedState } from '../../../src/feed';
 import { useStateStore } from '../useStateStore';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
-import { isCommentResponse } from '../../../src/utils';
-import { checkHasAnotherPage } from '../../../src/utils';
+import { checkHasAnotherPage, isCommentResponse } from '../../../src/utils';
 
 type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   comments: NonNullable<

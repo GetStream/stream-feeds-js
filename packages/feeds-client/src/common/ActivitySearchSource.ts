@@ -1,7 +1,7 @@
 import { BaseSearchSource } from './BaseSearchSource';
 import type { SearchSourceOptions } from './BaseSearchSource';
 
-import { FeedsClient } from '../FeedsClient';
+import { FeedsClient } from '../feeds-client';
 import { ActivityResponse } from '../gen/models';
 
 export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {

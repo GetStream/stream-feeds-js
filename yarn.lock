@@ -5965,6 +5965,7 @@ __metadata:
     "@vitest/coverage-v8": 3.2.4
     axios: ^1.7.7
     dotenv: ^16.4.5
+    human-id: ^4.1.1
     react: 19.0.0
     rimraf: ^6.0.1
     rollup: ^4.24.0
@@ -13226,6 +13227,15 @@ __metadata:
     agent-base: ^7.1.2
     debug: 4
   checksum: b882377a120aa0544846172e5db021fa8afbf83fea2a897d397bd2ddd8095ab268c24bc462f40a15f2a8c600bf4aa05ce52927f70038d4014e68aefecfa94e8d
+  languageName: node
+  linkType: hard
+
+"human-id@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "human-id@npm:4.1.1"
+  bin:
+    human-id: dist/cli.js
+  checksum: 7d78857b532323e065ae6b6d141b3b8407d6a3714adea8c91f451d5ea8e5461677970b2e2c99e879ff94a8bbefdaa396e9a0f337d82e840183a86fa78c4f88ce
   languageName: node
   linkType: hard
 

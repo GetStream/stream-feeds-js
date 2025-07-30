@@ -5,7 +5,7 @@ import {
   getTestUser,
 } from './utils';
 import { sleep } from '../src/common/utils';
-import { FeedsClient } from '../src/FeedsClient';
+import { FeedsClient } from '../src/feeds-client';
 import { UserRequest } from '../src/gen/models';
 
 describe('API requests and error handling', () => {

@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
 import { CommentParent } from '../../../src/types';
-import { isCommentResponse } from '../../../src/utils';
 import { useStableCallback } from '../internal';
+import { isCommentResponse } from '../../../src/utils';
 
 /**
  * A utility hook that takes in an entity and a reaction type, and creates reaction actions

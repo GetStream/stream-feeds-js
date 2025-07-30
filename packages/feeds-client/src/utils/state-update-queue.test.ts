@@ -6,7 +6,7 @@ describe('state-update-queue', () => {
   describe('shouldUpdateState', () => {
     it('should return true when watch is false', () => {
       const result = shouldUpdateState({
-        stateUpdateId: 'test-id',
+        stateUpdateQueueId: 'test-id',
         stateUpdateQueue: new Set(['other-id']),
         watch: false,
       });
@@ -14,11 +14,11 @@ describe('state-update-queue', () => {
       expect(result).toBe(true);
     });
 
-    it('should return true when watch is true but stateUpdateId is not in queue', () => {
+    it('should return true when watch is true but queueId is not in queue', () => {
       const stateUpdateQueue = new Set(['other-id-1', 'other-id-2']);
 
       const result = shouldUpdateState({
-        stateUpdateId: 'test-id',
+        stateUpdateQueueId: 'test-id',
         stateUpdateQueue: stateUpdateQueue,
         watch: true,
       });
@@ -27,11 +27,11 @@ describe('state-update-queue', () => {
       expect(result).toBe(true);
     });
 
-    it('should return false and remove stateUpdateId from queue when watch is true and stateUpdateId is in queue', () => {
+    it('should return false and remove queueId from queue when watch is true and queueId is in queue', () => {
       const stateUpdateQueue = new Set(['test-id', 'other-id']);
 
       const result = shouldUpdateState({
-        stateUpdateId: 'test-id',
+        stateUpdateQueueId: 'test-id',
         stateUpdateQueue,
         watch: true,
       });
@@ -42,7 +42,7 @@ describe('state-update-queue', () => {
 
     it('should handle empty queue when watch is true', () => {
       const result = shouldUpdateState({
-        stateUpdateId: 'test-id',
+        stateUpdateQueueId: 'test-id',
         stateUpdateQueue: new Set(),
         watch: true,
       });

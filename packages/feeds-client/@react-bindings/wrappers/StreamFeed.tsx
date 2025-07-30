@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { StreamFeedContext } from '../contexts/StreamFeedContext';
-import type { Feed } from '../../src/Feed';
+import type { Feed } from '../../src/feed';
 
 /**
  * The props for the StreamFeed component. It accepts a `Feed` instance.

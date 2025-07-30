@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { Feed, FeedState } from '../../../src/Feed';
+import { Feed, FeedState } from '../../../src/feed';
 import { useStateStore } from '../useStateStore';
 import { checkHasAnotherPage } from '../../../src/utils';
 import { useFeedContext } from '../../contexts/StreamFeedContext';

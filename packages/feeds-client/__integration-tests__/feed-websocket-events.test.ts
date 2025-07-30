@@ -6,7 +6,7 @@ import {
   getTestUser,
   waitForEvent,
 } from './utils';
-import { FeedsClient } from '../src/FeedsClient';
+import { FeedsClient } from '../src/feeds-client';
 
 describe('Feed state updates via WebSocket events', () => {
   let client: FeedsClient;

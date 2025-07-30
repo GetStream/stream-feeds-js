@@ -8,7 +8,7 @@ import type {
   ActivityResponse,
   CommentResponse,
 } from './gen/models';
-import { FeedsClient } from './FeedsClient';
+import { FeedsClient } from './feeds-client';
 
 export type FeedsEvent = WSEvent | ConnectionChangedEvent | NetworkChangedEvent;
 export type ActivityIdOrCommentId = string;

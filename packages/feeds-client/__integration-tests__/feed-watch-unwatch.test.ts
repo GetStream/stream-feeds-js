@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { FeedsClient } from '../src/FeedsClient';
+import { FeedsClient } from '../src/feeds-client';
 import {
   createTestClient,
   createTestTokenGenerator,
