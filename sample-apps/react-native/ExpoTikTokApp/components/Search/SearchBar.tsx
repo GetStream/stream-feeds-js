@@ -26,7 +26,6 @@ export const SearchBar = () => {
             placeholder="Search"
             placeholderTextColor="#aaa"
             onFocus={searchController?.activate}
-            onBlur={searchController?.exit}
           />
           {!!searchQuery && (
             <Pressable onPress={searchController?.clear}>

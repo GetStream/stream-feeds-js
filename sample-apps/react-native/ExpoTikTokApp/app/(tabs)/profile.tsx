@@ -1,34 +1,21 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View, Text } from '@/components/Themed';
 import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
-import { Pressable, StyleSheet, Platform } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useUserContext } from '@/contexts/UserContext';
 import { Profile } from '@/components/Profile';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ProfileScreen = () => {
   const { ownUserFeed, ownTimelineFeed } = useOwnFeedsContext();
   const { logOut } = useUserContext();
-  const tabBarHeight = useBottomTabBarHeight();
-  const insets = useSafeAreaInsets();
-
-  const extraContainerStyles = useMemo(
-    () => ({
-      paddingBottom:
-        insets.bottom + tabBarHeight + (Platform.OS === 'ios' ? 0 : 80),
-    }),
-    [insets.bottom, tabBarHeight],
-  );
 
   if (!ownUserFeed || !ownTimelineFeed) {
     return null;
   }
 
   return (
-    <View style={[styles.container, extraContainerStyles]}>
+    <View style={styles.container}>
       <ConnectionLostHeader />
       <Pressable
         onPress={logOut}
@@ -50,8 +37,8 @@ const ProfileScreen = () => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 16, backgroundColor: '#fff' },
-  profileContainer: { flex: 1, paddingBottom: 16 },
+  container: { flex: 1, paddingTop: 16, paddingBottom: 20, backgroundColor: '#fff' },
+  profileContainer: { height: '100%', paddingBottom: 16 },
   button: {
     flexDirection: 'row',
     alignItems: 'center',

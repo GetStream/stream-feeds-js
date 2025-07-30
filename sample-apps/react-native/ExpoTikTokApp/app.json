@@ -16,14 +16,22 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "io.getstream.expotiktokapp",
-      "appleTeamId": "EHV7XZLAHA"
+      "appleTeamId": "EHV7XZLAHA",
+      "config": {
+        "googleMapsApiKey":  "process.env.EXPO_PUBLIC_MAPS_API_KEY"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "io.getstream.expotiktokapp"
+      "package": "io.getstream.expotiktokapp",
+      "config": {
+        "googleMaps": {
+          "apiKey": "process.env.EXPO_PUBLIC_MAPS_API_KEY"
+        }
+      }
     },
     "web": {
       "bundler": "metro",

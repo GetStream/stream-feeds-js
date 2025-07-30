@@ -93,13 +93,25 @@ const RootLayoutNav = ({ user }: { user: UserRequest }) => {
               options={{ title: 'Profile' }}
             />
             <Stack.Screen
-              name="create-post-modal"
+              name="location-map-screen"
+              options={{ title: 'Location' }}
+            />
+            <Stack.Screen
+              name="(post-creation)"
               options={{
-                title: 'New Post',
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
+                headerShown: false,
+                // presentation: 'modal',
+                // animation: 'slide_from_bottom',
               }}
             />
+            {/* <Stack.Screen */}
+            {/*   name="(post-creation)/pick-location-modal" */}
+            {/*   options={{ */}
+            {/*     title: 'New Post', */}
+            {/*     // presentation: 'modal', */}
+            {/*     // animation: 'slide_from_bottom', */}
+            {/*   }} */}
+            {/* /> */}
             <Stack.Screen
               name="followers-modal"
               options={{

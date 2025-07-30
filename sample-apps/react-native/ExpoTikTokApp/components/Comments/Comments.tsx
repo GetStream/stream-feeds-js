@@ -10,7 +10,7 @@ import { Comment } from '@/components/Comments/Comment';
 import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 
 const maintainVisibleContentPosition = {
-  minIndexForVisible: 1,
+  minIndexForVisible: 0,
   autoscrollToTopThreshold: 10,
 };
 
