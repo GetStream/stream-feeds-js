@@ -40,6 +40,8 @@ import {
   handleFollowCreated,
   handleFollowDeleted,
   handleFollowUpdated,
+  handleWatchStarted,
+  handleWatchStopped,
 } from './feed';
 
 export type FeedsClientState = {
@@ -107,7 +109,7 @@ export class FeedsClient extends FeedsApi {
             }
           } else {
             for (const activeFeed of Object.values(this.activeFeeds)) {
-              activeFeed.handleWatchStopped();
+              handleWatchStopped.bind(activeFeed)();
             }
           }
           break;
@@ -436,7 +438,7 @@ export class FeedsClient extends FeedsApi {
     const feed =
       this.activeFeeds[`${request.feed_group_id}:${request.feed_id}`];
     if (feed) {
-      feed.handleWatchStopped();
+      handleWatchStopped.bind(feed)();
     }
 
     return response;
@@ -452,7 +454,7 @@ export class FeedsClient extends FeedsApi {
     if (this.activeFeeds[fid]) {
       const feed = this.activeFeeds[fid];
       if (watch && !feed.currentState.watch) {
-        feed.handleWatchStarted();
+        handleWatchStarted.bind(feed)();
       }
       return feed;
     } else {
