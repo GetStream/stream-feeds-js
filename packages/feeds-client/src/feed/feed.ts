@@ -51,6 +51,7 @@ import type {
   PagerResponseWithLoadingStates,
 } from '../types';
 import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
+import { handleActivityMarked } from './event-handlers/activity/handle-activity-marked';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -180,7 +181,7 @@ export class Feed extends FeedApi {
     'feeds.poll.vote_removed': Feed.noop,
     'feeds.activity.pinned': Feed.noop,
     'feeds.activity.unpinned': Feed.noop,
-    'feeds.activity.marked': Feed.noop,
+    'feeds.activity.marked': handleActivityMarked.bind(this),
     'moderation.custom_action': Feed.noop,
     'moderation.flagged': Feed.noop,
     'moderation.mark_reviewed': Feed.noop,
