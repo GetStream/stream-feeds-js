@@ -13,6 +13,7 @@ export const generateUserResponse = (
   overrides: Partial<UserResponse> = {},
 ): UserResponse => ({
   id: `user-${getHumanId()}`,
+  name: humanId({ separator: ' ' }),
   created_at: new Date(),
   updated_at: new Date(),
   banned: false,
@@ -58,28 +59,26 @@ export const generateFeedResponse = (
   const id = overrides.id || `feed-${getHumanId()}`;
   const groupId = overrides.group_id || 'user';
   const fid = `${groupId}:${id}`;
-  const createdBy = generateUserResponse(overrides.created_by);
-  const description = humanId({
-    addAdverb: true,
-    adjectiveCount: 4,
-  });
-  const name = humanId();
 
   return {
     id,
     group_id: groupId,
     created_at: new Date(),
     updated_at: new Date(),
-    description,
-    fid,
+    description: humanId({
+      addAdverb: true,
+      adjectiveCount: 4,
+      separator: ' ',
+    }),
     follower_count: 0,
     following_count: 0,
     member_count: 0,
-    name,
+    name: humanId({ separator: ' ' }),
     pin_count: 0,
     custom: {},
     ...overrides,
-    created_by: createdBy,
+    fid,
+    created_by: generateUserResponse(overrides.created_by),
   };
 };
 
