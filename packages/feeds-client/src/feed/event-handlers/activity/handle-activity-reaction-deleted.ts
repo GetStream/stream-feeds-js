@@ -51,7 +51,7 @@ export const removeReactionFromActivities = (
     activity,
     isCurrentUser,
   );
-  return updateActivityInState(updatedActivity, activities, true);
+  return updateActivityInState({ updatedActivity, activities });
 };
 
 export function handleActivityReactionDeleted(
