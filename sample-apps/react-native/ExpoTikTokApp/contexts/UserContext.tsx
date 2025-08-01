@@ -8,10 +8,12 @@ import {
 import { UserRequest } from '@stream-io/feeds-react-native-sdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export type LocalUser = Pick<UserRequest, 'id' | 'name' | 'image'> & { token?: string };
+
 type UserContextValue = {
-  user: UserRequest | null;
+  user: LocalUser | null;
   userLoaded: boolean;
-  logIn: (user: UserRequest) => Promise<void>;
+  logIn: (user: LocalUser) => Promise<void>;
   logOut: () => Promise<void>;
 };
 
@@ -23,7 +25,7 @@ const UserContext = createContext<UserContextValue>({
 });
 
 export const UserContextProvider = ({ children }: PropsWithChildren) => {
-  const [cachedUser, setCachedUser] = useState<UserRequest | null>(null);
+  const [cachedUser, setCachedUser] = useState<LocalUser | null>(null);
   const [userLoaded, setUserLoaded] = useState(false);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
     fetchUserFromStorage();
   }, []);
 
-  const logIn = async (user: UserRequest) => {
+  const logIn = async (user: LocalUser) => {
     await AsyncStorage.setItem('@stream-io/login-config', JSON.stringify(user));
     setCachedUser(user);
   };
