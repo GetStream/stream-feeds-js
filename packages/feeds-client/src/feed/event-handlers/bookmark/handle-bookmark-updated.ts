@@ -5,57 +5,41 @@ import type {
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
 
-import { updateActivityInState } from '../activity';
+import { updateEntityInState } from '../activity';
 import { isSameBookmark } from './handle-bookmark-deleted';
-
-export const updateBookmarkInActivity = (
-  event: BookmarkUpdatedEvent,
-  activity: ActivityResponse,
-  isCurrentUser: boolean,
-): UpdateStateResult<ActivityResponse> => {
-  // Update own_bookmarks if the bookmark is from the current user
-  let ownBookmarks = activity.own_bookmarks || [];
-  if (isCurrentUser) {
-    const bookmarkIndex = ownBookmarks.findIndex((bookmark) =>
-      isSameBookmark(bookmark, event.bookmark),
-    );
-    if (bookmarkIndex !== -1) {
-      ownBookmarks = [...ownBookmarks];
-      ownBookmarks[bookmarkIndex] = event.bookmark;
-    }
-  }
-
-  return {
-    ...activity,
-    own_bookmarks: ownBookmarks,
-    changed: true,
-  };
-};
 
 export const updateBookmarkInActivities = (
   event: BookmarkUpdatedEvent,
   activities: ActivityResponse[] | undefined,
-  isCurrentUser: boolean,
-): UpdateStateResult<{ activities: ActivityResponse[] }> => {
-  if (!activities) {
-    return { changed: false, activities: [] };
-  }
+  eventBelongsToCurrentUser: boolean,
+): UpdateStateResult<{ entities: ActivityResponse[] | undefined }> =>
+  updateEntityInState({
+    entities: activities,
+    matcher: (a) => a.id === event.bookmark.activity.id,
+    updater: (matchedActivity) => {
+      let newOwnBookmarks = matchedActivity.own_bookmarks;
 
-  const activityIndex = activities.findIndex(
-    (a) => a.id === event.bookmark.activity.id,
-  );
-  if (activityIndex === -1) {
-    return { changed: false, activities };
-  }
+      if (eventBelongsToCurrentUser) {
+        const bookmarkIndex = newOwnBookmarks.findIndex((bookmark) =>
+          isSameBookmark(bookmark, event.bookmark),
+        );
 
-  const activity = activities[activityIndex];
-  const updatedActivity = updateBookmarkInActivity(
-    event,
-    activity,
-    isCurrentUser,
-  );
-  return updateActivityInState({ updatedActivity, activities });
-};
+        if (bookmarkIndex !== -1) {
+          newOwnBookmarks = [...newOwnBookmarks];
+          newOwnBookmarks[bookmarkIndex] = event.bookmark;
+        }
+      }
+
+      if (newOwnBookmarks === matchedActivity.own_bookmarks) {
+        return matchedActivity;
+      }
+
+      return {
+        ...matchedActivity,
+        own_bookmarks: newOwnBookmarks,
+      };
+    },
+  });
 
 export function handleBookmarkUpdated(
   this: Feed,
@@ -63,14 +47,16 @@ export function handleBookmarkUpdated(
 ) {
   const currentActivities = this.currentState.activities;
   const { connected_user: connectedUser } = this.client.state.getLatestValue();
-  const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
+  const eventBelongsToCurrentUser =
+    event.bookmark.user.id === connectedUser?.id;
 
   const result = updateBookmarkInActivities(
     event,
     currentActivities,
-    isCurrentUser,
+    eventBelongsToCurrentUser,
   );
+
   if (result.changed) {
-    this.state.partialNext({ activities: result.activities });
+    this.state.partialNext({ activities: result.entities });
   }
 }
