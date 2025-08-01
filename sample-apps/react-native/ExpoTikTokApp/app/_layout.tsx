@@ -11,11 +11,14 @@ import React, { useEffect } from 'react';
 import { Text } from 'react-native';
 import 'react-native-reanimated';
 import { StreamFeeds } from '@stream-io/feeds-react-native-sdk';
-import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
 import LoginScreen from '@/components/LoginScreen';
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { UserContextProvider, useUserContext } from '@/contexts/UserContext';
+import {
+  LocalUser,
+  UserContextProvider,
+  useUserContext,
+} from '@/contexts/UserContext';
 import { useCreateClient } from '@/hooks/useCreateClient';
 import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
 import { View } from 'react-native';
@@ -67,7 +70,7 @@ const RootLayout = () => {
   return <RootLayoutNav user={user} />;
 };
 
-const RootLayoutNav = ({ user }: { user: UserRequest }) => {
+const RootLayoutNav = ({ user }: { user: LocalUser }) => {
   const colorScheme = useColorScheme();
 
   const client = useCreateClient(user);
