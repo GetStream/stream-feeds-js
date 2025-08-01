@@ -1,4 +1,4 @@
-export * from './src/feeds-client';
+export * from './src/feeds-client/feeds-client';
 export * from './src/feed/feed';
 export * from './src/gen/models';
 export * from './src/types';
