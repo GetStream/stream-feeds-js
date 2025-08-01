@@ -4,6 +4,8 @@ import {
   AcceptFeedMemberInviteResponse,
   AcceptFollowRequest,
   AcceptFollowResponse,
+  ActivityFeedbackRequest,
+  ActivityFeedbackResponse,
   AddActivityRequest,
   AddActivityResponse,
   AddBookmarkRequest,
@@ -41,6 +43,7 @@ import {
   FileUploadResponse,
   FollowBatchRequest,
   FollowBatchResponse,
+  FollowRequest,
   GetActivityResponse,
   GetApplicationResponse,
   GetBlockedUsersResponse,
@@ -92,7 +95,6 @@ import {
   Response,
   SharedLocationResponse,
   SharedLocationsResponse,
-  SingleFollowRequest,
   SingleFollowResponse,
   UnblockUsersRequest,
   UnblockUsersResponse,
@@ -292,7 +294,7 @@ export class FeedsApi {
   ): Promise<StreamResponse<AddActivityResponse>> {
     const body = {
       type: request?.type,
-      fids: request?.fids,
+      feeds: request?.feeds,
       expires_at: request?.expires_at,
       id: request?.id,
       parent_id: request?.parent_id,
@@ -401,11 +403,7 @@ export class FeedsApi {
 
   async deleteActivity(request: {
     activity_id: string;
-    hard_delete?: boolean;
   }): Promise<StreamResponse<DeleteActivityResponse>> {
-    const queryParams = {
-      hard_delete: request?.hard_delete,
-    };
     const pathParams = {
       activity_id: request?.activity_id,
     };
@@ -416,7 +414,7 @@ export class FeedsApi {
       'DELETE',
       '/api/v2/feeds/activities/{activity_id}',
       pathParams,
-      queryParams,
+      undefined,
     );
 
     decoders.DeleteActivityResponse?.(response.body);
@@ -579,6 +577,36 @@ export class FeedsApi {
     );
 
     decoders.AddBookmarkResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async activityFeedback(
+    request: ActivityFeedbackRequest & { activity_id: string },
+  ): Promise<StreamResponse<ActivityFeedbackResponse>> {
+    const pathParams = {
+      activity_id: request?.activity_id,
+    };
+    const body = {
+      hide: request?.hide,
+      mute_user: request?.mute_user,
+      reason: request?.reason,
+      report: request?.report,
+      show_less: request?.show_less,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ActivityFeedbackResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/activities/{activity_id}/feedback',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.ActivityFeedbackResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -1110,11 +1138,7 @@ export class FeedsApi {
   async deleteFeed(request: {
     feed_group_id: string;
     feed_id: string;
-    hard_delete?: boolean;
   }): Promise<StreamResponse<DeleteFeedResponse>> {
-    const queryParams = {
-      hard_delete: request?.hard_delete,
-    };
     const pathParams = {
       feed_group_id: request?.feed_group_id,
       feed_id: request?.feed_id,
@@ -1126,7 +1150,7 @@ export class FeedsApi {
       'DELETE',
       '/api/v2/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}',
       pathParams,
-      queryParams,
+      undefined,
     );
 
     decoders.DeleteFeedResponse?.(response.body);
@@ -1488,7 +1512,7 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async feedsQueryFeeds(
+  protected async _queryFeeds(
     request?: QueryFeedsRequest & { connection_id?: string },
   ): Promise<StreamResponse<QueryFeedsResponse>> {
     const queryParams = {
@@ -1523,8 +1547,8 @@ export class FeedsApi {
     request: UpdateFollowRequest,
   ): Promise<StreamResponse<UpdateFollowResponse>> {
     const body = {
-      source: request?.source,
-      target: request?.target,
+      source_fid: request?.source_fid,
+      target_fid: request?.target_fid,
       create_notification_activity: request?.create_notification_activity,
       follower_role: request?.follower_role,
       push_preference: request?.push_preference,
@@ -1548,11 +1572,11 @@ export class FeedsApi {
   }
 
   async follow(
-    request: SingleFollowRequest,
+    request: FollowRequest,
   ): Promise<StreamResponse<SingleFollowResponse>> {
     const body = {
-      source: request?.source,
-      target: request?.target,
+      source_fid: request?.source_fid,
+      target_fid: request?.target_fid,
       create_notification_activity: request?.create_notification_activity,
       push_preference: request?.push_preference,
       custom: request?.custom,
