@@ -40,7 +40,7 @@ export const addBookmarkToActivities = (
 
   const activity = activities[activityIndex];
   const updatedActivity = addBookmarkToActivity(event, activity, isCurrentUser);
-  return updateActivityInState(updatedActivity, activities, true);
+  return updateActivityInState({ updatedActivity, activities });
 };
 
 export function handleBookmarkAdded(

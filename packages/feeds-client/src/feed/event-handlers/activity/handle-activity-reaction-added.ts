@@ -2,6 +2,7 @@ import type { Feed } from '../../../feed';
 import type {
   ActivityReactionAddedEvent,
   ActivityResponse,
+  FeedsReactionResponse,
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
 
@@ -12,15 +13,16 @@ export const addReactionToActivity = (
   activity: ActivityResponse,
   isCurrentUser: boolean,
 ): UpdateStateResult<ActivityResponse> => {
-  // Update own_reactions if the reaction is from the current user
-  const ownReactions = [...(activity.own_reactions || [])];
+  // Update own_reactions if the reaction is from the
+  let newOwnReactions: FeedsReactionResponse[] | undefined;
+
   if (isCurrentUser) {
-    ownReactions.push(event.reaction);
+    newOwnReactions = [...(activity.own_reactions || []), event.reaction];
   }
 
   return {
     ...activity,
-    own_reactions: ownReactions,
+    own_reactions: newOwnReactions ?? activity.own_reactions,
     latest_reactions: event.activity.latest_reactions,
     reaction_groups: event.activity.reaction_groups,
     changed: true,
@@ -43,7 +45,7 @@ export const addReactionToActivities = (
 
   const activity = activities[activityIndex];
   const updatedActivity = addReactionToActivity(event, activity, isCurrentUser);
-  return updateActivityInState(updatedActivity, activities, true);
+  return updateActivityInState({ updatedActivity, activities });
 };
 
 export function handleActivityReactionAdded(
@@ -55,6 +57,8 @@ export function handleActivityReactionAdded(
   const isCurrentUser = Boolean(
     connectedUser && event.reaction.user.id === connectedUser.id,
   );
+  
+  // TODO: handle pinned activities
 
   const result = addReactionToActivities(
     event,
