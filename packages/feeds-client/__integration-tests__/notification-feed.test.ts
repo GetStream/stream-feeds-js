@@ -142,13 +142,14 @@ describe('Notification Feed Test Setup', () => {
     ).toHaveLength(3);
   });
 
-  it(`user marks notificaitons as read an seen`, async () => {
+  it(`user marks first notification as read and seen`, async () => {
     const firstActivity =
       user1NotificationFeed.state.getLatestValue().aggregated_activities?.[0]!;
 
     await Promise.all([
       user1NotificationFeed.markActivity({
         mark_read: [firstActivity.group],
+        mark_seen: [firstActivity.group],
       }),
       waitForEvent(user1NotificationFeed, 'feeds.activity.marked'),
       waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
@@ -156,19 +157,16 @@ describe('Notification Feed Test Setup', () => {
 
     expect(
       user1NotificationFeed.state.getLatestValue().notification_status?.unread,
-    ).toBe(0);
+    ).toBe(2);
 
     expect(
       user1NotificationFeed.state.getLatestValue().notification_status?.unseen,
-    ).toBe(0);
+    ).toBe(2);
 
     expect(
       user1NotificationFeed.state.getLatestValue().notification_status
-        ?.read_activities,
-    ).toHaveLength(
-      user1NotificationFeed.state.getLatestValue().aggregated_activities
-        ?.length ?? 0,
-    );
+        ?.read_activities?.[0],
+    ).toBe(firstActivity.group);
 
     expect(
       user1NotificationFeed.state.getLatestValue().notification_status

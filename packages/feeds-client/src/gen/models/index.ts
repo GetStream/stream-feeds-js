@@ -225,6 +225,8 @@ export interface ActivityMarkEvent {
 
   mark_read?: string[];
 
+  mark_seen?: string[];
+
   mark_watched?: string[];
 
   user?: UserResponseCommonFields;
@@ -1348,6 +1350,8 @@ export interface CallSettings {
 
   geofencing?: GeofenceSettings;
 
+  ingress?: IngressSettings;
+
   limits?: LimitsSettings;
 
   recording?: RecordSettings;
@@ -1391,6 +1395,8 @@ export interface CallSettingsResponse {
   transcription: TranscriptionSettingsResponse;
 
   video: VideoSettingsResponse;
+
+  ingress?: IngressSettingsResponse;
 }
 
 export interface CallType {
@@ -2730,6 +2736,8 @@ export interface FeedResponse {
 
   filter_tags?: string[];
 
+  own_follows?: FollowResponse[];
+
   custom?: Record<string, any>;
 }
 
@@ -3339,6 +3347,70 @@ export interface Images {
   original: ImageData;
 }
 
+export interface IngressAudioEncodingOptions {
+  bitrate: number;
+
+  channels: '1' | '2';
+
+  enable_dtx: boolean;
+}
+
+export interface IngressAudioEncodingResponse {
+  bitrate: number;
+
+  channels: number;
+
+  enable_dtx: boolean;
+}
+
+export interface IngressSettings {
+  enabled: boolean;
+
+  audio_encoding_options?: IngressAudioEncodingOptions;
+
+  video_encoding_options?: Record<string, IngressVideoEncodingOptions>;
+}
+
+export interface IngressSettingsResponse {
+  enabled: boolean;
+
+  audio_encoding_options?: IngressAudioEncodingResponse;
+
+  video_encoding_options?: Record<string, IngressVideoEncodingResponse>;
+}
+
+export interface IngressVideoEncodingOptions {
+  layers: IngressVideoLayer[];
+}
+
+export interface IngressVideoEncodingResponse {
+  layers: IngressVideoLayerResponse[];
+}
+
+export interface IngressVideoLayer {
+  bitrate: number;
+
+  codec: 'h264' | 'vp8';
+
+  frame_rate: number;
+
+  max_dimension: number;
+
+  min_dimension: number;
+}
+
+export interface IngressVideoLayerResponse {
+  bitrate: number;
+
+  codec: string;
+
+  frame_rate_limit: number;
+
+  max_dimension: number;
+
+  min_dimension: number;
+}
+
 export interface LabelThresholds {
   block?: number;
 
@@ -3395,6 +3467,8 @@ export interface MarkActivityRequest {
   mark_all_seen?: boolean;
 
   mark_read?: string[];
+
+  mark_seen?: string[];
 
   mark_watched?: string[];
 }
@@ -3742,9 +3816,13 @@ export interface NotificationStatusResponse {
 
   unseen: number;
 
+  last_read_at?: Date;
+
   last_seen_at?: Date;
 
   read_activities?: string[];
+
+  seen_activities?: string[];
 }
 
 export interface NullTime {}
@@ -5108,6 +5186,7 @@ export interface SubmitActionRequest {
     | 'delete_user'
     | 'unblock'
     | 'shadow_block'
+    | 'unmask'
     | 'kick_user'
     | 'end_call';
 
