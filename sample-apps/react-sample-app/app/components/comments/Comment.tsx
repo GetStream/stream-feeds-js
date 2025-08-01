@@ -2,13 +2,13 @@ import { useCallback, useState } from 'react';
 import clsx from 'clsx';
 import type {
   Feed,
-  FeedOwnCapability,
   FeedState,
   CommentResponse,
 } from '@stream-io/feeds-react-sdk';
 import {
   useComments,
   useStateStore,
+  FeedOwnCapability,
 } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';

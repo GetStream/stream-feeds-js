@@ -1,4 +1,7 @@
-import type { CommentResponse } from '@stream-io/feeds-react-native-sdk';
+import {
+  CommentResponse,
+  useFeedContext,
+} from '@stream-io/feeds-react-native-sdk';
 import { useComments, useFeedsClient } from '@stream-io/feeds-react-native-sdk';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useCommentsInputActionsContext } from '@/contexts/CommentsInputContext';

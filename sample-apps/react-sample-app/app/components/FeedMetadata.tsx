@@ -1,10 +1,10 @@
-import type { FeedOwnCapability, FeedState, Feed } from '@stream-io/feeds-react-sdk';
+import type { FeedState, Feed } from '@stream-io/feeds-react-sdk';
 import { useRef, useState } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { FollowRelationships } from './FollowRelationships';
 import { FollowStatusButton } from './FollowStatusButton';
 import { FeedMenu } from './FeedMenu';
-import { useStateStore } from '@stream-io/feeds-react-sdk';
+import { FeedOwnCapability, useStateStore } from '@stream-io/feeds-react-sdk';
 import { Dialog } from './Dialog';
 
 const selector = ({
