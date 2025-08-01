@@ -2,6 +2,12 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.0.2...@stream-io/feeds-react-sdk-0.0.3) (2025-08-01)
+
+
+* add back publish step for react sdk ([2548238](https://github.com/GetStream/stream-feeds-js/commit/2548238e57cc9ddc5b9eac8e456669e777cad7fa))
+* use react sdk in the react sample app ([#89](https://github.com/GetStream/stream-feeds-js/issues/89)) ([88c33b4](https://github.com/GetStream/stream-feeds-js/commit/88c33b46028a0c3634a9f8d3a0e2ae2fdfcfeeea))
+
 ## [0.0.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.0.1...@stream-io/feeds-react-sdk-0.0.2) (2025-08-01)
 
 
