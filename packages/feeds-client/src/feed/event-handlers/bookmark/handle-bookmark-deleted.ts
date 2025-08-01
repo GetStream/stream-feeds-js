@@ -43,7 +43,7 @@ export const removeBookmarkFromActivities = (
     activity,
     isCurrentUser,
   );
-  return updateActivityInState(updatedActivity, activities, true);
+  return updateActivityInState({ updatedActivity, activities });
 };
 
 export const removeBookmarkFromActivity = (
