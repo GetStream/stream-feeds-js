@@ -1,5 +1,6 @@
 import {
   Feed,
+  useClientConnectedUser,
   useFeedMetadata,
   useSearchResult,
 } from '@stream-io/feeds-react-native-sdk';
@@ -14,6 +15,7 @@ const keyExtractor = (item: Feed) => item.id;
 const UserSeparator = () => <View style={styles.separator} />;
 
 const UserItem = ({ feed }: { feed: Feed }) => {
+  const connectedUser = useClientConnectedUser();
   const { created_by: createdBy } = useFeedMetadata(feed) ?? {};
   const router = useRouter();
 
@@ -40,7 +42,9 @@ const UserItem = ({ feed }: { feed: Feed }) => {
           {createdBy?.name ?? `@${createdBy?.id}`}
         </Text>
       </View>
-      <FollowButton feed={feed}></FollowButton>
+      {createdBy?.id !== connectedUser?.id ? (
+        <FollowButton feed={feed}></FollowButton>
+      ) : null}
     </TouchableOpacity>
   );
 };
