@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.0.7](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.0.6...@stream-io/feeds-react-native-sdk-0.0.7) (2025-08-01)
+
+
+### Bug Fixes
+
+* properly update version ([a80d00e](https://github.com/GetStream/stream-feeds-js/commit/a80d00e64d01a023344ef3709d28956057feb3af))
+
 ## [0.0.6](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.0.5...@stream-io/feeds-react-native-sdk-0.0.6) (2025-08-01)
 
 
