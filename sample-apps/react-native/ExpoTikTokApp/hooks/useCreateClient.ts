@@ -20,7 +20,7 @@ const tokenProviderFactory = (userId: string) => async () => {
   return data.token;
 };
 
-const CLIENT_OPTIONS = { base_url: process.env.EXPO_PUBLIC_BASE_URL };
+const CLIENT_OPTIONS = {};
 
 export const useCreateClient = (user: UserRequest) => {
   const tokenProvider = useCallback(() => {
