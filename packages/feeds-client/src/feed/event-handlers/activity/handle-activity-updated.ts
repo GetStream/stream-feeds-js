@@ -1,68 +1,46 @@
 import { Feed, FeedState } from '../../../feed';
-import { ActivityPinResponse, ActivityResponse } from '../../../gen/models';
+import {
+  ActivityPinResponse,
+  ActivityResponse,
+  ActivityUpdatedEvent,
+} from '../../../gen/models';
 import { EventPayload } from '../../../types-internal';
 
-export const updateActivityInState = ({
-  updatedActivity,
-  activities,
-  /**
-   * If true, the function will merge the updated activity with the existing one
-   * in the state, preserving properties like own_reactions and own_bookmarks.
-   */
-  preserveOwnProperties = false,
-}: {
-  updatedActivity: ActivityResponse;
-  activities: ActivityResponse[];
-  preserveOwnProperties?: boolean;
-}) => {
-  const activityIndex = activities.findIndex(
-    (activity) => activity.id === updatedActivity.id,
-  );
-
-  if (activityIndex !== -1) {
-    const newActivities = [...activities];
-
-    const currentActivity = newActivities[activityIndex];
-
-    if (preserveOwnProperties) {
-      newActivities[activityIndex] = {
-        ...updatedActivity,
-        own_reactions: currentActivity.own_reactions,
-        own_bookmarks: currentActivity.own_bookmarks,
+export const updateActivityInState = (
+  event: ActivityUpdatedEvent,
+  activities: ActivityResponse[],
+) =>
+  updateEntityInState({
+    entities: activities,
+    matcher: (a) => a.id === event.activity.id,
+    updater: (matchedActivity) => {
+      return {
+        ...event.activity,
+        own_reactions: matchedActivity.own_reactions,
+        own_bookmarks: matchedActivity.own_bookmarks,
       };
-    } else {
-      newActivities[activityIndex] = updatedActivity;
-    }
-
-    return { changed: true, activities: newActivities };
-  } else {
-    return { changed: false, activities };
-  }
-};
+    },
+  });
 
 export const updatePinnedActivityInState = (
-  updatedActivityResponse: ActivityResponse,
+  event: ActivityUpdatedEvent,
   pinnedActivities: ActivityPinResponse[] | undefined,
-) => {
-  const index =
-    pinnedActivities?.findIndex(
-      (pinnedActivity) =>
-        pinnedActivity.activity.id === updatedActivityResponse.id,
-    ) ?? -1;
-
-  if (index >= 0) {
-    const newPinnedActivities = [...pinnedActivities!];
-
-    newPinnedActivities[index] = {
-      ...newPinnedActivities[index],
-      activity: updatedActivityResponse,
-    };
-
-    return { changed: true, pinnedActivities: newPinnedActivities };
-  }
-
-  return { changed: false, pinnedActivities };
-};
+) =>
+  updateEntityInState({
+    entities: pinnedActivities,
+    matcher: (pinnedActivity) =>
+      pinnedActivity.activity.id === event.activity.id,
+    updater: (matchedPinnedActivity) => {
+      return {
+        ...matchedPinnedActivity,
+        activity: {
+          ...event.activity,
+          own_reactions: matchedPinnedActivity.activity.own_reactions,
+          own_bookmarks: matchedPinnedActivity.activity.own_bookmarks,
+        },
+      };
+    },
+  });
 
 export function handleActivityUpdated(
   this: Feed,
@@ -79,23 +57,19 @@ export function handleActivityUpdated(
     let newState: FeedState | undefined;
 
     if (currentActivities) {
-      const result = updateActivityInState({
-        updatedActivity: event.activity,
-        activities: currentActivities,
-        preserveOwnProperties: true,
-      });
+      const result = updateActivityInState(event, currentActivities);
 
       if (result.changed) {
         newState ??= {
           ...currentState,
         };
-        newState.activities = result.activities;
+        newState.activities = result.entities;
       }
     }
 
     if (currentPinnedActivities) {
       const result = updatePinnedActivityInState(
-        event.activity,
+        event,
         currentPinnedActivities,
       );
 
@@ -103,10 +77,41 @@ export function handleActivityUpdated(
         newState ??= {
           ...currentState,
         };
-        newState.pinned_activities = result.pinnedActivities;
+        newState.pinned_activities = result.entities;
       }
     }
 
     return newState ?? currentState;
   });
 }
+
+export const updateEntityInState = <T>({
+  matcher,
+  updater,
+  entities,
+}: {
+  matcher: (entity: T) => boolean;
+  entities: T[] | undefined;
+  updater: (currentEntity: T) => T;
+}) => {
+  if (!entities || !entities.length) {
+    return { changed: false, entities };
+  }
+
+  const index = entities.findIndex(matcher);
+
+  if (index === -1) {
+    return { changed: false, entities };
+  }
+
+  const updatedEntities = [...entities];
+  const newEntity = updater(updatedEntities[index]);
+
+  if (newEntity === updatedEntities[index]) {
+    return { changed: false, entities };
+  }
+
+  updatedEntities[index] = newEntity;
+
+  return { changed: true, entities: updatedEntities };
+};

@@ -2,51 +2,33 @@ import type { Feed } from '../../../feed';
 import type {
   ActivityReactionAddedEvent,
   ActivityResponse,
-  FeedsReactionResponse,
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
 
-import { updateActivityInState } from './handle-activity-updated';
-
-export const addReactionToActivity = (
-  event: ActivityReactionAddedEvent,
-  activity: ActivityResponse,
-  isCurrentUser: boolean,
-): UpdateStateResult<ActivityResponse> => {
-  // Update own_reactions if the reaction is from the
-  let newOwnReactions: FeedsReactionResponse[] | undefined;
-
-  if (isCurrentUser) {
-    newOwnReactions = [...(activity.own_reactions || []), event.reaction];
-  }
-
-  return {
-    ...activity,
-    own_reactions: newOwnReactions ?? activity.own_reactions,
-    latest_reactions: event.activity.latest_reactions,
-    reaction_groups: event.activity.reaction_groups,
-    changed: true,
-  };
-};
+import { updateEntityInState } from './handle-activity-updated';
 
 export const addReactionToActivities = (
   event: ActivityReactionAddedEvent,
   activities: ActivityResponse[] | undefined,
-  isCurrentUser: boolean,
-): UpdateStateResult<{ activities: ActivityResponse[] }> => {
-  if (!activities) {
-    return { changed: false, activities: [] };
-  }
+  eventBelongsToCurrentUser: boolean,
+): UpdateStateResult<{ entities: ActivityResponse[] | undefined }> =>
+  updateEntityInState({
+    entities: activities,
+    matcher: (activity) => activity.id === event.activity.id,
+    updater: (matchedActivity) => {
+      let newOwnReactions = matchedActivity.own_reactions;
 
-  const activityIndex = activities.findIndex((a) => a.id === event.activity.id);
-  if (activityIndex === -1) {
-    return { changed: false, activities };
-  }
+      if (eventBelongsToCurrentUser) {
+        newOwnReactions = [...matchedActivity.own_reactions, event.reaction];
+      }
 
-  const activity = activities[activityIndex];
-  const updatedActivity = addReactionToActivity(event, activity, isCurrentUser);
-  return updateActivityInState({ updatedActivity, activities });
-};
+      return {
+        ...event.activity,
+        own_reactions: newOwnReactions,
+        own_bookmarks: matchedActivity.own_bookmarks,
+      };
+    },
+  });
 
 export function handleActivityReactionAdded(
   this: Feed,
@@ -54,18 +36,18 @@ export function handleActivityReactionAdded(
 ) {
   const currentActivities = this.currentState.activities;
   const connectedUser = this.client.state.getLatestValue().connected_user;
-  const isCurrentUser = Boolean(
-    connectedUser && event.reaction.user.id === connectedUser.id,
-  );
-  
+  const eventBelongsToCurrentUser =
+    typeof connectedUser !== 'undefined' &&
+    event.reaction.user.id === connectedUser.id;
+
   // TODO: handle pinned activities
 
   const result = addReactionToActivities(
     event,
     currentActivities,
-    isCurrentUser,
+    eventBelongsToCurrentUser,
   );
   if (result.changed) {
-    this.state.partialNext({ activities: result.activities });
+    this.state.partialNext({ activities: result.entities });
   }
 }

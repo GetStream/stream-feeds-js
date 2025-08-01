@@ -91,18 +91,24 @@ describe('activity-utils', () => {
       const updatedActivity = { ...originalActivity, text: 'updated text' };
       const originalActivities = [originalActivity];
 
-      const result = updateActivityInState({
-        updatedActivity,
-        activities: originalActivities,
-      });
+      const result = updateActivityInState(
+        {
+          activity: updatedActivity,
+          created_at: new Date(),
+          fid: '',
+          type: '',
+          custom: {},
+        },
+        originalActivities,
+      );
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(1);
-      expect(result.activities[0].id).toBe('activity1');
-      expect(result.activities[0].text).toBe('updated text');
+      expect(result.entities).toHaveLength(1);
+      expect(result.entities![0].id).toBe('activity1');
+      expect(result.entities![0].text).toBe('updated text');
 
       // Make sure we create a new array
-      expect(originalActivities === result.activities).toBe(false);
+      expect(originalActivities === result.entities).toBe(false);
     });
 
     it('should preserve reaction data (own_reaction) when updating an activity', () => {
@@ -132,16 +138,21 @@ describe('activity-utils', () => {
         ],
       });
 
-      const result = updateActivityInState({
-        updatedActivity,
-        activities: [originalActivity],
-        preserveOwnProperties: true,
-      });
+      const result = updateActivityInState(
+        {
+          activity: updatedActivity,
+          created_at: new Date(),
+          fid: '',
+          type: '',
+          custom: {},
+        },
+        [originalActivity],
+      );
 
       expect(result.changed).toBe(true);
-      expect(result.activities[0].text).toBe('updated text');
+      expect(result.entities![0].text).toBe('updated text');
       // Check that reactions were preserved
-      expect(result.activities[0].own_reactions).toEqual(
+      expect(result.entities![0].own_reactions).toEqual(
         originalActivity.own_reactions,
       );
     });
@@ -153,14 +164,20 @@ describe('activity-utils', () => {
         text: 'some text',
       });
 
-      const result = updateActivityInState({
-        updatedActivity,
-        activities: [existingActivity],
-      });
+      const result = updateActivityInState(
+        {
+          activity: updatedActivity,
+          created_at: new Date(),
+          fid: '',
+          type: '',
+          custom: {},
+        },
+        [existingActivity],
+      );
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toHaveLength(1);
-      expect(result.activities[0].id).toBe('activity1');
+      expect(result.entities).toHaveLength(1);
+      expect(result.entities![0].id).toBe('activity1');
     });
   });
 

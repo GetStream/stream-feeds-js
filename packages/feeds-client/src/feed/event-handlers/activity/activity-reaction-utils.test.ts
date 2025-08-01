@@ -5,12 +5,41 @@ import {
   ActivityResponse,
   FeedsReactionResponse,
 } from '../../../gen/models';
-import {
-  addReactionToActivity,
-  removeReactionFromActivity,
-  addReactionToActivities,
-  removeReactionFromActivities,
-} from './';
+import { addReactionToActivities, removeReactionFromActivities } from './';
+
+const addReactionToActivity = (
+  event: ActivityReactionAddedEvent,
+  activity: ActivityResponse,
+  eventBelongsToCurrentUser: boolean,
+) => {
+  const result = addReactionToActivities(
+    event,
+    [activity],
+    eventBelongsToCurrentUser,
+  );
+
+  return {
+    changed: result.changed,
+    ...result.entities![0],
+  };
+};
+
+const removeReactionFromActivity = (
+  event: ActivityReactionAddedEvent,
+  activity: ActivityResponse,
+  eventBelongsToCurrentUser: boolean,
+) => {
+  const result = removeReactionFromActivities(
+    event,
+    [activity],
+    eventBelongsToCurrentUser,
+  );
+
+  return {
+    changed: result.changed,
+    ...result.entities![0],
+  };
+};
 
 const createMockActivity = (id: string): ActivityResponse => ({
   id,
@@ -244,9 +273,9 @@ describe('activity-reaction-utils', () => {
       const result = addReactionToActivities(event, activities, true);
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(1);
-      expect(result.activities[0].own_reactions).toHaveLength(1);
-      expect(result.activities[0].own_reactions[0]).toEqual(reaction);
+      expect(result.entities!).toHaveLength(1);
+      expect(result.entities![0].own_reactions).toHaveLength(1);
+      expect(result.entities![0].own_reactions[0]).toEqual(reaction);
     });
 
     it('should return unchanged state if activity not found', () => {
@@ -268,7 +297,7 @@ describe('activity-reaction-utils', () => {
       const result = addReactionToActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toBe(activities);
+      expect(result.entities).toBe(activities);
     });
 
     it('should handle undefined activities', () => {
@@ -290,7 +319,7 @@ describe('activity-reaction-utils', () => {
       const result = addReactionToActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual([]);
+      expect(result.entities).toBeUndefined();
     });
   });
 
@@ -323,8 +352,8 @@ describe('activity-reaction-utils', () => {
       );
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(1);
-      expect(result.activities[0].own_reactions).toHaveLength(0);
+      expect(result.entities).toHaveLength(1);
+      expect(result.entities![0].own_reactions).toHaveLength(0);
     });
 
     it('should return unchanged state if activity not found', () => {
@@ -339,7 +368,7 @@ describe('activity-reaction-utils', () => {
       const result = removeReactionFromActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toBe(activities);
+      expect(result.entities).toBe(activities);
     });
 
     it('should handle undefined activities', () => {
@@ -353,7 +382,7 @@ describe('activity-reaction-utils', () => {
       const result = removeReactionFromActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual([]);
+      expect(result.entities).toBeUndefined();
     });
   });
 });

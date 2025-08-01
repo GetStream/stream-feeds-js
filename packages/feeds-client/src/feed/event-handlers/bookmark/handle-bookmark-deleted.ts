@@ -6,7 +6,7 @@ import type {
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
 
-import { updateActivityInState } from '../activity';
+import { updateEntityInState } from '../activity';
 
 // Helper function to check if two bookmarks are the same
 // A bookmark is identified by activity_id + folder_id + user_id
@@ -24,46 +24,30 @@ export const isSameBookmark = (
 export const removeBookmarkFromActivities = (
   event: BookmarkDeletedEvent,
   activities: ActivityResponse[] | undefined,
-  isCurrentUser: boolean,
-): UpdateStateResult<{ activities: ActivityResponse[] }> => {
-  if (!activities) {
-    return { changed: false, activities: [] };
-  }
+  eventBelongsToCurrentUser: boolean,
+): UpdateStateResult<{ entities: ActivityResponse[] | undefined }> =>
+  updateEntityInState({
+    entities: activities,
+    matcher: (activity) => activity.id === event.bookmark.activity.id,
+    updater: (matchedActivity) => {
+      let newOwnBookmarks = matchedActivity.own_bookmarks;
 
-  const activityIndex = activities.findIndex(
-    (a) => a.id === event.bookmark.activity.id,
-  );
-  if (activityIndex === -1) {
-    return { changed: false, activities };
-  }
+      if (eventBelongsToCurrentUser) {
+        newOwnBookmarks = matchedActivity.own_bookmarks.filter(
+          (bookmark) => !isSameBookmark(bookmark, event.bookmark),
+        );
+      }
 
-  const activity = activities[activityIndex];
-  const updatedActivity = removeBookmarkFromActivity(
-    event,
-    activity,
-    isCurrentUser,
-  );
-  return updateActivityInState({ updatedActivity, activities });
-};
+      if (newOwnBookmarks === matchedActivity.own_bookmarks) {
+        return matchedActivity;
+      }
 
-export const removeBookmarkFromActivity = (
-  event: BookmarkDeletedEvent,
-  activity: ActivityResponse,
-  isCurrentUser: boolean,
-): UpdateStateResult<ActivityResponse> => {
-  // Update own_bookmarks if the bookmark is from the current user
-  const ownBookmarks = isCurrentUser
-    ? (activity.own_bookmarks || []).filter(
-        (bookmark) => !isSameBookmark(bookmark, event.bookmark),
-      )
-    : activity.own_bookmarks;
-
-  return {
-    ...activity,
-    own_bookmarks: ownBookmarks,
-    changed: true,
-  };
-};
+      return {
+        ...matchedActivity,
+        own_bookmarks: newOwnBookmarks,
+      };
+    },
+  });
 
 export function handleBookmarkDeleted(
   this: Feed,
@@ -71,14 +55,16 @@ export function handleBookmarkDeleted(
 ) {
   const currentActivities = this.currentState.activities;
   const { connected_user: connectedUser } = this.client.state.getLatestValue();
-  const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
+  const eventBelongsToCurrentUser =
+    event.bookmark.user.id === connectedUser?.id;
 
   const result = removeBookmarkFromActivities(
     event,
     currentActivities,
-    isCurrentUser,
+    eventBelongsToCurrentUser,
   );
+
   if (result.changed) {
-    this.state.partialNext({ activities: result.activities });
+    this.state.partialNext({ activities: result.entities });
   }
 }

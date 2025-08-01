@@ -8,9 +8,6 @@ import {
   UserResponse,
 } from '../../../gen/models';
 import {
-  addBookmarkToActivity,
-  removeBookmarkFromActivity,
-  updateBookmarkInActivity,
   addBookmarkToActivities,
   removeBookmarkFromActivities,
   updateBookmarkInActivities,
@@ -57,6 +54,57 @@ const createMockUpdatedEvent = (
   custom: {},
   type: 'bookmark.updated',
 });
+
+const addBookmarkToActivity = (
+  event: BookmarkAddedEvent,
+  activity: ActivityResponse,
+  eventBelongsToCurrentUser: boolean,
+) => {
+  const result = addBookmarkToActivities(
+    event,
+    [activity],
+    eventBelongsToCurrentUser,
+  );
+
+  return {
+    changed: result.changed,
+    ...result.entities![0],
+  };
+};
+
+const removeBookmarkFromActivity = (
+  event: BookmarkAddedEvent,
+  activity: ActivityResponse,
+  eventBelongsToCurrentUser: boolean,
+) => {
+  const result = removeBookmarkFromActivities(
+    event,
+    [activity],
+    eventBelongsToCurrentUser,
+  );
+
+  return {
+    changed: result.changed,
+    ...result.entities![0],
+  };
+};
+
+const updateBookmarkInActivity = (
+  event: BookmarkAddedEvent,
+  activity: ActivityResponse,
+  eventBelongsToCurrentUser: boolean,
+) => {
+  const result = updateBookmarkInActivities(
+    event,
+    [activity],
+    eventBelongsToCurrentUser,
+  );
+
+  return {
+    changed: result.changed,
+    ...result.entities![0],
+  };
+};
 
 describe('bookmark-utils', () => {
   describe('addBookmarkToActivity', () => {
@@ -126,7 +174,7 @@ describe('bookmark-utils', () => {
       const event = createMockDeletedEvent(bookmark);
       const result = removeBookmarkFromActivity(event, activity, false);
 
-      expect(result.changed).toBe(true);
+      expect(result.changed).toBe(false);
       expect(result.own_bookmarks).toHaveLength(1);
       expect(result.own_bookmarks[0]).toEqual(bookmark);
     });
@@ -245,7 +293,7 @@ describe('bookmark-utils', () => {
       const event = createMockUpdatedEvent(updatedBookmark);
       const result = updateBookmarkInActivity(event, activity, false);
 
-      expect(result.changed).toBe(true);
+      expect(result.changed).toBe(false);
       expect(result.own_bookmarks).toHaveLength(1);
       expect(result.own_bookmarks[0]).toEqual(bookmark); // unchanged
     });
@@ -340,10 +388,10 @@ describe('bookmark-utils', () => {
       const result = addBookmarkToActivities(event, activities, true);
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(2);
-      expect(result.activities[0].own_bookmarks).toHaveLength(1);
-      expect(result.activities[0].own_bookmarks[0]).toEqual(bookmark);
-      expect(result.activities[1].own_bookmarks).toHaveLength(0);
+      expect(result.entities).toHaveLength(2);
+      expect(result.entities![0].own_bookmarks).toHaveLength(1);
+      expect(result.entities![0].own_bookmarks[0]).toEqual(bookmark);
+      expect(result.entities![1].own_bookmarks).toHaveLength(0);
     });
 
     it('should return unchanged when activity not found', () => {
@@ -358,7 +406,7 @@ describe('bookmark-utils', () => {
       const result = addBookmarkToActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual(activities);
+      expect(result.entities).toEqual(activities);
     });
 
     it('should handle undefined activities', () => {
@@ -370,7 +418,7 @@ describe('bookmark-utils', () => {
       const result = addBookmarkToActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual([]);
+      expect(result.entities).toBeUndefined();
     });
   });
 
@@ -387,9 +435,9 @@ describe('bookmark-utils', () => {
       const result = removeBookmarkFromActivities(event, activities, true);
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(2);
-      expect(result.activities[0].own_bookmarks).toHaveLength(0);
-      expect(result.activities[1].own_bookmarks).toHaveLength(0);
+      expect(result.entities).toHaveLength(2);
+      expect(result.entities![0].own_bookmarks).toHaveLength(0);
+      expect(result.entities![1].own_bookmarks).toHaveLength(0);
     });
 
     it('should return unchanged when activity not found', () => {
@@ -404,7 +452,7 @@ describe('bookmark-utils', () => {
       const result = removeBookmarkFromActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual(activities);
+      expect(result.entities).toEqual(activities);
     });
 
     it('should handle undefined activities', () => {
@@ -416,7 +464,7 @@ describe('bookmark-utils', () => {
       const result = removeBookmarkFromActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual([]);
+      expect(result.entities).toBeUndefined();
     });
   });
 
@@ -437,10 +485,10 @@ describe('bookmark-utils', () => {
       const result = updateBookmarkInActivities(event, activities, true);
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(2);
-      expect(result.activities[0].own_bookmarks).toHaveLength(1);
-      expect(result.activities[0].own_bookmarks[0]).toEqual(updatedBookmark);
-      expect(result.activities[1].own_bookmarks).toHaveLength(0);
+      expect(result.entities).toHaveLength(2);
+      expect(result.entities![0].own_bookmarks).toHaveLength(1);
+      expect(result.entities![0].own_bookmarks[0]).toEqual(updatedBookmark);
+      expect(result.entities![1].own_bookmarks).toHaveLength(0);
     });
 
     it('should return unchanged when activity not found', () => {
@@ -455,7 +503,7 @@ describe('bookmark-utils', () => {
       const result = updateBookmarkInActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual(activities);
+      expect(result.entities).toEqual(activities);
     });
 
     it('should handle undefined activities', () => {
@@ -467,7 +515,7 @@ describe('bookmark-utils', () => {
       const result = updateBookmarkInActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual([]);
+      expect(result.entities).toBeUndefined();
     });
   });
 });
