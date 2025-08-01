@@ -107,6 +107,5 @@ The `token` field will be preferred over the token provider, if it exists.
 To use your own API key with the sample app, you may do the following steps.
 
 1. Open the `sample-apps/react-native/ExpoTikTokApp/constants/stream.ts` file and change the `apiKey` variable to your own API key
-2. Populate the app with the respective API key with users, their feeds and their follow relationships
-   3. The easiest way to do this is by running the `sample-apps/react-sample-app/setup-env.js` script either directly from our repository or from your own (you can temporarily replace the environment variables in place with your own credentials, you can simply omit `NEXT_PUBLIC_API_URL`)
-4. Create user tokens manually for the users you'd like to use like it's explained [here](#using-user-tokens-directly), since the token provider is not going to work out of the box
+2. Populate the app with the respective API key with users, their feeds and their follow relationships; the easiest way to do this is by running the `sample-apps/react-sample-app/setup-env.js` script either directly from our repository or from your own (you can temporarily replace the environment variables in place with your own credentials, you can simply omit `NEXT_PUBLIC_API_URL`)
+3. Create user tokens manually for the users you'd like to use like it's explained [here](#using-user-tokens-directly), since the token provider is not going to work out of the box
