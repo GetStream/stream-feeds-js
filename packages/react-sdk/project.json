@@ -38,7 +38,7 @@
       "options": {
         "commands": [
           {
-            "command": "build:react-sdk",
+            "command": "yarn build:react-sdk",
             "forwardAllArgs": false
           }
         ]
