@@ -1,9 +1,8 @@
 import React from 'react';
-import type { SearchControllerState } from '@stream-io/feeds-client';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import type { SearchControllerState } from '@stream-io/feeds-react-sdk';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 
 import { SearchSourceResults } from './SearchSourceResults';
-// import { SearchResultsHeader } from './SearchResultsHeader';
 import { SearchResultsPresearch } from './SearchResultsPresearch';
 import { useSearchContext } from '../SearchContext';
 

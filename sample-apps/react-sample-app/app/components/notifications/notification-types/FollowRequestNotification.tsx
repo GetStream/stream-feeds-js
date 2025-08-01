@@ -1,9 +1,9 @@
 import { useErrorContext } from '@/app/error-context';
 import { useFeedContext } from '@/app/feed-context';
-import {
+import type {
   ActivityResponse,
   AggregatedActivityResponse,
-} from '@stream-io/feeds-client';
+} from '@stream-io/feeds-react-sdk';
 import { useState } from 'react';
 
 // TODO: Migrate to new API

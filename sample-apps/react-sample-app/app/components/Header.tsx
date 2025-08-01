@@ -3,13 +3,12 @@ import Link from 'next/link';
 import { useUserContext } from '../user-context';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { NotificationBell } from './notifications/NotificationBell';
 import {
   ActivitySearchSource,
   FeedSearchSource,
   SearchController,
   UserSearchSource,
-} from '@stream-io/feeds-client';
+} from '@stream-io/feeds-react-sdk';
 import { Search } from './Search';
 
 export function Header() {

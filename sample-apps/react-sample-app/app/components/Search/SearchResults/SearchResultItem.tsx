@@ -1,9 +1,9 @@
 import { ComponentType } from 'react';
-import {
+import type {
   ActivityResponse,
   FeedResponse,
   UserResponse,
-} from '@stream-io/feeds-client';
+} from '@stream-io/feeds-react-sdk';
 
 export type SearchResultItemComponents = Record<
   string,
