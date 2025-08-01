@@ -3,6 +3,7 @@ import { Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Place } from '@/components/PlaceSearchDropdown';
 import { useRouter } from 'expo-router';
+import { mapApiKey } from '@/constants/stream';
 
 type LocationPreviewProps = {
   location: Omit<Place, 'id' | 'address'>;
@@ -12,9 +13,11 @@ export const LocationPreview = ({ location }: LocationPreviewProps) => {
   const router = useRouter();
   return (
     <Pressable
-      onPress={() =>
-        router.push({ pathname: '/location-map-screen', params: location })
-      }
+      onPress={() => {
+        if (mapApiKey) {
+          router.push({ pathname: '/location-map-screen', params: location });
+        }
+      }}
       style={styles.container}
     >
       <Ionicons
