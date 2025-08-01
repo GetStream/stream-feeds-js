@@ -1,4 +1,4 @@
-import { AggregatedActivityResponse } from '@stream-io/feeds-client';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-react-sdk';
 
 // TODO: Migrate to new API
 export const SimpleNotification = ({

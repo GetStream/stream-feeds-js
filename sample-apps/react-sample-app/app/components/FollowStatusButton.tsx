@@ -1,6 +1,6 @@
-import { Feed, FeedState } from '@stream-io/feeds-client';
+import type { Feed, FeedState } from '@stream-io/feeds-react-sdk';
 import { useFeedContext } from '../feed-context';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
 
 const selector = ({ own_follows = [] }: FeedState) => {

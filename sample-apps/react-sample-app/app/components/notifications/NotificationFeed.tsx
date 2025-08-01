@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useFeedContext } from '../../feed-context';
-import { AggregatedActivityResponse } from '@stream-io/feeds-client';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-react-sdk';
 import { FollowRequestNotification } from './notification-types/FollowRequestNotification';
 import { SimpleNotification } from './notification-types/SimpleNotification';
 import { FollowInviteNotification } from './notification-types/FollowInviteNotification';

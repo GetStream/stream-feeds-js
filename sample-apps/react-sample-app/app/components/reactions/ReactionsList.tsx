@@ -1,9 +1,9 @@
 import { useUserContext } from '@/app/user-context';
-import {
+import type {
   ActivityResponse,
   CommentResponse,
   FeedsReactionResponse,
-} from '@stream-io/feeds-client';
+} from '@stream-io/feeds-react-sdk';
 import React, { useEffect, useState } from 'react';
 import { PaginatedList } from '../PaginatedList';
 

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
-import type { SearchSource, SearchSourceState } from '@stream-io/feeds-client';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import type { SearchSource, SearchSourceState } from '@stream-io/feeds-react-sdk';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 
 import { useSearchContext } from '../SearchContext';
 

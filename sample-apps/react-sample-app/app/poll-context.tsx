@@ -1,6 +1,6 @@
 'use client';
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
-import { ActivityResponse, Poll, StreamPoll } from '@stream-io/feeds-client';
+import type { ActivityResponse, Poll, StreamPoll } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 
 type PollContextValue = {

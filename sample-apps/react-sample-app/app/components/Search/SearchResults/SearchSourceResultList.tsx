@@ -3,8 +3,8 @@ import type { ComponentType } from 'react';
 import type {
   SearchSourceState,
   SearchSourceType,
-} from '@stream-io/feeds-client';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+} from '@stream-io/feeds-react-sdk';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 
 import { DefaultSearchResultItems } from './SearchResultItem';
 import { SearchSourceResultListFooter } from './SearchSourceResultListFooter';

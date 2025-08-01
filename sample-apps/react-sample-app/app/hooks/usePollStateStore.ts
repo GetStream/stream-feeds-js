@@ -1,5 +1,5 @@
-import { PollState } from '@stream-io/feeds-client';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import type { PollState } from '@stream-io/feeds-react-sdk';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 import { usePollContext } from '@/app/poll-context';
 
 export const usePollStateStore = <

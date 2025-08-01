@@ -5954,7 +5954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stream-io/feeds-client@workspace:*, @stream-io/feeds-client@workspace:^, @stream-io/feeds-client@workspace:packages/feeds-client":
+"@stream-io/feeds-client@workspace:*, @stream-io/feeds-client@workspace:packages/feeds-client":
   version: 0.0.0-use.local
   resolution: "@stream-io/feeds-client@workspace:packages/feeds-client"
   dependencies:
@@ -6053,7 +6053,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@stream-io/feeds-react-sdk@workspace:packages/react-sdk":
+"@stream-io/feeds-react-sdk@workspace:*, @stream-io/feeds-react-sdk@workspace:packages/react-sdk":
   version: 0.0.0-use.local
   resolution: "@stream-io/feeds-react-sdk@workspace:packages/react-sdk"
   dependencies:
@@ -12133,7 +12133,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "facebook-clone@workspace:sample-apps/react-sample-app"
   dependencies:
-    "@stream-io/feeds-client": "workspace:^"
+    "@stream-io/feeds-react-sdk": "workspace:*"
     "@stream-io/node-sdk": 0.5.0
     "@types/lodash.uniqby": ^4
     "@types/node": ^20

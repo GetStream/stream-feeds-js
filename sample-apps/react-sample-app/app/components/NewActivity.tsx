@@ -1,9 +1,8 @@
-import { Feed, FeedState, isImageFile } from '@stream-io/feeds-client';
+import { Feed, FeedState, isImageFile, useStateStore } from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
 import { FormEvent, useState } from 'react';
 import { ActivityComposer } from './ActivityComposer';
 import { LoadingIndicator } from './LoadingIndicator';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
 import { useUserContext } from '../user-context';
 
 const selector = ({ own_capabilities = [] }: FeedState) => ({

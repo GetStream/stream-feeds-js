@@ -1,10 +1,10 @@
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 import { useEffect, useState } from 'react';
 import type {
   SearchController,
   SearchControllerState,
   SearchSource,
-} from '@stream-io/feeds-client';
+} from '@stream-io/feeds-react-sdk';
 
 const searchControllerStateSelector = (value: SearchControllerState) => ({
   sources: value.sources,
@@ -40,6 +40,6 @@ export const useSearchQueriesInProgress = (
       subscriptions.forEach((unsubscribe) => unsubscribe());
     };
   }, [sources]);
-  
+
   return queriesInProgress;
 };

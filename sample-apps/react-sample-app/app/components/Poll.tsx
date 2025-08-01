@@ -3,7 +3,7 @@ import {
   ActivityResponse,
   PollState,
   PollOption as StreamPollOption,
-} from '@stream-io/feeds-client';
+} from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PollContextProvider, usePollContext } from '@/app/poll-context';
 import { usePollStateStore } from '@/app/hooks/usePollStateStore';

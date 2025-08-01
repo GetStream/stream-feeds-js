@@ -1,10 +1,10 @@
 import {
   checkHasAnotherPage,
+  useStateStore,
   Feed,
   FeedState,
   FollowResponse,
-} from '@stream-io/feeds-client';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+} from '@stream-io/feeds-react-sdk';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { PaginatedList } from './PaginatedList';
 
