@@ -1,36 +1,79 @@
 import type { Feed } from '../../../feed';
 import {
+  ActivityPinResponse,
   ActivityReactionDeletedEvent,
   ActivityResponse,
 } from '../../../gen/models';
-import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
 
-import { updateEntityInState } from './handle-activity-updated';
+const sharedUpdateActivity = ({
+  currentActivity,
+  event,
+  eventBelongsToCurrentUser,
+}: {
+  currentActivity: ActivityResponse;
+  event: ActivityReactionDeletedEvent;
+  eventBelongsToCurrentUser: boolean;
+}) => {
+  let newOwnReactions = currentActivity.own_reactions;
+
+  if (eventBelongsToCurrentUser) {
+    newOwnReactions = currentActivity.own_reactions.filter(
+      (reaction) =>
+        !(
+          reaction.type === event.reaction.type &&
+          reaction.user.id === event.reaction.user.id
+        ),
+    );
+  }
+
+  return {
+    ...event.activity,
+    own_reactions: newOwnReactions,
+    own_bookmarks: currentActivity.own_bookmarks,
+  };
+};
+
 export const removeReactionFromActivities = (
   event: ActivityReactionDeletedEvent,
   activities: ActivityResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
-): UpdateStateResult<{ entities: ActivityResponse[] | undefined }> =>
-  updateEntityInState({
+) =>
+  updateEntityInArray({
     entities: activities,
     matcher: (activity) => activity.id === event.activity.id,
-    updater: (matchedActivity) => {
-      let newOwnReactions = matchedActivity.own_reactions;
+    updater: (matchedActivity) =>
+      sharedUpdateActivity({
+        currentActivity: matchedActivity,
+        event,
+        eventBelongsToCurrentUser,
+      }),
+  });
 
-      if (eventBelongsToCurrentUser) {
-        newOwnReactions = matchedActivity.own_reactions.filter(
-          (reaction) =>
-            !(
-              reaction.type === event.reaction.type &&
-              reaction.user.id === event.reaction.user.id
-            ),
-        );
+export const removeReactionFromPinnedActivities = (
+  event: ActivityReactionDeletedEvent,
+  activities: ActivityPinResponse[] | undefined,
+  eventBelongsToCurrentUser: boolean,
+) =>
+  updateEntityInArray({
+    entities: activities,
+    matcher: (pinnedActivity) =>
+      pinnedActivity.activity.id === event.activity.id,
+    updater: (matchedPinnedActivity) => {
+      const newActivity = sharedUpdateActivity({
+        currentActivity: matchedPinnedActivity.activity,
+        event,
+        eventBelongsToCurrentUser,
+      });
+
+      if (newActivity === matchedPinnedActivity.activity) {
+        return matchedPinnedActivity;
       }
 
       return {
-        ...event.activity,
-        own_reactions: newOwnReactions,
-        own_bookmarks: matchedActivity.own_bookmarks,
+        ...matchedPinnedActivity,
+        activity: newActivity,
       };
     },
   });
@@ -39,19 +82,32 @@ export function handleActivityReactionDeleted(
   this: Feed,
   event: EventPayload<'feeds.activity.reaction.deleted'>,
 ) {
-  const currentActivities = this.currentState.activities;
+  const {
+    activities: currentActivities,
+    pinned_activities: currentPinnedActivities,
+  } = this.currentState;
   const connectedUser = this.client.state.getLatestValue().connected_user;
   const eventBelongsToCurrentUser =
     typeof connectedUser !== 'undefined' &&
     event.reaction.user.id === connectedUser.id;
 
-  const result = removeReactionFromActivities(
-    event,
-    currentActivities,
-    eventBelongsToCurrentUser,
-  );
+  const [result1, result2] = [
+    removeReactionFromActivities(
+      event,
+      currentActivities,
+      eventBelongsToCurrentUser,
+    ),
+    removeReactionFromPinnedActivities(
+      event,
+      currentPinnedActivities,
+      eventBelongsToCurrentUser,
+    ),
+  ];
 
-  if (result.changed) {
-    this.state.partialNext({ activities: result.entities });
+  if (result1.changed || result2.changed) {
+    this.state.partialNext({
+      activities: result1.entities,
+      pinned_activities: result2.entities,
+    });
   }
 }
