@@ -4,9 +4,8 @@ import type {
   BookmarkDeletedEvent,
   BookmarkResponse,
 } from '../../../gen/models';
-import type { EventPayload, UpdateStateResult } from '../../../types-internal';
-
-import { updateEntityInState } from '../activity';
+import type { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
 
 // Helper function to check if two bookmarks are the same
 // A bookmark is identified by activity_id + folder_id + user_id
@@ -25,8 +24,8 @@ export const removeBookmarkFromActivities = (
   event: BookmarkDeletedEvent,
   activities: ActivityResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
-): UpdateStateResult<{ entities: ActivityResponse[] | undefined }> =>
-  updateEntityInState({
+) =>
+  updateEntityInArray({
     entities: activities,
     matcher: (activity) => activity.id === event.bookmark.activity.id,
     updater: (matchedActivity) => {

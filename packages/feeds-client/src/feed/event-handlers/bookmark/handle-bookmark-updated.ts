@@ -3,17 +3,17 @@ import type {
   ActivityResponse,
   BookmarkUpdatedEvent,
 } from '../../../gen/models';
-import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
 
-import { updateEntityInState } from '../activity';
 import { isSameBookmark } from './handle-bookmark-deleted';
 
 export const updateBookmarkInActivities = (
   event: BookmarkUpdatedEvent,
   activities: ActivityResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
-): UpdateStateResult<{ entities: ActivityResponse[] | undefined }> =>
-  updateEntityInState({
+) =>
+  updateEntityInArray({
     entities: activities,
     matcher: (a) => a.id === event.bookmark.activity.id,
     updater: (matchedActivity) => {

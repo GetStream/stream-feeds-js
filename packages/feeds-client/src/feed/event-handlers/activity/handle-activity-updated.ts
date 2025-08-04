@@ -1,43 +1,61 @@
-import { Feed, FeedState } from '../../../feed';
+import { Feed } from '../../../feed';
 import {
   ActivityPinResponse,
   ActivityResponse,
   ActivityUpdatedEvent,
 } from '../../../gen/models';
 import { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
+
+const sharedUpdateActivity = ({
+  currentActivity,
+  event,
+}: {
+  currentActivity: ActivityResponse;
+  event: ActivityUpdatedEvent;
+}) => {
+  return {
+    ...event.activity,
+    own_reactions: currentActivity.own_reactions,
+    own_bookmarks: currentActivity.own_bookmarks,
+  };
+};
 
 export const updateActivityInState = (
   event: ActivityUpdatedEvent,
-  activities: ActivityResponse[],
+  activities: ActivityResponse[] | undefined,
 ) =>
-  updateEntityInState({
+  updateEntityInArray({
     entities: activities,
-    matcher: (a) => a.id === event.activity.id,
-    updater: (matchedActivity) => {
-      return {
-        ...event.activity,
-        own_reactions: matchedActivity.own_reactions,
-        own_bookmarks: matchedActivity.own_bookmarks,
-      };
-    },
+    matcher: (activity) => activity.id === event.activity.id,
+    updater: (matchedActivity) =>
+      sharedUpdateActivity({
+        currentActivity: matchedActivity,
+        event,
+      }),
   });
 
 export const updatePinnedActivityInState = (
   event: ActivityUpdatedEvent,
   pinnedActivities: ActivityPinResponse[] | undefined,
 ) =>
-  updateEntityInState({
+  updateEntityInArray({
     entities: pinnedActivities,
     matcher: (pinnedActivity) =>
       pinnedActivity.activity.id === event.activity.id,
     updater: (matchedPinnedActivity) => {
+      const newActivity = sharedUpdateActivity({
+        currentActivity: matchedPinnedActivity.activity,
+        event,
+      });
+
+      if (newActivity === matchedPinnedActivity.activity) {
+        return matchedPinnedActivity;
+      }
+
       return {
         ...matchedPinnedActivity,
-        activity: {
-          ...event.activity,
-          own_reactions: matchedPinnedActivity.activity.own_reactions,
-          own_bookmarks: matchedPinnedActivity.activity.own_bookmarks,
-        },
+        activity: newActivity,
       };
     },
   });
@@ -46,72 +64,22 @@ export function handleActivityUpdated(
   this: Feed,
   event: EventPayload<'feeds.activity.updated'>,
 ) {
-  this.client.hydratePollCache([event.activity]);
+  const {
+    activities: currentActivities,
+    pinned_activities: currentPinnedActivities,
+  } = this.currentState;
 
-  this.state.next((currentState) => {
-    const {
-      activities: currentActivities,
-      pinned_activities: currentPinnedActivities,
-    } = currentState;
+  const [result1, result2] = [
+    updateActivityInState(event, currentActivities),
+    updatePinnedActivityInState(event, currentPinnedActivities),
+  ];
 
-    let newState: FeedState | undefined;
+  if (result1.changed || result2.changed) {
+    this.client.hydratePollCache([event.activity]);
 
-    if (currentActivities) {
-      const result = updateActivityInState(event, currentActivities);
-
-      if (result.changed) {
-        newState ??= {
-          ...currentState,
-        };
-        newState.activities = result.entities;
-      }
-    }
-
-    if (currentPinnedActivities) {
-      const result = updatePinnedActivityInState(
-        event,
-        currentPinnedActivities,
-      );
-
-      if (result.changed) {
-        newState ??= {
-          ...currentState,
-        };
-        newState.pinned_activities = result.entities;
-      }
-    }
-
-    return newState ?? currentState;
-  });
+    this.state.partialNext({
+      activities: result1.entities,
+      pinned_activities: result2.entities,
+    });
+  }
 }
-
-export const updateEntityInState = <T>({
-  matcher,
-  updater,
-  entities,
-}: {
-  matcher: (entity: T) => boolean;
-  entities: T[] | undefined;
-  updater: (currentEntity: T) => T;
-}) => {
-  if (!entities || !entities.length) {
-    return { changed: false, entities };
-  }
-
-  const index = entities.findIndex(matcher);
-
-  if (index === -1) {
-    return { changed: false, entities };
-  }
-
-  const updatedEntities = [...entities];
-  const newEntity = updater(updatedEntities[index]);
-
-  if (newEntity === updatedEntities[index]) {
-    return { changed: false, entities };
-  }
-
-  updatedEntities[index] = newEntity;
-
-  return { changed: true, entities: updatedEntities };
-};
