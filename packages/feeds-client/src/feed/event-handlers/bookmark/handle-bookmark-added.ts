@@ -1,15 +1,14 @@
 import type { Feed } from '../../../feed';
 import type { ActivityResponse, BookmarkAddedEvent } from '../../../gen/models';
-import type { EventPayload, UpdateStateResult } from '../../../types-internal';
-
-import { updateEntityInState } from '../activity';
+import type { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
 
 export const addBookmarkToActivities = (
   event: BookmarkAddedEvent,
   activities: ActivityResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
-): UpdateStateResult<{ entities: ActivityResponse[] | undefined }> =>
-  updateEntityInState({
+) =>
+  updateEntityInArray({
     entities: activities,
     matcher: (activity) => activity.id === event.bookmark.activity.id,
     updater: (matchedActivity) => {
