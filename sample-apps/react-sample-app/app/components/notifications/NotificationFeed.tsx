@@ -12,6 +12,8 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
   >([]);
   const [readActivities, setReadActivities] = useState<string[]>([]);
   const [lastSeenAt, setLastSeenAt] = useState<Date | undefined>(undefined);
+  const [lastReadAt, setLastReadAt] = useState<Date | undefined>(undefined);
+  const [seenActivities, setSeenActivities] = useState<string[]>([]);
   const { ownNotifications } = useFeedContext();
 
   useEffect(() => {
@@ -26,6 +28,7 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
       ({ aggregated_activities, notification_status }) => {
         setAggregatedActivities(aggregated_activities ?? []);
         setReadActivities(notification_status?.read_activities ?? []);
+        setLastReadAt(notification_status?.last_read_at);
       },
     );
 
@@ -43,6 +46,7 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
       ({ notification_status }) => {
         if (!isMenuOpen) {
           setLastSeenAt(notification_status?.last_seen_at);
+          setSeenActivities(notification_status?.seen_activities ?? []);
         }
       },
     );
@@ -60,14 +64,32 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
     }
   };
 
+  const markAllRead = async () => {
+    try {
+      await ownNotifications?.markActivity({
+        mark_all_read: true,
+      });
+    } catch (error) {
+      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+    }
+  };
+
+  const hasUnreadNotifications = aggregatedActivities.some(
+    (group) => !readActivities.includes(group.group),
+  );
+
   const renderItem = (group: AggregatedActivityResponse, index: number) => {
     return (
       <li key={`notification:${index}`} className="w-full">
         <Notification
           group={group}
-          isRead={readActivities.includes(group.group)}
+          isRead={
+            (lastReadAt && group.created_at.getTime() < lastReadAt.getTime()) ||
+            readActivities.includes(group.group)
+          }
           isSeen={
-            !!(lastSeenAt && group.created_at.getTime() < lastSeenAt.getTime())
+            (lastSeenAt && group.created_at.getTime() < lastSeenAt.getTime()) ||
+            seenActivities.includes(group.group)
           }
           onMarkRead={() => markRead(group)}
         ></Notification>
@@ -77,6 +99,16 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
 
   return (
     <>
+      {hasUnreadNotifications && (
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={markAllRead}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+          >
+            Mark all read
+          </button>
+        </div>
+      )}
       <PaginatedList
         items={aggregatedActivities}
         hasNext={false}

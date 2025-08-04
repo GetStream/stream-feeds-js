@@ -429,7 +429,7 @@ export interface ActivityResponse {
 
   moderation?: ModerationV2Response;
 
-  object?: Record<string, any>;
+  notification_context?: Record<string, any>;
 
   parent?: ActivityResponse;
 
