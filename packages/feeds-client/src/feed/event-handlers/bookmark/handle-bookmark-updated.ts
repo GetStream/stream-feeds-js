@@ -15,7 +15,7 @@ export const updateBookmarkInActivities = (
 ) =>
   updateEntityInArray({
     entities: activities,
-    matcher: (a) => a.id === event.bookmark.activity.id,
+    matcher: (activity) => activity.id === event.bookmark.activity.id,
     updater: (matchedActivity) => {
       let newOwnBookmarks = matchedActivity.own_bookmarks;
 

@@ -6,7 +6,9 @@ export const removeActivityFromState = (
   activityResponse: ActivityResponse,
   activities: ActivityResponse[],
 ) => {
-  const index = activities.findIndex((a) => a.id === activityResponse.id);
+  const index = activities.findIndex(
+    (activity) => activity.id === activityResponse.id,
+  );
   if (index !== -1) {
     const newActivities = [...activities];
     newActivities.splice(index, 1);
