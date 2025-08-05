@@ -1,5 +1,8 @@
 import {
+  ActivityPinResponse,
   ActivityResponse,
+  BookmarkFolderResponse,
+  BookmarkResponse,
   FeedResponse,
   FeedsReactionResponse,
   FollowResponse,
@@ -8,6 +11,7 @@ import {
   UserResponse,
 } from '../gen/models';
 import { humanId } from 'human-id';
+import { EventPayload } from '../types-internal';
 
 export const getHumanId = () => humanId({ capitalize: false, separator: '-' });
 
@@ -151,3 +155,113 @@ export const generateFeedReactionResponse = (
     user,
   };
 };
+
+export const generateActivityPinResponse = (
+  overrides: Omit<Partial<ActivityPinResponse>, 'activity' | 'user'> & {
+    activity?: Partial<ActivityResponse>;
+    user?: Partial<UserResponse>;
+  } = {},
+): ActivityPinResponse => {
+  return {
+    created_at: new Date(),
+    updated_at: new Date(),
+    feed: getHumanId(),
+    ...overrides,
+    activity: generateActivityResponse(overrides.activity),
+    user: generateUserResponse(overrides.user),
+  };
+};
+
+export const generateBookmarkFolderResponse = (
+  overrides: Partial<BookmarkFolderResponse> = {},
+): BookmarkFolderResponse => ({
+  id: `bookmark-folder-${getHumanId()}`,
+  name: humanId(),
+  created_at: new Date(),
+  updated_at: new Date(),
+  ...overrides,
+});
+
+export const generateBookmarkResponse = (
+  overrides: Omit<Partial<BookmarkResponse>, 'activity' | 'user'> & {
+    activity?: Partial<ActivityResponse>;
+    user?: Partial<UserResponse>;
+  } = {},
+): BookmarkResponse => ({
+  created_at: new Date(),
+  updated_at: new Date(),
+  ...overrides,
+  activity: generateActivityResponse(overrides.activity),
+  user: generateUserResponse(overrides.user),
+});
+
+// event generators
+export function generateActivityReactionAddedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.reaction.added'>>,
+    'activity' | 'type' | 'reaction' | 'user'
+  > & {
+    activity?: Parameters<typeof generateActivityResponse>[0];
+    reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.reaction.added'> {
+  const activity = generateActivityResponse(overrides.activity);
+  const reaction = generateFeedReactionResponse(overrides.reaction);
+  const user = generateUserResponse(overrides.user);
+
+  return {
+    type: 'feeds.activity.reaction.added',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    user,
+    reaction,
+    activity,
+  };
+}
+
+export function generateActivityReactionDeletedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.reaction.deleted'>>,
+    'user' | 'activity' | 'reaction'
+  > & {
+    activity?: Parameters<typeof generateActivityResponse>[0];
+    reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.reaction.deleted'> {
+  const activity = generateActivityResponse(overrides.activity);
+  const reaction = generateFeedReactionResponse(overrides.reaction);
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'feeds.activity.reaction.deleted',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    user,
+    reaction,
+    activity,
+  };
+}
+
+export function generateActivityUpdatedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.updated'>>,
+    'activity' | 'type'
+  > & {
+    activity?: Parameters<typeof generateActivityResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.updated'> {
+  const activity = generateActivityResponse(overrides.activity);
+  return {
+    type: 'feeds.activity.updated',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    activity,
+  };
+}
