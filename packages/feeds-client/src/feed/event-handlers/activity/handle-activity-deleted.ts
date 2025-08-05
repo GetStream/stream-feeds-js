@@ -16,6 +16,8 @@ export const removeActivityFromState = (
   }
 };
 
+// TODO: handle pinned activities?
+
 export function handleActivityDeleted(
   this: Feed,
   event: EventPayload<'feeds.activity.deleted'>,
