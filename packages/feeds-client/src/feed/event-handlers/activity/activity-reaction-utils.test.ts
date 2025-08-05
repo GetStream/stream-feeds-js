@@ -6,6 +6,10 @@ import {
   FeedsReactionResponse,
 } from '../../../gen/models';
 import { addReactionToActivities, removeReactionFromActivities } from './';
+import {
+  generateActivityResponse,
+  generateFeedReactionResponse,
+} from '../../../test-utils';
 
 const addReactionToActivity = (
   event: ActivityReactionAddedEvent,
@@ -41,67 +45,6 @@ const removeReactionFromActivity = (
   };
 };
 
-const createMockActivity = (id: string): ActivityResponse => ({
-  id,
-  type: 'test',
-  created_at: new Date(),
-  updated_at: new Date(),
-  visibility: 'public',
-  bookmark_count: 0,
-  comment_count: 0,
-  share_count: 0,
-  attachments: [],
-  comments: [],
-  feeds: [],
-  filter_tags: [],
-  interest_tags: [],
-  latest_reactions: [],
-  mentioned_users: [],
-  own_bookmarks: [],
-  own_reactions: [],
-  custom: {},
-  reaction_groups: {},
-  search_data: {},
-  popularity: 0,
-  score: 0,
-  reaction_count: 0,
-  user: {
-    id: 'user1',
-    created_at: new Date(),
-    updated_at: new Date(),
-    banned: false,
-    language: 'en',
-    online: false,
-    role: 'user',
-    blocked_user_ids: [],
-    teams: [],
-    custom: {},
-  },
-});
-
-const createMockReaction = (
-  type: string,
-  userId: string,
-  activityId: string,
-): FeedsReactionResponse => ({
-  type,
-  user: {
-    id: userId,
-    created_at: new Date(),
-    updated_at: new Date(),
-    banned: false,
-    language: 'en',
-    online: false,
-    role: 'user',
-    blocked_user_ids: [],
-    teams: [],
-    custom: {},
-  },
-  activity_id: activityId,
-  created_at: new Date(),
-  updated_at: new Date(),
-});
-
 const createMockAddedEvent = (
   reaction: FeedsReactionResponse,
   activity: ActivityResponse,
@@ -129,8 +72,12 @@ const createMockDeletedEvent = (
 describe('activity-reaction-utils', () => {
   describe('addReactionToActivity', () => {
     it('should add reaction to own_reactions when from current user', () => {
-      const activity = createMockActivity('activity1');
-      const reaction = createMockReaction('like', 'user1', 'activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity1',
+      });
       const eventActivity = { ...activity };
       eventActivity.latest_reactions = [reaction];
       eventActivity.reaction_groups = {
@@ -158,8 +105,12 @@ describe('activity-reaction-utils', () => {
     });
 
     it('should not add reaction to own_reactions when not from current user', () => {
-      const activity = createMockActivity('activity1');
-      const reaction = createMockReaction('like', 'user2', 'activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user2' },
+        activity_id: 'activity1',
+      });
       const eventActivity = { ...activity };
       eventActivity.latest_reactions = [reaction];
       eventActivity.reaction_groups = {
@@ -189,8 +140,12 @@ describe('activity-reaction-utils', () => {
 
   describe('removeReactionFromActivity', () => {
     it('should remove reaction from own_reactions when from current user', () => {
-      const activity = createMockActivity('activity1');
-      const reaction = createMockReaction('like', 'user1', 'activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity1',
+      });
       const eventActivity = { ...activity };
       eventActivity.latest_reactions = [reaction];
       eventActivity.reaction_groups = {
@@ -221,8 +176,12 @@ describe('activity-reaction-utils', () => {
     });
 
     it('should not remove reaction from own_reactions when not from current user', () => {
-      const activity = createMockActivity('activity1');
-      const reaction = createMockReaction('like', 'user1', 'activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity1',
+      });
       const eventActivity = { ...activity };
       eventActivity.latest_reactions = [reaction];
       eventActivity.reaction_groups = {
@@ -255,9 +214,13 @@ describe('activity-reaction-utils', () => {
 
   describe('addReactionToActivities', () => {
     it('should add reaction to activity in activities array', () => {
-      const activity = createMockActivity('activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
       const activities = [activity];
-      const reaction = createMockReaction('like', 'user1', 'activity1');
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity1',
+      });
       const eventActivity = { ...activity };
       eventActivity.latest_reactions = [reaction];
       eventActivity.reaction_groups = {
@@ -279,10 +242,14 @@ describe('activity-reaction-utils', () => {
     });
 
     it('should return unchanged state if activity not found', () => {
-      const activity = createMockActivity('activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
       const activities = [activity];
-      const reaction = createMockReaction('like', 'user1', 'activity2');
-      const eventActivity = createMockActivity('activity2');
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity2',
+      });
+      const eventActivity = generateActivityResponse({ id: 'activity2' });
       eventActivity.latest_reactions = [reaction];
       eventActivity.reaction_groups = {
         [reaction.type]: {
@@ -301,8 +268,12 @@ describe('activity-reaction-utils', () => {
     });
 
     it('should handle undefined activities', () => {
-      const activity = createMockActivity('activity1');
-      const reaction = createMockReaction('like', 'user1', 'activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity1',
+      });
       const eventActivity = { ...activity };
       eventActivity.own_reactions = [reaction];
       eventActivity.latest_reactions = [reaction];
@@ -325,8 +296,12 @@ describe('activity-reaction-utils', () => {
 
   describe('removeReactionFromActivities', () => {
     it('should remove reaction from activity in activities array', () => {
-      const activity = createMockActivity('activity1');
-      const reaction = createMockReaction('like', 'user1', 'activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity1',
+      });
       const eventActivity = { ...activity };
       eventActivity.latest_reactions = [reaction];
       eventActivity.reaction_groups = {
@@ -357,10 +332,14 @@ describe('activity-reaction-utils', () => {
     });
 
     it('should return unchanged state if activity not found', () => {
-      const activity = createMockActivity('activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
       const activities = [activity];
-      const reaction = createMockReaction('like', 'user1', 'activity2');
-      const eventActivity = createMockActivity('activity2');
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity2',
+      });
+      const eventActivity = generateActivityResponse({ id: 'activity2' });
       eventActivity.latest_reactions = [];
       eventActivity.reaction_groups = {};
       const event = createMockDeletedEvent(reaction, eventActivity);
@@ -372,8 +351,12 @@ describe('activity-reaction-utils', () => {
     });
 
     it('should handle undefined activities', () => {
-      const activity = createMockActivity('activity1');
-      const reaction = createMockReaction('like', 'user1', 'activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const reaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: 'user1' },
+        activity_id: 'activity1',
+      });
       const eventActivity = { ...activity };
       eventActivity.latest_reactions = [];
       eventActivity.reaction_groups = {};
