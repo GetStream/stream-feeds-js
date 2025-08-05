@@ -84,11 +84,11 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
         <Notification
           group={group}
           isRead={
-            (lastReadAt && group.created_at.getTime() < lastReadAt.getTime()) ||
+            (lastReadAt && group.updated_at.getTime() < lastReadAt.getTime()) ||
             readActivities.includes(group.group)
           }
           isSeen={
-            (lastSeenAt && group.created_at.getTime() < lastSeenAt.getTime()) ||
+            (lastSeenAt && group.updated_at.getTime() < lastSeenAt.getTime()) ||
             seenActivities.includes(group.group)
           }
           onMarkRead={() => markRead(group)}
