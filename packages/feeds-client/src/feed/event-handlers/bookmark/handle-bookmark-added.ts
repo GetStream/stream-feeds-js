@@ -1,7 +1,33 @@
 import type { Feed } from '../../../feed';
-import type { ActivityResponse, BookmarkAddedEvent } from '../../../gen/models';
+import type {
+  ActivityPinResponse,
+  ActivityResponse,
+  BookmarkAddedEvent,
+} from '../../../gen/models';
 import type { EventPayload } from '../../../types-internal';
 import { updateEntityInArray } from '../../../utils';
+
+const sharedUpdateActivity = ({
+  currentActivity,
+  event,
+  eventBelongsToCurrentUser,
+}: {
+  currentActivity: ActivityResponse;
+  event: BookmarkAddedEvent;
+  eventBelongsToCurrentUser: boolean;
+}): ActivityResponse => {
+  let newOwnBookmarks = currentActivity.own_bookmarks;
+
+  if (eventBelongsToCurrentUser) {
+    newOwnBookmarks = [...newOwnBookmarks, event.bookmark];
+  }
+
+  return {
+    ...event.bookmark.activity,
+    own_bookmarks: newOwnBookmarks,
+    own_reactions: currentActivity.own_reactions,
+  };
+};
 
 export const addBookmarkToActivities = (
   event: BookmarkAddedEvent,
@@ -11,16 +37,37 @@ export const addBookmarkToActivities = (
   updateEntityInArray({
     entities: activities,
     matcher: (activity) => activity.id === event.bookmark.activity.id,
-    updater: (matchedActivity) => {
-      let newOwnBookmarks = matchedActivity.own_bookmarks;
+    updater: (matchedActivity) =>
+      sharedUpdateActivity({
+        currentActivity: matchedActivity,
+        event,
+        eventBelongsToCurrentUser,
+      }),
+  });
 
-      if (eventBelongsToCurrentUser) {
-        newOwnBookmarks = [...newOwnBookmarks, event.bookmark];
+export const addBookmarkToPinnedActivities = (
+  event: BookmarkAddedEvent,
+  pinnedActivities: ActivityPinResponse[] | undefined,
+  eventBelongsToCurrentUser: boolean,
+) =>
+  updateEntityInArray({
+    entities: pinnedActivities,
+    matcher: (pinnedActivity) =>
+      pinnedActivity.activity.id === event.bookmark.activity.id,
+    updater: (matchedPinnedActivity) => {
+      const newActivity = sharedUpdateActivity({
+        currentActivity: matchedPinnedActivity.activity,
+        event,
+        eventBelongsToCurrentUser,
+      });
+
+      if (newActivity === matchedPinnedActivity.activity) {
+        return matchedPinnedActivity;
       }
 
       return {
-        ...matchedActivity,
-        own_bookmarks: newOwnBookmarks,
+        ...matchedPinnedActivity,
+        activity: newActivity,
       };
     },
   });
@@ -29,18 +76,31 @@ export function handleBookmarkAdded(
   this: Feed,
   event: EventPayload<'feeds.bookmark.added'>,
 ) {
-  const currentActivities = this.currentState.activities;
+  const {
+    activities: currentActivities,
+    pinned_activities: currentPinnedActivities,
+  } = this.currentState;
   const { connected_user: connectedUser } = this.client.state.getLatestValue();
   const eventBelongsToCurrentUser =
     event.bookmark.user.id === connectedUser?.id;
 
-  const result = addBookmarkToActivities(
-    event,
-    currentActivities,
-    eventBelongsToCurrentUser,
-  );
+  const [result1, result2] = [
+    addBookmarkToActivities(
+      event,
+      currentActivities,
+      eventBelongsToCurrentUser,
+    ),
+    addBookmarkToPinnedActivities(
+      event,
+      currentPinnedActivities,
+      eventBelongsToCurrentUser,
+    ),
+  ];
 
-  if (result.changed) {
-    this.state.partialNext({ activities: result.entities });
+  if (result1.changed || result2.changed) {
+    this.state.partialNext({
+      activities: result1.entities,
+      pinned_activities: result2.entities,
+    });
   }
 }

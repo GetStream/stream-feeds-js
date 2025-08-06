@@ -265,3 +265,66 @@ export function generateActivityUpdatedEvent(
     activity,
   };
 }
+
+export function generateBookmarkAddedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.bookmark.added'>>,
+    'bookmark' | 'user'
+  > & {
+    bookmark?: Parameters<typeof generateBookmarkResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.bookmark.added'> {
+  const bookmark = generateBookmarkResponse(overrides.bookmark);
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'feeds.bookmark.added',
+    created_at: new Date(),
+    custom: {},
+    ...overrides,
+    bookmark,
+    user,
+  };
+}
+
+export function generateBookmarkDeletedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.bookmark.deleted'>>,
+    'bookmark' | 'user'
+  > & {
+    bookmark?: Parameters<typeof generateBookmarkResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.bookmark.deleted'> {
+  const bookmark = generateBookmarkResponse(overrides.bookmark);
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'feeds.bookmark.deleted',
+    created_at: new Date(),
+    custom: {},
+    ...overrides,
+    bookmark,
+    user,
+  };
+}
+
+export function generateBookmarkUpdatedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.bookmark.updated'>>,
+    'bookmark' | 'user'
+  > & {
+    bookmark?: Parameters<typeof generateBookmarkResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.bookmark.updated'> {
+  const bookmark = generateBookmarkResponse(overrides.bookmark);
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'feeds.bookmark.updated',
+    created_at: new Date(),
+    custom: {},
+    ...overrides,
+    bookmark,
+    user,
+  };
+}
