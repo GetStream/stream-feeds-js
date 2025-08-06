@@ -1,5 +1,6 @@
 import type { Feed } from '../../../feed';
 import type {
+  ActivityPinResponse,
   ActivityResponse,
   BookmarkUpdatedEvent,
 } from '../../../gen/models';
@@ -7,6 +8,35 @@ import type { EventPayload } from '../../../types-internal';
 import { updateEntityInArray } from '../../../utils';
 
 import { isSameBookmark } from './handle-bookmark-deleted';
+
+const sharedUpdateActivity = ({
+  currentActivity,
+  event,
+  eventBelongsToCurrentUser,
+}: {
+  currentActivity: ActivityResponse;
+  event: BookmarkUpdatedEvent;
+  eventBelongsToCurrentUser: boolean;
+}): ActivityResponse => {
+  let newOwnBookmarks = currentActivity.own_bookmarks;
+
+  if (eventBelongsToCurrentUser) {
+    const bookmarkIndex = newOwnBookmarks.findIndex((bookmark) =>
+      isSameBookmark(bookmark, event.bookmark),
+    );
+
+    if (bookmarkIndex !== -1) {
+      newOwnBookmarks = [...newOwnBookmarks];
+      newOwnBookmarks[bookmarkIndex] = event.bookmark;
+    }
+  }
+
+  return {
+    ...event.bookmark.activity,
+    own_bookmarks: newOwnBookmarks,
+    own_reactions: currentActivity.own_reactions,
+  };
+};
 
 export const updateBookmarkInActivities = (
   event: BookmarkUpdatedEvent,
@@ -16,27 +46,37 @@ export const updateBookmarkInActivities = (
   updateEntityInArray({
     entities: activities,
     matcher: (activity) => activity.id === event.bookmark.activity.id,
-    updater: (matchedActivity) => {
-      let newOwnBookmarks = matchedActivity.own_bookmarks;
+    updater: (matchedActivity) =>
+      sharedUpdateActivity({
+        currentActivity: matchedActivity,
+        event,
+        eventBelongsToCurrentUser,
+      }),
+  });
 
-      if (eventBelongsToCurrentUser) {
-        const bookmarkIndex = newOwnBookmarks.findIndex((bookmark) =>
-          isSameBookmark(bookmark, event.bookmark),
-        );
+export const updateBookmarkInPinnedActivities = (
+  event: BookmarkUpdatedEvent,
+  pinnedActivities: ActivityPinResponse[] | undefined,
+  eventBelongsToCurrentUser: boolean,
+) =>
+  updateEntityInArray({
+    entities: pinnedActivities,
+    matcher: (pinnedActivity) =>
+      pinnedActivity.activity.id === event.bookmark.activity.id,
+    updater: (matchedPinnedActivity) => {
+      const newActivity = sharedUpdateActivity({
+        currentActivity: matchedPinnedActivity.activity,
+        event,
+        eventBelongsToCurrentUser,
+      });
 
-        if (bookmarkIndex !== -1) {
-          newOwnBookmarks = [...newOwnBookmarks];
-          newOwnBookmarks[bookmarkIndex] = event.bookmark;
-        }
-      }
-
-      if (newOwnBookmarks === matchedActivity.own_bookmarks) {
-        return matchedActivity;
+      if (newActivity === matchedPinnedActivity.activity) {
+        return matchedPinnedActivity;
       }
 
       return {
-        ...matchedActivity,
-        own_bookmarks: newOwnBookmarks,
+        ...matchedPinnedActivity,
+        activity: newActivity,
       };
     },
   });
@@ -45,18 +85,31 @@ export function handleBookmarkUpdated(
   this: Feed,
   event: EventPayload<'feeds.bookmark.updated'>,
 ) {
-  const currentActivities = this.currentState.activities;
+  const {
+    activities: currentActivities,
+    pinned_activities: currentPinnedActivities,
+  } = this.currentState;
   const { connected_user: connectedUser } = this.client.state.getLatestValue();
   const eventBelongsToCurrentUser =
     event.bookmark.user.id === connectedUser?.id;
 
-  const result = updateBookmarkInActivities(
-    event,
-    currentActivities,
-    eventBelongsToCurrentUser,
-  );
+  const [result1, result2] = [
+    updateBookmarkInActivities(
+      event,
+      currentActivities,
+      eventBelongsToCurrentUser,
+    ),
+    updateBookmarkInPinnedActivities(
+      event,
+      currentPinnedActivities,
+      eventBelongsToCurrentUser,
+    ),
+  ];
 
-  if (result.changed) {
-    this.state.partialNext({ activities: result.entities });
+  if (result1.changed || result2.changed) {
+    this.state.partialNext({
+      activities: result1.entities,
+      pinned_activities: result2.entities,
+    });
   }
 }
