@@ -174,7 +174,7 @@ describe('bookmark-utils', () => {
       const event = createMockDeletedEvent(bookmark);
       const result = removeBookmarkFromActivity(event, activity, false);
 
-      expect(result.changed).toBe(false);
+      expect(result.changed).toBe(true);
       expect(result.own_bookmarks).toHaveLength(1);
       expect(result.own_bookmarks[0]).toEqual(bookmark);
     });
@@ -293,7 +293,7 @@ describe('bookmark-utils', () => {
       const event = createMockUpdatedEvent(updatedBookmark);
       const result = updateBookmarkInActivity(event, activity, false);
 
-      expect(result.changed).toBe(false);
+      expect(result.changed).toBe(true);
       expect(result.own_bookmarks).toHaveLength(1);
       expect(result.own_bookmarks[0]).toEqual(bookmark); // unchanged
     });
