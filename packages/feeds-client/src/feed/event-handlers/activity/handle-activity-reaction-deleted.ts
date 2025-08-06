@@ -1,75 +1,113 @@
 import type { Feed } from '../../../feed';
-import type {
+import {
+  ActivityPinResponse,
   ActivityReactionDeletedEvent,
   ActivityResponse,
 } from '../../../gen/models';
-import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
 
-import { updateActivityInState } from './handle-activity-updated';
-export const removeReactionFromActivity = (
-  event: ActivityReactionDeletedEvent,
-  activity: ActivityResponse,
-  isCurrentUser: boolean,
-): UpdateStateResult<ActivityResponse> => {
-  // Update own_reactions if the reaction is from the current user
-  const ownReactions = isCurrentUser
-    ? (activity.own_reactions || []).filter(
-        (r) =>
-          !(
-            r.type === event.reaction.type &&
-            r.user.id === event.reaction.user.id
-          ),
-      )
-    : activity.own_reactions;
+const sharedUpdateActivity = ({
+  currentActivity,
+  event,
+  eventBelongsToCurrentUser,
+}: {
+  currentActivity: ActivityResponse;
+  event: ActivityReactionDeletedEvent;
+  eventBelongsToCurrentUser: boolean;
+}) => {
+  let newOwnReactions = currentActivity.own_reactions;
+
+  if (eventBelongsToCurrentUser) {
+    newOwnReactions = currentActivity.own_reactions.filter(
+      (reaction) =>
+        !(
+          reaction.type === event.reaction.type &&
+          reaction.user.id === event.reaction.user.id
+        ),
+    );
+  }
 
   return {
-    ...activity,
-    own_reactions: ownReactions,
-    latest_reactions: event.activity.latest_reactions,
-    reaction_groups: event.activity.reaction_groups,
-    changed: true,
+    ...event.activity,
+    own_reactions: newOwnReactions,
+    own_bookmarks: currentActivity.own_bookmarks,
   };
 };
 
 export const removeReactionFromActivities = (
   event: ActivityReactionDeletedEvent,
   activities: ActivityResponse[] | undefined,
-  isCurrentUser: boolean,
-): UpdateStateResult<{ activities: ActivityResponse[] }> => {
-  if (!activities) {
-    return { changed: false, activities: [] };
-  }
+  eventBelongsToCurrentUser: boolean,
+) =>
+  updateEntityInArray({
+    entities: activities,
+    matcher: (activity) => activity.id === event.activity.id,
+    updater: (matchedActivity) =>
+      sharedUpdateActivity({
+        currentActivity: matchedActivity,
+        event,
+        eventBelongsToCurrentUser,
+      }),
+  });
 
-  const activityIndex = activities.findIndex((a) => a.id === event.activity.id);
-  if (activityIndex === -1) {
-    return { changed: false, activities };
-  }
+export const removeReactionFromPinnedActivities = (
+  event: ActivityReactionDeletedEvent,
+  activities: ActivityPinResponse[] | undefined,
+  eventBelongsToCurrentUser: boolean,
+) =>
+  updateEntityInArray({
+    entities: activities,
+    matcher: (pinnedActivity) =>
+      pinnedActivity.activity.id === event.activity.id,
+    updater: (matchedPinnedActivity) => {
+      const newActivity = sharedUpdateActivity({
+        currentActivity: matchedPinnedActivity.activity,
+        event,
+        eventBelongsToCurrentUser,
+      });
 
-  const activity = activities[activityIndex];
-  const updatedActivity = removeReactionFromActivity(
-    event,
-    activity,
-    isCurrentUser,
-  );
-  return updateActivityInState(updatedActivity, activities, true);
-};
+      if (newActivity === matchedPinnedActivity.activity) {
+        return matchedPinnedActivity;
+      }
+
+      return {
+        ...matchedPinnedActivity,
+        activity: newActivity,
+      };
+    },
+  });
 
 export function handleActivityReactionDeleted(
   this: Feed,
   event: EventPayload<'feeds.activity.reaction.deleted'>,
 ) {
-  const currentActivities = this.currentState.activities;
+  const {
+    activities: currentActivities,
+    pinned_activities: currentPinnedActivities,
+  } = this.currentState;
   const connectedUser = this.client.state.getLatestValue().connected_user;
-  const isCurrentUser = Boolean(
-    connectedUser && event.reaction.user.id === connectedUser.id,
-  );
+  const eventBelongsToCurrentUser =
+    typeof connectedUser !== 'undefined' &&
+    event.reaction.user.id === connectedUser.id;
 
-  const result = removeReactionFromActivities(
-    event,
-    currentActivities,
-    isCurrentUser,
-  );
-  if (result.changed) {
-    this.state.partialNext({ activities: result.activities });
+  const [result1, result2] = [
+    removeReactionFromActivities(
+      event,
+      currentActivities,
+      eventBelongsToCurrentUser,
+    ),
+    removeReactionFromPinnedActivities(
+      event,
+      currentPinnedActivities,
+      eventBelongsToCurrentUser,
+    ),
+  ];
+
+  if (result1.changed || result2.changed) {
+    this.state.partialNext({
+      activities: result1.entities,
+      pinned_activities: result2.entities,
+    });
   }
 }

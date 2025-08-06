@@ -1,47 +1,85 @@
 import { Feed } from '../../../feed';
-import { ActivityResponse } from '../../../gen/models';
+import {
+  ActivityPinResponse,
+  ActivityResponse,
+  ActivityUpdatedEvent,
+} from '../../../gen/models';
 import { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
+
+const sharedUpdateActivity = ({
+  currentActivity,
+  event,
+}: {
+  currentActivity: ActivityResponse;
+  event: ActivityUpdatedEvent;
+}) => {
+  return {
+    ...event.activity,
+    own_reactions: currentActivity.own_reactions,
+    own_bookmarks: currentActivity.own_bookmarks,
+  };
+};
 
 export const updateActivityInState = (
-  updatedActivityResponse: ActivityResponse,
-  activities: ActivityResponse[],
-  replaceCompletely: boolean = false,
-) => {
-  const index = activities.findIndex(
-    (a) => a.id === updatedActivityResponse.id,
-  );
-  if (index !== -1) {
-    const newActivities = [...activities];
-    const activity = activities[index];
+  event: ActivityUpdatedEvent,
+  activities: ActivityResponse[] | undefined,
+) =>
+  updateEntityInArray({
+    entities: activities,
+    matcher: (activity) => activity.id === event.activity.id,
+    updater: (matchedActivity) =>
+      sharedUpdateActivity({
+        currentActivity: matchedActivity,
+        event,
+      }),
+  });
 
-    if (replaceCompletely) {
-      newActivities[index] = updatedActivityResponse;
-    } else {
-      newActivities[index] = {
-        ...updatedActivityResponse,
-        own_reactions: activity.own_reactions,
-        own_bookmarks: activity.own_bookmarks,
-        latest_reactions: activity.latest_reactions,
-        reaction_groups: activity.reaction_groups,
+export const updatePinnedActivityInState = (
+  event: ActivityUpdatedEvent,
+  pinnedActivities: ActivityPinResponse[] | undefined,
+) =>
+  updateEntityInArray({
+    entities: pinnedActivities,
+    matcher: (pinnedActivity) =>
+      pinnedActivity.activity.id === event.activity.id,
+    updater: (matchedPinnedActivity) => {
+      const newActivity = sharedUpdateActivity({
+        currentActivity: matchedPinnedActivity.activity,
+        event,
+      });
+
+      if (newActivity === matchedPinnedActivity.activity) {
+        return matchedPinnedActivity;
+      }
+
+      return {
+        ...matchedPinnedActivity,
+        activity: newActivity,
       };
-    }
-
-    return { changed: true, activities: newActivities };
-  } else {
-    return { changed: false, activities };
-  }
-};
+    },
+  });
 
 export function handleActivityUpdated(
   this: Feed,
   event: EventPayload<'feeds.activity.updated'>,
 ) {
-  const currentActivities = this.currentState.activities;
-  if (currentActivities) {
-    const result = updateActivityInState(event.activity, currentActivities);
-    if (result.changed) {
-      this.client.hydratePollCache([event.activity]);
-      this.state.partialNext({ activities: result.activities });
-    }
+  const {
+    activities: currentActivities,
+    pinned_activities: currentPinnedActivities,
+  } = this.currentState;
+
+  const [result1, result2] = [
+    updateActivityInState(event, currentActivities),
+    updatePinnedActivityInState(event, currentPinnedActivities),
+  ];
+
+  if (result1.changed || result2.changed) {
+    this.client.hydratePollCache([event.activity]);
+
+    this.state.partialNext({
+      activities: result1.entities,
+      pinned_activities: result2.entities,
+    });
   }
 }
