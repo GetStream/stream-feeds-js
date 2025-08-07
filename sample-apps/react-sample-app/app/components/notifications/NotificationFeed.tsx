@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useFeedContext } from '../../feed-context';
 import { AggregatedActivityResponse } from '@stream-io/feeds-client';
+import { useNotificationStatus } from '@stream-io/feeds-client/react-bindings';
 import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
@@ -10,11 +11,14 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
   const [aggregatedActivities, setAggregatedActivities] = useState<
     AggregatedActivityResponse[]
   >([]);
-  const [readActivities, setReadActivities] = useState<string[]>([]);
-  const [lastSeenAt, setLastSeenAt] = useState<Date | undefined>(undefined);
-  const [lastReadAt, setLastReadAt] = useState<Date | undefined>(undefined);
-  const [seenActivities, setSeenActivities] = useState<string[]>([]);
   const { ownNotifications } = useFeedContext();
+
+  const {
+    last_read_at: lastReadAt,
+    last_seen_at: lastSeenAt,
+    read_activities: readActivities = [],
+    seen_activities: seenActivities = [],
+  } = useNotificationStatus(ownNotifications) ?? {};
 
   useEffect(() => {
     if (!ownNotifications) {
@@ -23,36 +27,14 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
     const unsubscribe = ownNotifications.state.subscribeWithSelector(
       (state) => ({
         aggregated_activities: state.aggregated_activities,
-        notification_status: state.notification_status,
       }),
-      ({ aggregated_activities, notification_status }) => {
+      ({ aggregated_activities }) => {
         setAggregatedActivities(aggregated_activities ?? []);
-        setReadActivities(notification_status?.read_activities ?? []);
-        setLastReadAt(notification_status?.last_read_at);
       },
     );
 
     return unsubscribe;
   }, [ownNotifications]);
-
-  useEffect(() => {
-    if (!ownNotifications) {
-      return;
-    }
-    const unsubscribe = ownNotifications.state.subscribeWithSelector(
-      (state) => ({
-        notification_status: state.notification_status,
-      }),
-      ({ notification_status }) => {
-        if (!isMenuOpen) {
-          setLastSeenAt(notification_status?.last_seen_at);
-          setSeenActivities(notification_status?.seen_activities ?? []);
-        }
-      },
-    );
-
-    return unsubscribe;
-  }, [isMenuOpen, ownNotifications]);
 
   const markRead = async (group: AggregatedActivityResponse) => {
     try {
