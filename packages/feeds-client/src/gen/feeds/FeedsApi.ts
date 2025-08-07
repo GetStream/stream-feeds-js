@@ -1243,6 +1243,7 @@ export class FeedsApi {
       mark_all_read: request?.mark_all_read,
       mark_all_seen: request?.mark_all_seen,
       mark_read: request?.mark_read,
+      mark_seen: request?.mark_seen,
       mark_watched: request?.mark_watched,
     };
 
@@ -1547,8 +1548,8 @@ export class FeedsApi {
     request: UpdateFollowRequest,
   ): Promise<StreamResponse<UpdateFollowResponse>> {
     const body = {
-      source_fid: request?.source_fid,
-      target_fid: request?.target_fid,
+      source: request?.source,
+      target: request?.target,
       create_notification_activity: request?.create_notification_activity,
       follower_role: request?.follower_role,
       push_preference: request?.push_preference,
@@ -1575,8 +1576,8 @@ export class FeedsApi {
     request: FollowRequest,
   ): Promise<StreamResponse<SingleFollowResponse>> {
     const body = {
-      source_fid: request?.source_fid,
-      target_fid: request?.target_fid,
+      source: request?.source,
+      target: request?.target,
       create_notification_activity: request?.create_notification_activity,
       push_preference: request?.push_preference,
       custom: request?.custom,

@@ -32,7 +32,7 @@ require('dotenv').config();
 
     await client.feeds.addActivity({
       type: 'post',
-      fids: [userFeed.fid],
+      feeds: [userFeed.fid],
       text: post,
       user_id: user.id,
     });
@@ -50,7 +50,7 @@ require('dotenv').config();
 
     await client.feeds.addActivity({
       type: 'post',
-      fids: [userFeed.fid],
+      feeds: [userFeed.fid],
       text: post,
       user_id: user.id,
       poll_id: createdPoll.poll.id,

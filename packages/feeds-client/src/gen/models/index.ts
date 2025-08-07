@@ -181,6 +181,8 @@ export interface ActivityAddedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -196,6 +198,8 @@ export interface ActivityDeletedEvent {
   custom: Record<string, any>;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -237,6 +241,8 @@ export interface ActivityMarkEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   mark_all_read?: boolean;
 
   mark_all_seen?: boolean;
@@ -244,6 +250,8 @@ export interface ActivityMarkEvent {
   received_at?: Date;
 
   mark_read?: string[];
+
+  mark_seen?: string[];
 
   mark_watched?: string[];
 
@@ -273,6 +281,8 @@ export interface ActivityPinnedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -297,6 +307,8 @@ export interface ActivityReactionAddedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -314,6 +326,8 @@ export interface ActivityReactionDeletedEvent {
   reaction: FeedsReactionResponse;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -333,6 +347,8 @@ export interface ActivityReactionUpdatedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -348,6 +364,8 @@ export interface ActivityRemovedFromFeedEvent {
   custom: Record<string, any>;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -443,6 +461,8 @@ export interface ActivityResponse {
 
   expires_at?: Date;
 
+  hidden?: boolean;
+
   text?: string;
 
   visibility_tag?: string;
@@ -453,7 +473,7 @@ export interface ActivityResponse {
 
   moderation?: ModerationV2Response;
 
-  object?: Record<string, any>;
+  notification_context?: Record<string, any>;
 
   parent?: ActivityResponse;
 
@@ -483,6 +503,8 @@ export interface ActivityUnpinnedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -498,6 +520,8 @@ export interface ActivityUpdatedEvent {
   custom: Record<string, any>;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -1218,8 +1242,6 @@ export interface CallParticipant {
 
   role: string;
 
-  role: string;
-
   user_session_id: string;
 
   custom: Record<string, any>;
@@ -1818,6 +1840,8 @@ export interface CommentAddedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -1833,6 +1857,8 @@ export interface CommentDeletedEvent {
   custom: Record<string, any>;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -1852,6 +1878,8 @@ export interface CommentReactionAddedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -1870,6 +1898,8 @@ export interface CommentReactionDeletedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 }
 
@@ -1885,6 +1915,8 @@ export interface CommentReactionUpdatedEvent {
   reaction: FeedsReactionResponse;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -1951,6 +1983,8 @@ export interface CommentUpdatedEvent {
   custom: Record<string, any>;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -2544,6 +2578,8 @@ export interface FeedCreatedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 }
 
@@ -2555,6 +2591,8 @@ export interface FeedDeletedEvent {
   custom: Record<string, any>;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -2602,6 +2640,8 @@ export interface FeedGroupChangedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   feed_group?: FeedGroup;
@@ -2619,6 +2659,8 @@ export interface FeedGroupDeletedEvent {
   custom: Record<string, any>;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 }
@@ -2648,6 +2690,8 @@ export interface FeedMemberAddedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -2664,6 +2708,8 @@ export interface FeedMemberRemovedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   user?: UserResponseCommonFields;
@@ -2673,6 +2719,8 @@ export interface FeedMemberRequest {
   user_id: string;
 
   invite?: boolean;
+
+  membership_level?: string;
 
   role?: string;
 
@@ -2707,6 +2755,8 @@ export interface FeedMemberUpdatedEvent {
   member: FeedMemberResponse;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -2800,6 +2850,8 @@ export interface FeedResponse {
 
   filter_tags?: string[];
 
+  own_follows?: FollowResponse[];
+
   custom?: Record<string, any>;
 }
 
@@ -2813,6 +2865,8 @@ export interface FeedUpdatedEvent {
   feed: FeedResponse;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 
@@ -2952,6 +3006,8 @@ export interface FollowCreatedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 }
 
@@ -2966,13 +3022,15 @@ export interface FollowDeletedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 }
 
 export interface FollowRequest {
-  source_fid: string;
+  source: string;
 
-  target_fid: string;
+  target: string;
 
   create_notification_activity?: boolean;
 
@@ -3013,6 +3071,8 @@ export interface FollowUpdatedEvent {
   follow: FollowResponse;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 }
@@ -3530,6 +3590,8 @@ export interface MarkActivityRequest {
 
   mark_read?: string[];
 
+  mark_seen?: string[];
+
   mark_watched?: string[];
 }
 
@@ -3848,6 +3910,8 @@ export interface NotificationFeedUpdatedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 
   aggregated_activities?: AggregatedActivityResponse[];
@@ -3876,9 +3940,13 @@ export interface NotificationStatusResponse {
 
   unseen: number;
 
+  last_read_at?: Date;
+
   last_seen_at?: Date;
 
   read_activities?: string[];
+
+  seen_activities?: string[];
 }
 
 export interface NullTime {}
@@ -4040,7 +4108,7 @@ export interface PinActivityResponse {
 
   duration: string;
 
-  fid: string;
+  feed: string;
 
   user_id: string;
 
@@ -4102,6 +4170,8 @@ export interface PollClosedFeedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 }
 
@@ -4115,6 +4185,8 @@ export interface PollDeletedFeedEvent {
   poll: PollResponseData;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 }
@@ -4216,6 +4288,8 @@ export interface PollUpdatedFeedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 }
 
@@ -4252,6 +4326,8 @@ export interface PollVoteCastedFeedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 }
 
@@ -4268,6 +4344,8 @@ export interface PollVoteChangedFeedEvent {
 
   type: string;
 
+  feed_visibility?: string;
+
   received_at?: Date;
 }
 
@@ -4283,6 +4361,8 @@ export interface PollVoteRemovedFeedEvent {
   poll_vote: PollVoteResponseData;
 
   type: string;
+
+  feed_visibility?: string;
 
   received_at?: Date;
 }
@@ -5502,7 +5582,7 @@ export interface UnfollowResponse {
 export interface UnpinActivityResponse {
   duration: string;
 
-  fid: string;
+  feed: string;
 
   user_id: string;
 
@@ -5634,9 +5714,9 @@ export interface UpdateFeedResponse {
 }
 
 export interface UpdateFollowRequest {
-  source_fid: string;
+  source: string;
 
-  target_fid: string;
+  target: string;
 
   create_notification_activity?: boolean;
 

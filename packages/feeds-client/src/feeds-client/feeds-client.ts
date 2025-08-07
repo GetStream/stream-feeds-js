@@ -4,13 +4,13 @@ import {
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
+  FollowRequest,
   ImageUploadRequest,
   OwnUser,
   PollResponse,
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
-  SingleFollowRequest,
   UpdateFollowRequest,
   UserRequest,
   WSEvent,
@@ -351,7 +351,7 @@ export class FeedsClient extends FeedsApi {
   };
 
   async queryFeeds(request?: QueryFeedsRequest) {
-    const response = await this.feedsQueryFeeds(request);
+    const response = await this._queryFeeds(request);
 
     const feeds = response.feeds.map((f) =>
       this.getOrCreateActiveFeed(f.group_id, f.id, f, request?.watch),
@@ -392,7 +392,7 @@ export class FeedsClient extends FeedsApi {
   }
 
   // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
-  async follow(request: SingleFollowRequest) {
+  async follow(request: FollowRequest) {
     const response = await super.follow(request);
 
     [response.follow.source_feed.fid, response.follow.target_feed.fid].forEach(
@@ -420,7 +420,7 @@ export class FeedsClient extends FeedsApi {
     return response;
   }
 
-  async unfollow(request: SingleFollowRequest) {
+  async unfollow(request: FollowRequest) {
     const response = await super.unfollow(request);
 
     [request.source, request.target].forEach((fid) => {

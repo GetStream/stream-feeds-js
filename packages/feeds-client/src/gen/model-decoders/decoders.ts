@@ -881,6 +881,8 @@ decoders.FeedResponse = (input?: Record<string, any>) => {
     created_by: { type: 'UserResponse', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    own_follows: { type: 'FollowResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -1244,6 +1246,8 @@ decoders.NotificationFeedUpdatedEvent = (input?: Record<string, any>) => {
 
 decoders.NotificationStatusResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    last_read_at: { type: 'DatetimeType', isSingle: true },
+
     last_seen_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
