@@ -111,19 +111,19 @@ describe('Feeds page', () => {
     await client.upsertActivities({
       activities: [
         {
-          fids: [feed.fid],
+          feeds: [feed.fid],
           type: 'post',
           text: 'first',
           filter_tags: ['green', 'blue'],
         },
         {
-          fids: [feed.fid],
+          feeds: [feed.fid],
           type: 'post',
           text: 'second',
           filter_tags: ['yellow', 'blue'],
         },
         {
-          fids: [feed.fid],
+          feeds: [feed.fid],
           type: 'post',
           text: 'third',
           filter_tags: ['orange'],

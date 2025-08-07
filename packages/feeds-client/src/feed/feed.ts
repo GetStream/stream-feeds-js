@@ -8,10 +8,10 @@ import {
   ActivityResponse,
   CommentResponse,
   PagerResponse,
-  SingleFollowRequest,
   QueryFeedMembersRequest,
   SortParamRequest,
   ThreadedCommentResponse,
+  FollowRequest,
 } from '../gen/models';
 import { StreamResponse } from '../gen-imports';
 import { StateStore } from '../common/StateStore';
@@ -747,7 +747,7 @@ export class Feed extends FeedApi {
 
   async follow(
     feedOrFid: Feed | string,
-    options?: Omit<SingleFollowRequest, 'source' | 'target'>,
+    options?: Omit<FollowRequest, 'source' | 'target'>,
   ) {
     const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.fid;
 
@@ -789,10 +789,10 @@ export class Feed extends FeedApi {
     });
   }
 
-  addActivity(request: Omit<ActivityRequest, 'fids'>) {
+  addActivity(request: Omit<ActivityRequest, 'feeds'>) {
     return this.feedsApi.addActivity({
       ...request,
-      fids: [this.fid],
+      feeds: [this.fid],
     });
   }
 

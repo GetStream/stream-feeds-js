@@ -43,7 +43,7 @@ describe('Activity state updates via WebSocket events', () => {
     // Create an activity
     const activityData = {
       type: 'test',
-      fids: [feed.fid],
+      feeds: [feed.fid],
       text: 'Test activity',
     };
     const response = await client.addActivity(activityData);
@@ -141,7 +141,7 @@ describe('Activity state updates via WebSocket events', () => {
 
     const response = await client.addActivity({
       type: 'post',
-      fids: [feed.fid, secondFeed.fid],
+      feeds: [feed.fid, secondFeed.fid],
       text: 'Test activity',
     });
 
@@ -157,7 +157,7 @@ describe('Activity state updates via WebSocket events', () => {
       activities: [
         {
           id: response.activity.id,
-          fids: [secondFeed.fid],
+          feeds: [secondFeed.fid],
           text: 'Test activity',
           type: 'post',
         },
