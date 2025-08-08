@@ -70,6 +70,7 @@ export const generateFeedResponse = (
       adjectiveCount: 4,
       separator: ' ',
     }),
+    feed: fid,
     follower_count: 0,
     following_count: 0,
     member_count: 0,
@@ -77,7 +78,6 @@ export const generateFeedResponse = (
     pin_count: 0,
     custom: {},
     ...overrides,
-    fid,
     created_by: generateUserResponse(overrides.created_by),
   };
 };
