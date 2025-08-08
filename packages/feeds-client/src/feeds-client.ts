@@ -372,14 +372,15 @@ export class FeedsClient extends FeedsApi {
   async updateFollow(request: UpdateFollowRequest) {
     const response = await super.updateFollow(request);
 
-    [response.follow.source_feed.fid, response.follow.target_feed.fid].forEach(
-      (fid) => {
-        const feed = this.activeFeeds[fid];
-        if (feed) {
-          handleFollowUpdated.bind(feed)(response);
-        }
-      },
-    );
+    [
+      response.follow.source_feed.feed,
+      response.follow.target_feed.feed,
+    ].forEach((fid) => {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        handleFollowUpdated.bind(feed)(response);
+      }
+    });
 
     return response;
   }
@@ -388,14 +389,15 @@ export class FeedsClient extends FeedsApi {
   async follow(request: FollowRequest) {
     const response = await super.follow(request);
 
-    [response.follow.source_feed.fid, response.follow.target_feed.fid].forEach(
-      (fid) => {
-        const feed = this.activeFeeds[fid];
-        if (feed) {
-          handleFollowCreated.bind(feed)(response);
-        }
-      },
-    );
+    [
+      response.follow.source_feed.feed,
+      response.follow.target_feed.feed,
+    ].forEach((fid) => {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        handleFollowCreated.bind(feed)(response);
+      }
+    });
 
     return response;
   }
@@ -404,7 +406,7 @@ export class FeedsClient extends FeedsApi {
     const response = await super.followBatch(request);
 
     response.follows.forEach((follow) => {
-      const feed = this.activeFeeds[follow.source_feed.fid];
+      const feed = this.activeFeeds[follow.source_feed.feed];
       if (feed) {
         handleFollowCreated.bind(feed)({ follow });
       }

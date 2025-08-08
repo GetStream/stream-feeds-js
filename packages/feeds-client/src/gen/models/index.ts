@@ -83,9 +83,9 @@ export interface AcceptFeedMemberInviteResponse {
 }
 
 export interface AcceptFollowRequest {
-  source_fid: string;
+  source: string;
 
-  target_fid: string;
+  target: string;
 
   follower_role?: string;
 }
@@ -2824,7 +2824,7 @@ export interface FeedResponse {
 
   description: string;
 
-  fid: string;
+  feed: string;
 
   follower_count: number;
 
@@ -4888,9 +4888,9 @@ export interface RejectFeedMemberInviteResponse {
 }
 
 export interface RejectFollowRequest {
-  source_fid: string;
+  source: string;
 
-  target_fid: string;
+  target: string;
 }
 
 export interface RejectFollowResponse {

@@ -71,7 +71,7 @@ export const generateFeedResponse = (
     created_at: new Date(),
     updated_at: new Date(),
     description,
-    fid,
+    feed: fid,
     follower_count: 0,
     following_count: 0,
     member_count: 0,
