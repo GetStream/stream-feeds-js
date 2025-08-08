@@ -205,7 +205,7 @@ export class Feed extends FeedApi {
   ) {
     super(client, groupId, id);
     this.state = new StateStore<FeedState>({
-      fid: `${groupId}:${id}`,
+      feed: `${groupId}:${id}`,
       group_id: groupId,
       id,
       ...(data ?? {}),
@@ -270,7 +270,7 @@ export class Feed extends FeedApi {
         this.stateUpdateQueue.clear();
         const responseCopy: Partial<
           StreamResponse<GetOrCreateFeedResponse>['feed'] &
-            StreamResponse<GetOrCreateFeedResponse>
+            StreamResponse<Omit<GetOrCreateFeedResponse, 'feed'>>
         > = {
           ...response,
           ...response.feed,
@@ -605,7 +605,7 @@ export class Feed extends FeedApi {
                   currentState[type],
                   follows,
                   (follow) =>
-                    `${follow.source_feed.fid}-${follow.target_feed.fid}`,
+                    `${follow.source_feed.feed}-${follow.target_feed.feed}`,
                 ),
           [paginationKey]: {
             ...currentState[paginationKey],
