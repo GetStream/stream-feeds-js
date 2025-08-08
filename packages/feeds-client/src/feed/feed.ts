@@ -569,7 +569,7 @@ export class Feed extends FeedApi {
       base: () =>
         this.client.getCommentReplies({
           ...request,
-          comment_id: comment.id,
+          id: comment.id,
           // use known sort first (prevents broken pagination)
           sort,
           next: currentNextCursor,
