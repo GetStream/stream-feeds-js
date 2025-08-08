@@ -961,14 +961,18 @@ export class FeedsApi {
 
   async deleteComment(request: {
     id: string;
+    hard_delete?: boolean;
   }): Promise<StreamResponse<DeleteCommentResponse>> {
+    const queryParams = {
+      hard_delete: request?.hard_delete,
+    };
     const pathParams = {
       id: request?.id,
     };
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<DeleteCommentResponse>
-    >('DELETE', '/api/v2/feeds/comments/{id}', pathParams, undefined);
+    >('DELETE', '/api/v2/feeds/comments/{id}', pathParams, queryParams);
 
     decoders.DeleteCommentResponse?.(response.body);
 
