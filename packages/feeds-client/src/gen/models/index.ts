@@ -2182,7 +2182,7 @@ export interface DecayFunctionConfig {
 }
 
 export interface DeleteActivitiesRequest {
-  activity_ids: string[];
+  ids: string[];
 
   hard_delete?: boolean;
 }
@@ -2190,7 +2190,7 @@ export interface DeleteActivitiesRequest {
 export interface DeleteActivitiesResponse {
   duration: string;
 
-  deleted_activity_ids: string[];
+  deleted_ids: string[];
 }
 
 export interface DeleteActivityReactionResponse {
