@@ -27,10 +27,13 @@ export class FeedApi {
     public readonly id: string,
   ) {}
 
-  delete(): Promise<StreamResponse<DeleteFeedResponse>> {
+  delete(request?: {
+    hard_delete?: boolean;
+  }): Promise<StreamResponse<DeleteFeedResponse>> {
     return this.feedsApi.deleteFeed({
       feed_id: this.id,
       feed_group_id: this.group,
+      ...request,
     });
   }
 

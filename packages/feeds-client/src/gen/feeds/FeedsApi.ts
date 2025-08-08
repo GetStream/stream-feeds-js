@@ -1138,7 +1138,11 @@ export class FeedsApi {
   async deleteFeed(request: {
     feed_group_id: string;
     feed_id: string;
+    hard_delete?: boolean;
   }): Promise<StreamResponse<DeleteFeedResponse>> {
+    const queryParams = {
+      hard_delete: request?.hard_delete,
+    };
     const pathParams = {
       feed_group_id: request?.feed_group_id,
       feed_id: request?.feed_id,
@@ -1150,7 +1154,7 @@ export class FeedsApi {
       'DELETE',
       '/api/v2/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}',
       pathParams,
-      undefined,
+      queryParams,
     );
 
     decoders.DeleteFeedResponse?.(response.body);
