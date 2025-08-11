@@ -11,7 +11,7 @@ export function handleFollowUpdated(
 ) {
   const follow = eventOrResponse.follow;
   const connectedUserId = this.client.state.getLatestValue().connected_user?.id;
-  const currentFeedId = this.fid;
+  const currentFeedId = this.feed;
 
   if (
     !shouldUpdateState({
