@@ -81,7 +81,7 @@ export function handleFollowCreated(
   const result = updateStateFollowCreated(
     follow,
     this.currentState,
-    this.fid,
+    this.feed,
     connectedUser?.id,
   );
   if (result.changed) {

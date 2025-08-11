@@ -31,7 +31,7 @@ describe('Activities page', () => {
 
     //...or multiple feeds
     response = await client.addActivity({
-      feeds: [feed.fid],
+      feeds: [feed.feed],
       type: 'post',
       text: 'apple stock will go up',
     });
@@ -92,13 +92,13 @@ describe('Activities page', () => {
     const response = await client.upsertActivities({
       activities: [
         {
-          feeds: [feed.fid],
+          feeds: [feed.feed],
           id: '1',
           type: 'post',
           text: 'hi',
         },
         {
-          feeds: [feed.fid],
+          feeds: [feed.feed],
           id: '2',
           type: 'post',
           text: 'hi',
@@ -113,13 +113,13 @@ describe('Activities page', () => {
     const activities = await client.upsertActivities({
       activities: [
         {
-          feeds: [feed.fid],
+          feeds: [feed.feed],
           id: '1',
           type: 'post',
           text: 'hi',
         },
         {
-          feeds: [feed.fid],
+          feeds: [feed.feed],
           id: '2',
           type: 'post',
           text: 'hi',

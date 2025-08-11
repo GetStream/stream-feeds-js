@@ -219,7 +219,7 @@ export class Feed extends FeedApi {
 
   protected readonly client: FeedsClient;
 
-  get fid() {
+  get feed() {
     return `${this.group}:${this.id}`;
   }
 
@@ -716,7 +716,7 @@ export class Feed extends FeedApi {
    */
   async queryFollowers(request: Omit<QueryFollowsRequest, 'filter'>) {
     const filter: QueryFollowsRequest['filter'] = {
-      target_feed: this.fid,
+      target_feed: this.feed,
     };
 
     const response = await this.client.queryFollows({
@@ -734,7 +734,7 @@ export class Feed extends FeedApi {
    */
   async queryFollowing(request: Omit<QueryFollowsRequest, 'filter'>) {
     const filter: QueryFollowsRequest['filter'] = {
-      source_feed: this.fid,
+      source_feed: this.feed,
     };
 
     const response = await this.client.queryFollows({
@@ -749,11 +749,11 @@ export class Feed extends FeedApi {
     feedOrFid: Feed | string,
     options?: Omit<FollowRequest, 'source' | 'target'>,
   ) {
-    const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.fid;
+    const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.feed;
 
     const response = await this.client.follow({
       ...options,
-      source: this.fid,
+      source: this.feed,
       target: fid,
     });
 
@@ -761,10 +761,10 @@ export class Feed extends FeedApi {
   }
 
   async unfollow(feedOrFid: Feed | string) {
-    const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.fid;
+    const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.feed;
 
     const response = await this.client.unfollow({
-      source: this.fid,
+      source: this.feed,
       target: fid,
     });
 
@@ -792,7 +792,7 @@ export class Feed extends FeedApi {
   addActivity(request: Omit<ActivityRequest, 'feeds'>) {
     return this.feedsApi.addActivity({
       ...request,
-      feeds: [this.fid],
+      feeds: [this.feed],
     });
   }
 

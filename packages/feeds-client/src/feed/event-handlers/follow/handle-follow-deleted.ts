@@ -85,7 +85,7 @@ export function handleFollowDeleted(
   const result = updateStateFollowDeleted(
     follow,
     this.currentState,
-    this.fid,
+    this.feed,
     connectedUser?.id,
   );
 

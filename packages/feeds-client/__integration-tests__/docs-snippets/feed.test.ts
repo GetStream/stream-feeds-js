@@ -111,19 +111,19 @@ describe('Feeds page', () => {
     await client.upsertActivities({
       activities: [
         {
-          feeds: [feed.fid],
+          feeds: [feed.feed],
           type: 'post',
           text: 'first',
           filter_tags: ['green', 'blue'],
         },
         {
-          feeds: [feed.fid],
+          feeds: [feed.feed],
           type: 'post',
           text: 'second',
           filter_tags: ['yellow', 'blue'],
         },
         {
-          feeds: [feed.fid],
+          feeds: [feed.feed],
           type: 'post',
           text: 'third',
           filter_tags: ['orange'],
@@ -133,14 +133,14 @@ describe('Feeds page', () => {
 
     await feed.getOrCreate({
       filter: {
-        fid: feed.fid,
+        fid: feed.feed,
         filter_tags: ['blue'],
       },
     });
 
     await feed.getOrCreate({
       filter: {
-        fid: feed.fid,
+        fid: feed.feed,
         $or: [
           {
             $and: [{ filter_tags: ['green'] }, { type: 'post' }],

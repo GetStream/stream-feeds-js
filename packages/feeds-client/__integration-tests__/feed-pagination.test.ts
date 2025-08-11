@@ -25,17 +25,17 @@ describe('Feed Pagination Integration Tests', () => {
     // Add 3 activities
     const activity1 = await client.addActivity({
       type: 'test',
-      feeds: [feed.fid],
+      feeds: [feed.feed],
       text: 'Test activity 1',
     });
     const activity2 = await client.addActivity({
       type: 'test',
-      feeds: [feed.fid],
+      feeds: [feed.feed],
       text: 'Test activity 2',
     });
     const activity3 = await client.addActivity({
       type: 'test',
-      feeds: [feed.fid],
+      feeds: [feed.feed],
       text: 'Test activity 3',
     });
 

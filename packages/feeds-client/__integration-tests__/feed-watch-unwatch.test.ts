@@ -33,7 +33,7 @@ describe('Feed watch and unwatch', () => {
   it(`query feed with watch=true`, async () => {
     await client.queryFeeds({
       filter: {
-        fid: feed.fid,
+        fid: feed.feed,
       },
       watch: true,
     });
@@ -44,7 +44,7 @@ describe('Feed watch and unwatch', () => {
   it(`query with watch=false won't update watch if it's already true`, async () => {
     await client.queryFeeds({
       filter: {
-        fid: feed.fid,
+        fid: feed.feed,
       },
       watch: false,
     });
