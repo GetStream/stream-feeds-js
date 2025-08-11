@@ -5702,8 +5702,6 @@ export interface UpdateFeedMembersResponse {
 }
 
 export interface UpdateFeedRequest {
-  created_by_id?: string;
-
   custom?: Record<string, any>;
 }
 

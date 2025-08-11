@@ -46,7 +46,7 @@ export const ReactionsList = ({
           })
         : client.queryCommentReactions({
             ...payload,
-            comment_id: object.id,
+            id: object.id,
           }));
       setReactions([...reactions, ...response.reactions]);
       setNext(response.next);

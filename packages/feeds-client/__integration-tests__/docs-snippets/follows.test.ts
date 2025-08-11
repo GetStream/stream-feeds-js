@@ -101,15 +101,15 @@ describe('Follows page', () => {
     expect(followRequest.follow.status).toBe('pending');
 
     await client.acceptFollow({
-      source_fid: adamTimeline.fid,
-      target_fid: saraFeed.fid,
+      source: adamTimeline.fid,
+      target: saraFeed.fid,
       // Optionally provide role
       follower_role: 'feed_member',
     });
 
     await client.rejectFollow({
-      source_fid: adamTimeline.fid,
-      target_fid: saraFeed.fid,
+      source: adamTimeline.fid,
+      target: saraFeed.fid,
     });
 
     await saraFeed.delete({ hard_delete: true });

@@ -32,7 +32,7 @@ export const Reactions = ({
     try {
       await (isActivity
         ? client?.addReaction({ activity_id: object.id, type })
-        : client?.addCommentReaction({ comment_id: object.id, type }));
+        : client?.addCommentReaction({ id: object.id, type }));
     } catch (error) {
       logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }
@@ -46,7 +46,7 @@ export const Reactions = ({
             activity_id: object.id,
             type,
           })
-        : client?.deleteCommentReaction({ comment_id: object.id, type }));
+        : client?.deleteCommentReaction({ id: object.id, type }));
     } catch (error) {
       logErrorAndDisplayNotification(error as Error, (error as Error).message);
     }

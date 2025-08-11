@@ -80,7 +80,7 @@ describe('Activity state updates via WebSocket events', () => {
     // Update the activity
     const updatedText = 'Updated activity text';
     await client.updateActivity({
-      activity_id: activityId,
+      id: activityId,
       text: updatedText,
     });
 
@@ -114,7 +114,7 @@ describe('Activity state updates via WebSocket events', () => {
 
     // Delete the activity
     await client.deleteActivity({
-      activity_id: activityId,
+      id: activityId,
     });
 
     // Wait for the activity.deleted event
