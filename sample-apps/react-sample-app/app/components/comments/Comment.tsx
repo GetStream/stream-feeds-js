@@ -113,9 +113,7 @@ export const Comment = ({
                 {canDelete && (
                   <button
                     className="text-red-700 flex gap-1 p-3 items-center rounded-md hover:bg-gray-100"
-                    onClick={() =>
-                      client?.deleteComment({ comment_id: comment.id })
-                    }
+                    onClick={() => client?.deleteComment({ id: comment.id })}
                   >
                     <span className="material-symbols-outlined">delete</span>
                     <div>Delete</div>

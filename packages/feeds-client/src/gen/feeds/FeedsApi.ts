@@ -1214,7 +1214,6 @@ export class FeedsApi {
       feed_id: request?.feed_id,
     };
     const body = {
-      created_by_id: request?.created_by_id,
       custom: request?.custom,
     };
 

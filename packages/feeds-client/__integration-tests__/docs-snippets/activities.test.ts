@@ -129,7 +129,7 @@ describe('Activities page', () => {
 
     // Update an activity
     const updatedActivity = await client.updateActivity({
-      activity_id: activities.activities[0].id,
+      id: activities.activities[0].id,
       text: 'Updated text',
       custom: {
         color: 'blue',
@@ -139,13 +139,13 @@ describe('Activities page', () => {
     expect(updatedActivity.activity?.type).toBe('post');
 
     await client.deleteActivity({
-      activity_id: activities.activities[0].id,
+      id: activities.activities[0].id,
       hard_delete: false, // Soft delete sets deleted at but retains the data, hard delete fully removes it
     });
 
     // Batch delete activities
     await client.deleteActivities({
-      activity_ids: [activities.activities[1].id],
+      ids: [activities.activities[1].id],
       hard_delete: false,
     });
   });

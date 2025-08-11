@@ -39,7 +39,7 @@ export const Activity = ({
   const updateActivity = async () => {
     try {
       await client?.updateActivityPartial({
-        activity_id: activity.id,
+        id: activity.id,
         set: {
           text: editedActivityText,
         },
@@ -53,7 +53,7 @@ export const Activity = ({
   const deleteActivity = async () => {
     try {
       await client?.deleteActivity({
-        activity_id: activity.id,
+        id: activity.id,
       });
       setIsMenuOpen(false);
     } catch (error) {
