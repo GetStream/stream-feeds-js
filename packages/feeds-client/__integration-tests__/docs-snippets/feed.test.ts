@@ -159,18 +159,19 @@ describe('Feeds page', () => {
     await serverClient.upsertUsers([{ id: userId }]);
 
     // The following methods are available to add or edit the members of a feed
-    await feed.updateFeedMembers({
+    const response = await feed.updateFeedMembers({
       operation: 'upsert',
       members: [
         {
           user_id: userId,
-          role: 'moderator',
           custom: {
             joined: '2024-01-01',
           },
         },
       ],
     });
+
+    expect(response.added[0].role).toBe('feed_member');
 
     // Remove members
     await feed.updateFeedMembers({
@@ -188,7 +189,6 @@ describe('Feeds page', () => {
       members: [
         {
           user_id: userId,
-          role: 'moderator',
         },
       ],
     });
@@ -208,7 +208,6 @@ describe('Feeds page', () => {
       members: [
         {
           user_id: userId,
-          role: 'moderator',
           invite: true,
           custom: {
             reason: 'community builder',

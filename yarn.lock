@@ -6082,23 +6082,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stream-io/node-sdk@npm:0.5.0":
-  version: 0.5.0
-  resolution: "@stream-io/node-sdk@npm:0.5.0"
-  dependencies:
-    "@types/jsonwebtoken": ^9.0.3
-    "@types/node": ^18.3.0
-    jsonwebtoken: ^9.0.2
-    uuid: ^9.0.1
-  peerDependencies:
-    "@stream-io/openai-realtime-api": ~0.1.3
-  peerDependenciesMeta:
-    "@stream-io/openai-realtime-api":
-      optional: true
-  checksum: 1918dfe264231ed00ce431b143d9e330d31f267bb50c6a56b3f116449000cdc5b4b0e2efce78eba55f4be1b6957729234f21aa3fc9e20872ba88df54d386eb18
-  languageName: node
-  linkType: hard
-
 "@swc/counter@npm:0.1.3":
   version: 0.1.3
   resolution: "@swc/counter@npm:0.1.3"
@@ -12151,7 +12134,7 @@ __metadata:
   resolution: "facebook-clone@workspace:sample-apps/react-sample-app"
   dependencies:
     "@stream-io/feeds-react-sdk": "workspace:*"
-    "@stream-io/node-sdk": 0.5.0
+    "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-main"
     "@types/lodash.uniqby": ^4
     "@types/node": ^20
     "@types/react": ^18
