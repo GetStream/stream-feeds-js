@@ -5,8 +5,11 @@ import type {
   FeedState,
   CommentResponse,
 } from '@stream-io/feeds-react-sdk';
-import { FeedOwnCapability } from '@stream-io/feeds-client';
-import { useComments, useStateStore } from '@stream-io/feeds-react-sdk';
+import {
+  useComments,
+  useStateStore,
+  FeedOwnCapability,
+} from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { DEFAULT_PAGINATION_SORT } from './ActivityCommentSection';
