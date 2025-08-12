@@ -53,7 +53,7 @@ export const Comment = ({
         },
         {
           text: 'Yes',
-          onPress: () => client?.deleteComment({ comment_id: comment.id }),
+          onPress: () => client?.deleteComment({ id: comment.id }),
           style: 'destructive',
         },
       ],
