@@ -2,7 +2,7 @@ import {
   ActivityResponse,
   Feed,
   FeedOwnCapability,
-} from '@stream-io/feeds-client';
+} from '@stream-io/feeds-react-sdk';
 import { Reactions } from './reactions/Reactions';
 import { useUserContext } from '../user-context';
 import { useEffect, useRef, useState } from 'react';

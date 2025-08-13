@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.11](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.10...@stream-io/feeds-client-0.1.11) (2025-08-01)
+
+
+### Features
+
+* add `feeds.follow.updated` handler & cleanup ([#83](https://github.com/GetStream/stream-feeds-js/issues/83)) ([9f296b8](https://github.com/GetStream/stream-feeds-js/commit/9f296b8cc195c34d6ac36eb53bf92ca8632e5dae))
+
+
+### Bug Fixes
+
+* real-time comment updates ([#79](https://github.com/GetStream/stream-feeds-js/issues/79)) ([afd485a](https://github.com/GetStream/stream-feeds-js/commit/afd485a489449985c157ce90da453a1e2dbc6fa3))
+* update open API spec - unfollow HTTP response now contains follo… ([#81](https://github.com/GetStream/stream-feeds-js/issues/81)) ([0f27ef3](https://github.com/GetStream/stream-feeds-js/commit/0f27ef34e034e52bcdbaca9798b890f17e13fc00))
+
 ## [0.1.10](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.9...@stream-io/feeds-client-0.1.10) (2025-07-28)
 
 

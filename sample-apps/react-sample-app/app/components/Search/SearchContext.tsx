@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import type { PropsWithChildren } from 'react';
-import type { SearchController } from '@stream-io/feeds-client';
+import type { SearchController } from '@stream-io/feeds-react-sdk';
 
 export type SearchContextValue = {
   /** The type of channel to create on user result select, defaults to `messaging` */

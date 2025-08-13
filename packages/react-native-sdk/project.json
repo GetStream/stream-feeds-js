@@ -38,7 +38,7 @@
       "options": {
         "commands": [
           {
-            "command": "build:react-native-sdk",
+            "command": "yarn build:react-native-sdk",
             "forwardAllArgs": false
           }
         ]
@@ -56,7 +56,7 @@
       "options": {
         "commands": [
           {
-            "command": "echo \"Skip releasing the React Native SDK.\"",
+            "command": "yarn release:react-native-sdk",
             "forwardAllArgs": false
           }
         ]

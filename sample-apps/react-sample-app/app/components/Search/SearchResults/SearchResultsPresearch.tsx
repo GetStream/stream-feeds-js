@@ -1,4 +1,4 @@
-import type { SearchSource } from '@stream-io/feeds-client';
+import type { SearchSource } from '@stream-io/feeds-react-sdk';
 
 export type SearchResultsPresearchProps = {
   activeSources: SearchSource[];

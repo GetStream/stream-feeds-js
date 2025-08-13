@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useFeedContext } from '../../feed-context';
-import { AggregatedActivityResponse } from '@stream-io/feeds-client';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-client';
 import { useNotificationStatus } from '@stream-io/feeds-client/react-bindings';
 import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';

@@ -3,8 +3,8 @@ import React from 'react';
 import type {
   SearchController,
   SearchControllerState,
-} from '@stream-io/feeds-client';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+} from '@stream-io/feeds-react-sdk';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 
 import { SearchBar } from './SearchBar/SearchBar';
 import { SearchResults } from './SearchResults/SearchResults';

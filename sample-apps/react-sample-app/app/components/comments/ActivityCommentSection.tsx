@@ -3,8 +3,8 @@ import {
   Feed,
   type ActivityResponse,
   type CommentResponse,
-} from '@stream-io/feeds-client';
-import { useComments } from '@stream-io/feeds-client/react-bindings';
+  useComments
+} from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { Comment } from './Comment';

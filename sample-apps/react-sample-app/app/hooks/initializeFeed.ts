@@ -2,7 +2,7 @@ import {
   Feed,
   FeedState,
   GetOrCreateFeedRequest,
-} from '@stream-io/feeds-client';
+} from '@stream-io/feeds-react-sdk';
 
 const promisesByFeedId: Record<string, Promise<FeedState>> = {};
 

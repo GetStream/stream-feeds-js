@@ -1,6 +1,6 @@
 import React from 'react';
-import { SearchSource, SearchSourceState } from '@stream-io/feeds-client';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import type { SearchSource, SearchSourceState } from '@stream-io/feeds-react-sdk';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 
 import { SearchSourceResultList } from './SearchSourceResultList';
 import { SearchSourceResultsEmpty } from './SearchSourceResultsEmpty';

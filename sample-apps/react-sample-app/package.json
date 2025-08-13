@@ -8,7 +8,7 @@
     "build": "next build"
   },
   "dependencies": {
-    "@stream-io/feeds-client": "workspace:^",
+    "@stream-io/feeds-react-sdk": "workspace:*",
     "@stream-io/node-sdk": "0.5.0",
     "clsx": "^2.1.1",
     "lodash.uniqby": "^4.7.0",

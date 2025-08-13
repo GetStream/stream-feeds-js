@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-react-sdk",
-  "version": "0.0.0",
+  "version": "0.0.3",
   "description": "Feeds SDK for React",
   "type": "module",
   "exports": {
@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "build": "rimraf ./dist && tsc",
+    "build": "rimraf ./dist && rimraf ./.ts && tsc",
     "prepare": "yarn run build",
     "prepack": "cp ../../LICENSE ./LICENSE",
     "postpack": "rimraf ./LICENSE",

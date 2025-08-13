@@ -1,5 +1,5 @@
 'use client';
-import type { UserRequest } from '@stream-io/feeds-client';
+import type { UserRequest } from '@stream-io/feeds-react-sdk';
 import { useRouter } from 'next/navigation';
 import { useUserContext } from '../user-context';
 import { useErrorContext } from '../error-context';

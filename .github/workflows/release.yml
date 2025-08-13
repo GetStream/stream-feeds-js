@@ -2,6 +2,7 @@ name: Version and Release
 env:
   VITE_STREAM_API_KEY: ${{ vars.CLIENT_TEST_API_KEY }}
   VITE_STREAM_API_SECRET: ${{ secrets.CLIENT_TEST_SECRET }}
+  VITE_API_URL: ${{ vars.CLIENT_TEST_API_URL }}
 
 on:
   workflow_dispatch:

@@ -6,7 +6,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { FeedsClient, UserRequest } from '@stream-io/feeds-client';
+import { FeedsClient, type UserRequest } from '@stream-io/feeds-react-sdk';
 import * as usersJSON from '../users.json';
 import { useRouter } from 'next/navigation';
 import { useAppNotificationsContext } from './app-notifications-context';

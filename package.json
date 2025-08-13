@@ -28,6 +28,7 @@
     "release": "nx run-many --target version --parallel=1",
     "release:client": "yarn workspace @stream-io/feeds-client npm publish --access=public --tag=alpha",
     "release:react-native-sdk": "yarn workspace @stream-io/feeds-react-native-sdk npm publish --access=public --tag=alpha",
+    "release:react-sdk": "yarn workspace @stream-io/feeds-react-sdk npm publish --access=public --tag=alpha",
     "postinstall": "patch-package"
   },
   "devDependencies": {

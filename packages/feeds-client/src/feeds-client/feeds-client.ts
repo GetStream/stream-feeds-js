@@ -1,4 +1,4 @@
-import { FeedsApi } from './gen/feeds/FeedsApi';
+import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
   ActivityResponse,
   FeedResponse,
@@ -14,33 +14,36 @@ import {
   UpdateFollowRequest,
   UserRequest,
   WSEvent,
-} from './gen/models';
-import { FeedsEvent, StreamFile, TokenOrProvider } from './types';
-import { StateStore } from './common/StateStore';
-import { TokenManager } from './common/TokenManager';
-import { ConnectionIdManager } from './common/ConnectionIdManager';
-import { StableWSConnection } from './common/real-time/StableWSConnection';
-import { EventDispatcher } from './common/EventDispatcher';
-import { ApiClient } from './common/ApiClient';
+} from '../gen/models';
+import { FeedsEvent, StreamFile, TokenOrProvider } from '../types';
+import { StateStore } from '../common/StateStore';
+import { TokenManager } from '../common/TokenManager';
+import { ConnectionIdManager } from '../common/ConnectionIdManager';
+import { StableWSConnection } from '../common/real-time/StableWSConnection';
+import { EventDispatcher } from '../common/EventDispatcher';
+import { ApiClient } from '../common/ApiClient';
 import {
   addConnectionEventListeners,
   removeConnectionEventListeners,
   streamDevToken,
-} from './common/utils';
-import { decodeWSEvent } from './gen/model-decoders/event-decoder-mapping';
+} from '../common/utils';
+import { decodeWSEvent } from '../gen/model-decoders/event-decoder-mapping';
 import {
   FeedsClientOptions,
   NetworkChangedEvent,
   StreamResponse,
-} from './common/types';
-import { ModerationClient } from './moderation-client';
-import { StreamPoll } from './common/Poll';
+} from '../common/types';
+import { ModerationClient } from '../moderation-client';
+import { StreamPoll } from '../common/Poll';
 import {
   Feed,
   handleFollowCreated,
   handleFollowDeleted,
   handleFollowUpdated,
-} from './feed';
+  handleWatchStarted,
+  handleWatchStopped,
+} from '../feed';
+import { handleUserUpdated } from './event-handlers';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -107,7 +110,7 @@ export class FeedsClient extends FeedsApi {
             }
           } else {
             for (const activeFeed of Object.values(this.activeFeeds)) {
-              activeFeed.handleWatchStopped();
+              handleWatchStopped.bind(activeFeed)();
             }
           }
           break;
@@ -192,6 +195,10 @@ export class FeedsClient extends FeedsApi {
           const feeds = this.findActiveFeedByActivityId(activityId);
           feeds.forEach((f) => f.handleWSEvent(event));
 
+          break;
+        }
+        case 'user.updated': {
+          handleUserUpdated.call(this, event);
           break;
         }
         default: {
@@ -436,7 +443,7 @@ export class FeedsClient extends FeedsApi {
     const feed =
       this.activeFeeds[`${request.feed_group_id}:${request.feed_id}`];
     if (feed) {
-      feed.handleWatchStopped();
+      handleWatchStopped.bind(feed)();
     }
 
     return response;
@@ -452,7 +459,7 @@ export class FeedsClient extends FeedsApi {
     if (this.activeFeeds[fid]) {
       const feed = this.activeFeeds[fid];
       if (watch && !feed.currentState.watch) {
-        feed.handleWatchStarted();
+        handleWatchStarted.bind(feed)();
       }
       return feed;
     } else {

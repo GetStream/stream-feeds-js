@@ -21,7 +21,7 @@ const PredefinedUserItem = ({ item }: { item: LocalUser}) => {
   const { logIn } = useUserContext();
 
   const handleUserSelect = useCallback((user: LocalUser) => {
-    logIn({ id: user.id });
+    logIn(user);
   }, [logIn]);
 
   return (

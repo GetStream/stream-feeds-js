@@ -1,8 +1,8 @@
-import { ActivityResponse, Feed as StreamFeed } from '@stream-io/feeds-client';
+import { ActivityResponse, Feed as StreamFeed } from '@stream-io/feeds-react-sdk';
 import { useState } from 'react';
 import { Activity } from './Activity';
 import { PaginatedList } from './PaginatedList';
-import { useStateStore } from '@stream-io/feeds-client/react-bindings';
+import { useStateStore } from '@stream-io/feeds-react-sdk';
 
 export const Feed = ({ feed }: { feed: StreamFeed }) => {
   const [error, setError] = useState<Error>();

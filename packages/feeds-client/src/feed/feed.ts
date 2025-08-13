@@ -318,24 +318,6 @@ export class Feed extends FeedApi {
   }
 
   /**
-   * @internal
-   */
-  handleWatchStopped() {
-    this.state.partialNext({
-      watch: false,
-    });
-  }
-
-  /**
-   * @internal
-   */
-  handleWatchStarted() {
-    this.state.partialNext({
-      watch: true,
-    });
-  }
-
-  /**
    * Returns index of the provided comment object.
    */
   protected getCommentIndex(

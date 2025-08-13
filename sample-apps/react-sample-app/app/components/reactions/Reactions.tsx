@@ -1,5 +1,5 @@
 import { useUserContext } from '@/app/user-context';
-import { ActivityResponse, CommentResponse } from '@stream-io/feeds-client';
+import type { ActivityResponse, CommentResponse } from '@stream-io/feeds-react-sdk';
 import { useRef } from 'react';
 import { ReactionsList } from './ReactionsList';
 import { useErrorContext } from '@/app/error-context';

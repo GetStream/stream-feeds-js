@@ -7,7 +7,7 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import { useMemo } from 'react';
 
-const ModalScreen = () => {
+const CreatePostScreen = () => {
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
 
@@ -22,12 +22,10 @@ const ModalScreen = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
       <StreamFeed feed={feed}>
         <ActivityComposer />
       </StreamFeed>
-    </SafeAreaView>
   );
 }
 
-export default ModalScreen;
+export default CreatePostScreen;

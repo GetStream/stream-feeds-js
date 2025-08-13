@@ -1,32 +1,32 @@
 [
   {
-    "id": "susan",
-    "name": "Susan",
-    "image": "https://randomuser.me/api/portraits/women/47.jpg",
+    "id": "tiffany",
+    "name": "Tiffany",
+    "image": "https://randomuser.me/api/portraits/women/40.jpg"
   },
   {
     "id": "adam",
     "name": "Adam",
-    "image": "https://randomuser.me/api/portraits/men/38.jpg",
+    "image": "https://randomuser.me/api/portraits/men/38.jpg"
+  },
+  {
+    "id": "susan",
+    "name": "Susan",
+    "image": "https://randomuser.me/api/portraits/women/47.jpg"
   },
   {
     "id": "thomas",
     "name": "Thomas",
-    "image": "https://randomuser.me/api/portraits/men/42.jpg",
-  },
-  {
-    "id": "sloan",
-    "name": "Sloan",
-    "image": "https://randomuser.me/api/portraits/women/60.jpg",
-  },
-  {
-    "id": "tiffany",
-    "name": "Tiffany",
-    "image": "https://randomuser.me/api/portraits/women/40.jpg",
+    "image": "https://randomuser.me/api/portraits/men/42.jpg"
   },
   {
     "id": "jack",
     "name": "Jack",
-    "image": "https://randomuser.me/api/portraits/men/54.jpg",
+    "image": "https://randomuser.me/api/portraits/men/54.jpg"
+  },
+  {
+    "id": "sloan",
+    "name": "Sloan",
+    "image": "https://randomuser.me/api/portraits/women/60.jpg"
   }
 ]

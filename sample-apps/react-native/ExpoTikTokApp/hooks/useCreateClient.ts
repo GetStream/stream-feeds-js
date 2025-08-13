@@ -1,9 +1,7 @@
 import { useCallback } from 'react';
-import {
-  useCreateFeedsClient
-} from '@stream-io/feeds-react-native-sdk';
-import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
+import { useCreateFeedsClient } from '@stream-io/feeds-react-native-sdk';
 import { apiKey, tokenCreationUrl } from '@/constants/stream';
+import { LocalUser } from '@/contexts/UserContext';
 
 const tokenProviderFactory = (userId: string) => async () => {
   if (!tokenCreationUrl) {
@@ -20,17 +18,19 @@ const tokenProviderFactory = (userId: string) => async () => {
   return data.token;
 };
 
-const CLIENT_OPTIONS = { base_url: process.env.EXPO_PUBLIC_BASE_URL };
+const CLIENT_OPTIONS = {};
 
-export const useCreateClient = (user: UserRequest) => {
+export const useCreateClient = (user: LocalUser) => {
   const tokenProvider = useCallback(() => {
     const provider = tokenProviderFactory(user.id);
     return provider();
   }, [user.id]);
 
+  const userData = { id: user.id, image: user.image, name: user.name };
+
   const client = useCreateFeedsClient({
-    userData: user,
-    tokenOrProvider: tokenProvider,
+    userData,
+    tokenOrProvider: user.token ?? tokenProvider,
     options: CLIENT_OPTIONS,
     apiKey,
   });
@@ -39,4 +39,4 @@ export const useCreateClient = (user: UserRequest) => {
   globalThis.client = client;
 
   return client;
-}
+};

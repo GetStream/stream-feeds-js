@@ -5954,7 +5954,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stream-io/feeds-client@workspace:*, @stream-io/feeds-client@workspace:^, @stream-io/feeds-client@workspace:packages/feeds-client":
+"@stream-io/feeds-client@workspace:*, @stream-io/feeds-client@workspace:packages/feeds-client":
   version: 0.0.0-use.local
   resolution: "@stream-io/feeds-client@workspace:packages/feeds-client"
   dependencies:
@@ -6053,7 +6053,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@stream-io/feeds-react-sdk@workspace:packages/react-sdk":
+"@stream-io/feeds-react-sdk@workspace:*, @stream-io/feeds-react-sdk@workspace:packages/react-sdk":
   version: 0.0.0-use.local
   resolution: "@stream-io/feeds-react-sdk@workspace:packages/react-sdk"
   dependencies:
@@ -6286,6 +6286,13 @@ __metadata:
   version: 1.0.8
   resolution: "@types/estree@npm:1.0.8"
   checksum: bd93e2e415b6f182ec4da1074e1f36c480f1d26add3e696d54fb30c09bc470897e41361c8fd957bf0985024f8fbf1e6e2aff977d79352ef7eb93a5c6dcff6c11
+  languageName: node
+  linkType: hard
+
+"@types/geojson@npm:^7946.0.13":
+  version: 7946.0.16
+  resolution: "@types/geojson@npm:7946.0.16"
+  checksum: d66e5e023f43b3e7121448117af1930af7d06410a32a585a8bc9c6bb5d97e0d656cd93d99e31fa432976c32e98d4b780f82bf1fd1acd20ccf952eb6b8e39edf2
   languageName: node
   linkType: hard
 
@@ -12100,6 +12107,7 @@ __metadata:
     react-dom: 19.0.0
     react-native: 0.79.5
     react-native-fast-image: ^8.6.3
+    react-native-maps: 1.20.1
     react-native-reanimated: ~3.17.4
     react-native-safe-area-context: 5.4.0
     react-native-screens: ~4.11.1
@@ -12125,7 +12133,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "facebook-clone@workspace:sample-apps/react-sample-app"
   dependencies:
-    "@stream-io/feeds-client": "workspace:^"
+    "@stream-io/feeds-react-sdk": "workspace:*"
     "@stream-io/node-sdk": 0.5.0
     "@types/lodash.uniqby": ^4
     "@types/node": ^20
@@ -18315,6 +18323,22 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 8fb6d8ab7b953c7d7cec8c987cef24f1c5348a293a85cb49c7c53b54ef110c0ca746736ae730e297603c8c76020df912e93915fb17518c4f2f91143757177aba
+  languageName: node
+  linkType: hard
+
+"react-native-maps@npm:1.20.1":
+  version: 1.20.1
+  resolution: "react-native-maps@npm:1.20.1"
+  dependencies:
+    "@types/geojson": ^7946.0.13
+  peerDependencies:
+    react: ">= 17.0.1"
+    react-native: ">= 0.64.3"
+    react-native-web: ">= 0.11"
+  peerDependenciesMeta:
+    react-native-web:
+      optional: true
+  checksum: 3451f2cb98a0cfcac973d73d8a5bd8bc3673490ca1b3c85f6bd54110028201a7cbbcffbac56ccb931acb31e02bca8aac5805269bc13e94d93bfef868035074a7
   languageName: node
   linkType: hard
 

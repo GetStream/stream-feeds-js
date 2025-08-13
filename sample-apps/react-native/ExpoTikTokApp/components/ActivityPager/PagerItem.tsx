@@ -2,7 +2,6 @@ import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { useFeedContext } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
 import {
-  Alert,
   Dimensions,
   StyleSheet,
   Text,
@@ -17,6 +16,8 @@ import { Reaction } from '@/components/Reaction';
 import { Bookmark } from '@/components/Bookmark';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LocationPreview } from '@/components/LocationPreview';
+import { ShareButton } from '@/components/Share';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -41,6 +42,18 @@ const UnmemoizedPagerItem = ({
     [activity.attachments],
   );
 
+  const locationData = useMemo(
+    () =>
+      activity.location && activity.custom.locationName
+        ? {
+            latitude: activity.location.lat,
+            longitude: activity.location.lng,
+            name: activity.custom.locationName,
+          }
+        : null,
+    [activity.custom.locationName, activity.location],
+  );
+
   if (videoAttachment?.asset_url) {
     return (
       <View style={styles.page}>
@@ -49,6 +62,7 @@ const UnmemoizedPagerItem = ({
         <View style={[styles.overlay, overlayStyle]}>
           <Text style={styles.title}>@{activity.user.id}</Text>
           <Text style={styles.description}>{activity.text}</Text>
+          {locationData ? <LocationPreview location={locationData} /> : null}
         </View>
 
         <View style={[styles.sidebar, overlayStyle]}>
@@ -81,16 +95,9 @@ const UnmemoizedPagerItem = ({
             <Text style={styles.iconLabel}>{activity.bookmark_count ?? 0}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() =>
-              Alert.alert(
-                'Sharing was captured successfully, but is not implemented yet !',
-              )
-            }
-            style={styles.iconContainer}
-          >
-            <Ionicons name="arrow-redo-outline" size={28} color="white" />
-          </TouchableOpacity>
+          <View style={styles.iconContainer}>
+            <ShareButton attachment={videoAttachment} />
+          </View>
         </View>
       </View>
     );
@@ -143,7 +150,7 @@ const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
     left: 16,
-    right: 100, // leave space if you add buttons later
+    right: 100,
   },
   title: {
     color: 'white',

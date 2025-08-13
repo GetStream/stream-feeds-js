@@ -1,4 +1,4 @@
-import { Feed } from '@stream-io/feeds-client';
+import type { Feed } from '@stream-io/feeds-react-sdk';
 import { useState } from 'react';
 import { useUserContext } from '../user-context';
 
