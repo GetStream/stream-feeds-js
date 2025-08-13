@@ -1,76 +1,115 @@
 import type { Feed } from '../../../feed';
 import type {
+  ActivityPinResponse,
   ActivityResponse,
   BookmarkUpdatedEvent,
 } from '../../../gen/models';
-import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
 
-import { updateActivityInState } from '../activity';
 import { isSameBookmark } from './handle-bookmark-deleted';
 
-export const updateBookmarkInActivity = (
-  event: BookmarkUpdatedEvent,
-  activity: ActivityResponse,
-  isCurrentUser: boolean,
-): UpdateStateResult<ActivityResponse> => {
-  // Update own_bookmarks if the bookmark is from the current user
-  let ownBookmarks = activity.own_bookmarks || [];
-  if (isCurrentUser) {
-    const bookmarkIndex = ownBookmarks.findIndex((bookmark) =>
+const sharedUpdateActivity = ({
+  currentActivity,
+  event,
+  eventBelongsToCurrentUser,
+}: {
+  currentActivity: ActivityResponse;
+  event: BookmarkUpdatedEvent;
+  eventBelongsToCurrentUser: boolean;
+}): ActivityResponse => {
+  let newOwnBookmarks = currentActivity.own_bookmarks;
+
+  if (eventBelongsToCurrentUser) {
+    const bookmarkIndex = newOwnBookmarks.findIndex((bookmark) =>
       isSameBookmark(bookmark, event.bookmark),
     );
+
     if (bookmarkIndex !== -1) {
-      ownBookmarks = [...ownBookmarks];
-      ownBookmarks[bookmarkIndex] = event.bookmark;
+      newOwnBookmarks = [...newOwnBookmarks];
+      newOwnBookmarks[bookmarkIndex] = event.bookmark;
     }
   }
 
   return {
-    ...activity,
-    own_bookmarks: ownBookmarks,
-    changed: true,
+    ...event.bookmark.activity,
+    own_bookmarks: newOwnBookmarks,
+    own_reactions: currentActivity.own_reactions,
   };
 };
 
 export const updateBookmarkInActivities = (
   event: BookmarkUpdatedEvent,
   activities: ActivityResponse[] | undefined,
-  isCurrentUser: boolean,
-): UpdateStateResult<{ activities: ActivityResponse[] }> => {
-  if (!activities) {
-    return { changed: false, activities: [] };
-  }
+  eventBelongsToCurrentUser: boolean,
+) =>
+  updateEntityInArray({
+    entities: activities,
+    matcher: (activity) => activity.id === event.bookmark.activity.id,
+    updater: (matchedActivity) =>
+      sharedUpdateActivity({
+        currentActivity: matchedActivity,
+        event,
+        eventBelongsToCurrentUser,
+      }),
+  });
 
-  const activityIndex = activities.findIndex(
-    (a) => a.id === event.bookmark.activity.id,
-  );
-  if (activityIndex === -1) {
-    return { changed: false, activities };
-  }
+export const updateBookmarkInPinnedActivities = (
+  event: BookmarkUpdatedEvent,
+  pinnedActivities: ActivityPinResponse[] | undefined,
+  eventBelongsToCurrentUser: boolean,
+) =>
+  updateEntityInArray({
+    entities: pinnedActivities,
+    matcher: (pinnedActivity) =>
+      pinnedActivity.activity.id === event.bookmark.activity.id,
+    updater: (matchedPinnedActivity) => {
+      const newActivity = sharedUpdateActivity({
+        currentActivity: matchedPinnedActivity.activity,
+        event,
+        eventBelongsToCurrentUser,
+      });
 
-  const activity = activities[activityIndex];
-  const updatedActivity = updateBookmarkInActivity(
-    event,
-    activity,
-    isCurrentUser,
-  );
-  return updateActivityInState(updatedActivity, activities, true);
-};
+      if (newActivity === matchedPinnedActivity.activity) {
+        return matchedPinnedActivity;
+      }
+
+      return {
+        ...matchedPinnedActivity,
+        activity: newActivity,
+      };
+    },
+  });
 
 export function handleBookmarkUpdated(
   this: Feed,
   event: EventPayload<'feeds.bookmark.updated'>,
 ) {
-  const currentActivities = this.currentState.activities;
+  const {
+    activities: currentActivities,
+    pinned_activities: currentPinnedActivities,
+  } = this.currentState;
   const { connected_user: connectedUser } = this.client.state.getLatestValue();
-  const isCurrentUser = event.bookmark.user.id === connectedUser?.id;
+  const eventBelongsToCurrentUser =
+    event.bookmark.user.id === connectedUser?.id;
 
-  const result = updateBookmarkInActivities(
-    event,
-    currentActivities,
-    isCurrentUser,
-  );
-  if (result.changed) {
-    this.state.partialNext({ activities: result.activities });
+  const [result1, result2] = [
+    updateBookmarkInActivities(
+      event,
+      currentActivities,
+      eventBelongsToCurrentUser,
+    ),
+    updateBookmarkInPinnedActivities(
+      event,
+      currentPinnedActivities,
+      eventBelongsToCurrentUser,
+    ),
+  ];
+
+  if (result1.changed || result2.changed) {
+    this.state.partialNext({
+      activities: result1.entities,
+      pinned_activities: result2.entities,
+    });
   }
 }
