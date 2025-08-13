@@ -42,7 +42,7 @@ export const Reactions = ({
             create_notification_activity: true,
           }));
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -56,7 +56,7 @@ export const Reactions = ({
           })
         : client?.deleteCommentReaction({ comment_id: object.id, type }));
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 

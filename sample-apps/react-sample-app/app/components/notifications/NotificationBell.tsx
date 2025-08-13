@@ -2,45 +2,29 @@ import { useEffect, useState } from 'react';
 import { useFeedContext } from '../../feed-context';
 import { NotificationFeed } from './NotificationFeed';
 import { useErrorContext } from '@/app/error-context';
+import { useNotificationStatus } from '@stream-io/feeds-react-sdk';
 
 export const NotificationBell = () => {
   const { logError } = useErrorContext();
-  const [unseen, setUnseen] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { ownNotifications } = useFeedContext();
+  const { unseen = 0 } = useNotificationStatus() ?? {};
 
   useEffect(() => {
-    if (!ownNotifications) {
-      return;
-    }
-    const unsubscribe = ownNotifications.state.subscribeWithSelector(
-      (state) => ({ unseen: state.notification_status?.unseen ?? 0 }),
-      ({ unseen }) => {
-        setUnseen(unseen ?? 0);
-      },
-    );
-
-    return unsubscribe;
-  }, [ownNotifications]);
-
-  useEffect(() => {
-    if (isMenuOpen && unseen > 0) {
-      ownNotifications
-        ?.markActivity({
-          mark_all_seen: true,
-        })
-        .catch((error) => {
-          logError(error as Error);
-        });
-    }
-  }, [isMenuOpen, unseen]);
+    if (!isMenuOpen || unseen <= 0) return;
+    ownNotifications
+      ?.markActivity({
+        mark_all_seen: true,
+      })
+      .catch(logError);
+  }, [isMenuOpen, logError, ownNotifications, unseen]);
 
   return (
     <>
       <div className="relative">
         <button
           title="Notifications"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={() => setIsMenuOpen((open) => !open)}
           id="dropdownButton"
           className="flex"
         >
@@ -54,7 +38,7 @@ export const NotificationBell = () => {
         <div
           className={`absolute right-0 mt-2 p-4 min-w-80 flex flex-col gap-3 text-gray-800 bg-white rounded-md shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
         >
-          <NotificationFeed isMenuOpen={isMenuOpen}></NotificationFeed>
+          <NotificationFeed />
         </div>
       </div>
     </>

@@ -45,23 +45,13 @@ export default function ProfilePage() {
       watch: true,
       followers_pagination: { limit: 10 },
     }).catch((error) => {
-      logErrorAndDisplayNotification(
-        error,
-        error instanceof Error
-          ? error.message
-          : `Failed to initialize feed: ${feed.fid}`,
-      );
+      logErrorAndDisplayNotification(error);
     });
     initializeFeed(timeline, {
       watch: true,
       following_pagination: { limit: 10 },
     }).catch((error) => {
-      logErrorAndDisplayNotification(
-        error,
-        error instanceof Error
-          ? error.message
-          : `Failed to initialize feed: ${timeline.fid}`,
-      );
+      logErrorAndDisplayNotification(error);
     });
 
     return () => {
@@ -89,7 +79,7 @@ export default function ProfilePage() {
         });
       }
     };
-  }, [feed, logErrorAndDisplayNotification, timeline, user, params.id]);
+  }, [feed, logErrorAndDisplayNotification, timeline, user, params.id, client]);
 
   if (!feed || !timeline) {
     return <LoadingIndicator color="blue" />;

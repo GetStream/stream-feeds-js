@@ -1,16 +1,15 @@
-import { useEffect, useState } from 'react';
 import { useFeedContext } from '../../feed-context';
 import type { AggregatedActivityResponse } from '@stream-io/feeds-client';
-import { useNotificationStatus } from '@stream-io/feeds-client/react-bindings';
+import {
+  useAggregatedActivities,
+  useNotificationStatus,
+} from '@stream-io/feeds-client/react-bindings';
 import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
 
-export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
+export const NotificationFeed = () => {
   const { logErrorAndDisplayNotification } = useErrorContext();
-  const [aggregatedActivities, setAggregatedActivities] = useState<
-    AggregatedActivityResponse[]
-  >([]);
   const { ownNotifications } = useFeedContext();
 
   const {
@@ -20,21 +19,8 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
     seen_activities: seenActivities = [],
   } = useNotificationStatus(ownNotifications) ?? {};
 
-  useEffect(() => {
-    if (!ownNotifications) {
-      return;
-    }
-    const unsubscribe = ownNotifications.state.subscribeWithSelector(
-      (state) => ({
-        aggregated_activities: state.aggregated_activities,
-      }),
-      ({ aggregated_activities }) => {
-        setAggregatedActivities(aggregated_activities ?? []);
-      },
-    );
-
-    return unsubscribe;
-  }, [ownNotifications]);
+  const { aggregated_activities: aggregatedActivities = [] } =
+    useAggregatedActivities(ownNotifications) ?? {};
 
   const markRead = async (group: AggregatedActivityResponse) => {
     try {
@@ -42,7 +28,7 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
         mark_read: [group.group],
       });
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -52,7 +38,7 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
         mark_all_read: true,
       });
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -74,7 +60,7 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
             seenActivities.includes(group.group)
           }
           onMarkRead={() => markRead(group)}
-        ></Notification>
+        />
       </li>
     );
   };
@@ -98,7 +84,7 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
         onLoadMore={() => {}}
         renderItem={renderItem}
         itemsName="notifications"
-      ></PaginatedList>
+      />
     </>
   );
 };

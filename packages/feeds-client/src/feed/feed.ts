@@ -41,6 +41,7 @@ import {
   handleActivityReactionAdded,
   handleFeedUpdated,
   handleNotificationFeedUpdated,
+  handleActivityMarked,
 } from './event-handlers';
 import { capitalize } from '../common/utils';
 import type {
@@ -51,7 +52,6 @@ import type {
   PagerResponseWithLoadingStates,
 } from '../types';
 import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
-import { handleActivityMarked } from './event-handlers/activity/handle-activity-marked';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
