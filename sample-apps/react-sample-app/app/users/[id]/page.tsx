@@ -49,7 +49,7 @@ export default function ProfilePage() {
         error,
         error instanceof Error
           ? error.message
-          : `Failed to initialize feed: ${feed.fid}`,
+          : `Failed to initialize feed: ${feed.feed}`,
       );
     });
     initializeFeed(timeline, {
@@ -60,7 +60,7 @@ export default function ProfilePage() {
         error,
         error instanceof Error
           ? error.message
-          : `Failed to initialize feed: ${timeline.fid}`,
+          : `Failed to initialize feed: ${timeline.feed}`,
       );
     });
 
