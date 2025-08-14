@@ -44,7 +44,7 @@ export const FeedSearchResultItem = ({ item }: FeedSearchResultItemProps) => {
       data-testid="search-result-feed"
       role="option"
     >
-      <div className="str-chat__search-result--display-name">{item.fid}</div>
+      <div className="str-chat__search-result--display-name">{item.feed}</div>
     </button>
   );
 };

@@ -27,7 +27,7 @@ export function getStateUpdateQueueId(
   prefix?: 'deleted' | 'updated' | 'created' | (string & {}),
 ) {
   if (isFollowResponse(data)) {
-    const toJoin = [data.source_feed.fid, data.target_feed.fid];
+    const toJoin = [data.source_feed.feed, data.target_feed.feed];
     if (prefix) {
       toJoin.unshift(prefix);
     }

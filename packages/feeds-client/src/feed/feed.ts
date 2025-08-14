@@ -8,10 +8,10 @@ import {
   ActivityResponse,
   CommentResponse,
   PagerResponse,
-  SingleFollowRequest,
   QueryFeedMembersRequest,
   SortParamRequest,
   ThreadedCommentResponse,
+  FollowRequest,
 } from '../gen/models';
 import { StreamResponse } from '../gen-imports';
 import { StateStore } from '../common/StateStore';
@@ -205,7 +205,7 @@ export class Feed extends FeedApi {
   ) {
     super(client, groupId, id);
     this.state = new StateStore<FeedState>({
-      fid: `${groupId}:${id}`,
+      feed: `${groupId}:${id}`,
       group_id: groupId,
       id,
       ...(data ?? {}),
@@ -219,7 +219,7 @@ export class Feed extends FeedApi {
 
   protected readonly client: FeedsClient;
 
-  get fid() {
+  get feed() {
     return `${this.group}:${this.id}`;
   }
 
@@ -270,7 +270,7 @@ export class Feed extends FeedApi {
         this.stateUpdateQueue.clear();
         const responseCopy: Partial<
           StreamResponse<GetOrCreateFeedResponse>['feed'] &
-            StreamResponse<GetOrCreateFeedResponse>
+            StreamResponse<Omit<GetOrCreateFeedResponse, 'feed'>>
         > = {
           ...response,
           ...response.feed,
@@ -551,7 +551,7 @@ export class Feed extends FeedApi {
       base: () =>
         this.client.getCommentReplies({
           ...request,
-          comment_id: comment.id,
+          id: comment.id,
           // use known sort first (prevents broken pagination)
           sort,
           next: currentNextCursor,
@@ -605,7 +605,7 @@ export class Feed extends FeedApi {
                   currentState[type],
                   follows,
                   (follow) =>
-                    `${follow.source_feed.fid}-${follow.target_feed.fid}`,
+                    `${follow.source_feed.feed}-${follow.target_feed.feed}`,
                 ),
           [paginationKey]: {
             ...currentState[paginationKey],
@@ -716,7 +716,7 @@ export class Feed extends FeedApi {
    */
   async queryFollowers(request: Omit<QueryFollowsRequest, 'filter'>) {
     const filter: QueryFollowsRequest['filter'] = {
-      target_feed: this.fid,
+      target_feed: this.feed,
     };
 
     const response = await this.client.queryFollows({
@@ -734,7 +734,7 @@ export class Feed extends FeedApi {
    */
   async queryFollowing(request: Omit<QueryFollowsRequest, 'filter'>) {
     const filter: QueryFollowsRequest['filter'] = {
-      source_feed: this.fid,
+      source_feed: this.feed,
     };
 
     const response = await this.client.queryFollows({
@@ -747,13 +747,13 @@ export class Feed extends FeedApi {
 
   async follow(
     feedOrFid: Feed | string,
-    options?: Omit<SingleFollowRequest, 'source' | 'target'>,
+    options?: Omit<FollowRequest, 'source' | 'target'>,
   ) {
-    const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.fid;
+    const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.feed;
 
     const response = await this.client.follow({
       ...options,
-      source: this.fid,
+      source: this.feed,
       target: fid,
     });
 
@@ -761,10 +761,10 @@ export class Feed extends FeedApi {
   }
 
   async unfollow(feedOrFid: Feed | string) {
-    const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.fid;
+    const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.feed;
 
     const response = await this.client.unfollow({
-      source: this.fid,
+      source: this.feed,
       target: fid,
     });
 
@@ -789,10 +789,10 @@ export class Feed extends FeedApi {
     });
   }
 
-  addActivity(request: Omit<ActivityRequest, 'fids'>) {
+  addActivity(request: Omit<ActivityRequest, 'feeds'>) {
     return this.feedsApi.addActivity({
       ...request,
-      fids: [this.fid],
+      feeds: [this.feed],
     });
   }
 

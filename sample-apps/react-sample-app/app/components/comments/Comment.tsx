@@ -5,7 +5,7 @@ import type {
   FeedState,
   CommentResponse,
 } from '@stream-io/feeds-react-sdk';
-import { FeedOwnCapability } from '@stream-io/feeds-client';
+import { FeedOwnCapability } from '@stream-io/feeds-react-sdk';
 import { useComments, useStateStore } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
@@ -113,9 +113,7 @@ export const Comment = ({
                 {canDelete && (
                   <button
                     className="text-red-700 flex gap-1 p-3 items-center rounded-md hover:bg-gray-100"
-                    onClick={() =>
-                      client?.deleteComment({ comment_id: comment.id })
-                    }
+                    onClick={() => client?.deleteComment({ id: comment.id })}
                   >
                     <span className="material-symbols-outlined">delete</span>
                     <div>Delete</div>

@@ -881,6 +881,8 @@ decoders.FeedResponse = (input?: Record<string, any>) => {
     created_by: { type: 'UserResponse', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    own_follows: { type: 'FollowResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -1197,6 +1199,15 @@ decoders.ModerationCustomActionEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.ModerationFlagResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    review_queue_item: { type: 'ReviewQueueItemResponse', isSingle: true },
+
+    user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.ModerationFlaggedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -1244,6 +1255,8 @@ decoders.NotificationFeedUpdatedEvent = (input?: Record<string, any>) => {
 
 decoders.NotificationStatusResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    last_read_at: { type: 'DatetimeType', isSingle: true },
+
     last_seen_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
@@ -1597,6 +1610,8 @@ decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
     actions: { type: 'ActionLogResponse', isSingle: false },
 
     bans: { type: 'Ban', isSingle: false },
+
+    flags: { type: 'ModerationFlagResponse', isSingle: false },
 
     completed_at: { type: 'DatetimeType', isSingle: true },
 

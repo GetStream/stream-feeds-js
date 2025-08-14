@@ -98,7 +98,7 @@ describe('Polls page', () => {
       },
     });
 
-    await waitForEvent(feed, 'feeds.poll.vote_casted', 1000);
+    await waitForEvent(feed, 'feeds.poll.vote_casted');
   });
 
   it(`Removing a poll vote`, async () => {

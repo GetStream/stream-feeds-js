@@ -24,7 +24,7 @@ const UserItem = ({ feed }: { feed: Feed }) => {
         <div className="flex flex-row items-center gap-1">
           <img className="size-10 rounded-full" src={createdBy?.image} alt="" />
           <p className="text-sm font-medium text-gray-900">
-            {createdBy?.name ?? feed.fid}
+            {createdBy?.name ?? feed.feed}
           </p>
         </div>
       </Link>
@@ -89,7 +89,7 @@ export default function FeedList({ types }: { types: Array<'user'> }) {
   }, [client, user, ownTimeline]);
 
   const renderUser = (feed: Feed) => {
-    return <UserItem key={feed.fid} feed={feed} />;
+    return <UserItem key={feed.feed} feed={feed} />;
   };
 
   return (

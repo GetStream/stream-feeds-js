@@ -25,7 +25,7 @@ describe('Follows page', () => {
     timeline = client.feed('timeline', crypto.randomUUID());
     await timeline.getOrCreate();
 
-    await timeline.follow(feed.fid, {
+    await timeline.follow(feed.feed, {
       push_preference: 'all',
       custom: {
         reason: 'investment',
@@ -40,7 +40,7 @@ describe('Follows page', () => {
     // Do I follow a list of feeds
     const response = await client.queryFollows({
       filter: {
-        source_feed: myTimeline.fid,
+        source_feed: myTimeline.feed,
         target_feed: { $in: ['user:sara', 'user:adam'] },
       },
     });
@@ -96,20 +96,20 @@ describe('Follows page', () => {
     });
     const adamTimeline = timeline;
     await adamTimeline.getOrCreate();
-    const followRequest = await adamTimeline.follow(saraFeed.fid);
+    const followRequest = await adamTimeline.follow(saraFeed.feed);
 
     expect(followRequest.follow.status).toBe('pending');
 
     await client.acceptFollow({
-      source_fid: adamTimeline.fid,
-      target_fid: saraFeed.fid,
+      source: adamTimeline.feed,
+      target: saraFeed.feed,
       // Optionally provide role
       follower_role: 'feed_member',
     });
 
     await client.rejectFollow({
-      source_fid: adamTimeline.fid,
-      target_fid: saraFeed.fid,
+      source: adamTimeline.feed,
+      target: saraFeed.feed,
     });
 
     await saraFeed.delete({ hard_delete: true });

@@ -36,8 +36,8 @@ require('dotenv').config();
 
     // user's timeline follows user's post feed
     await client.feeds.follow({
-      target: userFeed.fid,
-      source: timeline.fid,
+      target: userFeed.feed,
+      source: timeline.feed,
     });
 
     // TODO
