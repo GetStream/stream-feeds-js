@@ -5,7 +5,7 @@ import type {
   FeedState,
   CommentResponse,
 } from '@stream-io/feeds-react-sdk';
-import { FeedOwnCapability } from '@stream-io/node-sdk';
+import { FeedOwnCapability } from '@stream-io/feeds-react-sdk';
 import { useComments, useStateStore } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
