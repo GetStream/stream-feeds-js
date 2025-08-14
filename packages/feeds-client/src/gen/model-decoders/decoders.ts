@@ -1199,6 +1199,15 @@ decoders.ModerationCustomActionEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.ModerationFlagResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    review_queue_item: { type: 'ReviewQueueItemResponse', isSingle: true },
+
+    user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.ModerationFlaggedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -1601,6 +1610,8 @@ decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
     actions: { type: 'ActionLogResponse', isSingle: false },
 
     bans: { type: 'Ban', isSingle: false },
+
+    flags: { type: 'ModerationFlagResponse', isSingle: false },
 
     completed_at: { type: 'DatetimeType', isSingle: true },
 

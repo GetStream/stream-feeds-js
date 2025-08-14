@@ -222,8 +222,6 @@ export interface ActivityFeedbackResponse {
   activity_id: string;
 
   duration: string;
-
-  success: boolean;
 }
 
 export interface ActivityLocation {
@@ -290,6 +288,8 @@ export interface ActivityPinnedEvent {
 
 export interface ActivityProcessorConfig {
   type: string;
+
+  openai_key?: string;
 
   config?: Record<string, any>;
 }
@@ -3825,6 +3825,38 @@ export interface ModerationCustomActionEvent {
   user?: User;
 }
 
+export interface ModerationFlagResponse {
+  created_at: string;
+
+  entity_id: string;
+
+  entity_type: string;
+
+  type: string;
+
+  updated_at: string;
+
+  user_id: string;
+
+  entity_creator_id?: string;
+
+  reason?: string;
+
+  review_queue_item_id?: string;
+
+  labels?: string[];
+
+  result?: Array<Record<string, any>>;
+
+  custom?: Record<string, any>;
+
+  moderation_payload?: ModerationPayload;
+
+  review_queue_item?: ReviewQueueItemResponse;
+
+  user?: UserResponse;
+}
+
 export interface ModerationFlaggedEvent {
   created_at: Date;
 
@@ -5040,7 +5072,7 @@ export interface ReviewQueueItemResponse {
 
   bans: Ban[];
 
-  flags: FlagResponse[];
+  flags: ModerationFlagResponse[];
 
   languages: string[];
 
