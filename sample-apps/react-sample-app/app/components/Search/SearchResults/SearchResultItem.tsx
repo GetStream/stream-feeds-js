@@ -1,51 +1,64 @@
 import { ComponentType } from 'react';
-import type {
-  ActivityResponse,
-  FeedResponse,
-  UserResponse,
+import {
+  Feed,
+  FeedState,
+  useStateStore,
+  type ActivityResponse,
 } from '@stream-io/feeds-react-sdk';
+import { useFeedContext } from '@/app/feed-context';
+import Link from 'next/link';
 
 export type SearchResultItemComponents = Record<
   string,
   ComponentType<{ item: any }>
 >;
 
-export type UserSearchResultItemProps = {
-  item: UserResponse;
-};
-
 export type FeedSearchResultItemProps = {
-  item: FeedResponse;
+  item: Feed;
 };
 
 export type ActivitySearchResultItemProps = {
   item: ActivityResponse;
 };
 
-export const UserSearchResultItem = ({ item }: UserSearchResultItemProps) => {
-  return (
-    <button
-      aria-label={`Select User Channel: ${item.name ?? ''}`}
-      className="text-left flex gap-2 p-1 items-center rounded-md hover:bg-slate-100"
-      role="option"
-    >
-      <div className="w-5 h-5 items-center flex">
-        <img className="rounded-full" src={item.image}></img>
-      </div>
-      <div className="">{item.name ?? item.id}</div>
-    </button>
-  );
-};
-
+const selector = (nextValue: FeedState) => ({
+  own_follows: nextValue.own_follows ?? [],
+  created_by: nextValue.created_by,
+});
 export const FeedSearchResultItem = ({ item }: FeedSearchResultItemProps) => {
+  const { ownTimeline } = useFeedContext();
+
+  const { own_follows: ownFollows, created_by: createdBy } = useStateStore(
+    item.state,
+    selector,
+  );
+
+  const isFollowing =
+    ownFollows.some((follow) => follow.source_feed.fid === ownTimeline?.fid) ??
+    false;
+
   return (
-    <button
-      className="text-left"
+    <div
+      className="text-left justify-between flex items-center p-1"
       data-testid="search-result-feed"
       role="option"
     >
-      <div className="str-chat__search-result--display-name">{item.fid}</div>
-    </button>
+      <Link className="underline text-blue-500" href={`/users/${item.id}`}>
+        {createdBy?.name ?? item.id}
+      </Link>
+      <button
+        className="text-sm px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+        onClick={() => {
+          if (isFollowing) {
+            ownTimeline?.unfollow(item.fid);
+          } else {
+            ownTimeline?.follow(item.fid);
+          }
+        }}
+      >
+        {isFollowing ? 'Unfollow' : 'Follow'}
+      </button>
+    </div>
   );
 };
 
@@ -67,5 +80,4 @@ export const ActivitySearchResultItem = ({
 export const DefaultSearchResultItems: SearchResultItemComponents = {
   feed: FeedSearchResultItem,
   activity: ActivitySearchResultItem,
-  user: UserSearchResultItem,
 };

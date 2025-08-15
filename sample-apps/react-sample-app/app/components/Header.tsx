@@ -7,7 +7,6 @@ import {
   ActivitySearchSource,
   FeedSearchSource,
   SearchController,
-  UserSearchSource,
 } from '@stream-io/feeds-react-sdk';
 import { Search } from './Search';
 
@@ -24,7 +23,6 @@ export function Header() {
     return new SearchController({
       sources: [
         new ActivitySearchSource(client),
-        new UserSearchSource(client),
         new FeedSearchSource(client, { groupId: 'user' }),
       ],
       config: { keepSingleActiveSource: true },
