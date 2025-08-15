@@ -1219,6 +1219,7 @@ export class FeedsApi {
       mark_all_read: request?.mark_all_read,
       mark_all_seen: request?.mark_all_seen,
       mark_read: request?.mark_read,
+      mark_seen: request?.mark_seen,
       mark_watched: request?.mark_watched,
     };
 

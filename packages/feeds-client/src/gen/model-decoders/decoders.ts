@@ -6,7 +6,7 @@ export const decoders: Record<string, Decoder> = {};
 
 const decodeDatetimeType = (input: number | string) =>
   typeof input === 'number'
-    ? new Date(Math.floor(input / 1000000))
+    ? new Date(Math.floor(input / 1e6))
     : new Date(input);
 
 decoders.DatetimeType = decodeDatetimeType;
@@ -881,6 +881,8 @@ decoders.FeedResponse = (input?: Record<string, any>) => {
     created_by: { type: 'UserResponse', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    own_follows: { type: 'FollowResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -1244,6 +1246,8 @@ decoders.NotificationFeedUpdatedEvent = (input?: Record<string, any>) => {
 
 decoders.NotificationStatusResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    last_read_at: { type: 'DatetimeType', isSingle: true },
+
     last_seen_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);

@@ -33,7 +33,7 @@ export function PaginatedList<T>({
       if (items.length === 0) {
         logError(error);
       } else {
-        logErrorAndDisplayNotification(error, error.message);
+        logErrorAndDisplayNotification(error);
       }
     }
   }, [error, items, logError, logErrorAndDisplayNotification]);
@@ -64,7 +64,7 @@ export function PaginatedList<T>({
       )}
       {items.length > 0 && (
         <ul className={`w-full flex flex-col gap-3 ${listContainerClassNames}`}>
-          {items.map((item, index) => renderItem(item, index))}
+          {items.map(renderItem)}
         </ul>
       )}
       {items.length > 0 && hasNext && (

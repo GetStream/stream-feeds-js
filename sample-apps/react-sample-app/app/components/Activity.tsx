@@ -46,7 +46,7 @@ export const Activity = ({
       });
       setIsEditing(false);
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -57,7 +57,7 @@ export const Activity = ({
       });
       setIsMenuOpen(false);
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -69,7 +69,7 @@ export const Activity = ({
         await client?.addBookmark({ activity_id: activity.id });
       }
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -77,7 +77,7 @@ export const Activity = ({
     if (isEditing) {
       setEditedActivityText(activity?.text ?? '');
     }
-  }, [isEditing]);
+  }, [activity, isEditing]);
 
   return (
     <>
@@ -173,7 +173,7 @@ export const Activity = ({
             {attachment.type === 'file' && (
               <div className="flex items-center gap-1">
                 <span className="material-symbols-outlined">attach_file</span>
-                <a href={attachment.asset_url} target="_blank">
+                <a href={attachment.asset_url} target="_blank" rel="noreferrer">
                   File attachment
                 </a>
               </div>

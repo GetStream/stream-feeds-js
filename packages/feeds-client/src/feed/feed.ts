@@ -41,6 +41,7 @@ import {
   handleActivityReactionAdded,
   handleFeedUpdated,
   handleNotificationFeedUpdated,
+  handleActivityMarked,
 } from './event-handlers';
 import { capitalize } from '../common/utils';
 import type {
@@ -180,7 +181,7 @@ export class Feed extends FeedApi {
     'feeds.poll.vote_removed': Feed.noop,
     'feeds.activity.pinned': Feed.noop,
     'feeds.activity.unpinned': Feed.noop,
-    'feeds.activity.marked': Feed.noop,
+    'feeds.activity.marked': handleActivityMarked.bind(this),
     'moderation.custom_action': Feed.noop,
     'moderation.flagged': Feed.noop,
     'moderation.mark_reviewed': Feed.noop,

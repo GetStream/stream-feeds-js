@@ -13,13 +13,19 @@ type ErrorContextValue = {
   throwUnrecoverableError: (error: Error) => void;
   unrecoverableError?: Error;
   logError: (error: Error) => void;
-  logErrorAndDisplayNotification: (error: Error, message: string) => void;
+  logErrorAndDisplayNotification: (error: unknown) => void;
+};
+
+const noop = () => {};
+
+const logError = (error: unknown) => {
+  console.error(error);
 };
 
 const ErrorContext = createContext<ErrorContextValue>({
-  throwUnrecoverableError: () => {},
-  logError: () => {},
-  logErrorAndDisplayNotification: () => {},
+  throwUnrecoverableError: noop,
+  logError,
+  logErrorAndDisplayNotification: noop,
   unrecoverableError: undefined,
 });
 
@@ -28,23 +34,33 @@ export const ErrorContextProvider = ({ children }: PropsWithChildren) => {
   const [unrecoverableError, setUnrecoverableError] = useState<Error>();
   const router = useRouter();
 
-  const throwUnrecoverableError = (error: Error) => {
-    logError(error);
-    setUnrecoverableError(error);
-    router.push('/error');
-  };
-
-  const logError = (error: Error) => {
-    console.error(error);
-  };
-
-  const logErrorAndDisplayNotification = useCallback(
-    (error: Error, message: string) => {
+  const throwUnrecoverableError = useCallback(
+    (error: Error) => {
       logError(error);
-      showNotification({ message, type: 'error' }, { hideTimeout: 10000 });
+      setUnrecoverableError(error);
+      router.push('/error');
     },
-    [showNotification],
+    [router],
   );
+
+  const logErrorAndDisplayNotification: ErrorContextValue['logErrorAndDisplayNotification'] =
+    useCallback(
+      (error) => {
+        let message;
+
+        if (typeof error === 'string') {
+          message = error;
+        } else if (error instanceof Error) {
+          message = error.message;
+        } else {
+          message = 'An unknown error occurred, see logs for details';
+        }
+
+        logError(error);
+        showNotification({ message, type: 'error' }, { hideTimeout: 10000 });
+      },
+      [showNotification],
+    );
 
   return (
     <ErrorContext.Provider

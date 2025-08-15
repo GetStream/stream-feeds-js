@@ -1,4 +1,9 @@
-import { Feed, FeedState, isImageFile, useStateStore } from '@stream-io/feeds-react-sdk';
+import {
+  Feed,
+  FeedState,
+  isImageFile,
+  useStateStore,
+} from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
 import { FormEvent, useState } from 'react';
 import { ActivityComposer } from './ActivityComposer';
@@ -24,7 +29,7 @@ export const NewActivity = ({ feed }: { feed: Feed }) => {
     setIsSending(true);
     try {
       const requests = [];
-      for (let file of [...(files ?? [])]) {
+      for (const file of [...(files ?? [])]) {
         if (isImageFile(file)) {
           requests.push(
             client?.uploadImage({
@@ -57,9 +62,7 @@ export const NewActivity = ({ feed }: { feed: Feed }) => {
       setActivityText('');
       currentTarget.reset();
     } catch (error) {
-      if (error instanceof Error) {
-        logErrorAndDisplayNotification(error, error.message);
-      }
+      logErrorAndDisplayNotification(error);
     } finally {
       setIsSending(false);
     }

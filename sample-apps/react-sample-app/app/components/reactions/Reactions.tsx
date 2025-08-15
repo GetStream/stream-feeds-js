@@ -31,10 +31,18 @@ export const Reactions = ({
     const isActivity = !('object_type' in object);
     try {
       await (isActivity
-        ? client?.addReaction({ activity_id: object.id, type })
-        : client?.addCommentReaction({ comment_id: object.id, type }));
+        ? client?.addReaction({
+            activity_id: object.id,
+            type,
+            create_notification_activity: true,
+          })
+        : client?.addCommentReaction({
+            comment_id: object.id,
+            type,
+            create_notification_activity: true,
+          }));
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -48,7 +56,7 @@ export const Reactions = ({
           })
         : client?.deleteCommentReaction({ comment_id: object.id, type }));
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 

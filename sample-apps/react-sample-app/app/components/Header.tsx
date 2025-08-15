@@ -10,6 +10,7 @@ import {
   UserSearchSource,
 } from '@stream-io/feeds-react-sdk';
 import { Search } from './Search';
+import { NotificationBell } from './notifications/NotificationBell';
 
 export function Header() {
   const { user, logOut, client } = useUserContext();
@@ -78,9 +79,11 @@ export function Header() {
           </li>
           {user && (
             <>
-              {/* <li> Notification feed coming soon
-                <NotificationBell />
-              </li> */}
+              {
+                <li>
+                  <NotificationBell />
+                </li>
+              }
               <li>
                 <Link href={'/users/' + user.id}>
                   <img
