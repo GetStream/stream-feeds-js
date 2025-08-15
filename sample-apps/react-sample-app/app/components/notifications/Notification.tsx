@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-import clsx from 'clsx';
-import { AggregatedActivityResponse } from '@stream-io/feeds-client';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-react-sdk';
 
 export const Notification = ({
   group,
@@ -68,12 +67,9 @@ export const Notification = ({
             Mark read
           </button>
         )}
-        <div
-          className={clsx(`absolute right-1 rounded-full w-2 h-2`, {
-            'bg-white': isSeen,
-            'bg-blue-500': !isSeen,
-          })}
-        />
+        {!isSeen && (
+          <div className="absolute right-1 rounded-full w-2 h-2 bg-blue-500" />
+        )}
       </div>
     </div>
   );

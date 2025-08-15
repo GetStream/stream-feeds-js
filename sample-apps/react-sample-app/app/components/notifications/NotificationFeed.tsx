@@ -7,13 +7,14 @@ import {
 import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
+import { useStableCallback } from '@/app/hooks/useStableCallback';
 
 export const NotificationFeed = () => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const { ownNotifications } = useFeedContext();
 
   const {
-    last_read_at: lastReadAt,
+    // last_read_at: lastReadAt,
     last_seen_at: lastSeenAt,
     read_activities: readActivities = [],
     seen_activities: seenActivities = [],
@@ -46,24 +47,29 @@ export const NotificationFeed = () => {
     (group) => !readActivities.includes(group.group),
   );
 
-  const renderItem = (group: AggregatedActivityResponse, index: number) => {
-    return (
-      <li key={`notification:${index}`} className="w-full">
-        <Notification
-          group={group}
-          isRead={
-            (lastReadAt && group.updated_at.getTime() < lastReadAt.getTime()) ||
-            readActivities.includes(group.group)
-          }
-          isSeen={
-            (lastSeenAt && group.updated_at.getTime() < lastSeenAt.getTime()) ||
-            seenActivities.includes(group.group)
-          }
-          onMarkRead={() => markRead(group)}
-        />
-      </li>
-    );
-  };
+  const renderItem = useStableCallback(
+    (group: AggregatedActivityResponse, index: number) => {
+      return (
+        <li key={`notification:${index}`} className="w-full">
+          <Notification
+            group={group}
+            isRead={
+              // FIXME: this part of the condition does not work as marking individual groups as read also updates the last_read_at
+              // (lastReadAt &&
+              //   group.updated_at.getTime() <= lastReadAt.getTime()) ||
+              readActivities.includes(group.group)
+            }
+            isSeen={
+              (lastSeenAt &&
+                group.updated_at.getTime() < lastSeenAt.getTime()) ||
+              seenActivities.includes(group.group)
+            }
+            onMarkRead={() => markRead(group)}
+          />
+        </li>
+      );
+    },
+  );
 
   return (
     <>
