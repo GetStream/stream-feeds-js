@@ -8,6 +8,7 @@ import {
   FollowResponse,
   OwnUser,
   OwnUserResponse,
+  PinActivityResponse,
   UserResponse,
 } from '../gen/models';
 import { humanId } from 'human-id';
@@ -325,6 +326,38 @@ export function generateBookmarkUpdatedEvent(
     custom: {},
     ...overrides,
     bookmark,
+    user,
+  };
+}
+
+export function generateActivityPinnedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.pinned'>>,
+    'pinned_activity' | 'user'
+  > & {
+    pinned_activity?: Parameters<typeof generateActivityPinResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.pinned'> {
+  const pinnedActivity = generateActivityPinResponse(overrides.pinned_activity);
+  const user = generateUserResponse(overrides.user);
+
+  // FIXME(TEMPORARY): re-map ActivityPinResponse to PinActivityResponse
+  const typeAdjustedPinnedActivity: PinActivityResponse = {
+    fid: pinnedActivity.feed,
+    activity: pinnedActivity.activity,
+    user_id: pinnedActivity.user.id,
+    created_at: pinnedActivity.created_at,
+    duration: '0',    
+  };
+
+  return {
+    type: 'feeds.activity.pinned',
+    created_at: pinnedActivity.created_at,
+    fid: pinnedActivity.feed,
+    custom: {},
+    ...overrides,
+    pinned_activity: typeAdjustedPinnedActivity,
     user,
   };
 }
