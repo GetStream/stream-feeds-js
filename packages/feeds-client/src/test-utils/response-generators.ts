@@ -58,7 +58,7 @@ export const generateFeedResponse = (
 ): FeedResponse => {
   const id = overrides.id || `feed-${getHumanId()}`;
   const groupId = overrides.group_id || 'user';
-  const fid = `${groupId}:${id}`;
+  const feed = `${groupId}:${id}`;
 
   return {
     id,
@@ -77,7 +77,7 @@ export const generateFeedResponse = (
     pin_count: 0,
     custom: {},
     ...overrides,
-    fid,
+    feed,
     created_by: generateUserResponse(overrides.created_by),
   };
 };

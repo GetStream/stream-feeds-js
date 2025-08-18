@@ -57,14 +57,14 @@ describe('Feed follow and unfollow', () => {
     });
 
     it('should update state when following', async () => {
-      await feed.follow(secondUserFeed.fid);
+      await feed.follow(secondUserFeed.feed);
 
       expect(feed.currentState.following).toHaveLength(1);
       expect(feed.currentState.following_count).toEqual(1);
     });
 
     it('should update state when I unfollow someone', async () => {
-      await feed.unfollow(secondUserFeed.fid);
+      await feed.unfollow(secondUserFeed.feed);
 
       expect(feed.currentState.following).toHaveLength(0);
       expect(feed.currentState.following_count).toEqual(0);
@@ -133,7 +133,7 @@ describe('Feed follow and unfollow', () => {
 
     it('should update state when following', async () => {
       await Promise.all([
-        feed.follow(secondUserFeed.fid),
+        feed.follow(secondUserFeed.feed),
         waitForEvent(feed, 'feeds.follow.created', { shouldReject: true }),
       ]);
 
@@ -144,8 +144,8 @@ describe('Feed follow and unfollow', () => {
     it('should update state when someone follows me', async () => {
       await Promise.all([
         serverClient.feeds.follow({
-          target: feed.fid,
-          source: secondUserTimeline.fid,
+          target: feed.feed,
+          source: secondUserTimeline.feed,
         }),
         waitForEvent(feed, 'feeds.follow.created', { shouldReject: true }),
       ]);
@@ -156,7 +156,7 @@ describe('Feed follow and unfollow', () => {
 
     it('should update state when I unfollow someone', async () => {
       await Promise.all([
-        feed.unfollow(secondUserFeed.fid),
+        feed.unfollow(secondUserFeed.feed),
         waitForEvent(feed, 'feeds.follow.deleted', { shouldReject: true }),
       ]);
 
@@ -167,8 +167,8 @@ describe('Feed follow and unfollow', () => {
     it('should update state when someone unfollows me', async () => {
       await Promise.all([
         serverClient.feeds.unfollow({
-          target: feed.fid,
-          source: secondUserTimeline.fid,
+          target: feed.feed,
+          source: secondUserTimeline.feed,
         }),
         waitForEvent(feed, 'feeds.follow.deleted', {
           shouldReject: true,

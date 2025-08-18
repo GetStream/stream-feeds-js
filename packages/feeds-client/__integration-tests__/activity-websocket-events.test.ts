@@ -43,7 +43,7 @@ describe('Activity state updates via WebSocket events', () => {
     // Create an activity
     const activityData = {
       type: 'test',
-      fids: [feed.fid],
+      feeds: [feed.feed],
       text: 'Test activity',
     };
     const response = await client.addActivity(activityData);
@@ -56,7 +56,7 @@ describe('Activity state updates via WebSocket events', () => {
     const addEvent = addSpy.mock.lastCall?.[0] as ActivityAddedEvent;
     expect(addEvent?.type).toBe('feeds.activity.added');
     expect(addEvent?.activity.id).toBe(activity.id);
-    expect(addEvent?.fid).toBe(feed.fid);
+    expect(addEvent?.fid).toBe(feed.feed);
 
     // Verify the state was updated
     const feedActivities = feed.state.getLatestValue().activities;
@@ -80,7 +80,7 @@ describe('Activity state updates via WebSocket events', () => {
     // Update the activity
     const updatedText = 'Updated activity text';
     await client.updateActivity({
-      activity_id: activityId,
+      id: activityId,
       text: updatedText,
     });
 
@@ -114,7 +114,7 @@ describe('Activity state updates via WebSocket events', () => {
 
     // Delete the activity
     await client.deleteActivity({
-      activity_id: activityId,
+      id: activityId,
     });
 
     // Wait for the activity.deleted event
@@ -141,7 +141,7 @@ describe('Activity state updates via WebSocket events', () => {
 
     const response = await client.addActivity({
       type: 'post',
-      fids: [feed.fid, secondFeed.fid],
+      feeds: [feed.feed, secondFeed.feed],
       text: 'Test activity',
     });
 
@@ -157,7 +157,7 @@ describe('Activity state updates via WebSocket events', () => {
       activities: [
         {
           id: response.activity.id,
-          fids: [secondFeed.fid],
+          feeds: [secondFeed.feed],
           text: 'Test activity',
           type: 'post',
         },

@@ -83,7 +83,7 @@ export const FollowRelationships = ({
 
     return (
       <li
-        key={`${follow.source_feed.fid}_${follow.target_feed.fid}`}
+        key={`${follow.source_feed.feed}_${follow.target_feed.feed}`}
         className="w-full h-full flex flex-row items-center justify-between gap-1 py-4"
       >
         <div className="flex flex-row items-center gap-1">

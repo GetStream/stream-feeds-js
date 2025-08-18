@@ -46,7 +46,7 @@ describe('Quick start page', () => {
     });
     // Add a reaction to comment
     await client.addCommentReaction({
-      comment_id: comment1.comment.id,
+      id: comment1.comment.id,
       type: 'love',
     });
 

@@ -29,13 +29,13 @@ export const useReactionActions = ({
 
   const addReaction = useStableCallback(async () => {
     await (isComment
-      ? client?.addCommentReaction({ comment_id: entity.id, type })
+      ? client?.addCommentReaction({ id: entity.id, type })
       : client?.addReaction({ activity_id: entity.id, type }));
   });
 
   const removeReaction = useStableCallback(async () => {
     await (isComment
-      ? client?.deleteCommentReaction({ comment_id: entity.id, type })
+      ? client?.deleteCommentReaction({ id: entity.id, type })
       : client?.deleteActivityReaction({
           activity_id: entity.id,
           type,

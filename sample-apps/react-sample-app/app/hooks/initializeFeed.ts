@@ -32,12 +32,12 @@ export const initializeFeed = (
   }
 
   const removePromise = () => {
-    if (typeof promisesByFeedId[feed.fid] !== 'undefined') {
-      delete promisesByFeedId[feed.fid];
+    if (typeof promisesByFeedId[feed.feed] !== 'undefined') {
+      delete promisesByFeedId[feed.feed];
     }
   };
 
-  promisesByFeedId[feed.fid] = feed
+  promisesByFeedId[feed.feed] = feed
     .getOrCreate({
       watch: options?.watch,
       followers_pagination: options?.followers_pagination ?? { limit: 5 },
@@ -46,5 +46,5 @@ export const initializeFeed = (
     .then(() => feed.state.getLatestValue())
     .finally(removePromise);
 
-  return promisesByFeedId[feed.fid];
+  return promisesByFeedId[feed.feed];
 };

@@ -1,8 +1,5 @@
 import type { Feed, FeedState } from '../../../feed';
-import {
-  getStateUpdateQueueId,
-  shouldUpdateState,
-} from '../../../utils';
+import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 import { EventPayload, PartializeAllBut } from '../../../types-internal';
 
 export function handleFollowUpdated(
@@ -14,7 +11,7 @@ export function handleFollowUpdated(
 ) {
   const follow = eventOrResponse.follow;
   const connectedUserId = this.client.state.getLatestValue().connected_user?.id;
-  const currentFeedId = this.fid;
+  const currentFeedId = this.feed;
 
   if (
     !shouldUpdateState({
@@ -30,7 +27,7 @@ export function handleFollowUpdated(
     let newState: FeedState | undefined;
 
     // this feed followed someone
-    if (follow.source_feed.fid === currentFeedId) {
+    if (follow.source_feed.feed === currentFeedId) {
       newState ??= {
         ...currentState,
         // Update FeedResponse fields, that has the new follower/following count
@@ -39,7 +36,7 @@ export function handleFollowUpdated(
 
       const index =
         currentState.following?.findIndex(
-          (f) => f.target_feed.fid === follow.target_feed.fid,
+          (f) => f.target_feed.feed === follow.target_feed.feed,
         ) ?? -1;
 
       if (index >= 0) {
@@ -48,7 +45,7 @@ export function handleFollowUpdated(
       }
     } else if (
       // someone followed this feed
-      follow.target_feed.fid === currentFeedId
+      follow.target_feed.feed === currentFeedId
     ) {
       const source = follow.source_feed;
 
@@ -63,7 +60,7 @@ export function handleFollowUpdated(
         currentState.own_follows
       ) {
         const index = currentState.own_follows.findIndex(
-          (f) => f.source_feed.fid === follow.source_feed.fid,
+          (f) => f.source_feed.feed === follow.source_feed.feed,
         );
 
         if (index >= 0) {
@@ -74,7 +71,7 @@ export function handleFollowUpdated(
 
       const index =
         currentState.followers?.findIndex(
-          (f) => f.source_feed.fid === follow.source_feed.fid,
+          (f) => f.source_feed.feed === follow.source_feed.feed,
         ) ?? -1;
 
       if (index >= 0) {
