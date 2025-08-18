@@ -344,11 +344,9 @@ export function generateActivityPinnedEvent(
 
   // FIXME(TEMPORARY): re-map ActivityPinResponse to PinActivityResponse
   const typeAdjustedPinnedActivity: PinActivityResponse = {
-    fid: pinnedActivity.feed,
-    activity: pinnedActivity.activity,
+    ...pinnedActivity,
     user_id: pinnedActivity.user.id,
-    created_at: pinnedActivity.created_at,
-    duration: '0',    
+    duration: '0',
   };
 
   return {
