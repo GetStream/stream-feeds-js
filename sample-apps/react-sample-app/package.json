@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@stream-io/feeds-react-sdk": "workspace:*",
-    "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-main",
+    "@stream-io/node-sdk": "0.6.0",
     "clsx": "^2.1.1",
     "lodash.uniqby": "^4.7.0",
     "material-symbols": "^0.27.1",

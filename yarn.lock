@@ -5960,7 +5960,7 @@ __metadata:
   dependencies:
     "@rollup/plugin-replace": ^6.0.1
     "@rollup/plugin-typescript": ^12.1.0
-    "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-main"
+    "@stream-io/node-sdk": 0.6.0
     "@types/react": ^19.1.8
     "@vitest/coverage-v8": 3.2.4
     axios: ^1.7.7
@@ -6065,9 +6065,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#feeds-main":
-  version: 0.5.1
-  resolution: "@stream-io/node-sdk@https://github.com/GetStream/stream-node.git#commit=c1411632cd17b536599a8babebf69fc81d68e4bc"
+"@stream-io/node-sdk@npm:0.6.0":
+  version: 0.6.0
+  resolution: "@stream-io/node-sdk@npm:0.6.0"
   dependencies:
     "@types/jsonwebtoken": ^9.0.3
     "@types/node": ^18.3.0
@@ -6078,7 +6078,7 @@ __metadata:
   peerDependenciesMeta:
     "@stream-io/openai-realtime-api":
       optional: true
-  checksum: 3d1c97bbd03b7f66a512bde4cb5e343a3967f1f62aed31f872fa9248160b4b56f7e1ebadf4ef7cd0aa8975615d059a0c8165d18c529adfd9988e897b94af03d3
+  checksum: 090cf6ed90035923c9b4f18367f90c0770d3867ef9c4686691f26097afd2591107268a7f9148736c144e1b77b2849c85782727a749867bed12924a6f8e2350da
   languageName: node
   linkType: hard
 
@@ -12134,7 +12134,7 @@ __metadata:
   resolution: "facebook-clone@workspace:sample-apps/react-sample-app"
   dependencies:
     "@stream-io/feeds-react-sdk": "workspace:*"
-    "@stream-io/node-sdk": "https://github.com/GetStream/stream-node.git#feeds-main"
+    "@stream-io/node-sdk": 0.6.0
     "@types/lodash.uniqby": ^4
     "@types/node": ^20
     "@types/react": ^18
