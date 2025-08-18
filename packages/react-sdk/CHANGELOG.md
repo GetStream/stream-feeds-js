@@ -2,6 +2,17 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.0.3...@stream-io/feeds-react-sdk-0.1.0) (2025-08-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* API naming review (#92)
+
+### Features
+
+* API naming review ([#92](https://github.com/GetStream/stream-feeds-js/issues/92)) ([2c12445](https://github.com/GetStream/stream-feeds-js/commit/2c124451a098e739e7dd803a3ca7923dacd07db3))
+
 ## [0.0.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.0.2...@stream-io/feeds-react-sdk-0.0.3) (2025-08-01)
 
 
