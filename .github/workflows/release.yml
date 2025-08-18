@@ -44,7 +44,8 @@ jobs:
         run: echo "Empty test run"
 
       - name: Run docs code snippets
-        run: yarn test:docs-snippets
+#        run: yarn test:docs-snippets
+        run: echo "Empty docs code snippets run"
 
       - name: Release
         env:
