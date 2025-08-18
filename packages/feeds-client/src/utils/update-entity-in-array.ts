@@ -1,5 +1,5 @@
 /**
- * Utility function through which you can update an entity in an array,
+ * Utility function through which you can update an entity in an array;
  *
  * - if the entity is not found, it returns the original array unchanged
  * - if the entity is found and updated, it returns a new array with the updated entity
