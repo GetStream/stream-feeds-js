@@ -1,4 +1,7 @@
-import type { CommentResponse } from '@stream-io/feeds-react-native-sdk';
+import {
+  CommentResponse,
+  useClientConnectedUser,
+} from '@stream-io/feeds-react-native-sdk';
 import { useComments, useFeedsClient } from '@stream-io/feeds-react-native-sdk';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useCommentsInputActionsContext } from '@/contexts/CommentsInputContext';
@@ -24,6 +27,7 @@ export const Comment = ({
   depth?: number;
 }) => {
   const client = useFeedsClient();
+  const connectedUser = useClientConnectedUser();
   const isFirstLevel = depth === 0;
   const formattedDate = useFormatDate({ date: comment.created_at });
   const {
@@ -89,11 +93,13 @@ export const Comment = ({
         </View>
 
         <View style={styles.commentActionsContainer}>
-          <View style={styles.deleteButton}>
-            <TouchableOpacity onPress={handleCommentDeletion}>
-              <Ionicons name="trash" color="red" size={20} />
-            </TouchableOpacity>
-          </View>
+          {connectedUser?.id === comment.user.id ? (
+            <View style={styles.deleteButton}>
+              <TouchableOpacity onPress={handleCommentDeletion}>
+                <Ionicons name="trash" color="red" size={20} />
+              </TouchableOpacity>
+            </View>
+          ) : null}
           <View style={styles.reactionContainer}>
             <Reaction type="like" color="black" entity={comment} />
             <Text style={styles.reactionCount}>
