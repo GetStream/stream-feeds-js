@@ -1,7 +1,6 @@
 const { StreamClient } = require('@stream-io/node-sdk');
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { v4: uuidv4 } = require('uuid');
 
 require('dotenv').config();
 
@@ -32,7 +31,7 @@ require('dotenv').config();
 
     await client.feeds.addActivity({
       type: 'post',
-      fids: [userFeed.fid],
+      feeds: [userFeed.feed],
       text: post,
       user_id: user.id,
     });
@@ -50,7 +49,7 @@ require('dotenv').config();
 
     await client.feeds.addActivity({
       type: 'post',
-      fids: [userFeed.fid],
+      feeds: [userFeed.feed],
       text: post,
       user_id: user.id,
       poll_id: createdPoll.poll.id,

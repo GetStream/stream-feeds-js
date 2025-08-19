@@ -44,15 +44,11 @@ export default function ProfilePage() {
     initializeFeed(feed, {
       watch: true,
       followers_pagination: { limit: 10 },
-    }).catch((error) => {
-      logErrorAndDisplayNotification(error);
-    });
+    }).catch(logErrorAndDisplayNotification);
     initializeFeed(timeline, {
       watch: true,
       following_pagination: { limit: 10 },
-    }).catch((error) => {
-      logErrorAndDisplayNotification(error);
-    });
+    }).catch(logErrorAndDisplayNotification);
 
     return () => {
       if (

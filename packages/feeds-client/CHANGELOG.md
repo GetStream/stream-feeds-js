@@ -2,6 +2,23 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.11...@stream-io/feeds-client-0.2.0) (2025-08-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* API naming review (#92)
+
+### Features
+
+* add `user.updated` handler ([#87](https://github.com/GetStream/stream-feeds-js/issues/87)) ([bc7778d](https://github.com/GetStream/stream-feeds-js/commit/bc7778d533fccbf30b1972e0114aa15e8dc97677))
+* API naming review ([#92](https://github.com/GetStream/stream-feeds-js/issues/92)) ([2c12445](https://github.com/GetStream/stream-feeds-js/commit/2c124451a098e739e7dd803a3ca7923dacd07db3))
+
+
+### Bug Fixes
+
+* privatize watch handlers ([#85](https://github.com/GetStream/stream-feeds-js/issues/85)) ([ec8679d](https://github.com/GetStream/stream-feeds-js/commit/ec8679d6e5d4a0cc82200f7c1219c946921ae715)), closes [#83](https://github.com/GetStream/stream-feeds-js/issues/83)
+
 ## [0.1.11](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.10...@stream-io/feeds-client-0.1.11) (2025-08-01)
 
 

@@ -1,55 +1,19 @@
 import { describe, it, expect } from 'vitest';
-import { ActivityResponse, FeedsReactionResponse } from '../../../gen/models';
+import { ActivityResponse } from '../../../gen/models';
 import {
   addActivitiesToState,
   updateActivityInState,
   removeActivityFromState,
 } from './';
-
-const createMockActivity = (id: string, text?: string): ActivityResponse =>
-  ({
-    id,
-    type: 'test',
-    created_at: new Date(),
-    updated_at: new Date(),
-    visibility: 'public',
-    bookmark_count: 0,
-    comment_count: 0,
-    share_count: 0,
-    attachments: [],
-    comments: [],
-    feeds: [],
-    filter_tags: [],
-    interest_tags: [],
-    latest_reactions: [],
-    mentioned_users: [],
-    own_bookmarks: [],
-    own_reactions: [],
-    custom: {},
-    reaction_groups: {},
-    search_data: {},
-    text: text,
-    popularity: 0,
-    score: 0,
-    reaction_count: 0,
-    user: {
-      id: 'user1',
-      created_at: new Date(),
-      updated_at: new Date(),
-      banned: false,
-      language: 'en',
-      online: false,
-      role: 'user',
-      blocked_user_ids: [],
-      teams: [],
-      custom: {},
-    },
-  }) as ActivityResponse;
+import {
+  generateActivityResponse,
+  generateFeedReactionResponse,
+} from '../../../test-utils';
 
 describe('activity-utils', () => {
   describe('addActivitiesToState', () => {
-    const activity1 = createMockActivity('activity1');
-    const activity2 = createMockActivity('activity2');
+    const activity1 = generateActivityResponse({ id: 'activity1' });
+    const activity2 = generateActivityResponse({ id: 'activity2' });
 
     it('should add activities to empty state', () => {
       const result = addActivitiesToState([activity1], undefined, 'start');
@@ -101,7 +65,7 @@ describe('activity-utils', () => {
     });
 
     it('should handle multiple new activities correctly', () => {
-      const activity3 = createMockActivity('activity3');
+      const activity3 = generateActivityResponse({ id: 'activity3' });
 
       const existingActivities = [activity1];
       const result = addActivitiesToState(
@@ -120,109 +84,107 @@ describe('activity-utils', () => {
 
   describe('updateActivityInState', () => {
     it('should update an activity in the state', () => {
-      const originalActivity = createMockActivity('activity1', 'original text');
-      const updatedActivity = createMockActivity('activity1', 'updated text');
+      const originalActivity = generateActivityResponse({
+        id: 'activity1',
+        text: 'original text',
+      });
+      const updatedActivity = { ...originalActivity, text: 'updated text' };
       const originalActivities = [originalActivity];
 
-      const result = updateActivityInState(updatedActivity, originalActivities);
+      const result = updateActivityInState(
+        {
+          activity: updatedActivity,
+          created_at: new Date(),
+          fid: '',
+          type: '',
+          custom: {},
+        },
+        originalActivities,
+      );
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(1);
-      expect(result.activities[0].id).toBe('activity1');
-      expect(result.activities[0].text).toBe('updated text');
+      expect(result.entities).toHaveLength(1);
+      expect(result.entities![0].id).toBe('activity1');
+      expect(result.entities![0].text).toBe('updated text');
 
       // Make sure we create a new array
-      expect(originalActivities === result.activities).toBe(false);
+      expect(originalActivities === result.entities).toBe(false);
     });
 
-    it('should preserve reaction data when updating an activity', () => {
-      const originalActivity = createMockActivity('activity1', 'original text');
-      // Mock the reaction structure with proper types
-      originalActivity.own_reactions = [
-        {
-          type: 'like',
-          user: {
-            id: 'user1',
-            created_at: new Date(),
-            updated_at: new Date(),
-            banned: false,
-            language: 'en',
-            online: false,
-            role: 'user',
-            blocked_user_ids: [],
-            teams: [],
-            custom: {},
-          },
-          activity_id: 'activity1',
-          created_at: new Date(),
-          updated_at: new Date(),
+    it('should preserve reaction data (own_reaction) when updating an activity', () => {
+      const r = generateFeedReactionResponse({
+        activity_id: 'activity1',
+        user: {
+          id: 'user1',
         },
-      ];
-      originalActivity.latest_reactions = {} as FeedsReactionResponse[];
-      (originalActivity.latest_reactions as any).like = [
-        {
-          type: 'like',
-          user: {
-            id: 'user1',
-            created_at: new Date(),
-            updated_at: new Date(),
-            banned: false,
-            language: 'en',
-            online: false,
-            role: 'user',
-            blocked_user_ids: [],
-            teams: [],
-            custom: {},
-          },
-          activity_id: 'activity1',
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-      ];
-      originalActivity.reaction_groups = {
-        like: {
-          sum_scores: 0,
-          count: 1,
-          first_reaction_at: new Date(),
-          last_reaction_at: new Date(),
-        },
-      };
+      });
+      const originalActivity = generateActivityResponse({
+        id: 'activity1',
+        text: 'original text',
+        own_reactions: [r],
+        latest_reactions: [r],
+      });
 
-      const updatedActivity = createMockActivity('activity1', 'updated text');
-      // Reactions are not included in the updated activity from server
+      const updatedActivity = generateActivityResponse({
+        id: 'activity1',
+        text: 'updated text',
+        own_reactions: [],
+        latest_reactions: [
+          r,
+          generateFeedReactionResponse({
+            activity_id: 'activity1',
+            user: { id: 'user2' },
+          }),
+        ],
+      });
 
-      const result = updateActivityInState(updatedActivity, [originalActivity]);
+      const result = updateActivityInState(
+        {
+          activity: updatedActivity,
+          created_at: new Date(),
+          fid: '',
+          type: '',
+          custom: {},
+        },
+        [originalActivity],
+      );
 
       expect(result.changed).toBe(true);
-      expect(result.activities[0].text).toBe('updated text');
+      expect(result.entities![0].text).toBe('updated text');
       // Check that reactions were preserved
-      expect(result.activities[0].own_reactions).toEqual(
+      expect(result.entities![0].own_reactions).toEqual(
         originalActivity.own_reactions,
-      );
-      expect(result.activities[0].latest_reactions).toEqual(
-        originalActivity.latest_reactions,
-      );
-      expect(result.activities[0].reaction_groups).toEqual(
-        originalActivity.reaction_groups,
       );
     });
 
     it('should return unchanged state if activity not found', () => {
-      const existingActivity = createMockActivity('activity1');
-      const updatedActivity = createMockActivity('activity2', 'some text');
+      const existingActivity = generateActivityResponse({ id: 'activity1' });
+      const updatedActivity = generateActivityResponse({
+        id: 'activity2',
+        text: 'some text',
+      });
 
-      const result = updateActivityInState(updatedActivity, [existingActivity]);
+      const result = updateActivityInState(
+        {
+          activity: updatedActivity,
+          created_at: new Date(),
+          fid: '',
+          type: '',
+          custom: {},
+        },
+        [existingActivity],
+      );
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toHaveLength(1);
-      expect(result.activities[0].id).toBe('activity1');
+      expect(result.entities).toHaveLength(1);
+      expect(result.entities![0].id).toBe('activity1');
     });
   });
 
   describe('removeActivityFromState', () => {
     it('should remove an activity from the state', () => {
-      const activity1 = createMockActivity('activity1');
-      const activity2 = createMockActivity('activity2');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
+      const activity2 = generateActivityResponse({ id: 'activity2' });
       const activities = [activity1, activity2];
 
       const result = removeActivityFromState(activity1, activities);
@@ -235,8 +197,8 @@ describe('activity-utils', () => {
     });
 
     it('should return unchanged state if activity not found', () => {
-      const activity1 = createMockActivity('activity1');
-      const activity2 = createMockActivity('activity2');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
+      const activity2 = generateActivityResponse({ id: 'activity2' });
       const activities = [activity1];
 
       const result = removeActivityFromState(activity2, activities);
@@ -247,7 +209,7 @@ describe('activity-utils', () => {
     });
 
     it('should handle empty activities array', () => {
-      const activity = createMockActivity('activity1');
+      const activity = generateActivityResponse({ id: 'activity1' });
       const activities: ActivityResponse[] = [];
 
       const result = removeActivityFromState(activity, activities);

@@ -1,5 +1,8 @@
 import { useUserContext } from '@/app/user-context';
-import type { ActivityResponse, CommentResponse } from '@stream-io/feeds-react-sdk';
+import type {
+  ActivityResponse,
+  CommentResponse,
+} from '@stream-io/feeds-react-sdk';
 import { useRef } from 'react';
 import { ReactionsList } from './ReactionsList';
 import { useErrorContext } from '@/app/error-context';
@@ -37,7 +40,7 @@ export const Reactions = ({
             create_notification_activity: true,
           })
         : client?.addCommentReaction({
-            comment_id: object.id,
+            id: object.id,
             type,
             create_notification_activity: true,
           }));
@@ -54,7 +57,7 @@ export const Reactions = ({
             activity_id: object.id,
             type,
           })
-        : client?.deleteCommentReaction({ comment_id: object.id, type }));
+        : client?.deleteCommentReaction({ id: object.id, type }));
     } catch (error) {
       logErrorAndDisplayNotification(error);
     }

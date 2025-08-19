@@ -8,53 +8,14 @@ import {
   UserResponse,
 } from '../../../gen/models';
 import {
-  addBookmarkToActivity,
-  removeBookmarkFromActivity,
-  updateBookmarkInActivity,
   addBookmarkToActivities,
   removeBookmarkFromActivities,
   updateBookmarkInActivities,
 } from './';
-
-const createMockUser = (id: string): UserResponse => ({
-  id,
-  created_at: new Date(),
-  updated_at: new Date(),
-  banned: false,
-  language: 'en',
-  online: false,
-  role: 'user',
-  blocked_user_ids: [],
-  teams: [],
-  custom: {},
-});
-
-const createMockActivity = (id: string): ActivityResponse => ({
-  id,
-  type: 'test',
-  created_at: new Date(),
-  updated_at: new Date(),
-  visibility: 'public',
-  bookmark_count: 0,
-  comment_count: 0,
-  reaction_count: 0,
-  share_count: 0,
-  attachments: [],
-  comments: [],
-  feeds: [],
-  filter_tags: [],
-  interest_tags: [],
-  latest_reactions: [],
-  mentioned_users: [],
-  own_bookmarks: [],
-  own_reactions: [],
-  custom: {},
-  reaction_groups: {},
-  search_data: {},
-  popularity: 0,
-  score: 0,
-  user: createMockUser('user1'),
-});
+import {
+  generateActivityResponse,
+  generateUserResponse,
+} from '../../../test-utils';
 
 const createMockBookmark = (
   user: UserResponse,
@@ -94,11 +55,62 @@ const createMockUpdatedEvent = (
   type: 'bookmark.updated',
 });
 
+const addBookmarkToActivity = (
+  event: BookmarkAddedEvent,
+  activity: ActivityResponse,
+  eventBelongsToCurrentUser: boolean,
+) => {
+  const result = addBookmarkToActivities(
+    event,
+    [activity],
+    eventBelongsToCurrentUser,
+  );
+
+  return {
+    changed: result.changed,
+    ...result.entities![0],
+  };
+};
+
+const removeBookmarkFromActivity = (
+  event: BookmarkAddedEvent,
+  activity: ActivityResponse,
+  eventBelongsToCurrentUser: boolean,
+) => {
+  const result = removeBookmarkFromActivities(
+    event,
+    [activity],
+    eventBelongsToCurrentUser,
+  );
+
+  return {
+    changed: result.changed,
+    ...result.entities![0],
+  };
+};
+
+const updateBookmarkInActivity = (
+  event: BookmarkAddedEvent,
+  activity: ActivityResponse,
+  eventBelongsToCurrentUser: boolean,
+) => {
+  const result = updateBookmarkInActivities(
+    event,
+    [activity],
+    eventBelongsToCurrentUser,
+  );
+
+  return {
+    changed: result.changed,
+    ...result.entities![0],
+  };
+};
+
 describe('bookmark-utils', () => {
   describe('addBookmarkToActivity', () => {
     it('should add bookmark to own_bookmarks when from current user', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
       const bookmark = createMockBookmark(user, activity);
       const event = createMockAddedEvent(bookmark);
 
@@ -110,8 +122,8 @@ describe('bookmark-utils', () => {
     });
 
     it('should not add bookmark to own_bookmarks when not from current user', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user2');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user2' });
       const bookmark = createMockBookmark(user, activity);
       const event = createMockAddedEvent(bookmark);
 
@@ -122,8 +134,8 @@ describe('bookmark-utils', () => {
     });
 
     it('should handle existing bookmarks correctly', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
       const existingBookmark = createMockBookmark(user, activity);
       activity.own_bookmarks = [existingBookmark];
 
@@ -141,8 +153,8 @@ describe('bookmark-utils', () => {
 
   describe('removeBookmarkFromActivity', () => {
     it('should remove bookmark from own_bookmarks when from current user', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
       const bookmark = createMockBookmark(user, activity);
       activity.own_bookmarks = [bookmark];
 
@@ -154,8 +166,8 @@ describe('bookmark-utils', () => {
     });
 
     it('should not remove bookmark from own_bookmarks when not from current user', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
       const bookmark = createMockBookmark(user, activity);
       activity.own_bookmarks = [bookmark];
 
@@ -168,9 +180,9 @@ describe('bookmark-utils', () => {
     });
 
     it('should remove correct bookmark when multiple bookmarks exist', () => {
-      const activity = createMockActivity('activity1');
-      const user1 = createMockUser('user1');
-      const user2 = createMockUser('user2');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user1 = generateUserResponse({ id: 'user1' });
+      const user2 = generateUserResponse({ id: 'user2' });
       const bookmark1 = createMockBookmark(user1, activity);
       const bookmark2 = createMockBookmark(user2, activity);
       activity.own_bookmarks = [bookmark1, bookmark2];
@@ -184,8 +196,8 @@ describe('bookmark-utils', () => {
     });
 
     it('should correctly identify bookmarks by activity_id + folder_id + user_id', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
 
       // Create two bookmarks with same activity and user but different folders
       const bookmark1 = {
@@ -221,8 +233,8 @@ describe('bookmark-utils', () => {
     });
 
     it('should handle bookmarks without folders correctly', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
 
       // Create two bookmarks: one with folder, one without
       const bookmarkWithFolder = {
@@ -251,8 +263,8 @@ describe('bookmark-utils', () => {
 
   describe('updateBookmarkInActivity', () => {
     it('should update bookmark in own_bookmarks when from current user', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
       const bookmark = createMockBookmark(user, activity);
       activity.own_bookmarks = [bookmark];
 
@@ -269,8 +281,8 @@ describe('bookmark-utils', () => {
     });
 
     it('should not update bookmark in own_bookmarks when not from current user', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
       const bookmark = createMockBookmark(user, activity);
       activity.own_bookmarks = [bookmark];
 
@@ -288,8 +300,8 @@ describe('bookmark-utils', () => {
 
     // Test for the bug: updating bookmarks with same activity_id but different folder_id
     it('should correctly update bookmark by activity_id + folder_id + user_id', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
 
       // Create two bookmarks with same activity and user but different folders
       const bookmark1 = {
@@ -330,8 +342,8 @@ describe('bookmark-utils', () => {
     });
 
     it('should handle updating bookmarks without folders correctly', () => {
-      const activity = createMockActivity('activity1');
-      const user = createMockUser('user1');
+      const activity = generateActivityResponse({ id: 'activity1' });
+      const user = generateUserResponse({ id: 'user1' });
 
       // Create two bookmarks: one with folder, one without
       const bookmarkWithFolder = {
@@ -365,56 +377,56 @@ describe('bookmark-utils', () => {
 
   describe('addBookmarkToActivities', () => {
     it('should add bookmark to correct activity', () => {
-      const activity1 = createMockActivity('activity1');
-      const activity2 = createMockActivity('activity2');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
+      const activity2 = generateActivityResponse({ id: 'activity2' });
       const activities = [activity1, activity2];
 
-      const user = createMockUser('user1');
+      const user = generateUserResponse({ id: 'user1' });
       const bookmark = createMockBookmark(user, activity1);
       const event = createMockAddedEvent(bookmark);
 
       const result = addBookmarkToActivities(event, activities, true);
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(2);
-      expect(result.activities[0].own_bookmarks).toHaveLength(1);
-      expect(result.activities[0].own_bookmarks[0]).toEqual(bookmark);
-      expect(result.activities[1].own_bookmarks).toHaveLength(0);
+      expect(result.entities).toHaveLength(2);
+      expect(result.entities![0].own_bookmarks).toHaveLength(1);
+      expect(result.entities![0].own_bookmarks[0]).toEqual(bookmark);
+      expect(result.entities![1].own_bookmarks).toHaveLength(0);
     });
 
     it('should return unchanged when activity not found', () => {
-      const activity1 = createMockActivity('activity1');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
       const activities = [activity1];
 
-      const user = createMockUser('user1');
-      const differentActivity = createMockActivity('activity2');
+      const user = generateUserResponse({ id: 'user1' });
+      const differentActivity = generateActivityResponse({ id: 'activity2' });
       const bookmark = createMockBookmark(user, differentActivity);
       const event = createMockAddedEvent(bookmark);
 
       const result = addBookmarkToActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual(activities);
+      expect(result.entities).toEqual(activities);
     });
 
     it('should handle undefined activities', () => {
-      const user = createMockUser('user1');
-      const activity = createMockActivity('activity1');
+      const user = generateUserResponse({ id: 'user1' });
+      const activity = generateActivityResponse({ id: 'activity1' });
       const bookmark = createMockBookmark(user, activity);
       const event = createMockAddedEvent(bookmark);
 
       const result = addBookmarkToActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual([]);
+      expect(result.entities).toBeUndefined();
     });
   });
 
   describe('removeBookmarkFromActivities', () => {
     it('should remove bookmark from correct activity', () => {
-      const activity1 = createMockActivity('activity1');
-      const activity2 = createMockActivity('activity2');
-      const user = createMockUser('user1');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
+      const activity2 = generateActivityResponse({ id: 'activity2' });
+      const user = generateUserResponse({ id: 'user1' });
       const bookmark = createMockBookmark(user, activity1);
       activity1.own_bookmarks = [bookmark];
       const activities = [activity1, activity2];
@@ -423,44 +435,44 @@ describe('bookmark-utils', () => {
       const result = removeBookmarkFromActivities(event, activities, true);
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(2);
-      expect(result.activities[0].own_bookmarks).toHaveLength(0);
-      expect(result.activities[1].own_bookmarks).toHaveLength(0);
+      expect(result.entities).toHaveLength(2);
+      expect(result.entities![0].own_bookmarks).toHaveLength(0);
+      expect(result.entities![1].own_bookmarks).toHaveLength(0);
     });
 
     it('should return unchanged when activity not found', () => {
-      const activity1 = createMockActivity('activity1');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
       const activities = [activity1];
 
-      const user = createMockUser('user1');
-      const differentActivity = createMockActivity('activity2');
+      const user = generateUserResponse({ id: 'user1' });
+      const differentActivity = generateActivityResponse({ id: 'activity2' });
       const bookmark = createMockBookmark(user, differentActivity);
       const event = createMockDeletedEvent(bookmark);
 
       const result = removeBookmarkFromActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual(activities);
+      expect(result.entities).toEqual(activities);
     });
 
     it('should handle undefined activities', () => {
-      const user = createMockUser('user1');
-      const activity = createMockActivity('activity1');
+      const user = generateUserResponse({ id: 'user1' });
+      const activity = generateActivityResponse({ id: 'activity1' });
       const bookmark = createMockBookmark(user, activity);
       const event = createMockDeletedEvent(bookmark);
 
       const result = removeBookmarkFromActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual([]);
+      expect(result.entities).toBeUndefined();
     });
   });
 
   describe('updateBookmarkInActivities', () => {
     it('should update bookmark in correct activity', () => {
-      const activity1 = createMockActivity('activity1');
-      const activity2 = createMockActivity('activity2');
-      const user = createMockUser('user1');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
+      const activity2 = generateActivityResponse({ id: 'activity2' });
+      const user = generateUserResponse({ id: 'user1' });
       const bookmark = createMockBookmark(user, activity1);
       activity1.own_bookmarks = [bookmark];
       const activities = [activity1, activity2];
@@ -473,37 +485,37 @@ describe('bookmark-utils', () => {
       const result = updateBookmarkInActivities(event, activities, true);
 
       expect(result.changed).toBe(true);
-      expect(result.activities).toHaveLength(2);
-      expect(result.activities[0].own_bookmarks).toHaveLength(1);
-      expect(result.activities[0].own_bookmarks[0]).toEqual(updatedBookmark);
-      expect(result.activities[1].own_bookmarks).toHaveLength(0);
+      expect(result.entities).toHaveLength(2);
+      expect(result.entities![0].own_bookmarks).toHaveLength(1);
+      expect(result.entities![0].own_bookmarks[0]).toEqual(updatedBookmark);
+      expect(result.entities![1].own_bookmarks).toHaveLength(0);
     });
 
     it('should return unchanged when activity not found', () => {
-      const activity1 = createMockActivity('activity1');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
       const activities = [activity1];
 
-      const user = createMockUser('user1');
-      const differentActivity = createMockActivity('activity2');
+      const user = generateUserResponse({ id: 'user1' });
+      const differentActivity = generateActivityResponse({ id: 'activity2' });
       const bookmark = createMockBookmark(user, differentActivity);
       const event = createMockUpdatedEvent(bookmark);
 
       const result = updateBookmarkInActivities(event, activities, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual(activities);
+      expect(result.entities).toEqual(activities);
     });
 
     it('should handle undefined activities', () => {
-      const user = createMockUser('user1');
-      const activity = createMockActivity('activity1');
+      const user = generateUserResponse({ id: 'user1' });
+      const activity = generateActivityResponse({ id: 'activity1' });
       const bookmark = createMockBookmark(user, activity);
       const event = createMockUpdatedEvent(bookmark);
 
       const result = updateBookmarkInActivities(event, undefined, true);
 
       expect(result.changed).toBe(false);
-      expect(result.activities).toEqual([]);
+      expect(result.entities).toBeUndefined();
     });
   });
 });

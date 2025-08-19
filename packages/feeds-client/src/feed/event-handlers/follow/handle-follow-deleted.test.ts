@@ -1,4 +1,8 @@
-import { FollowResponse, FeedResponse, UserResponse } from '../../../gen/models';
+import {
+  FollowResponse,
+  FeedResponse,
+  UserResponse,
+} from '../../../gen/models';
 import { generateFollowResponse } from '../../../test-utils';
 import { updateStateFollowDeleted } from './handle-follow-deleted';
 
@@ -22,13 +26,13 @@ describe('handle-follow-deleted', () => {
         source_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
         target_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: mockUser,
         },
       };
@@ -59,7 +63,7 @@ describe('handle-follow-deleted', () => {
         source_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: {
             ...mockUser,
             id: 'other-user',
@@ -68,7 +72,7 @@ describe('handle-follow-deleted', () => {
         target_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
       };
@@ -101,13 +105,13 @@ describe('handle-follow-deleted', () => {
         source_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: { ...mockUser, id: 'user-1' },
         },
         target_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
       };
@@ -139,13 +143,13 @@ describe('handle-follow-deleted', () => {
         source_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: { ...mockUser, id: 'other-user' },
         },
         target_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
       };
@@ -176,13 +180,13 @@ describe('handle-follow-deleted', () => {
         source_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: mockUser,
         },
         target_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
       };
@@ -214,13 +218,13 @@ describe('handle-follow-deleted', () => {
         source_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
         target_feed: {
           ...mockFeed,
           id: 'target-to-remove',
-          fid: 'user:target-to-remove',
+          feed: 'user:target-to-remove',
           created_by: mockUser,
         },
       };
@@ -230,13 +234,13 @@ describe('handle-follow-deleted', () => {
         source_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
         target_feed: {
           ...mockFeed,
           id: 'target-to-keep',
-          fid: 'user:target-to-keep',
+          feed: 'user:target-to-keep',
           created_by: mockUser,
         },
       };

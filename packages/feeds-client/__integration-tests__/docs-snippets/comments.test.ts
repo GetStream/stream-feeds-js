@@ -56,7 +56,7 @@ describe('Comments page', () => {
   it('Updating comments', async () => {
     // Update a comment
     await client.updateComment({
-      comment_id: comment.id,
+      id: comment.id,
       comment: 'Updated comment',
       custom: {
         edited: true,
@@ -113,12 +113,12 @@ describe('Comments page', () => {
   it(`Comment reactions`, async () => {
     // Add a reaction to a comment
     await client.addCommentReaction({
-      comment_id: comment.id,
+      id: comment.id,
       type: 'like',
     });
 
     await client.deleteCommentReaction({
-      comment_id: comment.id,
+      id: comment.id,
       type: 'like',
     });
   });
@@ -150,13 +150,13 @@ describe('Comments page', () => {
 
     // Get replies of a specific parent comment
     await client.getCommentReplies({
-      comment_id: comment.id,
+      id: comment.id,
     });
   });
 
   it('Deleting comments', async () => {
     await client.deleteComment({
-      comment_id: comment.id,
+      id: comment.id,
     });
   });
 

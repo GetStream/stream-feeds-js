@@ -5,10 +5,7 @@ import type {
   PartializeAllBut,
   UpdateStateResult,
 } from '../../../types-internal';
-import {
-  getStateUpdateQueueId,
-  shouldUpdateState,
-} from '../../../utils';
+import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 
 export const updateStateFollowCreated = (
   follow: FollowResponse,
@@ -24,7 +21,7 @@ export const updateStateFollowCreated = (
   let newState: FeedState = { ...currentState };
 
   // this feed followed someone
-  if (follow.source_feed.fid === currentFeedId) {
+  if (follow.source_feed.feed === currentFeedId) {
     newState = {
       ...newState,
       // Update FeedResponse fields, that has the new follower/following count
@@ -37,7 +34,7 @@ export const updateStateFollowCreated = (
     }
   } else if (
     // someone followed this feed
-    follow.target_feed.fid === currentFeedId
+    follow.target_feed.feed === currentFeedId
   ) {
     const source = follow.source_feed;
 
@@ -84,7 +81,7 @@ export function handleFollowCreated(
   const result = updateStateFollowCreated(
     follow,
     this.currentState,
-    this.fid,
+    this.feed,
     connectedUser?.id,
   );
   if (result.changed) {

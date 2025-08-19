@@ -1,4 +1,8 @@
-import { FeedResponse, FollowResponse, UserResponse } from '../../../gen/models';
+import {
+  FeedResponse,
+  FollowResponse,
+  UserResponse,
+} from '../../../gen/models';
 import { generateFollowResponse } from '../../../test-utils';
 import { updateStateFollowCreated } from './handle-follow-created';
 
@@ -44,7 +48,7 @@ describe('handle-follow-created', () => {
         source_feed: {
           ...mockFeed,
           id: 'feed-x',
-          fid: 'user:feed-x',
+          feed: 'user:feed-x',
           created_by: {
             ...mockUser,
             id: 'user-x',
@@ -54,7 +58,7 @@ describe('handle-follow-created', () => {
         target_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: mockUser,
         },
       };
@@ -86,7 +90,7 @@ describe('handle-follow-created', () => {
         source_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: {
             ...mockUser,
             id: 'other-user',
@@ -95,7 +99,7 @@ describe('handle-follow-created', () => {
         target_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
           follower_count: 1,
         },
@@ -128,13 +132,13 @@ describe('handle-follow-created', () => {
         source_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: { ...mockUser, id: 'user-1' },
         },
         target_feed: {
           ...mockFeed,
           id: 'feed-x',
-          fid: 'user:feed-x',
+          feed: 'user:feed-x',
           created_by: {
             ...mockUser,
             id: 'user-x',
@@ -166,13 +170,13 @@ describe('handle-follow-created', () => {
         source_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: mockUser,
         },
         target_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
       };
@@ -202,7 +206,7 @@ describe('handle-follow-created', () => {
         source_feed: {
           ...mockFeed,
           id: 'existing-feed',
-          fid: 'user:existing-feed',
+          feed: 'user:existing-feed',
           created_by: mockUser,
         },
       };
@@ -212,13 +216,13 @@ describe('handle-follow-created', () => {
         source_feed: {
           ...mockFeed,
           id: 'other-feed',
-          fid: 'user:other-feed',
+          feed: 'user:other-feed',
           created_by: mockUser,
         },
         target_feed: {
           ...mockFeed,
           id: 'feed-1',
-          fid: 'user:feed-1',
+          feed: 'user:feed-1',
           created_by: mockUser,
         },
       };

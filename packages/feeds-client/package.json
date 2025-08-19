@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-client",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "packageManager": "yarn@3.2.4",
   "main": "./dist/index.node.js",
   "exports": {
@@ -63,7 +63,7 @@
   "devDependencies": {
     "@rollup/plugin-replace": "^6.0.1",
     "@rollup/plugin-typescript": "^12.1.0",
-    "@stream-io/node-sdk": "0.5.0",
+    "@stream-io/node-sdk": "0.6.0",
     "@types/react": "^19.1.8",
     "@vitest/coverage-v8": "3.2.4",
     "dotenv": "^16.4.5",

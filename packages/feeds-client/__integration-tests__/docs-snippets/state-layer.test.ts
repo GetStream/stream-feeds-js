@@ -89,7 +89,7 @@ describe('State layer page', () => {
       poll_id: response.poll.id,
     });
 
-    await waitForEvent(feed, 'feeds.activity.added', 1000);
+    await waitForEvent(feed, 'feeds.activity.added');
 
     // pollResponse object won't receive state updates
     const pollResponse = feed.state.getLatestValue().activities?.[0].poll!;

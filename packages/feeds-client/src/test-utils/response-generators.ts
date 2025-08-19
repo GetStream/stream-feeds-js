@@ -1,11 +1,18 @@
 import {
+  ActivityPinResponse,
+  ActivityResponse,
+  BookmarkFolderResponse,
+  BookmarkResponse,
   FeedResponse,
+  FeedsReactionResponse,
   FollowResponse,
   OwnUser,
   OwnUserResponse,
+  PinActivityResponse,
   UserResponse,
 } from '../gen/models';
 import { humanId } from 'human-id';
+import { EventPayload } from '../types-internal';
 
 export const getHumanId = () => humanId({ capitalize: false, separator: '-' });
 
@@ -58,7 +65,7 @@ export const generateFeedResponse = (
 ): FeedResponse => {
   const id = overrides.id || `feed-${getHumanId()}`;
   const groupId = overrides.group_id || 'user';
-  const fid = `${groupId}:${id}`;
+  const feed = `${groupId}:${id}`;
 
   return {
     id,
@@ -77,7 +84,7 @@ export const generateFeedResponse = (
     pin_count: 0,
     custom: {},
     ...overrides,
-    fid,
+    feed,
     created_by: generateUserResponse(overrides.created_by),
   };
 };
@@ -99,3 +106,256 @@ export const generateFollowResponse = (
     ...overrides,
   };
 };
+
+export const generateActivityResponse = (
+  overrides: Omit<Partial<ActivityResponse>, 'user'> & {
+    user?: Partial<UserResponse>;
+  } = {},
+): ActivityResponse => {
+  return {
+    id: getHumanId(),
+    type: 'test',
+    created_at: new Date(),
+    updated_at: new Date(),
+    visibility: 'public',
+    bookmark_count: 0,
+    comment_count: 0,
+    reaction_count: 0,
+    share_count: 0,
+    attachments: [],
+    comments: [],
+    feeds: [],
+    filter_tags: [],
+    interest_tags: [],
+    latest_reactions: [],
+    mentioned_users: [],
+    own_bookmarks: [],
+    own_reactions: [],
+    custom: {},
+    reaction_groups: {},
+    search_data: {},
+    popularity: 0,
+    score: 0,
+    ...overrides,
+    user: generateUserResponse(overrides.user),
+  };
+};
+
+export const generateFeedReactionResponse = (
+  overrides: Omit<Partial<FeedsReactionResponse>, 'user'> & {
+    user?: Partial<UserResponse>;
+  } = {},
+): FeedsReactionResponse => {
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'like',
+    activity_id: getHumanId(),
+    created_at: new Date(),
+    updated_at: new Date(),
+    ...overrides,
+    user,
+  };
+};
+
+export const generateActivityPinResponse = (
+  overrides: Omit<Partial<ActivityPinResponse>, 'activity' | 'user'> & {
+    activity?: Partial<ActivityResponse>;
+    user?: Partial<UserResponse>;
+  } = {},
+): ActivityPinResponse => {
+  return {
+    created_at: new Date(),
+    updated_at: new Date(),
+    feed: getHumanId(),
+    ...overrides,
+    activity: generateActivityResponse(overrides.activity),
+    user: generateUserResponse(overrides.user),
+  };
+};
+
+export const generateBookmarkFolderResponse = (
+  overrides: Partial<BookmarkFolderResponse> = {},
+): BookmarkFolderResponse => ({
+  id: `bookmark-folder-${getHumanId()}`,
+  name: humanId(),
+  created_at: new Date(),
+  updated_at: new Date(),
+  ...overrides,
+});
+
+export const generateBookmarkResponse = (
+  overrides: Omit<Partial<BookmarkResponse>, 'activity' | 'user'> & {
+    activity?: Partial<ActivityResponse>;
+    user?: Partial<UserResponse>;
+  } = {},
+): BookmarkResponse => ({
+  created_at: new Date(),
+  updated_at: new Date(),
+  ...overrides,
+  activity: generateActivityResponse(overrides.activity),
+  user: generateUserResponse(overrides.user),
+});
+
+// event generators
+export function generateActivityReactionAddedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.reaction.added'>>,
+    'activity' | 'type' | 'reaction' | 'user'
+  > & {
+    activity?: Parameters<typeof generateActivityResponse>[0];
+    reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.reaction.added'> {
+  const activity = generateActivityResponse(overrides.activity);
+  const reaction = generateFeedReactionResponse(overrides.reaction);
+  const user = generateUserResponse(overrides.user);
+
+  return {
+    type: 'feeds.activity.reaction.added',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    user,
+    reaction,
+    activity,
+  };
+}
+
+export function generateActivityReactionDeletedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.reaction.deleted'>>,
+    'user' | 'activity' | 'reaction'
+  > & {
+    activity?: Parameters<typeof generateActivityResponse>[0];
+    reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.reaction.deleted'> {
+  const activity = generateActivityResponse(overrides.activity);
+  const reaction = generateFeedReactionResponse(overrides.reaction);
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'feeds.activity.reaction.deleted',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    user,
+    reaction,
+    activity,
+  };
+}
+
+export function generateActivityUpdatedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.updated'>>,
+    'activity' | 'type'
+  > & {
+    activity?: Parameters<typeof generateActivityResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.updated'> {
+  const activity = generateActivityResponse(overrides.activity);
+  return {
+    type: 'feeds.activity.updated',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    activity,
+  };
+}
+
+export function generateBookmarkAddedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.bookmark.added'>>,
+    'bookmark' | 'user'
+  > & {
+    bookmark?: Parameters<typeof generateBookmarkResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.bookmark.added'> {
+  const bookmark = generateBookmarkResponse(overrides.bookmark);
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'feeds.bookmark.added',
+    created_at: new Date(),
+    custom: {},
+    ...overrides,
+    bookmark,
+    user,
+  };
+}
+
+export function generateBookmarkDeletedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.bookmark.deleted'>>,
+    'bookmark' | 'user'
+  > & {
+    bookmark?: Parameters<typeof generateBookmarkResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.bookmark.deleted'> {
+  const bookmark = generateBookmarkResponse(overrides.bookmark);
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'feeds.bookmark.deleted',
+    created_at: new Date(),
+    custom: {},
+    ...overrides,
+    bookmark,
+    user,
+  };
+}
+
+export function generateBookmarkUpdatedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.bookmark.updated'>>,
+    'bookmark' | 'user'
+  > & {
+    bookmark?: Parameters<typeof generateBookmarkResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.bookmark.updated'> {
+  const bookmark = generateBookmarkResponse(overrides.bookmark);
+  const user = generateUserResponse(overrides.user);
+  return {
+    type: 'feeds.bookmark.updated',
+    created_at: new Date(),
+    custom: {},
+    ...overrides,
+    bookmark,
+    user,
+  };
+}
+
+export function generateActivityPinnedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.pinned'>>,
+    'pinned_activity' | 'user'
+  > & {
+    pinned_activity?: Parameters<typeof generateActivityPinResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.pinned'> {
+  const pinnedActivity = generateActivityPinResponse(overrides.pinned_activity);
+  const user = generateUserResponse(overrides.user);
+
+  // FIXME(TEMPORARY): re-map ActivityPinResponse to PinActivityResponse
+  const typeAdjustedPinnedActivity: PinActivityResponse = {
+    ...pinnedActivity,
+    user_id: pinnedActivity.user.id,
+    duration: '0',
+  };
+
+  return {
+    type: 'feeds.activity.pinned',
+    created_at: pinnedActivity.created_at,
+    fid: pinnedActivity.feed,
+    custom: {},
+    ...overrides,
+    pinned_activity: typeAdjustedPinnedActivity,
+    user,
+  };
+}
