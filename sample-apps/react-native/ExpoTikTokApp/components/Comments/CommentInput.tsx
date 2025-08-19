@@ -14,16 +14,14 @@ import {
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
-import {
-  useCommentsInputActionsContext,
-  useCommentsInputContext,
-} from '@/contexts/CommentsInputContext';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { useCommentInputState } from '@/hooks/useCommentInputState';
+import { setParent } from '@/store/comment-input-state-store';
 
 const INPUT_METADATA_HEIGHT = 25;
 
@@ -31,8 +29,7 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
   const [text, setText] = useState('');
-  const { setParent } = useCommentsInputActionsContext();
-  const { parent } = useCommentsInputContext();
+  const { parent } = useCommentInputState();
 
   const panelY = useSharedValue(0);
 

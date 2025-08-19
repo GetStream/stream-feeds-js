@@ -7,16 +7,16 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { useCommentsInputActionsContext } from '@/contexts/CommentsInputContext';
 import { SheetList } from '@/components/BottomSheet/SheetList';
 import { closeSheet } from '@/store/bottom-sheet-state-store';
+import { setParent, setEditingEntity } from '@/store/comment-input-state-store';
 
 export const CommentSheet = () => {
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
   const { data } = useBottomSheetState();
   const comment = data?.entity as CommentResponse;
-  const { setParent, setEditingEntity } = useCommentsInputActionsContext();
+  const depth = data?.depth;
 
   const items = useMemo(
     () => [
@@ -55,13 +55,17 @@ export const CommentSheet = () => {
             },
           ]
         : []),
-      {
-        title: 'Reply',
-        action: () => setParent(comment),
-        icon: <Ionicons name="arrow-undo" size={20} color="#666" />,
-      },
+      ...(depth === 0
+        ? [
+            {
+              title: 'Reply',
+              action: () => setParent(comment),
+              icon: <Ionicons name="arrow-undo" size={20} color="#666" />,
+            },
+          ]
+        : []),
     ],
-    [client, comment, connectedUser?.id, setEditingEntity, setParent],
+    [client, comment, connectedUser?.id, depth],
   );
 
   return <SheetList items={items} />;

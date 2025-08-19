@@ -4,7 +4,6 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import { useComments } from '@stream-io/feeds-react-native-sdk';
 import { useFormatDate } from '@/hooks/useFormatDate';
-import { useCommentsInputActionsContext } from '@/contexts/CommentsInputContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import {
   Image,
@@ -17,6 +16,7 @@ import { Reaction } from '@/components/Reaction';
 import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 import { openSheetWith } from '@/store/bottom-sheet-state-store';
 import { useRouter } from 'expo-router';
+import { setParent } from '@/store/comment-input-state-store';
 
 export const Comment = ({
   comment,
@@ -35,8 +35,6 @@ export const Comment = ({
     loadNextPage,
   } = useComments({ parent: comment }) ?? {};
 
-  const { setParent } = useCommentsInputActionsContext();
-
   const loadNext = useStableCallback(async () => {
     if (is_loading_next_page || !loadNextPage || !has_next_page) {
       return;
@@ -44,9 +42,8 @@ export const Comment = ({
     loadNextPage(COMMENTS_LOADING_CONFIG);
   });
 
-  const handleCommentEdit = useStableCallback(() => {
-    // setEditingEntity(comment);
-    openSheetWith({ type: 'comment', entity: comment });
+  const openSheet = useStableCallback(() => {
+    openSheetWith({ type: 'comment', entity: comment, depth });
     router.push('/overlay/sheet');
   });
 
@@ -58,7 +55,7 @@ export const Comment = ({
         styles.commentBlock,
         isFirstLevel ? styles.commentBlockBorder : {},
       ]}
-      onLongPress={handleCommentEdit}
+      onLongPress={openSheet}
     >
       <View style={styles.commentRow}>
         <Image
