@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   createTestClient,
@@ -72,7 +74,7 @@ describe('Notification Feed Test Setup', () => {
 
   it(`user 2 follows user 1 - user 1 receives notification`, async () => {
     await Promise.all([
-      user2TimelineFeed.follow(user1UserFeed.fid, {
+      user2TimelineFeed.follow(user1UserFeed.feed, {
         create_notification_activity: true,
       }),
       waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
