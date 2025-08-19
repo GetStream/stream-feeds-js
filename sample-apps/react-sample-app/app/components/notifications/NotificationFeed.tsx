@@ -7,7 +7,7 @@ import {
 import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
-import { useStableCallback } from '@/app/hooks/useStableCallback';
+import { useCallback } from 'react';
 
 export const NotificationFeed = () => {
   const { logErrorAndDisplayNotification } = useErrorContext();
@@ -23,15 +23,18 @@ export const NotificationFeed = () => {
   const { aggregated_activities: aggregatedActivities = [] } =
     useAggregatedActivities(ownNotifications) ?? {};
 
-  const markRead = async (group: AggregatedActivityResponse) => {
-    try {
-      await ownNotifications?.markActivity({
-        mark_read: [group.group],
-      });
-    } catch (error) {
-      logErrorAndDisplayNotification(error);
-    }
-  };
+  const markRead = useCallback(
+    async (group: AggregatedActivityResponse) => {
+      try {
+        await ownNotifications?.markActivity({
+          mark_read: [group.group],
+        });
+      } catch (error) {
+        logErrorAndDisplayNotification(error);
+      }
+    },
+    [ownNotifications, logErrorAndDisplayNotification],
+  );
 
   const markAllRead = async () => {
     try {
@@ -47,7 +50,7 @@ export const NotificationFeed = () => {
     (group) => !readActivities.includes(group.group),
   );
 
-  const renderItem = useStableCallback(
+  const renderItem = useCallback(
     (group: AggregatedActivityResponse, index: number) => {
       return (
         <li key={`notification:${index}`} className="w-full">
@@ -69,6 +72,7 @@ export const NotificationFeed = () => {
         </li>
       );
     },
+    [readActivities, lastSeenAt, seenActivities, markRead],
   );
 
   return (
