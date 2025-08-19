@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   CommentResponse,
   useClientConnectedUser,
@@ -16,8 +17,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Reaction } from '@/components/Reaction';
-import React from 'react';
 import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
+import { openSheetWith } from '@/store/bottom-sheet-state-store';
+import { useRouter } from 'expo-router';
 
 export const Comment = ({
   comment,
@@ -26,6 +28,7 @@ export const Comment = ({
   comment: CommentResponse;
   depth?: number;
 }) => {
+  const router = useRouter();
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
   const isFirstLevel = depth === 0;
@@ -37,7 +40,7 @@ export const Comment = ({
     loadNextPage,
   } = useComments({ parent: comment }) ?? {};
 
-  const { setParent } = useCommentsInputActionsContext();
+  const { setParent, setEditingEntity } = useCommentsInputActionsContext();
 
   const loadNext = useStableCallback(async () => {
     if (is_loading_next_page || !loadNextPage || !has_next_page) {
@@ -63,6 +66,12 @@ export const Comment = ({
       ],
       { cancelable: true },
     );
+  });
+
+  const handleCommentEdit = useStableCallback(() => {
+    setEditingEntity(comment);
+    openSheetWith({ type: 'comment', entity: comment });
+    router.push('/overlay/sheet');
   });
 
   const repliesLeftToLoad = comment.reply_count - comments.length;
@@ -94,10 +103,17 @@ export const Comment = ({
 
         <View style={styles.commentActionsContainer}>
           {connectedUser?.id === comment.user.id ? (
-            <View style={styles.deleteButton}>
-              <TouchableOpacity onPress={handleCommentDeletion}>
-                <Ionicons name="trash" color="red" size={20} />
-              </TouchableOpacity>
+            <View style={{ flexDirection: 'row', flex: 1 }}>
+              <View style={{ marginRight: 30 }}>
+                <TouchableOpacity onPress={handleCommentEdit}>
+                  <Ionicons name="pencil" color="blue" size={20} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.deleteButton}>
+                <TouchableOpacity onPress={handleCommentDeletion}>
+                  <Ionicons name="trash" color="red" size={20} />
+                </TouchableOpacity>
+              </View>
             </View>
           ) : null}
           <View style={styles.reactionContainer}>
@@ -193,7 +209,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   deleteButton: {
-    flex: 1,
+
   },
   reactionContainer: {
     flexDirection: 'row',
