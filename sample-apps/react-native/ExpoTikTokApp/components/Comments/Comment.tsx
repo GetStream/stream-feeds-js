@@ -1,21 +1,18 @@
 import React from 'react';
 import {
   CommentResponse,
-  useClientConnectedUser,
 } from '@stream-io/feeds-react-native-sdk';
-import { useComments, useFeedsClient } from '@stream-io/feeds-react-native-sdk';
+import { useComments } from '@stream-io/feeds-react-native-sdk';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useCommentsInputActionsContext } from '@/contexts/CommentsInputContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import {
-  Alert,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Reaction } from '@/components/Reaction';
 import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 import { openSheetWith } from '@/store/bottom-sheet-state-store';
@@ -29,8 +26,6 @@ export const Comment = ({
   depth?: number;
 }) => {
   const router = useRouter();
-  const client = useFeedsClient();
-  const connectedUser = useClientConnectedUser();
   const isFirstLevel = depth === 0;
   const formattedDate = useFormatDate({ date: comment.created_at });
   const {
@@ -40,7 +35,7 @@ export const Comment = ({
     loadNextPage,
   } = useComments({ parent: comment }) ?? {};
 
-  const { setParent, setEditingEntity } = useCommentsInputActionsContext();
+  const { setParent } = useCommentsInputActionsContext();
 
   const loadNext = useStableCallback(async () => {
     if (is_loading_next_page || !loadNextPage || !has_next_page) {
@@ -49,27 +44,8 @@ export const Comment = ({
     loadNextPage(COMMENTS_LOADING_CONFIG);
   });
 
-  const handleCommentDeletion = useStableCallback(() => {
-    Alert.alert(
-      'Delete Comment',
-      'Are you sure you want to delete this comment ? The action cannot be undone.',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: () => client?.deleteComment({ id: comment.id }),
-          style: 'destructive',
-        },
-      ],
-      { cancelable: true },
-    );
-  });
-
   const handleCommentEdit = useStableCallback(() => {
-    setEditingEntity(comment);
+    // setEditingEntity(comment);
     openSheetWith({ type: 'comment', entity: comment });
     router.push('/overlay/sheet');
   });
@@ -77,11 +53,12 @@ export const Comment = ({
   const repliesLeftToLoad = comment.reply_count - comments.length;
 
   return (
-    <View
+    <TouchableOpacity
       style={[
         styles.commentBlock,
         isFirstLevel ? styles.commentBlockBorder : {},
       ]}
+      onLongPress={handleCommentEdit}
     >
       <View style={styles.commentRow}>
         <Image
@@ -102,20 +79,6 @@ export const Comment = ({
         </View>
 
         <View style={styles.commentActionsContainer}>
-          {connectedUser?.id === comment.user.id ? (
-            <View style={{ flexDirection: 'row', flex: 1 }}>
-              <View style={{ marginRight: 30 }}>
-                <TouchableOpacity onPress={handleCommentEdit}>
-                  <Ionicons name="pencil" color="blue" size={20} />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.deleteButton}>
-                <TouchableOpacity onPress={handleCommentDeletion}>
-                  <Ionicons name="trash" color="red" size={20} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : null}
           <View style={styles.reactionContainer}>
             <Reaction type="like" color="black" entity={comment} />
             <Text style={styles.reactionCount}>
@@ -146,7 +109,7 @@ export const Comment = ({
           </Text>
         </TouchableOpacity>
       ) : null}
-    </View>
+    </TouchableOpacity>
   );
 };
 

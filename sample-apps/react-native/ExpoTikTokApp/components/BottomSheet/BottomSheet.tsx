@@ -5,7 +5,6 @@ import {
   View,
   Pressable,
   Platform,
-  StatusBar,
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -119,7 +118,6 @@ export function BottomSheet({ children }: Props) {
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: '#000' },
   sheet: {
-    zIndex: 10000,
     position: 'absolute',
     left: 0,
     right: 0,
@@ -128,7 +126,7 @@ const styles = StyleSheet.create({
     transform: [{ translateY: SCREEN_H }],
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    backgroundColor: '#111', // dark surfaces reduce overdraw perception
+    backgroundColor: 'white',
     ...Platform.select({
       ios: {
         shadowColor: '#000',

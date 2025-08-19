@@ -1,27 +1,13 @@
-// app/overlay/sheet.tsx
-import React, { useEffect, useMemo, useRef } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { closeSheet } from '@/store/bottom-sheet-state-store';
-import { useRouter } from 'expo-router';
+import React from 'react';
 import { BottomSheet } from '@/components/BottomSheet';
+import { useBottomSheetState } from '@/hooks/useBottomSheetState';
+import { CommentSheet } from '@/components/BottomSheet/CommentSheet';
 
 export default function SheetOverlay() {
-  const router = useRouter();
-
-  // useEffect(() => {
-  //   modalRef.current?.present();
-  // }, []);
-
-  const close = () => {
-    closeSheet();
-    router.back();
-  };
-
+  const { data } = useBottomSheetState();
   return (
     <BottomSheet>
-      <View>
-        <Text>Custom sheet content</Text>
-      </View>
+      {data?.type === 'comment' ? <CommentSheet /> : null}
     </BottomSheet>
   );
 }

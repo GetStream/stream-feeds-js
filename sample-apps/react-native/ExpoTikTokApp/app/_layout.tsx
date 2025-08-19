@@ -24,7 +24,6 @@ import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBounda
 import { View } from 'react-native';
 import { OwnFeedsContextProvider } from '@/contexts/OwnFeedsContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheet } from '@/components/BottomSheet';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -138,7 +137,6 @@ const RootLayoutNav = ({ user }: { user: LocalUser }) => {
                   presentation: 'transparentModal',
                   animation: 'none',
                   headerShown: false,
-                  contentStyle: { backgroundColor: 'transparent', paddingVertical: 0 },
                 }}
               />
             </Stack>
