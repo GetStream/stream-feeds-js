@@ -40,12 +40,10 @@ jobs:
         run: NODE_ENV=production yarn build:libs
 
       - name: Test packages
-#        run: yarn test:ci:libs
-        run: echo "Empty test run"
+        run: yarn test:ci:libs
 
       - name: Run docs code snippets
-#        run: yarn test:docs-snippets
-        run: echo "Empty docs code snippets run"
+        run: yarn test:docs-snippets
 
       - name: Release
         env:

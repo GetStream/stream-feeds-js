@@ -34,7 +34,7 @@ export const FeedSearchResultItem = ({ item }: FeedSearchResultItemProps) => {
   );
 
   const isFollowing =
-    ownFollows.some((follow) => follow.source_feed.fid === ownTimeline?.fid) ??
+    ownFollows.some((follow) => follow.source_feed.feed === ownTimeline?.feed) ??
     false;
 
   return (
@@ -50,9 +50,9 @@ export const FeedSearchResultItem = ({ item }: FeedSearchResultItemProps) => {
         className="text-sm px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
         onClick={() => {
           if (isFollowing) {
-            ownTimeline?.unfollow(item.fid);
+            ownTimeline?.unfollow(item.feed);
           } else {
-            ownTimeline?.follow(item.fid);
+            ownTimeline?.follow(item.feed);
           }
         }}
       >
