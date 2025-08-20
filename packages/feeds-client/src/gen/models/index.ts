@@ -672,6 +672,8 @@ export interface AggregatedActivityResponse {
 
 export interface AggregationConfig {
   format?: string;
+
+  group_size?: number;
 }
 
 export interface AppEventResponse {
@@ -1242,6 +1244,8 @@ export interface CallParticipant {
 
   role: string;
 
+  role: string;
+
   user_session_id: string;
 
   custom: Record<string, any>;
@@ -1516,6 +1520,10 @@ export interface Channel {
 
   member_count?: number;
 
+  message_count?: number;
+
+  message_count_updated_at?: Date;
+
   team?: string;
 
   active_live_locations?: SharedLocation[];
@@ -1539,6 +1547,8 @@ export interface ChannelConfig {
   automod_behavior: 'flag' | 'block' | 'shadow_block';
 
   connect_events: boolean;
+
+  count_messages: boolean;
 
   created_at: Date;
 
@@ -1605,6 +1615,8 @@ export interface ChannelConfigWithInfo {
   automod_behavior: 'flag' | 'block' | 'shadow_block';
 
   connect_events: boolean;
+
+  count_messages: boolean;
 
   created_at: Date;
 
@@ -1704,6 +1716,8 @@ export interface ChannelMember {
 
   user_id?: string;
 
+  deleted_messages?: string[];
+
   user?: UserResponse;
 }
 
@@ -1795,6 +1809,8 @@ export interface ChannelResponse {
   last_message_at?: Date;
 
   member_count?: number;
+
+  message_count?: number;
 
   mute_expires_at?: Date;
 
@@ -2006,6 +2022,8 @@ export interface ConfigOverrides {
 
   blocklist_behavior?: 'flag' | 'block';
 
+  count_messages?: boolean;
+
   max_message_length?: number;
 
   quotes?: boolean;
@@ -2049,6 +2067,8 @@ export interface ConfigResponse {
   automod_toxicity_config?: AutomodToxicityConfig;
 
   block_list_config?: BlockListConfig;
+
+  llm_config?: LLMConfig;
 
   rule_builder_config?: RuleBuilderConfig;
 
@@ -2743,6 +2763,8 @@ export interface FeedMemberResponse {
   invite_rejected_at?: Date;
 
   custom?: Record<string, any>;
+
+  membership_level?: MembershipLevelResponse;
 }
 
 export interface FeedMemberUpdatedEvent {
@@ -3533,6 +3555,33 @@ export interface IngressVideoLayerResponse {
   min_dimension: number;
 }
 
+export interface LLMConfig {
+  enabled: boolean;
+
+  rules: LLMRule[];
+
+  async?: boolean;
+
+  severity_descriptions?: Record<string, string>;
+}
+
+export interface LLMRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove'
+    | 'keep';
+
+  description: string;
+
+  label: string;
+
+  severity_rules: BodyguardSeverityRule[];
+}
+
 export interface LabelThresholds {
   block?: number;
 
@@ -3605,6 +3654,24 @@ export interface MemberLookup {
   limit: number;
 }
 
+export interface MembershipLevelResponse {
+  created_at: Date;
+
+  id: string;
+
+  name: string;
+
+  priority: number;
+
+  updated_at: Date;
+
+  tags: string[];
+
+  description?: string;
+
+  custom?: Record<string, any>;
+}
+
 export interface Message {
   cid: string;
 
@@ -3653,6 +3720,8 @@ export interface Message {
   command?: string;
 
   deleted_at?: Date;
+
+  deleted_for_me?: boolean;
 
   message_text_updated_at?: Date;
 
@@ -3760,6 +3829,8 @@ export interface MessageResponse {
 
   deleted_at?: Date;
 
+  deleted_for_me?: boolean;
+
   message_text_updated_at?: Date;
 
   mml?: string;
@@ -3838,6 +3909,8 @@ export interface ModerationFlagResponse {
 
   user_id: string;
 
+  result: Array<Record<string, any>>;
+
   entity_creator_id?: string;
 
   reason?: string;
@@ -3845,8 +3918,6 @@ export interface ModerationFlagResponse {
   review_queue_item_id?: string;
 
   labels?: string[];
-
-  result?: Array<Record<string, any>>;
 
   custom?: Record<string, any>;
 
@@ -5871,6 +5942,8 @@ export interface UpsertConfigRequest {
   bodyguard_config?: AITextConfig;
 
   google_vision_config?: GoogleVisionConfig;
+
+  llm_config?: LLMConfig;
 
   rule_builder_config?: RuleBuilderConfig;
 

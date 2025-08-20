@@ -69,6 +69,7 @@ export class ModerationApi {
       block_list_config: request?.block_list_config,
       bodyguard_config: request?.bodyguard_config,
       google_vision_config: request?.google_vision_config,
+      llm_config: request?.llm_config,
       rule_builder_config: request?.rule_builder_config,
       velocity_filter_config: request?.velocity_filter_config,
       video_call_rule_config: request?.video_call_rule_config,
