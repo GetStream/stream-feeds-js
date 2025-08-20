@@ -469,6 +469,8 @@ decoders.Channel = (input?: Record<string, any>) => {
 
     last_message_at: { type: 'DatetimeType', isSingle: true },
 
+    message_count_updated_at: { type: 'DatetimeType', isSingle: true },
+
     active_live_locations: { type: 'SharedLocation', isSingle: false },
 
     invites: { type: 'ChannelMember', isSingle: false },
@@ -857,6 +859,8 @@ decoders.FeedMemberResponse = (input?: Record<string, any>) => {
     invite_accepted_at: { type: 'DatetimeType', isSingle: true },
 
     invite_rejected_at: { type: 'DatetimeType', isSingle: true },
+
+    membership_level: { type: 'MembershipLevelResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1087,6 +1091,15 @@ decoders.ListBlockListResponse = (input?: Record<string, any>) => {
 decoders.ListDevicesResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     devices: { type: 'DeviceResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.MembershipLevelResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
