@@ -9,8 +9,13 @@ import React, { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { SheetList } from '@/components/BottomSheet/SheetList';
 import { closeSheet } from '@/store/bottom-sheet-state-store';
-import { setParent, setEditingEntity, resetState } from '@/store/comment-input-state-store';
+import {
+  setParent,
+  setEditingEntity,
+  resetState,
+} from '@/store/comment-input-state-store';
 import { useCommentInputState } from '@/hooks/useCommentInputState';
+import { useStableCallback } from '@/hooks/useStableCallback';
 
 export const CommentSheet = () => {
   const client = useFeedsClient();
@@ -20,48 +25,49 @@ export const CommentSheet = () => {
   const depth = data?.depth;
   const { parent, editingEntity } = useCommentInputState();
 
+  const deleteAction = useStableCallback(() => () => {
+    Alert.alert(
+      'Delete Comment',
+      'Are you sure you want to delete this comment ? The action cannot be undone.',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => {
+            const idToDelete = comment.id;
+            client?.deleteComment({ id: idToDelete });
+
+            if (idToDelete === parent?.id || idToDelete === editingEntity?.id) {
+              resetState();
+            }
+
+            closeSheet();
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true },
+    );
+  });
+  const editAction = useStableCallback(() => setEditingEntity(comment));
+  const replyAction = useStableCallback(() => setParent(comment));
+
   const items = useMemo(
     () => [
       ...(connectedUser?.id === comment.user.id
         ? [
             {
               title: 'Delete Comment',
-              action: () => {
-                Alert.alert(
-                  'Delete Comment',
-                  'Are you sure you want to delete this comment ? The action cannot be undone.',
-                  [
-                    {
-                      text: 'No',
-                      style: 'cancel',
-                    },
-                    {
-                      text: 'Yes',
-                      onPress: () => {
-                        const idToDelete = comment.id;
-                        client?.deleteComment({ id: idToDelete });
-
-                        if (
-                          idToDelete === parent?.id ||
-                          idToDelete === editingEntity?.id
-                        ) {
-                          resetState();
-                        }
-
-                        closeSheet();
-                      },
-                      style: 'destructive',
-                    },
-                  ],
-                  { cancelable: true },
-                );
-              },
+              action: deleteAction,
               icon: <Ionicons name="trash" color="red" size={20} />,
               preventAutoclose: true,
             },
             {
               title: 'Edit Comment',
-              action: () => setEditingEntity(comment),
+              action: editAction,
               icon: <Ionicons name="pencil" color="blue" size={20} />,
             },
           ]
@@ -70,13 +76,20 @@ export const CommentSheet = () => {
         ? [
             {
               title: 'Reply',
-              action: () => setParent(comment),
+              action: replyAction,
               icon: <Ionicons name="arrow-undo" size={20} color="#666" />,
             },
           ]
         : []),
     ],
-    [client, comment, connectedUser?.id, depth],
+    [
+      comment.user.id,
+      connectedUser?.id,
+      deleteAction,
+      depth,
+      editAction,
+      replyAction,
+    ],
   );
 
   return <SheetList items={items} />;

@@ -1,12 +1,14 @@
 import { ReactElement } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/Themed';
-import { useStableCallback } from '@/hooks/useStableCallback';
+import { StableCallback, useStableCallback } from '@/hooks/useStableCallback';
 import { closeSheet } from '@/store/bottom-sheet-state-store';
+
+type ActionType = () => void | Promise<void>;
 
 export type SheetItemType = {
   title: string;
-  action: () => void | Promise<void>;
+  action: StableCallback<[], ActionType> | ActionType;
   icon?: ReactElement;
   preventAutoclose?: boolean;
 };
