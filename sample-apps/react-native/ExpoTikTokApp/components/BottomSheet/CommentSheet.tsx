@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SheetList } from '@/components/BottomSheet/SheetList';
 import { closeSheet } from '@/store/bottom-sheet-state-store';
 import { setParent, setEditingEntity } from '@/store/comment-input-state-store';
+import { useCommentInputState } from '@/hooks/useCommentInputState';
 
 export const CommentSheet = () => {
   const client = useFeedsClient();
@@ -17,6 +18,7 @@ export const CommentSheet = () => {
   const { data } = useBottomSheetState();
   const comment = data?.entity as CommentResponse;
   const depth = data?.depth;
+  const { parent, editingEntity } = useCommentInputState();
 
   const items = useMemo(
     () => [
@@ -36,7 +38,17 @@ export const CommentSheet = () => {
                     {
                       text: 'Yes',
                       onPress: () => {
-                        client?.deleteComment({ id: comment.id });
+                        const idToDelete = comment.id;
+                        client?.deleteComment({ id: idToDelete });
+
+                        if (
+                          idToDelete === parent?.id ||
+                          idToDelete === editingEntity?.id
+                        ) {
+                          setEditingEntity(undefined);
+                          setParent(undefined);
+                        }
+
                         closeSheet();
                       },
                       style: 'destructive',

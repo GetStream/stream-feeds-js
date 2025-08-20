@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useCommentInputState } from '@/hooks/useCommentInputState';
-import { setParent } from '@/store/comment-input-state-store';
+import { setParent, setEditingEntity } from '@/store/comment-input-state-store';
 
 const INPUT_METADATA_HEIGHT = 25;
 
@@ -29,7 +29,8 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
   const [text, setText] = useState('');
-  const { parent } = useCommentInputState();
+  const { parent, editingEntity } = useCommentInputState();
+  const editingEntityRef = useRef<typeof editingEntity | undefined>(undefined);
 
   const panelY = useSharedValue(0);
 
@@ -37,33 +38,53 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
     height: panelY.value,
   }));
 
-  const resetContextValues = useStableCallback(() => {
+  const resetInputMode = useStableCallback(() => {
     setParent(undefined);
+    setEditingEntity(undefined);
   });
 
   const handleSend = useStableCallback(() => {
     if (!text.trim()) return;
-    client
-      ?.addComment({
+    const action = async () => {
+      if (editingEntity) {
+        return client?.updateComment({
+          comment: text as string,
+          id: editingEntity.id,
+        });
+      }
+
+      return client?.addComment({
         comment: text as string,
         object_id: activityId,
         object_type: 'activity',
         parent_id: parent?.id,
-      })
-      .catch((e) => console.error(e));
+      });
+    };
+
+    action?.().catch((e) => console.error(e));
 
     // cleanup
     setText('');
-    resetContextValues();
+    resetInputMode();
   });
 
   useEffect(() => {
-    if (parent) {
+    if (editingEntity && editingEntity.text) {
+      setText(editingEntity.text);
+    }
+
+    if (!editingEntity && editingEntityRef.current) {
+      setText('');
+    }
+
+    editingEntityRef.current = editingEntity;
+
+    if (parent || editingEntity) {
       panelY.value = withTiming(INPUT_METADATA_HEIGHT, { duration: 100 });
     } else {
       panelY.value = 0;
     }
-  }, [panelY, parent]);
+  }, [editingEntity, panelY, parent]);
 
   return (
     <KeyboardAvoidingView
@@ -71,8 +92,12 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 128 : 0}
     >
       <Animated.View style={[styles.inputMetadataContainer, animatedStyle]}>
-        <Text style={styles.label}>{`Replying to @${parent?.user.id}`}</Text>
-        <TouchableOpacity onPress={resetContextValues} hitSlop={10}>
+        <Text style={styles.label}>
+          {editingEntity
+            ? `Editing @${parent?.user.id}'s comment`
+            : `Replying to @${parent?.user.id}`}
+        </Text>
+        <TouchableOpacity onPress={resetInputMode} hitSlop={10}>
           <Ionicons name="close" size={18} color="#aaa" />
         </TouchableOpacity>
       </Animated.View>
