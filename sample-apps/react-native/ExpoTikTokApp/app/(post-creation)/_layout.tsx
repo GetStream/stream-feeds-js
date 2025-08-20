@@ -1,19 +1,21 @@
 import { PostCreationContextProvider } from '@/contexts/PostCreationContext';
-import { Slot, Stack, useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React from 'react';
 import { useColorScheme } from '@/components/useColorScheme';
 import { Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
+import { resetState } from '@/store/activity-action-state-store';
 
 const HeaderLeft = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
   return (
     <Pressable
-      onPress={() =>
-        router.back()
-      }
+      onPress={() => {
+        resetState();
+        router.back();
+      }}
     >
       {({ pressed }) => (
         <Ionicons
@@ -49,6 +51,6 @@ const PostCreationLayout = () => {
       </Stack>
     </PostCreationContextProvider>
   );
-}
+};
 
 export default PostCreationLayout;

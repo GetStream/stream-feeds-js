@@ -1,5 +1,4 @@
 import { ActivityComposer } from '@/components/ActivityComposer';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   StreamFeed,
   useClientConnectedUser,
@@ -12,8 +11,7 @@ const CreatePostScreen = () => {
   const connectedUser = useClientConnectedUser();
 
   const feed = useMemo(
-    () =>
-      connectedUser?.id ? client?.feed('user', connectedUser.id) : null,
+    () => (connectedUser?.id ? client?.feed('user', connectedUser.id) : null),
     [connectedUser?.id, client],
   );
 
@@ -22,10 +20,10 @@ const CreatePostScreen = () => {
   }
 
   return (
-      <StreamFeed feed={feed}>
-        <ActivityComposer />
-      </StreamFeed>
+    <StreamFeed feed={feed}>
+      <ActivityComposer />
+    </StreamFeed>
   );
-}
+};
 
 export default CreatePostScreen;
