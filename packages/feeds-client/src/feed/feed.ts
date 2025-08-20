@@ -12,6 +12,7 @@ import {
   SortParamRequest,
   ThreadedCommentResponse,
   FollowRequest,
+  QueryCommentsRequest,
 } from '../gen/models';
 import { StreamResponse } from '../gen-imports';
 import { StateStore } from '../common/StateStore';
@@ -71,7 +72,7 @@ export type FeedState = Omit<
     | {
         pagination?: PagerResponseWithLoadingStates & {
           // registered on first pagination attempt and then used for real-time updates & subsequent pagination calls
-          sort?: string;
+          sort?: QueryCommentsRequest['sort'] | (string & {});
         };
         /**
          * Id of the "store" where the actual parent is stored in the comments array.

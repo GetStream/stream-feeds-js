@@ -8,24 +8,38 @@ export function handleCommentDeleted(
   const entityId = comment.parent_id ?? comment.object_id;
 
   this.state.next((currentState) => {
-    const newCommentsByEntityId = {
-      ...currentState.comments_by_entity_id,
-      [entityId]: {
-        ...currentState.comments_by_entity_id[entityId],
-      },
-    };
+    let newCommentsByEntityId:
+      | typeof currentState.comments_by_entity_id
+      | undefined;
 
     const index = this.getCommentIndex(comment, currentState);
 
-    if (newCommentsByEntityId?.[entityId]?.comments?.length && index !== -1) {
-      newCommentsByEntityId[entityId].comments = [
-        ...newCommentsByEntityId[entityId].comments,
+    if (index !== -1) {
+      newCommentsByEntityId ??= {
+        ...currentState.comments_by_entity_id,
+        [entityId]: {
+          ...currentState.comments_by_entity_id[entityId],
+        },
+      };
+
+      newCommentsByEntityId[entityId]!.comments = [
+        ...newCommentsByEntityId[entityId]!.comments!,
       ];
 
       newCommentsByEntityId[entityId]?.comments?.splice(index, 1);
     }
 
-    delete newCommentsByEntityId[comment.id];
+    if (typeof currentState.comments_by_entity_id[comment.id] !== 'undefined') {
+      newCommentsByEntityId ??= {
+        ...currentState.comments_by_entity_id,
+      };
+
+      delete newCommentsByEntityId[comment.id];
+    }
+
+    if (!newCommentsByEntityId) {
+      return currentState;
+    }
 
     return {
       ...currentState,

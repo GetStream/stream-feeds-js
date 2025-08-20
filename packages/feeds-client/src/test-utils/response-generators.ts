@@ -3,6 +3,7 @@ import {
   ActivityResponse,
   BookmarkFolderResponse,
   BookmarkResponse,
+  CommentResponse,
   FeedResponse,
   FeedsReactionResponse,
   FollowResponse,
@@ -152,6 +153,33 @@ export const generateFeedReactionResponse = (
     activity_id: getHumanId(),
     created_at: new Date(),
     updated_at: new Date(),
+    ...overrides,
+    user,
+  };
+};
+
+export const generateCommentResponse = (
+  overrides: Omit<Partial<CommentResponse>, 'user'> & {
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): CommentResponse => {
+  const user = generateUserResponse(overrides.user);
+  const sharedId = getHumanId();
+  return {
+    id: `comment-${sharedId}`,
+    object_id: `activity-${sharedId}`,
+    object_type: 'activity',
+    confidence_score: 1,
+    created_at: new Date(),
+    updated_at: new Date(),
+    score: 0,
+    reaction_count: 0,
+    reply_count: 0,
+    upvote_count: 0,
+    downvote_count: 0,
+    mentioned_users: [],
+    own_reactions: [],
+    status: '',
     ...overrides,
     user,
   };
@@ -327,6 +355,40 @@ export function generateBookmarkUpdatedEvent(
     ...overrides,
     bookmark,
     user,
+  };
+}
+
+export function generateCommentAddedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.comment.added'>>,
+    'comment' | 'type'
+  > & { comment?: Parameters<typeof generateCommentResponse>[0] } = {},
+): EventPayload<'feeds.comment.added'> {
+  const comment = generateCommentResponse(overrides.comment);
+  return {
+    type: 'feeds.comment.added',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    comment,
+  };
+}
+
+export function generateCommentDeletedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.comment.deleted'>>,
+    'comment' | 'type'
+  > & { comment?: Parameters<typeof generateCommentResponse>[0] } = {},
+): EventPayload<'feeds.comment.deleted'> {
+  const comment = generateCommentResponse(overrides.comment);
+  return {
+    type: 'feeds.comment.deleted',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    comment,
   };
 }
 
