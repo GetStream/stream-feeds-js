@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useCommentInputState } from '@/hooks/useCommentInputState';
-import { setParent, setEditingEntity } from '@/store/comment-input-state-store';
+import { resetState } from '@/store/comment-input-state-store';
 
 const INPUT_METADATA_HEIGHT = 25;
 
@@ -39,8 +39,7 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
   }));
 
   const resetInputMode = useStableCallback(() => {
-    setParent(undefined);
-    setEditingEntity(undefined);
+    resetState();
   });
 
   const handleSend = useStableCallback(() => {
@@ -94,7 +93,7 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
       <Animated.View style={[styles.inputMetadataContainer, animatedStyle]}>
         <Text style={styles.label}>
           {editingEntity
-            ? `Editing @${parent?.user.id}'s comment`
+            ? `Editing @${editingEntity?.user.id}'s comment`
             : `Replying to @${parent?.user.id}`}
         </Text>
         <TouchableOpacity onPress={resetInputMode} hitSlop={10}>

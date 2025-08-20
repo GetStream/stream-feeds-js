@@ -5,9 +5,15 @@ export type CommentInputState = {
   parent?: CommentParent;
 };
 
-export const store = new StateStore<CommentInputState>({});
+const DEFAULT_STATE: CommentInputState = {
+  editingEntity: undefined,
+  parent: undefined,
+};
+
+export const store = new StateStore<CommentInputState>(DEFAULT_STATE);
 
 export const setEditingEntity = (entity: CommentInputState['editingEntity']) =>
   store.partialNext({ editingEntity: entity });
 export const setParent = (entity: CommentInputState['parent']) =>
   store.partialNext({ parent: entity });
+export const resetState = () => store.partialNext(DEFAULT_STATE);

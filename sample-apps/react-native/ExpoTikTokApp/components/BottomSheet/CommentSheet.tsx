@@ -9,7 +9,7 @@ import React, { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { SheetList } from '@/components/BottomSheet/SheetList';
 import { closeSheet } from '@/store/bottom-sheet-state-store';
-import { setParent, setEditingEntity } from '@/store/comment-input-state-store';
+import { setParent, setEditingEntity, resetState } from '@/store/comment-input-state-store';
 import { useCommentInputState } from '@/hooks/useCommentInputState';
 
 export const CommentSheet = () => {
@@ -45,8 +45,7 @@ export const CommentSheet = () => {
                           idToDelete === parent?.id ||
                           idToDelete === editingEntity?.id
                         ) {
-                          setEditingEntity(undefined);
-                          setParent(undefined);
+                          resetState();
                         }
 
                         closeSheet();
