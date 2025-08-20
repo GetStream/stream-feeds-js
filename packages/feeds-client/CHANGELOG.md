@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.0...@stream-io/feeds-client-0.2.1) (2025-08-20)
+
+
+### Features
+
+* add membership_level in FeedMemberResponse ([#96](https://github.com/GetStream/stream-feeds-js/issues/96)) ([2aeeefa](https://github.com/GetStream/stream-feeds-js/commit/2aeeefa82abdc885dc52e9fe8249758042f9aed9))
+* handle activity pinning ([#91](https://github.com/GetStream/stream-feeds-js/issues/91)) ([4347110](https://github.com/GetStream/stream-feeds-js/commit/4347110ce16c78f9e482d0c08e33dda0840678af))
+
 ## [0.2.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.1.11...@stream-io/feeds-client-0.2.0) (2025-08-18)
 
 
