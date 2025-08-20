@@ -26,8 +26,8 @@ export const ActivitySheet = () => {
 
   const deleteAction = useStableCallback(() => {
     Alert.alert(
-      'Delete Comment',
-      'Are you sure you want to delete this comment ? The action cannot be undone.',
+      'Delete Post',
+      'Are you sure you want to delete this post ? The action cannot be undone.',
       [
         {
           text: 'No',
