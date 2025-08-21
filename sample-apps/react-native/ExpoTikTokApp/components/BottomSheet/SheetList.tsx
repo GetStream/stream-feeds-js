@@ -1,8 +1,8 @@
 import { ReactElement } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, Platform, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/Themed';
 import { StableCallback, useStableCallback } from '@/hooks/useStableCallback';
-import { closeSheet } from '@/store/bottom-sheet-state-store';
+import { closeSheet, setHeight } from '@/store/bottom-sheet-state-store';
 
 type ActionType = () => void | Promise<void>;
 
@@ -11,6 +11,7 @@ export type SheetItemType = {
   action: StableCallback<[], ActionType> | ActionType;
   icon?: ReactElement;
   preventAutoclose?: boolean;
+  id: string;
 };
 
 const SheetListItem = ({ item }: { item: SheetItemType }) => {
@@ -33,18 +34,22 @@ const renderItem = ({ item }: { item: SheetItemType }) => (
   <SheetListItem item={item} />
 );
 
+const keyExtractor = (item: SheetItemType) => item.id;
+
 export const SheetList = ({ items }: { items: SheetItemType[] }) => {
   return (
     <FlatList
       contentContainerStyle={styles.listContentContainer}
       data={items}
       renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      onContentSizeChange={(_, height) => setHeight(height)}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  listContentContainer: { flex: 1 },
+  listContentContainer: { paddingBottom: Platform.OS === 'ios' ? 50 : 75 },
   itemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

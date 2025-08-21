@@ -67,12 +67,14 @@ export const ActivitySheet = () => {
               action: deleteAction,
               icon: <Ionicons name="trash" color="red" size={20} />,
               preventAutoclose: true,
+              id: 'delete-activity',
             },
             {
               title: 'Edit Post',
               action: editAction,
               icon: <Ionicons name="pencil" color="blue" size={20} />,
               preventAutoclose: true,
+              id: 'edit-activity',
             },
           ]
         : []),

@@ -11,7 +11,11 @@ import { useStateStore } from '@stream-io/feeds-react-native-sdk';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { useRouter } from 'expo-router';
 
-const selector = ({ open, data }: BottomSheetState) => ({ open, data });
+const selector = ({ open, data, height }: BottomSheetState) => ({
+  open,
+  data,
+  height,
+});
 
 export const useBottomSheetState = () => {
   const router = useRouter();

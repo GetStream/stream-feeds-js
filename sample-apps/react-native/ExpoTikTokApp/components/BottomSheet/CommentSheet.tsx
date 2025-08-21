@@ -64,11 +64,13 @@ export const CommentSheet = () => {
               action: deleteAction,
               icon: <Ionicons name="trash" color="red" size={20} />,
               preventAutoclose: true,
+              id: 'delete-comment'
             },
             {
               title: 'Edit Comment',
               action: editAction,
               icon: <Ionicons name="pencil" color="blue" size={20} />,
+              id: 'edit-comment'
             },
           ]
         : []),
@@ -78,6 +80,7 @@ export const CommentSheet = () => {
               title: 'Reply',
               action: replyAction,
               icon: <Ionicons name="arrow-undo" size={20} color="#666" />,
+              id: 'reply-to-comment'
             },
           ]
         : []),
