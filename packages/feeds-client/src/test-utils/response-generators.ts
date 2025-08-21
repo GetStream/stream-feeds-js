@@ -392,6 +392,23 @@ export function generateCommentDeletedEvent(
   };
 }
 
+export function generateCommentUpdatedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.comment.updated'>>,
+    'comment' | 'type'
+  > & { comment?: Parameters<typeof generateCommentResponse>[0] } = {},
+): EventPayload<'feeds.comment.updated'> {
+  const comment = generateCommentResponse(overrides.comment);
+  return {
+    type: 'feeds.comment.updated',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    comment,
+  };
+}
+
 export function generateCommentReactionAddedEvent(
   overrides: Omit<
     Partial<EventPayload<'feeds.comment.reaction.added'>>,
