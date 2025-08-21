@@ -6,7 +6,11 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  GestureType,
+} from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   withTiming,
@@ -47,8 +51,14 @@ export function BottomSheet({ children }: Props) {
   }, [bottomSheetY, closeSheet, maxTranslateY, open, translateY]);
 
   const dragStartY = useRef(0);
+  const panRef = useRef<GestureType | undefined>(undefined);
+  const scrollRef = useRef<GestureType | undefined>(undefined);
+
+  const nativeScroll = useMemo(() => Gesture.Native().withRef(scrollRef), []);
 
   const pan = Gesture.Pan()
+    .withRef(panRef)
+    .requireExternalGestureToFail(scrollRef)
     .onBegin(() => {
       dragStartY.current = 0;
     })
@@ -118,7 +128,15 @@ export function BottomSheet({ children }: Props) {
             <View style={styles.handle} />
           </View>
 
-          <View style={[styles.content, sheetContentStyle]}>{children}</View>
+          <View style={[styles.content, sheetContentStyle]}>
+            <View style={styles.contentContainer}>
+              {open ? (
+                <GestureDetector gesture={nativeScroll}>
+                  {children}
+                </GestureDetector>
+              ) : null}
+            </View>
+          </View>
         </Animated.View>
       </GestureDetector>
     </View>
@@ -129,6 +147,7 @@ const styles = StyleSheet.create({
   backdrop: { backgroundColor: '#000' },
   sheet: {
     position: 'absolute',
+    overflow: 'hidden',
     left: 0,
     right: 0,
     top: 0,
@@ -150,4 +169,5 @@ const styles = StyleSheet.create({
   handleContainer: { alignItems: 'center', paddingVertical: 8 },
   handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#444' },
   content: { flexGrow: 0 },
+  contentContainer: { flex: 1, minHeight: 0 },
 });
