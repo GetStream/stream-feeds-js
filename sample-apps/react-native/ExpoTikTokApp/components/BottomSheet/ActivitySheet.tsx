@@ -15,6 +15,7 @@ import { SheetList } from '@/components/BottomSheet/SheetList';
 import { Alert } from 'react-native';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 import { useRouter } from 'expo-router';
+import { closeSheet as closeSheetInternal } from '@/store/bottom-sheet-state-store';
 
 export const ActivitySheet = () => {
   const router = useRouter();
@@ -43,7 +44,7 @@ export const ActivitySheet = () => {
               resetState();
             }
 
-            closeSheet();
+            closeSheetInternal();
           },
           style: 'destructive',
         },
