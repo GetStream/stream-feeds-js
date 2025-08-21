@@ -1,5 +1,6 @@
 import {
   ActivityResponse,
+  useClientConnectedUser,
   useFeedContext,
 } from '@stream-io/feeds-react-native-sdk';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -9,6 +10,7 @@ import { Reaction } from '@/components/Reaction';
 import { useRouter } from 'expo-router';
 import FastImage from 'react-native-fast-image';
 import { useMemo } from 'react';
+import { ActivityAction } from '@/components/ActivityAction';
 
 export const Activity = ({
   activity,
@@ -17,6 +19,7 @@ export const Activity = ({
   activity: ActivityResponse;
   index: number;
 }) => {
+  const connectedUser = useClientConnectedUser();
   const feed = useFeedContext();
   const router = useRouter();
   const attachment = activity.attachments.find(
@@ -62,6 +65,11 @@ export const Activity = ({
           style={styles.image}
           resizeMode="cover"
         />
+        {connectedUser?.id === activity.user.id ? (
+          <View style={styles.activityActionButton}>
+            <ActivityAction activity={activity} />
+          </View>
+        ) : null}
         {feed ? (
           <View style={styles.heartIcon}>
             <Reaction type="like" entity={activity} />
@@ -93,6 +101,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
+  },
+  activityActionButton: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
   },
   title: {
     fontWeight: '600',

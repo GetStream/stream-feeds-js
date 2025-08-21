@@ -10,6 +10,7 @@ import {
 
 import * as ImagePicker from 'expo-image-picker';
 import {
+  Attachment,
   isImageFile,
   isVideoFile,
   StreamFile,
@@ -23,22 +24,37 @@ import { usePostCreationContext } from '@/contexts/PostCreationContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { MediaPickerRow } from '@/components/MediaPickerList';
 import { ACTIVITY_TEXT_MAX_CHARACTERS } from '@/constants/stream';
+import { useActivityActionState } from '@/hooks/useActivityActionState';
+import { resetState } from '@/store/activity-action-state-store';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
   const feed = useFeedContext();
   const router = useRouter();
 
-  const [text, setText] = useState('');
-  const [files, setFiles] = useState<StreamFile[]>([]);
-  const [isSending, setIsSending] = useState(false);
-
+  const { editingActivity } = useActivityActionState();
   const {
     location,
     media = [],
     setLocation,
     setMedia,
   } = usePostCreationContext();
+
+  const [text, setText] = useState(editingActivity?.text ?? '');
+  const [files, setFiles] = useState<StreamFile[]>(() =>
+    media.map((attachment: Attachment) => {
+      const type = attachment.type ?? 'file';
+      const uri = (
+        type === 'image' ? attachment.image_url : attachment.asset_url
+      ) as string;
+      return {
+        name: attachment.title ?? '',
+        uri,
+        type,
+      };
+    }),
+  );
+  const [isSending, setIsSending] = useState(false);
 
   const pickMedia = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -97,13 +113,13 @@ export const ActivityComposer = () => {
     }
   }, [client, setMedia]);
 
-  const sendActivity = useCallback(async () => {
+  const sendActivity = useStableCallback(async () => {
     if (!feed) {
       return null;
     }
     setIsSending(true);
     try {
-      await feed.addActivity({
+      const activityData = {
         type: 'post',
         text,
         attachments: media,
@@ -119,12 +135,21 @@ export const ActivityComposer = () => {
               // So that activities can also be searched by location
               search_data: {
                 locationName: location.name,
-              }
+              },
             }
           : {}),
-      });
+      };
+      if (editingActivity) {
+        await client?.updateActivity({
+          ...activityData,
+          id: editingActivity.id,
+        });
+      } else {
+        await feed.addActivity(activityData);
+      }
       setMedia([]);
       setText('');
+      resetState();
     } catch (error) {
       if (error instanceof Error) {
         console.error(error);
@@ -132,7 +157,7 @@ export const ActivityComposer = () => {
     } finally {
       setIsSending(false);
     }
-  }, [feed, location, media, setMedia, text]);
+  });
 
   const submitPressHandler = useCallback(async () => {
     await sendActivity();

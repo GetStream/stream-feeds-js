@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { Place } from '@/components/PlaceSearchDropdown';
 import type { Attachment } from '@stream-io/feeds-react-native-sdk';
+import { useActivityActionState } from '@/hooks/useActivityActionState';
 
 type PostCreationContextValue = {
   location?: Place;
@@ -22,9 +23,29 @@ const PostCreationContext = createContext<PostCreationContextValue>({
 
 export const PostCreationContextProvider = ({
   children,
-}: PropsWithChildren<PostCreationContextValue>) => {
-  const [location, setLocation] = useState<Place | undefined>();
-  const [media, setMedia] = useState<Attachment[] | undefined>();
+}: PropsWithChildren<Pick<PostCreationContextValue, 'location' | 'media'>>) => {
+  const { editingActivity } = useActivityActionState();
+
+  // we derive the location as best we can
+  // TODO: Find a better way to do/map this.
+  const derivedLocation = useMemo(
+    () =>
+      editingActivity?.location
+        ? {
+            latitude: editingActivity.location.lat,
+            longitude: editingActivity.location.lng,
+            name: editingActivity.custom?.locationName,
+            address: 'No address available',
+            id: '',
+          }
+        : undefined,
+    [editingActivity],
+  );
+
+  const [location, setLocation] = useState<Place | undefined>(derivedLocation);
+  const [media, setMedia] = useState<Attachment[] | undefined>(
+    editingActivity?.attachments,
+  );
   const contextValue = useMemo(
     () => ({ location, media, setLocation, setMedia }),
     [media, location],

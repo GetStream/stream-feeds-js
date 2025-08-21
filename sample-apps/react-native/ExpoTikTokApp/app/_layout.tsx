@@ -23,6 +23,7 @@ import { useCreateClient } from '@/hooks/useCreateClient';
 import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
 import { View } from 'react-native';
 import { OwnFeedsContextProvider } from '@/contexts/OwnFeedsContext';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -80,69 +81,69 @@ const RootLayoutNav = ({ user }: { user: LocalUser }) => {
   }
 
   return (
-    <StreamFeeds client={client}>
-      <OwnFeedsContextProvider>
-        <ThemeProvider
-          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-        >
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="activity-pager-screen"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="user-profile-screen"
-              options={{ title: 'Profile' }}
-            />
-            <Stack.Screen
-              name="location-map-screen"
-              options={{ title: 'Location' }}
-            />
-            <Stack.Screen
-              name="(post-creation)"
-              options={{
-                headerShown: false,
-                // presentation: 'modal',
-                // animation: 'slide_from_bottom',
-              }}
-            />
-            {/* <Stack.Screen */}
-            {/*   name="(post-creation)/pick-location-modal" */}
-            {/*   options={{ */}
-            {/*     title: 'New Post', */}
-            {/*     // presentation: 'modal', */}
-            {/*     // animation: 'slide_from_bottom', */}
-            {/*   }} */}
-            {/* /> */}
-            <Stack.Screen
-              name="followers-modal"
-              options={{
-                title: 'Followers',
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-              }}
-            />
-            <Stack.Screen
-              name="following-modal"
-              options={{
-                title: 'Following',
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-              }}
-            />
-            <Stack.Screen
-              name="comments-modal"
-              options={{
-                title: 'Comments',
-                presentation: 'modal',
-                animation: 'slide_from_bottom',
-              }}
-            />
-          </Stack>
-        </ThemeProvider>
-      </OwnFeedsContextProvider>
-    </StreamFeeds>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StreamFeeds client={client}>
+        <OwnFeedsContextProvider>
+          <ThemeProvider
+            value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+          >
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="activity-pager-screen"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="user-profile-screen"
+                options={{ title: 'Profile' }}
+              />
+              <Stack.Screen
+                name="location-map-screen"
+                options={{ title: 'Location' }}
+              />
+              <Stack.Screen
+                name="(post-creation)"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="followers-modal"
+                options={{
+                  title: 'Followers',
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="following-modal"
+                options={{
+                  title: 'Following',
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="comments-modal"
+                options={{
+                  title: 'Comments',
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="overlay/sheet"
+                options={{
+                  presentation: 'transparentModal',
+                  animation: 'none',
+                  headerShown: false,
+                }}
+              />
+            </Stack>
+          </ThemeProvider>
+        </OwnFeedsContextProvider>
+      </StreamFeeds>
+    </GestureHandlerRootView>
   );
 };
 
