@@ -1,26 +1,4 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "outDir": "./dist",
-    "rootDir": ".",
-    "module": "ES2020",
-    "target": "ES2020",
-    "lib": ["esnext", "dom"],
-    "noEmitOnError": true,
-    "noImplicitAny": true,
-    "declaration": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "jsx": "react-jsx"
-  },
-  "exclude": ["**/*.test.ts"],
-  "include": ["./src", "@react-bindings", "index.ts", "version.ts"]
+	"files": [],
+	"references": [{ "path": "./tsconfig.lib.json" }, { "path": "./tsconfig.test.json" }]
 }

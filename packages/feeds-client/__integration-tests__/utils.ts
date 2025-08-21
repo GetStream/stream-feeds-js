@@ -13,7 +13,7 @@ const baseUrl = import.meta.env.VITE_API_URL;
 
 export const createTestClient = (options?: FeedsClientOptions) => {
   if (!apiKey) {
-    throw new Error('Provide an api key, check .env-example for details');
+    throw new Error('Provide an API key, check .env-example for details');
   }
   return new FeedsClient(apiKey, {
     base_url: baseUrl,

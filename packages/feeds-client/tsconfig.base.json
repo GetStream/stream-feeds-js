@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "strict": true,
+    "noEmitOnError": true,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "module": "es2020",
+    "lib": ["ESNext"],
+    "moduleResolution": "node"
+  }
+}

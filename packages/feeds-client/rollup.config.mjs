@@ -30,60 +30,62 @@ const namespacedPackages = [
   { input: '@react-bindings/index.ts', indexFileName: 'index-react-bindings' },
 ];
 
-const configs = namespacedPackages.map(({ input, indexFileName }) => {
-  /**
-   * @type {import('rollup').RollupOptions}
-   */
-  const browserConfig = {
-    input,
-    output: [
-      {
-        file: `dist/${indexFileName}.browser.js`,
-        format: 'es',
-        sourcemap: true,
-      },
-      {
-        file: `dist/${indexFileName}.browser.cjs`,
-        format: 'cjs',
-        sourcemap: true,
-      },
-    ],
-    external: external.filter((dep) => !browserIgnoredModules.includes(dep)),
-    plugins: [
-      replace({
-        preventAssignment: true,
-        'process.env.PKG_VERSION': JSON.stringify(pkg.version),
-      }),
-      browserIgnorePlugin,
-      typescript(),
-    ],
-  };
+const configs = namespacedPackages
+  .map(({ input, indexFileName }) => {
+    /**
+     * @type {import('rollup').RollupOptions}
+     */
+    const browserConfig = {
+      input,
+      output: [
+        {
+          file: `dist/${indexFileName}.browser.js`,
+          format: 'es',
+          sourcemap: true,
+        },
+        {
+          file: `dist/${indexFileName}.browser.cjs`,
+          format: 'cjs',
+          sourcemap: true,
+        },
+      ],
+      external: external.filter((dep) => !browserIgnoredModules.includes(dep)),
+      plugins: [
+        replace({
+          preventAssignment: true,
+          'process.env.PKG_VERSION': JSON.stringify(pkg.version),
+        }),
+        browserIgnorePlugin,
+        typescript({ tsconfig: './tsconfig.lib.json' }),
+      ],
+    };
 
-  const nodeConfig = {
-    input,
-    output: [
-      {
-        file: `dist/${indexFileName}.node.cjs`,
-        format: 'cjs',
-        sourcemap: true,
-      },
-      {
-        file: `dist/${indexFileName}.node.js`,
-        format: 'es',
-        sourcemap: true,
-      },
-    ],
-    external,
-    plugins: [
-      replace({
-        preventAssignment: true,
-        'process.env.PKG_VERSION': JSON.stringify(pkg.version),
-      }),
-      typescript(),
-    ],
-  };
+    const nodeConfig = {
+      input,
+      output: [
+        {
+          file: `dist/${indexFileName}.node.cjs`,
+          format: 'cjs',
+          sourcemap: true,
+        },
+        {
+          file: `dist/${indexFileName}.node.js`,
+          format: 'es',
+          sourcemap: true,
+        },
+      ],
+      external,
+      plugins: [
+        replace({
+          preventAssignment: true,
+          'process.env.PKG_VERSION': JSON.stringify(pkg.version),
+        }),
+        typescript({ tsconfig: './tsconfig.lib.json' }),
+      ],
+    };
 
-  return [browserConfig, nodeConfig];
-}).flat()
+    return [browserConfig, nodeConfig];
+  })
+  .flat();
 
 export default configs;
