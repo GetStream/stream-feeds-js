@@ -148,7 +148,7 @@ describe(handleFollowUpdated.name, () => {
 
       // State should not change
       const stateAfter = feed.currentState;
-      expect(stateAfter).toEqual(stateBefore);
+      expect(stateAfter).toBe(stateBefore);
     });
 
     it('allows update again after clearing stateUpdateQueue', () => {

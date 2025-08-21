@@ -72,8 +72,8 @@ describe(handleActivityReactionDeleted.name, () => {
     expect(
       stateBefore.pinned_activities![0].activity.own_reactions,
     ).toHaveLength(1);
-    expect(stateBefore.activities![0].reaction_count).toEqual(1);
-    expect(stateBefore.pinned_activities![0].activity.reaction_count).toEqual(
+    expect(stateBefore.activities![0].reaction_count).toBe(1);
+    expect(stateBefore.pinned_activities![0].activity.reaction_count).toBe(
       1,
     );
 
@@ -84,12 +84,12 @@ describe(handleActivityReactionDeleted.name, () => {
     expect(
       stateAfter.pinned_activities![0].activity.own_reactions,
     ).toHaveLength(0);
-    expect(stateAfter.activities![0].reaction_count).toEqual(0);
-    expect(stateAfter.pinned_activities![0].activity.reaction_count).toEqual(0);
-    expect(stateAfter.activities![0].own_bookmarks).toEqual(
+    expect(stateAfter.activities![0].reaction_count).toBe(0);
+    expect(stateAfter.pinned_activities![0].activity.reaction_count).toBe(0);
+    expect(stateAfter.activities![0].own_bookmarks).toBe(
       stateBefore.activities![0].own_bookmarks,
     );
-    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toEqual(
+    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toBe(
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     );
   });
@@ -130,8 +130,8 @@ describe(handleActivityReactionDeleted.name, () => {
     expect(
       stateBefore.pinned_activities![0].activity.own_reactions,
     ).toHaveLength(1);
-    expect(stateBefore.activities![0].reaction_count).toEqual(1);
-    expect(stateBefore.pinned_activities![0].activity.reaction_count).toEqual(
+    expect(stateBefore.activities![0].reaction_count).toBe(1);
+    expect(stateBefore.pinned_activities![0].activity.reaction_count).toBe(
       1,
     );
 
@@ -139,23 +139,23 @@ describe(handleActivityReactionDeleted.name, () => {
 
     const stateAfter = feed.currentState;
     expect(stateAfter.activities![0].own_reactions).toHaveLength(1);
-    expect(stateAfter.activities![0].own_reactions).toEqual(
+    expect(stateAfter.activities![0].own_reactions).toBe(
       stateBefore.activities![0].own_reactions,
     );
-    expect(stateAfter.pinned_activities![0].activity.own_reactions).toEqual(
+    expect(stateAfter.pinned_activities![0].activity.own_reactions).toBe(
       stateBefore.pinned_activities![0].activity.own_reactions,
     );
-    expect(stateAfter.activities![0].own_bookmarks).toEqual(
+    expect(stateAfter.activities![0].own_bookmarks).toBe(
       stateBefore.activities![0].own_bookmarks,
     );
-    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toEqual(
+    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toBe(
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     );
     expect(
       stateAfter.pinned_activities![0].activity.own_reactions,
     ).toHaveLength(1);
-    expect(stateAfter.activities![0].reaction_count).toEqual(0);
-    expect(stateAfter.pinned_activities![0].activity.reaction_count).toEqual(0);
+    expect(stateAfter.activities![0].reaction_count).toBe(0);
+    expect(stateAfter.pinned_activities![0].activity.reaction_count).toBe(0);
   });
 
   it('does nothing if activity is not found', () => {

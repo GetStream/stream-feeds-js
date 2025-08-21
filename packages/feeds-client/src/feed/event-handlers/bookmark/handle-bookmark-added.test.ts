@@ -65,8 +65,8 @@ describe(handleBookmarkAdded.name, () => {
     expect(
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     ).toHaveLength(0);
-    expect(stateBefore.activities![0].bookmark_count).toEqual(0);
-    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toEqual(
+    expect(stateBefore.activities![0].bookmark_count).toBe(0);
+    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toBe(
       0,
     );
 
@@ -81,14 +81,14 @@ describe(handleBookmarkAdded.name, () => {
     expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toContain(
       event.bookmark,
     );
-    expect(stateAfter.activities![0].own_reactions).toEqual(
+    expect(stateAfter.activities![0].own_reactions).toBe(
       stateBefore.activities![0].own_reactions,
     );
-    expect(stateAfter.pinned_activities![0].activity.own_reactions).toEqual(
+    expect(stateAfter.pinned_activities![0].activity.own_reactions).toBe(
       stateBefore.pinned_activities![0].activity.own_reactions,
     );
-    expect(stateAfter.activities![0].bookmark_count).toEqual(1);
-    expect(stateAfter.pinned_activities![0].activity.bookmark_count).toEqual(1);
+    expect(stateAfter.activities![0].bookmark_count).toBe(1);
+    expect(stateAfter.pinned_activities![0].activity.bookmark_count).toBe(1);
   });
 
   it('does not add to own_bookmarks if bookmark is from another user but still updates activity', () => {
@@ -120,28 +120,28 @@ describe(handleBookmarkAdded.name, () => {
     expect(
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     ).toHaveLength(0);
-    expect(stateBefore.activities![0].bookmark_count).toEqual(0);
-    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toEqual(
+    expect(stateBefore.activities![0].bookmark_count).toBe(0);
+    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toBe(
       0,
     );
 
     handleBookmarkAdded.call(feed, event);
 
     const stateAfter = feed.currentState;
-    expect(stateAfter.activities![0].own_bookmarks).toEqual(
+    expect(stateAfter.activities![0].own_bookmarks).toBe(
       stateBefore.activities![0].own_bookmarks,
     );
-    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toEqual(
+    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toBe(
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     );
-    expect(stateAfter.activities![0].own_reactions).toEqual(
+    expect(stateAfter.activities![0].own_reactions).toBe(
       stateBefore.activities![0].own_reactions,
     );
-    expect(stateAfter.pinned_activities![0].activity.own_reactions).toEqual(
+    expect(stateAfter.pinned_activities![0].activity.own_reactions).toBe(
       stateBefore.pinned_activities![0].activity.own_reactions,
     );
-    expect(stateAfter.activities![0].bookmark_count).toEqual(1);
-    expect(stateAfter.pinned_activities![0].activity.bookmark_count).toEqual(1);
+    expect(stateAfter.activities![0].bookmark_count).toBe(1);
+    expect(stateAfter.pinned_activities![0].activity.bookmark_count).toBe(1);
   });
 
   it('does nothing if activity is not found', () => {
