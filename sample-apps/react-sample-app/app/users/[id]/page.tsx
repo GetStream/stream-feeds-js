@@ -44,25 +44,11 @@ export default function ProfilePage() {
     initializeFeed(feed, {
       watch: true,
       followers_pagination: { limit: 10 },
-    }).catch((error) => {
-      logErrorAndDisplayNotification(
-        error,
-        error instanceof Error
-          ? error.message
-          : `Failed to initialize feed: ${feed.feed}`,
-      );
-    });
+    }).catch(logErrorAndDisplayNotification);
     initializeFeed(timeline, {
       watch: true,
       following_pagination: { limit: 10 },
-    }).catch((error) => {
-      logErrorAndDisplayNotification(
-        error,
-        error instanceof Error
-          ? error.message
-          : `Failed to initialize feed: ${timeline.feed}`,
-      );
-    });
+    }).catch(logErrorAndDisplayNotification);
 
     return () => {
       if (
@@ -89,7 +75,7 @@ export default function ProfilePage() {
         });
       }
     };
-  }, [feed, logErrorAndDisplayNotification, timeline, user, params.id]);
+  }, [feed, logErrorAndDisplayNotification, timeline, user, params.id, client]);
 
   if (!feed || !timeline) {
     return <LoadingIndicator color="blue" />;

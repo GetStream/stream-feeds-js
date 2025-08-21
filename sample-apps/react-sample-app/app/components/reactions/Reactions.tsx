@@ -1,5 +1,8 @@
 import { useUserContext } from '@/app/user-context';
-import type { ActivityResponse, CommentResponse } from '@stream-io/feeds-react-sdk';
+import type {
+  ActivityResponse,
+  CommentResponse,
+} from '@stream-io/feeds-react-sdk';
 import { useRef } from 'react';
 import { ReactionsList } from './ReactionsList';
 import { useErrorContext } from '@/app/error-context';
@@ -31,10 +34,18 @@ export const Reactions = ({
     const isActivity = !('object_type' in object);
     try {
       await (isActivity
-        ? client?.addReaction({ activity_id: object.id, type })
-        : client?.addCommentReaction({ id: object.id, type }));
+        ? client?.addReaction({
+            activity_id: object.id,
+            type,
+            create_notification_activity: true,
+          })
+        : client?.addCommentReaction({
+            id: object.id,
+            type,
+            create_notification_activity: true,
+          }));
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -48,7 +59,7 @@ export const Reactions = ({
           })
         : client?.deleteCommentReaction({ id: object.id, type }));
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 

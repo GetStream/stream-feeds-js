@@ -1,133 +1,100 @@
-import { useEffect, useState } from 'react';
-import type { AggregatedActivityResponse } from '@stream-io/feeds-react-sdk';
-import { FollowRequestNotification } from './notification-types/FollowRequestNotification';
-import { SimpleNotification } from './notification-types/SimpleNotification';
-import { FollowInviteNotification } from './notification-types/FollowInviteNotification';
+import { useFeedContext } from '../../feed-context';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-client';
+import {
+  useAggregatedActivities,
+  useNotificationStatus,
+} from '@stream-io/feeds-client/react-bindings';
+import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
+import { useCallback } from 'react';
 
-export const NotificationFeed = (proprs: { onLoadMore?: () => void }) => {
-  const { logError } = useErrorContext();
-  const { onLoadMore } = proprs;
-  const [error, setError] = useState<Error>();
-  const [groups, setGroups] = useState<AggregatedActivityResponse[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hasNextPage, setHasNextPage] = useState<boolean>(false);
-  // const { ownNotifications } = useFeedContext();
+export const NotificationFeed = () => {
+  const { logErrorAndDisplayNotification } = useErrorContext();
+  const { ownNotifications } = useFeedContext();
 
-  // useEffect(() => {
-  //   if (!ownNotifications) {
-  //     return;
-  //   }
-  //   const unsubscribe = ownNotifications.state.subscribeWithSelector(
-  //     (state) => ({ groups: state.groups }),
-  //     ({ groups }) => {
-  //       setGroups(groups ?? []);
-  //     },
-  //   );
+  const {
+    // last_read_at: lastReadAt,
+    last_seen_at: lastSeenAt,
+    read_activities: readActivities = [],
+    seen_activities: seenActivities = [],
+  } = useNotificationStatus(ownNotifications) ?? {};
 
-  //   return unsubscribe;
-  // }, [ownNotifications]);
+  const { aggregated_activities: aggregatedActivities = [] } =
+    useAggregatedActivities(ownNotifications) ?? {};
 
-  // useEffect(() => {
-  //   if (!ownNotifications) {
-  //     return;
-  //   }
-  //   const unsubscribe = ownNotifications.state.subscribeWithSelector(
-  //     (state) => ({ is_loading_next_page: state.is_loading_next_page }),
-  //     ({ is_loading_next_page }) => {
-  //       setIsLoading(is_loading_next_page);
-  //     },
-  //   );
+  const markRead = useCallback(
+    async (group: AggregatedActivityResponse) => {
+      try {
+        await ownNotifications?.markActivity({
+          mark_read: [group.group],
+        });
+      } catch (error) {
+        logErrorAndDisplayNotification(error);
+      }
+    },
+    [ownNotifications, logErrorAndDisplayNotification],
+  );
 
-  //   return unsubscribe;
-  // }, [ownNotifications]);
+  const markAllRead = async () => {
+    try {
+      await ownNotifications?.markActivity({
+        mark_all_read: true,
+      });
+    } catch (error) {
+      logErrorAndDisplayNotification(error);
+    }
+  };
 
-  // useEffect(() => {
-  //   if (!ownNotifications) {
-  //     return;
-  //   }
-  //   const unsubscribe = ownNotifications.state.subscribeWithSelector(
-  //     (state) => ({ has_next_page: state.has_next_page }),
-  //     ({ has_next_page }) => {
-  //       setHasNextPage(has_next_page);
-  //     },
-  //   );
+  const hasUnreadNotifications = aggregatedActivities.some(
+    (group) => !readActivities.includes(group.group),
+  );
 
-  //   return unsubscribe;
-  // }, [ownNotifications]);
-
-  // const getNextPage = async () => {
-  //   setError(undefined);
-  //   try {
-  //     await ownNotifications?.readNextPage();
-  //   } catch (error) {
-  //     setError(error as Error);
-  //   }
-  // };
-
-  // const markRead = async (group: AggregatedActivitiesResponse) => {
-  //   if (!group.read) {
-  //     try {
-  //       await ownNotifications?.read({
-  //         limit: 30,
-  //         offset: 0,
-  //         mark_read: group.id,
-  //       });
-  //       await ownNotifications?.read({ limit: 30, offset: 0 });
-  //     } catch (error) {
-  //       logError(error as Error);
-  //     }
-  //   }
-  // };
-
-  // const renderItem = (group: AggregatedActivitiesResponse, index2: number) => {
-  //   return (
-  //     <li key={`notification:${index2}`} className="w-full">
-  //       {group.activities[0]?.verb === 'follow-request' && (
-  //         <FollowRequestNotification
-  //           group={group}
-  //           onMarkRead={() => markRead(group)}
-  //         ></FollowRequestNotification>
-  //       )}
-  //       {group.activities[0]?.verb === 'invite' && (
-  //         <FollowInviteNotification
-  //           group={group}
-  //           onMarkRead={() => markRead(group)}
-  //         ></FollowInviteNotification>
-  //       )}
-  //       {group.activities[0]?.verb === 'added-as-member' && (
-  //         <MemberNotification
-  //           group={group}
-  //           onMarkRead={() => markRead(group)}
-  //         ></MemberNotification>
-  //       )}
-  //       {group.activities[0]?.verb !== 'invite' &&
-  //         group.activities[0]?.verb !== 'follow-request' &&
-  //         group.activities[0]?.verb !== 'added-as-member' && (
-  //           <SimpleNotification
-  //             group={group}
-  //             onMarkRead={() => markRead(group)}
-  //           ></SimpleNotification>
-  //         )}
-  //     </li>
-  //   );
-  // };
+  const renderItem = useCallback(
+    (group: AggregatedActivityResponse, index: number) => {
+      return (
+        <li key={`notification:${index}`} className="w-full">
+          <Notification
+            group={group}
+            isRead={
+              // FIXME: this part of the condition does not work as marking individual groups as read also updates the last_read_at
+              // (lastReadAt &&
+              //   group.updated_at.getTime() <= lastReadAt.getTime()) ||
+              readActivities.includes(group.group)
+            }
+            isSeen={
+              (lastSeenAt &&
+                group.updated_at.getTime() < lastSeenAt.getTime()) ||
+              seenActivities.includes(group.group)
+            }
+            onMarkRead={() => markRead(group)}
+          />
+        </li>
+      );
+    },
+    [readActivities, lastSeenAt, seenActivities, markRead],
+  );
 
   return (
     <>
-      {/* <PaginatedList
-        items={groups}
-        hasNext={hasNextPage}
-        isLoading={isLoading}
-        onLoadMore={() => {
-          void getNextPage();
-          onLoadMore?.();
-        }}
+      {hasUnreadNotifications && (
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={markAllRead}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+          >
+            Mark all read
+          </button>
+        </div>
+      )}
+      <PaginatedList
+        items={aggregatedActivities}
+        hasNext={false}
+        isLoading={false}
+        onLoadMore={() => {}}
         renderItem={renderItem}
-        error={error}
         itemsName="notifications"
-      ></PaginatedList> */}
+      />
     </>
   );
 };

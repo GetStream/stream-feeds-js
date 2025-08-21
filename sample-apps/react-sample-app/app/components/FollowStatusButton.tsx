@@ -24,11 +24,11 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
     if (!ownTimeline) return;
 
     try {
-      await ownTimeline.follow(feed);
+      await ownTimeline.follow(feed, {
+        create_notification_activity: true,
+      });
     } catch (error) {
-      if (error instanceof Error) {
-        logErrorAndDisplayNotification(error, error.message);
-      }
+      logErrorAndDisplayNotification(error);
     }
   };
 
@@ -38,7 +38,7 @@ export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
     try {
       await ownTimeline.unfollow(feed);
     } catch (error) {
-      logErrorAndDisplayNotification(error as Error, (error as Error).message);
+      logErrorAndDisplayNotification(error);
     }
   };
 

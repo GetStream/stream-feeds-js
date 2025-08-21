@@ -40,11 +40,10 @@ require('dotenv').config();
       source: timeline.feed,
     });
 
-    // TODO
-    // await client.feeds.feed('notification', user.id).getOrCreate({
-    //   visibility_level: 'private',
-    //   user_id: user.id,
-    // });
+    await client.feeds.feed('notification', user.id).getOrCreate({
+      visibility_level: 'private',
+      user_id: user.id,
+    });
   }
 
   console.log('Finished initialization');

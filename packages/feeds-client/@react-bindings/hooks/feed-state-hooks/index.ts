@@ -5,3 +5,5 @@ export * from './useFollowers';
 export * from './useFollowing';
 export * from './useFeedMetadata';
 export * from './useOwnFollows';
+export * from './useNotificationStatus';
+export * from './useAggregatedActivities';
