@@ -392,6 +392,50 @@ export function generateCommentDeletedEvent(
   };
 }
 
+export function generateCommentReactionAddedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.comment.reaction.added'>>,
+    'comment' | 'reaction' | 'type'
+  > & {
+    comment?: Parameters<typeof generateCommentResponse>[0];
+    reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+  } = {},
+): EventPayload<'feeds.comment.reaction.added'> {
+  const comment = generateCommentResponse(overrides.comment);
+  const reaction = generateFeedReactionResponse(overrides.reaction);
+  return {
+    type: 'feeds.comment.reaction.added',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    comment,
+    reaction,
+  };
+}
+
+export function generateCommentReactionDeletedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.comment.reaction.deleted'>>,
+    'comment' | 'reaction' | 'type'
+  > & {
+    comment?: Parameters<typeof generateCommentResponse>[0];
+    reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+  } = {},
+): EventPayload<'feeds.comment.reaction.deleted'> {
+  const comment = generateCommentResponse(overrides.comment);
+  const reaction = generateFeedReactionResponse(overrides.reaction);
+  return {
+    type: 'feeds.comment.reaction.deleted',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    comment,
+    reaction,
+  };
+}
+
 export function generateActivityPinnedEvent(
   overrides: Omit<
     Partial<EventPayload<'feeds.activity.pinned'>>,

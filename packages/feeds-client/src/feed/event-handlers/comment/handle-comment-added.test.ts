@@ -58,7 +58,7 @@ describe(handleCommentAdded.name, () => {
     handleCommentAdded.call(feed, event);
     const stateAfter = feed.currentState;
 
-    expect(stateAfter.comments_by_entity_id[activityId]!.comments).not.toEqual(
+    expect(stateAfter.comments_by_entity_id[activityId]!.comments).not.toBe(
       stateBefore.comments_by_entity_id[activityId]!.comments,
     );
     expect(stateAfter.comments_by_entity_id[activityId]!.comments).toHaveLength(
@@ -66,7 +66,7 @@ describe(handleCommentAdded.name, () => {
     );
     expect(
       stateAfter.comments_by_entity_id[activityId]!.comments!.at(-1),
-    ).toEqual(event.comment);
+    ).toBe(event.comment);
   });
 
   it('prepends a new comment when pagination.sort is "last"', () => {
@@ -91,7 +91,7 @@ describe(handleCommentAdded.name, () => {
     handleCommentAdded.call(feed, event);
     const stateAfter = feed.currentState;
 
-    expect(stateAfter.comments_by_entity_id[activityId]!.comments).not.toEqual(
+    expect(stateAfter.comments_by_entity_id[activityId]!.comments).not.toBe(
       stateBefore.comments_by_entity_id[activityId]!.comments,
     );
     expect(stateAfter.comments_by_entity_id[activityId]!.comments).toHaveLength(
@@ -99,7 +99,7 @@ describe(handleCommentAdded.name, () => {
     );
     expect(
       stateAfter.comments_by_entity_id[activityId]!.comments!.at(0),
-    ).toEqual(event.comment);
+    ).toBe(event.comment);
   });
 
   it('stores the comment in the correct parent entity state (prefers parent_id)', () => {
@@ -126,11 +126,11 @@ describe(handleCommentAdded.name, () => {
     handleCommentAdded.call(feed, event);
     const nextState = feed.currentState;
 
-    expect(nextState.comments_by_entity_id[parentId]!.comments).not.toEqual(
+    expect(nextState.comments_by_entity_id[parentId]!.comments).not.toBe(
       prevState.comments_by_entity_id[parentId]!.comments,
     );
     expect(nextState.comments_by_entity_id[parentId]!.comments).toHaveLength(2);
-    expect(nextState.comments_by_entity_id[parentId]!.comments!.at(-1)).toEqual(
+    expect(nextState.comments_by_entity_id[parentId]!.comments!.at(-1)).toBe(
       event.comment,
     );
   });

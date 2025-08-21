@@ -63,7 +63,7 @@ describe(handleCommentDeleted.name, () => {
 
     const stateAfter = feed.currentState;
 
-    expect(stateAfter.comments_by_entity_id[activityId]?.comments).not.toEqual(
+    expect(stateAfter.comments_by_entity_id[activityId]?.comments).not.toBe(
       stateBefore.comments_by_entity_id[activityId]?.comments,
     );
     expect(stateAfter.comments_by_entity_id[activityId]?.comments).toHaveLength(
@@ -109,7 +109,7 @@ describe(handleCommentDeleted.name, () => {
     expect(stateAfter).not.toBe(stateBefore);
     expect(
       stateAfter.comments_by_entity_id[parentComment.id]?.comments,
-    ).not.toEqual(
+    ).not.toBe(
       stateBefore.comments_by_entity_id[parentComment.id]?.comments,
     );
     expect(
@@ -128,6 +128,6 @@ describe(handleCommentDeleted.name, () => {
     handleCommentDeleted.call(feed, event);
     const stateAfter = feed.currentState;
 
-    expect(stateAfter).toEqual(stateBefore);
+    expect(stateAfter).toBe(stateBefore);
   });
 });
