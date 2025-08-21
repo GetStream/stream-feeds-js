@@ -95,7 +95,7 @@ describe('handle-follow-deleted', () => {
 
       expect(result.changed).toBe(true);
       expect(result.data.followers).toHaveLength(0);
-      expect(result.data.own_follows).toEqual(currentState.own_follows);
+      expect(result.data.own_follows).toBe(currentState.own_follows);
       expect(result.data).toMatchObject(follow.target_feed);
     });
 
@@ -262,7 +262,7 @@ describe('handle-follow-deleted', () => {
 
       expect(result.changed).toBe(true);
       expect(result.data.following).toHaveLength(1);
-      expect(result.data.following?.[0]).toEqual(followToKeep);
+      expect(result.data.following?.[0]).toBe(followToKeep);
     });
   });
 });

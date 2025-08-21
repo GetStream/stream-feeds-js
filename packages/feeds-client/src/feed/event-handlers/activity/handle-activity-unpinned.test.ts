@@ -22,7 +22,7 @@ function makeUnpinnedEvent(
     pinned_activity: {
       created_at: pinnedActivity.created_at,
       duration: '0',
-      fid: pinnedActivity.feed,
+      feed: pinnedActivity.feed,
       user_id: pinnedActivity.user.id,
       activity: pinnedActivity.activity,
     },
@@ -67,7 +67,7 @@ describe(handleActivityUnpinned.name, () => {
     const stateBefore = feed.currentState;
     handleActivityUnpinned.call(feed, event);
     const stateAfter = feed.currentState;
-    expect(stateAfter.pinned_activities).toEqual(stateBefore.pinned_activities);
+    expect(stateAfter.pinned_activities).toBe(stateBefore.pinned_activities);
   });
 
   it('does nothing if pinned_activities is empty', () => {
@@ -76,9 +76,10 @@ describe(handleActivityUnpinned.name, () => {
       pinned_activities: [],
     }));
     const event = makeUnpinnedEvent(pinnedActivity);
+    const stateBefore = feed.currentState;
     handleActivityUnpinned.call(feed, event);
     const stateAfter = feed.currentState;
-    expect(stateAfter.pinned_activities).toEqual([]);
+    expect(stateAfter).toBe(stateBefore);
   });
 
   it('does nothing if pinned_activities is undefined', () => {

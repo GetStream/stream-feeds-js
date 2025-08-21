@@ -77,16 +77,16 @@ describe(handleActivityUpdated.name, () => {
       id: 'activity-1',
       text: 'updated text',
     });
-    expect(stateAfter.activities![0].own_reactions).toEqual(
+    expect(stateAfter.activities![0].own_reactions).toBe(
       stateBefore.activities![0].own_reactions,
     );
-    expect(stateAfter.activities![0].own_bookmarks).toEqual(
+    expect(stateAfter.activities![0].own_bookmarks).toBe(
       stateBefore.activities![0].own_bookmarks,
     );
-    expect(stateAfter.pinned_activities![0].activity.own_reactions).toEqual(
+    expect(stateAfter.pinned_activities![0].activity.own_reactions).toBe(
       stateBefore.pinned_activities![0].activity.own_reactions,
     );
-    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toEqual(
+    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toBe(
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     );
   });

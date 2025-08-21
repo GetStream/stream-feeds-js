@@ -60,7 +60,7 @@ describe('notification-feed-utils', () => {
       const result = updateNotificationFeedFromEvent(event);
 
       expect(result.changed).toBe(true);
-      expect(result.data?.notification_status).toEqual(notificationStatus);
+      expect(result.data?.notification_status).toBe(notificationStatus);
       expect(result.data?.aggregated_activities).toBeUndefined();
     });
 
@@ -76,7 +76,7 @@ describe('notification-feed-utils', () => {
       const result = updateNotificationFeedFromEvent(event);
 
       expect(result.changed).toBe(true);
-      expect(result.data?.aggregated_activities).toEqual(aggregatedActivities);
+      expect(result.data?.aggregated_activities).toBe(aggregatedActivities);
       expect(result.data?.notification_status).toBeUndefined();
     });
 
@@ -96,8 +96,8 @@ describe('notification-feed-utils', () => {
       const result = updateNotificationFeedFromEvent(event);
 
       expect(result.changed).toBe(true);
-      expect(result.data?.notification_status).toEqual(notificationStatus);
-      expect(result.data?.aggregated_activities).toEqual(aggregatedActivities);
+      expect(result.data?.notification_status).toBe(notificationStatus);
+      expect(result.data?.aggregated_activities).toBe(aggregatedActivities);
     });
 
     it('should handle notification_status with all fields', () => {
@@ -114,7 +114,7 @@ describe('notification-feed-utils', () => {
       const result = updateNotificationFeedFromEvent(event);
 
       expect(result.changed).toBe(true);
-      expect(result.data?.notification_status).toEqual(notificationStatus);
+      expect(result.data?.notification_status).toBe(notificationStatus);
     });
   });
 });

@@ -78,10 +78,10 @@ describe('handle-follow-created', () => {
 
       expect(result.changed).toBe(true);
       expect(result.data.following).toHaveLength(1);
-      expect(result.data.following?.[0]).toEqual(follow);
+      expect(result.data.following?.[0]).toBe(follow);
       expect(result.data).toMatchObject(follow.source_feed);
       expect(result.data.own_follows).toBeUndefined();
-      expect(result.data.following_count).toEqual(1);
+      expect(result.data.following_count).toBe(1);
     });
 
     it('should handle when someone follows this feed', () => {
@@ -120,10 +120,10 @@ describe('handle-follow-created', () => {
 
       expect(result.changed).toBe(true);
       expect(result.data.followers).toHaveLength(1);
-      expect(result.data.followers?.[0]).toEqual(follow);
+      expect(result.data.followers?.[0]).toBe(follow);
       expect(result.data).toMatchObject(follow.target_feed);
       expect(result.data.own_follows).toBeUndefined();
-      expect(result.data.follower_count).toEqual(1);
+      expect(result.data.follower_count).toBe(1);
     });
 
     it('should add to own_follows when connected user is the source', () => {
@@ -161,7 +161,7 @@ describe('handle-follow-created', () => {
 
       expect(result.changed).toBe(true);
       expect(result.data.own_follows).toHaveLength(1);
-      expect(result.data.own_follows?.[0]).toEqual(follow);
+      expect(result.data.own_follows?.[0]).toBe(follow);
     });
 
     it('should not update followers/following when they are undefined', () => {
@@ -243,8 +243,8 @@ describe('handle-follow-created', () => {
 
       expect(result.changed).toBe(true);
       expect(result.data.followers).toHaveLength(2);
-      expect(result.data.followers?.[0]).toEqual(follow);
-      expect(result.data.followers?.[1]).toEqual(existingFollow);
+      expect(result.data.followers?.[0]).toBe(follow);
+      expect(result.data.followers?.[1]).toBe(existingFollow);
     });
   });
 });
