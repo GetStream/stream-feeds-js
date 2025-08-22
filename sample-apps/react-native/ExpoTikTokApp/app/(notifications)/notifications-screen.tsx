@@ -1,6 +1,6 @@
 import { StreamFeed } from '@stream-io/feeds-react-native-sdk';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
-import { Notifications } from '@/components/notifications';
+import { Notifications } from '@/components/notifications/Notifications';
 import { LoadingIndicator } from '@/components/indicators';
 
 const NotificationsScreen = () => {

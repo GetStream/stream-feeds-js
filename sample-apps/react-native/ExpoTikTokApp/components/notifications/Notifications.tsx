@@ -5,7 +5,7 @@ import {
   useAggregatedActivities,
   useFeedContext,
 } from '@stream-io/feeds-react-native-sdk';
-import { NotificationItem } from '@/components/notifications';
+import { NotificationItem } from '@/components/notifications/Notification';
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
