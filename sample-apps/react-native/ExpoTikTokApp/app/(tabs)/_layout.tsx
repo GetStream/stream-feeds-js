@@ -9,7 +9,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { View } from '@/components/Themed';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useNotificationStatus } from '@stream-io/feeds-react-native-sdk';
-import { NotificationBadge } from '@/components/NotificationBadge';
+import { NotificationBadge } from '@/components/Notifications/NotificationBadge';
 
 const TabBarIcon = (props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];

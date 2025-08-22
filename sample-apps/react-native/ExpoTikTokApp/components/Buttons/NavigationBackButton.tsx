@@ -4,12 +4,14 @@ import { Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
 import React from 'react';
-import { useStableCallback } from '@/hooks/useStableCallback';
+import { StableCallback, useStableCallback } from '@/hooks/useStableCallback';
+
+type CallbackType = () => void | Promise<void>;
 
 export const NavigationBackButton = ({
   preNavigationCallback,
 }: {
-  preNavigationCallback?: () => void | (() => Promise<void>);
+  preNavigationCallback?: StableCallback<[], CallbackType> | CallbackType;
 }) => {
   const colorScheme = useColorScheme();
   const router = useRouter();

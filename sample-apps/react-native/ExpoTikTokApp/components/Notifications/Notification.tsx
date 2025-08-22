@@ -1,17 +1,16 @@
-import { FlatList, Pressable, Image, StyleSheet } from 'react-native';
-import { View, Text } from '@/components/Themed';
-import type { AggregatedActivityResponse } from '@stream-io/feeds-react-native-sdk';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-client';
+import { useRouter } from 'expo-router';
 import {
-  useAggregatedActivities,
   useFeedContext,
   useIsAggregatedActivityRead,
 } from '@stream-io/feeds-react-native-sdk';
-import { useStableCallback } from '@/hooks/useStableCallback';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useMemo } from 'react';
-import { useRouter } from 'expo-router';
+import { useStableCallback } from '@/hooks/useStableCallback';
+import { Image, Pressable, StyleSheet } from 'react-native';
+import { Text, View } from '@/components/Themed';
 
-const NotificationItem = ({
+export const NotificationItem = ({
   aggregatedActivity,
 }: {
   aggregatedActivity: AggregatedActivityResponse;
@@ -127,39 +126,7 @@ const NotificationItem = ({
   );
 };
 
-const ItemSeparator = () => <View style={styles.separator} />;
-
-const renderItem = ({ item }: { item: AggregatedActivityResponse }) => (
-  <NotificationItem aggregatedActivity={item} />
-);
-
-const keyExtractor = (item: AggregatedActivityResponse) => item.group;
-
-export const Notifications = () => {
-  const feed = useFeedContext();
-  const { aggregated_activities } = useAggregatedActivities(feed) ?? {};
-
-  return (
-    <FlatList
-      data={aggregated_activities}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
-      contentContainerStyle={styles.listContainer}
-      ItemSeparatorComponent={ItemSeparator}
-      showsVerticalScrollIndicator={false}
-    />
-  );
-};
-
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#F7F7F9',
-  },
-  listContainer: {
-    padding: 12,
-    paddingBottom: 24,
-  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -211,9 +178,5 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: '#E11D48', // red
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#eee',
   },
 });
