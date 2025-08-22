@@ -6,11 +6,11 @@ import {
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 // @ts-expect-error something broken with local assets, will fix later
 import postPlaceholder from '@/assets/images/post-placeholder.png';
-import { Reaction } from '@/components/Reaction';
+import { Reaction } from '@/components/common/Reaction';
 import { useRouter } from 'expo-router';
 import FastImage from 'react-native-fast-image';
 import { useMemo } from 'react';
-import { ActivityAction } from '@/components/ActivityAction';
+import { ActivityAction } from '@/components/activity-section-list/ActivityAction';
 
 export const Activity = ({
   activity,

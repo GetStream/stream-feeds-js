@@ -1,6 +1,6 @@
 import { Feed } from '@/components/Feed';
 import { StyleSheet, View } from 'react-native';
-import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
+import { ConnectionLostHeader } from '@/components/common/ConnectionLostHeader';
 import { StreamFeed } from '@stream-io/feeds-react-native-sdk';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 

@@ -5,7 +5,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Place } from '@/components/PlaceSearchDropdown';
+import { Place } from '@/components/search/PlaceSearchDropdown';
 import type { Attachment } from '@stream-io/feeds-react-native-sdk';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 

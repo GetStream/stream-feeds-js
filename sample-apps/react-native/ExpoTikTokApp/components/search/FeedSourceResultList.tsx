@@ -6,7 +6,7 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FollowButton } from '@/components/follows/FollowButton';
-import { View, Text } from '@/components/Themed';
+import { View, Text } from '@/components/common/Themed';
 import { useRouter } from 'expo-router';
 import { ErrorIndicator, LoadingIndicator } from '@/components/indicators';
 

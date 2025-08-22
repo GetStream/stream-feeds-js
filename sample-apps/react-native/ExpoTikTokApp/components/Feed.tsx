@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFeedActivities } from '@stream-io/feeds-react-native-sdk';
-import { ActivitySectionList } from '@/components/ActivitySectionList';
+import { ActivitySectionList } from '@/components/activity-section-list/ActivitySectionList';
 import { useStableCallback } from '@/hooks/useStableCallback';
 
 export const Feed = () => {

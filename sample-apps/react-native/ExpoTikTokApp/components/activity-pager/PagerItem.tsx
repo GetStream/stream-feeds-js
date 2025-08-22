@@ -12,12 +12,12 @@ import {
 import { useActivityPagerContext } from '@/contexts/ActivityPagerContext';
 import { PagerVideo } from '@/components/activity-pager/PagerVideo';
 import { Ionicons } from '@expo/vector-icons';
-import { Reaction } from '@/components/Reaction';
-import { Bookmark } from '@/components/Bookmark';
+import { Reaction } from '@/components/common/Reaction';
+import { Bookmark } from '@/components/common/Bookmark';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LocationPreview } from '@/components/LocationPreview';
-import { ShareButton } from '@/components/Share';
+import { LocationPreview } from '@/components/common/LocationPreview';
+import { ShareButton } from '@/components/common/Share';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 

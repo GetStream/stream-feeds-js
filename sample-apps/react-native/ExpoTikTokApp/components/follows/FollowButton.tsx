@@ -2,7 +2,7 @@ import { Feed, FollowResponse } from '@stream-io/feeds-react-native-sdk';
 import { useOwnFollows } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/Themed';
+import { Text } from '@/components/common/Themed';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
 

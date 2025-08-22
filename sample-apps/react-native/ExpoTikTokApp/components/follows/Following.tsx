@@ -7,7 +7,7 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useStableCallback } from '@/hooks/useStableCallback';
-import { View, Text } from '@/components/Themed';
+import { View, Text } from '@/components/common/Themed';
 import { useRouter } from 'expo-router';
 
 const keyExtractor = (item: FollowResponse) => item.target_feed.id;

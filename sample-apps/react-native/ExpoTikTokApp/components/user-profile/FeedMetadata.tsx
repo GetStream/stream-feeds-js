@@ -1,5 +1,5 @@
 import { Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from '@/components/common/Themed';
 import React from 'react';
 import {
   Feed,

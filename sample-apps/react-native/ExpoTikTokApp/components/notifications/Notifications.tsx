@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet } from 'react-native';
-import { View } from '@/components/Themed';
+import { View } from '@/components/common/Themed';
 import type { AggregatedActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import {
   useAggregatedActivities,

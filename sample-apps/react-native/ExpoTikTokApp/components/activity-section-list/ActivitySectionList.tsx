@@ -4,11 +4,11 @@ import {
   useFeedActivities,
 } from '@stream-io/feeds-react-native-sdk';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
-import { Activity } from '@/components/Activity';
+import { Activity } from '@/components/activity-section-list/Activity';
 import { useCallback } from 'react';
 import { LoadingIndicator, ErrorIndicator } from '@/components/indicators';
 import { useStableCallback } from '@/hooks/useStableCallback';
-import { View } from '@/components/Themed';
+import { View } from '@/components/common/Themed';
 
 const renderItem = ({
   item,

@@ -1,5 +1,5 @@
-import { FeedMetadata } from '@/components/FeedMetadata';
-import { View } from '@/components/Themed';
+import { FeedMetadata } from '@/components/user-profile/FeedMetadata';
+import { View } from '@/components/common/Themed';
 import { StreamFeed } from '@stream-io/feeds-react-native-sdk';
 import type { Feed as FeedType } from '@stream-io/feeds-react-native-sdk';
 import { Feed } from '@/components/Feed';

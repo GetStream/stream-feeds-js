@@ -1,5 +1,5 @@
 import { useSearchResult } from '@stream-io/feeds-react-native-sdk';
-import { ActivitySectionList } from '@/components/ActivitySectionList';
+import { ActivitySectionList } from '@/components/activity-section-list/ActivitySectionList';
 
 export const ActivitySourceResultList = () => {
   const {

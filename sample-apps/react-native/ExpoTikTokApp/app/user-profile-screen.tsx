@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
-import { Profile } from '@/components/Profile';
-import { View } from '@/components/Themed';
+import { Profile } from '@/components/user-profile/Profile';
+import { View } from '@/components/common/Themed';
 import { StyleSheet } from 'react-native';
 
 const queryOptions = {

@@ -1,4 +1,4 @@
-import { View, Text } from '@/components/Themed'
+import { View, Text } from '@/components/common/Themed'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   DarkTheme,
@@ -20,7 +20,7 @@ import {
   useUserContext,
 } from '@/contexts/UserContext';
 import { useCreateClient } from '@/hooks/useCreateClient';
-import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
+import { ErrorBoundary as InternalErrorBoundary } from '@/components/common/ErrorBoundary';
 import { OwnFeedsContextProvider } from '@/contexts/OwnFeedsContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 

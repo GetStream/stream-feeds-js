@@ -5,7 +5,7 @@ import { Tabs, useRouter } from 'expo-router';
 import { Pressable, useColorScheme } from 'react-native';
 
 import Colors from '@/constants/Colors';
-import { View } from '@/components/Themed';
+import { View } from '@/components/common/Themed';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useNotificationStatus } from '@stream-io/feeds-react-native-sdk';
 import { NotificationBadge } from '@/components/notifications/NotificationBadge';

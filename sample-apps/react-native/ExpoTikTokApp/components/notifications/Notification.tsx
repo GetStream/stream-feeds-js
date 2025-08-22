@@ -8,7 +8,7 @@ import { useFormatDate } from '@/hooks/useFormatDate';
 import { useMemo } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { Image, Pressable, StyleSheet } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from '@/components/common/Themed';
 
 export const NotificationItem = ({
   aggregatedActivity,

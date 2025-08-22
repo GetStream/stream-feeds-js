@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Reaction } from '@/components/Reaction';
+import { Reaction } from '@/components/common/Reaction';
 import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 import { openSheetWith } from '@/store/bottom-sheet-state-store';
 import { useRouter } from 'expo-router';

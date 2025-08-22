@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useLocalSearchParams } from 'expo-router';
-import { View } from '@/components/Themed';
+import { View } from '@/components/common/Themed';
 
 const LocationMapScreen = () => {
   const { latitude: latitudeParam, longitude: longitudeParam } =
