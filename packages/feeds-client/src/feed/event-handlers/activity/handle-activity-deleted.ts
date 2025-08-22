@@ -3,12 +3,14 @@ import type {
   ActivityPinResponse,
   ActivityResponse,
 } from '../../../gen/models';
-import type { EventPayload } from '../../../types-internal';
+import type { EventPayload, UpdateStateResult } from '../../../types-internal';
 
 export const removeActivityFromState = (
   activityResponse: ActivityResponse,
   activities: ActivityResponse[] | undefined,
-) => {
+): UpdateStateResult<{
+  activities: ActivityResponse[] | undefined;
+}> => {
   const index =
     activities?.findIndex((activity) => activity.id === activityResponse.id) ??
     -1;
@@ -25,7 +27,9 @@ export const removeActivityFromState = (
 export const removePinnedActivityFromState = (
   activityResponse: ActivityResponse,
   pinnedActivities: ActivityPinResponse[] | undefined,
-) => {
+): UpdateStateResult<{
+  pinned_activities: ActivityPinResponse[] | undefined;
+}> => {
   const index =
     pinnedActivities?.findIndex(
       (pinnedActivity) => pinnedActivity.activity.id === activityResponse.id,
@@ -34,7 +38,7 @@ export const removePinnedActivityFromState = (
   if (index !== -1) {
     const newActivities = [...pinnedActivities!];
     newActivities.splice(index, 1);
-    return { changed: true, activities: newActivities };
+    return { changed: true, pinned_activities: newActivities };
   } else {
     return { changed: false, pinned_activities: pinnedActivities };
   }
