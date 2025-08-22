@@ -6,10 +6,10 @@ import {
   StreamSearch,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
-import { SearchBar } from '@/components/Search/SearchBar';
-import { SearchTabs } from '@/components/Search/SearchTabs';
-import { SearchResults } from '@/components/Search/SearchResults';
-import { LocationSearchSource } from '@/components/Search/sources/LocationSearchSource';
+import { SearchBar } from '@/components/search/SearchBar';
+import { SearchTabs } from '@/components/search/SearchTabs';
+import { SearchResults } from '@/components/search/SearchResults';
+import { LocationSearchSource } from '@/components/search/sources/LocationSearchSource';
 
 export const Search = () => {
   const client = useFeedsClient();

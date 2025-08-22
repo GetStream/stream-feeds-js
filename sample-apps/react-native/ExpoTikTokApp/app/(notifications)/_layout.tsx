@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import React from 'react';
-import { NotificationBackButton } from '@/components/Notifications/NotificationBackButton';
+import { NotificationBackButton } from '@/components/notifications';
 
 // Additional things will be needed here in the future, hence why this is
 // a stack and not a separate screen.

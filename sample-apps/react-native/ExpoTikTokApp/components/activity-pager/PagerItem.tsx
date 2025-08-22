@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { useActivityPagerContext } from '@/contexts/ActivityPagerContext';
-import { PagerVideo } from '@/components/ActivityPager/PagerVideo';
+import { PagerVideo } from '@/components/activity-pager/PagerVideo';
 import { Ionicons } from '@expo/vector-icons';
 import { Reaction } from '@/components/Reaction';
 import { Bookmark } from '@/components/Bookmark';

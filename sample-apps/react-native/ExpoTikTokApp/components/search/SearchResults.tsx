@@ -3,7 +3,7 @@ import {
   useSearchSources,
 } from '@stream-io/feeds-react-native-sdk';
 import { useMemo } from 'react';
-import { SearchResultsList } from '@/components/Search/SearchResultsList';
+import { SearchResultsList } from '@/components/search/SearchResultsList';
 
 export const SearchResults = () => {
   const { sources = [] } = useSearchSources() ?? {};

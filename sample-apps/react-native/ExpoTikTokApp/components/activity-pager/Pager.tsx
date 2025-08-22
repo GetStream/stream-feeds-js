@@ -11,8 +11,8 @@ import {
 import { FlashList } from '@shopify/flash-list';
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { ActivityPagerContextProvider } from '@/contexts/ActivityPagerContext';
-import { PagerItem } from '@/components/ActivityPager/PagerItem';
-import { useInitialIndex } from '@/components/ActivityPager/hooks/useInitialIndex';
+import { PagerItem } from '@/components/activity-pager/PagerItem';
+import { useInitialIndex } from '@/components/activity-pager/hooks/useInitialIndex';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 

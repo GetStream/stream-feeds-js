@@ -2,7 +2,7 @@ import { PostCreationContextProvider } from '@/contexts/PostCreationContext';
 import { Stack } from 'expo-router';
 import React from 'react';
 import { resetState } from '@/store/activity-action-state-store';
-import { NavigationBackButton } from '@/components/Buttons';
+import { NavigationBackButton } from '@/components/buttons';
 
 const PostCreationLayout = () => {
   return (

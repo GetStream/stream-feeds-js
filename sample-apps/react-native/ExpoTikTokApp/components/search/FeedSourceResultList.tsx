@@ -8,7 +8,7 @@ import { FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FollowButton } from '@/components/FollowButton';
 import { View, Text } from '@/components/Themed';
 import { useRouter } from 'expo-router';
-import { ErrorIndicator, LoadingIndicator } from '@/components/Indicators';
+import { ErrorIndicator, LoadingIndicator } from '@/components/indicators';
 
 const keyExtractor = (item: Feed) => item.id;
 

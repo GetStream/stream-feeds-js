@@ -6,7 +6,7 @@ import {
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { Activity } from '@/components/Activity';
 import { useCallback } from 'react';
-import { LoadingIndicator, ErrorIndicator } from '@/components/Indicators';
+import { LoadingIndicator, ErrorIndicator } from '@/components/indicators';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { View } from '@/components/Themed';
 

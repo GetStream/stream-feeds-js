@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import { View } from '@/components/Themed';
 import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
-import { Search } from '@/components/Search';
+import { Search } from '@/components/search';
 
 const ExploreScreen = () => {
   return (

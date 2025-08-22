@@ -2,7 +2,7 @@ import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useNotificationStatus } from '@stream-io/feeds-react-native-sdk';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import React, { useEffect } from 'react';
-import { NavigationBackButton } from '@/components/Buttons';
+import { NavigationBackButton } from '@/components/buttons';
 
 export const NotificationBackButton = () => {
   const { ownNotificationFeed } = useOwnFeedsContext();

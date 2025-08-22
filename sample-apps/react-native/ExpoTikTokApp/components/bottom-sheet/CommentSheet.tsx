@@ -7,7 +7,7 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { SheetList } from '@/components/BottomSheet/SheetList';
+import { SheetList } from '@/components/bottom-sheet/SheetList';
 import { closeSheet } from '@/store/bottom-sheet-state-store';
 import {
   setParent,

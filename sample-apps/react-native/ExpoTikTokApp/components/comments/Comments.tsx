@@ -6,7 +6,7 @@ import {
 import { FlatList, StyleSheet } from 'react-native';
 import React, { useEffect } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
-import { Comment } from '@/components/Comments/Comment';
+import { Comment } from '@/components/comments/Comment';
 import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 
 const maintainVisibleContentPosition = {
