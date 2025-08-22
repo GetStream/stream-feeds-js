@@ -3,6 +3,7 @@ import {
   ActivityResponse,
   BookmarkFolderResponse,
   BookmarkResponse,
+  FeedMemberResponse,
   CommentResponse,
   FeedResponse,
   FeedsReactionResponse,
@@ -221,6 +222,20 @@ export const generateBookmarkResponse = (
   updated_at: new Date(),
   ...overrides,
   activity: generateActivityResponse(overrides.activity),
+  user: generateUserResponse(overrides.user),
+});
+
+export const generateFeedMemberResponse = (
+  overrides: Omit<Partial<FeedMemberResponse>, 'user'> & {
+    user?: Partial<UserResponse>;
+  } = {},
+): FeedMemberResponse => ({
+  created_at: new Date(),
+  updated_at: new Date(),
+  role: 'feed_member',
+  status: 'member',
+  custom: {},
+  ...overrides,
   user: generateUserResponse(overrides.user),
 });
 
@@ -450,6 +465,60 @@ export function generateCommentReactionDeletedEvent(
     ...overrides,
     comment,
     reaction,
+  };
+}
+
+export function generateFeedMemberAddedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.feed_member.added'>>,
+    'member' | 'type'
+  > & {
+    member?: Parameters<typeof generateFeedMemberResponse>[0];
+  } = {},
+): EventPayload<'feeds.feed_member.added'> {
+  const member = generateFeedMemberResponse(overrides.member);
+  return {
+    type: 'feeds.feed_member.added',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    member,
+  };
+}
+
+export function generateFeedMemberRemovedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.feed_member.removed'>>,
+    'type'
+  > = {},
+): EventPayload<'feeds.feed_member.removed'> {
+  return {
+    member_id: getHumanId(),
+    type: 'feeds.feed_member.removed',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+  };
+}
+
+export function generateFeedMemberUpdatedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.feed_member.updated'>>,
+    'member' | 'type'
+  > & {
+    member?: Parameters<typeof generateFeedMemberResponse>[0];
+  } = {},
+): EventPayload<'feeds.feed_member.updated'> {
+  const member = generateFeedMemberResponse(overrides.member);
+  return {
+    type: 'feeds.feed_member.updated',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    member,
   };
 }
 
