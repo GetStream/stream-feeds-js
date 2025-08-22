@@ -9,6 +9,8 @@ import { useMemo } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { Image, Pressable, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/common/Themed';
+import { getRoutingParams } from '@/components/notifications/utils/getRoutingParams';
+import { getNotificationText } from '@/components/notifications/utils/getNotificationText';
 
 export const NotificationItem = ({
   aggregatedActivity,
@@ -23,45 +25,10 @@ export const NotificationItem = ({
 
   const formattedDate = useFormatDate({ date: lastActivity.created_at });
 
-  const notificationText = useMemo(() => {
-    const { activities } = aggregatedActivity;
-    const last = activities.at(-1);
-    const verb = last?.type;
-
-    let text = '';
-
-    const remainingActors = aggregatedActivity.user_count - 1;
-    if (remainingActors > 1) {
-      text += ` and ${remainingActors} more people`;
-    } else if (remainingActors === 1) {
-      text += ' and 1 more person';
-    }
-
-    switch (verb) {
-      case 'comment': {
-        text += ` commented on your post`;
-        break;
-      }
-      case 'reaction': {
-        text += ` reacted to your post`;
-        break;
-      }
-      case 'follow': {
-        text += ` started following you`;
-        break;
-      }
-      case 'comment_reaction': {
-        text += ` reacted to your comment`;
-        break;
-      }
-      default: {
-        text += 'Unknown type';
-        break;
-      }
-    }
-
-    return text;
-  }, [aggregatedActivity]);
+  const notificationText = useMemo(
+    () => getNotificationText(aggregatedActivity),
+    [aggregatedActivity],
+  );
 
   const markRead = useStableCallback(async () => {
     try {
@@ -78,22 +45,15 @@ export const NotificationItem = ({
     }
   });
 
-  const routingParams = useMemo(() => {
-    // Hardcoded because we always want to deep link to the
-    // user feed.
-    const groupId = 'user';
-    const id = lastActivity.notification_context?.target.user_id;
-    const activityId = lastActivity.notification_context?.target.id;
-    return {
-      activityId,
-      groupId,
-      id,
-    };
-  }, [lastActivity]);
+  const routingParams = useMemo(
+    () => getRoutingParams(lastActivity),
+    [lastActivity],
+  );
 
   const onPress = useStableCallback(() => {
     markRead();
-    router.push({ pathname: '/activity-pager-screen', params: routingParams });
+    // @ts-expect-error Routing parameters type error, should be fixed once we type them explicitly
+    router.push(routingParams);
   });
 
   return (
