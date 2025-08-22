@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  CommentResponse,
+  CommentResponse, useClientConnectedUser,
 } from '@stream-io/feeds-react-native-sdk';
 import { useComments } from '@stream-io/feeds-react-native-sdk';
 import { useFormatDate } from '@/hooks/useFormatDate';
@@ -26,6 +26,7 @@ export const Comment = ({
   depth?: number;
 }) => {
   const router = useRouter();
+  const connectedUser = useClientConnectedUser();
   const isFirstLevel = depth === 0;
   const formattedDate = useFormatDate({ date: comment.created_at });
   const {
@@ -56,6 +57,7 @@ export const Comment = ({
         isFirstLevel ? styles.commentBlockBorder : {},
       ]}
       onLongPress={openSheet}
+      disabled={depth > 0 && comment.user.id !== connectedUser?.id}
     >
       <View style={styles.commentRow}>
         <Image
