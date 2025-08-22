@@ -310,6 +310,25 @@ export function generateActivityUpdatedEvent(
   };
 }
 
+export function generateActivityAddedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.added'>>,
+    'activity' | 'type'
+  > & {
+    activity?: Parameters<typeof generateActivityResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.added'> {
+  const activity = generateActivityResponse(overrides.activity);
+  return {
+    type: 'feeds.activity.added',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    activity,
+  };
+}
+
 export function generateBookmarkAddedEvent(
   overrides: Omit<
     Partial<EventPayload<'feeds.bookmark.added'>>,
