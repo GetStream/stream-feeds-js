@@ -1,5 +1,5 @@
-import { Followers } from '@/components/Followers';
-import { FollowsWrapper } from '@/components/FollowsWrapper';
+import { Followers } from '@/components/follows/Followers';
+import { FollowsWrapper } from '@/components/follows/FollowsWrapper';
 
 const FollowersModal = () => {
   return (

@@ -22,7 +22,7 @@ import { placesApiKey } from '@/constants/stream';
 import { Ionicons } from '@expo/vector-icons';
 import { usePostCreationContext } from '@/contexts/PostCreationContext';
 import { useStableCallback } from '@/hooks/useStableCallback';
-import { MediaPickerRow } from '@/components/MediaPickerList';
+import { MediaPickerRow } from '@/components/activity-composer/MediaPickerList';
 import { ACTIVITY_TEXT_MAX_CHARACTERS } from '@/constants/stream';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 import { resetState } from '@/store/activity-action-state-store';

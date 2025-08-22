@@ -8,7 +8,7 @@ import {
   useFeedMetadata,
   useStateStore,
 } from '@stream-io/feeds-react-native-sdk';
-import { FollowButton } from '@/components/FollowButton';
+import { FollowButton } from '@/components/follows/FollowButton';
 import { useRouter } from 'expo-router';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
