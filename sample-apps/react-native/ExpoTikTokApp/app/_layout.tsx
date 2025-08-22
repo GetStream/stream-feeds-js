@@ -108,6 +108,12 @@ const RootLayoutNav = ({ user }: { user: LocalUser }) => {
                 }}
               />
               <Stack.Screen
+                name="(notifications)"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
                 name="followers-modal"
                 options={{
                   title: 'Followers',

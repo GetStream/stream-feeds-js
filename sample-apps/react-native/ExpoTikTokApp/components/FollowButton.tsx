@@ -45,7 +45,9 @@ export const FollowButton = ({ feed }: { feed: Feed }) => {
       if (followStatus === 'accepted' || followStatus === 'pending') {
         await ownTimelineFeed.unfollow(feed);
       } else {
-        await ownTimelineFeed.follow(feed);
+        await ownTimelineFeed.follow(feed, {
+          create_notification_activity: true,
+        });
       }
     } catch (error) {
       console.error(error);

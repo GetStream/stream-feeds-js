@@ -29,8 +29,9 @@ export const useReactionActions = ({
 
   const addReaction = useStableCallback(async () => {
     await (isComment
-      ? client?.addCommentReaction({ id: entity.id, type })
-      : client?.addReaction({ activity_id: entity.id, type }));
+      // TODO: Fix this so that the hook supports everything OOTB
+      ? client?.addCommentReaction({ id: entity.id, type, create_notification_activity: true })
+      : client?.addReaction({ activity_id: entity.id, type, create_notification_activity: true }));
   });
 
   const removeReaction = useStableCallback(async () => {

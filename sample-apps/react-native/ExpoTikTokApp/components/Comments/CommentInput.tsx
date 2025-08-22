@@ -57,6 +57,7 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
         object_id: activityId,
         object_type: 'activity',
         parent_id: parent?.id,
+        create_notification_activity: true,
       });
     };
 
