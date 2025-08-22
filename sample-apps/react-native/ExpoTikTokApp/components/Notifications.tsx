@@ -1,11 +1,11 @@
 import { FlatList, Pressable, Image, StyleSheet } from 'react-native';
 import { View, Text } from '@/components/Themed';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import {
-  AggregatedActivityResponse,
   useAggregatedActivities,
   useFeedContext,
+  useIsAggregatedActivityRead,
 } from '@stream-io/feeds-react-native-sdk';
-import { useIsNotificationRead } from '@/hooks/useIsNotificationRead';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useMemo } from 'react';
@@ -18,7 +18,7 @@ const NotificationItem = ({
 }) => {
   const router = useRouter();
   const feed = useFeedContext();
-  const isRead = useIsNotificationRead({ id: aggregatedActivity.group });
+  const isRead = useIsAggregatedActivityRead({ aggregatedActivity });
   const lastActivity =
     aggregatedActivity.activities[aggregatedActivity.activity_count - 1];
 

@@ -1,6 +1,7 @@
 import { Feed, FeedState } from '../../../src/feed';
 import { useStateStore } from '../useStateStore';
 import { NotificationStatusResponse } from '../../../src/gen/models';
+import { useFeedContext } from '../../contexts/StreamFeedContext';
 
 const selector = ({ notification_status }: FeedState) =>
   ({
@@ -20,15 +21,9 @@ export function useNotificationStatus(
 export function useNotificationStatus(
   feed?: Feed,
 ): UseNotificationStatusReturnType | undefined;
-export function useNotificationStatus(feed?: Feed) {
+export function useNotificationStatus(feedFromProps?: Feed) {
+  const feedFromContext = useFeedContext();
+  const feed = feedFromProps ?? feedFromContext;
+
   return useStateStore(feed?.state, selector);
-
-  // TODO: add markRead and markAllRead functions?
-  // return useMemo(() => {
-  //   if (!data) {
-  //     return undefined;
-  //   }
-
-  //   return data;
-  // }, [data]);
 }

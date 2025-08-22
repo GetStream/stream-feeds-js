@@ -2,12 +2,13 @@ import {
   ActivityResponse,
   CommentResponse,
   useOwnCapabilities,
-  useReactionActions,
   isCommentResponse,
+  useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
+import { useStableCallback } from '@/hooks/useStableCallback';
 
 const iconMap = {
   like: {
@@ -56,20 +57,47 @@ export const Reaction = ({
     ? ownCapabilities.can_remove_comment_reaction
     : ownCapabilities.can_remove_activity_reaction;
 
-  const { toggleReaction } = useReactionActions({ entity, type });
+  const client = useFeedsClient();
 
-  const handleReactionToggle = useCallback(async () => {
+  const addReaction = useStableCallback(async () => {
+    await (isComment
+      ? client?.addCommentReaction({
+          id: entity.id,
+          type,
+          create_notification_activity: true,
+        })
+      : client?.addReaction({
+          activity_id: entity.id,
+          type,
+          create_notification_activity: true,
+        }));
+  });
+
+  const removeReaction = useStableCallback(async () => {
+    await (isComment
+      ? client?.deleteCommentReaction({ id: entity.id, type })
+      : client?.deleteActivityReaction({
+          activity_id: entity.id,
+          type,
+        }));
+  });
+
+  const handleReactionToggle = useStableCallback(async () => {
     const canDoReactionAction =
       (!hasOwnReaction && canAddReaction) ||
       (hasOwnReaction && canRemoveReaction);
     if (canDoReactionAction) {
       try {
-        await toggleReaction();
+        if (hasOwnReaction && canRemoveReaction) {
+          await removeReaction();
+        } else if (!hasOwnReaction && canAddReaction) {
+          await addReaction();
+        }
       } catch (error) {
         console.error(error);
       }
     }
-  }, [hasOwnReaction, canAddReaction, canRemoveReaction, toggleReaction]);
+  });
 
   const IconComponent = iconMap[type][hasOwnReaction ? 'active' : 'inactive'];
 
