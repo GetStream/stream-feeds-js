@@ -1,3 +1,4 @@
+import { View, Text } from '@/components/Themed'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   DarkTheme,
@@ -8,12 +9,11 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
-import { Text } from 'react-native';
+import { useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 import { StreamFeeds } from '@stream-io/feeds-react-native-sdk';
 import LoginScreen from '@/components/LoginScreen';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import {
   LocalUser,
   UserContextProvider,
@@ -21,7 +21,6 @@ import {
 } from '@/contexts/UserContext';
 import { useCreateClient } from '@/hooks/useCreateClient';
 import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
-import { View } from 'react-native';
 import { OwnFeedsContextProvider } from '@/contexts/OwnFeedsContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 

@@ -1,9 +1,9 @@
-import { useColorScheme } from '@/components/useColorScheme';
 import { useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
 import React from 'react';
+import { useColorScheme } from 'react-native';
 import { StableCallback, useStableCallback } from '@/hooks/useStableCallback';
 
 type CallbackType = () => void | Promise<void>;

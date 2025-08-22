@@ -2,10 +2,9 @@ import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs, useRouter } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, useColorScheme } from 'react-native';
 
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
 import { View } from '@/components/Themed';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useNotificationStatus } from '@stream-io/feeds-react-native-sdk';
