@@ -13,3 +13,13 @@ export const useIsNotificationRead = ({ id }: { id: string }) => {
     [readActivities, id],
   );
 };
+
+export const useIsNotificationSeen = ({ id }: { id: string }) => {
+  const feed = useFeedContext();
+  const { read_activities: readActivities } = useNotificationStatus(feed) ?? {};
+
+  return useMemo(
+    () => (readActivities ?? []).includes(id),
+    [readActivities, id],
+  );
+};

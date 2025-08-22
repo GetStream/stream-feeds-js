@@ -9,22 +9,29 @@ import { useIsNotificationRead } from '@/hooks/useIsNotificationRead';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useMemo } from 'react';
+import { useRouter } from 'expo-router';
 
-const NotificationItem = ({ item }: { item: AggregatedActivityResponse }) => {
+const NotificationItem = ({
+  aggregatedActivity,
+}: {
+  aggregatedActivity: AggregatedActivityResponse;
+}) => {
+  const router = useRouter();
   const feed = useFeedContext();
-  const isRead = useIsNotificationRead({ id: item.group });
-  const lastActivity = item.activities[item.activity_count - 1];
+  const isRead = useIsNotificationRead({ id: aggregatedActivity.group });
+  const lastActivity =
+    aggregatedActivity.activities[aggregatedActivity.activity_count - 1];
 
   const formattedDate = useFormatDate({ date: lastActivity.created_at });
 
   const notificationText = useMemo(() => {
-    const { activities } = item;
+    const { activities } = aggregatedActivity;
     const last = activities.at(-1);
     const verb = last?.type;
 
     let text = '';
 
-    const remainingActors = item.user_count - 1;
+    const remainingActors = aggregatedActivity.user_count - 1;
     if (remainingActors > 1) {
       text += ` and ${remainingActors} more people`;
     } else if (remainingActors === 1) {
@@ -55,26 +62,46 @@ const NotificationItem = ({ item }: { item: AggregatedActivityResponse }) => {
     }
 
     return text;
-  }, [item]);
+  }, [aggregatedActivity]);
 
   const markRead = useStableCallback(async () => {
     try {
-      await feed?.markActivity({
-        mark_read: [item.group],
-      });
+      if (!isRead) {
+        await feed?.markActivity({
+          mark_read: [aggregatedActivity.group],
+        });
+      }
     } catch (error) {
       console.error(
-        `An error has occurred while marking group ${item.group} as read: `,
+        `An error has occurred while marking group ${aggregatedActivity.group} as read: `,
         error,
       );
     }
   });
 
+  const routingParams = useMemo(() => {
+    // Hardcoded because we always want to deep link to the
+    // user feed.
+    const groupId = 'user';
+    const id = lastActivity.notification_context?.target.user_id;
+    const activityId = lastActivity.notification_context?.target.id;
+    return {
+      activityId,
+      groupId,
+      id,
+    };
+  }, [lastActivity]);
+
+  const onPress = useStableCallback(() => {
+    markRead();
+    router.push({ pathname: '/activity-pager-screen', params: routingParams });
+  });
+
   return (
     <Pressable
-      onPress={markRead}
+      onPress={onPress}
       android_ripple={{ color: '#e5e7eb' }}
-      style={styles.card}
+      style={({ pressed }) => [styles.card, { opacity: pressed ? 0.5 : 1 }]}
     >
       <Image source={{ uri: lastActivity.user.image }} style={styles.avatar} />
 
@@ -100,6 +127,14 @@ const NotificationItem = ({ item }: { item: AggregatedActivityResponse }) => {
   );
 };
 
+const ItemSeparator = () => <View style={styles.separator} />;
+
+const renderItem = ({ item }: { item: AggregatedActivityResponse }) => (
+  <NotificationItem aggregatedActivity={item} />
+);
+
+const keyExtractor = (item: AggregatedActivityResponse) => item.group;
+
 export const Notifications = () => {
   const feed = useFeedContext();
   const { aggregated_activities } = useAggregatedActivities(feed) ?? {};
@@ -107,10 +142,10 @@ export const Notifications = () => {
   return (
     <FlatList
       data={aggregated_activities}
-      keyExtractor={(it) => it.group}
-      renderItem={({ item }) => <NotificationItem item={item} />}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
       contentContainerStyle={styles.listContainer}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      ItemSeparatorComponent={ItemSeparator}
       showsVerticalScrollIndicator={false}
     />
   );
@@ -119,7 +154,7 @@ export const Notifications = () => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#F7F7F9', // light gray page bg
+    backgroundColor: '#F7F7F9',
   },
   listContainer: {
     padding: 12,
