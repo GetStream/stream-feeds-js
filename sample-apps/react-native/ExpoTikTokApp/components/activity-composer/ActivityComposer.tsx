@@ -26,6 +26,7 @@ import { MediaPickerRow } from '@/components/activity-composer/MediaPickerList';
 import { ACTIVITY_TEXT_MAX_CHARACTERS } from '@/constants/stream';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 import { resetState } from '@/store/activity-action-state-store';
+import AutocompleteInput from '@/components/mentions/AutocompleteInput';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
@@ -229,14 +230,17 @@ export const ActivityComposer = () => {
         </Text>
       </View>
 
-      <TextInput
-        multiline
-        style={styles.descriptionInput}
-        placeholder="💡 Tell us more about your post."
-        placeholderTextColor="#888"
-        value={text}
-        onChangeText={setText}
-      />
+      <View>
+        <AutocompleteInput
+          multiline
+          style={styles.descriptionInput}
+          placeholder="💡 Tell us more about your post."
+          placeholderTextColor="#888"
+          text={text}
+          setText={setText}
+          height={180}
+        />
+      </View>
 
       {placesApiKey ? (
         <>
@@ -337,6 +341,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     minHeight: 100,
+    maxHeight: 200,
     textAlignVertical: 'top',
     fontSize: 14,
     marginBottom: 16,

@@ -22,6 +22,7 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import { useCommentInputState } from '@/hooks/useCommentInputState';
 import { resetState } from '@/store/comment-input-state-store';
+import AutocompleteInput from '@/components/mentions/AutocompleteInput';
 
 const INPUT_METADATA_HEIGHT = 25;
 
@@ -110,9 +111,9 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
           style={styles.avatar}
         />
         <View style={styles.inputContainer}>
-          <TextInput
-            value={text}
-            onChangeText={setText}
+          <AutocompleteInput
+            text={text}
+            setText={setText}
             placeholder="Add comment..."
             placeholderTextColor="#888"
             style={styles.input}
@@ -159,6 +160,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
+    maxHeight: 48,
     fontSize: 15,
     color: '#000',
     paddingRight: 8,
