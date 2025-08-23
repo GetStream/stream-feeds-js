@@ -27,6 +27,7 @@ import { ACTIVITY_TEXT_MAX_CHARACTERS } from '@/constants/stream';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 import { resetState } from '@/store/activity-action-state-store';
 import AutocompleteInput from '@/components/mentions/AutocompleteInput';
+import { findMentionedUsers } from '@/utils/findMentionedUsers';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
@@ -120,6 +121,8 @@ export const ActivityComposer = () => {
     }
     setIsSending(true);
     try {
+      const mentionedUsers = findMentionedUsers(text);
+
       const activityData = {
         type: 'post',
         text,
@@ -139,6 +142,7 @@ export const ActivityComposer = () => {
               },
             }
           : {}),
+        ...(mentionedUsers ? { mentioned_user_ids: mentionedUsers } : {})
       };
       if (editingActivity) {
         await client?.updateActivity({

@@ -25,7 +25,7 @@ export const CommentSheet = () => {
   const depth = data?.depth;
   const { parent, editingEntity } = useCommentInputState();
 
-  const deleteAction = useStableCallback(() => () => {
+  const deleteAction = useStableCallback(() => {
     Alert.alert(
       'Delete Comment',
       'Are you sure you want to delete this comment ? The action cannot be undone.',

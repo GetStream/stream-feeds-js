@@ -23,6 +23,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCommentInputState } from '@/hooks/useCommentInputState';
 import { resetState } from '@/store/comment-input-state-store';
 import AutocompleteInput from '@/components/mentions/AutocompleteInput';
+import { findMentionedUsers } from '@/utils/findMentionedUsers';
 
 const INPUT_METADATA_HEIGHT = 25;
 
@@ -53,12 +54,15 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
         });
       }
 
+      const mentionedUsers = findMentionedUsers(text);
+
       return client?.addComment({
         comment: text as string,
         object_id: activityId,
         object_type: 'activity',
         parent_id: parent?.id,
         create_notification_activity: true,
+        ...(mentionedUsers ? { mentioned_user_ids: mentionedUsers } : {})
       });
     };
 

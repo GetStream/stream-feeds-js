@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -16,6 +16,7 @@ import {
   useSearchResult,
 } from '@stream-io/feeds-react-native-sdk';
 import { SuggestionsList } from '@/components/mentions/SuggestionsList';
+import { useStableCallback } from '@/hooks/useStableCallback';
 
 const MENTION_CHARS = /[A-Za-z0-9_.]/;
 
@@ -45,6 +46,12 @@ const AutocompleteInputInner = ({
   const prevTextRef = useRef(text);
   const prevSelRef = useRef(selection);
 
+  useEffect(() => {
+    if (!session) {
+      searchController?.search('');
+    }
+  }, [searchController, session]);
+
   const query = useMemo(() => {
     if (!session) return null;
 
@@ -61,30 +68,30 @@ const AutocompleteInputInner = ({
     return slice;
   }, [session, selection.start, text]);
 
-  const onSelectionChange = (
-    e: NativeSyntheticEvent<TextInputSelectionChangeEventData>,
-  ) => {
-    const sel = e.nativeEvent.selection;
-    setSelection(sel);
-    prevSelRef.current = sel;
+  const onSelectionChange = useStableCallback(
+    (e: NativeSyntheticEvent<TextInputSelectionChangeEventData>) => {
+      const sel = e.nativeEvent.selection;
+      setSelection(sel);
+      prevSelRef.current = sel;
 
-    if (session) {
-      const from = session.start + 1;
-      const end = sel.start;
-      const searchQuery = text.slice(from, end);
-      const within =
-        end >= from &&
-        [...text.slice(from, end)].every((ch) => MENTION_CHARS.test(ch));
+      if (session) {
+        const from = session.start + 1;
+        const end = sel.start;
+        const searchQuery = text.slice(from, end);
+        const within =
+          end >= from &&
+          [...text.slice(from, end)].every((ch) => MENTION_CHARS.test(ch));
 
-      if (!within) {
-        setSession(null);
+        if (!within) {
+          setSession(null);
+        }
+
+        searchController?.search(searchQuery);
       }
+    },
+  );
 
-      searchController?.search(searchQuery);
-    }
-  };
-
-  const onChangeText = (next: string) => {
+  const onChangeText = useStableCallback((next: string) => {
     const prev = prevTextRef.current;
     const selBefore = prevSelRef.current;
 
@@ -118,9 +125,9 @@ const AutocompleteInputInner = ({
 
     setText(next);
     prevTextRef.current = next;
-  };
+  });
 
-  const pick = (u: User) => {
+  const pick = useStableCallback((u: User) => {
     if (!session) return;
     const from = session.start;
     const to = selection.start;
@@ -132,7 +139,7 @@ const AutocompleteInputInner = ({
     setSession(null);
     prevTextRef.current = newText;
     prevSelRef.current = { start: caret, end: caret };
-  };
+  });
 
   return (
     <>
