@@ -20,7 +20,7 @@ export const getRoutingParams = (lastActivity: ActivityResponse) => {
   if (lastActivity.type === 'follow') {
     return {
       pathname: '/user-profile-screen',
-      params: { userId: id },
+      params: { userId: lastActivity.user.id },
     };
   }
 
