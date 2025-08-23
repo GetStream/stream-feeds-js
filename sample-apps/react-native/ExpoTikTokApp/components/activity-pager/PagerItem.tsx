@@ -18,6 +18,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationPreview } from '@/components/common/LocationPreview';
 import { ShareButton } from '@/components/common/Share';
+import { MentionText } from '@/components/common/MentionText';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -61,7 +62,11 @@ const UnmemoizedPagerItem = ({
 
         <View style={[styles.overlay, overlayStyle]}>
           <Text style={styles.title}>@{activity.user.id}</Text>
-          <Text style={styles.description}>{activity.text}</Text>
+          <MentionText
+            text={activity?.text ?? ''}
+            mentionedUsers={activity.mentioned_users}
+            style={styles.description}
+          />
           {locationData ? <LocationPreview location={locationData} /> : null}
         </View>
 

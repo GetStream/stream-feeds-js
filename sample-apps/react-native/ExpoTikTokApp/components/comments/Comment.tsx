@@ -1,22 +1,18 @@
 import React from 'react';
 import {
-  CommentResponse, useClientConnectedUser,
+  CommentResponse,
+  useClientConnectedUser,
 } from '@stream-io/feeds-react-native-sdk';
 import { useComments } from '@stream-io/feeds-react-native-sdk';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useStableCallback } from '@/hooks/useStableCallback';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Reaction } from '@/components/common/Reaction';
 import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 import { openSheetWith } from '@/store/bottom-sheet-state-store';
 import { useRouter } from 'expo-router';
 import { setParent } from '@/store/comment-input-state-store';
+import { MentionText } from '@/components/common/MentionText';
 
 export const Comment = ({
   comment,
@@ -66,7 +62,11 @@ export const Comment = ({
         />
         <View style={styles.commentContent}>
           <Text style={styles.commentUser}>{comment.user.id}</Text>
-          <Text style={styles.commentText}>{comment.text}</Text>
+          <MentionText
+            text={comment.text ?? ''}
+            mentionedUsers={comment.mentioned_users}
+            style={styles.commentText}
+          />
           <View style={styles.metaRow}>
             <Text style={styles.commentDate}>{formattedDate}</Text>
             {isFirstLevel ? (
@@ -170,9 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     alignSelf: 'flex-end',
   },
-  deleteButton: {
-
-  },
+  deleteButton: {},
   reactionContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
