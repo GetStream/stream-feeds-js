@@ -17,7 +17,6 @@ export const MentionSearchResults = ({ children }: PropsWithChildren) => {
     if (!searchController) return;
     searchController?.activateSource('user');
     if (activeSource && !activeSource.items?.length) {
-      console.log('T: ', searchController.searchQuery)
       void activeSource.search(searchController.searchQuery);
     }
   }, [activeSource, searchController]);
