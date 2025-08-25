@@ -9,8 +9,10 @@ export type StreamFeedProps = {
   feed: Feed;
 };
 
-export const StreamFeed = ({ feed, children }: PropsWithChildren<StreamFeedProps>) => {
-
+export const StreamFeed = ({
+  feed,
+  children,
+}: PropsWithChildren<StreamFeedProps>) => {
   return (
     <StreamFeedContext.Provider value={feed}>
       {children}
