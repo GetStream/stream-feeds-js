@@ -1,3 +1,4 @@
+import { View, Text } from '@/components/common/Themed'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   DarkTheme,
@@ -8,20 +9,18 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
-import { Text } from 'react-native';
+import { useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 import { StreamFeeds } from '@stream-io/feeds-react-native-sdk';
 import LoginScreen from '@/components/LoginScreen';
 
-import { useColorScheme } from '@/components/useColorScheme';
 import {
   LocalUser,
   UserContextProvider,
   useUserContext,
 } from '@/contexts/UserContext';
 import { useCreateClient } from '@/hooks/useCreateClient';
-import { ErrorBoundary as InternalErrorBoundary } from '@/components/ErrorBoundary';
-import { View } from 'react-native';
+import { ErrorBoundary as InternalErrorBoundary } from '@/components/common/ErrorBoundary';
 import { OwnFeedsContextProvider } from '@/contexts/OwnFeedsContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -103,6 +102,12 @@ const RootLayoutNav = ({ user }: { user: LocalUser }) => {
               />
               <Stack.Screen
                 name="(post-creation)"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="(notifications)"
                 options={{
                   headerShown: false,
                 }}

@@ -1,10 +1,14 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs, useRouter } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, useColorScheme } from 'react-native';
 
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { View } from '@/components/common/Themed';
+import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
+import { useNotificationStatus } from '@stream-io/feeds-react-native-sdk';
+import { NotificationBadge } from '@/components/notifications/NotificationBadge';
 
 const TabBarIcon = (props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -16,17 +20,35 @@ const TabBarIcon = (props: {
 const HeaderRight = () => {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const { ownNotificationFeed } = useOwnFeedsContext();
+  const { unseen } = useNotificationStatus(ownNotificationFeed) ?? {};
+
   return (
-    <Pressable onPress={() => router.push('/create-post-modal')}>
-      {({ pressed }) => (
-        <FontAwesome
-          name="plus-square"
-          size={25}
-          color={Colors[colorScheme ?? 'light'].text}
-          style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-        />
-      )}
-    </Pressable>
+    <View style={{ flexDirection: 'row' }}>
+      <Pressable onPress={() => router.push('/(notifications)/notifications-screen')}>
+        {({ pressed }) => (
+          <View>
+            <Ionicons
+              name="notifications"
+              size={28}
+              color={Colors[colorScheme ?? 'light'].text}
+              style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+            />
+            {unseen && unseen > 0 ? <NotificationBadge count={unseen} /> : null}
+          </View>
+        )}
+      </Pressable>
+      <Pressable onPress={() => router.push('/create-post-modal')}>
+        {({ pressed }) => (
+          <Ionicons
+            name="add-circle"
+            size={30}
+            color={Colors[colorScheme ?? 'light'].text}
+            style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+          />
+        )}
+      </Pressable>
+    </View>
   );
 };
 

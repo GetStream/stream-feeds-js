@@ -1,5 +1,5 @@
 import type { FeedState, Feed } from '@stream-io/feeds-react-sdk';
-import { FeedOwnCapability } from '@stream-io/feeds-client';
+import { FeedOwnCapability } from '@stream-io/feeds-react-sdk';
 import { useRef, useState } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { FollowRelationships } from './FollowRelationships';

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { BottomSheet } from '@/components/BottomSheet';
+import { BottomSheet } from '@/components/bottom-sheet';
 import { useBottomSheetState } from '@/hooks/useBottomSheetState';
-import { CommentSheet } from '@/components/BottomSheet/CommentSheet';
-import { ActivitySheet } from '@/components/BottomSheet/ActivitySheet';
+import { CommentSheet } from '@/components/bottom-sheet/CommentSheet';
+import { ActivitySheet } from '@/components/bottom-sheet/ActivitySheet';
 
 export default function SheetOverlay() {
   const { data } = useBottomSheetState();

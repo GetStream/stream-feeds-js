@@ -3,7 +3,7 @@ import {
   StreamFeed,
 } from '@stream-io/feeds-react-native-sdk';
 import { useLocalSearchParams } from 'expo-router';
-import { ActivityPager } from '@/components/ActivityPager/Pager';
+import { ActivityPager } from '@/components/activity-pager/Pager';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
 
 const ActivityPagerScreen = () => {

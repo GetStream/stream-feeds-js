@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-import { View } from '@/components/Themed';
-import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
-import { Search } from '@/components/Search';
+import { View } from '@/components/common/Themed';
+import { ConnectionLostHeader } from '@/components/common/ConnectionLostHeader';
+import { Search } from '@/components/search';
 
 const ExploreScreen = () => {
   return (

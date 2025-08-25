@@ -5,6 +5,7 @@ import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
 type OwnFeedsContextValue = {
   ownUserFeed?: Feed;
   ownTimelineFeed?: Feed;
+  ownNotificationFeed?: Feed;
 };
 
 const OwnFeedsContext = createContext<OwnFeedsContextValue>({});
@@ -21,14 +22,27 @@ const timelineFeedRequestConfig = {
     watch: true,
   },
 };
+const notificationFeedRequestConfig = {
+  groupId: 'notification',
+  queryOptions: {
+    watch: true,
+  },
+};
 
 export const OwnFeedsContextProvider = ({
   children,
 }: PropsWithChildren<OwnFeedsContextValue>) => {
   const ownUserFeed = useCreateAndQueryFeed(userFeedRequestConfig);
   const ownTimelineFeed = useCreateAndQueryFeed(timelineFeedRequestConfig);
+  const ownNotificationFeed = useCreateAndQueryFeed(
+    notificationFeedRequestConfig,
+  );
 
-  const contextValue = useMemo(() => ({ ownUserFeed, ownTimelineFeed }), [ownUserFeed, ownTimelineFeed]);
+  const contextValue = useMemo(
+    () => ({ ownUserFeed, ownTimelineFeed, ownNotificationFeed }),
+    [ownUserFeed, ownTimelineFeed, ownNotificationFeed],
+  );
+
   return (
     <OwnFeedsContext.Provider value={contextValue}>
       {children}

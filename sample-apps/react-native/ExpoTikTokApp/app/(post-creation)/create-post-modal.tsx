@@ -1,4 +1,4 @@
-import { ActivityComposer } from '@/components/ActivityComposer';
+import { ActivityComposer } from '@/components/activity-composer/ActivityComposer';
 import {
   StreamFeed,
   useClientConnectedUser,

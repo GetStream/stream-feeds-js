@@ -7,3 +7,5 @@ export * from './useFeedMetadata';
 export * from './useOwnFollows';
 export * from './useNotificationStatus';
 export * from './useAggregatedActivities';
+export * from './useIsAggregatedActivityRead';
+export * from './useIsAggregatedActivitySeen';

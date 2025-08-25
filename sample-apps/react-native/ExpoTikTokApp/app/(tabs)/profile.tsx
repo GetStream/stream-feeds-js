@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text } from '@/components/Themed';
-import { ConnectionLostHeader } from '@/components/ConnectionLostHeader';
+import { View, Text } from '@/components/common/Themed';
+import { ConnectionLostHeader } from '@/components/common/ConnectionLostHeader';
 import { Pressable, StyleSheet } from 'react-native';
 import { useOwnFeedsContext } from '@/contexts/OwnFeedsContext';
 import { useUserContext } from '@/contexts/UserContext';
-import { Profile } from '@/components/Profile';
+import { Profile } from '@/components/user-profile/Profile';
 
 const ProfileScreen = () => {
   const { ownUserFeed, ownTimelineFeed } = useOwnFeedsContext();

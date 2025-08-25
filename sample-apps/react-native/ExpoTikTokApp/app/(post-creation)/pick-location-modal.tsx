@@ -1,4 +1,4 @@
-import { PlaceSearchDropdown } from '@/components/PlaceSearchDropdown';
+import { PlaceSearchDropdown } from '@/components/search/PlaceSearchDropdown';
 import { StyleSheet, View } from 'react-native';
 
 const CreatePostScreen = () => {
