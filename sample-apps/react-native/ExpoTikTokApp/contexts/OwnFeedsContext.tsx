@@ -1,6 +1,7 @@
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
 import { Feed } from '@stream-io/feeds-react-native-sdk';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 type OwnFeedsContextValue = {
   ownUserFeed?: Feed;
@@ -42,6 +43,8 @@ export const OwnFeedsContextProvider = ({
     () => ({ ownUserFeed, ownTimelineFeed, ownNotificationFeed }),
     [ownUserFeed, ownTimelineFeed, ownNotificationFeed],
   );
+
+  usePushNotifications();
 
   return (
     <OwnFeedsContext.Provider value={contextValue}>

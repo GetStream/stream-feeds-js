@@ -14,6 +14,9 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "entitlements": { "aps-environment": "development" },
+      "infoPlist": { "UIBackgroundModes": ["remote-notification"] },
+      "googleServicesFile": "./firebase/GoogleService-Info.plist",
       "supportsTablet": true,
       "bundleIdentifier": "io.getstream.expotiktokapp",
       "appleTeamId": "EHV7XZLAHA",
@@ -22,6 +25,7 @@
       }
     },
     "android": {
+      "googleServicesFile": "./firebase/google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -39,7 +43,18 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      "./config-plugins/with-notifee-maven"
     ],
     "experiments": {
       "typedRoutes": true
