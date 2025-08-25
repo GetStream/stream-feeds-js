@@ -21,9 +21,9 @@ export const NotificationItem = ({
   const feed = useFeedContext();
   const isRead = useIsAggregatedActivityRead({ aggregatedActivity });
   const lastActivity =
-    aggregatedActivity.activities[aggregatedActivity.activity_count - 1];
+    aggregatedActivity.activities[aggregatedActivity.activities.length - 1];
 
-  const formattedDate = useFormatDate({ date: lastActivity.created_at });
+  const formattedDate = useFormatDate({ date: lastActivity?.created_at });
 
   const notificationText = useMemo(
     () => getNotificationText(aggregatedActivity),
