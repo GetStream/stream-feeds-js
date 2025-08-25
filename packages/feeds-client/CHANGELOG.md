@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.1...@stream-io/feeds-client-0.2.2) (2025-08-25)
+
+
+### Features
+
+* notification feed support ([#86](https://github.com/GetStream/stream-feeds-js/issues/86)) ([9ba245e](https://github.com/GetStream/stream-feeds-js/commit/9ba245e969c77f5c241fb4f5da93491ba87c3278))
+* notification feeds ([#102](https://github.com/GetStream/stream-feeds-js/issues/102)) ([6822da8](https://github.com/GetStream/stream-feeds-js/commit/6822da8516ef83e66fd9b74f5497136ca51f8bda))
+
 ## [0.2.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.0...@stream-io/feeds-client-0.2.1) (2025-08-20)
 
 
