@@ -34,10 +34,7 @@ const config: ExpoConfig = {
   },
   android: {
     googleServicesFile: './firebase/google-services.json',
-    adaptiveIcon: {
-      foregroundImage: './assets/images/adaptive-foreground.png',
-      backgroundColor: '#2063F6',
-    },
+    icon: './assets/images/icon.png',
     package: 'io.getstream.expotiktokapp',
     config: {
       googleMaps: {
