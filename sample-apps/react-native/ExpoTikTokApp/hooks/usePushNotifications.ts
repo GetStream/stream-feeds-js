@@ -59,45 +59,51 @@ const navigateFromData = (data?: MessagingDataType) => {
   const type = data.type as string;
   const activityId = data.activity_id as string;
 
-  if (['feeds.comment.added', 'feeds.comment.reaction.added'].includes(type)) {
-    const fid = data.fid as string;
-    const [groupId, id] = fid.split(':');
-    router.push({
-      pathname: '/comments-modal',
-      params: {
-        feedUserId: id,
-        feedGroupId: groupId,
-        activityId,
-      },
-    });
-    return;
-  }
+  switch (type) {
+    case 'feeds.comment.added':
+    case 'feeds.comment.reaction.added': {
+      const fid = data.fid as string;
+      const [groupId, id] = fid.split(':');
+      router.push({
+        pathname: '/comments-modal',
+        params: {
+          feedUserId: id,
+          feedGroupId: groupId,
+          activityId,
+        },
+      });
+      return;
+    }
 
-  if (
-    ['feeds.activity.reaction.added', 'feeds.activity.added'].includes(type)
-  ) {
-    const fid = data.fid as string;
-    const [groupId, id] = fid.split(':');
-    router.push({
-      pathname: '/activity-pager-screen',
-      params: {
-        groupId,
-        id,
-        activityId,
-      },
-    });
-    return;
-  }
+    case 'feeds.activity.reaction.added':
+    case 'feeds.activity.added': {
+      const fid = data.fid as string;
+      const [groupId, id] = fid.split(':');
+      router.push({
+        pathname: '/activity-pager-screen',
+        params: {
+          groupId,
+          id,
+          activityId,
+        },
+      });
+      return;
+    }
 
-  if (type === 'feeds.follow.created') {
-    const fid = (data.source_fid ?? data.fid) as string;
-    const [_, id] = fid.split(':');
-    router.push({
-      pathname: '/user-profile-screen',
-      params: {
-        userId: id,
-      },
-    });
+    case 'feeds.follow.created': {
+      const fid = (data.source_fid ?? data.fid) as string;
+      const [_, id] = fid.split(':');
+      router.push({
+        pathname: '/user-profile-screen',
+        params: {
+          userId: id,
+        },
+      });
+      return;
+    }
+
+    default:
+      return;
   }
 };
 
