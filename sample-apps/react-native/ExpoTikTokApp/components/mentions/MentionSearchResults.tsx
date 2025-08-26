@@ -16,10 +16,7 @@ export const MentionSearchResults = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (!searchController) return;
     searchController?.activateSource('user');
-    if (activeSource && !activeSource.items?.length) {
-      void activeSource.search(searchController.searchQuery);
-    }
-  }, [activeSource, searchController]);
+  }, [searchController]);
 
   if (!activeSource) {
     return null;

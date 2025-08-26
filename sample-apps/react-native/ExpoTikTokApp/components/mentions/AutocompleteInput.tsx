@@ -46,12 +46,6 @@ const AutocompleteInputInner = ({
   const prevTextRef = useRef(text);
   const prevSelRef = useRef(selection);
 
-  useEffect(() => {
-    if (!session) {
-      searchController?.search('');
-    }
-  }, [searchController, session]);
-
   const query = useMemo(() => {
     if (!session) return null;
 
@@ -77,7 +71,6 @@ const AutocompleteInputInner = ({
       if (session) {
         const from = session.start + 1;
         const end = sel.start;
-        const searchQuery = text.slice(from, end);
         const within =
           end >= from &&
           [...text.slice(from, end)].every((ch) => MENTION_CHARS.test(ch));
@@ -85,8 +78,6 @@ const AutocompleteInputInner = ({
         if (!within) {
           setSession(null);
         }
-
-        searchController?.search(searchQuery);
       }
     },
   );
@@ -97,6 +88,9 @@ const AutocompleteInputInner = ({
 
     const insertedOneChar =
       next.length === prev.length + 1 && selBefore.start === selBefore.end;
+
+    const deletedOneChar =
+      next.length === prev.length - 1 && selBefore.start === selBefore.end;
 
     if (insertedOneChar) {
       const insertIndex = selBefore.start;
@@ -114,12 +108,27 @@ const AutocompleteInputInner = ({
         const typedAllowed = MENTION_CHARS.test(ch);
         const stillExtending =
           caretAfter >= from && caretAfter === selection.start + 1;
+        if (!(typedAllowed && stillExtending)) setSession(null);
+      }
+    } else if (deletedOneChar) {
+      // 👇 handle backspace
+      if (session) {
+        const from = session.start + 1;
+        const caretBefore = selBefore.start;
+        const caretAfter = Math.max(caretBefore - 1, 0);
 
-        if (!(typedAllowed && stillExtending)) {
+        if (caretAfter >= from) {
+          // still inside the mention query -> keep session and move caret left
+          setSelection({ start: caretAfter, end: caretAfter });
+          prevSelRef.current = { start: caretAfter, end: caretAfter };
+          // search will run via the useEffect tied to `query`
+        } else {
+          // deleted '@' or stepped before it -> end session
           setSession(null);
         }
       }
     } else {
+      // multi-char edits, paste, selection replaces, etc. -> exit session
       if (session) setSession(null);
     }
 
@@ -141,17 +150,23 @@ const AutocompleteInputInner = ({
     prevSelRef.current = { start: caret, end: caret };
   });
 
+  useEffect(() => {
+    if (!session) {
+      searchController?.clear();
+      return;
+    }
+    searchController?.search(query ?? '');
+  }, [query, session, searchController]);
+
   return (
     <>
-      {session && query !== null && !isLoading && !error && (
+      {session && query !== null && !error && (suggestions ?? []).length > 0 && (
         <View style={[styles.suggestionsShadow, { bottom: layoutH + 25 }]}>
           <View style={[styles.suggestionsCard, { height }]}>
-            <MentionSearchResults>
-              <SuggestionsList
-                onPress={pick}
-                suggestions={suggestions as User[]}
-              />
-            </MentionSearchResults>
+            <SuggestionsList
+              onPress={pick}
+              suggestions={suggestions as User[]}
+            />
           </View>
         </View>
       )}

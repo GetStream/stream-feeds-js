@@ -18,6 +18,10 @@ export const Mentions = ({ children }: PropsWithChildren) => {
     });
   }, [client]);
 
+  if (!client || !searchController) {
+    return null;
+  }
+
   return (
     <StreamSearch searchController={searchController}>{children}</StreamSearch>
   );
