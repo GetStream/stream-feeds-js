@@ -5,7 +5,7 @@ import {
   setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
 import { getApp } from '@react-native-firebase/app';
-import { extractNotificationConfig } from '@/hooks/usePushNotifications';
+import { extractNotificationConfig } from '@/utils/push-notifications/extractNotificationConfig';
 
 const messaging = getMessaging(getApp());
 

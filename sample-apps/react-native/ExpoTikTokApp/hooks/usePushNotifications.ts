@@ -21,11 +21,12 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import { useEffect, useRef } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
-import { router } from 'expo-router';
+import { navigateFromData } from '@/utils/push-notifications/navigateFromData';
+import { extractNotificationConfig } from '@/utils/push-notifications/extractNotificationConfig';
 
 const messaging = getMessaging(getApp());
 
-type MessagingDataType = FirebaseMessagingTypes.RemoteMessage['data'];
+export type MessagingDataType = FirebaseMessagingTypes.RemoteMessage['data'];
 
 notifee.onBackgroundEvent(async (message) => {
   if (
@@ -35,77 +36,6 @@ notifee.onBackgroundEvent(async (message) => {
     navigateFromData(message.detail.notification?.data as MessagingDataType);
   }
 });
-
-export const extractNotificationConfig = (
-  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
-) => {
-  const { stream, ...rest } = remoteMessage.data ?? {};
-  const data = {
-    ...rest,
-    ...((stream as unknown as Record<string, string> | undefined) ?? {}), // extract and merge stream object if present
-  };
-  const notification = remoteMessage.notification ?? {};
-  const body = (data.body ?? notification.body ?? '') as string;
-  const title = (data.title ?? notification.title) as string;
-
-  return { data, body, title };
-};
-
-const navigateFromData = (data?: MessagingDataType) => {
-  if (!data) {
-    return;
-  }
-
-  const type = data.type as string;
-  const activityId = data.activity_id as string;
-
-  switch (type) {
-    case 'feeds.comment.added':
-    case 'feeds.comment.reaction.added': {
-      const fid = data.fid as string;
-      const [groupId, id] = fid.split(':');
-      router.push({
-        pathname: '/comments-modal',
-        params: {
-          feedUserId: id,
-          feedGroupId: groupId,
-          activityId,
-        },
-      });
-      return;
-    }
-
-    case 'feeds.activity.reaction.added':
-    case 'feeds.activity.added': {
-      const fid = data.fid as string;
-      const [groupId, id] = fid.split(':');
-      router.push({
-        pathname: '/activity-pager-screen',
-        params: {
-          groupId,
-          id,
-          activityId,
-        },
-      });
-      return;
-    }
-
-    case 'feeds.follow.created': {
-      const fid = (data.source_fid ?? data.fid) as string;
-      const [_, id] = fid.split(':');
-      router.push({
-        pathname: '/user-profile-screen',
-        params: {
-          userId: id,
-        },
-      });
-      return;
-    }
-
-    default:
-      return;
-  }
-};
 
 const getInitialNotification = async () => {
   if (Platform.OS === 'ios') {
