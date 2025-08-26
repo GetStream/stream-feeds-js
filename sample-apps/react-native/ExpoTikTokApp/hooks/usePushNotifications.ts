@@ -32,7 +32,6 @@ notifee.onBackgroundEvent(async (m) => {
 
 // FIXME: Fix this type.
 const navigateFromData = (data?: Record<string, any>) => {
-  console.log('DATA: ', data);
   if (!data) {
     return;
   }
@@ -80,7 +79,6 @@ const getInitialNotification = async () => {
     }
   } else {
     const initialNotification = await notifee.getInitialNotification();
-    console.log('INITIAL: ', initialNotification);
     if (initialNotification) {
       const data = initialNotification.notification.data;
       if (data) {
