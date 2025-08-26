@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import {
   ActivitySearchSource,
   FeedSearchSource,
-  UserSearchSource,
   SearchController,
   StreamSearch,
   useFeedsClient,
