@@ -8,6 +8,7 @@ import {
   hasPermission,
   getToken,
   AuthorizationStatus,
+  FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
 import { getApp } from '@react-native-firebase/app';
 
@@ -24,47 +25,79 @@ import { router } from 'expo-router';
 
 const messaging = getMessaging(getApp());
 
-notifee.onBackgroundEvent(async (m) => {
-  if (m.type === EventType.PRESS || m.type === EventType.ACTION_PRESS) {
-    navigateFromData(m.detail.notification?.data);
+type MessagingDataType = FirebaseMessagingTypes.RemoteMessage['data'];
+
+notifee.onBackgroundEvent(async (message) => {
+  if (
+    message.type === EventType.PRESS ||
+    message.type === EventType.ACTION_PRESS
+  ) {
+    navigateFromData(message.detail.notification?.data as MessagingDataType);
   }
 });
 
-// FIXME: Fix this type.
-const navigateFromData = (data?: Record<string, any>) => {
+export const extractNotificationConfig = (
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
+) => {
+  const { stream, ...rest } = remoteMessage.data ?? {};
+  const data = {
+    ...rest,
+    ...((stream as unknown as Record<string, string> | undefined) ?? {}), // extract and merge stream object if present
+  };
+  const notification = remoteMessage.notification ?? {};
+  const body = (data.body ?? notification.body ?? '') as string;
+  const title = (data.title ?? notification.title) as string;
+
+  return { data, body, title };
+};
+
+const navigateFromData = (data?: MessagingDataType) => {
   if (!data) {
     return;
   }
-  if (
-    ['feeds.comment.added', 'feeds.comment.reaction.added'].includes(data.type)
-  ) {
-    const [groupId, id] = data.fid.split(':');
+
+  const type = data.type as string;
+  const activityId = data.activity_id as string;
+
+  if (['feeds.comment.added', 'feeds.comment.reaction.added'].includes(type)) {
+    const fid = data.fid as string;
+    const [groupId, id] = fid.split(':');
     router.push({
       pathname: '/comments-modal',
       params: {
         feedUserId: id,
         feedGroupId: groupId,
-        activityId: data.activity_id,
+        activityId,
       },
     });
     return;
   }
 
   if (
-    ['feeds.activity.reaction.added', 'feeds.activity.added'].includes(
-      data.type,
-    )
+    ['feeds.activity.reaction.added', 'feeds.activity.added'].includes(type)
   ) {
-    const [groupId, id] = data.fid.split(':');
+    const fid = data.fid as string;
+    const [groupId, id] = fid.split(':');
     router.push({
       pathname: '/activity-pager-screen',
       params: {
-        activityId: data.activity_id,
         groupId,
         id,
+        activityId,
       },
     });
     return;
+  }
+
+  if (type === 'feeds.follow.created') {
+    const fid = (data.source_fid ?? data.fid) as string;
+    const [_, id] = fid.split(':');
+    router.push({
+      pathname: '/user-profile-screen',
+      params: {
+        userId: id,
+      },
+    });
   }
 };
 
@@ -82,7 +115,7 @@ const getInitialNotification = async () => {
     if (initialNotification) {
       const data = initialNotification.notification.data;
       if (data) {
-        navigateFromData(data);
+        navigateFromData(data as MessagingDataType);
       }
     }
   }
@@ -140,14 +173,6 @@ export const usePushNotifications = () => {
 
         await client.createDevice(createDeviceConfiguration);
 
-        const devices = await client.listDevices();
-
-        console.log('devices created', devices);
-
-        // for (const device of devices.devices) {
-        //   await client.deleteDevice({ id: device.id });
-        // }
-
         // Listen to new FCM tokens and register them with stream chat server.
         const unsubscribeTokenRefresh = onTokenRefresh(
           messaging,
@@ -162,23 +187,17 @@ export const usePushNotifications = () => {
         const unsubscribeForegroundMessageReceive = onMessage(
           messaging,
           async (remoteMessage) => {
-            const { stream, ...rest } = remoteMessage.data ?? {};
-            const data = {
-              ...rest,
-              ...((stream as unknown as Record<string, string> | undefined) ??
-                {}), // extract and merge stream object if present
-            };
+            // create the android channel to send the notification to
+            // display the notification on foreground
             const channelId = await notifee.createChannel({
               id: 'foreground',
               name: 'Foreground Messages',
             });
-            // create the android channel to send the notification to
-            // display the notification on foreground
-            const notification = remoteMessage.notification ?? {};
-            const body = (data.body ?? notification.body) as string;
-            const title = (data.title ?? notification.title) as string;
 
-            if (body && title) {
+            const { data, body, title } =
+              extractNotificationConfig(remoteMessage);
+
+            if (title) {
               await notifee.displayNotification({
                 android: {
                   channelId,
@@ -206,7 +225,7 @@ export const usePushNotifications = () => {
         // 3) Tapped a Notifee notification while app is foreground/background but running
         const unsubNotifee = notifee.onForegroundEvent(({ type, detail }) => {
           if (type === EventType.PRESS || type === EventType.ACTION_PRESS) {
-            navigateFromData(detail.notification?.data);
+            navigateFromData(detail.notification?.data as MessagingDataType);
           }
         });
 

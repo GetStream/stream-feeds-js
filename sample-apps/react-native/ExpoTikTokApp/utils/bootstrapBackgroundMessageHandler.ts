@@ -5,20 +5,23 @@ import {
   setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
 import { getApp } from '@react-native-firebase/app';
+import { extractNotificationConfig } from '@/hooks/usePushNotifications';
 
 const messaging = getMessaging(getApp());
 
-setBackgroundMessageHandler(messaging, async (msg) => {
+setBackgroundMessageHandler(messaging, async (remoteMessage) => {
   await notifee.createChannel({
     id: 'default',
     name: 'Default',
     importance: AndroidImportance.HIGH,
   });
 
+  const { data, body, title } = extractNotificationConfig(remoteMessage);
+
   await notifee.displayNotification({
-    title: msg.data?.title as string,
-    body: (msg.data?.body as string) ?? '',
-    data: msg.data,
+    title,
+    body,
+    data,
     android: {
       channelId: 'default',
       pressAction: { id: 'default', launchActivity: 'default' },
