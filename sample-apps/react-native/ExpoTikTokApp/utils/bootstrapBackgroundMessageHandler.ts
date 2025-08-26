@@ -24,6 +24,8 @@ setBackgroundMessageHandler(messaging, async (remoteMessage) => {
     data,
     android: {
       channelId: 'default',
+      smallIcon: 'notification_icon',
+      color: '#2063F6',
       pressAction: { id: 'default', launchActivity: 'default' },
     },
   });

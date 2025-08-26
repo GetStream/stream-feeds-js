@@ -1,4 +1,3 @@
-// app.config.ts
 import type { ExpoConfig } from 'expo/config';
 
 const MAPS_KEY = process.env.EXPO_PUBLIC_MAPS_API_KEY ?? '';
@@ -9,6 +8,10 @@ const config: ExpoConfig = {
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
+  notification: {
+    icon: './assets/images/adaptive-foreground.png',
+    color: '#2063F6'
+  },
   scheme: 'expotiktokapp',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
@@ -18,6 +21,7 @@ const config: ExpoConfig = {
     backgroundColor: '#ffffff',
   },
   ios: {
+    icon: './assets/images/icon.png',
     entitlements: { 'aps-environment': 'development' },
     infoPlist: { UIBackgroundModes: ['remote-notification'] },
     googleServicesFile: './firebase/GoogleService-Info.plist',
@@ -31,8 +35,8 @@ const config: ExpoConfig = {
   android: {
     googleServicesFile: './firebase/google-services.json',
     adaptiveIcon: {
-      foregroundImage: './assets/images/adaptive-icon.png',
-      backgroundColor: '#ffffff',
+      foregroundImage: './assets/images/adaptive-foreground.png',
+      backgroundColor: '#2063F6',
     },
     package: 'io.getstream.expotiktokapp',
     config: {

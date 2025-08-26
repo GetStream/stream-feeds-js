@@ -137,6 +137,8 @@ export const usePushNotifications = () => {
               await notifee.displayNotification({
                 android: {
                   channelId,
+                  smallIcon: 'notification_icon',
+                  color: '#2063F6',
                   pressAction: {
                     id: 'default',
                     launchActivity: 'default',
