@@ -24,14 +24,15 @@ import { router } from 'expo-router';
 
 const messaging = getMessaging(getApp());
 
-notifee.onBackgroundEvent(async m => {
+notifee.onBackgroundEvent(async (m) => {
   if (m.type === EventType.PRESS || m.type === EventType.ACTION_PRESS) {
     navigateFromData(m.detail.notification?.data);
   }
-})
+});
 
 // FIXME: Fix this type.
 const navigateFromData = (data?: Record<string, any>) => {
+  console.log('DATA: ', data);
   if (!data) {
     return;
   }
@@ -50,7 +51,11 @@ const navigateFromData = (data?: Record<string, any>) => {
     return;
   }
 
-  if (data.type === 'feeds.activity.reaction.added') {
+  if (
+    ['feeds.activity.reaction.added', 'feeds.activity.added'].includes(
+      data.type,
+    )
+  ) {
     const [groupId, id] = data.fid.split(':');
     router.push({
       pathname: '/activity-pager-screen',
@@ -75,7 +80,7 @@ const getInitialNotification = async () => {
     }
   } else {
     const initialNotification = await notifee.getInitialNotification();
-    console.log('INITIAL: ', initialNotification)
+    console.log('INITIAL: ', initialNotification);
     if (initialNotification) {
       const data = initialNotification.notification.data;
       if (data) {
