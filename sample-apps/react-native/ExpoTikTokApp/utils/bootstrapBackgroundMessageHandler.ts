@@ -4,8 +4,9 @@ import {
   getMessaging,
   setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
+import { getApp } from '@react-native-firebase/app';
 
-const messaging = getMessaging();
+const messaging = getMessaging(getApp());
 
 setBackgroundMessageHandler(messaging, async (msg) => {
   await notifee.createChannel({
@@ -18,7 +19,10 @@ setBackgroundMessageHandler(messaging, async (msg) => {
     title: msg.data?.title as string,
     body: (msg.data?.body as string) ?? '',
     data: msg.data,
-    android: { channelId: 'default', pressAction: { id: 'default' } },
+    android: {
+      channelId: 'default',
+      pressAction: { id: 'default', launchActivity: 'default' },
+    },
   });
 });
 

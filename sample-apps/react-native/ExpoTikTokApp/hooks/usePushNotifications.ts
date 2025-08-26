@@ -9,6 +9,8 @@ import {
   getToken,
   AuthorizationStatus,
 } from '@react-native-firebase/messaging';
+import { getApp } from '@react-native-firebase/app';
+
 import notifee, { EventType } from '@notifee/react-native';
 import { PermissionsAndroid, Platform } from 'react-native';
 import {
@@ -20,7 +22,13 @@ import { useEffect, useRef } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { router } from 'expo-router';
 
-const messaging = getMessaging();
+const messaging = getMessaging(getApp());
+
+notifee.onBackgroundEvent(async m => {
+  if (m.type === EventType.PRESS || m.type === EventType.ACTION_PRESS) {
+    navigateFromData(m.detail.notification?.data);
+  }
+})
 
 // FIXME: Fix this type.
 const navigateFromData = (data?: Record<string, any>) => {
@@ -173,6 +181,7 @@ export const usePushNotifications = () => {
                   channelId,
                   pressAction: {
                     id: 'default',
+                    launchActivity: 'default',
                   },
                 },
                 body,
