@@ -191,7 +191,7 @@ describe('activity-utils', () => {
 
       expect(result.changed).toBe(true);
       expect(result.activities).toHaveLength(1);
-      expect(result.activities[0].id).toBe('activity2');
+      expect(result.activities![0].id).toBe('activity2');
       // Make sure we create a new array
       expect(activities === result.activities).toBe(false);
     });
@@ -205,7 +205,7 @@ describe('activity-utils', () => {
 
       expect(result.changed).toBe(false);
       expect(result.activities).toHaveLength(1);
-      expect(result.activities[0].id).toBe('activity1');
+      expect(result.activities![0].id).toBe('activity1');
     });
 
     it('should handle empty activities array', () => {
