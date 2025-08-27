@@ -1,12 +1,12 @@
 import React, { createContext, useContext } from 'react';
 import type { PropsWithChildren } from 'react';
-import type { SearchController2 } from '@stream-io/feeds-react-sdk';
+import type { SearchController } from '@stream-io/feeds-react-sdk';
 
 export type SearchContextValue = {
   /** The type of channel to create on user result select, defaults to `messaging` */
   directMessagingChannelType: string;
   /** Instance of the search controller that handles the data management */
-  searchController: SearchController2;
+  searchController: SearchController;
   /** Sets the input element into disabled state */
   disabled?: boolean;
   /** Clear search state / results on every click outside the search input, defaults to true */

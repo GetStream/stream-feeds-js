@@ -1,7 +1,7 @@
 import { useStateStore } from '@stream-io/feeds-react-sdk';
 import { useEffect, useState } from 'react';
 import type {
-  SearchController2,
+  SearchController,
   SearchControllerState,
   SearchSource,
 } from '@stream-io/feeds-react-sdk';
@@ -11,11 +11,11 @@ const searchControllerStateSelector = (value: SearchControllerState) => ({
 });
 
 export type UseSearchQueriesInProgressParams = {
-  searchController: SearchController2;
+  searchController: SearchController;
 };
 
 export const useSearchQueriesInProgress = (
-  searchController: SearchController2,
+  searchController: SearchController,
 ) => {
   const [queriesInProgress, setQueriesInProgress] = useState<string[]>([]);
   const { sources } = useStateStore(
