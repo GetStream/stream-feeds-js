@@ -1,4 +1,4 @@
-import { StateStore } from './StateStore';
+import { StateStore } from '../StateStore';
 import type { SearchSource } from './BaseSearchSource';
 
 export type SearchControllerState = {
@@ -23,8 +23,6 @@ export class SearchController {
   /**
    * Not intended for direct use by integrators, might be removed without notice resulting in
    * broken integrations.
-   *
-   * @internal
    */
   _internalState: StateStore<InternalSearchControllerState>;
   state: StateStore<SearchControllerState>;
@@ -39,7 +37,6 @@ export class SearchController {
     this._internalState = new StateStore<InternalSearchControllerState>({});
     this.config = { keepSingleActiveSource: true, ...config };
   }
-
   get hasNext() {
     return this.sources.some((source) => source.hasNext);
   }
@@ -117,9 +114,7 @@ export class SearchController {
     this.state.partialNext({
       searchQuery,
     });
-    await Promise.all(
-      searchedSources.map((source) => source.search(searchQuery)),
-    );
+    await Promise.all(searchedSources.map((source) => source.search(searchQuery)));
   };
 
   cancelSearchQueries = () => {

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 import type {
-  SearchController,
+  SearchController2,
   SearchControllerState,
 } from '@stream-io/feeds-react-sdk';
 import { useStateStore } from '@stream-io/feeds-react-sdk';
@@ -28,7 +28,7 @@ export type SearchProps = {
   exitSearchOnInputBlur?: boolean;
   /** Custom placeholder text to be displayed in the search input */
   placeholder?: string;
-  searchController: SearchController;
+  searchController: SearchController2;
 };
 
 export const Search = ({

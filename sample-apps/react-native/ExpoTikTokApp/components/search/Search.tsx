@@ -22,7 +22,7 @@ export const Search = () => {
       sources: [
         new ActivitySearchSource(client, { allowEmptySearchString: true }),
         new FeedSearchSource(client, {
-          groupId: 'user',
+          groupId: 'timeline',
           allowEmptySearchString: true,
         }),
         new LocationSearchSource(client, { allowEmptySearchString: true }),

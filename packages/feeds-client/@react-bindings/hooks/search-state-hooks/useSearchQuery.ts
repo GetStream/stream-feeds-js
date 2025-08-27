@@ -1,7 +1,7 @@
 import type {
   SearchController,
   SearchControllerState,
-} from '../../../src/common/SearchController';
+} from '../../../src/common/search';
 import { useSearchContext } from '../../contexts/StreamSearchContext';
 import { useStateStore } from '../useStateStore';
 

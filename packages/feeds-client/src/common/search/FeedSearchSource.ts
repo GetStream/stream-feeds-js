@@ -1,8 +1,8 @@
 import { BaseSearchSource } from './BaseSearchSource';
-import type { SearchSourceOptions } from './BaseSearchSource';
+import type { SearchSourceOptions } from './types';
 
-import { FeedsClient } from '../feeds-client';
-import { Feed } from '../feed';
+import { FeedsClient } from '../../feeds-client';
+import { Feed } from '../../feed';
 
 export type FeedSearchSourceOptions = SearchSourceOptions & {
   groupId?: string;

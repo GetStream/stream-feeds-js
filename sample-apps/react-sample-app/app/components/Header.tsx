@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import {
   ActivitySearchSource,
   FeedSearchSource,
-  SearchController,
+  SearchController2,
 } from '@stream-io/feeds-react-sdk';
 import { Search } from './Search';
 import { NotificationBell } from './notifications/NotificationBell';
@@ -21,7 +21,7 @@ export function Header() {
       return undefined;
     }
 
-    return new SearchController({
+    return new SearchController2({
       sources: [
         new ActivitySearchSource(client),
         new FeedSearchSource(client, { groupId: 'user' }),

@@ -1,7 +1,7 @@
 import type {
   SearchSource,
   SearchSourceState,
-} from '../../../src/common/BaseSearchSource';
+} from '../../../src/common/search';
 import { useSearchResultsContext } from '../../contexts/StreamSearchResultsContext';
 import { useStateStore } from '../useStateStore';
 import { useStableCallback } from '../internal';
