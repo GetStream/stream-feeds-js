@@ -11,7 +11,7 @@ export type StreamSearchContextProps = {
 };
 
 /**
- * Hook to access the nearest SearchController2 instance.
+ * Hook to access the nearest SearchController instance.
  */
 export const useSearchContext = () => {
   return useContext(StreamSearchContext);

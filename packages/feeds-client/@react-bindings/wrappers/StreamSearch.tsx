@@ -3,7 +3,7 @@ import { StreamSearchContext } from '../contexts/StreamSearchContext';
 import type { SearchController } from '../../src/common/search';
 
 /**
- * The props for the StreamSearch component. It accepts a `SearchController2` instance.
+ * The props for the StreamSearch component. It accepts a `SearchController` instance.
  */
 export type StreamSearchProps = {
   searchController: SearchController | undefined;
