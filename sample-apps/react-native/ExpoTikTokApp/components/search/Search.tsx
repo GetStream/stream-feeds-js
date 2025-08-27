@@ -25,7 +25,7 @@ export const Search = () => {
           resetOnNewSearchQuery: false,
         }),
         new FeedSearchSource(client, {
-          groupId: 'timeline',
+          groupId: 'user',
           allowEmptySearchString: true,
           resetOnNewSearchQuery: false,
         }),
