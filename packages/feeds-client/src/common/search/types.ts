@@ -14,6 +14,7 @@ export type SearchSourceOptions = {
   debounceMs?: number;
   pageSize?: number;
   allowEmptySearchString?: boolean;
+  resetOnNewSearchQuery?: boolean;
 };
 
 export type SearchSourceType = 'activity' | 'user' | 'feed' | (string & {});

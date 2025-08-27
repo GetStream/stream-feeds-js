@@ -20,12 +20,19 @@ export const Search = () => {
 
     return new SearchController({
       sources: [
-        new ActivitySearchSource(client, { allowEmptySearchString: true }),
+        new ActivitySearchSource(client, {
+          allowEmptySearchString: true,
+          resetOnNewSearchQuery: false,
+        }),
         new FeedSearchSource(client, {
           groupId: 'timeline',
           allowEmptySearchString: true,
+          resetOnNewSearchQuery: false,
         }),
-        new LocationSearchSource(client, { allowEmptySearchString: true }),
+        new LocationSearchSource(client, {
+          allowEmptySearchString: true,
+          resetOnNewSearchQuery: false,
+        }),
       ],
       config: { keepSingleActiveSource: true },
     });

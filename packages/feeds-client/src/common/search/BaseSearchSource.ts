@@ -53,18 +53,21 @@ const DEFAULT_SEARCH_SOURCE_OPTIONS: Required<SearchSourceOptions> = {
   debounceMs: 300,
   pageSize: 10,
   allowEmptySearchString: false,
+  resetOnNewSearchQuery: true,
 } as const;
 
 abstract class BaseSearchSourceBase<T> implements ISearchSource<T> {
   state: StateStore<SearchSourceState<T>>;
   pageSize: number;
   protected allowEmptySearchString: boolean;
+  protected resetOnNewSearchQuery: boolean;
   abstract readonly type: SearchSourceType;
 
   protected constructor(options?: SearchSourceOptions) {
-    const { pageSize, allowEmptySearchString } = { ...DEFAULT_SEARCH_SOURCE_OPTIONS, ...options };
+    const { pageSize, allowEmptySearchString, resetOnNewSearchQuery } = { ...DEFAULT_SEARCH_SOURCE_OPTIONS, ...options };
     this.pageSize = pageSize;
     this.allowEmptySearchString = allowEmptySearchString;
+    this.resetOnNewSearchQuery = resetOnNewSearchQuery;
     this.state = new StateStore<SearchSourceState<T>>(this.initialState);
   }
 
@@ -139,10 +142,15 @@ abstract class BaseSearchSourceBase<T> implements ISearchSource<T> {
   };
 
   protected getStateBeforeFirstQuery(newSearchString: string): SearchSourceState<T> {
+    const initialState = this.initialState;
+    const oldItems = this.items;
+
+    const items = this.resetOnNewSearchQuery ? initialState.items : oldItems;
     return {
       ...this.initialState,
+      items,
       isActive: this.isActive,
-      isLoading: true,
+      isLoading: this.resetOnNewSearchQuery ? true : !oldItems,
       searchQuery: newSearchString,
     };
   }
