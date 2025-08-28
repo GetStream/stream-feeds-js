@@ -9,24 +9,27 @@ import { FollowButton } from '@/components/follows/FollowButton';
 import { View, Text } from '@/components/common/Themed';
 import { useRouter } from 'expo-router';
 import { ErrorIndicator, LoadingIndicator } from '@/components/indicators';
+import { useStableCallback } from '@/hooks/useStableCallback';
 
 const keyExtractor = (item: Feed) => item.id;
 
 const UserSeparator = () => <View style={styles.separator} />;
 
 const UserItem = ({ feed }: { feed: Feed }) => {
+  const router = useRouter();
   const connectedUser = useClientConnectedUser();
   const { created_by: createdBy } = useFeedMetadata(feed) ?? {};
-  const router = useRouter();
+
+  const onPress = useStableCallback(() =>
+    router.push({
+      pathname: '/user-profile-screen',
+      params: { userId: createdBy?.id },
+    }))
 
   return (
     <TouchableOpacity
-      onPress={() =>
-        router.push({
-          pathname: '/user-profile-screen',
-          params: { userId: createdBy?.id },
-        })
-      }
+      onPress={onPress
+    }
       style={styles.userRow}
     >
       <View style={styles.userInfo}>
@@ -49,8 +52,35 @@ const UserItem = ({ feed }: { feed: Feed }) => {
   );
 };
 
+const HashtagItem = ({ feed }: { feed: Feed }) => {
+  const router = useRouter();
+
+  const onPress = useStableCallback(() =>
+    router.push({
+      pathname: '/user-profile-screen',
+      params: { userId: '' },
+    }))
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.hashtagRow}
+    >
+      <View style={styles.iconCircle}>
+        <Text style={styles.iconHash}>#</Text>
+      </View>
+
+      <View style={styles.textCol}>
+        <Text style={styles.tagText} numberOfLines={1}>
+          {feed.id}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 const renderItem = ({ item }: { item: Feed }) => {
-  return <UserItem feed={item} />;
+  return item.group === 'user' ? <UserItem feed={item} /> : <HashtagItem feed={item} />;
 };
 
 export const FeedSourceResultList = () => {
@@ -120,5 +150,36 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: '#eee',
+  },
+  hashtagRow: {
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  iconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#9CA3AF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  iconHash: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  textCol: {
+    flex: 1,
+  },
+  tagText: {
+    fontSize: 16,
+    lineHeight: 20,
+    color: '#111827', // gray-900
+    fontWeight: '600',
   },
 });

@@ -127,6 +127,7 @@ export const ActivityComposer = () => {
           feeds: hashtags.map((hashtag) => ({
             feed_group_id: 'hashtag',
             feed_id: hashtag,
+            name: hashtag,
             visibility: 'public',
           })),
         });
