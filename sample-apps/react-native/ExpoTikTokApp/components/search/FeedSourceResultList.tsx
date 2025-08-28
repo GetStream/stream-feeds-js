@@ -24,14 +24,11 @@ const UserItem = ({ feed }: { feed: Feed }) => {
     router.push({
       pathname: '/user-profile-screen',
       params: { userId: createdBy?.id },
-    }))
+    }),
+  );
 
   return (
-    <TouchableOpacity
-      onPress={onPress
-    }
-      style={styles.userRow}
-    >
+    <TouchableOpacity onPress={onPress} style={styles.userRow}>
       <View style={styles.userInfo}>
         <Image
           source={{
@@ -57,15 +54,13 @@ const HashtagItem = ({ feed }: { feed: Feed }) => {
 
   const onPress = useStableCallback(() =>
     router.push({
-      pathname: '/user-profile-screen',
-      params: { userId: '' },
-    }))
+      pathname: '/hashtag-screen',
+      params: { id: feed.id },
+    }),
+  );
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={styles.hashtagRow}
-    >
+    <TouchableOpacity onPress={onPress} style={styles.hashtagRow}>
       <View style={styles.iconCircle}>
         <Text style={styles.iconHash}>#</Text>
       </View>
@@ -80,7 +75,11 @@ const HashtagItem = ({ feed }: { feed: Feed }) => {
 };
 
 const renderItem = ({ item }: { item: Feed }) => {
-  return item.group === 'user' ? <UserItem feed={item} /> : <HashtagItem feed={item} />;
+  return item.group === 'user' ? (
+    <UserItem feed={item} />
+  ) : (
+    <HashtagItem feed={item} />
+  );
 };
 
 export const FeedSourceResultList = () => {

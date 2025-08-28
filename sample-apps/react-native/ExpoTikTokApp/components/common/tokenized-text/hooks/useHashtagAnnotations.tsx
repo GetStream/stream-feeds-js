@@ -9,8 +9,8 @@ export const useHashtagAnnotations = () => {
   const onPressHashtag = useStableCallback((handle: string) => {
     if (handle) {
       router.push({
-        pathname: '/user-profile-screen',
-        params: { userId: handle },
+        pathname: '/hashtag-screen',
+        params: { id: handle },
       });
     }
   });

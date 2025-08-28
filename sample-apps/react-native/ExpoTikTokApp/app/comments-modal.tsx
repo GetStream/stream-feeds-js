@@ -36,7 +36,7 @@ const CommentsModal = () => {
   const feedUserid = feedUserIdParam as string;
 
   const feedConfig = useMemo(
-    () => ({ userId: feedUserid, groupId: feedGroupId }),
+    () => ({ id: feedUserid, groupId: feedGroupId }),
     [feedUserid, feedGroupId],
   );
 
