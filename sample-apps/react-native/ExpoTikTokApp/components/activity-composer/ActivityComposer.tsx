@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
-  TextInput,
   ScrollView,
   Text,
   StyleSheet,
@@ -27,7 +26,7 @@ import { ACTIVITY_TEXT_MAX_CHARACTERS } from '@/constants/stream';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 import { resetState } from '@/store/activity-action-state-store';
 import AutocompleteInput from '@/components/mentions/AutocompleteInput';
-import { findMentionedUsers } from '@/utils/findMentionedUsers';
+import { findMatchedTokens } from '@/utils/findMatchedTokens';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
@@ -121,7 +120,7 @@ export const ActivityComposer = () => {
     }
     setIsSending(true);
     try {
-      const mentionedUsers = findMentionedUsers(text);
+      const mentionedUsers = findMatchedTokens({ text, matcher: '@' });
 
       const activityData = {
         type: 'post',
