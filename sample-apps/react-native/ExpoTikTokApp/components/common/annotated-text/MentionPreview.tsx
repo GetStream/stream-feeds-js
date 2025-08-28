@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInputProps } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import React from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
 

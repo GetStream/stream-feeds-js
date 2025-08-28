@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
-import { Text, TextProps, StyleSheet } from 'react-native';
-import { useStableCallback } from '@/hooks/useStableCallback';
+import { Text, TextProps } from 'react-native';
 
 export type AnnotationConfig = {
   matching: string;
