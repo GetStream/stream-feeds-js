@@ -11,34 +11,37 @@ require('dotenv').config();
   const users = JSON.parse(
     await fs.readFile(path.resolve('users.json'), 'utf-8'),
   );
-  const client = new StreamClient(key, secret);
+  const nodeClient = new StreamClient(key, secret);
 
   console.log('Creating users...');
-  await client.upsertUsers(users);
+  await nodeClient.upsertUsers(users);
+
+  console.log('Creating custom feed groups...');
+  await nodeClient.feeds.createFeedGroup({ id: 'hashtag' });
 
   console.log('Creating feeds for users...');
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
 
-    const userFeed = client.feeds.feed('user', user.id);
+    const userFeed = nodeClient.feeds.feed('user', user.id);
     await userFeed.getOrCreate({
       visibility_level: user.visibility_level,
       user: { id: user.id },
     });
 
-    const timeline = client.feeds.feed('timeline', user.id);
+    const timeline = nodeClient.feeds.feed('timeline', user.id);
     await timeline.getOrCreate({
       visibility_level: 'private',
       user: { id: user.id },
     });
 
     // user's timeline follows user's post feed
-    await client.feeds.follow({
+    await nodeClient.feeds.follow({
       target: userFeed.feed,
       source: timeline.feed,
     });
 
-    await client.feeds.feed('notification', user.id).getOrCreate({
+    await nodeClient.feeds.feed('notification', user.id).getOrCreate({
       visibility_level: 'private',
       user_id: user.id,
     });
