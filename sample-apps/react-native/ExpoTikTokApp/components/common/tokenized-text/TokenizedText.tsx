@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
 import { Text, TextProps } from 'react-native';
 
-export type AnnotationConfig = {
+export type TokenizerConfig = {
   matching: string;
   name: string;
   Component: React.ComponentType<{ text: string, handle: string }>;
 };
 
-export type AnnotatedTextProps = TextProps & {
+export type TokenizedTextProps = TextProps & {
   text: string;
-  annotations?: Record<string, AnnotationConfig>;
+  annotations?: Record<string, TokenizerConfig>;
 };
 
 export type Part = {
@@ -23,12 +23,12 @@ export type Part = {
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-export const AnnotatedText = ({
+export const TokenizedText = ({
   text,
   style,
   annotations = {},
   ...rest
-}: AnnotatedTextProps) => {
+}: TokenizedTextProps) => {
   const regex = useMemo(() => {
     const escapedMatchers = Object.values(annotations).map((m) =>
       escapeRe(m.matching),
@@ -81,7 +81,7 @@ export const AnnotatedText = ({
     <Text style={style} {...rest}>
       {parts.map((part, index) =>
         part.entity ? (
-          <AnnotatedTextPart
+          <TokenizedTextPart
             key={index}
             part={part}
             PartComponent={annotations[part.entity?.name].Component}
@@ -94,10 +94,10 @@ export const AnnotatedText = ({
   );
 };
 
-const AnnotatedTextPart = ({
+const TokenizedTextPart = ({
   part,
   PartComponent,
 }: {
   part: Part;
-  PartComponent: AnnotationConfig['Component'];
+  PartComponent: TokenizerConfig['Component'];
 }) => <PartComponent handle={part.entity?.value ?? ''} text={part.text} />;
