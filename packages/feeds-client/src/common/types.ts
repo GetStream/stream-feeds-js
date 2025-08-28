@@ -1,3 +1,5 @@
+export * from './search/types';
+
 export type FeedsClientOptions = {
   base_url?: string;
   timeout?: number;

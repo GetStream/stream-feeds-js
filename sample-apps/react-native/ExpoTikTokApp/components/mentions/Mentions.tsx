@@ -14,7 +14,12 @@ export const Mentions = ({ children }: PropsWithChildren) => {
     }
 
     return new SearchController({
-      sources: [new UserSearchSource(client, { allowEmptySearchString: true })],
+      sources: [
+        new UserSearchSource(client, {
+          allowEmptySearchString: true,
+          resetOnNewSearchQuery: false,
+        }),
+      ],
     });
   }, [client]);
 

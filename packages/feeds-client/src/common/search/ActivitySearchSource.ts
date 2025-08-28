@@ -1,8 +1,8 @@
 import { BaseSearchSource } from './BaseSearchSource';
-import type { SearchSourceOptions } from './BaseSearchSource';
+import type { SearchSourceOptions } from './types';
 
-import { FeedsClient } from '../feeds-client';
-import { ActivityResponse } from '../gen/models';
+import { FeedsClient } from '../../feeds-client';
+import { ActivityResponse } from '../../gen/models';
 
 export class ActivitySearchSource extends BaseSearchSource<ActivityResponse> {
   readonly type = 'activity' as const;

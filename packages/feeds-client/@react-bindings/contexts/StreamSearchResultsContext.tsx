@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { SearchSource } from '../../src/common/BaseSearchSource';
+import type { SearchSource } from '../../src/common/search';
 
 export const StreamSearchResultsContext = createContext<SearchSource | undefined>(undefined);
 
