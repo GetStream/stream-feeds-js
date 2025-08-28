@@ -18,7 +18,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationPreview } from '@/components/common/LocationPreview';
 import { ShareButton } from '@/components/common/Share';
-import { MentionText } from '@/components/common/annotated-text/MentionText';
+import { MentionText } from '@/components/mentions/MentionText';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 

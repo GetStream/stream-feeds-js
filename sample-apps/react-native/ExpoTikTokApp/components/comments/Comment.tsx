@@ -12,7 +12,7 @@ import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 import { openSheetWith } from '@/store/bottom-sheet-state-store';
 import { useRouter } from 'expo-router';
 import { setParent } from '@/store/comment-input-state-store';
-import { MentionText } from '@/components/common/annotated-text/MentionText';
+import { MentionText } from '@/components/mentions/MentionText';
 
 export const Comment = ({
   comment,

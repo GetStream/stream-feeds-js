@@ -1,8 +1,8 @@
 import { TextProps } from 'react-native';
 import { useMemo } from 'react';
 import { CommentParent } from '@stream-io/feeds-react-native-sdk';
-import { AnnotatedText } from '@/components/common/annotated-text/AnnotatedText';
-import { useMentionAnnotations } from '@/components/common/annotated-text/hooks/useMentionAnnotations';
+import { AnnotatedText } from '@/components/common/AnnotatedText';
+import { useMentionAnnotations } from '@/components/mentions/hooks/useMentionAnnotations';
 
 export const MentionText = ({
   entity,

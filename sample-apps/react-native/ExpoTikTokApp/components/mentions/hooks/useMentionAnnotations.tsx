@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
-import { MentionPreview } from '@/components/common/annotated-text/MentionPreview';
+import { MentionPreview } from '@/components/mentions/MentionPreview';
 import { CommentParent } from '@stream-io/feeds-react-native-sdk';
 
 export const useMentionAnnotations = ({
