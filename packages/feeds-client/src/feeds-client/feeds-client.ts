@@ -1,5 +1,6 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
+  ActivityRequest,
   ActivityResponse,
   FeedResponse,
   FileUploadRequest,
@@ -266,6 +267,11 @@ export class FeedsClient extends FeedsApi {
   devToken = (userId: string) => {
     return streamDevToken(userId);
   };
+
+  // TODO: The name is a WIP
+  createActivity(request: ActivityRequest) {
+    return this.addActivity(request);
+  }
 
   closePoll = async (request: {
     poll_id: string;

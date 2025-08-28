@@ -15,7 +15,9 @@ export const useSearchResult = (sourceFromProps?: SearchSource) => {
     useStateStore(source?.state, selector) ?? {};
 
   const loadMore = useStableCallback(async () => {
-    source?.search();
+    if (hasNext) {
+      source?.search();
+    }
   });
 
   return useMemo(

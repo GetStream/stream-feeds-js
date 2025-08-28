@@ -3,12 +3,14 @@ import { useEffect, useState } from 'react';
 import {
   useSearchContext,
   useSearchSources,
+  SearchSource,
 } from '@stream-io/feeds-react-native-sdk';
 
 const tabsNameMap = {
-  feed: 'Users',
+  'user-feed': 'Users',
   activity: 'Posts',
-  'activity-location': 'Places'
+  'activity-location': 'Places',
+  'hashtag-feed': 'Hashtags',
 };
 
 export const SearchTabs = () => {

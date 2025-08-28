@@ -188,7 +188,7 @@ abstract class BaseSearchSourceBase<T> implements ISearchSource<T> {
     const { items, next } = result;
 
     const stateUpdate: Partial<SearchSourceState<T>> = {};
-    if (next || next === null) {
+    if (Object.hasOwn(result, 'next')) {
       stateUpdate.next = next;
       stateUpdate.hasNext = !!next;
     } else {
