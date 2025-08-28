@@ -12,7 +12,7 @@ import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 import { openSheetWith } from '@/store/bottom-sheet-state-store';
 import { useRouter } from 'expo-router';
 import { setParent } from '@/store/comment-input-state-store';
-import { MentionText } from '@/components/common/MentionText';
+import { MentionText } from '@/components/common/annotated-text/MentionText';
 
 export const Comment = ({
   comment,
@@ -63,8 +63,7 @@ export const Comment = ({
         <View style={styles.commentContent}>
           <Text style={styles.commentUser}>{comment.user.id}</Text>
           <MentionText
-            text={comment.text ?? ''}
-            mentionedUsers={comment.mentioned_users}
+            entity={comment}
             style={styles.commentText}
           />
           <View style={styles.metaRow}>
