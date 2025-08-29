@@ -4,7 +4,7 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import { PropsWithChildren, useEffect, useMemo } from 'react';
 
-export const MentionSearchResults = ({ children }: PropsWithChildren) => {
+export const AutocompleteSearchResults = ({ children }: PropsWithChildren) => {
   const searchController = useSearchContext();
   const { sources = [] } = useSearchSources() ?? {};
 

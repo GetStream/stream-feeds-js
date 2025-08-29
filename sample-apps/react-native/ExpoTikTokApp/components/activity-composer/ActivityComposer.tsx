@@ -20,7 +20,7 @@ import { MediaPickerRow } from '@/components/activity-composer/MediaPickerList';
 import { ACTIVITY_TEXT_MAX_CHARACTERS } from '@/constants/stream';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 import { resetState } from '@/store/activity-action-state-store';
-import AutocompleteInput from '@/components/mentions/AutocompleteInput';
+import AutocompleteInput from '@/components/common/autocomplete-input/AutocompleteInput';
 import { findMatchedTokens } from '@/utils/findMatchedTokens';
 
 export const ActivityComposer = () => {
