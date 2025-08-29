@@ -33,6 +33,11 @@ export const Search = () => {
           allowEmptySearchString: true,
           resetOnNewSearchQuery: false,
         }),
+        new FeedSearchSource(client, {
+          groupId: 'hashtag',
+          allowEmptySearchString: true,
+          resetOnNewSearchQuery: false,
+        }),
       ],
       config: { keepSingleActiveSource: true },
     });

@@ -22,8 +22,8 @@ import Animated, {
 import { Ionicons } from '@expo/vector-icons';
 import { useCommentInputState } from '@/hooks/useCommentInputState';
 import { resetState } from '@/store/comment-input-state-store';
-import AutocompleteInput from '@/components/mentions/AutocompleteInput';
-import { findMentionedUsers } from '@/utils/findMentionedUsers';
+import AutocompleteInput from '@/components/common/autocomplete-input/AutocompleteInput';
+import { findMatchedTokens } from '@/utils/findMatchedTokens';
 
 const INPUT_METADATA_HEIGHT = 25;
 
@@ -54,7 +54,7 @@ export const CommentsInput = ({ activityId }: { activityId: string }) => {
         });
       }
 
-      const mentionedUsers = findMentionedUsers(text);
+      const mentionedUsers = findMatchedTokens({ text, matcher: '@' });
 
       return client?.addComment({
         comment: text as string,

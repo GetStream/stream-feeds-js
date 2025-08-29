@@ -9,16 +9,16 @@ import { useEffect, useMemo } from 'react';
 export const useCreateAndQueryFeed = ({
   groupId,
   queryOptions = { watch: true },
-  userId,
+  id: idFromProps,
 }: {
   groupId: string;
-  userId?: string;
+  id?: string;
   queryOptions?: GetOrCreateFeedRequest;
 }) => {
   const { user } = useUserContext();
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
-  const id = userId ?? user?.id;
+  const id = idFromProps ?? user?.id;
 
   const feed = useMemo(() => {
     if (!client || !id) {

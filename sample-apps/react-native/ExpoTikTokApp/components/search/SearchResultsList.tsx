@@ -7,7 +7,7 @@ export const SearchResultsList = () => {
 
   if (!source) return null;
 
-  return source.type === 'feed' ? (
+  return source.type.includes('-feed') ? (
     <FeedSourceResultList />
   ) : (
     <ActivitySourceResultList />

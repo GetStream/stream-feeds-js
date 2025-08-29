@@ -17,7 +17,7 @@ const UserProfileScreen = () => {
   const userFeedConfig = useMemo(
     () => ({
       groupId: 'user',
-      userId,
+      id: userId,
       queryOptions,
     }),
     [userId],
@@ -25,7 +25,7 @@ const UserProfileScreen = () => {
   const timelineFeedConfig = useMemo(
     () => ({
       groupId: 'timeline',
-      userId,
+      id: userId,
       queryOptions,
     }),
     [userId],

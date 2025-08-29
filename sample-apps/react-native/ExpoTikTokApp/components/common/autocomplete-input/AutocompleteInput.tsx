@@ -8,32 +8,42 @@ import {
   TextInputProps,
   Platform,
 } from 'react-native';
-import { Mentions } from '@/components/mentions/Mentions';
-import { MentionSearchResults } from '@/components/mentions/MentionSearchResults';
-import type { User } from '@stream-io/feeds-react-native-sdk';
+import { AutocompleteSearch } from '@/components/common/autocomplete-input/AutocompleteSearch';
+import { AutocompleteSearchResults } from '@/components/common/autocomplete-input/AutocompleteSearchResults';
 import {
   useSearchContext,
   useSearchResult,
 } from '@stream-io/feeds-react-native-sdk';
-import { SuggestionsList } from '@/components/mentions/SuggestionsList';
+import {
+  Suggestion,
+  SuggestionsList,
+} from '@/components/common/autocomplete-input/SuggestionsList';
 import { useStableCallback } from '@/hooks/useStableCallback';
 
-const MENTION_CHARS = /[A-Za-z0-9_.]/;
+const ALLOWED_CHARS = /[A-Za-z0-9_.]/;
 
 type AutocompleteInputProps = TextInputProps & {
   text: string;
   setText: React.Dispatch<React.SetStateAction<string>>;
+  enabledSuggestions?: Record<string, { name: string }>;
   height?: number;
 };
+
+const DEFAULT_ENABLED_SUGGESTIONS = {
+  '@': { name: 'mention' },
+  '#': { name: 'hashtag' },
+};
+const SUGGESTION_SESSION_CHARACTERS = Object.keys(DEFAULT_ENABLED_SUGGESTIONS);
 
 const AutocompleteInputInner = ({
   text,
   setText,
   height = 300,
+  enabledSuggestions = DEFAULT_ENABLED_SUGGESTIONS,
   ...textInputProps
 }: AutocompleteInputProps) => {
   const searchController = useSearchContext();
-  const { items: suggestions, error, isLoading } = useSearchResult();
+  const { items: suggestions, error } = useSearchResult();
   const [selection, setSelection] = useState<{ start: number; end: number }>({
     start: 0,
     end: 0,
@@ -41,7 +51,10 @@ const AutocompleteInputInner = ({
 
   const [layoutH, setLayoutH] = useState(0);
 
-  const [session, setSession] = useState<null | { start: number }>(null);
+  const [session, setSession] = useState<null | {
+    start: number;
+    prefix: string;
+  }>(null);
 
   const prevTextRef = useRef(text);
   const prevSelRef = useRef(selection);
@@ -57,7 +70,7 @@ const AutocompleteInputInner = ({
     const slice = text.slice(from, to);
 
     for (let i = 0; i < slice.length; i++) {
-      if (!MENTION_CHARS.test(slice[i])) return null;
+      if (!ALLOWED_CHARS.test(slice[i])) return null;
     }
     return slice;
   }, [session, selection.start, text]);
@@ -73,7 +86,7 @@ const AutocompleteInputInner = ({
         const end = sel.start;
         const within =
           end >= from &&
-          [...text.slice(from, end)].every((ch) => MENTION_CHARS.test(ch));
+          [...text.slice(from, end)].every((ch) => ALLOWED_CHARS.test(ch));
 
         if (!within) {
           setSession(null);
@@ -93,25 +106,35 @@ const AutocompleteInputInner = ({
       next.length === prev.length - 1 && selBefore.start === selBefore.end;
 
     if (insertedOneChar) {
+      // handle adding characters
       const insertIndex = selBefore.start;
       const ch = next[insertIndex];
       const prevChar = insertIndex > 0 ? next[insertIndex - 1] : '';
 
       if (
-        ch === '@' &&
-        (!prevChar || (!MENTION_CHARS.test(prevChar) && prevChar !== '@'))
+        SUGGESTION_SESSION_CHARACTERS.includes(ch) &&
+        (!prevChar ||
+          (!ALLOWED_CHARS.test(prevChar) &&
+            !SUGGESTION_SESSION_CHARACTERS.includes(prevChar)))
       ) {
-        setSession({ start: insertIndex });
+        // start the session if we open with a suggestion character
+        const suggestionType = enabledSuggestions[ch]?.name ?? '';
+        if (suggestionType === 'mention') {
+          searchController?.activateSource('user');
+        } else if (suggestionType === 'hashtag') {
+          searchController?.activateSource('hashtag-feed');
+        }
+        setSession({ start: insertIndex, prefix: ch });
       } else if (session) {
         const caretAfter = insertIndex + 1;
         const from = session.start + 1;
-        const typedAllowed = MENTION_CHARS.test(ch);
+        const typedAllowed = ALLOWED_CHARS.test(ch);
         const stillExtending =
           caretAfter >= from && caretAfter === selection.start + 1;
         if (!(typedAllowed && stillExtending)) setSession(null);
       }
     } else if (deletedOneChar) {
-      // 👇 handle backspace
+      // handle removing characters
       if (session) {
         const from = session.start + 1;
         const caretBefore = selBefore.start;
@@ -136,11 +159,11 @@ const AutocompleteInputInner = ({
     prevTextRef.current = next;
   });
 
-  const pick = useStableCallback((u: User) => {
+  const pick = useStableCallback((u: Suggestion) => {
     if (!session) return;
     const from = session.start;
     const to = selection.start;
-    const insert = `@${u.id} `;
+    const insert = `${session.prefix}${u.id} `;
     const newText = text.slice(0, from) + insert + text.slice(to);
     const caret = from + insert.length;
     setText(newText);
@@ -160,16 +183,19 @@ const AutocompleteInputInner = ({
 
   return (
     <>
-      {session && query !== null && !error && (suggestions ?? []).length > 0 && (
-        <View style={[styles.suggestionsShadow, { bottom: layoutH + 25 }]}>
-          <View style={[styles.suggestionsCard, { height }]}>
-            <SuggestionsList
-              onPress={pick}
-              suggestions={suggestions as User[]}
-            />
+      {session &&
+        query !== null &&
+        !error &&
+        (suggestions ?? []).length > 0 && (
+          <View style={[styles.suggestionsShadow, { bottom: layoutH + 25 }]}>
+            <View style={[styles.suggestionsCard, { height }]}>
+              <SuggestionsList
+                onPress={pick}
+                suggestions={suggestions as Suggestion[]}
+              />
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
       <TextInput
         value={text}
@@ -186,11 +212,11 @@ const AutocompleteInputInner = ({
 
 const AutocompleteInput = (props: AutocompleteInputProps) => {
   return (
-    <Mentions>
-      <MentionSearchResults>
+    <AutocompleteSearch>
+      <AutocompleteSearchResults>
         <AutocompleteInputInner {...props} />
-      </MentionSearchResults>
-    </Mentions>
+      </AutocompleteSearchResults>
+    </AutocompleteSearch>
   );
 };
 

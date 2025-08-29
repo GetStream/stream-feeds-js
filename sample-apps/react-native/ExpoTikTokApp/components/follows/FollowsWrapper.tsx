@@ -6,9 +6,9 @@ import { PropsWithChildren, useMemo } from 'react';
 export const FollowsWrapper = ({ groupId, children }: PropsWithChildren<{ groupId: string }>) => {
   const { userId: userIdParam } = useLocalSearchParams();
   // sigh
-  const userId = userIdParam as string;
+  const id = userIdParam as string;
 
-  const config = useMemo(() => ({ groupId, userId }), [groupId, userId]);
+  const config = useMemo(() => ({ groupId, id }), [groupId, id]);
 
   const feed = useCreateAndQueryFeed(config);
 

@@ -1,4 +1,5 @@
 import {
+  FeedSearchSource,
   SearchController,
   StreamSearch,
   useFeedsClient,
@@ -6,7 +7,7 @@ import {
 } from '@stream-io/feeds-react-native-sdk';
 import { PropsWithChildren, useMemo } from 'react';
 
-export const Mentions = ({ children }: PropsWithChildren) => {
+export const AutocompleteSearch = ({ children }: PropsWithChildren) => {
   const client = useFeedsClient();
   const searchController = useMemo(() => {
     if (!client) {
@@ -19,7 +20,13 @@ export const Mentions = ({ children }: PropsWithChildren) => {
           allowEmptySearchString: true,
           resetOnNewSearchQuery: false,
         }),
+        new FeedSearchSource(client, {
+          groupId: 'hashtag',
+          allowEmptySearchString: true,
+          resetOnNewSearchQuery: false,
+        }),
       ],
+      config: { keepSingleActiveSource: true },
     });
   }, [client]);
 

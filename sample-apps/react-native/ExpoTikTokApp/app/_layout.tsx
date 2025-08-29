@@ -1,4 +1,4 @@
-import { View, Text } from '@/components/common/Themed'
+import { View, Text } from '@/components/common/Themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   DarkTheme,
@@ -23,6 +23,7 @@ import { useCreateClient } from '@/hooks/useCreateClient';
 import { ErrorBoundary as InternalErrorBoundary } from '@/components/common/ErrorBoundary';
 import { OwnFeedsContextProvider } from '@/contexts/OwnFeedsContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { NavigationBackButton } from '@/components/buttons';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -94,7 +95,16 @@ const RootLayoutNav = ({ user }: { user: LocalUser }) => {
               />
               <Stack.Screen
                 name="user-profile-screen"
-                options={{ title: 'Profile' }}
+                options={{
+                  title: 'Profile',
+                }}
+              />
+              <Stack.Screen
+                name="hashtag-screen"
+                options={{
+                  title: 'Hashtags',
+                  headerLeft: () => <NavigationBackButton />,
+                }}
               />
               <Stack.Screen
                 name="location-map-screen"

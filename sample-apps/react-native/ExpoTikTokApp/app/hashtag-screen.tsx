@@ -3,16 +3,16 @@ import {
   StreamFeed,
 } from '@stream-io/feeds-react-native-sdk';
 import { useLocalSearchParams } from 'expo-router';
-import { ActivityPager } from '@/components/activity-pager/Pager';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
+import { HashtagFeedMetadata } from '@/components/hashtags/HashtagFeedMetadata';
+import { Feed } from '@/components/Feed';
 
-const ActivityPagerScreen = () => {
-  const { groupId: groupIdParam, id: idParam } = useLocalSearchParams();
+const HashtagScreen = () => {
+  const { id: idParam } = useLocalSearchParams();
 
-  const groupId = groupIdParam as string;
   const id = idParam as string;
 
-  const feed = useCreateAndQueryFeed({ groupId, id });
+  const feed = useCreateAndQueryFeed({ groupId: 'hashtag', id });
 
   if (!feed) {
     return null;
@@ -20,9 +20,10 @@ const ActivityPagerScreen = () => {
 
   return (
     <StreamFeed feed={feed}>
-      <ActivityPager />
+      <HashtagFeedMetadata />
+      <Feed />
     </StreamFeed>
   );
 }
 
-export default ActivityPagerScreen;
+export default HashtagScreen;
