@@ -20,7 +20,7 @@ import {
 } from '@/components/common/autocomplete-input/SuggestionsList';
 import { useStableCallback } from '@/hooks/useStableCallback';
 
-const MENTION_CHARS = /[A-Za-z0-9_.]/;
+const ALLOWED_CHARS = /[A-Za-z0-9_.]/;
 
 type AutocompleteInputProps = TextInputProps & {
   text: string;
@@ -70,7 +70,7 @@ const AutocompleteInputInner = ({
     const slice = text.slice(from, to);
 
     for (let i = 0; i < slice.length; i++) {
-      if (!MENTION_CHARS.test(slice[i])) return null;
+      if (!ALLOWED_CHARS.test(slice[i])) return null;
     }
     return slice;
   }, [session, selection.start, text]);
@@ -86,7 +86,7 @@ const AutocompleteInputInner = ({
         const end = sel.start;
         const within =
           end >= from &&
-          [...text.slice(from, end)].every((ch) => MENTION_CHARS.test(ch));
+          [...text.slice(from, end)].every((ch) => ALLOWED_CHARS.test(ch));
 
         if (!within) {
           setSession(null);
@@ -114,7 +114,7 @@ const AutocompleteInputInner = ({
       if (
         SUGGESTION_SESSION_CHARACTERS.includes(ch) &&
         (!prevChar ||
-          (!MENTION_CHARS.test(prevChar) &&
+          (!ALLOWED_CHARS.test(prevChar) &&
             !SUGGESTION_SESSION_CHARACTERS.includes(prevChar)))
       ) {
         // start the session if we open with a suggestion character
@@ -128,7 +128,7 @@ const AutocompleteInputInner = ({
       } else if (session) {
         const caretAfter = insertIndex + 1;
         const from = session.start + 1;
-        const typedAllowed = MENTION_CHARS.test(ch);
+        const typedAllowed = ALLOWED_CHARS.test(ch);
         const stillExtending =
           caretAfter >= from && caretAfter === selection.start + 1;
         if (!(typedAllowed && stillExtending)) setSession(null);
