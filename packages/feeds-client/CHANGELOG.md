@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.2...@stream-io/feeds-client-0.2.3) (2025-09-01)
+
+
+### Features
+
+* add the ability to keep search items stable while searching ([#104](https://github.com/GetStream/stream-feeds-js/issues/104)) ([62a9808](https://github.com/GetStream/stream-feeds-js/commit/62a980890ce3a16e34a6d323ef8f58d58d2f8f4c))
+* update to latest API spec ([#106](https://github.com/GetStream/stream-feeds-js/issues/106)) ([6555d15](https://github.com/GetStream/stream-feeds-js/commit/6555d15049fddace837cfd592bff2d18293a16be))
+
 ## [0.2.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.1...@stream-io/feeds-client-0.2.2) (2025-08-25)
 
 
