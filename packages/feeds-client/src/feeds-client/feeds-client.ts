@@ -1,6 +1,5 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
-  ActivityRequest,
   ActivityResponse,
   FeedResponse,
   FileUploadRequest,
