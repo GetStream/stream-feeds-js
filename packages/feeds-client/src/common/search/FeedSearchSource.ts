@@ -9,14 +9,15 @@ export type FeedSearchSourceOptions = SearchSourceOptions & {
 };
 
 export class FeedSearchSource extends BaseSearchSource<Feed> {
-  readonly type = 'feed' as const;
+  readonly type: string;
+  readonly feedGroupId?: string | undefined;
   private readonly client: FeedsClient;
-  private readonly feedGroupId?: string | undefined;
 
   constructor(client: FeedsClient, options?: FeedSearchSourceOptions) {
     super(options);
     this.client = client;
     this.feedGroupId = options?.groupId;
+    this.type = `${this.feedGroupId}-feed`;
   }
 
   protected async query(searchQuery: string) {

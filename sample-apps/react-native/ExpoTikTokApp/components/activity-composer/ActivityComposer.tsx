@@ -1,16 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  View,
-  TextInput,
-  ScrollView,
-  Text,
-  StyleSheet,
-  Pressable,
-} from 'react-native';
+import { View, ScrollView, Text, StyleSheet, Pressable } from 'react-native';
 
 import * as ImagePicker from 'expo-image-picker';
 import {
   Attachment,
+  CreateFeedsBatchResponse,
   isImageFile,
   isVideoFile,
   StreamFile,
@@ -26,8 +20,8 @@ import { MediaPickerRow } from '@/components/activity-composer/MediaPickerList';
 import { ACTIVITY_TEXT_MAX_CHARACTERS } from '@/constants/stream';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 import { resetState } from '@/store/activity-action-state-store';
-import AutocompleteInput from '@/components/mentions/AutocompleteInput';
-import { findMentionedUsers } from '@/utils/findMentionedUsers';
+import AutocompleteInput from '@/components/common/autocomplete-input/AutocompleteInput';
+import { findMatchedTokens } from '@/utils/findMatchedTokens';
 
 export const ActivityComposer = () => {
   const client = useFeedsClient();
@@ -121,7 +115,24 @@ export const ActivityComposer = () => {
     }
     setIsSending(true);
     try {
-      const mentionedUsers = findMentionedUsers(text);
+      const mentionedUsers = findMatchedTokens({ text, matcher: '@' });
+      const hashtags = findMatchedTokens({ text, matcher: '#' });
+
+      const hasHashtags = hashtags && hashtags.length > 0;
+
+      let createdHashtagFeeds: CreateFeedsBatchResponse['feeds'] = [];
+
+      if (hasHashtags) {
+        const response = await client?.createFeedsBatch({
+          feeds: hashtags.map((hashtag) => ({
+            feed_group_id: 'hashtag',
+            feed_id: hashtag,
+            name: hashtag,
+            visibility: 'public',
+          })),
+        });
+        createdHashtagFeeds = response?.feeds ?? [];
+      }
 
       const activityData = {
         type: 'post',
@@ -142,16 +153,25 @@ export const ActivityComposer = () => {
               },
             }
           : {}),
-        ...(mentionedUsers ? { mentioned_user_ids: mentionedUsers } : {})
+        ...(mentionedUsers ? { mentioned_user_ids: mentionedUsers } : {}),
       };
       if (editingActivity) {
         await client?.updateActivity({
           ...activityData,
           id: editingActivity.id,
         });
+      } else if (hasHashtags) {
+        await client?.addActivity({
+          ...activityData,
+          feeds: [
+            feed.feed,
+            ...createdHashtagFeeds.map((hashtagFeed) => hashtagFeed.feed),
+          ],
+        });
       } else {
         await feed.addActivity(activityData);
       }
+
       setMedia([]);
       setText('');
       resetState();
