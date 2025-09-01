@@ -268,11 +268,6 @@ export class FeedsClient extends FeedsApi {
     return streamDevToken(userId);
   };
 
-  // TODO: The name is a WIP
-  createActivity(request: ActivityRequest) {
-    return this.addActivity(request);
-  }
-
   closePoll = async (request: {
     poll_id: string;
   }): Promise<StreamResponse<PollResponse>> => {

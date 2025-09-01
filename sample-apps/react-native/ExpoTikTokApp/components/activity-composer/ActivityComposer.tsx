@@ -161,7 +161,7 @@ export const ActivityComposer = () => {
           id: editingActivity.id,
         });
       } else if (hasHashtags) {
-        await client?.createActivity({
+        await client?.addActivity({
           ...activityData,
           feeds: [
             feed.feed,
