@@ -1,11 +1,12 @@
 const { StreamClient } = require('@stream-io/node-sdk');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const { apiKey } = require('./constants/stream');
 
 require('dotenv').config();
 
 (async () => {
-  const key = 'ccqysy8u2tm6';
+  const key = apiKey;
   const secret = process.env.STREAM_API_SECRET;
 
   const users = JSON.parse(

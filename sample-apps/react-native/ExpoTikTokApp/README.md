@@ -71,8 +71,14 @@ To do this, create the file in `sample-apps/react-native/ExpoTikTokApp` and fill
 It should look something like this:
 
 ```
+; Expo
+
 EXPO_PUBLIC_PLACES_API_KEY=<geapify-api-key>
 EXPO_PUBLIC_MAPS_API_KEY=<google-maps-api-key>
+
+; Setup (only needed if you use your own API key)
+
+STREAM_API_SECRET=<stream-api-secret>
 ```
 
 ### Run
@@ -106,6 +112,9 @@ The `token` field will be preferred over the token provider, if it exists.
 
 To use your own API key with the sample app, you may do the following steps.
 
-1. Open the `sample-apps/react-native/ExpoTikTokApp/constants/stream.ts` file and change the `apiKey` variable to your own API key
-2. Populate the app with the respective API key with users, their feeds and their follow relationships; the easiest way to do this is by running the `sample-apps/react-sample-app/setup-env.js` script either directly from our repository or from your own (you can temporarily replace the environment variables in place with your own credentials, you can simply omit `NEXT_PUBLIC_API_URL`)
+1. Open the `sample-apps/react-native/ExpoTikTokApp/constants/stream.js` file and change the `apiKey` variable to your own API key
+2. Populate the app with the respective API key with users, their feeds and their follow relationships; the easiest way to do this is by running `yarn setup`
+   - In case you need to modify anything, the script is located at `sample-apps/react-native/ExpoTikTokApp/setup-env.js`; if things are removed from it however the sample app may not work exactly as intended (addition is fine, though)
+   - The script relies on the `STREAM_API_SECRET` environment variable, if you need to use it make sure it's set in your `.env` file as well
 3. Create user tokens manually for the users you'd like to use like it's explained [here](#using-user-tokens-directly), since the token provider is not going to work out of the box
+   - Alternatively you can also run your own backend, which would expose a token generation endpoint; in order to change this you can change the `tokenCreationUrl` variable in `sample-apps/react-native/ExpoTikTokApp/constants/stream.js` 
