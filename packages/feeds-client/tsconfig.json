@@ -21,6 +21,6 @@
     "inlineSources": true,
     "jsx": "react-jsx"
   },
-  "exclude": ["**/*.test.ts"],
+  "exclude": ["**/*.test.ts", "**/test-utils/**/*.ts"],
   "include": ["./src", "@react-bindings", "index.ts", "version.ts"]
 }
