@@ -6,7 +6,7 @@ export const decoders: Record<string, Decoder> = {};
 
 const decodeDatetimeType = (input: number | string) =>
   typeof input === 'number'
-    ? new Date(Math.floor(input / 1e6))
+    ? new Date(Math.floor(input / 1000000))
     : new Date(input);
 
 decoders.DatetimeType = decodeDatetimeType;
@@ -584,6 +584,8 @@ decoders.CommentAddedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
+    activity: { type: 'ActivityResponse', isSingle: true },
+
     comment: { type: 'CommentResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
@@ -605,6 +607,8 @@ decoders.CommentDeletedEvent = (input?: Record<string, any>) => {
 decoders.CommentReactionAddedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'ActivityResponse', isSingle: true },
 
     comment: { type: 'CommentResponse', isSingle: true },
 
@@ -631,6 +635,8 @@ decoders.CommentReactionDeletedEvent = (input?: Record<string, any>) => {
 decoders.CommentReactionUpdatedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'ActivityResponse', isSingle: true },
 
     comment: { type: 'CommentResponse', isSingle: true },
 
@@ -1128,6 +1134,8 @@ decoders.Message = (input?: Record<string, any>) => {
 
     thread_participants: { type: 'User', isSingle: false },
 
+    member: { type: 'ChannelMember', isSingle: true },
+
     pinned_by: { type: 'User', isSingle: true },
 
     poll: { type: 'Poll', isSingle: true },
@@ -1214,6 +1222,10 @@ decoders.ModerationCustomActionEvent = (input?: Record<string, any>) => {
 
 decoders.ModerationFlagResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
     review_queue_item: { type: 'ReviewQueueItemResponse', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
