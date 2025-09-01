@@ -578,6 +578,7 @@ export class FeedsApi {
     const body = {
       type: request?.type,
       create_notification_activity: request?.create_notification_activity,
+      skip_push: request?.skip_push,
       custom: request?.custom,
     };
 
@@ -888,6 +889,7 @@ export class FeedsApi {
       object_type: request?.object_type,
       create_notification_activity: request?.create_notification_activity,
       parent_id: request?.parent_id,
+      skip_push: request?.skip_push,
       attachments: request?.attachments,
       mentioned_user_ids: request?.mentioned_user_ids,
       custom: request?.custom,
@@ -1003,6 +1005,7 @@ export class FeedsApi {
     };
     const body = {
       comment: request?.comment,
+      skip_push: request?.skip_push,
       custom: request?.custom,
     };
 
@@ -1031,6 +1034,7 @@ export class FeedsApi {
     const body = {
       type: request?.type,
       create_notification_activity: request?.create_notification_activity,
+      skip_push: request?.skip_push,
       custom: request?.custom,
     };
 
@@ -1554,6 +1558,7 @@ export class FeedsApi {
       create_notification_activity: request?.create_notification_activity,
       follower_role: request?.follower_role,
       push_preference: request?.push_preference,
+      skip_push: request?.skip_push,
       custom: request?.custom,
     };
 
@@ -1581,6 +1586,7 @@ export class FeedsApi {
       target: request?.target,
       create_notification_activity: request?.create_notification_activity,
       push_preference: request?.push_preference,
+      skip_push: request?.skip_push,
       custom: request?.custom,
     };
 

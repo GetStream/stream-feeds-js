@@ -587,6 +587,8 @@ export interface AddCommentReactionRequest {
 
   create_notification_activity?: boolean;
 
+  skip_push?: boolean;
+
   custom?: Record<string, any>;
 }
 
@@ -608,6 +610,8 @@ export interface AddCommentRequest {
   create_notification_activity?: boolean;
 
   parent_id?: string;
+
+  skip_push?: boolean;
 
   attachments?: Attachment[];
 
@@ -642,6 +646,8 @@ export interface AddReactionRequest {
   type: string;
 
   create_notification_activity?: boolean;
+
+  skip_push?: boolean;
 
   custom?: Record<string, any>;
 }
@@ -879,13 +885,13 @@ export interface BanActionRequest {
 }
 
 export interface BanOptions {
-  duration: number;
+  duration?: number;
 
-  ip_ban: boolean;
+  ip_ban?: boolean;
 
-  reason: string;
+  reason?: string;
 
-  shadow_ban: boolean;
+  shadow_ban?: boolean;
 }
 
 export interface BanRequest {
@@ -913,7 +919,7 @@ export interface BanResponse {
 }
 
 export interface BlockContentOptions {
-  reason: string;
+  reason?: string;
 }
 
 export interface BlockListConfig {
@@ -1719,6 +1725,10 @@ export interface ChannelMember {
   user?: UserResponse;
 }
 
+export interface ChannelMemberResponse {
+  channel_role: string;
+}
+
 export interface ChannelMute {
   created_at: Date;
 
@@ -1848,6 +1858,8 @@ export interface CommentAddedEvent {
 
   fid: string;
 
+  activity: ActivityResponse;
+
   comment: CommentResponse;
 
   custom: Record<string, any>;
@@ -1883,6 +1895,8 @@ export interface CommentReactionAddedEvent {
   created_at: Date;
 
   fid: string;
+
+  activity: ActivityResponse;
 
   comment: CommentResponse;
 
@@ -1921,6 +1935,8 @@ export interface CommentReactionUpdatedEvent {
   created_at: Date;
 
   fid: string;
+
+  activity: ActivityResponse;
 
   comment: CommentResponse;
 
@@ -2068,8 +2084,6 @@ export interface ConfigResponse {
 
   llm_config?: LLMConfig;
 
-  rule_builder_config?: RuleBuilderConfig;
-
   velocity_filter_config?: VelocityFilterConfig;
 
   video_call_rule_config?: VideoCallRuleConfig;
@@ -2092,9 +2106,9 @@ export interface ConnectUserDetailsRequest {
 }
 
 export interface ContentCountRuleParameters {
-  threshold: number;
+  threshold?: number;
 
-  time_window: string;
+  time_window?: string;
 }
 
 export interface CreateBlockListRequest {
@@ -2644,6 +2658,8 @@ export interface FeedGroup {
 
   notification?: NotificationConfig;
 
+  push_notification?: PushNotificationConfig;
+
   ranking?: RankingConfig;
 
   stories?: StoriesConfig;
@@ -2893,6 +2909,16 @@ export interface FeedUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface FeedsEventPreferences {
+  comments?: string;
+
+  mentions?: string;
+
+  new_followers?: string;
+
+  reactions?: string;
+}
+
 export interface FeedsReactionResponse {
   activity_id: string;
 
@@ -2978,7 +3004,7 @@ export interface Flag {
 }
 
 export interface FlagContentOptions {
-  reason: string;
+  reason?: string;
 }
 
 export interface FlagRequest {
@@ -3002,7 +3028,7 @@ export interface FlagResponse {
 }
 
 export interface FlagUserOptions {
-  reason: string;
+  reason?: string;
 }
 
 export interface FollowBatchRequest {
@@ -3055,6 +3081,8 @@ export interface FollowRequest {
   create_notification_activity?: boolean;
 
   push_preference?: 'all' | 'none';
+
+  skip_push?: boolean;
 
   custom?: Record<string, any>;
 }
@@ -3438,9 +3466,9 @@ export interface ImageData {
 }
 
 export interface ImageRuleParameters {
-  threshold: number;
+  threshold?: number;
 
-  time_window: string;
+  time_window?: string;
 
   harm_labels?: string[];
 }
@@ -3557,6 +3585,8 @@ export interface LLMConfig {
   enabled: boolean;
 
   rules: LLMRule[];
+
+  app_context?: string;
 
   async?: boolean;
 
@@ -3743,6 +3773,8 @@ export interface Message {
 
   image_labels?: Record<string, string[]>;
 
+  member?: ChannelMember;
+
   moderation?: ModerationV2Response;
 
   pinned_by?: User;
@@ -3853,6 +3885,8 @@ export interface MessageResponse {
 
   image_labels?: Record<string, string[]>;
 
+  member?: ChannelMemberResponse;
+
   moderation?: ModerationV2Response;
 
   pinned_by?: UserResponse;
@@ -3895,7 +3929,7 @@ export interface ModerationCustomActionEvent {
 }
 
 export interface ModerationFlagResponse {
-  created_at: string;
+  created_at: Date;
 
   entity_id: string;
 
@@ -3903,7 +3937,7 @@ export interface ModerationFlagResponse {
 
   type: string;
 
-  updated_at: string;
+  updated_at: Date;
 
   user_id: string;
 
@@ -4516,12 +4550,22 @@ export interface PrivacySettingsResponse {
   typing_indicators?: TypingIndicatorsResponse;
 }
 
+export interface PushNotificationConfig {
+  enabled?: boolean;
+
+  activity_types?: string[];
+}
+
 export interface PushPreferences {
   call_level?: string;
 
   chat_level?: string;
 
   disabled_until?: Date;
+
+  feeds_level?: string;
+
+  feeds_events?: FeedsEventPreferences;
 }
 
 export interface Quality {
@@ -5191,7 +5235,7 @@ export interface RingSettingsResponse {
 }
 
 export interface RuleBuilderAction {
-  type: string;
+  type?: string;
 
   ban_options?: BanOptions;
 
@@ -5203,9 +5247,9 @@ export interface RuleBuilderAction {
 }
 
 export interface RuleBuilderCondition {
-  type: string;
-
   confidence?: number;
+
+  type?: string;
 
   content_count_rule_params?: ContentCountRuleParameters;
 
@@ -5219,6 +5263,8 @@ export interface RuleBuilderCondition {
 
   user_created_within_params?: UserCreatedWithinParameters;
 
+  user_custom_property_params?: UserCustomPropertyParameters;
+
   user_rule_params?: UserRuleParameters;
 
   video_content_params?: VideoContentParameters;
@@ -5227,29 +5273,25 @@ export interface RuleBuilderCondition {
 }
 
 export interface RuleBuilderConditionGroup {
-  logic: string;
+  logic?: string;
 
-  conditions: RuleBuilderCondition[];
+  conditions?: RuleBuilderCondition[];
 }
 
 export interface RuleBuilderConfig {
-  rules: RuleBuilderRule[];
-
   async?: boolean;
+
+  rules?: RuleBuilderRule[];
 }
 
 export interface RuleBuilderRule {
-  enabled: boolean;
-
-  id: string;
-
-  name: string;
-
   rule_type: string;
 
   action: RuleBuilderAction;
 
   cooldown_period?: string;
+
+  id?: string;
 
   logic?: string;
 
@@ -5472,20 +5514,24 @@ export interface TextContentParameters {
   blocklist_match?: string[];
 
   harm_labels?: string[];
+
+  llm_harm_labels?: Record<string, string>;
 }
 
 export interface TextRuleParameters {
-  threshold: number;
-
-  time_window: string;
-
   contains_url?: boolean;
 
   severity?: string;
 
+  threshold?: number;
+
+  time_window?: string;
+
   blocklist_match?: string[];
 
   harm_labels?: string[];
+
+  llm_harm_labels?: Record<string, string>;
 }
 
 export interface ThreadedCommentResponse {
@@ -5771,6 +5817,8 @@ export interface UpdateBookmarkResponse {
 export interface UpdateCommentRequest {
   comment?: string;
 
+  skip_push?: boolean;
+
   custom?: Record<string, any>;
 }
 
@@ -5822,6 +5870,8 @@ export interface UpdateFollowRequest {
   follower_role?: string;
 
   push_preference?: 'all' | 'none';
+
+  skip_push?: boolean;
 
   custom?: Record<string, any>;
 }
@@ -6022,6 +6072,12 @@ export interface UserBannedEvent {
 
 export interface UserCreatedWithinParameters {
   max_age?: string;
+}
+
+export interface UserCustomPropertyParameters {
+  operator?: string;
+
+  property_key?: string;
 }
 
 export interface UserDeactivatedEvent {
@@ -6291,9 +6347,9 @@ export interface VideoOrientation {
 }
 
 export interface VideoRuleParameters {
-  threshold: number;
+  threshold?: number;
 
-  time_window: string;
+  time_window?: string;
 
   harm_labels?: string[];
 }
