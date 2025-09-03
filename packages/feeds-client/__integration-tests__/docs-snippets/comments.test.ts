@@ -65,12 +65,6 @@ describe('Comments page', () => {
   });
 
   it(`Reading comments`, async () => {
-    const activity = (
-      await feed.addActivity({
-        type: 'post',
-        text: 'Hello, world!',
-      })
-    ).activity;
 
     await feed.getOrCreate();
 
