@@ -414,10 +414,14 @@ export function generateBookmarkUpdatedEvent(
 export function generateCommentAddedEvent(
   overrides: Omit<
     Partial<EventPayload<'feeds.comment.added'>>,
-    'comment' | 'type'
-  > & { comment?: Parameters<typeof generateCommentResponse>[0] } = {},
+    'comment' | 'activity' | 'type'
+  > & {
+    comment?: Parameters<typeof generateCommentResponse>[0];
+    activity?: Parameters<typeof generateActivityResponse>[0];
+  } = {},
 ): EventPayload<'feeds.comment.added'> {
   const comment = generateCommentResponse(overrides.comment);
+  const activity = generateActivityResponse(overrides.activity);
   return {
     type: 'feeds.comment.added',
     created_at: new Date(),
@@ -425,6 +429,7 @@ export function generateCommentAddedEvent(
     custom: {},
     ...overrides,
     comment,
+    activity,
   };
 }
 
@@ -465,14 +470,17 @@ export function generateCommentUpdatedEvent(
 export function generateCommentReactionAddedEvent(
   overrides: Omit<
     Partial<EventPayload<'feeds.comment.reaction.added'>>,
-    'comment' | 'reaction' | 'type'
+    'comment' | 'reaction' | 'activity' | 'type'
   > & {
     comment?: Parameters<typeof generateCommentResponse>[0];
     reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+    activity?: Parameters<typeof generateActivityResponse>[0];
   } = {},
 ): EventPayload<'feeds.comment.reaction.added'> {
   const comment = generateCommentResponse(overrides.comment);
   const reaction = generateFeedReactionResponse(overrides.reaction);
+  const activity = generateActivityResponse(overrides.activity);
+
   return {
     type: 'feeds.comment.reaction.added',
     created_at: new Date(),
@@ -481,6 +489,7 @@ export function generateCommentReactionAddedEvent(
     ...overrides,
     comment,
     reaction,
+    activity,
   };
 }
 
