@@ -2265,6 +2265,8 @@ export interface DeleteCommentResponse {
 
 export interface DeleteFeedResponse {
   duration: string;
+
+  task_id: string;
 }
 
 export interface DeleteMessageRequest {
@@ -2909,14 +2911,18 @@ export interface FeedUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface FeedsEventPreferences {
-  comments?: string;
+export interface FeedsPreferences {
+  comment?: string;
 
-  mentions?: string;
+  comment_reaction?: string;
 
-  new_followers?: string;
+  follow?: string;
 
-  reactions?: string;
+  mention?: string;
+
+  reaction?: string;
+
+  custom_activity_types?: Record<string, string>;
 }
 
 export interface FeedsReactionResponse {
@@ -4551,9 +4557,9 @@ export interface PrivacySettingsResponse {
 }
 
 export interface PushNotificationConfig {
-  enabled?: boolean;
+  enable_push?: boolean;
 
-  activity_types?: string[];
+  push_types?: string[];
 }
 
 export interface PushPreferences {
@@ -4565,7 +4571,7 @@ export interface PushPreferences {
 
   feeds_level?: string;
 
-  feeds_events?: FeedsEventPreferences;
+  feeds_preferences?: FeedsPreferences;
 }
 
 export interface Quality {
@@ -5324,6 +5330,8 @@ export interface STTEgressConfig {
   translation_languages?: string[];
 
   external_storage?: ExternalStorage;
+
+  speech_segment_config?: SpeechSegmentConfig;
 }
 
 export interface ScreensharingSettings {
@@ -5448,6 +5456,12 @@ export interface SortParamRequest {
   direction?: number;
 
   field?: string;
+}
+
+export interface SpeechSegmentConfig {
+  max_speech_caption_ms?: number;
+
+  silence_duration_ms?: number;
 }
 
 export interface StoriesConfig {
@@ -5653,6 +5667,8 @@ export interface TranscriptionSettings {
     | 'sk';
 
   mode: 'available' | 'disabled' | 'auto-on';
+
+  speech_segment_config?: SpeechSegmentConfig;
 }
 
 export interface TranscriptionSettingsResponse {
@@ -5698,6 +5714,8 @@ export interface TranscriptionSettingsResponse {
     | 'sk';
 
   mode: 'available' | 'disabled' | 'auto-on';
+
+  speech_segment_config?: SpeechSegmentConfig;
 }
 
 export interface TypingIndicators {
