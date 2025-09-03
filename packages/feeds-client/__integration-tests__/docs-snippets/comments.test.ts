@@ -65,6 +65,13 @@ describe('Comments page', () => {
   });
 
   it(`Reading comments`, async () => {
+    const activity = (
+      await feed.addActivity({
+        type: 'post',
+        text: 'Hello, world!',
+      })
+    ).activity;
+
     await feed.getOrCreate();
 
     // Supported values for sort: first, last, top, controversial, best
@@ -81,7 +88,7 @@ describe('Comments page', () => {
     // To read comments without storing them in feed state
     const response = await client.getComments({
       object_type: 'activity',
-      object_id: '123',
+      object_id: activity.id,
       limit: 10,
       sort: 'best',
     });
