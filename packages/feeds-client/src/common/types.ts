@@ -1,8 +1,12 @@
+import type { Logger, LogLevel } from '../utils/logger';
+
 export * from './search/types';
 
 export type FeedsClientOptions = {
   base_url?: string;
   timeout?: number;
+  logger?: Logger;
+  log_level?: LogLevel;
 };
 
 export type RateLimit = {
@@ -33,8 +37,6 @@ export class StreamApiError extends Error {
     super(message, errorOptions);
   }
 }
-
-export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
 
 export interface NetworkChangedEvent {
   type: 'network.changed';
