@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.4](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.3...@stream-io/feeds-client-0.2.4) (2025-09-04)
+
+
+* fix docs snippets tests ([879d5d4](https://github.com/GetStream/stream-feeds-js/commit/879d5d48b70cb5ec16b82b145bf46abdb000c428))
+* Skip notification tests to be able to release ([c71733e](https://github.com/GetStream/stream-feeds-js/commit/c71733e6e26ca65df1660452fd7ae73ef70f2e98))
+
+
+### Features
+
+* add TaskID in DeleteFeedResponse ([#107](https://github.com/GetStream/stream-feeds-js/issues/107)) ([153aa23](https://github.com/GetStream/stream-feeds-js/commit/153aa230e415fb20d790f083f0fb1057990e91f5))
+* hashtags ([#105](https://github.com/GetStream/stream-feeds-js/issues/105)) ([f5e5e24](https://github.com/GetStream/stream-feeds-js/commit/f5e5e24be1183aab682cae05115f2c04f5543c4d))
+
 ## [0.2.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.2...@stream-io/feeds-client-0.2.3) (2025-09-01)
 
 
