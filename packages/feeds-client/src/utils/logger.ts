@@ -1,10 +1,15 @@
 import { isReactNative } from './is-react-native';
 
-export type Logger = (
+type LogMethod = (
   logLevel: LogLevel,
   message: string,
-  ...args: unknown[]
+  ...rest: unknown[]
 ) => void;
+
+export interface Logger {
+  (..._: Parameters<LogMethod>): void;
+  logAndReturn<T>(e: T, message?: string, ...rest: unknown[]): T;
+}
 
 export type LogLevel = keyof typeof logLevels;
 
@@ -17,10 +22,10 @@ export const logLevels = Object.freeze({
   error: 4,
 } as const);
 
-let moduleLogger: Logger | undefined;
+let moduleLogMethod: LogMethod | undefined;
 let moduleLogLevel: LogLevel = 'info';
 
-export const logToConsole: Logger = (logLevel, message, ...args) => {
+export const logToConsole: LogMethod = (logLevel, message, ...rest) => {
   let logMethod;
   switch (logLevel) {
     case 'error':
@@ -50,11 +55,14 @@ export const logToConsole: Logger = (logLevel, message, ...args) => {
       break;
   }
 
-  logMethod(message, ...args);
+  logMethod(message, ...rest);
 };
 
-export const setLogger = (logger: Logger = logToConsole, level?: LogLevel) => {
-  moduleLogger = logger;
+export const setLogger = (
+  logger: LogMethod = logToConsole,
+  level?: LogLevel,
+) => {
+  moduleLogMethod = logger;
   if (level) {
     setLogLevel(level);
   }
@@ -66,14 +74,26 @@ export const setLogLevel = (level: LogLevel) => {
 
 export const getLogLevel = (): LogLevel => moduleLogLevel;
 
-export const getLogger = (...withTags: string[]) => {
-  const loggerMethod = moduleLogger || logToConsole;
+export const getLogger = (...withTags: string[]): Logger => {
+  const loggerMethod = moduleLogMethod || logToConsole;
 
   const tags = (withTags || []).filter(Boolean).join(':');
 
-  return ((logLevel, message, ...args) => {
+  const logger: Logger = (logLevel, message, ...rest) => {
     if (logLevels[logLevel] >= logLevels[moduleLogLevel]) {
-      loggerMethod(logLevel, `[${tags}]: ${message}`, ...args);
+      loggerMethod(logLevel, `[${tags}]: ${message}`, ...rest);
     }
-  }) satisfies Logger;
+  };
+
+  logger.logAndReturn = (
+    e,
+    message = e instanceof Error ? e.message : `${e}`,
+    ...rest
+  ) => {
+    logger('error', message, ...rest);
+
+    throw e;
+  };
+
+  return logger;
 };
