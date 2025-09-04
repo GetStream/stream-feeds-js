@@ -1,3 +1,4 @@
+import { getLogger } from '../utils/logger';
 import { isFunction, sleep } from './utils';
 
 /**
@@ -10,6 +11,7 @@ export class TokenManager {
   type: 'static' | 'provider';
   token?: string;
   tokenProvider?: string | (() => Promise<string>);
+  private readonly logger = getLogger(TokenManager.name);
 
   constructor() {
     this.loadTokenPromise = null;
@@ -49,6 +51,8 @@ export class TokenManager {
   // Fetches a token from tokenProvider function and sets in tokenManager.
   // In case of static token, it will simply resolve to static token.
   loadToken = () => {
+    this.logger('debug', 'Loading a new token');
+
     if (this.loadTokenPromise) {
       return this.loadTokenPromise;
     }
@@ -71,9 +75,11 @@ export class TokenManager {
             if (numberOfFailures === 3) {
               this.loadTokenPromise = null;
               return reject(
-                new Error(
-                  `Stream error: tried to get token ${numberOfFailures} times, but it failed with ${e}. Check your token provider`,
-                  { cause: e },
+                this.logger.logAndReturn(
+                  new Error(
+                    `Stream error: tried to get token ${numberOfFailures} times, but it failed with ${e}. Check your token provider`,
+                    { cause: e },
+                  ),
                 ),
               );
             } else {
@@ -104,7 +110,9 @@ export class TokenManager {
       }
     }
 
-    throw new Error(`Can't get token because token provider isn't set`);
+    throw this.logger.logAndReturn(
+      new Error(`Can't get token because token provider isn't set`),
+    );
   };
 
   isStatic = () => this.type === 'static';
