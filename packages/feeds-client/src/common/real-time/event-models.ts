@@ -39,7 +39,6 @@ export interface ConnectedEvent {
 
 export enum UnhandledErrorType {
   ReconnectionReconciliation = 'reconnection-reconciliation',
-  TokenRefresh = 'token-refresh',
 }
 
 export type SyncFailure = { feed: string, reason: unknown };
@@ -52,5 +51,4 @@ export type UnhandledErrorEvent = {
       error_type: UnhandledErrorType.ReconnectionReconciliation;
       failures: SyncFailure[];
     }
-  | { error_type: UnhandledErrorType.TokenRefresh; error: unknown }
 );
