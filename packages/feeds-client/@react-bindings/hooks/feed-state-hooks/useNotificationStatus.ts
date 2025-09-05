@@ -11,6 +11,7 @@ const selector = ({ notification_status }: FeedState) =>
     last_seen_at: notification_status?.last_seen_at,
     read_activities: notification_status?.read_activities,
     seen_activities: notification_status?.seen_activities,
+    count_truncated: notification_status?.count_truncated ?? false,
   }) satisfies NotificationStatusResponse;
 
 type UseNotificationStatusReturnType = ReturnType<typeof selector>;
