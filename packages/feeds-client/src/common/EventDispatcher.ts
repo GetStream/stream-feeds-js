@@ -1,5 +1,5 @@
 import { FeedsEvent } from '../types';
-import { LogLevel } from './types';
+import { getLogger } from '../utils/logger';
 
 export class EventDispatcher<
   Type extends string = FeedsEvent['type'],
@@ -9,10 +9,7 @@ export class EventDispatcher<
     Record<Type | 'all', Array<(event: Event) => void> | undefined>
   > = {};
 
-  private readonly logger = (level: LogLevel, message: string, extra: any) => {
-    // TODO implement logging
-    console.log(level, message, extra);
-  };
+  private readonly logger = getLogger(EventDispatcher.name);
 
   dispatch = (event: Event) => {
     const listeners = [
