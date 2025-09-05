@@ -1,10 +1,19 @@
-import { CommentResponse, FollowResponse } from '../gen/models';
+import {
+  AddCommentReactionResponse,
+  AddReactionResponse,
+  CommentResponse,
+  FollowResponse,
+} from '../gen/models';
 import { StreamFile } from '../types';
 import { CommentParent } from '../types';
 
 export const isFollowResponse = (data: object): data is FollowResponse => {
   return 'source_feed' in data && 'target_feed' in data;
 };
+
+export const isReactionResponse = (data: object): data is AddReactionResponse | AddCommentReactionResponse => {
+  return 'reaction' in data && ('activity' in data || 'comment' in data);
+}
 
 export const isCommentResponse = (
   entity: CommentParent,

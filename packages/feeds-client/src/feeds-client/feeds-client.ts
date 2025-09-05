@@ -1,6 +1,7 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
   ActivityResponse,
+  AddReactionRequest,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -37,6 +38,7 @@ import { ModerationClient } from '../moderation-client';
 import { StreamPoll } from '../common/Poll';
 import {
   Feed,
+  handleActivityReactionAdded,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
@@ -321,6 +323,18 @@ export class FeedsClient extends FeedsApi {
       // @ts-expect-error form data will only work if this is a string
       upload_sizes: JSON.stringify(request.upload_sizes),
     });
+  };
+
+  addReaction = async (
+    request: AddReactionRequest & {
+      activity_id: string;
+    },
+  ) => {
+    const response = await super.addReaction(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleActivityReactionAdded.bind(feed)(response);
+    }
+    return response;
   };
 
   queryPollAnswers = async (

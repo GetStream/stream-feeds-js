@@ -70,7 +70,7 @@ export function handleFollowCreated(
 
   if (
     !shouldUpdateState({
-      stateUpdateQueueId: getStateUpdateQueueId(follow, 'created'),
+      stateUpdateQueueId: getStateUpdateQueueId(follow, 'follow-created'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
     })
