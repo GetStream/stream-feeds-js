@@ -1,11 +1,11 @@
-import type { Logger, LogLevel } from '../utils/logger';
+import type { LogFunction, LogLevel } from '../utils/logger';
 
 export * from './search/types';
 
 export type FeedsClientOptions = {
   base_url?: string;
   timeout?: number;
-  logger?: Logger;
+  log_function?: LogFunction;
   log_level?: LogLevel;
 };
 
