@@ -2,6 +2,7 @@ import type { Feed } from '../../feed';
 import type {
   ActivityPinResponse,
   ActivityResponse,
+  AddReactionResponse,
 } from '../../../gen/models';
 import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import {
