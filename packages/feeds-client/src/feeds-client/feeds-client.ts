@@ -44,6 +44,10 @@ import {
   handleWatchStopped,
 } from '../feed';
 import { handleUserUpdated } from './event-handlers';
+import {
+  SyncFailure,
+  UnhandledErrorType,
+} from '../common/real-time/event-models';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -100,14 +104,7 @@ export class FeedsClient extends FeedsApi {
           this.state.partialNext({ is_ws_connection_healthy: online });
 
           if (online) {
-            this.healthyConnectionChangedEventCount++;
-
-            // we skip the first event as we could potentially be querying twice
-            if (this.healthyConnectionChangedEventCount > 1) {
-              for (const activeFeed of Object.values(this.activeFeeds)) {
-                activeFeed.synchronize();
-              }
-            }
+            this.recoverOnReconnect();
           } else {
             for (const activeFeed of Object.values(this.activeFeeds)) {
               handleWatchStopped.bind(activeFeed)();
@@ -207,6 +204,31 @@ export class FeedsClient extends FeedsApi {
       }
     });
   }
+
+  private recoverOnReconnect = async () => {
+    this.healthyConnectionChangedEventCount++;
+
+    // we skip the first event as we could potentially be querying twice
+    if (this.healthyConnectionChangedEventCount > 1) {
+      const entries = Object.entries(this.activeFeeds);
+
+      const results = await Promise.allSettled(
+        entries.map(([, feed]) => feed.synchronize()),
+      );
+
+      const failures: SyncFailure[] = results.flatMap((result, index) =>
+        result.status === 'rejected'
+          ? [{ feed: entries[index][0], reason: result.reason }]
+          : [],
+      );
+
+      this.eventDispatcher.dispatch({
+        type: 'errors.unhandled',
+        error_type: UnhandledErrorType.ReconnectionReconciliation,
+        failures,
+      });
+    }
+  };
 
   public pollFromState = (id: string) => this.polls_by_id.get(id);
 
