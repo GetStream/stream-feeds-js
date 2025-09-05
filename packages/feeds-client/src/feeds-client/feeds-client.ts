@@ -37,6 +37,7 @@ import { ModerationClient } from '../moderation-client';
 import { StreamPoll } from '../common/Poll';
 import {
   Feed,
+  handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
   handleFollowUpdated,
@@ -375,8 +376,13 @@ export class FeedsClient extends FeedsApi {
   async queryFeeds(request?: QueryFeedsRequest) {
     const response = await this._queryFeeds(request);
 
-    const feeds = response.feeds.map((f) =>
-      this.getOrCreateActiveFeed(f.group_id, f.id, f, request?.watch),
+    const feeds = response.feeds.map((feedResponse) =>
+      this.getOrCreateActiveFeed(
+        feedResponse.group_id,
+        feedResponse.id,
+        feedResponse,
+        request?.watch,
+      ),
     );
 
     return {
@@ -480,17 +486,20 @@ export class FeedsClient extends FeedsApi {
     watch?: boolean,
   ) => {
     const fid = `${group}:${id}`;
-    if (this.activeFeeds[fid]) {
-      const feed = this.activeFeeds[fid];
-      if (watch && !feed.currentState.watch) {
-        handleWatchStarted.bind(feed)();
-      }
-      return feed;
-    } else {
-      const feed = new Feed(this, group, id, data, watch);
-      this.activeFeeds[fid] = feed;
-      return feed;
+
+    if (!this.activeFeeds[fid]) {
+      this.activeFeeds[fid] = new Feed(this, group, id, data, watch);
     }
+
+    const feed = this.activeFeeds[fid];
+
+    if (!feed.currentState.watch) {
+      // feed isn't watched and may be stale, update it
+      if (data) handleFeedUpdated.call(feed, { feed: data });
+      if (watch) handleWatchStarted.call(feed);
+    }
+
+    return feed;
   };
 
   private findActiveFeedByActivityId(activityId: string) {

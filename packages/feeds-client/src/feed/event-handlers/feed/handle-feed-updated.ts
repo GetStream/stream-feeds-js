@@ -1,9 +1,9 @@
 import { Feed } from '../../../feed';
-import { EventPayload } from '../../../types-internal';
+import { EventPayload, PartializeAllBut } from '../../../types-internal';
 
 export function handleFeedUpdated(
   this: Feed,
-  event: EventPayload<'feeds.feed.updated'>,
+  event: PartializeAllBut<EventPayload<'feeds.feed.updated'>, 'feed'>,
 ) {
   this.state.partialNext({ ...event.feed });
 }
