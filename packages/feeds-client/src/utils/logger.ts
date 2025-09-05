@@ -1,13 +1,13 @@
 import { isReactNative } from './is-react-native';
 
-type LogMethod = (
+export type LogFunction = (
   logLevel: LogLevel,
   message: string,
   ...rest: unknown[]
 ) => void;
 
 export interface Logger {
-  (..._: Parameters<LogMethod>): void;
+  (..._: Parameters<LogFunction>): void;
   logAndReturn<T>(e: T, message?: string, ...rest: unknown[]): T;
 }
 
@@ -22,10 +22,10 @@ export const logLevels = Object.freeze({
   error: 4,
 } as const);
 
-let moduleLogMethod: LogMethod | undefined;
+let moduleLogFunction: LogFunction | undefined;
 let moduleLogLevel: LogLevel = 'info';
 
-export const logToConsole: LogMethod = (logLevel, message, ...rest) => {
+export const logToConsole: LogFunction = (logLevel, message, ...rest) => {
   let logMethod;
   switch (logLevel) {
     case 'error':
@@ -58,11 +58,11 @@ export const logToConsole: LogMethod = (logLevel, message, ...rest) => {
   logMethod(message, ...rest);
 };
 
-export const setLogger = (
-  logger: LogMethod = logToConsole,
+export const setLogFunction = (
+  logFunction: LogFunction = logToConsole,
   level?: LogLevel,
 ) => {
-  moduleLogMethod = logger;
+  moduleLogFunction = logFunction;
   if (level) {
     setLogLevel(level);
   }
@@ -75,13 +75,13 @@ export const setLogLevel = (level: LogLevel) => {
 export const getLogLevel = (): LogLevel => moduleLogLevel;
 
 export const getLogger = (...withTags: string[]): Logger => {
-  const loggerMethod = moduleLogMethod || logToConsole;
+  const logFunction = moduleLogFunction ?? logToConsole;
 
-  const tags = (withTags || []).filter(Boolean).join(':');
+  const tags = withTags.filter(Boolean).join(':');
 
   const logger: Logger = (logLevel, message, ...rest) => {
     if (logLevels[logLevel] >= logLevels[moduleLogLevel]) {
-      loggerMethod(logLevel, `[${tags}]: ${message}`, ...rest);
+      logFunction(logLevel, `[${tags}]: ${message}`, ...rest);
     }
   };
 
@@ -92,7 +92,7 @@ export const getLogger = (...withTags: string[]): Logger => {
   ) => {
     logger('error', message, ...rest);
 
-    throw e;
+    return e;
   };
 
   return logger;
