@@ -673,6 +673,8 @@ export interface AggregatedActivityResponse {
 
   user_count: number;
 
+  user_count_truncated: boolean;
+
   activities: ActivityResponse[];
 }
 
@@ -4077,6 +4079,8 @@ export interface NotificationSettings {
 }
 
 export interface NotificationStatusResponse {
+  count_truncated: boolean;
+
   unread: number;
 
   unseen: number;
