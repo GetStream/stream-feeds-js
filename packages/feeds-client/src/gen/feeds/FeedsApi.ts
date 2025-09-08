@@ -127,6 +127,8 @@ import {
   UpdateUsersResponse,
   UpsertActivitiesRequest,
   UpsertActivitiesResponse,
+  UpsertPushPreferencesRequest,
+  UpsertPushPreferencesResponse,
   WSAuthMessage,
 } from '../models';
 import { decoders } from '../model-decoders/decoders';
@@ -2069,6 +2071,29 @@ export class FeedsApi {
     );
 
     decoders.PollVotesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updatePushNotificationPreferences(
+    request: UpsertPushPreferencesRequest,
+  ): Promise<StreamResponse<UpsertPushPreferencesResponse>> {
+    const body = {
+      preferences: request?.preferences,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpsertPushPreferencesResponse>
+    >(
+      'POST',
+      '/api/v2/push_preferences',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.UpsertPushPreferencesResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
