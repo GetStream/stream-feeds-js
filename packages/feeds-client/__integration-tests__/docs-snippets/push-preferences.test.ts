@@ -52,7 +52,7 @@ describe.skip('Push preferences page', () => {
       preferences: [
         {
           feeds_level: 'all',
-          // @ts-expect-error
+          // @ts-expect-error API spec issue https://getstream.slack.com/archives/C06RK9WCR09/p1757335586873509?thread_ts=1757077886.530269&cid=C06RK9WCR09
           disabled_until: twoHoursFromNow.toISOString(),
         },
       ],
@@ -111,7 +111,7 @@ describe.skip('Push preferences page', () => {
       preferences: [
         {
           feeds_level: 'none',
-          // @ts-expect-error
+          // @ts-expect-error  API spec issue https://getstream.slack.com/archives/C06RK9WCR09/p1757335586873509?thread_ts=1757077886.530269&cid=C06RK9WCR09
           disabled_until: tomorrow.toISOString(),
         },
       ],
