@@ -218,6 +218,13 @@ export class Feed extends FeedApi {
       watch,
     });
     this.client = client;
+    // if (this.group === 'timeline') {
+    //   // used purely for debugging the state update queue, will remove
+    //   setInterval(() => {
+    //     console.log('Q: ', this.stateUpdateQueue);
+    //   }, 2000);
+    // }
+
     this.state.subscribeWithSelector(
       (nextState) => ({ activities: nextState.activities }),
       (nextState) => {

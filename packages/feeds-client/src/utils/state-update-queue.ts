@@ -1,5 +1,8 @@
 import { isFollowResponse, isReactionResponse } from './type-assertions';
-import { AddCommentReactionResponse, AddReactionResponse } from '../gen/models';
+import {
+  AddCommentReactionResponse,
+  AddReactionResponse,
+} from '../gen/models';
 
 export const shouldUpdateState = ({
   stateUpdateQueueId,

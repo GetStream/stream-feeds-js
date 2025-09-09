@@ -2,18 +2,15 @@ import type { Feed } from '../../feed';
 import type {
   ActivityPinResponse,
   ActivityResponse,
-  AddReactionResponse,
 } from '../../../gen/models';
-import type { EventPayload } from '../../../types-internal';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import {
   getStateUpdateQueueId,
   shouldUpdateState,
   updateEntityInArray,
 } from '../../../utils';
 
-type AddActivityReactionPayload =
-  | EventPayload<'feeds.activity.reaction.added'>
-  | AddReactionResponse;
+type AddActivityReactionPayload = PartializeAllBut<EventPayload<'feeds.activity.reaction.added'>, 'activity' | 'reaction'>;
 
 // shared function to update the activity with the new reaction
 const sharedUpdateActivity = ({
@@ -127,7 +124,7 @@ export function handleActivityReactionAdded(
 
   if (result1?.changed || result2.changed) {
     this.state.partialNext({
-      ...(result1 ? {activities: result1.entities} : {}),
+      ...(result1 ? { activities: result1.entities } : {}),
       pinned_activities: result2.entities,
     });
   }

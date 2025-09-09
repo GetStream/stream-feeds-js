@@ -2,18 +2,30 @@ import {
   AddCommentReactionResponse,
   AddReactionResponse,
   CommentResponse,
+  DeleteCommentReactionResponse,
   FollowResponse,
 } from '../gen/models';
 import { StreamFile } from '../types';
 import { CommentParent } from '../types';
+import { DeleteReactionResponse } from '@stream-io/node-sdk';
 
 export const isFollowResponse = (data: object): data is FollowResponse => {
   return 'source_feed' in data && 'target_feed' in data;
 };
 
-export const isReactionResponse = (data: object): data is AddReactionResponse | AddCommentReactionResponse => {
-  return 'reaction' in data && ('activity' in data || 'comment' in data);
-}
+export const isReactionResponse = (
+  data: object,
+): data is (
+  | AddReactionResponse
+  | AddCommentReactionResponse
+  | DeleteReactionResponse
+  | DeleteCommentReactionResponse
+) & { fid: string } => {
+  return (
+    'reaction' in data &&
+    ('activity' in data || 'comment' in data)
+  );
+};
 
 export const isCommentResponse = (
   entity: CommentParent,

@@ -1,7 +1,7 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
   ActivityResponse,
-  AddReactionRequest,
+  AddReactionRequest, DeleteActivityReactionResponse,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -39,6 +39,7 @@ import { StreamPoll } from '../common/Poll';
 import {
   Feed,
   handleActivityReactionAdded,
+  handleActivityReactionDeleted,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
@@ -336,6 +337,17 @@ export class FeedsClient extends FeedsApi {
     }
     return response;
   };
+
+  deleteActivityReaction = async (request: {
+    activity_id: string;
+    type: string;
+  }): Promise<StreamResponse<DeleteActivityReactionResponse>> => {
+    const response = await super.deleteActivityReaction(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleActivityReactionDeleted.bind(feed)(response);
+    }
+    return response;
+  }
 
   queryPollAnswers = async (
     request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
