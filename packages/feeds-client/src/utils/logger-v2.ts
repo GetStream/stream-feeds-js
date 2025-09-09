@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-indexed-object-style */
 import { isReactNative } from './is-react-native';
 
 export enum LogLevelEnum {
@@ -58,22 +59,22 @@ export const getLogger = <T extends string>(
   scope: T,
   options: { tags?: string[] } = {},
 ) => {
+  const tagString = (options.tags ?? []).filter(Boolean).join(',');
+
   const constructLogFunction =
     (logLevel: LogLevel) =>
     (message: string, ...data: any[]) => {
-      const scopedSink = sinkByScope.get(scope) ?? defaultSink;
       const scopedLogLevel = logLevelByScope.get(scope) ?? defaultLogLevel;
-      const tagString = (options.tags ?? []).filter(Boolean).join(',');
 
       if (LogLevelEnum[logLevel] >= LogLevelEnum[scopedLogLevel]) {
+        const scopedSink = sinkByScope.get(scope) ?? defaultSink;
+
         scopedSink(
           logLevel,
           `[${scope}]${tagString.length ? `(${tagString})` : ''}: ${message}`,
           ...data,
         );
       }
-
-      return [message, ...data];
     };
 
   return {
@@ -93,15 +94,18 @@ export const getLogger = <T extends string>(
   };
 };
 
-export type ConfigureLoggersOptions<T extends string> = Partial<
-  Record<
-    T,
-    Partial<{
-      sink: Sink;
-      level: LogLevel;
-    }>
-  >
->;
+/**
+ * Configuration options for `configureLoggers`, where keys are logger scopes.
+ * The 'default' scope is reserved and is used to set default options for all loggers.
+ */
+export type ConfigureLoggersOptions<T extends string> = T extends 'default'
+  ? never
+  : Partial<{
+      [K in T | 'default']: Partial<{
+        sink: Sink;
+        level: LogLevel;
+      }>;
+    }>;
 
 export const configureLoggers = <T extends string>(
   optionsByScope: ConfigureLoggersOptions<T>,
