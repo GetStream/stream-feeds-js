@@ -80,7 +80,7 @@ export const addReactionToPinnedActivities = (
 
       return {
         ...matchedPinnedActivity,
-        activity: payload.activity,
+        activity: updatedActivity,
       };
     },
   });
@@ -99,7 +99,6 @@ export function handleActivityReactionAdded(
       watch: this.currentState.watch,
     })
   ) {
-    console.log('SKIPPING EVENT', (payload as any).type)
     return;
   }
 
@@ -114,11 +113,11 @@ export function handleActivityReactionAdded(
     payload.reaction.user.id === connectedUser.id;
 
   const [result1, result2] = [
-    addReactionToActivities(
+    this.hasActivity(payload.activity.id) ? addReactionToActivities(
       payload,
       currentActivities,
       eventBelongsToCurrentUser,
-    ),
+    ) : undefined,
     addReactionToPinnedActivities(
       payload,
       currentPinnedActivities,
@@ -126,9 +125,9 @@ export function handleActivityReactionAdded(
     ),
   ];
 
-  if (result1.changed || result2.changed) {
+  if (result1?.changed || result2.changed) {
     this.state.partialNext({
-      activities: result1.entities,
+      ...(result1 ? {activities: result1.entities} : {}),
       pinned_activities: result2.entities,
     });
   }

@@ -1,28 +1,28 @@
-import type { Feed } from '../../../feed';
+import type { Feed } from '../../feed';
 import type {
   ActivityPinResponse,
   ActivityResponse,
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
 
-export const removeActivityFromState = (
+export function removeActivityFromState (
+  this: Feed,
   activityResponse: ActivityResponse,
   activities: ActivityResponse[] | undefined,
 ): UpdateStateResult<{
   activities: ActivityResponse[] | undefined;
-}> => {
-  const index =
-    activities?.findIndex((activity) => activity.id === activityResponse.id) ??
-    -1;
-
-  if (index !== -1) {
+}> {
+  if (this.hasActivity(activityResponse.id)) {
+    const index =
+      activities?.findIndex((activity) => activity.id === activityResponse.id) ??
+      -1;
     const newActivities = [...activities!];
     newActivities.splice(index, 1);
     return { changed: true, activities: newActivities };
   } else {
     return { changed: false, activities };
   }
-};
+}
 
 export const removePinnedActivityFromState = (
   activityResponse: ActivityResponse,
@@ -54,13 +54,13 @@ export function handleActivityDeleted(
   } = this.currentState;
 
   const [result1, result2] = [
-    removeActivityFromState(event.activity, currentActivities),
+    this.hasActivity(event.activity.id) ? removeActivityFromState.bind(this)(event.activity, currentActivities) : undefined,
     removePinnedActivityFromState(event.activity, currentPinnedActivities),
   ];
 
-  if (result1.changed || result2.changed) {
+  if (result1?.changed || result2.changed) {
     this.state.partialNext({
-      activities: result1.activities,
+      ...(result1 ? { activities: result1.activities, } : {}),
       pinned_activities: result2.pinned_activities,
     });
   }

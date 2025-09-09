@@ -8,7 +8,7 @@ import {
   generateFeedResponse,
   generateOwnUser,
   getHumanId,
-} from '../../../test-utils/response-generators';
+} from '../../../test-utils';
 
 describe(handleActivityAdded.name, () => {
   let feed: Feed;

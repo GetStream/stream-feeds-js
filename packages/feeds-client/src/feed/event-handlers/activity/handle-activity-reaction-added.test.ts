@@ -9,7 +9,7 @@ import {
   generateOwnUser,
   generateActivityReactionAddedEvent,
   getHumanId,
-} from '../../../test-utils/response-generators';
+} from '../../../test-utils';
 
 describe(handleActivityReactionAdded.name, () => {
   let feed: Feed;

@@ -139,6 +139,7 @@ type EventHandlerByEventType = {
 export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private static readonly noop = () => {};
+  protected indexedActivityIds: Set<string> = new Set();
   protected readonly stateUpdateQueue: Set<string> = new Set();
 
   private readonly eventHandlers: EventHandlerByEventType = {
@@ -217,6 +218,18 @@ export class Feed extends FeedApi {
       watch,
     });
     this.client = client;
+    this.state.subscribeWithSelector(
+      (nextState) => ({ activities: nextState.activities }),
+      (nextState) => {
+        const { activities: nextActivities = [] } = nextState;
+
+        if (this.indexedActivityIds.size !== nextActivities?.length) {
+          this.indexedActivityIds = new Set(
+            nextActivities.map((activity) => activity.id),
+          );
+        }
+      },
+    );
   }
 
   protected readonly client: FeedsClient;
@@ -227,6 +240,18 @@ export class Feed extends FeedApi {
 
   get currentState() {
     return this.state.getLatestValue();
+  }
+
+  hasActivity(activity_id: string) {
+    return this.indexedActivityIds.has(activity_id);
+  }
+
+  protected addActivityToIndex(activity_id: string) {
+    this.indexedActivityIds.add(activity_id);
+  }
+
+  protected removeActivityFromIndex(activity_id: string) {
+    this.indexedActivityIds.delete(activity_id);
   }
 
   async synchronize() {
@@ -254,7 +279,7 @@ export class Feed extends FeedApi {
       if (request?.next) {
         const { activities: currentActivities = [] } = this.currentState;
 
-        const result = addActivitiesToState(
+        const result = addActivitiesToState.bind(this)(
           response.activities,
           currentActivities,
           'end',
@@ -281,6 +306,9 @@ export class Feed extends FeedApi {
         delete responseCopy.feed;
         delete responseCopy.metadata;
         delete responseCopy.duration;
+
+        // recreate the caches so that they are updated on the next state update
+        this.indexedActivityIds = new Set();
 
         // TODO: lazy-load comments from activities when comment_sort and comment_pagination are supported
 
