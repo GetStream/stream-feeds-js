@@ -15,7 +15,7 @@ export class ApiClient {
   public readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
   private timeout: number;
-  private readonly logger = getLogger(ApiClient.name);
+  private readonly logger = getLogger('api-client');
 
   constructor(
     public readonly apiKey: string,
@@ -49,10 +49,7 @@ export class ApiClient {
       body?.watch ||
       body?.presence
     ) {
-      this.logger(
-        'info',
-        'Getting connection_id for watch or presence request',
-      );
+      this.logger.info('Getting connection_id for watch or presence request');
       const connectionId = await this.connectionIdManager.getConnectionId();
       queryParams.connection_id = connectionId;
     }
@@ -89,8 +86,7 @@ export class ApiClient {
     }
 
     try {
-      this.logger(
-        'debug',
+      this.logger.debug(
         `Sending request ${method.toUpperCase()}:${requestUrl} with:`,
         { queryParams },
         { body },
@@ -115,15 +111,11 @@ export class ApiClient {
       return { body: response.data, metadata };
     } catch (error) {
       if (!this.isAxiosError(error)) {
-        throw this.logger.logAndReturn(
-          new Error('Unknown error received during an API call', {
-            cause: error,
-          }),
-        );
+        throw new Error('Unknown error received during an API call', {
+          cause: error,
+        });
       } else if (!error.response) {
-        throw this.logger.logAndReturn(
-          new StreamApiError(`Stream error ${error.message}`),
-        );
+        throw new StreamApiError(`Stream error ${error.message}`);
       }
 
       // Stream specific error response
@@ -135,8 +127,7 @@ export class ApiClient {
         error.response.status === 401 &&
         !this.tokenManager.isStatic()
       ) {
-        this.logger(
-          'info',
+        this.logger.info(
           'Token expired, fetching a new one and retrying request',
         );
         await this.tokenManager.loadToken();
@@ -149,13 +140,11 @@ export class ApiClient {
         );
       }
 
-      throw this.logger.logAndReturn(
-        new StreamApiError(
-          `Stream error code ${code}: ${message}`,
-          this.getRequestMetadata(client_request_id, error.response),
-          code,
-          undefined,
-        ),
+      throw new StreamApiError(
+        `Stream error code ${code}: ${message}`,
+        this.getRequestMetadata(client_request_id, error.response),
+        code,
+        undefined,
       );
     }
   };

@@ -16,7 +16,7 @@ export type Sink = (
   ...data: any[]
 ) => void;
 
-export const logToConsole: Sink = (logLevel, message, ...rest) => {
+const logToConsole: Sink = (logLevel, message, ...rest) => {
   let logMethod;
   switch (logLevel) {
     case 'error':
@@ -54,6 +54,8 @@ const logLevelByScope = new Map<string, LogLevel>();
 
 export let defaultLogLevel: LogLevel = 'info';
 export let defaultSink: Sink = logToConsole;
+
+export type Logger<T extends string> = ReturnType<typeof getLogger<T>>;
 
 export const getLogger = <T extends string>(
   scope: T,
@@ -108,7 +110,7 @@ export type ConfigureLoggersOptions<T extends string> = T extends 'default'
     }>;
 
 export const configureLoggers = <T extends string>(
-  optionsByScope: ConfigureLoggersOptions<T>,
+  optionsByScope?: ConfigureLoggersOptions<T>,
 ) => {
   for (const option in optionsByScope) {
     const options = optionsByScope[option]!;
