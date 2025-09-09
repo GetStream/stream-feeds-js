@@ -53,12 +53,7 @@ import {
   SyncFailure,
   UnhandledErrorType,
 } from '../common/real-time/event-models';
-import {
-  getLogger,
-  Logger,
-  setLogFunction,
-  setLogLevel,
-} from '../utils/logger';
+import { configureLoggers } from '../utils/logger';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -80,7 +75,6 @@ export class FeedsClient extends FeedsApi {
   >();
 
   private readonly polls_by_id: Map<string, StreamPoll>;
-  private readonly logger: Logger;
 
   private activeFeeds: Record<FID, Feed> = {};
 
@@ -105,8 +99,7 @@ export class FeedsClient extends FeedsApi {
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
 
-    setLogFunction(options?.log_function, options?.log_level);
-    this.logger = getLogger(FeedsClient.name);
+    configureLoggers(options?.logger_options);
 
     this.on('all', (event) => {
       const fid = event.fid;
@@ -245,9 +238,6 @@ export class FeedsClient extends FeedsApi {
       });
     }
   };
-
-  public setLogFunction = setLogFunction;
-  public setLogLevel = setLogLevel;
 
   public pollFromState = (id: string) => this.polls_by_id.get(id);
 

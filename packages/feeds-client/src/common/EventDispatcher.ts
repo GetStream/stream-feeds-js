@@ -9,7 +9,7 @@ export class EventDispatcher<
     Record<Type | 'all', Array<(event: Event) => void> | undefined>
   > = {};
 
-  private readonly logger = getLogger(EventDispatcher.name);
+  private readonly logger = getLogger('event-dispatcher');
 
   dispatch = (event: Event) => {
     const listeners = [
@@ -21,7 +21,7 @@ export class EventDispatcher<
         fn(event);
       } catch (e) {
         // TODO: do we really want to silence this error?
-        this.logger('warn', 'Listener failed with error', e);
+        this.logger.error('Listener failed with error', e);
       }
     }
   };
