@@ -1849,6 +1849,13 @@ decoders.UpsertConfigResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.UpsertPushPreferencesResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    user_preferences: { type: 'PushPreferences', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.User = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     ban_expires: { type: 'DatetimeType', isSingle: true },
