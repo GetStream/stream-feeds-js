@@ -1221,6 +1221,8 @@ export interface CallEgress {
 
 export interface CallIngressResponse {
   rtmp: RTMPIngress;
+
+  srt: SRTIngress;
 }
 
 export interface CallMember {
@@ -1782,6 +1784,12 @@ export const ChannelOwnCapability = {
 
 export type ChannelOwnCapability =
   (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
+
+export interface ChannelPushPreferences {
+  chat_level?: string;
+
+  disabled_until?: Date;
+}
 
 export interface ChannelResponse {
   cid: string;
@@ -2912,15 +2920,15 @@ export interface FeedUpdatedEvent {
 }
 
 export interface FeedsPreferences {
-  comment?: string;
+  comment?: 'all' | 'none';
 
-  comment_reaction?: string;
+  comment_reaction?: 'all' | 'none';
 
-  follow?: string;
+  follow?: 'all' | 'none';
 
-  mention?: string;
+  mention?: 'all' | 'none';
 
-  reaction?: string;
+  reaction?: 'all' | 'none';
 
   custom_activity_types?: Record<string, string>;
 }
@@ -4562,6 +4570,24 @@ export interface PushNotificationConfig {
   push_types?: string[];
 }
 
+export interface PushPreferenceInput {
+  call_level?: 'all' | 'none' | 'default';
+
+  channel_cid?: string;
+
+  chat_level?: 'all' | 'mentions' | 'none' | 'default';
+
+  disabled_until?: Date;
+
+  feeds_level?: 'all' | 'none' | 'default';
+
+  remove_disable?: boolean;
+
+  user_id?: string;
+
+  feeds_preferences?: FeedsPreferences;
+}
+
 export interface PushPreferences {
   call_level?: string;
 
@@ -5314,6 +5340,10 @@ export interface SFUIDLastSeen {
   process_start_time: number;
 }
 
+export interface SRTIngress {
+  address: string;
+}
+
 export interface STTEgressConfig {
   closed_captions_enabled?: boolean;
 
@@ -5777,6 +5807,8 @@ export interface UpdateActivityRequest {
 
   attachments?: Attachment[];
 
+  feeds?: string[];
+
   filter_tags?: string[];
 
   interest_tags?: string[];
@@ -6022,6 +6054,21 @@ export interface UpsertConfigResponse {
   duration: string;
 
   config?: ConfigResponse;
+}
+
+export interface UpsertPushPreferencesRequest {
+  preferences: PushPreferenceInput[];
+}
+
+export interface UpsertPushPreferencesResponse {
+  duration: string;
+
+  user_channel_preferences: Record<
+    string,
+    Record<string, ChannelPushPreferences | null>
+  >;
+
+  user_preferences: Record<string, PushPreferences>;
 }
 
 export interface User {
