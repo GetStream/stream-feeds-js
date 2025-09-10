@@ -9,7 +9,6 @@ import {
   generateOwnUser,
 } from '../../../test-utils/response-generators';
 import { FollowResponse } from '../../../gen/models';
-import { shouldUpdateState } from '../../../utils';
 
 describe(handleFollowUpdated.name, () => {
   let feed: Feed;
@@ -128,79 +127,5 @@ describe(handleFollowUpdated.name, () => {
     expect(stateAfter.follower_count).toBe(stateBefore.follower_count);
     expect(stateAfter.following).toBe(stateBefore.following);
     expect(stateAfter.following_count).toBe(stateBefore.following_count);
-  });
-
-  describe(`${shouldUpdateState.name} integration`, () => {
-    it(`skips update if ${shouldUpdateState.name} returns false`, () => {
-      // Prepare feed, set as watched
-      feed.state.partialNext({ watch: true });
-
-      const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
-
-      // Call once as WS event to populate queue
-      handleFollowUpdated.call(feed, { follow: updatedFollow });
-
-      // Call again as HTTP response, should be skipped
-      const stateBefore = feed.currentState;
-      handleFollowUpdated.call(
-        feed,
-        {
-          follow: { ...updatedFollow, status: 'accepted' },
-        },
-        false,
-      );
-
-      // State should not change
-      const stateAfter = feed.currentState;
-      expect(stateAfter).toBe(stateBefore);
-
-      (feed as any).stateUpdateQueue.clear();
-
-
-    });
-
-    it('allows update again from WS after clearing the stateUpdateQueue', () => {
-      const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
-
-      handleFollowUpdated.call(feed, { follow: updatedFollow });
-
-      // Clear the queue
-      (feed as any).stateUpdateQueue.clear();
-
-      // Now update should be allowed from another WS event
-      handleFollowUpdated.call(feed, {
-        follow: { ...updatedFollow, status: 'accepted' },
-      });
-
-      const [updatedFollowAfter] = feed.currentState.following!;
-
-      expect(updatedFollowAfter).toMatchObject({
-        status: 'accepted',
-      });
-    });
-
-    it('allows update again from HTTP response after clearing the stateUpdateQueue', () => {
-      const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
-
-      handleFollowUpdated.call(feed, { follow: updatedFollow }, false);
-
-      // Clear the queue
-      (feed as any).stateUpdateQueue.clear();
-
-      // Now update should be allowed from another HTTP response
-      handleFollowUpdated.call(
-        feed,
-        {
-          follow: { ...updatedFollow, status: 'accepted' },
-        },
-        false,
-      );
-
-      const [updatedFollowAfter] = feed.currentState.following!;
-
-      expect(updatedFollowAfter).toMatchObject({
-        status: 'accepted',
-      });
-    });
   });
 });

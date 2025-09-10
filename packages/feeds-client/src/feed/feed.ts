@@ -38,8 +38,6 @@ import {
   handleBookmarkAdded,
   handleActivityDeleted,
   handleActivityRemovedFromFeed,
-  handleActivityReactionDeleted,
-  handleActivityReactionAdded,
   handleFeedUpdated,
   handleNotificationFeedUpdated,
   handleActivityMarked,

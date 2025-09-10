@@ -20,6 +20,9 @@ export function handleFollowUpdated(
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
       fromWs,
+      isTriggeredByConnectedUser:
+        this.client.state.getLatestValue().connected_user?.id ===
+        follow.source_feed.created_by.id,
     })
   ) {
     return;
