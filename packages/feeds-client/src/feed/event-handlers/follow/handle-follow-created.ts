@@ -1,4 +1,4 @@
-import type { Feed, FeedState } from '../../../feed';
+import type { Feed, FeedState } from '../../feed';
 import type { FollowResponse } from '../../../gen/models';
 import type {
   EventPayload,
@@ -65,6 +65,7 @@ export function handleFollowCreated(
     EventPayload<'feeds.follow.created'>,
     'follow'
   >,
+  fromWs?: boolean,
 ) {
   const follow = eventOrResponse.follow;
 
@@ -73,6 +74,7 @@ export function handleFollowCreated(
       stateUpdateQueueId: getStateUpdateQueueId(follow, 'follow-created'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
+      fromWs,
     })
   ) {
     return;

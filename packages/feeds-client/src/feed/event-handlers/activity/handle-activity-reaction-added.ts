@@ -85,6 +85,7 @@ export const addReactionToPinnedActivities = (
 export function handleActivityReactionAdded(
   this: Feed,
   payload: AddActivityReactionPayload,
+  fromWs?: boolean,
 ) {
   if (
     !shouldUpdateState({
@@ -94,6 +95,7 @@ export function handleActivityReactionAdded(
       ),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
+      fromWs,
     })
   ) {
     return;

@@ -1,28 +1,34 @@
 import { isFollowResponse, isReactionResponse } from './type-assertions';
-import {
-  AddCommentReactionResponse,
-  AddReactionResponse,
-} from '../gen/models';
+import { AddCommentReactionResponse, AddReactionResponse } from '../gen/models';
 
 export const shouldUpdateState = ({
   stateUpdateQueueId,
   stateUpdateQueue,
   watch,
+  fromWs = true,
 }: {
   stateUpdateQueueId: string;
   stateUpdateQueue: Set<string>;
   watch: boolean;
+  fromWs?: boolean;
 }) => {
   if (!watch) {
     return true;
   }
 
-  if (watch && stateUpdateQueue.has(stateUpdateQueueId)) {
-    stateUpdateQueue.delete(stateUpdateQueueId);
+  const prefixedStateUpdateQueueId = fromWs
+    ? `ws-${stateUpdateQueueId}`
+    : `http-${stateUpdateQueueId}`;
+  const pairedStateUpdateQueueId = fromWs
+    ? `http-${stateUpdateQueueId}`
+    : `ws-${stateUpdateQueueId}`;
+
+  if (watch && stateUpdateQueue.has(pairedStateUpdateQueueId)) {
+    stateUpdateQueue.delete(pairedStateUpdateQueueId);
     return false;
   }
 
-  stateUpdateQueue.add(stateUpdateQueueId);
+  stateUpdateQueue.add(prefixedStateUpdateQueueId);
   return true;
 };
 

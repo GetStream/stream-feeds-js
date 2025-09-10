@@ -333,7 +333,7 @@ export class FeedsClient extends FeedsApi {
   ) => {
     const response = await super.addReaction(request);
     for (const feed of Object.values(this.activeFeeds)) {
-      handleActivityReactionAdded.bind(feed)(response);
+      handleActivityReactionAdded.bind(feed)(response, false);
     }
     return response;
   };
@@ -344,7 +344,7 @@ export class FeedsClient extends FeedsApi {
   }): Promise<StreamResponse<DeleteActivityReactionResponse>> => {
     const response = await super.deleteActivityReaction(request);
     for (const feed of Object.values(this.activeFeeds)) {
-      handleActivityReactionDeleted.bind(feed)(response);
+      handleActivityReactionDeleted.bind(feed)(response, false);
     }
     return response;
   }
@@ -439,7 +439,7 @@ export class FeedsClient extends FeedsApi {
     ].forEach((fid) => {
       const feed = this.activeFeeds[fid];
       if (feed) {
-        handleFollowUpdated.bind(feed)(response);
+        handleFollowUpdated.bind(feed)(response, false);
       }
     });
 
@@ -456,7 +456,7 @@ export class FeedsClient extends FeedsApi {
     ].forEach((fid) => {
       const feed = this.activeFeeds[fid];
       if (feed) {
-        handleFollowCreated.bind(feed)(response);
+        handleFollowCreated.bind(feed)(response, false);
       }
     });
 
@@ -482,7 +482,7 @@ export class FeedsClient extends FeedsApi {
     [request.source, request.target].forEach((fid) => {
       const feed = this.activeFeeds[fid];
       if (feed) {
-        handleFollowDeleted.bind(feed)(response);
+        handleFollowDeleted.bind(feed)(response, false);
       }
     });
 

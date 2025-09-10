@@ -137,21 +137,29 @@ describe(handleFollowUpdated.name, () => {
 
       const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
 
-      // Call once to populate queue
+      // Call once as WS event to populate queue
       handleFollowUpdated.call(feed, { follow: updatedFollow });
 
-      // Call again, should be skipped
+      // Call again as HTTP response, should be skipped
       const stateBefore = feed.currentState;
-      handleFollowUpdated.call(feed, {
-        follow: { ...updatedFollow, status: 'accepted' },
-      });
+      handleFollowUpdated.call(
+        feed,
+        {
+          follow: { ...updatedFollow, status: 'accepted' },
+        },
+        false,
+      );
 
       // State should not change
       const stateAfter = feed.currentState;
       expect(stateAfter).toBe(stateBefore);
+
+      (feed as any).stateUpdateQueue.clear();
+
+
     });
 
-    it('allows update again after clearing stateUpdateQueue', () => {
+    it('allows update again from WS after clearing the stateUpdateQueue', () => {
       const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
 
       handleFollowUpdated.call(feed, { follow: updatedFollow });
@@ -159,10 +167,34 @@ describe(handleFollowUpdated.name, () => {
       // Clear the queue
       (feed as any).stateUpdateQueue.clear();
 
-      // Now update should be allowed
+      // Now update should be allowed from another WS event
       handleFollowUpdated.call(feed, {
         follow: { ...updatedFollow, status: 'accepted' },
       });
+
+      const [updatedFollowAfter] = feed.currentState.following!;
+
+      expect(updatedFollowAfter).toMatchObject({
+        status: 'accepted',
+      });
+    });
+
+    it('allows update again from HTTP response after clearing the stateUpdateQueue', () => {
+      const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
+
+      handleFollowUpdated.call(feed, { follow: updatedFollow }, false);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another HTTP response
+      handleFollowUpdated.call(
+        feed,
+        {
+          follow: { ...updatedFollow, status: 'accepted' },
+        },
+        false,
+      );
 
       const [updatedFollowAfter] = feed.currentState.following!;
 

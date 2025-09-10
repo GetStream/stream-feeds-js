@@ -8,6 +8,7 @@ export function handleFollowUpdated(
     EventPayload<'feeds.follow.updated'>,
     'follow'
   >,
+  fromWs?: boolean,
 ) {
   const follow = eventOrResponse.follow;
   const connectedUserId = this.client.state.getLatestValue().connected_user?.id;
@@ -18,6 +19,7 @@ export function handleFollowUpdated(
       stateUpdateQueueId: getStateUpdateQueueId(follow, 'follow-updated'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
+      fromWs,
     })
   ) {
     return;

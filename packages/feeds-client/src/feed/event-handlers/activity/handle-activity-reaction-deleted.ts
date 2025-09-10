@@ -89,6 +89,7 @@ export const removeReactionFromPinnedActivities = (
 export function handleActivityReactionDeleted(
   this: Feed,
   payload: ActivityReactionDeletedPayload,
+  fromWs?: boolean,
 ) {
   if (
     !shouldUpdateState({
@@ -98,6 +99,7 @@ export function handleActivityReactionDeleted(
       ),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
+      fromWs,
     })
   ) {
     return;
