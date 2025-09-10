@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.7](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.6...@stream-io/feeds-client-0.2.7) (2025-09-10)
+
+
+### Features
+
+* Added user_count_truncated ([#112](https://github.com/GetStream/stream-feeds-js/issues/112)) ([827f222](https://github.com/GetStream/stream-feeds-js/commit/827f2222c8b63a822ea44f8718ec5b3a2cf67373))
+* push config method ([#115](https://github.com/GetStream/stream-feeds-js/issues/115)) ([033441d](https://github.com/GetStream/stream-feeds-js/commit/033441d808215aa71396ebbea1b94222fd118a91))
+
 ## [0.2.6](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.5...@stream-io/feeds-client-0.2.6) (2025-09-09)
 
 
