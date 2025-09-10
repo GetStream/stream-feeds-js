@@ -94,11 +94,11 @@ export const updateNotificationFeedFromEvent = (
     }
   }
 
-  if (event.aggregated_activities && currentAggregatedActivities) {
+  if (event.aggregated_activities) {
     const aggregatedActivitiesResult = addAggregatedActivitiesToState(
       event.aggregated_activities,
       currentAggregatedActivities,
-      'start',
+      'start', // Add new activities at the start
     );
 
     if (aggregatedActivitiesResult.changed) {
@@ -126,7 +126,6 @@ export function handleNotificationFeedUpdated(
   const result = updateNotificationFeedFromEvent(
     event,
     this.currentState.aggregated_activities,
-    this.currentState.notification_status,
   );
   if (result.changed) {
     this.state.partialNext({
