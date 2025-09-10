@@ -36,3 +36,19 @@ export interface ConnectedEvent {
    */
   type: string;
 }
+
+export enum UnhandledErrorType {
+  ReconnectionReconciliation = 'reconnection-reconciliation',
+}
+
+export type SyncFailure = { feed: string, reason: unknown };
+
+export type UnhandledErrorEvent = {
+  type: 'errors.unhandled';
+  error_type: UnhandledErrorType;
+} & (
+  | {
+      error_type: UnhandledErrorType.ReconnectionReconciliation;
+      failures: SyncFailure[];
+    }
+);

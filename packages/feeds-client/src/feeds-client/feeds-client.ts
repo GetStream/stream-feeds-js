@@ -37,6 +37,7 @@ import { ModerationClient } from '../moderation-client';
 import { StreamPoll } from '../common/Poll';
 import {
   Feed,
+  handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
   handleFollowUpdated,
@@ -44,6 +45,10 @@ import {
   handleWatchStopped,
 } from '../feed';
 import { handleUserUpdated } from './event-handlers';
+import {
+  SyncFailure,
+  UnhandledErrorType,
+} from '../common/real-time/event-models';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -100,14 +105,7 @@ export class FeedsClient extends FeedsApi {
           this.state.partialNext({ is_ws_connection_healthy: online });
 
           if (online) {
-            this.healthyConnectionChangedEventCount++;
-
-            // we skip the first event as we could potentially be querying twice
-            if (this.healthyConnectionChangedEventCount > 1) {
-              for (const activeFeed of Object.values(this.activeFeeds)) {
-                activeFeed.synchronize();
-              }
-            }
+            this.recoverOnReconnect();
           } else {
             for (const activeFeed of Object.values(this.activeFeeds)) {
               handleWatchStopped.bind(activeFeed)();
@@ -207,6 +205,31 @@ export class FeedsClient extends FeedsApi {
       }
     });
   }
+
+  private recoverOnReconnect = async () => {
+    this.healthyConnectionChangedEventCount++;
+
+    // we skip the first event as we could potentially be querying twice
+    if (this.healthyConnectionChangedEventCount > 1) {
+      const entries = Object.entries(this.activeFeeds);
+
+      const results = await Promise.allSettled(
+        entries.map(([, feed]) => feed.synchronize()),
+      );
+
+      const failures: SyncFailure[] = results.flatMap((result, index) =>
+        result.status === 'rejected'
+          ? [{ feed: entries[index][0], reason: result.reason }]
+          : [],
+      );
+
+      this.eventDispatcher.dispatch({
+        type: 'errors.unhandled',
+        error_type: UnhandledErrorType.ReconnectionReconciliation,
+        failures,
+      });
+    }
+  };
 
   public pollFromState = (id: string) => this.polls_by_id.get(id);
 
@@ -353,8 +376,13 @@ export class FeedsClient extends FeedsApi {
   async queryFeeds(request?: QueryFeedsRequest) {
     const response = await this._queryFeeds(request);
 
-    const feeds = response.feeds.map((f) =>
-      this.getOrCreateActiveFeed(f.group_id, f.id, f, request?.watch),
+    const feeds = response.feeds.map((feedResponse) =>
+      this.getOrCreateActiveFeed(
+        feedResponse.group_id,
+        feedResponse.id,
+        feedResponse,
+        request?.watch,
+      ),
     );
 
     return {
@@ -458,17 +486,20 @@ export class FeedsClient extends FeedsApi {
     watch?: boolean,
   ) => {
     const fid = `${group}:${id}`;
-    if (this.activeFeeds[fid]) {
-      const feed = this.activeFeeds[fid];
-      if (watch && !feed.currentState.watch) {
-        handleWatchStarted.bind(feed)();
-      }
-      return feed;
-    } else {
-      const feed = new Feed(this, group, id, data, watch);
-      this.activeFeeds[fid] = feed;
-      return feed;
+
+    if (!this.activeFeeds[fid]) {
+      this.activeFeeds[fid] = new Feed(this, group, id, data, watch);
     }
+
+    const feed = this.activeFeeds[fid];
+
+    if (!feed.currentState.watch) {
+      // feed isn't watched and may be stale, update it
+      if (data) handleFeedUpdated.call(feed, { feed: data });
+      if (watch) handleWatchStarted.call(feed);
+    }
+
+    return feed;
   };
 
   private findActiveFeedByActivityId(activityId: string) {

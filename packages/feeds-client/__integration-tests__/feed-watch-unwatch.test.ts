@@ -58,7 +58,7 @@ describe('Feed watch and unwatch', () => {
     expect(feed.currentState.watch).toBe(false);
   });
 
-  it(`loosing connection will set watch to false, reconnecting will reset watch to true`, async () => {
+  it(`losing connection will set watch to false, reconnecting will reset watch to true`, async () => {
     await feed.getOrCreate({ watch: true });
 
     expect(feed.currentState.watch).toBe(true);

@@ -2,6 +2,26 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.6](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.5...@stream-io/feeds-client-0.2.6) (2025-09-09)
+
+
+* [FEEDS-708] regenerate client from spec ([#116](https://github.com/GetStream/stream-feeds-js/issues/116)) ([a7e7edd](https://github.com/GetStream/stream-feeds-js/commit/a7e7edde50d37445cc85b051e7a6236f2ee92955))
+
+## [0.2.5](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.4...@stream-io/feeds-client-0.2.5) (2025-09-08)
+
+
+* add push code snippets to docs snippets tests ([#113](https://github.com/GetStream/stream-feeds-js/issues/113)) ([1f4f6ea](https://github.com/GetStream/stream-feeds-js/commit/1f4f6ead115d24e23bcde99e0dc20b3d85d696e3))
+
+
+### Features
+
+* add unhandled error events ([#109](https://github.com/GetStream/stream-feeds-js/issues/109)) ([2ac0cf3](https://github.com/GetStream/stream-feeds-js/commit/2ac0cf3adfa963348cf5602b462bda39487ffcaa))
+
+
+### Bug Fixes
+
+* update possibly stale feeds (`FeedsClient.queryFeeds`) ([#111](https://github.com/GetStream/stream-feeds-js/issues/111)) ([b1660e1](https://github.com/GetStream/stream-feeds-js/commit/b1660e1be4b24d01bb7cd26e11f27b2a46b746af))
+
 ## [0.2.4](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.3...@stream-io/feeds-client-0.2.4) (2025-09-04)
 
 

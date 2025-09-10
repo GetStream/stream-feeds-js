@@ -47,6 +47,7 @@ export const FollowButton = ({ feed }: { feed: Feed }) => {
       } else {
         await ownTimelineFeed.follow(feed, {
           create_notification_activity: true,
+          push_preference: 'all',
         });
       }
     } catch (error) {

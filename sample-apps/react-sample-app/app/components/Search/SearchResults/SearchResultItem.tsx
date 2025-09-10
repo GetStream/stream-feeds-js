@@ -78,6 +78,6 @@ export const ActivitySearchResultItem = ({
 };
 
 export const DefaultSearchResultItems: SearchResultItemComponents = {
-  feed: FeedSearchResultItem,
+  'user-feed': FeedSearchResultItem,
   activity: ActivitySearchResultItem,
 };

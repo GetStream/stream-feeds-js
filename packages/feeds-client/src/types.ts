@@ -1,4 +1,7 @@
-import { ConnectionChangedEvent } from './common/real-time/event-models';
+import {
+  ConnectionChangedEvent,
+  UnhandledErrorEvent,
+} from './common/real-time/event-models';
 import { NetworkChangedEvent } from './common/types';
 import {
   PagerResponse,
@@ -10,7 +13,7 @@ import type {
 } from './gen/models';
 import { FeedsClient } from './feeds-client';
 
-export type FeedsEvent = WSEvent | ConnectionChangedEvent | NetworkChangedEvent;
+export type FeedsEvent = WSEvent | ConnectionChangedEvent | NetworkChangedEvent | UnhandledErrorEvent;
 export type ActivityIdOrCommentId = string;
 
 export type GetCommentsRequest = Parameters<FeedsClient['getComments']>[0];
