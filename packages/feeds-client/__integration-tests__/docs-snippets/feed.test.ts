@@ -140,15 +140,7 @@ describe('Feeds page', () => {
 
     await feed.getOrCreate({
       filter: {
-        fid: feed.feed,
-        $or: [
-          {
-            $and: [{ filter_tags: ['green'] }, { type: 'post' }],
-          },
-          {
-            $and: [{ filter_tags: ['orange'] }, { type: 'activity' }],
-          },
-        ],
+        $and: [{ filter_tags: ['green'] }, { filter_tags: ['orange'] }],
       },
     });
   });
