@@ -1,7 +1,8 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
   ActivityResponse,
-  AddReactionRequest, DeleteActivityReactionResponse,
+  AddReactionRequest,
+  DeleteActivityReactionResponse,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -347,7 +348,7 @@ export class FeedsClient extends FeedsApi {
       handleActivityReactionDeleted.bind(feed)(response, false);
     }
     return response;
-  }
+  };
 
   queryPollAnswers = async (
     request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
