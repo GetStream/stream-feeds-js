@@ -42,7 +42,7 @@ describe('Aggregated Feed Pagination Integration Tests', () => {
     await request;
 
     // Verify first page state
-    let state = feed.state.getLatestValue();
+    const state = feed.state.getLatestValue();
     expect(state.is_loading_activities).toBe(false);
     expect(state.aggregated_activities?.length).toBe(2);
     expect(state.next).toBeDefined();
