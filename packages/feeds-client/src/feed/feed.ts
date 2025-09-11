@@ -145,8 +145,8 @@ export class Feed extends FeedApi {
   private readonly eventHandlers: EventHandlerByEventType = {
     'feeds.activity.added': handleActivityAdded.bind(this),
     'feeds.activity.deleted': handleActivityDeleted.bind(this),
-    'feeds.activity.reaction.added': Feed.noop,
-    'feeds.activity.reaction.deleted': Feed.noop,
+    'feeds.activity.reaction.added': handleActivityReactionAdded.bind(this),
+    'feeds.activity.reaction.deleted': handleActivityReactionDeleted.bind(this),
     'feeds.activity.reaction.updated': Feed.noop,
     'feeds.activity.removed_from_feed':
       handleActivityRemovedFromFeed.bind(this),
