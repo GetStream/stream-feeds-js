@@ -43,6 +43,8 @@ import {
   handleFeedUpdated,
   handleNotificationFeedUpdated,
   handleActivityMarked,
+  addAggregatedActivitiesToState,
+  updateNotificationStatus,
 } from './event-handlers';
 import { capitalize } from '../common/utils';
 import type {
@@ -260,9 +262,27 @@ export class Feed extends FeedApi {
           'end',
         );
 
-        if (result.changed) {
+        const aggregatedActivitiesResult = addAggregatedActivitiesToState(
+          response.aggregated_activities,
+          this.currentState.aggregated_activities,
+          'end',
+        );
+
+        const notificationStatusResult = updateNotificationStatus(
+          response.notification_status,
+          this.currentState.notification_status,
+        );
+
+        if (
+          result.changed ||
+          aggregatedActivitiesResult.changed ||
+          notificationStatusResult.changed
+        ) {
           this.state.partialNext({
             activities: result.activities,
+            aggregated_activities:
+              aggregatedActivitiesResult.aggregated_activities,
+            notification_status: notificationStatusResult.notification_status,
             next: response.next,
             prev: response.prev,
           });
