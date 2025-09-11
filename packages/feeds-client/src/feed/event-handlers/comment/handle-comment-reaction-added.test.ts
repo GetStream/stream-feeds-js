@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Feed, handleCommentReactionDeleted } from '../../../feed';
+import { Feed } from '../../../feed';
 import { FeedsClient } from '../../../feeds-client';
 import { handleCommentReactionAdded } from './handle-comment-reaction-added';
 import {
@@ -9,7 +9,6 @@ import {
   getHumanId,
   generateCommentReactionAddedEvent,
   generateFeedReactionResponse,
-  generateCommentReactionDeletedEvent,
 } from '../../../test-utils';
 import {
   CommentResponse,
