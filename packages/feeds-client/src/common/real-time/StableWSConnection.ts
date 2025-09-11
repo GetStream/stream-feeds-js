@@ -6,12 +6,12 @@ import {
   retryInterval,
   sleep,
 } from '../utils';
-import type { LogLevel } from '../types';
 import type { UserRequest } from '../../gen/models';
 import { TokenManager } from '../TokenManager';
 import { EventDispatcher } from '../EventDispatcher';
 import { ConnectionIdManager } from '../ConnectionIdManager';
 import { ConnectedEvent } from './event-models';
+import { getLogger } from '../../utils/logger';
 
 // Type guards to check WebSocket error type
 const isCloseEvent = (
@@ -78,6 +78,7 @@ export class StableWSConnection {
   wsID: number;
   private readonly dispatcher = new EventDispatcher();
   private readonly clientId: string;
+  private readonly logger = getLogger('stable-ws-connection');
 
   constructor(
     private readonly config: WSConfig,
@@ -111,11 +112,6 @@ export class StableWSConnection {
     addConnectionEventListeners(this.onlineStatusChanged);
   }
 
-  _log = (msg: string, extra: any = {}, level: LogLevel = 'info') => {
-    // TODO: fix logging
-    console.log(msg, extra, level);
-  };
-
   on = this.dispatcher.on;
   off = this.dispatcher.off;
   offAll = this.dispatcher.offAll;
@@ -126,6 +122,7 @@ export class StableWSConnection {
    * @return {ConnectAPIResponse<ConnectedEvent>} Promise that completes once the first health check message is received
    */
   async connect(timeout = 15000) {
+    const logger = this.logger.withExtraTags('connect');
     if (this.isConnecting) {
       throw Error(
         `You've called connect twice, can only attempt 1 connection at the time`,
@@ -142,10 +139,7 @@ export class StableWSConnection {
       const healthCheck = await this._connect();
       this.consecutiveFailures = 0;
 
-      this._log(
-        `connect() - Established ws connection with healthcheck`,
-        healthCheck,
-      );
+      logger.debug(`Established ws connection with healthcheck`, healthCheck);
     } catch (error) {
       this.isHealthy = false;
       this.consecutiveFailures += 1;
@@ -155,8 +149,8 @@ export class StableWSConnection {
           error.code === KnownCodes.TOKEN_EXPIRED &&
           !this.tokenManager.isStatic()
         ) {
-          this._log(
-            'connect() - WS failure due to expired token, so going to try to reload token and reconnect',
+          logger.debug(
+            'WS failure due to expired token, so going to try to reload token and reconnect',
           );
           void this._reconnect({ refreshToken: true });
         } else {
@@ -227,9 +221,8 @@ export class StableWSConnection {
    *
    */
   disconnect(timeout?: number) {
-    this._log(
-      `disconnect() - Closing the websocket connection for wsID ${this.wsID}`,
-    );
+    const logger = this.logger.withExtraTags('disconnect');
+    logger.debug(`Closing the WS connection for wsID ${this.wsID}`);
 
     this.wsID += 1;
     this.isConnecting = false;
@@ -262,8 +255,8 @@ export class StableWSConnection {
     if (ws?.close && ws.readyState === ws.OPEN) {
       isClosedPromise = new Promise((resolve) => {
         const onclose = (event: CloseEvent) => {
-          this._log(
-            `disconnect() - resolving isClosedPromise ${
+          logger.debug(
+            `resolving isClosedPromise ${
               event ? 'with' : 'without'
             } close frame`,
             { event },
@@ -277,18 +270,14 @@ export class StableWSConnection {
         setTimeout(onclose, timeout ?? 1000);
       });
 
-      this._log(
-        `disconnect() - Manually closed connection by calling client.disconnect()`,
-      );
+      logger.debug(`Manually closed connection by calling client.disconnect()`);
 
       ws.close(
         KnownCodes.WS_CLOSED_SUCCESS,
         'Manually closed connection by calling client.disconnect()',
       );
     } else {
-      this._log(
-        `disconnect() - ws connection doesn't exist or it is already closed.`,
-      );
+      logger.debug(`WS connection doesn't exist or it is already closed.`);
       isClosedPromise = Promise.resolve();
     }
 
@@ -303,12 +292,13 @@ export class StableWSConnection {
    * @return {ConnectAPIResponse<ConnectedEvent>} Promise that completes once the first health check message is received
    */
   async _connect() {
+    const logger = this.logger.withExtraTags('_connect');
     if (this.isConnecting) return; // simply ignore _connect if it's currently trying to connect
     this.isConnecting = true;
     this.requestID = randomId();
     let isTokenReady = false;
     try {
-      this._log(`_connect() - waiting for token`);
+      logger.debug(`waiting for token`);
       await this.tokenManager.getToken();
       isTokenReady = true;
     } catch (_) {
@@ -317,15 +307,13 @@ export class StableWSConnection {
 
     try {
       if (!isTokenReady) {
-        this._log(
-          `_connect() - tokenProvider failed before, so going to retry`,
-        );
+        logger.debug(`tokenProvider failed before, so going to retry`);
         await this.tokenManager.loadToken();
       }
 
       this._setupConnectionPromise();
       const wsURL = this.config.baseUrl;
-      this._log(`_connect() - Connecting to ${wsURL}`, {
+      logger.debug(`Connecting to ${wsURL}`, {
         wsURL,
         requestID: this.requestID,
       });
@@ -342,7 +330,6 @@ export class StableWSConnection {
       }
     } catch (err) {
       this.isConnecting = false;
-      this._log(`_connect() - Error - `, err);
       throw err;
     }
   }
@@ -358,11 +345,13 @@ export class StableWSConnection {
   async _reconnect(
     options: { interval?: number; refreshToken?: boolean } = {},
   ): Promise<void> {
-    this._log('_reconnect() - Initiating the reconnect');
+    const logger = this.logger.withExtraTags('_reconnect');
+
+    logger.debug('Initiating the reconnect');
 
     // only allow 1 connection at the time
     if (this.isConnecting || this.isHealthy) {
-      this._log('_reconnect() - Abort (1) since already connecting or healthy');
+      logger.debug('Abort (1) since already connecting or healthy');
       return;
     }
 
@@ -378,16 +367,16 @@ export class StableWSConnection {
     // Check once again if by some other call to _reconnect is active or connection is
     // already restored, then no need to proceed.
     if (this.isConnecting || this.isHealthy) {
-      this._log('_reconnect() - Abort (2) since already connecting or healthy');
+      logger.debug('Abort (2) since already connecting or healthy');
       return;
     }
 
     if (this.isDisconnected) {
-      this._log('_reconnect() - Abort (3) since disconnect() is called');
+      logger.debug('Abort (3) since disconnect() is called');
       return;
     }
 
-    this._log('_reconnect() - Destroying current WS connection');
+    logger.debug('Destroying current WS connection');
 
     // cleanup the old connection
     this._destroyCurrentWSConnection();
@@ -398,9 +387,9 @@ export class StableWSConnection {
 
     try {
       await this._connect();
-      this._log('_reconnect() - Waiting for recoverCallBack');
+      // logger.debug('Waiting for recoverCallBack');
       // await this.client.recoverState();
-      this._log('_reconnect() - Finished recoverCallBack');
+      // logger.debug('Finished recoverCallBack');
 
       this.consecutiveFailures = 0;
     } catch (error: any) {
@@ -410,8 +399,8 @@ export class StableWSConnection {
         error.code === KnownCodes.TOKEN_EXPIRED &&
         !this.tokenManager.isStatic()
       ) {
-        this._log(
-          '_reconnect() - WS failure due to expired token, so going to try to reload token and reconnect',
+        logger.debug(
+          'WS failure due to expired token, so going to try to reload token and reconnect',
         );
 
         return await this._reconnect({ refreshToken: true });
@@ -419,12 +408,12 @@ export class StableWSConnection {
 
       // reconnect on WS failures, don't reconnect if there is a code bug
       if (error.isWSFailure) {
-        this._log('_reconnect() - WS failure, so going to try to reconnect');
+        logger.debug('WS failure, so going to try to reconnect');
 
         void this._reconnect();
       }
     }
-    this._log('_reconnect() - == END ==');
+    logger.debug('== END ==');
   }
 
   /**
@@ -434,9 +423,11 @@ export class StableWSConnection {
    *
    */
   onlineStatusChanged = (event: Event) => {
+    const logger = this.logger.withExtraTags('onlineStatusChanged');
+
     if (event.type === 'offline') {
       // mark the connection as down
-      this._log('onlineStatusChanged() - Status changing to offline');
+      logger.debug('Status changing to offline');
       // we know that the app is offline so dispatch the unhealthy connection event immediately
       this._setHealth(false, true);
     } else if (event.type === 'online') {
@@ -444,9 +435,7 @@ export class StableWSConnection {
       // We check this.isHealthy, not sure if it's always
       // smart to create a new WS connection if the old one is still up and running.
       // it's possible we didn't miss any messages, so this process is just expensive and not needed.
-      this._log(
-        `onlineStatusChanged() - Status changing to online. isHealthy: ${this.isHealthy}`,
-      );
+      logger.debug(`Status changing to online. isHealthy: ${this.isHealthy}`);
       if (!this.isHealthy) {
         void this._reconnect({ interval: 10 });
       }
@@ -454,17 +443,19 @@ export class StableWSConnection {
   };
 
   onopen = async (wsID: number) => {
+    const logger = this.logger.withExtraTags('onopen');
+
     if (this.wsID !== wsID) return;
 
     const user = this.config.user;
     if (!user) {
-      this._log('error', `User not set, can't connect to WS`);
+      logger.warn(`User not set, can't connect to WS`);
       return;
     }
 
     const token = await this.tokenManager.getToken();
     if (!token) {
-      this._log('error', `Token not set, can't connect authenticate`);
+      logger.warn(`Token not set, can't connect authenticate`);
       return;
     }
 
@@ -481,13 +472,15 @@ export class StableWSConnection {
 
     this.authenticationSent = true;
     this.ws?.send(JSON.stringify(authMessage));
-    this._log('onopen() - onopen callback', { wsID });
+    logger.debug('onopen callback', { wsID });
   };
 
   onmessage = (wsID: number, event: MessageEvent) => {
+    const logger = this.logger.withExtraTags('onmessage');
+
     if (this.wsID !== wsID) return;
 
-    this._log('onmessage() - onmessage callback', {
+    logger.debug('onmessage callback', {
       event: { ...event, data: JSON.parse(event.data) },
       wsID,
     });
@@ -531,8 +524,8 @@ export class StableWSConnection {
       this.consecutiveFailures += 1;
       if (code === KnownCodes.TOKEN_EXPIRED && !this.tokenManager.isStatic()) {
         clearTimeout(this.connectionCheckTimeoutRef);
-        this._log(
-          'connect() - WS failure due to expired token, so going to try to reload token and reconnect',
+        logger.debug(
+          'WS failure due to expired token, so going to try to reload token and reconnect',
         );
         void this._reconnect({ refreshToken: true });
       }
@@ -546,15 +539,20 @@ export class StableWSConnection {
   };
 
   onclose = (wsID: number, event: CloseEvent) => {
+    const logger = this.logger.withExtraTags('onclose');
+
     if (this.wsID !== wsID) return;
 
-    this._log('onclose() - onclose callback - ' + event.code, { event, wsID });
+    logger.debug('onclose callback - ' + event.code, {
+      event,
+      wsID,
+    });
 
     if (event.code === KnownCodes.WS_CLOSED_SUCCESS) {
       // this is a permanent error raised by stream..
       // usually caused by invalid auth details
       this.rejectPromise?.(this._errorFromWSEvent(event));
-      this._log(`onclose() - WS connection reject with error ${event.reason}`, {
+      logger.debug(`WS connection reject with error ${event.reason}`, {
         event,
       });
     } else {
@@ -565,7 +563,7 @@ export class StableWSConnection {
 
       this.rejectPromise?.(this._errorFromWSEvent(event));
 
-      this._log(`onclose() - WS connection closed. Calling reconnect ...`, {
+      logger.debug(`WS connection closed. Calling reconnect ...`, {
         event,
       });
 
@@ -582,7 +580,11 @@ export class StableWSConnection {
     this._setHealth(false);
     this.isConnecting = false;
     this.rejectPromise?.(this._errorFromWSEvent(event));
-    this._log(`onerror() - WS connection resulted into error`, { event });
+    this.logger
+      .withExtraTags('onerror')
+      .debug(`WS connection resulted into error`, {
+        event,
+      });
 
     void this._reconnect();
   };
@@ -661,11 +663,11 @@ export class StableWSConnection {
     }
 
     // Keeping this `warn` level log, to avoid cluttering of error logs from ws failures.
-    this._log(
-      `_errorFromWSEvent() - WS failed with code ${code}`,
-      { event },
-      'warn',
-    );
+    this.logger
+      .withExtraTags('_errorFromWSEvent')
+      .debug(`WS failed with code ${code}`, {
+        event,
+      });
 
     const error = new Error(
       `WS failed with code ${code} and reason - ${message}`,
@@ -755,7 +757,9 @@ export class StableWSConnection {
         this.lastEvent &&
         now.getTime() - this.lastEvent.getTime() > this.connectionCheckTimeout
       ) {
-        this._log('scheduleConnectionCheck - going to reconnect');
+        this.logger
+          .withExtraTags('scheduleConnectionCheck')
+          .debug('going to reconnect');
         this._setHealth(false);
         void this._reconnect();
       }

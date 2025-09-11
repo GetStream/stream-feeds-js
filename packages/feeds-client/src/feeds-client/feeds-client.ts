@@ -49,6 +49,7 @@ import {
   SyncFailure,
   UnhandledErrorType,
 } from '../common/real-time/event-models';
+import { configureLoggers } from '../utils/logger';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -93,6 +94,9 @@ export class FeedsClient extends FeedsApi {
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
+
+    configureLoggers(options?.configure_loggers_options);
+
     this.on('all', (event) => {
       const fid = event.fid;
 

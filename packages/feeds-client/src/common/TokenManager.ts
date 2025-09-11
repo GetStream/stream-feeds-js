@@ -1,3 +1,4 @@
+import { getLogger } from '../utils/logger';
 import { isFunction, sleep } from './utils';
 
 /**
@@ -10,6 +11,7 @@ export class TokenManager {
   type: 'static' | 'provider';
   token?: string;
   tokenProvider?: string | (() => Promise<string>);
+  private readonly logger = getLogger('token-manager');
 
   constructor() {
     this.loadTokenPromise = null;
@@ -49,6 +51,8 @@ export class TokenManager {
   // Fetches a token from tokenProvider function and sets in tokenManager.
   // In case of static token, it will simply resolve to static token.
   loadToken = () => {
+    this.logger.info('Loading a new token');
+
     if (this.loadTokenPromise) {
       return this.loadTokenPromise;
     }
