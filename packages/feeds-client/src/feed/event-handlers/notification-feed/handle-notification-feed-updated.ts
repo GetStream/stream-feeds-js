@@ -129,7 +129,6 @@ export function handleNotificationFeedUpdated(
     this.currentState.notification_status,
   );
   if (result.changed) {
-    console.log('result changed', result.data?.notification_status);
     this.state.partialNext({
       notification_status: result.data?.notification_status,
       aggregated_activities: result.data?.aggregated_activities,
