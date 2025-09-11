@@ -5,7 +5,7 @@ import type {
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
 
-export function removeActivityFromState (
+export function removeActivityFromState(
   this: Feed,
   activityResponse: ActivityResponse,
   activities: ActivityResponse[] | undefined,
@@ -14,8 +14,9 @@ export function removeActivityFromState (
 }> {
   if (this.hasActivity(activityResponse.id)) {
     const index =
-      activities?.findIndex((activity) => activity.id === activityResponse.id) ??
-      -1;
+      activities?.findIndex(
+        (activity) => activity.id === activityResponse.id,
+      ) ?? -1;
     const newActivities = [...activities!];
     newActivities.splice(index, 1);
     return { changed: true, activities: newActivities };
@@ -54,13 +55,15 @@ export function handleActivityDeleted(
   } = this.currentState;
 
   const [result1, result2] = [
-    this.hasActivity(event.activity.id) ? removeActivityFromState.bind(this)(event.activity, currentActivities) : undefined,
+    this.hasActivity(event.activity.id)
+      ? removeActivityFromState.bind(this)(event.activity, currentActivities)
+      : undefined,
     removePinnedActivityFromState(event.activity, currentPinnedActivities),
   ];
 
   if (result1?.changed || result2.changed) {
     this.state.partialNext({
-      ...(result1 ? { activities: result1.activities, } : {}),
+      activities: result1?.changed ? result1.activities : currentActivities,
       pinned_activities: result2.pinned_activities,
     });
   }
