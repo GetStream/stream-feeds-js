@@ -15,7 +15,9 @@ export const NotificationBell = () => {
 
     ownNotifications
       ?.markActivity({
-        mark_all_seen: true,
+        mark_seen: ownNotifications.state
+          .getLatestValue()
+          .aggregated_activities!.map((a) => a.group),
       })
       .catch(logErrorAndDisplayNotification);
   }, [isMenuOpen, logErrorAndDisplayNotification, ownNotifications, unseen]);
@@ -35,11 +37,11 @@ export const NotificationBell = () => {
           </div>
         )}
       </button>
-      {isMenuOpen && (
-        <div className="absolute right-0 mt-2 p-4 min-w-80 flex z-10 flex-col gap-3 text-gray-800 bg-white rounded-md shadow-lg">
-          <NotificationFeed />
-        </div>
-      )}
+      <div
+        className={`absolute right-0 mt-2 p-4 min-w-80 flex z-10 flex-col gap-3 text-gray-800 bg-white rounded-md shadow-lg ${isMenuOpen ? '' : 'hidden'}`}
+      >
+        <NotificationFeed isMenuOpen={isMenuOpen} />
+      </div>
     </div>
   );
 };
