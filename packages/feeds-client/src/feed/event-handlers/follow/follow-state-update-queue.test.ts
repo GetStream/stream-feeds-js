@@ -108,6 +108,8 @@ describe(`Follow ${shouldUpdateState.name} integration`, () => {
 
       const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
 
+      // 1. HTTP and then WS event
+
       // Call once as HTTP response to populate the queue
       handler.call(
         feed,
@@ -118,12 +120,34 @@ describe(`Follow ${shouldUpdateState.name} integration`, () => {
       );
 
       // Call again as WS event, should be skipped
-      const stateBefore = feed.currentState;
+      let stateBefore = feed.currentState;
       handler.call(feed, { follow: updatedFollow });
 
       // State should not change
-      const stateAfter = feed.currentState;
+      let stateAfter = feed.currentState;
       expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+
+      // 2. WS and then HTTP
+
+      // Call once as WS event to populate the queue
+      handler.call(
+        feed,
+        {
+          follow: { ...updatedFollow, ...state },
+        },
+      );
+
+      // Call again as HTTP response, should be skipped
+      stateBefore = feed.currentState;
+      handler.call(feed, { follow: updatedFollow }, false);
+
+      // State should not change
+      stateAfter = feed.currentState;
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
     });
 
     it('allows update again from WS after clearing the stateUpdateQueue', () => {

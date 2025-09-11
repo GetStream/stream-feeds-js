@@ -10,6 +10,11 @@ import {
   generateActivityReactionAddedEvent,
   getHumanId,
 } from '../../../test-utils';
+import {
+  type FollowResponse,
+  shouldUpdateState,
+} from '@stream-io/feeds-client';
+import { EventPayload } from '../../../types-internal';
 
 describe(handleActivityReactionAdded.name, () => {
   let feed: Feed;
@@ -154,4 +159,102 @@ describe(handleActivityReactionAdded.name, () => {
 
     expect(stateAfter).toBe(stateBefore);
   });
+
+  describe(`${shouldUpdateState.name} integration`, () => {
+    const activityId = 'reacted-activity';
+    let currentUserPayload: EventPayload<'feeds.activity.reaction.added'>;
+
+    beforeEach(() => {
+      currentUserPayload = generateActivityReactionAddedEvent({
+        reaction: { user: { id: currentUserId }, activity_id: activityId },
+        activity: { id: activityId }
+      });
+
+      feed.state.partialNext({ activities: [currentUserPayload.activity]});
+      feed.state.partialNext({ watch: true });
+    })
+
+    it(`skips update if ${shouldUpdateState.name} returns false`, () => {
+      // 1. HTTP and then WS
+
+      handleActivityReactionAdded.call(feed, currentUserPayload, false);
+
+      let stateBefore = feed.currentState;
+
+      handleActivityReactionAdded.call(feed, currentUserPayload);
+
+      let stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+
+      // 2. WS and the HTTP
+
+      handleActivityReactionAdded.call(feed, currentUserPayload);
+
+      stateBefore = feed.currentState;
+
+      handleActivityReactionAdded.call(feed, currentUserPayload, false);
+
+      stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+    })
+
+    it('allows update again from WS after clearing the stateUpdateQueue', () => {
+      handleActivityReactionAdded.call(feed, currentUserPayload);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another WS event
+      handleActivityReactionAdded.call(feed, currentUserPayload);
+
+      const activities = feed.currentState.activities!;
+      const activity = activities.find((a) => a.id === activityId);
+      const [latestReaction] = activity?.own_reactions ?? [];
+
+      expect(activity?.own_reactions.length).toEqual(2);
+      expect(latestReaction).toMatchObject(currentUserPayload.reaction);
+    });
+
+    it('allows update again from HTTP response after clearing the stateUpdateQueue', () => {
+      handleActivityReactionAdded.call(feed, currentUserPayload, false);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another WS event
+      handleActivityReactionAdded.call(feed, currentUserPayload, false);
+
+      const activities = feed.currentState.activities!;
+      const activity = activities.find((a) => a.id === activityId);
+      const [latestReaction] = activity?.own_reactions ?? [];
+
+      expect(activity?.own_reactions.length).toEqual(2);
+      expect(latestReaction).toMatchObject(currentUserPayload.reaction);
+    });
+
+    it('should not insert anything into the stateUpdateQueue if the connected_user did not trigger the reaction', () => {
+      const otherUserPayload = generateActivityReactionAddedEvent({
+        reaction: { user: { id: getHumanId() }, activity_id: activityId },
+        activity: { id: activityId }
+      });
+
+      handleActivityReactionAdded.call(feed, otherUserPayload);
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+
+      handleActivityReactionAdded.call(feed, otherUserPayload);
+
+      const activities = feed.currentState.activities!;
+      const activity = activities.find((a) => a.id === activityId);
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+      expect(activity?.own_reactions.length).toEqual(0);
+    });
+  })
 });

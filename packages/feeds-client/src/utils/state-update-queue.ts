@@ -12,7 +12,7 @@ export const shouldUpdateState = ({
   stateUpdateQueue: Set<string>;
   watch: boolean;
   fromWs?: boolean;
-  isTriggeredByConnectedUser?: boolean;
+  isTriggeredByConnectedUser: boolean;
 }) => {
   if (!watch || !isTriggeredByConnectedUser) {
     return true;

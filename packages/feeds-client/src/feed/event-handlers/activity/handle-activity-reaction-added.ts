@@ -87,6 +87,12 @@ export function handleActivityReactionAdded(
   payload: AddActivityReactionPayload,
   fromWs?: boolean,
 ) {
+  const connectedUser = this.client.state.getLatestValue().connected_user;
+
+  const eventBelongsToCurrentUser =
+    typeof connectedUser !== 'undefined' &&
+    payload.reaction.user.id === connectedUser.id;
+
   if (
     !shouldUpdateState({
       stateUpdateQueueId: getStateUpdateQueueId(
@@ -96,6 +102,7 @@ export function handleActivityReactionAdded(
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
       fromWs,
+      isTriggeredByConnectedUser: eventBelongsToCurrentUser,
     })
   ) {
     return;
@@ -105,11 +112,6 @@ export function handleActivityReactionAdded(
     activities: currentActivities,
     pinned_activities: currentPinnedActivities,
   } = this.currentState;
-  const connectedUser = this.client.state.getLatestValue().connected_user;
-
-  const eventBelongsToCurrentUser =
-    typeof connectedUser !== 'undefined' &&
-    payload.reaction.user.id === connectedUser.id;
 
   const [result1, result2] = [
     this.hasActivity(payload.activity.id) ? addReactionToActivities(
