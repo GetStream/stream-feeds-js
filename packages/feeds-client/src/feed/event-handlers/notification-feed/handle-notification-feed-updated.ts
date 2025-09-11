@@ -5,6 +5,7 @@ import type {
   NotificationStatusResponse,
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import { uniqueArrayMerge } from '../../../utils';
 
 export const addAggregatedActivitiesToState = (
   newAggregatedActivities: AggregatedActivityResponse[],
@@ -14,79 +15,72 @@ export const addAggregatedActivitiesToState = (
   let result: UpdateStateResult<{
     aggregated_activities: AggregatedActivityResponse[];
   }>;
-  if (aggregatedActivities === undefined) {
-    aggregatedActivities = [];
+  if (newAggregatedActivities.length === 0) {
     result = {
       changed: false,
-      aggregated_activities: aggregatedActivities,
+      aggregated_activities: [],
     };
   } else {
     result = {
-      changed: false,
-      aggregated_activities: aggregatedActivities,
-    };
-  }
-
-  let hasChanges = false;
-  const updatedAggregatedActivities = [...result.aggregated_activities];
-  const newActivitiesToAdd: AggregatedActivityResponse[] = [];
-
-  // First pass: handle existing activities (updates) and collect new activities
-  newAggregatedActivities.forEach((newAggregatedActivityResponse) => {
-    const existingIndex = updatedAggregatedActivities.findIndex(
-      (a) => a.group === newAggregatedActivityResponse.group,
-    );
-
-    if (existingIndex === -1) {
-      // Activity doesn't exist, collect it for later addition
-      newActivitiesToAdd.push(newAggregatedActivityResponse);
-    } else {
-      // Activity exists, update it (upsert)
-      const existingActivity = updatedAggregatedActivities[existingIndex];
-
-      const hasActivityChanged =
-        existingActivity.activity_count !==
-          newAggregatedActivityResponse.activity_count ||
-        existingActivity.score !== newAggregatedActivityResponse.score ||
-        existingActivity.user_count !==
-          newAggregatedActivityResponse.user_count ||
-        existingActivity.user_count_truncated !==
-          newAggregatedActivityResponse.user_count_truncated ||
-        existingActivity.updated_at.getTime() !==
-          newAggregatedActivityResponse.updated_at.getTime() ||
-        existingActivity.activities.length !==
-          newAggregatedActivityResponse.activities.length;
-
-      if (hasActivityChanged) {
-        updatedAggregatedActivities[existingIndex] =
-          newAggregatedActivityResponse;
-        hasChanges = true;
-      }
-    }
-  });
-
-  if (newActivitiesToAdd.length > 0) {
-    if (position === 'start') {
-      updatedAggregatedActivities.unshift(...newActivitiesToAdd);
-    } else {
-      updatedAggregatedActivities.push(...newActivitiesToAdd);
-    }
-    hasChanges = true;
-  }
-
-  if (hasChanges) {
-    result = {
       changed: true,
-      aggregated_activities: updatedAggregatedActivities,
+      aggregated_activities: [],
     };
   }
+
+  result.aggregated_activities =
+    position === 'start'
+      ? uniqueArrayMerge(
+          newAggregatedActivities,
+          aggregatedActivities ?? [],
+          (a) => a.group,
+        )
+      : uniqueArrayMerge(
+          aggregatedActivities ?? [],
+          newAggregatedActivities,
+          (a) => a.group,
+        );
 
   return result;
+};
+
+export const updateNotificationStatus = (
+  newNotificationStatus?: NotificationStatusResponse,
+  currentNotificationStatus?: NotificationStatusResponse,
+) => {
+  if (!newNotificationStatus && !currentNotificationStatus) {
+    return {
+      changed: false,
+      notification_status: undefined,
+    };
+  } else if (!newNotificationStatus) {
+    return {
+      changed: false,
+      notification_status: currentNotificationStatus,
+    };
+  } else {
+    return {
+      changed: true,
+      notification_status: {
+        ...newNotificationStatus,
+        read_activities: uniqueArrayMerge(
+          newNotificationStatus?.read_activities ?? [],
+          currentNotificationStatus?.read_activities ?? [],
+          (a) => a,
+        ),
+        seen_activities: uniqueArrayMerge(
+          newNotificationStatus?.seen_activities ?? [],
+          currentNotificationStatus?.seen_activities ?? [],
+          (a) => a,
+        ),
+      },
+    };
+  }
 };
 
 export const updateNotificationFeedFromEvent = (
   event: NotificationFeedUpdatedEvent,
   currentAggregatedActivities?: AggregatedActivityResponse[],
+  currentNotificationStatus?: NotificationStatusResponse,
 ): UpdateStateResult<{
   data?: {
     notification_status?: NotificationStatusResponse;
@@ -98,15 +92,23 @@ export const updateNotificationFeedFromEvent = (
     aggregated_activities?: AggregatedActivityResponse[];
   } = {};
 
-  if (event.notification_status) {
-    updates.notification_status = event.notification_status;
+  if (event.notification_status && currentNotificationStatus) {
+    const notificationStatusResult = updateNotificationStatus(
+      event.notification_status,
+      currentNotificationStatus,
+    );
+
+    if (notificationStatusResult.changed) {
+      updates.notification_status =
+        notificationStatusResult.notification_status;
+    }
   }
 
-  if (event.aggregated_activities) {
+  if (event.aggregated_activities && currentAggregatedActivities) {
     const aggregatedActivitiesResult = addAggregatedActivitiesToState(
       event.aggregated_activities,
       currentAggregatedActivities,
-      'start', // Add new activities at the start
+      'start',
     );
 
     if (aggregatedActivitiesResult.changed) {
@@ -115,7 +117,6 @@ export const updateNotificationFeedFromEvent = (
     }
   }
 
-  // Only return changed if we have actual updates
   if (Object.keys(updates).length > 0) {
     return {
       changed: true,
@@ -135,8 +136,10 @@ export function handleNotificationFeedUpdated(
   const result = updateNotificationFeedFromEvent(
     event,
     this.currentState.aggregated_activities,
+    this.currentState.notification_status,
   );
   if (result.changed) {
+    console.log('result changed', result.data?.notification_status);
     this.state.partialNext({
       notification_status: result.data?.notification_status,
       aggregated_activities: result.data?.aggregated_activities,

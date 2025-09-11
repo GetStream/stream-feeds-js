@@ -7,6 +7,7 @@ import type {
 import {
   updateNotificationFeedFromEvent,
   addAggregatedActivitiesToState,
+  updateNotificationStatus,
 } from './handle-notification-feed-updated';
 
 const createMockNotificationFeedUpdatedEvent = (
@@ -24,7 +25,6 @@ const createMockNotificationStatus = (
 ): NotificationStatusResponse => ({
   unread: 0,
   unseen: 0,
-  count_truncated: false,
   ...overrides,
 });
 
@@ -47,7 +47,34 @@ describe('notification-feed-utils', () => {
     it('should return unchanged if event has no notification_status or aggregated_activities', () => {
       const event = createMockNotificationFeedUpdatedEvent();
 
-      const result = updateNotificationFeedFromEvent(event, []);
+      const result = updateNotificationFeedFromEvent(event, [], {
+        unread: 0,
+        unseen: 0,
+        read_activities: [],
+        seen_activities: [],
+      });
+
+      expect(result.changed).toBe(false);
+    });
+
+    it(`shouldn't update notification_status when event has notification_status but currentNotificationStatus is undefined`, () => {
+      const event = createMockNotificationFeedUpdatedEvent({
+        notification_status: createMockNotificationStatus(),
+      });
+      const result = updateNotificationFeedFromEvent(event, [], undefined);
+
+      expect(result.changed).toBe(false);
+    });
+
+    it(`shouldn't update aggregated_activities when event has aggregated_activities but currentAggregatedActivities is undefined`, () => {
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [createMockAggregatedActivity()],
+      });
+      const result = updateNotificationFeedFromEvent(
+        event,
+        undefined,
+        createMockNotificationStatus(),
+      );
 
       expect(result.changed).toBe(false);
     });
@@ -57,15 +84,23 @@ describe('notification-feed-utils', () => {
         unread: 5,
         unseen: 3,
         read_activities: ['activity1', 'activity2'],
+        seen_activities: [],
       });
       const event = createMockNotificationFeedUpdatedEvent({
         notification_status: notificationStatus,
       });
 
-      const result = updateNotificationFeedFromEvent(event, []);
+      const result = updateNotificationFeedFromEvent(event, [], {
+        unread: 0,
+        unseen: 0,
+        read_activities: [],
+        seen_activities: [],
+      });
 
       expect(result.changed).toBe(true);
-      expect(result.data?.notification_status).toBe(notificationStatus);
+      expect(result.data?.notification_status).toStrictEqual(
+        notificationStatus,
+      );
       expect(result.data?.aggregated_activities).toBeUndefined();
     });
 
@@ -78,7 +113,12 @@ describe('notification-feed-utils', () => {
         aggregated_activities: aggregatedActivities,
       });
 
-      const result = updateNotificationFeedFromEvent(event, []);
+      const result = updateNotificationFeedFromEvent(event, [], {
+        unread: 0,
+        unseen: 0,
+        read_activities: [],
+        seen_activities: [],
+      });
 
       expect(result.changed).toBe(true);
       expect(result.data?.aggregated_activities).toStrictEqual(
@@ -100,10 +140,20 @@ describe('notification-feed-utils', () => {
         aggregated_activities: aggregatedActivities,
       });
 
-      const result = updateNotificationFeedFromEvent(event, []);
+      const result = updateNotificationFeedFromEvent(event, [], {
+        unread: 0,
+        unseen: 0,
+        read_activities: [],
+        seen_activities: [],
+      });
 
       expect(result.changed).toBe(true);
-      expect(result.data?.notification_status).toBe(notificationStatus);
+      expect(result.data?.notification_status?.unread).toBe(
+        notificationStatus.unread,
+      );
+      expect(result.data?.notification_status?.unseen).toBe(
+        notificationStatus.unseen,
+      );
       expect(result.data?.aggregated_activities).toStrictEqual(
         aggregatedActivities,
       );
@@ -114,16 +164,24 @@ describe('notification-feed-utils', () => {
         unread: 10,
         unseen: 5,
         last_seen_at: new Date('2023-01-01'),
+        seen_activities: [],
         read_activities: ['activity1', 'activity2', 'activity3'],
       });
       const event = createMockNotificationFeedUpdatedEvent({
         notification_status: notificationStatus,
       });
 
-      const result = updateNotificationFeedFromEvent(event, []);
+      const result = updateNotificationFeedFromEvent(event, [], {
+        unread: 0,
+        unseen: 0,
+        read_activities: [],
+        seen_activities: [],
+      });
 
       expect(result.changed).toBe(true);
-      expect(result.data?.notification_status).toBe(notificationStatus);
+      expect(result.data?.notification_status).toStrictEqual(
+        notificationStatus,
+      );
     });
   });
 
@@ -246,92 +304,6 @@ describe('notification-feed-utils', () => {
       expect(newGroup3?.score).toBe(40);
     });
 
-    it('should not mark as changed when updating with identical data', () => {
-      const baseDate = new Date('2023-01-01');
-      const existingActivities = [
-        createMockAggregatedActivity({
-          group: 'group1',
-          activity_count: 1,
-          score: 10,
-          updated_at: baseDate,
-        }),
-      ];
-      const identicalActivities = [
-        createMockAggregatedActivity({
-          group: 'group1',
-          activity_count: 1,
-          score: 10,
-          updated_at: baseDate,
-        }),
-      ];
-
-      const result = addAggregatedActivitiesToState(
-        identicalActivities,
-        existingActivities,
-        'start',
-      );
-
-      expect(result.changed).toBe(false);
-      expect(result.aggregated_activities).toStrictEqual(existingActivities);
-    });
-
-    it('should detect changes in user_count and user_count_truncated', () => {
-      const existingActivities = [
-        createMockAggregatedActivity({
-          group: 'group1',
-          user_count: 5,
-          user_count_truncated: false,
-        }),
-      ];
-      const updatedActivities = [
-        createMockAggregatedActivity({
-          group: 'group1',
-          user_count: 10,
-          user_count_truncated: true,
-        }),
-      ];
-
-      const result = addAggregatedActivitiesToState(
-        updatedActivities,
-        existingActivities,
-        'start',
-      );
-
-      expect(result.changed).toBe(true);
-      const updatedActivity = result.aggregated_activities.find(
-        (a) => a.group === 'group1',
-      );
-      expect(updatedActivity?.user_count).toBe(10);
-      expect(updatedActivity?.user_count_truncated).toBe(true);
-    });
-
-    it('should detect changes in activities array length', () => {
-      const existingActivities = [
-        createMockAggregatedActivity({
-          group: 'group1',
-          activities: [{ id: 'activity1' } as any],
-        }),
-      ];
-      const updatedActivities = [
-        createMockAggregatedActivity({
-          group: 'group1',
-          activities: [{ id: 'activity1' } as any, { id: 'activity2' } as any],
-        }),
-      ];
-
-      const result = addAggregatedActivitiesToState(
-        updatedActivities,
-        existingActivities,
-        'start',
-      );
-
-      expect(result.changed).toBe(true);
-      const updatedActivity = result.aggregated_activities.find(
-        (a) => a.group === 'group1',
-      );
-      expect(updatedActivity?.activities).toHaveLength(2);
-    });
-
     it('should handle mixed new and existing activities', () => {
       const existingActivities = [
         createMockAggregatedActivity({ group: 'existing1' }),
@@ -415,6 +387,325 @@ describe('notification-feed-utils', () => {
       expect(result.aggregated_activities).toStrictEqual([
         ...existingActivities,
         ...newActivities,
+      ]);
+    });
+  });
+
+  describe('updateNotificationStatus', () => {
+    it('should merge read_activities and seen_activities arrays correctly', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 5,
+        unseen: 3,
+        read_activities: ['activity1', 'activity2'],
+        seen_activities: ['activity3', 'activity4'],
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 2,
+        unseen: 1,
+        read_activities: ['activity5', 'activity6'],
+        seen_activities: ['activity7', 'activity8'],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.unread).toBe(5);
+      expect(result.notification_status?.unseen).toBe(3);
+      expect(result.notification_status?.read_activities).toEqual([
+        'activity1',
+        'activity2',
+        'activity5',
+        'activity6',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'activity3',
+        'activity4',
+        'activity7',
+        'activity8',
+      ]);
+    });
+
+    it('should handle empty arrays in both notification statuses', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: [],
+        seen_activities: [],
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: [],
+        seen_activities: [],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.read_activities).toEqual([]);
+      expect(result.notification_status?.seen_activities).toEqual([]);
+    });
+
+    it('should handle undefined arrays by treating them as empty arrays', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 1,
+        unseen: 1,
+        read_activities: undefined,
+        seen_activities: undefined,
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: ['activity1'],
+        seen_activities: ['activity2'],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.read_activities).toEqual([
+        'activity1',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'activity2',
+      ]);
+    });
+
+    it('should handle when current arrays are undefined', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 1,
+        unseen: 1,
+        read_activities: ['activity1', 'activity2'],
+        seen_activities: ['activity3', 'activity4'],
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: undefined,
+        seen_activities: undefined,
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.read_activities).toEqual([
+        'activity1',
+        'activity2',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'activity3',
+        'activity4',
+      ]);
+    });
+
+    it('should remove duplicates when merging arrays', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 1,
+        unseen: 1,
+        read_activities: ['activity1', 'activity2', 'activity3'],
+        seen_activities: ['activity4', 'activity5', 'activity6'],
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: ['activity2', 'activity3', 'activity7'],
+        seen_activities: ['activity5', 'activity6', 'activity8'],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.read_activities).toEqual([
+        'activity1',
+        'activity2',
+        'activity3',
+        'activity7',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'activity4',
+        'activity5',
+        'activity6',
+        'activity8',
+      ]);
+    });
+
+    it('should preserve all other properties from newNotificationStatus', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 10,
+        unseen: 5,
+        last_seen_at: new Date('2023-01-01'),
+        read_activities: ['activity1'],
+        seen_activities: ['activity2'],
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        last_seen_at: new Date('2022-01-01'),
+        read_activities: ['activity3'],
+        seen_activities: ['activity4'],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.unread).toBe(10);
+      expect(result.notification_status?.unseen).toBe(5);
+      expect(result.notification_status?.last_seen_at).toEqual(
+        new Date('2023-01-01'),
+      );
+      expect(result.notification_status?.read_activities).toEqual([
+        'activity1',
+        'activity3',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'activity2',
+        'activity4',
+      ]);
+    });
+
+    it('should handle mixed undefined and defined arrays', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 1,
+        unseen: 1,
+        read_activities: ['activity1'],
+        seen_activities: undefined,
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: undefined,
+        seen_activities: ['activity2'],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.read_activities).toEqual([
+        'activity1',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'activity2',
+      ]);
+    });
+
+    it('should handle complex activity arrays with many duplicates', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 1,
+        unseen: 1,
+        read_activities: ['a', 'b', 'c', 'd', 'e'],
+        seen_activities: ['f', 'g', 'h', 'i', 'j'],
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: ['c', 'd', 'e', 'f', 'g'],
+        seen_activities: ['h', 'i', 'j', 'k', 'l'],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.read_activities).toEqual([
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'f',
+        'g',
+        'h',
+        'i',
+        'j',
+        'k',
+        'l',
+      ]);
+    });
+
+    it('should handle empty new arrays with non-empty current arrays', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 1,
+        unseen: 1,
+        read_activities: [],
+        seen_activities: [],
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: ['activity1', 'activity2'],
+        seen_activities: ['activity3', 'activity4'],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.read_activities).toEqual([
+        'activity1',
+        'activity2',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'activity3',
+        'activity4',
+      ]);
+    });
+
+    it('should handle non-empty new arrays with empty current arrays', () => {
+      const newNotificationStatus = createMockNotificationStatus({
+        unread: 1,
+        unseen: 1,
+        read_activities: ['activity1', 'activity2'],
+        seen_activities: ['activity3', 'activity4'],
+      });
+
+      const currentNotificationStatus = createMockNotificationStatus({
+        unread: 0,
+        unseen: 0,
+        read_activities: [],
+        seen_activities: [],
+      });
+
+      const result = updateNotificationStatus(
+        newNotificationStatus,
+        currentNotificationStatus,
+      );
+
+      expect(result.notification_status?.read_activities).toEqual([
+        'activity1',
+        'activity2',
+      ]);
+      expect(result.notification_status?.seen_activities).toEqual([
+        'activity3',
+        'activity4',
       ]);
     });
   });
