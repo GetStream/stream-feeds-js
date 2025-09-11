@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/consistent-indexed-object-style */
 import { isReactNative } from './is-react-native';
 
 export enum LogLevelEnum {
@@ -49,11 +48,13 @@ const logToConsole: Sink = (logLevel, message, ...rest) => {
   logMethod(message, ...rest);
 };
 
-const sinkByScope = new Map<string, Sink>();
-const logLevelByScope = new Map<string, LogLevel>();
+const DEFAULT_LOG_LEVEL: LogLevel = 'info';
+const DEFAULT_SINK: Sink = logToConsole;
 
-export let defaultLogLevel: LogLevel = 'info';
-export let defaultSink: Sink = logToConsole;
+const sinkByScope = new Map<string, Sink>([['default', DEFAULT_SINK]]);
+const logLevelByScope = new Map<string, LogLevel>([
+  ['default', DEFAULT_LOG_LEVEL],
+]);
 
 export type Logger<T extends string> = ReturnType<typeof getLogger<T>>;
 
@@ -66,10 +67,12 @@ export const getLogger = <T extends string>(
   const constructLogFunction =
     (logLevel: LogLevel) =>
     (message: string, ...data: any[]) => {
-      const scopedLogLevel = logLevelByScope.get(scope) ?? defaultLogLevel;
+      const scopedLogLevel =
+        logLevelByScope.get(scope) ?? logLevelByScope.get('default')!;
 
       if (LogLevelEnum[logLevel] >= LogLevelEnum[scopedLogLevel]) {
-        const scopedSink = sinkByScope.get(scope) ?? defaultSink;
+        const scopedSink =
+          sinkByScope.get(scope) ?? sinkByScope.get('default')!;
 
         scopedSink(
           logLevel,
@@ -98,38 +101,43 @@ export const getLogger = <T extends string>(
 
 /**
  * Configuration options for `configureLoggers`, where keys are logger scopes.
- * The 'default' scope is reserved and is used to set default options for all loggers.
+ * The `default` scope is reserved and is used to set default options for all loggers.
+ *
+ * To reset a specific scope settings, set its `sink` or `level` to `null`. To reset all scopes
+ * to default settings, use `restoreDefaults()` function.
  */
 export type ConfigureLoggersOptions<T extends string> = T extends 'default'
   ? never
   : Partial<{
       [K in T | 'default']: Partial<{
-        sink: Sink;
-        level: LogLevel;
+        sink: K extends 'default' ? Sink : Sink | null;
+        level: K extends 'default' ? LogLevel : LogLevel | null;
       }>;
     }>;
 
 export const configureLoggers = <T extends string>(
   optionsByScope?: ConfigureLoggersOptions<T>,
 ) => {
-  for (const option in optionsByScope) {
-    const options = optionsByScope[option]!;
-
-    if (option === 'default') {
-      if (options.sink) {
-        defaultSink = options.sink;
-      }
-      if (options.level) {
-        defaultLogLevel = options.level;
-      }
-      continue;
-    }
+  for (const scope in optionsByScope) {
+    const options = optionsByScope[scope]!;
 
     if (options.sink) {
-      sinkByScope.set(option, options.sink);
+      sinkByScope.set(scope, options.sink);
+    } else if (options.sink === null && scope !== 'default') {
+      sinkByScope.delete(scope);
     }
+
     if (options.level) {
-      logLevelByScope.set(option, options.level);
+      logLevelByScope.set(scope, options.level);
+    } else if (options.level === null && scope !== 'default') {
+      logLevelByScope.delete(scope);
     }
   }
+};
+
+export const restoreDefaults = () => {
+  sinkByScope.clear();
+  logLevelByScope.clear();
+  sinkByScope.set('default', DEFAULT_SINK);
+  logLevelByScope.set('default', DEFAULT_LOG_LEVEL);
 };

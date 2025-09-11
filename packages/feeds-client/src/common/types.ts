@@ -5,7 +5,7 @@ export * from './search/types';
 export type FeedsClientOptions = {
   base_url?: string;
   timeout?: number;
-  logger_options?: ConfigureLoggersOptions;
+  configure_loggers_options?: ConfigureLoggersOptions;
 };
 
 export type RateLimit = {
