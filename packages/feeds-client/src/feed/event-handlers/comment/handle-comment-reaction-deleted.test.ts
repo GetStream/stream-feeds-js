@@ -10,6 +10,9 @@ import {
   getHumanId,
   generateCommentReactionDeletedEvent,
 } from '../../../test-utils';
+import { shouldUpdateState } from '../../../utils';
+import { CommentResponse, FeedsReactionResponse } from '../../../gen/models';
+import { EventPayload } from '../../../types-internal';
 
 describe(handleCommentReactionDeleted.name, () => {
   let feed: Feed;
@@ -200,5 +203,141 @@ describe(handleCommentReactionDeleted.name, () => {
     handleCommentReactionDeleted.call(feed, deletedEvent);
     const stateAfter = feed.currentState;
     expect(stateAfter).toBe(stateBefore);
+  });
+
+  describe(`Comment reaction deleted ${shouldUpdateState.name} integration`, () => {
+    let currentUserPayload: EventPayload<'feeds.comment.reaction.deleted'>;
+    let existingComment: CommentResponse;
+    let existingReaction: FeedsReactionResponse;
+    let commentId: string;
+
+    beforeEach(() => {
+      commentId = `comment-${getHumanId()}`;
+      existingReaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: currentUserId },
+        activity_id: activityId,
+        comment_id: commentId,
+      });
+      existingComment = generateCommentResponse({
+        id: commentId,
+        object_id: activityId,
+        own_reactions: [existingReaction],
+      });
+
+      currentUserPayload = generateCommentReactionDeletedEvent({
+        comment: {
+          ...existingComment,
+          own_reactions: [],
+        },
+        reaction: existingReaction,
+      });
+
+      feed.state.partialNext({
+        comments_by_entity_id: {
+          [activityId]: {
+            comments: [existingComment],
+            pagination: { sort: 'first' },
+          },
+        },
+      });
+      feed.state.partialNext({ watch: true });
+    });
+
+    it(`skips update if ${shouldUpdateState.name} returns false`, () => {
+      // 1. HTTP and then WS
+
+      handleCommentReactionDeleted.call(feed, currentUserPayload, false);
+
+      let stateBefore = feed.currentState;
+
+      handleCommentReactionDeleted.call(feed, currentUserPayload);
+
+      let stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+
+      // 2. WS and the HTTP
+
+      handleCommentReactionDeleted.call(feed, currentUserPayload);
+
+      stateBefore = feed.currentState;
+
+      handleCommentReactionDeleted.call(feed, currentUserPayload, false);
+
+      stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+    });
+
+    it('allows update again from WS after clearing the stateUpdateQueue', () => {
+      handleCommentReactionDeleted.call(feed, currentUserPayload);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another WS event
+      handleCommentReactionDeleted.call(feed, currentUserPayload);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const comment = comments?.find((a) => a.id === commentId);
+      const [latestReaction] = comment?.own_reactions ?? [];
+
+      expect(comment?.own_reactions.length).toEqual(0);
+      expect(latestReaction).toBeUndefined();
+    });
+
+    it('allows update again from HTTP response after clearing the stateUpdateQueue', () => {
+      handleCommentReactionDeleted.call(feed, currentUserPayload, false);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another HTTP response
+      handleCommentReactionDeleted.call(feed, currentUserPayload, false);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const comment = comments?.find((a) => a.id === commentId);
+      const [latestReaction] = comment?.own_reactions ?? [];
+
+      expect(comment?.own_reactions.length).toEqual(0);
+      expect(latestReaction).toBeUndefined();
+    });
+
+    it('should not insert anything into the stateUpdateQueue if the connected_user did not trigger the comment reaction deletion', () => {
+      const otherUserPayload = generateCommentReactionDeletedEvent({
+        comment: {
+          ...existingComment,
+          own_reactions: [],
+        },
+        reaction: {
+          ...existingReaction,
+          user: {
+            id: getHumanId(),
+          },
+        },
+      });
+
+      handleCommentReactionDeleted.call(feed, otherUserPayload);
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+
+      handleCommentReactionDeleted.call(feed, otherUserPayload);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const comment = comments?.find((a) => a.id === commentId);
+      const [latestReaction] = comment?.own_reactions ?? [];
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+      expect(comment?.own_reactions.length).toEqual(1);
+      expect(latestReaction).toMatchObject(existingReaction);
+    });
   });
 });
