@@ -117,13 +117,15 @@ describe('Feed Pagination Integration Tests', () => {
     }
 
     // Make sure that `indexedActivityIds` is reset on initial page requery
-    const firstPageRequeryResponse = await feed.getOrCreate();
+    const firstPageRequeryResponse = await feed.getOrCreate({ limit: 1 });
+    indexedActivityIds = (feed as any).indexedActivityIds;
+
     expect(indexedActivityIds.size).toEqual(
       firstPageRequeryResponse.activities.length,
     );
-    expect(indexedActivityIds.size).toEqual(3);
-    for (const activityResponse of activities) {
-      expect(indexedActivityIds.has(activityResponse.activity.id)).toBe(true);
+    expect(indexedActivityIds.size).toEqual(1);
+    for (const activityResponse of firstPageRequeryResponse.activities) {
+      expect(indexedActivityIds.has(activityResponse.id)).toBe(true);
     }
   });
 
