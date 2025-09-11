@@ -99,7 +99,7 @@ export class FeedsClient extends FeedsApi {
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
 
-    configureLoggers(options?.logger_options);
+    configureLoggers(options?.configure_loggers_options);
 
     this.on('all', (event) => {
       const fid = event.fid;

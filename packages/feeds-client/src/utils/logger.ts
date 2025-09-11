@@ -16,4 +16,4 @@ export const configureLoggers =
 export const getLogger = loggerInternal.getLogger<AvailableScopes>;
 
 export type { LogLevel, Sink } from './logger-internal';
-export { LogLevelEnum, defaultLogLevel, defaultSink } from './logger-internal';
+export { LogLevelEnum, restoreDefaults } from './logger-internal';
