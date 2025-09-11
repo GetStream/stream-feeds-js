@@ -2,10 +2,9 @@ import * as loggerInternal from './logger-internal';
 
 type AvailableScopes =
   | 'api-client'
-  | 'ws-event'
+  | 'event-dispatcher'
   | 'token-manager'
-  | 'stable-ws-connection'
-  | 'event-dispatcher';
+  | 'stable-ws-connection';
 
 export type ConfigureLoggersOptions =
   loggerInternal.ConfigureLoggersOptions<AvailableScopes>;

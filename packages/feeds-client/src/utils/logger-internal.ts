@@ -1,3 +1,5 @@
+// TODO: move to @getstream/logger package
+
 import { isReactNative } from './is-react-native';
 
 export enum LogLevelEnum {
