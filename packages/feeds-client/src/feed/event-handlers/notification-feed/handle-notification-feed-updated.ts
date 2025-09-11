@@ -62,6 +62,16 @@ export const updateNotificationStatus = (
       changed: true,
       notification_status: {
         ...newNotificationStatus,
+        read_activities: uniqueArrayMerge(
+          newNotificationStatus?.read_activities ?? [],
+          currentNotificationStatus?.read_activities ?? [],
+          (a) => a,
+        ),
+        seen_activities: uniqueArrayMerge(
+          newNotificationStatus?.seen_activities ?? [],
+          currentNotificationStatus?.seen_activities ?? [],
+          (a) => a,
+        ),
       },
     };
   }
@@ -94,11 +104,11 @@ export const updateNotificationFeedFromEvent = (
     }
   }
 
-  if (event.aggregated_activities) {
+  if (event.aggregated_activities && currentAggregatedActivities) {
     const aggregatedActivitiesResult = addAggregatedActivitiesToState(
       event.aggregated_activities,
       currentAggregatedActivities,
-      'start', // Add new activities at the start
+      'start',
     );
 
     if (aggregatedActivitiesResult.changed) {
@@ -126,8 +136,10 @@ export function handleNotificationFeedUpdated(
   const result = updateNotificationFeedFromEvent(
     event,
     this.currentState.aggregated_activities,
+    this.currentState.notification_status,
   );
   if (result.changed) {
+    console.log('result changed', result.data?.notification_status);
     this.state.partialNext({
       notification_status: result.data?.notification_status,
       aggregated_activities: result.data?.aggregated_activities,
