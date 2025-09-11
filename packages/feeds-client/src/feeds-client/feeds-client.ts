@@ -1,8 +1,10 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
   ActivityResponse,
+  AddCommentReactionRequest,
+  AddCommentReactionResponse,
   AddReactionRequest,
-  DeleteActivityReactionResponse,
+  DeleteActivityReactionResponse, DeleteCommentReactionResponse,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -41,6 +43,8 @@ import {
   Feed,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
+  handleCommentReactionAdded,
+  handleCommentReactionDeleted,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
@@ -353,6 +357,27 @@ export class FeedsClient extends FeedsApi {
     }
     return response;
   };
+
+  addCommentReaction = async (
+    request: AddCommentReactionRequest & { id: string },
+  ): Promise<StreamResponse<AddCommentReactionResponse>> => {
+    const response = await super.addCommentReaction(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleCommentReactionAdded.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  async deleteCommentReaction(request: {
+    id: string;
+    type: string;
+  }): Promise<StreamResponse<DeleteCommentReactionResponse>> {
+    const response = await super.deleteCommentReaction(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleCommentReactionDeleted.bind(feed)(response, false);
+    }
+    return response;
+  }
 
   queryPollAnswers = async (
     request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
