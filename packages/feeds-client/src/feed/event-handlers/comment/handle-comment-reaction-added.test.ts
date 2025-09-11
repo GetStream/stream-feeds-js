@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Feed } from '../../../feed';
+import { Feed, handleCommentReactionDeleted } from '../../../feed';
 import { FeedsClient } from '../../../feeds-client';
 import { handleCommentReactionAdded } from './handle-comment-reaction-added';
 import {
@@ -8,7 +8,15 @@ import {
   generateOwnUser,
   getHumanId,
   generateCommentReactionAddedEvent,
+  generateFeedReactionResponse,
+  generateCommentReactionDeletedEvent,
 } from '../../../test-utils';
+import {
+  CommentResponse,
+  FeedsReactionResponse,
+} from '../../../gen/models';
+import { shouldUpdateState } from '../../../utils'
+import { EventPayload } from '../../../types-internal';
 
 describe(handleCommentReactionAdded.name, () => {
   let feed: Feed;
@@ -181,5 +189,142 @@ describe(handleCommentReactionAdded.name, () => {
     handleCommentReactionAdded.call(feed, addedEvent);
     const stateAfter = feed.currentState;
     expect(stateAfter).toBe(stateBefore);
+  });
+
+  describe(`Comment reaction added ${shouldUpdateState.name} integration`, () => {
+    let currentUserPayload: EventPayload<'feeds.comment.reaction.added'>;
+    let existingComment: CommentResponse;
+    let existingReaction: FeedsReactionResponse;
+    let newReaction: FeedsReactionResponse;
+    let commentId: string;
+
+    beforeEach(() => {
+      commentId = `comment-${getHumanId()}`;
+      existingReaction = generateFeedReactionResponse({
+        type: 'heart',
+        user: { id: currentUserId },
+        activity_id: activityId,
+        comment_id: commentId,
+      });
+      newReaction = generateFeedReactionResponse({
+        type: 'like',
+        user: { id: currentUserId },
+        activity_id: activityId,
+        comment_id: commentId,
+      });
+      existingComment = generateCommentResponse({
+        id: commentId,
+        object_id: activityId,
+        own_reactions: [existingReaction],
+      });
+
+      currentUserPayload = generateCommentReactionAddedEvent({
+        comment: existingComment,
+        reaction: newReaction,
+      });
+
+      feed.state.partialNext({
+        comments_by_entity_id: {
+          [activityId]: {
+            comments: [existingComment],
+            pagination: { sort: 'first' },
+          },
+        },
+      });
+      feed.state.partialNext({ watch: true });
+    });
+
+    it(`skips update if ${shouldUpdateState.name} returns false`, () => {
+      // 1. HTTP and then WS
+
+      handleCommentReactionAdded.call(feed, currentUserPayload, false);
+
+      let stateBefore = feed.currentState;
+
+      handleCommentReactionAdded.call(feed, currentUserPayload);
+
+      let stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+
+      // 2. WS and the HTTP
+
+      handleCommentReactionAdded.call(feed, currentUserPayload);
+
+      stateBefore = feed.currentState;
+
+      handleCommentReactionAdded.call(feed, currentUserPayload, false);
+
+      stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+    });
+
+    it('allows update again from WS after clearing the stateUpdateQueue', () => {
+      handleCommentReactionAdded.call(feed, currentUserPayload);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another WS event
+      handleCommentReactionAdded.call(feed, currentUserPayload);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const comment = comments?.find((a) => a.id === commentId);
+      const [latestReaction] = (comment?.own_reactions ?? []).toReversed();
+
+      expect(comment?.own_reactions.length).toEqual(3);
+      expect(latestReaction).toMatchObject(newReaction);
+    });
+
+    it('allows update again from HTTP response after clearing the stateUpdateQueue', () => {
+      handleCommentReactionAdded.call(feed, currentUserPayload, false);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another HTTP response
+      handleCommentReactionAdded.call(feed, currentUserPayload, false);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const comment = comments?.find((a) => a.id === commentId);
+      const [latestReaction] = (comment?.own_reactions ?? []).toReversed();
+
+      expect(comment?.own_reactions.length).toEqual(3);
+      expect(latestReaction).toMatchObject(newReaction);
+    });
+
+    it('should not insert anything into the stateUpdateQueue if the connected_user did not trigger the comment reaction deletion', () => {
+      const otherUserPayload = generateCommentReactionAddedEvent({
+        comment: existingComment,
+        reaction: {
+          ...existingReaction,
+          user: {
+            id: getHumanId(),
+          },
+        },
+      });
+
+      handleCommentReactionAdded.call(feed, otherUserPayload);
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+
+      handleCommentReactionAdded.call(feed, otherUserPayload);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const comment = comments?.find((a) => a.id === commentId);
+      const [latestReaction] = comment?.own_reactions ?? [];
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+      expect(comment?.own_reactions.length).toEqual(1);
+      expect(latestReaction).toMatchObject(existingReaction);
+    });
   });
 });
