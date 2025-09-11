@@ -10,10 +10,7 @@ import {
   generateActivityReactionAddedEvent,
   getHumanId,
 } from '../../../test-utils';
-import {
-  type FollowResponse,
-  shouldUpdateState,
-} from '@stream-io/feeds-client';
+import { shouldUpdateState } from '../../../utils';
 import { EventPayload } from '../../../types-internal';
 
 describe(handleActivityReactionAdded.name, () => {
@@ -160,7 +157,7 @@ describe(handleActivityReactionAdded.name, () => {
     expect(stateAfter).toBe(stateBefore);
   });
 
-  describe(`${shouldUpdateState.name} integration`, () => {
+  describe(`Activity reaction added ${shouldUpdateState.name} integration`, () => {
     const activityId = 'reacted-activity';
     let currentUserPayload: EventPayload<'feeds.activity.reaction.added'>;
 
@@ -227,7 +224,7 @@ describe(handleActivityReactionAdded.name, () => {
       // Clear the queue
       (feed as any).stateUpdateQueue.clear();
 
-      // Now update should be allowed from another WS event
+      // Now update should be allowed from another HTTP response
       handleActivityReactionAdded.call(feed, currentUserPayload, false);
 
       const activities = feed.currentState.activities!;
