@@ -35,7 +35,7 @@ export const Notification = ({
           .join(', ');
         const remainingActors = group.user_count - previewCount;
         if (remainingActors > 1) {
-          text += ` and ${remainingActors} more people`;
+          text += ` and ${remainingActors}${group.user_count_truncated ? '+' : ''} more people`;
         } else if (remainingActors === 1) {
           text += ' and 1 more person';
         }
