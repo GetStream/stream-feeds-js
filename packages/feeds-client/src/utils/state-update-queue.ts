@@ -120,8 +120,8 @@ export function getStateUpdateQueueId(
   } else if (isReactionResponse(data)) {
     return toJoin
       .concat([
-        (data as AddReactionResponse).activity.id ??
-          (data as AddCommentReactionResponse).comment.id,
+        (data as AddReactionResponse)?.activity?.id ??
+          (data as AddCommentReactionResponse)?.comment?.id,
         data.reaction.type,
       ])
       .join('-');

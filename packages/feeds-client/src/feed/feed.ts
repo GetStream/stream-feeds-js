@@ -34,7 +34,6 @@ import {
   handleFeedMemberAdded,
   handleFeedMemberRemoved,
   handleFeedMemberUpdated,
-  handleCommentReaction,
   handleBookmarkAdded,
   handleActivityDeleted,
   handleActivityRemovedFromFeed,
@@ -43,6 +42,8 @@ import {
   handleActivityMarked,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
+  handleCommentReactionAdded,
+  handleCommentReactionDeleted,
 } from './event-handlers';
 import { capitalize } from '../common/utils';
 import type {
@@ -167,8 +168,8 @@ export class Feed extends FeedApi {
     'feeds.follow.created': handleFollowCreated.bind(this),
     'feeds.follow.deleted': handleFollowDeleted.bind(this),
     'feeds.follow.updated': handleFollowUpdated.bind(this),
-    'feeds.comment.reaction.added': handleCommentReaction.bind(this),
-    'feeds.comment.reaction.deleted': handleCommentReaction.bind(this),
+    'feeds.comment.reaction.added': handleCommentReactionAdded.bind(this),
+    'feeds.comment.reaction.deleted': handleCommentReactionDeleted.bind(this),
     'feeds.comment.reaction.updated': Feed.noop,
     'feeds.feed_member.added': handleFeedMemberAdded.bind(this),
     'feeds.feed_member.removed': handleFeedMemberRemoved.bind(this),
