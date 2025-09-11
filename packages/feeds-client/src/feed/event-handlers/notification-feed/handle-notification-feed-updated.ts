@@ -62,16 +62,6 @@ export const updateNotificationStatus = (
       changed: true,
       notification_status: {
         ...newNotificationStatus,
-        read_activities: uniqueArrayMerge(
-          newNotificationStatus?.read_activities ?? [],
-          currentNotificationStatus?.read_activities ?? [],
-          (a) => a,
-        ),
-        seen_activities: uniqueArrayMerge(
-          newNotificationStatus?.seen_activities ?? [],
-          currentNotificationStatus?.seen_activities ?? [],
-          (a) => a,
-        ),
       },
     };
   }
