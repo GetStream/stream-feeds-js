@@ -15,6 +15,8 @@ export function handleCommentDeleted(
   const { comment } = payload;
   const entityId = comment.parent_id ?? comment.object_id;
 
+  // FIXME: This is not the correct way to check if an event was triggered by us.
+  //        Use event.user.id instead.
   const isOwnComment =
     this.client.state.getLatestValue().connected_user?.id === comment.user.id;
 
