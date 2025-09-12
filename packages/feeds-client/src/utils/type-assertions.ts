@@ -20,7 +20,7 @@ export const isReactionResponse = (
   | AddCommentReactionResponse
   | DeleteReactionResponse
   | DeleteCommentReactionResponse
-) & { fid: string } => {
+) => {
   return (
     'reaction' in data &&
     ('activity' in data || 'comment' in data)
@@ -28,7 +28,7 @@ export const isReactionResponse = (
 };
 
 export const isCommentResponse = (
-  entity: CommentParent,
+  entity: object,
 ): entity is CommentResponse => {
   return typeof (entity as CommentResponse)?.object_id === 'string';
 };

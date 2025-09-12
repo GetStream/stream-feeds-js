@@ -3,8 +3,12 @@ import {
   ActivityResponse,
   AddCommentReactionRequest,
   AddCommentReactionResponse,
+  AddCommentRequest,
+  AddCommentResponse,
   AddReactionRequest,
-  DeleteActivityReactionResponse, DeleteCommentReactionResponse,
+  DeleteActivityReactionResponse,
+  DeleteCommentReactionResponse,
+  DeleteCommentResponse,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -15,6 +19,8 @@ import {
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
+  UpdateCommentRequest,
+  UpdateCommentResponse,
   UpdateFollowRequest,
   UserRequest,
   WSEvent,
@@ -43,8 +49,11 @@ import {
   Feed,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
+  handleCommentAdded,
+  handleCommentDeleted,
   handleCommentReactionAdded,
   handleCommentReactionDeleted,
+  handleCommentUpdated,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
@@ -333,6 +342,72 @@ export class FeedsClient extends FeedsApi {
       // @ts-expect-error form data will only work if this is a string
       upload_sizes: JSON.stringify(request.upload_sizes),
     });
+  };
+
+  addComment = async (
+    request: AddCommentRequest,
+  ): Promise<StreamResponse<AddCommentResponse>> => {
+    const response = await super.addComment(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      const { comment } = response;
+      handleCommentAdded.bind(feed)(response, false);
+      const id = comment.object_id;
+      if (id) {
+        const toUpdate = feed.currentState.comments_by_entity_id[
+          id
+        ]?.comments?.find((c) => c.id === comment.parent_id);
+        if (toUpdate) {
+          handleCommentUpdated.bind(feed)(
+            { comment: { ...toUpdate, reply_count: toUpdate.reply_count + 1 } },
+            false,
+          );
+        }
+      }
+    }
+    return response;
+  };
+
+  updateComment = async (
+    request: UpdateCommentRequest & { id: string },
+  ): Promise<StreamResponse<UpdateCommentResponse>> => {
+    const response = await super.updateComment(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleCommentUpdated.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  deleteComment = async (request: {
+    id: string;
+    hard_delete?: boolean;
+  }): Promise<StreamResponse<DeleteCommentResponse>> => {
+    const response = await super.deleteComment(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      /*
+       * TODO: The handling below is a workaround to make HTTP response state updates work until
+       *  https://linear.app/stream/issue/FEEDS-757/consider-returning-deleted-comment-in-deletecomment-api-response
+       *  is implemented on the backend. It will be much more performant then.
+       *  */
+      let comment;
+      for (const entry of Object.values(
+        feed.currentState.comments_by_entity_id,
+      )) {
+        const comments = entry?.comments;
+        if (!comments?.length) continue;
+
+        for (let i = 0; i < comments.length; i++) {
+          const c = comments[i];
+          if (c?.id === request.id) {
+            comment = c;
+            break;
+          }
+        }
+      }
+      if (comment) {
+        handleCommentDeleted.bind(feed)({ comment }, false);
+      }
+    }
+    return response;
   };
 
   addReaction = async (

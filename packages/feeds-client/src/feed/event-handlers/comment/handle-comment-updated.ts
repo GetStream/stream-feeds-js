@@ -1,12 +1,37 @@
-import { Feed } from '../../../feed';
-import { EventPayload } from '../../../types-internal';
+import { Feed } from '../../feed';
+import { EventPayload, type PartializeAllBut } from '../../../types-internal';
+import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
+
+type CommentUpdatedPayload = PartializeAllBut<
+  EventPayload<'feeds.comment.updated'>,
+  'comment'
+>;
 
 export function handleCommentUpdated(
   this: Feed,
-  event: EventPayload<'feeds.comment.updated'>,
+  payload: CommentUpdatedPayload,
+  fromWs?: boolean,
 ) {
-  const { comment } = event;
+  const { comment } = payload;
   const entityId = comment.parent_id ?? comment.object_id;
+
+  const isOwnComment =
+    this.client.state.getLatestValue().connected_user?.id === comment.user.id;
+
+  if (
+    !shouldUpdateState({
+      stateUpdateQueueId: getStateUpdateQueueId(
+        comment,
+        'comment-updated',
+      ),
+      stateUpdateQueue: this.stateUpdateQueue,
+      watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser: isOwnComment,
+    })
+  ) {
+    return;
+  }
 
   this.state.next((currentState) => {
     const entityState = currentState.comments_by_entity_id[entityId];
