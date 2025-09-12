@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ActivityResponse } from '../../../gen/models';
+import { FeedsClient } from '../../../feeds-client';
 import {
-  addActivitiesToState,
+  addActivitiesToState as addActivitiesToStateOriginal,
   updateActivityInState,
-  removeActivityFromState,
+  removeActivityFromState as removeActivityFromStateOriginal,
 } from './';
 import {
   generateActivityResponse,
@@ -11,6 +12,38 @@ import {
 } from '../../../test-utils';
 
 describe('activity-utils', () => {
+  let addActivitiesToState: OmitThisParameter<
+    typeof addActivitiesToStateOriginal
+  >;
+  let removeActivityFromState: OmitThisParameter<
+    typeof removeActivityFromStateOriginal
+  >;
+  let prehydrateActivities: (
+    newActivities: ActivityResponse[],
+  ) => ActivityResponse[];
+
+  beforeEach(() => {
+    const client = new FeedsClient('mock-api-key');
+    const feed = client.feed('some', 'feed');
+
+    addActivitiesToState = addActivitiesToStateOriginal.bind(feed);
+    removeActivityFromState = removeActivityFromStateOriginal.bind(feed);
+
+    prehydrateActivities = (newActivities: ActivityResponse[]) => {
+      const existingActivities = [...newActivities];
+      // @ts-expect-error Using internals only in tests
+      feed.indexedActivityIds = new Set(
+        existingActivities.map((activity) => activity.id),
+      );
+
+      return existingActivities;
+    };
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
   describe('addActivitiesToState', () => {
     const activity1 = generateActivityResponse({ id: 'activity1' });
     const activity2 = generateActivityResponse({ id: 'activity2' });
@@ -24,7 +57,7 @@ describe('activity-utils', () => {
     });
 
     it('should add activities to the start of existing activities', () => {
-      const existingActivities = [activity2];
+      const existingActivities = prehydrateActivities([activity2]);
       const result = addActivitiesToState(
         [activity1],
         existingActivities,
@@ -38,7 +71,7 @@ describe('activity-utils', () => {
     });
 
     it('should add activities to the end of existing activities', () => {
-      const existingActivities = [activity1];
+      const existingActivities = prehydrateActivities([activity1]);
       const result = addActivitiesToState(
         [activity2],
         existingActivities,
@@ -52,7 +85,7 @@ describe('activity-utils', () => {
     });
 
     it('should not add duplicate activities', () => {
-      const existingActivities = [activity1];
+      const existingActivities = prehydrateActivities([activity1]);
       const result = addActivitiesToState(
         [activity1],
         existingActivities,
@@ -67,7 +100,7 @@ describe('activity-utils', () => {
     it('should handle multiple new activities correctly', () => {
       const activity3 = generateActivityResponse({ id: 'activity3' });
 
-      const existingActivities = [activity1];
+      const existingActivities = prehydrateActivities([activity1]);
       const result = addActivitiesToState(
         [activity2, activity3],
         existingActivities,
@@ -185,7 +218,7 @@ describe('activity-utils', () => {
     it('should remove an activity from the state', () => {
       const activity1 = generateActivityResponse({ id: 'activity1' });
       const activity2 = generateActivityResponse({ id: 'activity2' });
-      const activities = [activity1, activity2];
+      const activities = prehydrateActivities([activity1, activity2]);
 
       const result = removeActivityFromState(activity1, activities);
 
@@ -199,7 +232,7 @@ describe('activity-utils', () => {
     it('should return unchanged state if activity not found', () => {
       const activity1 = generateActivityResponse({ id: 'activity1' });
       const activity2 = generateActivityResponse({ id: 'activity2' });
-      const activities = [activity1];
+      const activities = prehydrateActivities([activity1]);
 
       const result = removeActivityFromState(activity2, activities);
 

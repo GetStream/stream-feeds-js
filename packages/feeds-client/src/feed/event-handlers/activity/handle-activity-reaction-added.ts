@@ -1,108 +1,134 @@
-import type { Feed } from '../../../feed';
+import type { Feed } from '../../feed';
 import type {
   ActivityPinResponse,
-  ActivityReactionAddedEvent,
   ActivityResponse,
 } from '../../../gen/models';
-import type { EventPayload } from '../../../types-internal';
-import { updateEntityInArray } from '../../../utils';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
+import {
+  getStateUpdateQueueId,
+  shouldUpdateState,
+  updateEntityInArray,
+} from '../../../utils';
+
+type AddActivityReactionPayload = PartializeAllBut<EventPayload<'feeds.activity.reaction.added'>, 'activity' | 'reaction'>;
 
 // shared function to update the activity with the new reaction
 const sharedUpdateActivity = ({
+  payload,
   currentActivity,
-  event,
   eventBelongsToCurrentUser,
 }: {
+  payload: AddActivityReactionPayload;
   currentActivity: ActivityResponse;
-  event: ActivityReactionAddedEvent;
   eventBelongsToCurrentUser: boolean;
 }) => {
+  const { activity: newActivity, reaction: newReaction } = payload;
   let newOwnReactions = currentActivity.own_reactions;
 
   if (eventBelongsToCurrentUser) {
-    newOwnReactions = [...currentActivity.own_reactions, event.reaction];
+    newOwnReactions = [...currentActivity.own_reactions, newReaction];
   }
 
   return {
-    ...event.activity,
+    ...currentActivity,
+    latest_reactions: newActivity.latest_reactions,
+    reaction_groups: newActivity.reaction_groups,
+    reaction_count: newActivity.reaction_count,
     own_reactions: newOwnReactions,
-    own_bookmarks: currentActivity.own_bookmarks,
   };
 };
 
 export const addReactionToActivities = (
-  event: ActivityReactionAddedEvent,
+  payload: AddActivityReactionPayload,
   activities: ActivityResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
 ) =>
   updateEntityInArray({
     entities: activities,
-    matcher: (activity) => activity.id === event.activity.id,
+    matcher: (activity) => activity.id === payload.activity.id,
     updater: (matchedActivity) =>
       sharedUpdateActivity({
+        payload,
         currentActivity: matchedActivity,
-        event,
         eventBelongsToCurrentUser,
       }),
   });
 
 export const addReactionToPinnedActivities = (
-  event: ActivityReactionAddedEvent,
+  payload: AddActivityReactionPayload,
   pinnedActivities: ActivityPinResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
 ) =>
   updateEntityInArray({
     entities: pinnedActivities,
     matcher: (pinnedActivity) =>
-      pinnedActivity.activity.id === event.activity.id,
+      pinnedActivity.activity.id === payload.activity.id,
     updater: (matchedPinnedActivity) => {
-      const newActivity = sharedUpdateActivity({
+      const updatedActivity = sharedUpdateActivity({
+        payload,
         currentActivity: matchedPinnedActivity.activity,
-        event,
         eventBelongsToCurrentUser,
       });
 
       // this should never happen, but just in case
-      if (newActivity === matchedPinnedActivity.activity) {
+      if (updatedActivity === matchedPinnedActivity.activity) {
         return matchedPinnedActivity;
       }
 
       return {
         ...matchedPinnedActivity,
-        activity: newActivity,
+        activity: updatedActivity,
       };
     },
   });
 
 export function handleActivityReactionAdded(
   this: Feed,
-  event: EventPayload<'feeds.activity.reaction.added'>,
+  payload: AddActivityReactionPayload,
+  fromWs?: boolean,
 ) {
+  const connectedUser = this.client.state.getLatestValue().connected_user;
+
+  const eventBelongsToCurrentUser =
+    typeof connectedUser !== 'undefined' &&
+    payload.reaction.user.id === connectedUser.id;
+
+  if (
+    !shouldUpdateState({
+      stateUpdateQueueId: getStateUpdateQueueId(
+        payload,
+        'activity-reaction-created',
+      ),
+      stateUpdateQueue: this.stateUpdateQueue,
+      watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser: eventBelongsToCurrentUser,
+    })
+  ) {
+    return;
+  }
+
   const {
     activities: currentActivities,
     pinned_activities: currentPinnedActivities,
   } = this.currentState;
-  const connectedUser = this.client.state.getLatestValue().connected_user;
-  const eventBelongsToCurrentUser =
-    typeof connectedUser !== 'undefined' &&
-    event.reaction.user.id === connectedUser.id;
 
   const [result1, result2] = [
-    addReactionToActivities(
-      event,
+    this.hasActivity(payload.activity.id) ? addReactionToActivities(
+      payload,
       currentActivities,
       eventBelongsToCurrentUser,
-    ),
+    ) : undefined,
     addReactionToPinnedActivities(
-      event,
+      payload,
       currentPinnedActivities,
       eventBelongsToCurrentUser,
     ),
   ];
 
-  if (result1.changed || result2.changed) {
+  if (result1?.changed || result2.changed) {
     this.state.partialNext({
-      activities: result1.entities,
+      ...(result1 ? { activities: result1.entities } : {}),
       pinned_activities: result2.entities,
     });
   }

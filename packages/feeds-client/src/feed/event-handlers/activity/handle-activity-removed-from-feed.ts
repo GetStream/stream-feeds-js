@@ -8,7 +8,7 @@ export function handleActivityRemovedFromFeed(
 ) {
   const currentActivities = this.currentState.activities;
   if (currentActivities) {
-    const result = removeActivityFromState(event.activity, currentActivities);
+    const result = removeActivityFromState.bind(this)(event.activity, currentActivities);
     if (result.changed) {
       this.state.partialNext({ activities: result.activities });
     }

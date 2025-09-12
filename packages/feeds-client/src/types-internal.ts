@@ -14,3 +14,7 @@ export type EventPayload<T extends WSEvent['type']> = Extract<
 export type PartializeAllBut<T, K extends keyof T> = Pick<T, K> & {
   [key in K]?: T[key];
 };
+
+export type CommonProps<A, B> = {
+  [K in keyof A & keyof B]: A[K] & B[K]
+};

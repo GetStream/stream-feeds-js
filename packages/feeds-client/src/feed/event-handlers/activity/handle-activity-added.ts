@@ -1,12 +1,13 @@
-import { Feed } from '../../../feed';
+import { Feed } from '../../feed';
 import { ActivityResponse } from '../../../gen/models';
 import { EventPayload, UpdateStateResult } from '../../../types-internal';
 
-export const addActivitiesToState = (
+export function addActivitiesToState(
+  this: Feed,
   newActivities: ActivityResponse[],
   activities: ActivityResponse[] | undefined,
   position: 'start' | 'end',
-) => {
+) {
   let result: UpdateStateResult<{ activities: ActivityResponse[] }>;
   if (activities === undefined) {
     activities = [];
@@ -23,8 +24,7 @@ export const addActivitiesToState = (
 
   const newActivitiesDeduplicated: ActivityResponse[] = [];
   newActivities.forEach((newActivityResponse) => {
-    const index = activities.findIndex((a) => a.id === newActivityResponse.id);
-    if (index === -1) {
+    if (!this.hasActivity(newActivityResponse.id)) {
       newActivitiesDeduplicated.push(newActivityResponse);
     }
   });
@@ -41,14 +41,14 @@ export const addActivitiesToState = (
   }
 
   return result;
-};
+}
 
 export function handleActivityAdded(
   this: Feed,
   event: EventPayload<'feeds.activity.added'>,
 ) {
   const currentActivities = this.currentState.activities;
-  const result = addActivitiesToState(
+  const result = addActivitiesToState.bind(this)(
     [event.activity],
     currentActivities,
     'start',

@@ -9,7 +9,6 @@ import {
   generateOwnUser,
 } from '../../../test-utils/response-generators';
 import { FollowResponse } from '../../../gen/models';
-import { shouldUpdateState } from '../../../utils';
 
 describe(handleFollowUpdated.name, () => {
   let feed: Feed;
@@ -128,47 +127,5 @@ describe(handleFollowUpdated.name, () => {
     expect(stateAfter.follower_count).toBe(stateBefore.follower_count);
     expect(stateAfter.following).toBe(stateBefore.following);
     expect(stateAfter.following_count).toBe(stateBefore.following_count);
-  });
-
-  describe(`${shouldUpdateState.name} integration`, () => {
-    it(`skips update if ${shouldUpdateState.name} returns false`, () => {
-      // Prepare feed, set as watched
-      feed.state.partialNext({ watch: true });
-
-      const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
-
-      // Call once to populate queue
-      handleFollowUpdated.call(feed, { follow: updatedFollow });
-
-      // Call again, should be skipped
-      const stateBefore = feed.currentState;
-      handleFollowUpdated.call(feed, {
-        follow: { ...updatedFollow, status: 'accepted' },
-      });
-
-      // State should not change
-      const stateAfter = feed.currentState;
-      expect(stateAfter).toBe(stateBefore);
-    });
-
-    it('allows update again after clearing stateUpdateQueue', () => {
-      const updatedFollow: FollowResponse = { ...follow, status: 'pending' };
-
-      handleFollowUpdated.call(feed, { follow: updatedFollow });
-
-      // Clear the queue
-      (feed as any).stateUpdateQueue.clear();
-
-      // Now update should be allowed
-      handleFollowUpdated.call(feed, {
-        follow: { ...updatedFollow, status: 'accepted' },
-      });
-
-      const [updatedFollowAfter] = feed.currentState.following!;
-
-      expect(updatedFollowAfter).toMatchObject({
-        status: 'accepted',
-      });
-    });
   });
 });

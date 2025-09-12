@@ -1,4 +1,4 @@
-import type { Feed, FeedState } from '../../../feed';
+import type { Feed, FeedState } from '../../feed';
 import type { FollowResponse } from '../../../gen/models';
 import type {
   EventPayload,
@@ -65,14 +65,19 @@ export function handleFollowCreated(
     EventPayload<'feeds.follow.created'>,
     'follow'
   >,
+  fromWs?: boolean,
 ) {
   const follow = eventOrResponse.follow;
 
   if (
     !shouldUpdateState({
-      stateUpdateQueueId: getStateUpdateQueueId(follow, 'created'),
+      stateUpdateQueueId: getStateUpdateQueueId(follow, 'follow-created'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser:
+        this.client.state.getLatestValue().connected_user?.id ===
+        follow.source_feed.created_by.id,
     })
   ) {
     return;
