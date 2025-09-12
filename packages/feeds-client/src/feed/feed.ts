@@ -247,14 +247,6 @@ export class Feed extends FeedApi {
     return this.indexedActivityIds.has(activity_id);
   }
 
-  protected addActivityToIndex(activity_id: string) {
-    this.indexedActivityIds.add(activity_id);
-  }
-
-  protected removeActivityFromIndex(activity_id: string) {
-    this.indexedActivityIds.delete(activity_id);
-  }
-
   async synchronize() {
     const { last_get_or_create_request_config } = this.state.getLatestValue();
     if (last_get_or_create_request_config?.watch) {
