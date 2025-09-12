@@ -1,4 +1,8 @@
-import { isFollowResponse, isReactionResponse } from './type-assertions';
+import {
+  isCommentResponse,
+  isFollowResponse,
+  isReactionResponse,
+} from './type-assertions';
 import { AddCommentReactionResponse, AddReactionResponse } from '../gen/models';
 
 /**
@@ -117,11 +121,13 @@ export function getStateUpdateQueueId(
     return toJoin
       .concat([data.source_feed.feed, data.target_feed.feed])
       .join('-');
+  } else if (isCommentResponse(data)) {
+    return toJoin.concat([data.id]).join('-')
   } else if (isReactionResponse(data)) {
     return toJoin
       .concat([
-        (data as AddReactionResponse).activity.id ??
-          (data as AddCommentReactionResponse).comment.id,
+        (data as AddReactionResponse)?.activity?.id ??
+          (data as AddCommentReactionResponse)?.comment?.id,
         data.reaction.type,
       ])
       .join('-');
