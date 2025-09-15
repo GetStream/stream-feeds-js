@@ -243,8 +243,8 @@ export class Feed extends FeedApi {
     return this.state.getLatestValue();
   }
 
-  hasActivity(activity_id: string) {
-    return this.indexedActivityIds.has(activity_id);
+  hasActivity(activityId: string) {
+    return this.indexedActivityIds.has(activityId);
   }
 
   async synchronize() {
