@@ -66,7 +66,7 @@ import {
   SyncFailure,
   UnhandledErrorType,
 } from '../common/real-time/event-models';
-import { updateCommentCount } from '../feed/event-handlers/comment/utils/update-comment-count';
+import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils/logger';
 
 export type FeedsClientState = {
