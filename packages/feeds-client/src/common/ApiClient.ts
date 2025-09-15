@@ -9,6 +9,7 @@ import { getRateLimitFromResponseHeader } from './rate-limit';
 import { KnownCodes, randomId } from './utils';
 import { TokenManager } from './TokenManager';
 import { ConnectionIdManager } from './ConnectionIdManager';
+import { version } from '../../package.json';
 
 export class ApiClient {
   public readonly baseUrl: string;
@@ -153,11 +154,46 @@ export class ApiClient {
     return `${wsBaseURL}/api/v2/connect?${params.toString()}`;
   }
 
+  public generateStreamClientHeader(
+    options: {
+      sdkIdentifier?: { name: string; version: string };
+      deviceIdentifier?: { os?: string; model?: string };
+    } = {},
+  ) {
+    const clientBundle = process.env.CLIENT_BUNDLE;
+
+    let userAgentString = '';
+    if (options.sdkIdentifier) {
+      userAgentString = `stream-feeds-${options.sdkIdentifier.name}-v${options.sdkIdentifier.version}-llc-v${version}`;
+    } else {
+      userAgentString = `stream-feeds-js-v${version}`;
+    }
+
+    const { os, model } = options.deviceIdentifier ?? {};
+
+    return (
+      [
+        // reports the device OS, if provided
+        ['os', os],
+        // reports the device model, if provided
+        ['device_model', model],
+        // reports which bundle is being picked from the exports
+        ['client_bundle', clientBundle],
+      ] as const
+    ).reduce(
+      (withArguments, [key, value]) =>
+        value && value.length > 0
+          ? withArguments.concat(`|${key}=${value}`)
+          : withArguments,
+      userAgentString,
+    );
+  }
+
   private get commonHeaders(): Record<string, string> {
     return {
       'stream-auth-type': 'jwt',
       // TODO: add version here
-      'X-Stream-Client': 'stream-feeds-js-',
+      'X-Stream-Client': this.generateStreamClientHeader(),
     };
   }
 
