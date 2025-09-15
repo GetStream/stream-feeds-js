@@ -1,6 +1,8 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
   ActivityResponse,
+  AddReactionRequest,
+  DeleteActivityReactionResponse,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -37,6 +39,8 @@ import { ModerationClient } from '../moderation-client';
 import { StreamPoll } from '../common/Poll';
 import {
   Feed,
+  handleActivityReactionAdded,
+  handleActivityReactionDeleted,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
@@ -323,6 +327,29 @@ export class FeedsClient extends FeedsApi {
     });
   };
 
+  addReaction = async (
+    request: AddReactionRequest & {
+      activity_id: string;
+    },
+  ) => {
+    const response = await super.addReaction(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleActivityReactionAdded.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  deleteActivityReaction = async (request: {
+    activity_id: string;
+    type: string;
+  }): Promise<StreamResponse<DeleteActivityReactionResponse>> => {
+    const response = await super.deleteActivityReaction(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleActivityReactionDeleted.bind(feed)(response, false);
+    }
+    return response;
+  };
+
   queryPollAnswers = async (
     request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
   ): Promise<StreamResponse<PollVotesResponse>> => {
@@ -413,7 +440,7 @@ export class FeedsClient extends FeedsApi {
     ].forEach((fid) => {
       const feed = this.activeFeeds[fid];
       if (feed) {
-        handleFollowUpdated.bind(feed)(response);
+        handleFollowUpdated.bind(feed)(response, false);
       }
     });
 
@@ -430,7 +457,7 @@ export class FeedsClient extends FeedsApi {
     ].forEach((fid) => {
       const feed = this.activeFeeds[fid];
       if (feed) {
-        handleFollowCreated.bind(feed)(response);
+        handleFollowCreated.bind(feed)(response, false);
       }
     });
 
@@ -456,7 +483,7 @@ export class FeedsClient extends FeedsApi {
     [request.source, request.target].forEach((fid) => {
       const feed = this.activeFeeds[fid];
       if (feed) {
-        handleFollowDeleted.bind(feed)(response);
+        handleFollowDeleted.bind(feed)(response, false);
       }
     });
 

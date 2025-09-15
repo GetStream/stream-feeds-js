@@ -64,6 +64,11 @@ describe('Activity state updates via WebSocket events', () => {
     expect(feedActivities?.length).toBe(1);
     expect(feedActivities?.[0].id).toBe(activity.id);
     expect(feedActivities?.[0].text).toBe('Test activity');
+
+    // Verify that the cache is updated
+    const indexedActivityIds = (feed as any).indexedActivityIds;
+    expect(indexedActivityIds.size).toEqual(1);
+    expect(feed.hasActivity(activity.id)).toBe(true);
   });
 
   it('should update activity in feed in response to activity.updated event', async () => {
@@ -99,6 +104,11 @@ describe('Activity state updates via WebSocket events', () => {
     expect(updatedActivities?.length).toBe(1);
     expect(updatedActivities?.[0].id).toBe(activityId);
     expect(updatedActivities?.[0].text).toBe(updatedText);
+
+    // Verify that the cache still has only one activity
+    const indexedActivityIds = (feed as any).indexedActivityIds;
+    expect(indexedActivityIds.size).toEqual(1);
+    expect(feed.hasActivity(activityId)).toBe(true);
   });
 
   it('should remove activity from feed in response to activity.deleted event', async () => {
@@ -129,6 +139,11 @@ describe('Activity state updates via WebSocket events', () => {
     const updatedActivities = feed.state.getLatestValue().activities;
     expect(updatedActivities).toBeDefined();
     expect(updatedActivities?.length).toBe(0);
+
+    // Verify that the activity is removed from the cache
+    const indexedActivityIds = (feed as any).indexedActivityIds;
+    expect(indexedActivityIds.size).toEqual(0);
+    expect(feed.hasActivity(activityId)).toBe(false);
   });
 
   it('should remove activity from feed in response to activity.removed_from_feed event', async () => {
@@ -178,6 +193,11 @@ describe('Activity state updates via WebSocket events', () => {
         .getLatestValue()
         .activities?.find((a) => a.id === response.activity.id),
     ).toBeUndefined();
+
+    // Verify that the activity is removed from the cache
+    const indexedActivityIds = (feed as any).indexedActivityIds;
+    expect(indexedActivityIds.size).toEqual(0);
+    expect(feed.hasActivity(response.activity.id)).toBe(false);
 
     await secondFeed.delete({ hard_delete: true });
   });

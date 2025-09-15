@@ -68,6 +68,7 @@ export function handleFollowDeleted(
     EventPayload<'feeds.follow.deleted'>,
     'follow'
   >,
+  fromWs?: boolean,
 ) {
   const follow = eventOrResponse.follow;
 
@@ -76,6 +77,10 @@ export function handleFollowDeleted(
       stateUpdateQueueId: getStateUpdateQueueId(follow, 'deleted'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser:
+        this.client.state.getLatestValue().connected_user?.id ===
+        follow.source_feed.created_by.id,
     })
   ) {
     return;

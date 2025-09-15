@@ -1,4 +1,4 @@
-import type { Feed, FeedState } from '../../../feed';
+import type { Feed, FeedState } from '../../feed';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 import { EventPayload, PartializeAllBut } from '../../../types-internal';
 
@@ -8,6 +8,7 @@ export function handleFollowUpdated(
     EventPayload<'feeds.follow.updated'>,
     'follow'
   >,
+  fromWs?: boolean,
 ) {
   const follow = eventOrResponse.follow;
   const connectedUserId = this.client.state.getLatestValue().connected_user?.id;
@@ -15,9 +16,13 @@ export function handleFollowUpdated(
 
   if (
     !shouldUpdateState({
-      stateUpdateQueueId: getStateUpdateQueueId(follow, 'updated'),
+      stateUpdateQueueId: getStateUpdateQueueId(follow, 'follow-updated'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser:
+        this.client.state.getLatestValue().connected_user?.id ===
+        follow.source_feed.created_by.id,
     })
   ) {
     return;
