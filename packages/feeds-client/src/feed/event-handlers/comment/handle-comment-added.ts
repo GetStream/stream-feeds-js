@@ -1,6 +1,7 @@
 import type { Feed } from '../../feed';
 import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
+import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
 
 type CommentAddedPayload = PartializeAllBut<
   EventPayload<'feeds.comment.added'>,
@@ -15,21 +16,13 @@ export function handleCommentAdded(
   const { comment } = payload;
   const entityId = comment.parent_id ?? comment.object_id;
 
-  // FIXME: This is not the correct way to check if an event was triggered by us.
-  //        Use event.user.id instead.
-  const isOwnComment =
-    this.client.state.getLatestValue().connected_user?.id === comment.user.id;
-
   if (
     !shouldUpdateState({
-      stateUpdateQueueId: getStateUpdateQueueId(
-        comment,
-        'comment-added',
-      ),
+      stateUpdateQueueId: getStateUpdateQueueId(comment, 'comment-added'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
       fromWs,
-      isTriggeredByConnectedUser: isOwnComment,
+      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(this, payload),
     })
   ) {
     return;

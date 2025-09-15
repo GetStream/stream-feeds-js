@@ -66,6 +66,7 @@ import {
   SyncFailure,
   UnhandledErrorType,
 } from '../common/real-time/event-models';
+import { updateCommentCount } from '../feed/event-handlers/comment/utils/update-comment-count';
 import { configureLoggers } from '../utils/logger';
 
 export type FeedsClientState = {
@@ -348,21 +349,14 @@ export class FeedsClient extends FeedsApi {
     request: AddCommentRequest,
   ): Promise<StreamResponse<AddCommentResponse>> => {
     const response = await super.addComment(request);
+    const { comment } = response;
     for (const feed of Object.values(this.activeFeeds)) {
-      const { comment } = response;
       handleCommentAdded.bind(feed)(response, false);
-      const id = comment.object_id;
-      if (id) {
-        const toUpdate = feed.currentState.comments_by_entity_id[
-          id
-        ]?.comments?.find((c) => c.id === comment.parent_id);
-        if (toUpdate) {
-          handleCommentUpdated.bind(feed)(
-            { comment: { ...toUpdate, reply_count: toUpdate.reply_count + 1 } },
-            false,
-          );
-        }
-      }
+      updateCommentCount.bind(feed)({
+        comment,
+        replyCountUpdater: (prevCount) => prevCount + 1,
+        commentCountUpdater: (prevCount) => prevCount + 1,
+      });
     }
     return response;
   };
@@ -405,6 +399,17 @@ export class FeedsClient extends FeedsApi {
       }
       if (comment) {
         handleCommentDeleted.bind(feed)({ comment }, false);
+        updateCommentCount.bind(feed)({
+          comment,
+          replyCountUpdater: (prevCount) => prevCount - 1,
+          /*
+          *  FIXME: This is incorrect and will work only for comments down to depth <= 2.
+          *         The comment_count needs to come server-side, as we have no reliable way
+          *         of knowing how many replies the comment subtree has.
+          */
+          commentCountUpdater: (prevCount) =>
+            prevCount - comment.reply_count - 1,
+        });
       }
     }
     return response;

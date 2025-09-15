@@ -2,14 +2,14 @@ import { Feed } from '../../feed';
 import { EventPayload, type PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 
-type CommentReactionPayload = PartializeAllBut<
+type CommentReactionAddedPayload = PartializeAllBut<
   EventPayload<'feeds.comment.reaction.added'>,
   'comment' | 'reaction'
 >;
 
 export function handleCommentReactionAdded(
   this: Feed,
-  payload: CommentReactionPayload,
+  payload: CommentReactionAddedPayload,
   fromWs?: boolean,
 ) {
   const { comment, reaction } = payload;

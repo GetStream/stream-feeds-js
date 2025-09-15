@@ -1,18 +1,19 @@
 import { Feed } from '../../../feed';
-import {
-  ActivityPinResponse,
-  ActivityResponse,
-  ActivityUpdatedEvent,
-} from '../../../gen/models';
-import { EventPayload } from '../../../types-internal';
+import { ActivityPinResponse, ActivityResponse } from '../../../gen/models';
+import { EventPayload, PartializeAllBut } from '../../../types-internal';
 import { updateEntityInArray } from '../../../utils';
+
+type ActivityUpdatedPayload = PartializeAllBut<
+  EventPayload<'feeds.activity.updated'>,
+  'activity'
+>;
 
 const sharedUpdateActivity = ({
   currentActivity,
   event,
 }: {
   currentActivity: ActivityResponse;
-  event: ActivityUpdatedEvent;
+  event: ActivityUpdatedPayload;
 }) => {
   return {
     ...event.activity,
@@ -22,7 +23,7 @@ const sharedUpdateActivity = ({
 };
 
 export const updateActivityInState = (
-  event: ActivityUpdatedEvent,
+  event: ActivityUpdatedPayload,
   activities: ActivityResponse[] | undefined,
 ) =>
   updateEntityInArray({
@@ -36,7 +37,7 @@ export const updateActivityInState = (
   });
 
 export const updatePinnedActivityInState = (
-  event: ActivityUpdatedEvent,
+  event: ActivityUpdatedPayload,
   pinnedActivities: ActivityPinResponse[] | undefined,
 ) =>
   updateEntityInArray({
@@ -62,7 +63,7 @@ export const updatePinnedActivityInState = (
 
 export function handleActivityUpdated(
   this: Feed,
-  event: EventPayload<'feeds.activity.updated'>,
+  event: ActivityUpdatedPayload,
 ) {
   const {
     activities: currentActivities,

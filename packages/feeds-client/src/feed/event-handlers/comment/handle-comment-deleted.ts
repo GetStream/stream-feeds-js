@@ -1,6 +1,9 @@
 import { Feed } from '../../feed';
 import { EventPayload, type PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
+import {
+  eventTriggeredByConnectedUser
+} from '../../../utils/event-triggered-by-connected-user';
 
 type CommentDeletedPayload = PartializeAllBut<
   EventPayload<'feeds.comment.deleted'>,
@@ -15,11 +18,6 @@ export function handleCommentDeleted(
   const { comment } = payload;
   const entityId = comment.parent_id ?? comment.object_id;
 
-  // FIXME: This is not the correct way to check if an event was triggered by us.
-  //        Use event.user.id instead.
-  const isOwnComment =
-    this.client.state.getLatestValue().connected_user?.id === comment.user.id;
-
   if (
     !shouldUpdateState({
       stateUpdateQueueId: getStateUpdateQueueId(
@@ -29,7 +27,7 @@ export function handleCommentDeleted(
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
       fromWs,
-      isTriggeredByConnectedUser: isOwnComment,
+      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(this, payload),
     })
   ) {
     return;
