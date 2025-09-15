@@ -31,10 +31,8 @@ describe('activity-utils', () => {
 
     prehydrateActivities = (newActivities: ActivityResponse[]) => {
       const existingActivities = [...newActivities];
-      // @ts-expect-error Using internals only in tests
-      feed.indexedActivityIds = new Set(
-        existingActivities.map((activity) => activity.id),
-      );
+
+      feed.state.partialNext({ activities: existingActivities });
 
       return existingActivities;
     };
