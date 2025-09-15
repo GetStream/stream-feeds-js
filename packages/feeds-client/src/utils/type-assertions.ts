@@ -6,7 +6,6 @@ import {
   FollowResponse,
 } from '../gen/models';
 import { StreamFile } from '../types';
-import { CommentParent } from '../types';
 import { DeleteReactionResponse } from '@stream-io/node-sdk';
 
 export const isFollowResponse = (data: object): data is FollowResponse => {
