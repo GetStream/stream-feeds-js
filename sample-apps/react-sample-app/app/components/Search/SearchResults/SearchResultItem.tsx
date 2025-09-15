@@ -34,8 +34,9 @@ export const FeedSearchResultItem = ({ item }: FeedSearchResultItemProps) => {
   );
 
   const isFollowing =
-    ownFollows.some((follow) => follow.source_feed.feed === ownTimeline?.feed) ??
-    false;
+    ownFollows.some(
+      (follow) => follow.source_feed.feed === ownTimeline?.feed,
+    ) ?? false;
 
   return (
     <div
@@ -52,7 +53,9 @@ export const FeedSearchResultItem = ({ item }: FeedSearchResultItemProps) => {
           if (isFollowing) {
             ownTimeline?.unfollow(item.feed);
           } else {
-            ownTimeline?.follow(item.feed);
+            ownTimeline?.follow(item.feed, {
+              create_notification_activity: true,
+            });
           }
         }}
       >
