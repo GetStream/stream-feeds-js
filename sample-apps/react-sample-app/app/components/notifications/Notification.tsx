@@ -17,13 +17,21 @@ export const Notification = ({
 
     let text = '';
 
+    const targetActivity = group.activities[0].notification_context?.target;
+    const notification = {
+      text: '',
+      image: targetActivity?.text
+        ? undefined
+        : targetActivity?.attachments[0]?.image_url,
+    };
+
     switch (verb) {
       case 'comment': {
-        text += `${group.activity_count} new comments`;
+        notification.text += `${group.activity_count} new comments on your post${targetActivity?.text ? ' ' + targetActivity?.text : ''}`;
         break;
       }
       case 'reaction': {
-        text += `${group.activity_count} likes`;
+        notification.text += `${group.user_count} new reactions on your post${targetActivity?.text ? ' ' + targetActivity?.text : ''}`;
         break;
       }
       case 'follow': {
@@ -43,7 +51,7 @@ export const Notification = ({
         break;
       }
       case 'comment_reaction': {
-        text += `${group.activity_count} new reactions to your comment`;
+        text += `${group.user_count} new reactions to your comment`;
         break;
       }
       default: {
