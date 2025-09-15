@@ -68,7 +68,7 @@ describe('Activity state updates via WebSocket events', () => {
     // Verify that the cache is updated
     const indexedActivityIds = (feed as any).indexedActivityIds;
     expect(indexedActivityIds.size).toEqual(1);
-    expect(indexedActivityIds.has(activity.id)).toBe(true);
+    expect(feed.hasActivity(activity.id)).toBe(true);
   });
 
   it('should update activity in feed in response to activity.updated event', async () => {
@@ -108,7 +108,7 @@ describe('Activity state updates via WebSocket events', () => {
     // Verify that the cache still has only one activity
     const indexedActivityIds = (feed as any).indexedActivityIds;
     expect(indexedActivityIds.size).toEqual(1);
-    expect(indexedActivityIds.has(activityId)).toBe(true);
+    expect(feed.hasActivity(activityId)).toBe(true);
   });
 
   it('should remove activity from feed in response to activity.deleted event', async () => {
@@ -143,7 +143,7 @@ describe('Activity state updates via WebSocket events', () => {
     // Verify that the activity is removed from the cache
     const indexedActivityIds = (feed as any).indexedActivityIds;
     expect(indexedActivityIds.size).toEqual(0);
-    expect(indexedActivityIds.has(activityId)).toBe(false);
+    expect(feed.hasActivity(activityId)).toBe(false);
   });
 
   it('should remove activity from feed in response to activity.removed_from_feed event', async () => {
@@ -197,7 +197,7 @@ describe('Activity state updates via WebSocket events', () => {
     // Verify that the activity is removed from the cache
     const indexedActivityIds = (feed as any).indexedActivityIds;
     expect(indexedActivityIds.size).toEqual(0);
-    expect(indexedActivityIds.has(response.activity.id)).toBe(false);
+    expect(feed.hasActivity(response.activity.id)).toBe(false);
 
     await secondFeed.delete({ hard_delete: true });
   });
