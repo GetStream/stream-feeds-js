@@ -1,4 +1,3 @@
-import { useLocalSearchParams } from 'expo-router';
 import { useFeedActivities } from '@stream-io/feeds-react-native-sdk';
 import React, { useEffect, useRef, useState } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
@@ -8,7 +7,7 @@ import {
   NativeSyntheticEvent,
   Platform,
 } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, FlashListRef } from '@shopify/flash-list';
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { ActivityPagerContextProvider } from '@/contexts/ActivityPagerContext';
 import { PagerItem } from '@/components/activity-pager/PagerItem';
@@ -47,7 +46,7 @@ export const ActivityPager = () => {
   const activeIdRef = useRef(activeId);
   activeIdRef.current = activeId;
 
-  const flatListRef = useRef<FlashList<ActivityResponse>>(null);
+  const flatListRef = useRef<FlashListRef<ActivityResponse>>(null);
 
   useEffect(() => {
     if (
@@ -67,7 +66,6 @@ export const ActivityPager = () => {
     <ActivityPagerContextProvider activeId={activeId}>
       <FlashList
         ref={flatListRef}
-        estimatedItemSize={SCREEN_HEIGHT}
         data={activities}
         renderItem={renderItem}
         keyExtractor={keyExtractor}

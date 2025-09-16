@@ -43,14 +43,13 @@ export const Comments = ({ activity }: { activity: ActivityResponse }) => {
 
   return (
     <FlatList
-      // @ts-expect-error FlatList internal, perf reasons
-      strictMode={true}
       data={comments}
       keyExtractor={keyExtractor}
       contentContainerStyle={styles.commentList}
       renderItem={renderItem}
       onEndReached={loadNext}
       onEndReachedThreshold={0.2}
+      removeClippedSubviews={false}
       maintainVisibleContentPosition={maintainVisibleContentPosition}
     />
   );

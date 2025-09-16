@@ -28,19 +28,11 @@ const config: ExpoConfig = {
     supportsTablet: true,
     bundleIdentifier: 'io.getstream.expotiktokapp',
     appleTeamId: 'EHV7XZLAHA',
-    config: {
-      googleMapsApiKey: MAPS_KEY,
-    },
   },
   android: {
     googleServicesFile: './firebase/google-services.json',
     icon: './assets/images/icon.png',
     package: 'io.getstream.expotiktokapp',
-    config: {
-      googleMaps: {
-        apiKey: MAPS_KEY,
-      },
-    },
   },
   web: {
     bundler: 'metro',
@@ -48,7 +40,16 @@ const config: ExpoConfig = {
     favicon: './assets/images/favicon.png',
   },
   plugins: [
+    'expo-font',
+    'expo-web-browser',
     'expo-router',
+    [
+    'react-native-maps',
+      {
+        'iosGoogleMapsApiKey': MAPS_KEY,
+        'androidGoogleMapsApiKey': MAPS_KEY
+      }
+    ],
     '@react-native-firebase/app',
     '@react-native-firebase/messaging',
     [
@@ -56,6 +57,7 @@ const config: ExpoConfig = {
       {
         ios: {
           useFrameworks: 'static',
+          buildReactNativeFromSource: true,
         },
       },
     ],
