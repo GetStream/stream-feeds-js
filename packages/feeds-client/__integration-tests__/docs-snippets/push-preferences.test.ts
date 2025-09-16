@@ -7,7 +7,7 @@ import {
 import { FeedsClient } from '../../src/feeds-client';
 import { UserRequest } from '../../src/gen/models';
 
-describe.skip('Push preferences page', () => {
+describe('Push preferences page', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
 
