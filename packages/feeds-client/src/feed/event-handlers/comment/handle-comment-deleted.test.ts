@@ -6,9 +6,12 @@ import {
   generateCommentDeletedEvent,
   generateCommentResponse,
   generateFeedResponse,
-  generateOwnUser,
+  generateOwnUser, generateUserResponseCommonFields,
   getHumanId,
-} from '../../../test-utils/response-generators';
+} from '../../../test-utils';
+import { CommentResponse, UserResponseCommonFields } from '../../../gen/models';
+import { shouldUpdateState } from '../../../utils';
+import { EventPayload } from '../../../types-internal';
 
 describe(handleCommentDeleted.name, () => {
   let feed: Feed;
@@ -129,5 +132,124 @@ describe(handleCommentDeleted.name, () => {
     const stateAfter = feed.currentState;
 
     expect(stateAfter).toBe(stateBefore);
+  });
+
+  describe(`Comment deleted ${shouldUpdateState.name} integration`, () => {
+    let currentUserPayload: EventPayload<'feeds.comment.deleted'>;
+    let existingComment: CommentResponse;
+    let commentToDelete: CommentResponse;
+    let commentId: string;
+
+    beforeEach(() => {
+      commentId = `comment-${getHumanId()}`;
+      existingComment = generateCommentResponse({
+        id: commentId,
+        object_id: activityId,
+      });
+      commentToDelete = generateCommentResponse({
+        id: `comment-${getHumanId()}`,
+        object_id: activityId,
+      })
+
+      currentUserPayload = generateCommentDeletedEvent({
+        comment: commentToDelete,
+        user: client.state.getLatestValue().connected_user as UserResponseCommonFields,
+      });
+
+      feed.state.partialNext({
+        comments_by_entity_id: {
+          [activityId]: {
+            comments: [existingComment, commentToDelete],
+            pagination: { sort: 'first' },
+          },
+        },
+      });
+      feed.state.partialNext({ watch: true });
+    });
+
+    it(`skips update if ${shouldUpdateState.name} returns false`, () => {
+      // 1. HTTP and then WS
+
+      handleCommentDeleted.call(feed, currentUserPayload, false);
+
+      let stateBefore = feed.currentState;
+
+      handleCommentDeleted.call(feed, currentUserPayload);
+
+      let stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+
+      // 2. WS and the HTTP
+
+      handleCommentDeleted.call(feed, currentUserPayload);
+
+      stateBefore = feed.currentState;
+
+      handleCommentDeleted.call(feed, currentUserPayload, false);
+
+      stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+    });
+
+    it('allows update again from WS after clearing the stateUpdateQueue', () => {
+      handleCommentDeleted.call(feed, currentUserPayload);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another WS event
+      handleCommentDeleted.call(feed, currentUserPayload);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const [latestComment] = (comments ?? []).toReversed();
+
+      expect(comments?.length).toEqual(1);
+      expect(latestComment).toMatchObject(existingComment);
+    });
+
+    it('allows update again from HTTP response after clearing the stateUpdateQueue', () => {
+      handleCommentDeleted.call(feed, currentUserPayload, false);
+
+      // Clear the queue
+      (feed as any).stateUpdateQueue.clear();
+
+      // Now update should be allowed from another HTTP response
+      handleCommentDeleted.call(feed, currentUserPayload, false);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const [latestComment] = (comments ?? []).toReversed();
+
+      expect(comments?.length).toEqual(1);
+      expect(latestComment).toMatchObject(existingComment);
+    });
+
+    it('should not insert anything into the stateUpdateQueue if the connected_user did not trigger the comment reaction deletion', () => {
+      const otherUserPayload = generateCommentDeletedEvent({
+        comment: commentToDelete,
+        user: generateUserResponseCommonFields({ id: getHumanId() })
+      });
+
+      handleCommentDeleted.call(feed, otherUserPayload);
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+
+      handleCommentDeleted.call(feed, otherUserPayload);
+
+      const comments =
+        feed.currentState.comments_by_entity_id[activityId]?.comments;
+      const [latestComment] = (comments ?? []).toReversed();
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+      expect(comments?.length).toEqual(1);
+      expect(latestComment).toMatchObject(existingComment);
+    });
   });
 });

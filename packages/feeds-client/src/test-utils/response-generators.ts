@@ -11,7 +11,7 @@ import {
   OwnUser,
   OwnUserResponse,
   PinActivityResponse,
-  UserResponse,
+  UserResponse, UserResponseCommonFields,
 } from '../gen/models';
 import { humanId } from 'human-id';
 import { EventPayload } from '../types-internal';
@@ -21,6 +21,23 @@ export const getHumanId = () => humanId({ capitalize: false, separator: '-' });
 export const generateUserResponse = (
   overrides: Partial<UserResponse> = {},
 ): UserResponse => ({
+  id: `user-${getHumanId()}`,
+  name: humanId({ separator: ' ' }),
+  created_at: new Date(),
+  updated_at: new Date(),
+  banned: false,
+  language: 'en',
+  online: false,
+  role: 'user',
+  blocked_user_ids: [],
+  teams: [],
+  custom: {},
+  ...overrides,
+});
+
+export const generateUserResponseCommonFields = (
+  overrides: Partial<UserResponseCommonFields> = {},
+): UserResponseCommonFields => ({
   id: `user-${getHumanId()}`,
   name: humanId({ separator: ' ' }),
   created_at: new Date(),
