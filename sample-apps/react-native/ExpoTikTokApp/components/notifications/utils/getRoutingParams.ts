@@ -4,8 +4,8 @@ export const getRoutingParams = (lastActivity: ActivityResponse) => {
   // Hardcoded because we always want to deep link to the
   // user feed.
   const groupId = 'user';
-  const id = lastActivity.notification_context?.target.user_id;
-  const activityId = lastActivity.notification_context?.target.id;
+  const id = lastActivity.notification_context?.target?.user_id;
+  const activityId = lastActivity.notification_context?.target?.id;
   if (lastActivity.type.includes('comment')) {
     return {
       pathname: '/comments-modal',
