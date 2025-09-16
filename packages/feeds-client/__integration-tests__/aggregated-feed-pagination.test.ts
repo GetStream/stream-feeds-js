@@ -92,15 +92,8 @@ describe('Aggregated Feed Pagination Integration Tests', () => {
     });
   });
 
-  // Why isn't seen_activities are paginated here?
-  it.skip(`repaginate again, seen activities are paginated`, async () => {
+  it(`seen activities aren't paginated, they contain the last 100 seen groups`, async () => {
     await feed.getOrCreate({ limit: 2 });
-
-    expect(feed.currentState.notification_status?.seen_activities?.length).toBe(
-      2,
-    );
-
-    await feed.getNextPage();
 
     expect(feed.currentState.notification_status?.seen_activities?.length).toBe(
       3,
