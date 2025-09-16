@@ -1,5 +1,5 @@
 import type { FeedsClientState } from '@self';
-import { useStateStore } from '../useStateStore';
+import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
 
 /**

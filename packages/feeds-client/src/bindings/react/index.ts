@@ -1,6 +1,6 @@
 // Hooks
 
-export * from './hooks/useStateStore';
+export * from '@stream-io/state-store/react-bindings';
 export * from './hooks/useCreateFeedsClient';
 
 export * from './hooks/client-state-hooks';

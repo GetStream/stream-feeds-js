@@ -1,6 +1,6 @@
 import type { Feed, FeedState } from '@self';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
-import { useStateStore } from '../useStateStore';
+import { useStateStore } from '@stream-io/state-store/react-bindings';
 
 /**
  * A React hook that returns a reactive object containing some often used

@@ -1,6 +1,6 @@
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import type { Feed, FeedState } from '@self';
-import { useStateStore } from '../useStateStore';
+import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useMemo } from 'react';
 import { useStableCallback } from '../internal';
 

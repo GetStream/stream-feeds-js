@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { type Feed, type FeedState, FeedOwnCapability } from '@self';
-import { useStateStore } from '../useStateStore';
+import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 
 const stableEmptyArray: readonly FeedOwnCapability[] = [];

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { type Feed, type FeedState, checkHasAnotherPage } from '@self';
-import { useStateStore } from '../useStateStore';
+import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 
 const selector = ({

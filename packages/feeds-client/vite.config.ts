@@ -19,7 +19,7 @@ export default defineConfig({
       },
       name: '@stream-io/feeds-client',
     },
-    emptyOutDir: true,
+    emptyOutDir: false,
     outDir: 'dist',
     minify: false,
     sourcemap: true,

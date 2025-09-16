@@ -15,7 +15,7 @@ import {
   QueryCommentsRequest,
 } from '../gen/models';
 import { StreamResponse } from '../gen-imports';
-import { StateStore } from '../common/StateStore';
+import { StateStore } from '@stream-io/state-store';
 import { EventDispatcher } from '../common/EventDispatcher';
 import { FeedApi } from '../gen/feeds/FeedApi';
 import { FeedsClient } from '../feeds-client';

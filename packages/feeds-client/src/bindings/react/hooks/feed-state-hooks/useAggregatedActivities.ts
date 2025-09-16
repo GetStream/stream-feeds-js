@@ -1,5 +1,5 @@
 import type { Feed, FeedState } from '@self';
-import { useStateStore } from '../useStateStore';
+import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 
 const selector = ({ aggregated_activities }: FeedState) => ({

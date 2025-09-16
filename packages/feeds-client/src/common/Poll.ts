@@ -1,4 +1,4 @@
-import { StateStore } from './StateStore';
+import { StateStore } from '@stream-io/state-store';
 import type { FeedsClient } from '../feeds-client';
 import type {
   PollVote,

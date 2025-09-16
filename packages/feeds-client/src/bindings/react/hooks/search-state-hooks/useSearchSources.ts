@@ -3,7 +3,7 @@ import type {
   SearchControllerState,
 } from '@self';
 import { useSearchContext } from '../../contexts/StreamSearchContext';
-import { useStateStore } from '../useStateStore';
+import { useStateStore } from '@stream-io/state-store/react-bindings';
 
 export const useSearchSources = (controllerFromProps?: SearchController) => {
   const controllerFromState = useSearchContext();
