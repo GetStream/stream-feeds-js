@@ -481,6 +481,8 @@ decoders.Channel = (input?: Record<string, any>) => {
 
     created_by: { type: 'User', isSingle: true },
 
+    members_lookup: { type: 'ChannelMemberLookup', isSingle: false },
+
     truncated_by: { type: 'User', isSingle: true },
   };
   return decode(typeMappings, input);
@@ -525,6 +527,17 @@ decoders.ChannelMember = (input?: Record<string, any>) => {
     pinned_at: { type: 'DatetimeType', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ChannelMemberLookup = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    archived_at: { type: 'DatetimeType', isSingle: true },
+
+    ban_expires: { type: 'DatetimeType', isSingle: true },
+
+    pinned_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -730,6 +743,15 @@ decoders.DeleteCommentReactionResponse = (input?: Record<string, any>) => {
     comment: { type: 'CommentResponse', isSingle: true },
 
     reaction: { type: 'FeedsReactionResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.DeleteCommentResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    activity: { type: 'ActivityResponse', isSingle: true },
+
+    comment: { type: 'CommentResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };

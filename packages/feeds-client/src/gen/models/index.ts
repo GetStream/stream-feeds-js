@@ -473,7 +473,7 @@ export interface ActivityResponse {
 
   moderation?: ModerationV2Response;
 
-  notification_context?: Record<string, any>;
+  notification_context?: NotificationContext;
 
   parent?: ActivityResponse;
 
@@ -587,6 +587,8 @@ export interface AddCommentReactionRequest {
 
   create_notification_activity?: boolean;
 
+  enforce_unique?: boolean;
+
   skip_push?: boolean;
 
   custom?: Record<string, any>;
@@ -647,6 +649,8 @@ export interface AddReactionRequest {
 
   create_notification_activity?: boolean;
 
+  enforce_unique?: boolean;
+
   skip_push?: boolean;
 
   custom?: Record<string, any>;
@@ -672,8 +676,6 @@ export interface AggregatedActivityResponse {
   updated_at: Date;
 
   user_count: number;
-
-  user_count_truncated: boolean;
 
   activities: ActivityResponse[];
 }
@@ -1225,6 +1227,8 @@ export interface CallIngressResponse {
   rtmp: RTMPIngress;
 
   srt: SRTIngress;
+
+  whip: WHIPIngress;
 }
 
 export interface CallMember {
@@ -1313,6 +1317,8 @@ export interface CallResponse {
   recording: boolean;
 
   transcribing: boolean;
+
+  translating: boolean;
 
   type: string;
 
@@ -1546,6 +1552,8 @@ export interface Channel {
 
   created_by?: User;
 
+  members_lookup?: Record<string, ChannelMemberLookup>;
+
   truncated_by?: User;
 }
 
@@ -1727,6 +1735,22 @@ export interface ChannelMember {
   deleted_messages?: string[];
 
   user?: UserResponse;
+}
+
+export interface ChannelMemberLookup {
+  archived: boolean;
+
+  banned: boolean;
+
+  hidden: boolean;
+
+  pinned: boolean;
+
+  archived_at?: Date;
+
+  ban_expires?: Date;
+
+  pinned_at?: Date;
 }
 
 export interface ChannelMemberResponse {
@@ -2271,6 +2295,10 @@ export interface DeleteCommentReactionResponse {
 
 export interface DeleteCommentResponse {
   duration: string;
+
+  activity: ActivityResponse;
+
+  comment: CommentResponse;
 }
 
 export interface DeleteFeedResponse {
@@ -4052,6 +4080,12 @@ export interface NotificationConfig {
   track_seen?: boolean;
 }
 
+export interface NotificationContext {
+  target?: NotificationTarget;
+
+  trigger?: NotificationTrigger;
+}
+
 export interface NotificationFeedUpdatedEvent {
   created_at: Date;
 
@@ -4098,6 +4132,26 @@ export interface NotificationStatusResponse {
   read_activities?: string[];
 
   seen_activities?: string[];
+}
+
+export interface NotificationTarget {
+  id: string;
+
+  name?: string;
+
+  text?: string;
+
+  type?: string;
+
+  user_id?: string;
+
+  attachments?: Attachment[];
+}
+
+export interface NotificationTrigger {
+  text: string;
+
+  type: string;
 }
 
 export interface NullTime {}
@@ -5701,6 +5755,8 @@ export interface TranscriptionSettings {
   mode: 'available' | 'disabled' | 'auto-on';
 
   speech_segment_config?: SpeechSegmentConfig;
+
+  translation?: TranslationSettings;
 }
 
 export interface TranscriptionSettingsResponse {
@@ -5748,6 +5804,14 @@ export interface TranscriptionSettingsResponse {
   mode: 'available' | 'disabled' | 'auto-on';
 
   speech_segment_config?: SpeechSegmentConfig;
+
+  translation?: TranslationSettings;
+}
+
+export interface TranslationSettings {
+  enabled: boolean;
+
+  languages: string[];
 }
 
 export interface TypingIndicators {
@@ -6449,6 +6513,10 @@ export interface VoteData {
   answer_text?: string;
 
   option_id?: string;
+}
+
+export interface WHIPIngress {
+  address: string;
 }
 
 export interface WSAuthMessage {
