@@ -22,6 +22,7 @@
       "@self": ["../feeds-client/src/index.ts"]
     }
   },
+  "files": ["./vite-env.d.ts"],
   "exclude": ["**/*.test.ts", "**/test-utils/**/*.ts"],
   "include": ["./src", "./package.json"]
 }

@@ -9,12 +9,24 @@ import { getRateLimitFromResponseHeader } from './rate-limit';
 import { KnownCodes, randomId } from './utils';
 import { TokenManager } from './TokenManager';
 import { ConnectionIdManager } from './ConnectionIdManager';
+// this gets replaced during the build process (var version = 'x.y.z';)
 import { version } from '../../package.json';
+
+type RequiredAtLeastOne<T> = {
+  [K in keyof T]: Required<Pick<T, K>> & Partial<Omit<T, K>>;
+}[keyof T];
+
+// Information that can be set to be sent as part of the header of each request
+export type ExtraHeaderInformation = Partial<{
+  sdkIdentifier: { name: string; version: string };
+  deviceIdentifier: RequiredAtLeastOne<{ os: string; model: string }>;
+}>;
 
 export class ApiClient {
   public readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
   private timeout: number;
+  public extraHeaderInformation: ExtraHeaderInformation = {};
 
   constructor(
     public readonly apiKey: string,
@@ -154,22 +166,18 @@ export class ApiClient {
     return `${wsBaseURL}/api/v2/connect?${params.toString()}`;
   }
 
-  public generateStreamClientHeader(
-    options: {
-      sdkIdentifier?: { name: string; version: string };
-      deviceIdentifier?: { os?: string; model?: string };
-    } = {},
-  ) {
-    const clientBundle = process.env.CLIENT_BUNDLE;
+  public generateStreamClientHeader() {
+    // TODO: figure out a way to inject this during the build process
+    const clientBundle = import.meta.env.VITE_CLIENT_BUNDLE;
 
     let userAgentString = '';
-    if (options.sdkIdentifier) {
-      userAgentString = `stream-feeds-${options.sdkIdentifier.name}-v${options.sdkIdentifier.version}-llc-v${version}`;
+    if (this.extraHeaderInformation.sdkIdentifier) {
+      userAgentString = `stream-feeds-${this.extraHeaderInformation.sdkIdentifier.name}-v${this.extraHeaderInformation.sdkIdentifier.version}-llc-v${version}`;
     } else {
       userAgentString = `stream-feeds-js-v${version}`;
     }
 
-    const { os, model } = options.deviceIdentifier ?? {};
+    const { os, model } = this.extraHeaderInformation.deviceIdentifier ?? {};
 
     return (
       [
@@ -192,7 +200,6 @@ export class ApiClient {
   private get commonHeaders(): Record<string, string> {
     return {
       'stream-auth-type': 'jwt',
-      // TODO: add version here
       'X-Stream-Client': this.generateStreamClientHeader(),
     };
   }
