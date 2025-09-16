@@ -11,7 +11,7 @@
     "noEmitOnError": true,
     "noImplicitAny": true,
     "declaration": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,

@@ -5698,6 +5698,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@stream-io/feeds-client@workspace:packages/feeds-client"
   dependencies:
+    "@stream-io/logger": ^1.0.2
     "@stream-io/node-sdk": 0.6.0
     "@stream-io/state-store": ^1.1.4
     "@types/react": ^19.1.8
@@ -5802,6 +5803,13 @@ __metadata:
     react: ^18 || ^19
   languageName: unknown
   linkType: soft
+
+"@stream-io/logger@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@stream-io/logger@npm:1.0.2"
+  checksum: f493411f9be52a86a49891be3d81070a03ca6bac4f60715d3a4bdd3381e78f865c474be0e9282a2b74e3b83253b4aaa02b403fae8363caec516d89acd22fe74a
+  languageName: node
+  linkType: hard
 
 "@stream-io/node-sdk@npm:0.6.0":
   version: 0.6.0
