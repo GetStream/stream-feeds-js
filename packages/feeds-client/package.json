@@ -46,7 +46,7 @@
     "CHANGELOG.md"
   ],
   "dependencies": {
-    "@stream-io/logger": "^1.0.2",
+    "@stream-io/logger": "^1.1.4",
     "@stream-io/state-store": "^1.1.4",
     "axios": "^1.7.7"
   },
