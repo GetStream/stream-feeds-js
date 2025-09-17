@@ -7,7 +7,7 @@ import {
   CommentReactionAddedPayload,
   CommentReactionDeletedPayload, CommentUpdatedPayload,
 } from '../feed';
-import { ensureExhausted } from './ensure-exshausted';
+import { ensureExhausted } from './ensure-exhausted';
 
 export type StateUpdateQueuePrefix =
   | 'activity-reaction-created'
