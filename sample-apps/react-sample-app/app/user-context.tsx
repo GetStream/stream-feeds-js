@@ -69,7 +69,10 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
         const data = await response.json();
         return data.token;
       };
-      const _client = new FeedsClient(apiKey, { base_url: apiUrl });
+      const _client = new FeedsClient(apiKey, {
+        base_url: apiUrl,
+        configure_loggers_options: { default: { level: 'debug' } },
+      });
       const connectPromise = _client.connectUser(user, tokenProvider);
       setClient(_client);
       // @ts-expect-error Exposing the client to globalThis for debugging purposes

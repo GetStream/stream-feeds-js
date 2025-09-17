@@ -9,6 +9,7 @@ import { getRateLimitFromResponseHeader } from './rate-limit';
 import { KnownCodes, randomId } from './utils';
 import { TokenManager } from './TokenManager';
 import { ConnectionIdManager } from './ConnectionIdManager';
+import { getLogger } from '../utils/logger';
 // this gets replaced during the build process (var version = 'x.y.z';)
 import { version } from '../../package.json';
 
@@ -27,6 +28,7 @@ export class ApiClient {
   private readonly axiosInstance: AxiosInstance;
   private timeout: number;
   public extraHeaderInformation: ExtraHeaderInformation = {};
+  private readonly logger = getLogger('api-client');
 
   constructor(
     public readonly apiKey: string,
@@ -60,6 +62,7 @@ export class ApiClient {
       body?.watch ||
       body?.presence
     ) {
+      this.logger.info('Getting connection_id for watch or presence request');
       const connectionId = await this.connectionIdManager.getConnectionId();
       queryParams.connection_id = connectionId;
     }
@@ -96,6 +99,11 @@ export class ApiClient {
     }
 
     try {
+      this.logger.debug(
+        `Sending request ${method.toUpperCase()}:${requestUrl} with:`,
+        { queryParams },
+        { body },
+      );
       const response = await this.axiosInstance.request<T>({
         url: requestUrl,
         method,
@@ -114,41 +122,43 @@ export class ApiClient {
       );
 
       return { body: response.data, metadata };
-    } catch (error: any) {
-      if (this.isAxiosError(error)) {
-        if (!error.response) {
-          throw new StreamApiError(`Stream error ${error.message}`);
-        } else {
-          // Stream specific error response
-          const data = error.response.data as StreamApiError;
-          const code = data?.code ?? error.response.status;
-          const message = data?.message ?? error.response.statusText;
-          if (
-            code === KnownCodes.TOKEN_EXPIRED &&
-            error.response.status === 401 &&
-            !this.tokenManager.isStatic()
-          ) {
-            await this.tokenManager.loadToken();
-            return await this.sendRequest(
-              method,
-              url,
-              pathParams,
-              queryParams,
-              body,
-            );
-          }
-          throw new StreamApiError(
-            `Stream error code ${code}: ${message}`,
-            this.getRequestMetadata(client_request_id, error.response),
-            code,
-            undefined,
-          );
-        }
-      } else {
+    } catch (error) {
+      if (!this.isAxiosError(error)) {
         throw new Error('Unknown error received during an API call', {
           cause: error,
         });
+      } else if (!error.response) {
+        throw new StreamApiError(`Stream error ${error.message}`);
       }
+
+      // Stream specific error response
+      const data = error.response.data as StreamApiError;
+      const code = data?.code ?? error.response.status;
+      const message = data?.message ?? error.response.statusText;
+      if (
+        code === KnownCodes.TOKEN_EXPIRED &&
+        error.response.status === 401 &&
+        !this.tokenManager.isStatic()
+      ) {
+        this.logger.info(
+          'Token expired, fetching a new one and retrying request',
+        );
+        await this.tokenManager.loadToken();
+        return await this.sendRequest(
+          method,
+          url,
+          pathParams,
+          queryParams,
+          body,
+        );
+      }
+
+      throw new StreamApiError(
+        `Stream error code ${code}: ${message}`,
+        this.getRequestMetadata(client_request_id, error.response),
+        code,
+        undefined,
+      );
     }
   };
 
