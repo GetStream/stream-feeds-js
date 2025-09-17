@@ -8,7 +8,6 @@
     "lib": ["esnext", "dom"],
     "noEmitOnError": true,
     "noImplicitAny": true,
-    "declaration": true,
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
