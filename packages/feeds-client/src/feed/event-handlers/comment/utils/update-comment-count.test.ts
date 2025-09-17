@@ -119,7 +119,7 @@ describe('updateCommentCount', () => {
     expect(handleActivityUpdated).toHaveBeenCalledTimes(1);
     expect(handleActivityUpdated).toHaveBeenCalledWith({
       activity: { id: activityId, comment_count: 11 },
-    });
+    }, false);
   });
 
   it('updates parent comment reply_count when grandparent is missing (falls back to activity store)', () => {
@@ -162,7 +162,7 @@ describe('updateCommentCount', () => {
     expect(handleActivityUpdated).toHaveBeenCalledTimes(1);
     expect(handleActivityUpdated).toHaveBeenCalledWith({
       activity: { id: activityId, comment_count: 1 },
-    });
+    }, false);
   });
 
   it('updates the correct parent when replying to a depth-3 comment (entity_parent_id points to the parent comment store)', () => {
@@ -201,7 +201,7 @@ describe('updateCommentCount', () => {
     expect(handleActivityUpdated).toHaveBeenCalledTimes(1);
     expect(handleActivityUpdated).toHaveBeenCalledWith({
       activity: { id: activityId, comment_count: 1 },
-    });
+    }, false);
   });
 
   it('does nothing on parent reply when parent comment is not found in the resolved store', () => {
@@ -230,7 +230,7 @@ describe('updateCommentCount', () => {
     expect(handleActivityUpdated).toHaveBeenCalledTimes(1);
     expect(handleActivityUpdated).toHaveBeenCalledWith({
       activity: { id: activityId, comment_count: 5 },
-    });
+    }, false);
   });
 
   it('skips parent reply update when comment has no parent_id (top-level comment)', () => {
@@ -257,41 +257,7 @@ describe('updateCommentCount', () => {
     expect(handleActivityUpdated).toHaveBeenCalledTimes(1);
     expect(handleActivityUpdated).toHaveBeenCalledWith({
       activity: { id: activityId, comment_count: 3 },
-    });
-  });
-
-  it('does not update activity comment_count when watch: true', () => {
-    const parentCommentId = 'c1';
-    const c1: CommentResponse = generateCommentResponse({ id: parentCommentId, object_id: activityId, reply_count: 1 });
-
-    feed.state.partialNext({
-      watch: true,
-      activities: [{ ...existingActivity, comment_count: 5 }],
-      comments_by_entity_id: {
-        [activityId]: { comments: [c1] },
-        [parentCommentId]: { entity_parent_id: activityId },
-      },
-    });
-
-    const incomingReply: CommentResponse = generateCommentResponse({
-      id: 'c2',
-      object_id: activityId,
-      parent_id: parentCommentId,
-      reply_count: 0,
-    });
-
-    updateCommentCount({
-      comment: incomingReply,
-      replyCountUpdater: (prev) => prev + 1,
-      commentCountUpdater: (prev) => prev + 999,
-    });
-
-    expect(handleCommentUpdated).toHaveBeenCalledTimes(1);
-    expect(handleCommentUpdated).toHaveBeenCalledWith(
-      { comment: { ...c1, reply_count: 2 } },
-      false,
-    );
-    expect(handleActivityUpdated).not.toHaveBeenCalled();
+    }, false);
   });
 
   it('no-ops any update if neither activity nor comment are found', () => {
@@ -349,6 +315,6 @@ describe('updateCommentCount', () => {
     expect(handleActivityUpdated).toHaveBeenCalledTimes(1);
     expect(handleActivityUpdated).toHaveBeenCalledWith({
       activity: { id: activityId, comment_count: 97 },
-    });
+    }, false);
   });
 });

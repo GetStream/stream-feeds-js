@@ -40,20 +40,16 @@ export function updateCommentCount(
     }
   }
 
-  // update the activity comment_count only if we are not currently watching
-  // the feed; this check can be removed once we start adding the activity.updated
-  // event to the `stateUpdateQueue` as well
-  if (!this.currentState.watch) {
-    const activityToUpdate = this.currentState.activities?.find(
-      (activity) => activity.id === parentActivityId,
-    );
-    if (activityToUpdate) {
-      handleActivityUpdated.bind(this)({
-        activity: {
-          ...activityToUpdate,
-          comment_count: commentCountUpdater(activityToUpdate.comment_count),
-        },
-      });
-    }
+  // finally, update the activity comment_count
+  const activityToUpdate = this.currentState.activities?.find(
+    (activity) => activity.id === parentActivityId,
+  );
+  if (activityToUpdate) {
+    handleActivityUpdated.bind(this)({
+      activity: {
+        ...activityToUpdate,
+        comment_count: commentCountUpdater(activityToUpdate.comment_count),
+      },
+    }, false);
   }
 }
