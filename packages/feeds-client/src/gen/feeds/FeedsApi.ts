@@ -580,6 +580,7 @@ export class FeedsApi {
     const body = {
       type: request?.type,
       create_notification_activity: request?.create_notification_activity,
+      enforce_unique: request?.enforce_unique,
       skip_push: request?.skip_push,
       custom: request?.custom,
     };
@@ -1037,6 +1038,7 @@ export class FeedsApi {
     const body = {
       type: request?.type,
       create_notification_activity: request?.create_notification_activity,
+      enforce_unique: request?.enforce_unique,
       skip_push: request?.skip_push,
       custom: request?.custom,
     };
