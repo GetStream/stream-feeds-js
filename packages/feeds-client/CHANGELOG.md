@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.8](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.7...@stream-io/feeds-client-0.2.8) (2025-09-17)
+
+
+* update feeds API spec ([#122](https://github.com/GetStream/stream-feeds-js/issues/122)) ([a29c243](https://github.com/GetStream/stream-feeds-js/commit/a29c243d42d6c5da56b43e1d6091394f3db5419d))
+* update filtering example in code snippets tests ([d05c730](https://github.com/GetStream/stream-feeds-js/commit/d05c730d8ce346e7b8ab7df4b4bc54a925e84308))
+
+
+### Features
+
+* configurable logging mechanism ([#108](https://github.com/GetStream/stream-feeds-js/issues/108)) ([c0fff26](https://github.com/GetStream/stream-feeds-js/commit/c0fff2668b037efd5dde35a288b45dde5e9f72c7))
+* reaction state updates on http responses ([#118](https://github.com/GetStream/stream-feeds-js/issues/118)) ([181e150](https://github.com/GetStream/stream-feeds-js/commit/181e150cae97b32fc1264c2188e4ad3ef6b2c976))
+* user agent and build revamp ([#121](https://github.com/GetStream/stream-feeds-js/issues/121)) ([c8009b0](https://github.com/GetStream/stream-feeds-js/commit/c8009b00820803e12539f39700787364c220e434))
+
 ## [0.2.7](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.6...@stream-io/feeds-client-0.2.7) (2025-09-10)
 
 
