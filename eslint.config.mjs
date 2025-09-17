@@ -34,6 +34,7 @@ export default [
       'prefer-const': 'warn',
       '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
       '@typescript-eslint/consistent-indexed-object-style': 'error',
+      "@typescript-eslint/consistent-type-imports": "error",
       '@typescript-eslint/ban-ts-comment': 'error',
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
