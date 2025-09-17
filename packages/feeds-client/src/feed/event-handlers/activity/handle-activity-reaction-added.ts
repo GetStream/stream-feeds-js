@@ -10,7 +10,10 @@ import {
   updateEntityInArray,
 } from '../../../utils';
 
-export type ActivityReactionAddedPayload = PartializeAllBut<EventPayload<'feeds.activity.reaction.added'>, 'activity' | 'reaction'>;
+export type ActivityReactionAddedPayload = PartializeAllBut<
+  EventPayload<'feeds.activity.reaction.added'>,
+  'activity' | 'reaction'
+>;
 
 // shared function to update the activity with the new reaction
 const sharedUpdateActivity = ({
@@ -114,11 +117,13 @@ export function handleActivityReactionAdded(
   } = this.currentState;
 
   const [result1, result2] = [
-    this.hasActivity(payload.activity.id) ? addReactionToActivities(
-      payload,
-      currentActivities,
-      eventBelongsToCurrentUser,
-    ) : undefined,
+    this.hasActivity(payload.activity.id)
+      ? addReactionToActivities(
+          payload,
+          currentActivities,
+          eventBelongsToCurrentUser,
+        )
+      : undefined,
     addReactionToPinnedActivities(
       payload,
       currentPinnedActivities,
