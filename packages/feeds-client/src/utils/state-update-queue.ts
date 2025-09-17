@@ -3,13 +3,18 @@ import {
 } from '../gen/models';
 import {
   ActivityReactionAddedPayload,
-  ActivityReactionDeletedPayload, CommentAddedPayload, CommentDeletedPayload,
+  ActivityReactionDeletedPayload,
+  ActivityUpdatedPayload,
+  CommentAddedPayload,
+  CommentDeletedPayload,
   CommentReactionAddedPayload,
-  CommentReactionDeletedPayload, CommentUpdatedPayload,
+  CommentReactionDeletedPayload,
+  CommentUpdatedPayload,
 } from '../feed';
 import { ensureExhausted } from './ensure-exhausted';
 
 export type StateUpdateQueuePrefix =
+  | 'activity-updated'
   | 'activity-reaction-created'
   | 'activity-reaction-deleted'
   | 'comment-reaction-created'
@@ -22,6 +27,7 @@ export type StateUpdateQueuePrefix =
   | 'comment-updated';
 
 type StateUpdateQueuePayloadByPrefix = {
+  'activity-updated': ActivityUpdatedPayload;
   'activity-reaction-created': ActivityReactionAddedPayload;
   'activity-reaction-deleted': ActivityReactionDeletedPayload;
   'comment-reaction-created': CommentReactionAddedPayload;
@@ -150,15 +156,11 @@ export function getStateUpdateQueueId(
   ...args: StateUpdateQueuePairTuples
 ) {
   const [data, prefix] = args;
-  const toJoin = prefix ? [prefix as string] : [];
+  const toJoin = [prefix as string];
 
   switch (prefix) {
-    case 'follow-created':
-    case 'follow-deleted':
-    case 'follow-updated': {
-      return toJoin
-        .concat([data.source_feed.feed, data.target_feed.feed])
-        .join('-');
+    case 'activity-updated': {
+      return toJoin.concat([data.activity.id]).join('-')
     }
     case 'activity-reaction-created':
     case 'activity-reaction-deleted': {
@@ -171,17 +173,24 @@ export function getStateUpdateQueueId(
     }
     case 'comment-reaction-created':
     case 'comment-reaction-deleted': {
-     return toJoin
-       .concat([
-         data.comment.id,
-         data.reaction.type,
-       ])
-       .join('-');
+      return toJoin
+        .concat([
+          data.comment.id,
+          data.reaction.type,
+        ])
+        .join('-');
     }
     case 'comment-created':
     case 'comment-deleted':
     case 'comment-updated': {
       return toJoin.concat([data.comment.id]).join('-')
+    }
+    case 'follow-created':
+    case 'follow-deleted':
+    case 'follow-updated': {
+      return toJoin
+        .concat([data.source_feed.feed, data.target_feed.feed])
+        .join('-');
     }
     default: {
       ensureExhausted(data, 'Encountered unknown state update queue prefix.')

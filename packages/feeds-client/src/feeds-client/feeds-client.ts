@@ -18,7 +18,7 @@ import {
   PollResponse,
   PollVotesResponse,
   QueryFeedsRequest,
-  QueryPollVotesRequest,
+  QueryPollVotesRequest, UpdateActivityRequest, UpdateActivityResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
   UpdateFollowRequest,
@@ -48,7 +48,7 @@ import { StreamPoll } from '../common/Poll';
 import {
   Feed,
   handleActivityReactionAdded,
-  handleActivityReactionDeleted,
+  handleActivityReactionDeleted, handleActivityUpdated,
   handleCommentAdded,
   handleCommentDeleted,
   handleCommentReactionAdded,
@@ -345,6 +345,18 @@ export class FeedsClient extends FeedsApi {
     });
   };
 
+  updateActivity = async (
+    request: UpdateActivityRequest & {
+      id: string;
+    },
+  ): Promise<StreamResponse<UpdateActivityResponse>> => {
+    const response = await super.updateActivity(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleActivityUpdated.bind(feed)(response, false);
+    }
+    return response;
+  }
+
   addComment = async (
     request: AddCommentRequest,
   ): Promise<StreamResponse<AddCommentResponse>> => {
@@ -403,10 +415,10 @@ export class FeedsClient extends FeedsApi {
           comment,
           replyCountUpdater: (prevCount) => prevCount - 1,
           /*
-          *  FIXME: This is incorrect and will work only for comments down to depth <= 2.
-          *         The comment_count needs to come server-side, as we have no reliable way
-          *         of knowing how many replies the comment subtree has.
-          */
+           *  FIXME: This is incorrect and will work only for comments down to depth <= 2.
+           *         The comment_count needs to come server-side, as we have no reliable way
+           *         of knowing how many replies the comment subtree has.
+           */
           commentCountUpdater: (prevCount) =>
             prevCount - comment.reply_count - 1,
         });
@@ -448,16 +460,16 @@ export class FeedsClient extends FeedsApi {
     return response;
   };
 
-  async deleteCommentReaction(request: {
+  deleteCommentReaction = async (request: {
     id: string;
     type: string;
-  }): Promise<StreamResponse<DeleteCommentReactionResponse>> {
+  }): Promise<StreamResponse<DeleteCommentReactionResponse>> => {
     const response = await super.deleteCommentReaction(request);
     for (const feed of Object.values(this.activeFeeds)) {
       handleCommentReactionDeleted.bind(feed)(response, false);
     }
     return response;
-  }
+  };
 
   queryPollAnswers = async (
     request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
