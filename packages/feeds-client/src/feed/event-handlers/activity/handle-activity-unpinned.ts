@@ -1,5 +1,5 @@
-import { EventPayload } from '../../../types-internal';
-import { Feed, FeedState } from '../../feed';
+import type { EventPayload } from '../../../types-internal';
+import type { Feed, FeedState } from '../../feed';
 
 export function handleActivityUnpinned(
   this: Feed,

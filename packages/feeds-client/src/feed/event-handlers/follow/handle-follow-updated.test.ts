@@ -8,7 +8,7 @@ import {
   getHumanId,
   generateOwnUser,
 } from '../../../test-utils/response-generators';
-import { FollowResponse } from '../../../gen/models';
+import type { FollowResponse } from '../../../gen/models';
 
 describe(handleFollowUpdated.name, () => {
   let feed: Feed;

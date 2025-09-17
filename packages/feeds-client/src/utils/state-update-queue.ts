@@ -1,5 +1,5 @@
 import { isFollowResponse, isReactionResponse } from './type-assertions';
-import { AddCommentReactionResponse, AddReactionResponse } from '../gen/models';
+import type { AddCommentReactionResponse, AddReactionResponse } from '../gen/models';
 
 /**
  * Decide whether to apply a state update that may arrive twice (HTTP + WS)

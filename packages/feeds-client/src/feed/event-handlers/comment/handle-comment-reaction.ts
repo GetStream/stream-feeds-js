@@ -1,6 +1,6 @@
-import { Feed } from '../../../feed';
-import { CommentResponse } from '../../../gen/models';
-import { EventPayload } from '../../../types-internal';
+import type { Feed } from '../../../feed';
+import type { CommentResponse } from '../../../gen/models';
+import type { EventPayload } from '../../../types-internal';
 
 export function handleCommentReaction(
   this: Feed,

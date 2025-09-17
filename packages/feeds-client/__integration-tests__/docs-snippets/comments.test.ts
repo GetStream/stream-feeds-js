@@ -4,9 +4,9 @@ import {
   createTestTokenGenerator,
   getTestUser,
 } from '../utils';
-import { FeedsClient } from '../../src/feeds-client';
-import { Feed } from '../../src/feed';
-import {
+import type { FeedsClient } from '../../src/feeds-client';
+import type { Feed } from '../../src/feed';
+import type {
   ActivityResponse,
   CommentResponse,
   UserRequest,

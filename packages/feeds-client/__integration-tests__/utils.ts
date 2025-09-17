@@ -1,9 +1,9 @@
 import { FeedsClient } from '../src/feeds-client';
-import { Feed } from '../src/feed';
-import { UserRequest } from '../src/gen/models';
-import { FeedsClientOptions } from '../src/common/types';
-import { WSEvent } from '../src/gen/models';
-import { FeedsEvent } from '../src/types';
+import type { Feed } from '../src/feed';
+import type { UserRequest } from '../src/gen/models';
+import type { FeedsClientOptions } from '../src/common/types';
+import type { WSEvent } from '../src/gen/models';
+import type { FeedsEvent } from '../src/types';
 import { StreamClient } from '@stream-io/node-sdk';
 import { randomId } from '../src/common/utils';
 

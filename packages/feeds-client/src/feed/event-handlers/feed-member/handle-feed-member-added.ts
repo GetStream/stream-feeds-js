@@ -1,5 +1,5 @@
-import { Feed, FeedState } from '../../../feed';
-import { EventPayload } from '../../../types-internal';
+import type { Feed, FeedState } from '../../../feed';
+import type { EventPayload } from '../../../types-internal';
 
 export function handleFeedMemberAdded(
   this: Feed,

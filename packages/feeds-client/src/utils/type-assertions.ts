@@ -1,13 +1,13 @@
-import {
+import type {
   AddCommentReactionResponse,
   AddReactionResponse,
   CommentResponse,
   DeleteCommentReactionResponse,
   FollowResponse,
 } from '../gen/models';
-import { StreamFile } from '../types';
-import { CommentParent } from '../types';
-import { DeleteReactionResponse } from '@stream-io/node-sdk';
+import type { StreamFile } from '../types';
+import type { CommentParent } from '../types';
+import type { DeleteReactionResponse } from '@stream-io/node-sdk';
 
 export const isFollowResponse = (data: object): data is FollowResponse => {
   return 'source_feed' in data && 'target_feed' in data;

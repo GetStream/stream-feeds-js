@@ -8,9 +8,9 @@ import {
   waitForEvent,
 } from './utils';
 
-import { UserRequest } from '../src/gen/models';
-import { FeedsClient } from '../src/feeds-client';
-import { Feed } from '../src/feed';
+import type { UserRequest } from '../src/gen/models';
+import type { FeedsClient } from '../src/feeds-client';
+import type { Feed } from '../src/feed';
 
 describe.skip('Notification Feed Test Setup', () => {
   let client1: FeedsClient;

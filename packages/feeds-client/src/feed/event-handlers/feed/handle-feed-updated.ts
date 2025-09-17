@@ -1,5 +1,5 @@
-import { Feed } from '../../../feed';
-import { EventPayload, PartializeAllBut } from '../../../types-internal';
+import type { Feed } from '../../../feed';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 
 export function handleFeedUpdated(
   this: Feed,

@@ -13,7 +13,7 @@ import {
   generateActivityReactionDeletedEvent,
 } from '../../../test-utils';
 import { shouldUpdateState } from '../../../utils';
-import { EventPayload } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 
 describe(handleActivityReactionDeleted.name, () => {
   let feed: Feed;

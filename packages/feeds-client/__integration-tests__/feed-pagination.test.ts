@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { FeedsClient } from '../src/feeds-client';
+import type { FeedsClient } from '../src/feeds-client';
 import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
 } from './utils';
-import { UserRequest, AddActivityResponse } from '../src/gen/models';
-import { StreamResponse } from '../src/gen-imports';
+import type { UserRequest, AddActivityResponse } from '../src/gen/models';
+import type { StreamResponse } from '../src/gen-imports';
 
 describe('Feed Pagination Integration Tests', () => {
   let client: FeedsClient;

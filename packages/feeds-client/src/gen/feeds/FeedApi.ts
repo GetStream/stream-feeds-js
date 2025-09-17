@@ -1,5 +1,5 @@
-import { StreamResponse, FeedsApi } from '../../gen-imports';
-import {
+import type { StreamResponse, FeedsApi } from '../../gen-imports';
+import type {
   AcceptFeedMemberInviteRequest,
   AcceptFeedMemberInviteResponse,
   DeleteFeedResponse,
