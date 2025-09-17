@@ -5699,7 +5699,7 @@ __metadata:
   resolution: "@stream-io/feeds-client@workspace:packages/feeds-client"
   dependencies:
     "@stream-io/node-sdk": 0.6.0
-    "@stream-io/state-store": ^1.0.0
+    "@stream-io/state-store": ^1.1.4
     "@types/react": ^19.1.8
     "@vitest/coverage-v8": 3.2.4
     axios: ^1.7.7
@@ -5837,15 +5837,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stream-io/state-store@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@stream-io/state-store@npm:1.0.0"
+"@stream-io/state-store@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "@stream-io/state-store@npm:1.1.4"
+  dependencies:
+    use-sync-external-store: ^1.5.0
   peerDependencies:
-    react: ^18 || ^19
+    react: ^17 || ^18 || ^19
   peerDependenciesMeta:
     react:
       optional: true
-  checksum: bbde5a93ab8391fd19221dc33d660cb16b1322ea37602c96b99883bd5392038b105c0d45dd9f104497ec120278789e36f9c07c2e1e6f8df278b800f1051ae41b
+  checksum: dfd0701ba488f2a36e953c59f0c1ce1d13336bb751e89a9baf35ca3603fa6fb37ff6b2b4e03373f6a513917cdc67c8f739ff45d673ce33dda3ffa914390d500b
   languageName: node
   linkType: hard
 
