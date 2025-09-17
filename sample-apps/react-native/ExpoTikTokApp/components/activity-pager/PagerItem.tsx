@@ -32,10 +32,9 @@ const UnmemoizedPagerItem = ({
   const feed = useFeedContext();
   const router = useRouter();
 
-  const insets = useSafeAreaInsets();
   const overlayStyle = useMemo(
-    () => ({ bottom: (Platform.OS === 'android' ? insets.bottom : 0) + 60 }),
-    [insets.bottom],
+    () => ({ bottom: 50 }),
+    [],
   );
 
   const videoAttachment = useMemo(

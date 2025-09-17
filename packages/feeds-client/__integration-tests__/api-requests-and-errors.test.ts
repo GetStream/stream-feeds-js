@@ -32,7 +32,7 @@ describe('API requests and error handling', () => {
     expect(typeof headers.Authorization).toBe('string');
     expect(headers['stream-auth-type']).toBe('jwt');
     expect(typeof headers['x-client-request-id']).toBe('string');
-    expect(headers['X-Stream-Client']).toBe('stream-feeds-js-');
+    expect(headers['X-Stream-Client']).toMatch(/stream-feeds-js-(v\d+\.\d+\.\d+)/);
   });
 
   it('should return response body', async () => {

@@ -18,7 +18,7 @@ import {
   WSEvent,
 } from '../gen/models';
 import { FeedsEvent, StreamFile, TokenOrProvider } from '../types';
-import { StateStore } from '../common/StateStore';
+import { StateStore } from '@stream-io/state-store';
 import { TokenManager } from '../common/TokenManager';
 import { ConnectionIdManager } from '../common/ConnectionIdManager';
 import { StableWSConnection } from '../common/real-time/StableWSConnection';
@@ -53,6 +53,7 @@ import {
   SyncFailure,
   UnhandledErrorType,
 } from '../common/real-time/event-models';
+import { configureLoggers } from '../utils/logger';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -97,6 +98,9 @@ export class FeedsClient extends FeedsApi {
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
+
+    configureLoggers(options?.configure_loggers_options);
+
     this.on('all', (event) => {
       const fid = event.fid;
 

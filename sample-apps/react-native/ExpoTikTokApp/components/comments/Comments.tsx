@@ -51,6 +51,7 @@ export const Comments = ({ activity }: { activity: ActivityResponse }) => {
       renderItem={renderItem}
       onEndReached={loadNext}
       onEndReachedThreshold={0.2}
+      removeClippedSubviews={false}
       maintainVisibleContentPosition={maintainVisibleContentPosition}
     />
   );

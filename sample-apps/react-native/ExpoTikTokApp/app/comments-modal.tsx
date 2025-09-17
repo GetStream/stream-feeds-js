@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
+import {
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { Comments, CommentsInput } from '@/components/comments';
 import { useLocalSearchParams } from 'expo-router';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
@@ -11,16 +13,17 @@ import {
 
 const CommentsModalUI = ({ activityId }: { activityId: string }) => {
   const { activities } = useFeedActivities();
+  const { bottom } = useSafeAreaInsets();
   const activity = useMemo(
     () => (activities ?? []).find((a) => a.id === activityId),
     [activities, activityId],
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingBottom: bottom }]}>
         {activity ? <Comments activity={activity} /> : null}
         <CommentsInput activityId={activityId} />
-    </SafeAreaView>
+    </View>
   );
 };
 
