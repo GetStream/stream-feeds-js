@@ -337,7 +337,7 @@ describe(handleCommentReactionDeleted.name, () => {
 
       expect((feed as any).stateUpdateQueue).toEqual(new Set());
       expect(comment?.own_reactions.length).toEqual(1);
-      expect(latestReaction).toMatchObject(existingReaction);
+      expect(latestReaction).toBe(existingReaction);
     });
   });
 });

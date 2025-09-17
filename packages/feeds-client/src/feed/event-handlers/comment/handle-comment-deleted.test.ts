@@ -211,7 +211,7 @@ describe(handleCommentDeleted.name, () => {
       const [latestComment] = (comments ?? []).toReversed();
 
       expect(comments?.length).toEqual(1);
-      expect(latestComment).toMatchObject(existingComment);
+      expect(latestComment).toBe(existingComment);
     });
 
     it('allows update again from HTTP response after clearing the stateUpdateQueue', () => {
@@ -228,7 +228,7 @@ describe(handleCommentDeleted.name, () => {
       const [latestComment] = (comments ?? []).toReversed();
 
       expect(comments?.length).toEqual(1);
-      expect(latestComment).toMatchObject(existingComment);
+      expect(latestComment).toBe(existingComment);
     });
 
     it('should not insert anything into the stateUpdateQueue if the connected_user did not trigger the comment reaction deletion', () => {
@@ -249,7 +249,7 @@ describe(handleCommentDeleted.name, () => {
 
       expect((feed as any).stateUpdateQueue).toEqual(new Set());
       expect(comments?.length).toEqual(1);
-      expect(latestComment).toMatchObject(existingComment);
+      expect(latestComment).toBe(existingComment);
     });
   });
 });
