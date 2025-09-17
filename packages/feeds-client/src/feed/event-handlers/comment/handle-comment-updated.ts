@@ -5,7 +5,7 @@ import {
   eventTriggeredByConnectedUser
 } from '../../../utils/event-triggered-by-connected-user';
 
-type CommentUpdatedPayload = PartializeAllBut<
+export type CommentUpdatedPayload = PartializeAllBut<
   EventPayload<'feeds.comment.updated'>,
   'comment'
 >;
@@ -21,7 +21,7 @@ export function handleCommentUpdated(
   if (
     !shouldUpdateState({
       stateUpdateQueueId: getStateUpdateQueueId(
-        comment,
+        payload,
         'comment-updated',
       ),
       stateUpdateQueue: this.stateUpdateQueue,

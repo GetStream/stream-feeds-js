@@ -3,7 +3,7 @@ import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
 
-type CommentAddedPayload = PartializeAllBut<
+export type CommentAddedPayload = PartializeAllBut<
   EventPayload<'feeds.comment.added'>,
   'comment'
 >;
@@ -18,7 +18,7 @@ export function handleCommentAdded(
 
   if (
     !shouldUpdateState({
-      stateUpdateQueueId: getStateUpdateQueueId(comment, 'comment-added'),
+      stateUpdateQueueId: getStateUpdateQueueId(payload, 'comment-created'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
       fromWs,

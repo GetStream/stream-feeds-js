@@ -5,7 +5,7 @@ import {
   eventTriggeredByConnectedUser
 } from '../../../utils/event-triggered-by-connected-user';
 
-type CommentDeletedPayload = PartializeAllBut<
+export type CommentDeletedPayload = PartializeAllBut<
   EventPayload<'feeds.comment.deleted'>,
   'comment'
 >;
@@ -21,7 +21,7 @@ export function handleCommentDeleted(
   if (
     !shouldUpdateState({
       stateUpdateQueueId: getStateUpdateQueueId(
-        comment,
+        payload,
         'comment-deleted',
       ),
       stateUpdateQueue: this.stateUpdateQueue,

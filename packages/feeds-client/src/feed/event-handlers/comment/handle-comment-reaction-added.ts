@@ -2,7 +2,7 @@ import { Feed } from '../../feed';
 import { EventPayload, type PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 
-type CommentReactionAddedPayload = PartializeAllBut<
+export type CommentReactionAddedPayload = PartializeAllBut<
   EventPayload<'feeds.comment.reaction.added'>,
   'comment' | 'reaction'
 >;

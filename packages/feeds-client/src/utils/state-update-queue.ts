@@ -1,9 +1,43 @@
 import {
-  isCommentResponse,
-  isFollowResponse,
-  isReactionResponse,
-} from './type-assertions';
-import { AddCommentReactionResponse, AddReactionResponse } from '../gen/models';
+  FollowResponse,
+} from '../gen/models';
+import {
+  ActivityReactionAddedPayload,
+  ActivityReactionDeletedPayload, CommentAddedPayload, CommentDeletedPayload,
+  CommentReactionAddedPayload,
+  CommentReactionDeletedPayload, CommentUpdatedPayload,
+} from '../feed';
+import { ensureExhausted } from './ensure-exshausted';
+
+export type StateUpdateQueuePrefix =
+  | 'activity-reaction-created'
+  | 'activity-reaction-deleted'
+  | 'comment-reaction-created'
+  | 'comment-reaction-deleted'
+  | 'follow-created'
+  | 'follow-deleted'
+  | 'follow-updated'
+  | 'comment-created'
+  | 'comment-deleted'
+  | 'comment-updated';
+
+type StateUpdateQueuePayloadByPrefix = {
+  'activity-reaction-created': ActivityReactionAddedPayload;
+  'activity-reaction-deleted': ActivityReactionDeletedPayload;
+  'comment-reaction-created': CommentReactionAddedPayload;
+  'comment-reaction-deleted': CommentReactionDeletedPayload;
+  'follow-created': FollowResponse;
+  'follow-deleted': FollowResponse;
+  'follow-updated': FollowResponse;
+  'comment-created': CommentAddedPayload;
+  'comment-deleted': CommentDeletedPayload;
+  'comment-updated': CommentUpdatedPayload;
+};
+
+// Union of ([payload, prefix]) tuples:
+export type StateUpdateQueuePairTuples = {
+  [K in StateUpdateQueuePrefix]: [StateUpdateQueuePayloadByPrefix[K], K];
+}[StateUpdateQueuePrefix];
 
 /**
  * Decide whether to apply a state update that may arrive twice (HTTP + WS)
@@ -86,13 +120,13 @@ export const shouldUpdateState = ({
   fromWs = true,
   isTriggeredByConnectedUser = false,
 }: {
-  stateUpdateQueueId: string;
+  stateUpdateQueueId?: string;
   stateUpdateQueue: Set<string>;
   watch: boolean;
   fromWs?: boolean;
   isTriggeredByConnectedUser: boolean;
 }): boolean => {
-  if (!watch || !isTriggeredByConnectedUser) {
+  if (!watch || !isTriggeredByConnectedUser || !stateUpdateQueueId) {
     return true;
   }
 
@@ -113,29 +147,44 @@ export const shouldUpdateState = ({
 };
 
 export function getStateUpdateQueueId(
-  data: object,
-  prefix?: 'deleted' | 'updated' | 'created' | (string & {}),
+  ...args: StateUpdateQueuePairTuples
 ) {
-  const toJoin = prefix ? [prefix] : [];
-  if (isFollowResponse(data)) {
-    return toJoin
-      .concat([data.source_feed.feed, data.target_feed.feed])
-      .join('-');
-  } else if (isCommentResponse(data)) {
-    return toJoin.concat([data.id]).join('-')
-  } else if (isReactionResponse(data)) {
-    return toJoin
-      .concat([
-        (data as AddReactionResponse)?.activity?.id ??
-          (data as AddCommentReactionResponse)?.comment?.id,
-        data.reaction.type,
-      ])
-      .join('-');
-  }
-  // else if (isMemberResponse(data)) {
-  // }
+  const [data, prefix] = args;
+  const toJoin = prefix ? [prefix as string] : [];
 
-  throw new Error(
-    `Cannot create state update queueId for data: ${JSON.stringify(data)}`,
-  );
+  switch (prefix) {
+    case 'follow-created':
+    case 'follow-deleted':
+    case 'follow-updated': {
+      return toJoin
+        .concat([data.source_feed.feed, data.target_feed.feed])
+        .join('-');
+    }
+    case 'activity-reaction-created':
+    case 'activity-reaction-deleted': {
+      return toJoin
+        .concat([
+          data.activity.id,
+          data.reaction.type,
+        ])
+        .join('-');
+    }
+    case 'comment-reaction-created':
+    case 'comment-reaction-deleted': {
+     return toJoin
+       .concat([
+         data.comment.id,
+         data.reaction.type,
+       ])
+       .join('-');
+    }
+    case 'comment-created':
+    case 'comment-deleted':
+    case 'comment-updated': {
+      return toJoin.concat([data.comment.id]).join('-')
+    }
+    default: {
+      ensureExhausted(data, 'Encountered unknown state update queue prefix.')
+    }
+  }
 }

@@ -10,7 +10,7 @@ import {
   updateEntityInArray,
 } from '../../../utils';
 
-type AddActivityReactionPayload = PartializeAllBut<EventPayload<'feeds.activity.reaction.added'>, 'activity' | 'reaction'>;
+export type ActivityReactionAddedPayload = PartializeAllBut<EventPayload<'feeds.activity.reaction.added'>, 'activity' | 'reaction'>;
 
 // shared function to update the activity with the new reaction
 const sharedUpdateActivity = ({
@@ -18,7 +18,7 @@ const sharedUpdateActivity = ({
   currentActivity,
   eventBelongsToCurrentUser,
 }: {
-  payload: AddActivityReactionPayload;
+  payload: ActivityReactionAddedPayload;
   currentActivity: ActivityResponse;
   eventBelongsToCurrentUser: boolean;
 }) => {
@@ -39,7 +39,7 @@ const sharedUpdateActivity = ({
 };
 
 export const addReactionToActivities = (
-  payload: AddActivityReactionPayload,
+  payload: ActivityReactionAddedPayload,
   activities: ActivityResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
 ) =>
@@ -55,7 +55,7 @@ export const addReactionToActivities = (
   });
 
 export const addReactionToPinnedActivities = (
-  payload: AddActivityReactionPayload,
+  payload: ActivityReactionAddedPayload,
   pinnedActivities: ActivityPinResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
 ) =>
@@ -84,7 +84,7 @@ export const addReactionToPinnedActivities = (
 
 export function handleActivityReactionAdded(
   this: Feed,
-  payload: AddActivityReactionPayload,
+  payload: ActivityReactionAddedPayload,
   fromWs?: boolean,
 ) {
   const connectedUser = this.client.state.getLatestValue().connected_user;
