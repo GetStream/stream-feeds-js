@@ -18,7 +18,7 @@ import {
   WSEvent,
 } from '../gen/models';
 import { FeedsEvent, StreamFile, TokenOrProvider } from '../types';
-import { StateStore } from '../common/StateStore';
+import { StateStore } from '@stream-io/state-store';
 import { TokenManager } from '../common/TokenManager';
 import { ConnectionIdManager } from '../common/ConnectionIdManager';
 import { StableWSConnection } from '../common/real-time/StableWSConnection';

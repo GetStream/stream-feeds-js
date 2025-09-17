@@ -1,4 +1,4 @@
-import { StateStore } from '../StateStore';
+import { StateStore } from '@stream-io/state-store';
 import { debounce, type DebouncedFunc } from '../utils';
 import type {
   QueryReturnValue,
@@ -10,7 +10,9 @@ import type {
 export type DebounceOptions = {
   debounceMs: number;
 };
-type DebouncedExecQueryFunction = DebouncedFunc<(searchString?: string) => Promise<void>>;
+type DebouncedExecQueryFunction = DebouncedFunc<
+  (searchString?: string) => Promise<void>
+>;
 
 interface ISearchSource<T = any> {
   activate(): void;
@@ -64,7 +66,10 @@ abstract class BaseSearchSourceBase<T> implements ISearchSource<T> {
   abstract readonly type: SearchSourceType;
 
   protected constructor(options?: SearchSourceOptions) {
-    const { pageSize, allowEmptySearchString, resetOnNewSearchQuery } = { ...DEFAULT_SEARCH_SOURCE_OPTIONS, ...options };
+    const { pageSize, allowEmptySearchString, resetOnNewSearchQuery } = {
+      ...DEFAULT_SEARCH_SOURCE_OPTIONS,
+      ...options,
+    };
     this.pageSize = pageSize;
     this.allowEmptySearchString = allowEmptySearchString;
     this.resetOnNewSearchQuery = resetOnNewSearchQuery;
@@ -141,7 +146,9 @@ abstract class BaseSearchSourceBase<T> implements ISearchSource<T> {
     );
   };
 
-  protected getStateBeforeFirstQuery(newSearchString: string): SearchSourceState<T> {
+  protected getStateBeforeFirstQuery(
+    newSearchString: string,
+  ): SearchSourceState<T> {
     const initialState = this.initialState;
     const oldItems = this.items;
 

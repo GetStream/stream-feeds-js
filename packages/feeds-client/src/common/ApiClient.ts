@@ -9,11 +9,24 @@ import { getRateLimitFromResponseHeader } from './rate-limit';
 import { KnownCodes, randomId } from './utils';
 import { TokenManager } from './TokenManager';
 import { ConnectionIdManager } from './ConnectionIdManager';
+// this gets replaced during the build process (var version = 'x.y.z';)
+import { version } from '../../package.json';
+
+type RequiredAtLeastOne<T> = {
+  [K in keyof T]: Required<Pick<T, K>> & Partial<Omit<T, K>>;
+}[keyof T];
+
+// Information that can be set to be sent as part of the header of each request
+export type ExtraHeaderInformation = Partial<{
+  sdkIdentifier: { name: string; version: string };
+  deviceIdentifier: RequiredAtLeastOne<{ os: string; model: string }>;
+}>;
 
 export class ApiClient {
   public readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
   private timeout: number;
+  public extraHeaderInformation: ExtraHeaderInformation = {};
 
   constructor(
     public readonly apiKey: string,
@@ -153,11 +166,41 @@ export class ApiClient {
     return `${wsBaseURL}/api/v2/connect?${params.toString()}`;
   }
 
+  public generateStreamClientHeader() {
+    // TODO: figure out a way to inject this during the build process
+    const clientBundle = import.meta.env.VITE_CLIENT_BUNDLE;
+
+    let userAgentString = '';
+    if (this.extraHeaderInformation.sdkIdentifier) {
+      userAgentString = `stream-feeds-${this.extraHeaderInformation.sdkIdentifier.name}-v${this.extraHeaderInformation.sdkIdentifier.version}-llc-v${version}`;
+    } else {
+      userAgentString = `stream-feeds-js-v${version}`;
+    }
+
+    const { os, model } = this.extraHeaderInformation.deviceIdentifier ?? {};
+
+    return (
+      [
+        // reports the device OS, if provided
+        ['os', os],
+        // reports the device model, if provided
+        ['device_model', model],
+        // reports which bundle is being picked from the exports
+        ['client_bundle', clientBundle],
+      ] as const
+    ).reduce(
+      (withArguments, [key, value]) =>
+        value && value.length > 0
+          ? withArguments.concat(`|${key}=${value}`)
+          : withArguments,
+      userAgentString,
+    );
+  }
+
   private get commonHeaders(): Record<string, string> {
     return {
       'stream-auth-type': 'jwt',
-      // TODO: add version here
-      'X-Stream-Client': 'stream-feeds-js-',
+      'X-Stream-Client': this.generateStreamClientHeader(),
     };
   }
 

@@ -4,12 +4,13 @@ import tsEsLint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import importPlugin from 'eslint-plugin-import';
-import unusedImports from 'eslint-plugin-unused-imports';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
-  { ignores: ['**/node_modules/**', '**/build/**', '**/dist/**'] },
+  {
+    ignores: ['**/node_modules/**', '**/build/**', '**/dist/**'],
+  },
   { languageOptions: { globals: globals.node } },
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
@@ -19,7 +20,6 @@ export default [
     plugins: {
       import: importPlugin,
       'react-hooks': reactHooksPlugin,
-      'unused-imports': unusedImports,
     },
     settings: {
       react: { version: 'detect' },
@@ -28,7 +28,6 @@ export default [
   {
     rules: {
       'dot-notation': 'error',
-      'unused-imports/no-unused-imports': 'error',
       'no-async-promise-executor': 'off',
       'no-empty-pattern': 'off',
       'no-empty': 'off',

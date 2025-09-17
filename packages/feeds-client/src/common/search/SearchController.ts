@@ -1,4 +1,4 @@
-import { StateStore } from '../StateStore';
+import { StateStore } from '@stream-io/state-store';
 import type { SearchSource } from './BaseSearchSource';
 
 export type SearchControllerState = {
@@ -114,7 +114,9 @@ export class SearchController {
     this.state.partialNext({
       searchQuery,
     });
-    await Promise.all(searchedSources.map((source) => source.search(searchQuery)));
+    await Promise.all(
+      searchedSources.map((source) => source.search(searchQuery)),
+    );
   };
 
   cancelSearchQueries = () => {
