@@ -18,7 +18,9 @@ import {
   PollResponse,
   PollVotesResponse,
   QueryFeedsRequest,
-  QueryPollVotesRequest, UpdateActivityRequest, UpdateActivityResponse,
+  QueryPollVotesRequest,
+  UpdateActivityRequest,
+  UpdateActivityResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
   UpdateFollowRequest,
@@ -48,7 +50,8 @@ import { StreamPoll } from '../common/Poll';
 import {
   Feed,
   handleActivityReactionAdded,
-  handleActivityReactionDeleted, handleActivityUpdated,
+  handleActivityReactionDeleted,
+  handleActivityUpdated,
   handleCommentAdded,
   handleCommentDeleted,
   handleCommentReactionAdded,
@@ -355,7 +358,7 @@ export class FeedsClient extends FeedsApi {
       handleActivityUpdated.bind(feed)(response, false);
     }
     return response;
-  }
+  };
 
   addComment = async (
     request: AddCommentRequest,
@@ -364,11 +367,22 @@ export class FeedsClient extends FeedsApi {
     const { comment } = response;
     for (const feed of Object.values(this.activeFeeds)) {
       handleCommentAdded.bind(feed)(response, false);
-      updateCommentCount.bind(feed)({
-        comment,
-        replyCountUpdater: (prevCount) => prevCount + 1,
-        commentCountUpdater: (prevCount) => prevCount + 1,
-      });
+      const parentActivityId = comment.object_id;
+      if (feed.hasActivity(parentActivityId)) {
+        const activityToUpdate = feed.currentState.activities?.find(
+          (activity) => activity.id === parentActivityId,
+        );
+        if (activityToUpdate) {
+          updateCommentCount.bind(feed)({
+            activity: {
+              ...activityToUpdate,
+              comment_count: activityToUpdate.comment_count + 1,
+            },
+            comment,
+            replyCountUpdater: (prevCount) => prevCount + 1,
+          });
+        }
+      }
     }
     return response;
   };
@@ -388,41 +402,14 @@ export class FeedsClient extends FeedsApi {
     hard_delete?: boolean;
   }): Promise<StreamResponse<DeleteCommentResponse>> => {
     const response = await super.deleteComment(request);
+    const { activity, comment } = response;
     for (const feed of Object.values(this.activeFeeds)) {
-      /*
-       * TODO: The handling below is a workaround to make HTTP response state updates work until
-       *  https://linear.app/stream/issue/FEEDS-757/consider-returning-deleted-comment-in-deletecomment-api-response
-       *  is implemented on the backend. It will be much more performant then.
-       *  */
-      let comment;
-      for (const entry of Object.values(
-        feed.currentState.comments_by_entity_id,
-      )) {
-        const comments = entry?.comments;
-        if (!comments?.length) continue;
-
-        for (let i = 0; i < comments.length; i++) {
-          const c = comments[i];
-          if (c?.id === request.id) {
-            comment = c;
-            break;
-          }
-        }
-      }
-      if (comment) {
-        handleCommentDeleted.bind(feed)({ comment }, false);
-        updateCommentCount.bind(feed)({
-          comment,
-          replyCountUpdater: (prevCount) => prevCount - 1,
-          /*
-           *  FIXME: This is incorrect and will work only for comments down to depth <= 2.
-           *         The comment_count needs to come server-side, as we have no reliable way
-           *         of knowing how many replies the comment subtree has.
-           */
-          commentCountUpdater: (prevCount) =>
-            prevCount - comment.reply_count - 1,
-        });
-      }
+      handleCommentDeleted.bind(feed)({ comment }, false);
+      updateCommentCount.bind(feed)({
+        activity,
+        comment,
+        replyCountUpdater: (prevCount) => prevCount - 1,
+      });
     }
     return response;
   };

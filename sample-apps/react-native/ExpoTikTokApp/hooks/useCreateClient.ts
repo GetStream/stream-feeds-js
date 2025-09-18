@@ -18,7 +18,9 @@ const tokenProviderFactory = (userId: string) => async () => {
   return data.token;
 };
 
-const CLIENT_OPTIONS = {};
+const CLIENT_OPTIONS = {
+  configure_loggers_options: { default: { level: 'debug' } },
+};
 
 export const useCreateClient = (user: LocalUser) => {
   const tokenProvider = useCallback(() => {

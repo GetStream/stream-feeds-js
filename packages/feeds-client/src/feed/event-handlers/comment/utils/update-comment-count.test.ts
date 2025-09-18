@@ -101,9 +101,9 @@ describe('updateCommentCount', () => {
     });
 
     updateCommentCount({
+      activity: { ...existingActivity, comment_count: 11 },
       comment: incomingReply,
-      replyCountUpdater: (prev) => prev + 1,
-      commentCountUpdater: (prev) => prev + 10,
+      replyCountUpdater: (prev: number) => prev + 1,
     });
 
     expect(handleCommentUpdated).toHaveBeenCalledTimes(1);
@@ -149,9 +149,9 @@ describe('updateCommentCount', () => {
     });
 
     updateCommentCount({
+      activity: { ...existingActivity, comment_count: 1 },
       comment: incomingReply,
-      replyCountUpdater: (prev) => prev - 2,
-      commentCountUpdater: (prev) => prev + 1,
+      replyCountUpdater: (prev: number) => prev - 2,
     });
 
     expect(handleCommentUpdated).toHaveBeenCalledTimes(1);
@@ -188,9 +188,9 @@ describe('updateCommentCount', () => {
     });
 
     updateCommentCount({
+      activity: { ...existingActivity, comment_count: 1 },
       comment: incomingReplyToC2,
-      replyCountUpdater: (prev) => prev + 5,
-      commentCountUpdater: (prev) => prev,
+      replyCountUpdater: (prev: number) => prev + 5,
     });
 
     expect(handleCommentUpdated).toHaveBeenCalledTimes(1);
@@ -220,9 +220,9 @@ describe('updateCommentCount', () => {
     });
 
     updateCommentCount({
+      activity: { ...existingActivity, comment_count: 5 },
       comment: incomingReply,
-      replyCountUpdater: (prev) => prev + 1,
-      commentCountUpdater: (prev) => prev + 1,
+      replyCountUpdater: (prev: number) => prev + 1,
     });
 
     expect(handleCommentUpdated).not.toHaveBeenCalled();
@@ -248,9 +248,9 @@ describe('updateCommentCount', () => {
     });
 
     updateCommentCount({
+      activity: { ...existingActivity, comment_count: 3 },
       comment: topLevel,
-      replyCountUpdater: (prev) => prev + 100,
-      commentCountUpdater: (prev) => prev + 2,
+      replyCountUpdater: (prev: number) => prev + 100,
     });
 
     expect(handleCommentUpdated).not.toHaveBeenCalled();
@@ -262,7 +262,7 @@ describe('updateCommentCount', () => {
 
   it('no-ops any update if neither activity nor comment are found', () => {
     feed.state.partialNext({
-      activities: [{ id: 'other', comment_count: 1 } as ActivityResponse],
+      activities: [{ id: 'other-1', comment_count: 1 } as ActivityResponse, { id: 'other-2', comment_count: 3 } as ActivityResponse],
       comments_by_entity_id: {},
     });
 
@@ -273,9 +273,9 @@ describe('updateCommentCount', () => {
     });
 
     updateCommentCount({
+      activity: { ...existingActivity, comment_count: 3 },
       comment: topLevel,
-      replyCountUpdater: (prev) => prev + 1,
-      commentCountUpdater: (prev) => prev + 1,
+      replyCountUpdater: (prev: number) => prev + 1,
     });
 
     expect(handleActivityUpdated).not.toHaveBeenCalled();
@@ -302,9 +302,9 @@ describe('updateCommentCount', () => {
     });
 
     updateCommentCount({
+      activity: { ...existingActivity, comment_count: 97 },
       comment: incomingReply,
-      replyCountUpdater: (prev) => prev + 2,
-      commentCountUpdater: (prev) => prev - 3,
+      replyCountUpdater: (prev: number) => prev + 2,
     });
 
     expect(handleCommentUpdated).toHaveBeenCalledTimes(1);

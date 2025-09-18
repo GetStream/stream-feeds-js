@@ -1,4 +1,4 @@
-import { Feed } from '@self';
+import { ActivityResponse, Feed } from '@self';
 import { CommentResponse } from '@self';
 import { handleCommentUpdated } from '../handle-comment-updated';
 import { handleActivityUpdated } from '../../activity';
@@ -6,13 +6,13 @@ import { handleActivityUpdated } from '../../activity';
 export function updateCommentCount(
   this: Feed,
   {
+    activity,
     comment,
     replyCountUpdater,
-    commentCountUpdater,
   }: {
+    activity: ActivityResponse;
     comment: CommentResponse;
     replyCountUpdater: (prevCount: number) => number;
-    commentCountUpdater: (prevCount: number) => number;
   },
 ) {
   const parentActivityId = comment.object_id;
@@ -42,16 +42,10 @@ export function updateCommentCount(
     }
   }
 
-  // finally, update the activity comment_count
-  const activityToUpdate = this.currentState.activities?.find(
-    (activity) => activity.id === parentActivityId,
-  );
-  if (activityToUpdate) {
+  // finally, update the activity comment_count if it exists
+  if (this.hasActivity(activity.id)) {
     handleActivityUpdated.bind(this)({
-      activity: {
-        ...activityToUpdate,
-        comment_count: commentCountUpdater(activityToUpdate.comment_count),
-      },
+      activity,
     }, false);
   }
 }
