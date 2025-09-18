@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.9](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.8...@stream-io/feeds-client-0.2.9) (2025-09-18)
+
+
+### Bug Fixes
+
+* bump core packages and install shim ([#125](https://github.com/GetStream/stream-feeds-js/issues/125)) ([4659634](https://github.com/GetStream/stream-feeds-js/commit/4659634a49cd8dc6c0a04d9199e7eb3ea4e32d19))
+
 ## [0.2.8](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.7...@stream-io/feeds-client-0.2.8) (2025-09-17)
 
 
