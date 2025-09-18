@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { FeedsClient } from '../feeds-client';
 import { Feed } from './feed';
-import { ActivityResponse } from '../gen/models';
+import type { ActivityResponse } from '../gen/models';
 import { generateActivityResponse, generateFeedResponse } from '../test-utils';
 
 describe('Feed derived state updates', () => {

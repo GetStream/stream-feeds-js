@@ -1,4 +1,4 @@
-import { Feed } from '../../feed';
+import type { Feed } from '../../feed';
 
 export function handleWatchStopped(this: Feed) {
   this.state.partialNext({ watch: false });

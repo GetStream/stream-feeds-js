@@ -1,12 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { UserRequest } from '../src/gen/models';
+import type { UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
   waitForEvent,
 } from './utils';
-import { FeedsClient } from '../src/feeds-client';
+import type { FeedsClient } from '../src/feeds-client';
 
 describe('Feed state updates via WebSocket events', () => {
   let client: FeedsClient;

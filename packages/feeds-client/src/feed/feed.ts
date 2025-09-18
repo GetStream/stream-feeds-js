@@ -1,4 +1,4 @@
-import {
+import type {
   ActivityRequest,
   FeedResponse,
   GetOrCreateFeedRequest,
@@ -14,11 +14,11 @@ import {
   FollowRequest,
   QueryCommentsRequest,
 } from '../gen/models';
-import { StreamResponse } from '../gen-imports';
+import type { StreamResponse } from '../gen-imports';
 import { StateStore } from '@stream-io/state-store';
 import { EventDispatcher } from '../common/EventDispatcher';
 import { FeedApi } from '../gen/feeds/FeedApi';
-import { FeedsClient } from '../feeds-client';
+import type { FeedsClient } from '../feeds-client';
 import {
   handleFollowUpdated,
   handleFollowCreated,

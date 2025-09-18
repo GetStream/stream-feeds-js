@@ -1,4 +1,4 @@
-import { Feed, FeedState } from '@self';
+import type { Feed, FeedState } from '@self';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
 

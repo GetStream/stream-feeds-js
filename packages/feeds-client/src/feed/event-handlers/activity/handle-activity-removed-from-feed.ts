@@ -1,5 +1,5 @@
-import { Feed } from '../../../feed';
-import { EventPayload } from '../../../types-internal';
+import type { Feed } from '../../../feed';
+import type { EventPayload } from '../../../types-internal';
 import { removeActivityFromState } from './handle-activity-deleted';
 
 export function handleActivityRemovedFromFeed(

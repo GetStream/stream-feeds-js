@@ -1,6 +1,6 @@
-import { ActivityPinResponse } from '../../../gen/models';
-import { EventPayload } from '../../../types-internal';
-import { Feed } from '../../feed';
+import type { ActivityPinResponse } from '../../../gen/models';
+import type { EventPayload } from '../../../types-internal';
+import type { Feed } from '../../feed';
 
 export function handleActivityPinned(
   this: Feed,

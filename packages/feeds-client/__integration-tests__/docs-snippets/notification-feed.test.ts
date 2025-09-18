@@ -5,14 +5,14 @@ import {
   getServerClient,
   getTestUser,
 } from '../utils';
-import { FeedsClient } from '../../src/feeds-client';
-import { Feed } from '../../src/feed';
-import {
+import type { FeedsClient } from '../../src/feeds-client';
+import type { Feed } from '../../src/feed';
+import type {
   ActivityResponse,
   CommentResponse,
   UserRequest,
 } from '../../src/gen/models';
-import { StreamFeed } from '@stream-io/node-sdk';
+import type { StreamFeed } from '@stream-io/node-sdk';
 
 describe('Notification feed', () => {
   let janeClient: FeedsClient;

@@ -4,8 +4,8 @@ import {
   createTestTokenGenerator,
   getTestUser,
 } from '../utils';
-import { FeedsClient } from '../../src/feeds-client';
-import { UserRequest } from '../../src/gen/models';
+import type { FeedsClient } from '../../src/feeds-client';
+import type { UserRequest } from '../../src/gen/models';
 
 describe('Push preferences page', () => {
   let client: FeedsClient;

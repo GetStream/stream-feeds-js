@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { StreamSearchResultsContext } from '../contexts/StreamSearchResultsContext';
 import type { SearchSource } from '@self';
 

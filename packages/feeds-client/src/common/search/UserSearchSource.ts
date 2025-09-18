@@ -1,8 +1,8 @@
 import { BaseSearchSource } from './BaseSearchSource';
 import type { SearchSourceOptions } from './types';
 
-import { FeedsClient } from '../../feeds-client';
-import { UserResponse } from '../../gen/models';
+import type { FeedsClient } from '../../feeds-client';
+import type { UserResponse } from '../../gen/models';
 
 export class UserSearchSource extends BaseSearchSource<UserResponse> {
   readonly type = 'user' as const;

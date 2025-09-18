@@ -1,6 +1,6 @@
-import { Feed } from '../../feed';
-import { ActivityResponse } from '../../../gen/models';
-import { EventPayload, UpdateStateResult } from '../../../types-internal';
+import type { Feed } from '../../feed';
+import type { ActivityResponse } from '../../../gen/models';
+import type { EventPayload, UpdateStateResult } from '../../../types-internal';
 
 export function addActivitiesToState(
   this: Feed,

@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { FeedsClient } from '../src/feeds-client';
+import type { FeedsClient } from '../src/feeds-client';
 import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
 } from './utils';
-import { UserRequest } from '../src/gen/models';
+import type { UserRequest } from '../src/gen/models';
 
 describe('Feed watch and unwatch', () => {
   let client: FeedsClient;

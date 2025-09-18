@@ -1,4 +1,4 @@
-import { OwnUser } from '../../gen/models';
+import type { OwnUser } from '../../gen/models';
 
 export interface ConnectionChangedEvent {
   type: 'connection.changed';

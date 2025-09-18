@@ -1,10 +1,10 @@
-import { Feed } from '../../../feed';
-import {
+import type { Feed } from '../../../feed';
+import type {
   ActivityPinResponse,
   ActivityResponse,
   ActivityUpdatedEvent,
 } from '../../../gen/models';
-import { EventPayload } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 import { updateEntityInArray } from '../../../utils';
 
 const sharedUpdateActivity = ({

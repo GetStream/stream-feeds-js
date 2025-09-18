@@ -1,13 +1,13 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { HealthCheckEvent, UserRequest } from '../src/gen/models';
+import type { HealthCheckEvent, UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
   waitForEvent,
 } from './utils';
-import { ConnectedEvent } from '../src/common/real-time/event-models';
-import { FeedsClient } from '../src/feeds-client';
+import type { ConnectedEvent } from '../src/common/real-time/event-models';
+import type { FeedsClient } from '../src/feeds-client';
 describe('WebSocket connection', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();

@@ -10,6 +10,7 @@
     "noImplicitAny": true,
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

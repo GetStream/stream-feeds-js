@@ -7,8 +7,8 @@ import {
   generateActivityPinResponse,
   generateFeedResponse,
 } from '../../../test-utils/response-generators';
-import { ActivityPinResponse } from '../../../gen/models';
-import { EventPayload } from '../../../types-internal';
+import type { ActivityPinResponse } from '../../../gen/models';
+import type { EventPayload } from '../../../types-internal';
 
 // Helper to construct the event payload for 'feeds.activity.unpinned'
 function makeUnpinnedEvent(

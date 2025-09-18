@@ -7,10 +7,10 @@ import {
   sleep,
 } from '../utils';
 import type { UserRequest } from '../../gen/models';
-import { TokenManager } from '../TokenManager';
+import type { TokenManager } from '../TokenManager';
 import { EventDispatcher } from '../EventDispatcher';
-import { ConnectionIdManager } from '../ConnectionIdManager';
-import { ConnectedEvent } from './event-models';
+import type { ConnectionIdManager } from '../ConnectionIdManager';
+import type { ConnectedEvent } from './event-models';
 import { getLogger } from '../../utils/logger';
 
 // Type guards to check WebSocket error type

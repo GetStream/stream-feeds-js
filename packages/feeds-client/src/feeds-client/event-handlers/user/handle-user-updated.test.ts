@@ -2,7 +2,7 @@ import { describe, it, beforeEach, expect } from 'vitest';
 
 import { FeedsClient, handleUserUpdated } from '../..';
 import { generateOwnUser, generateUserResponse } from '../../../test-utils';
-import { EventPayload } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 
 describe('handleUserUpdated', () => {
   let feedsClient: FeedsClient;
