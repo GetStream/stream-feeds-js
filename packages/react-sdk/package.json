@@ -34,9 +34,11 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
-    "@stream-io/feeds-client": "workspace:*"
+    "@stream-io/feeds-client": "workspace:*",
+    "use-sync-external-store": "^1.5.0"
   },
   "devDependencies": {
+    "@types/use-sync-external-store": "^1",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3"
   }

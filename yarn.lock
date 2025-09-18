@@ -5700,7 +5700,7 @@ __metadata:
   dependencies:
     "@stream-io/logger": ^1.1.4
     "@stream-io/node-sdk": 0.6.0
-    "@stream-io/state-store": ^1.1.4
+    "@stream-io/state-store": ^1.1.6
     "@types/react": ^19.1.8
     "@vitest/coverage-v8": 3.2.4
     axios: ^1.7.7
@@ -5767,6 +5767,7 @@ __metadata:
     "@types/jest": ^30.0.0
     "@types/react": ^19.0.0
     "@types/react-test-renderer": 19.0.0
+    "@types/use-sync-external-store": ^1
     eslint: ^9.28.0
     eslint-plugin-react: ^7.37.5
     eslint-plugin-react-hooks: ^5.2.0
@@ -5780,6 +5781,7 @@ __metadata:
     rimraf: ^6.0.1
     typescript: 5.8.3
     typescript-eslint: ^8.34.0
+    use-sync-external-store: ^1.5.0
     vitest: ^3.2.1
   peerDependencies:
     "@react-native-community/netinfo": ">=9.0.0"
@@ -5797,8 +5799,10 @@ __metadata:
   resolution: "@stream-io/feeds-react-sdk@workspace:packages/react-sdk"
   dependencies:
     "@stream-io/feeds-client": "workspace:*"
+    "@types/use-sync-external-store": ^1
     rimraf: ^6.0.1
     typescript: ^5.8.3
+    use-sync-external-store: ^1.5.0
   peerDependencies:
     react: ^18 || ^19
   languageName: unknown
@@ -5845,17 +5849,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stream-io/state-store@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "@stream-io/state-store@npm:1.1.4"
-  dependencies:
-    use-sync-external-store: ^1.5.0
+"@stream-io/state-store@npm:^1.1.6":
+  version: 1.1.6
+  resolution: "@stream-io/state-store@npm:1.1.6"
   peerDependencies:
     react: ^17 || ^18 || ^19
+    use-sync-external-store: ^1.5.0
   peerDependenciesMeta:
     react:
       optional: true
-  checksum: dfd0701ba488f2a36e953c59f0c1ce1d13336bb751e89a9baf35ca3603fa6fb37ff6b2b4e03373f6a513917cdc67c8f739ff45d673ce33dda3ffa914390d500b
+    use-sync-external-store:
+      optional: true
+  checksum: 5970d6d2aff1520650de383de555014d77f07bd9f916d14d4852970d09dbb184fad1a3b8a0515b9c99c3cfb39963a8f54ea1c88ef9a6d4703307c90937a02602
   languageName: node
   linkType: hard
 
@@ -6278,6 +6283,13 @@ __metadata:
   version: 4.0.5
   resolution: "@types/tough-cookie@npm:4.0.5"
   checksum: f19409d0190b179331586365912920d192733112a195e870c7f18d20ac8adb7ad0b0ff69dad430dba8bc2be09593453a719cfea92dc3bda19748fd158fe1498d
+  languageName: node
+  linkType: hard
+
+"@types/use-sync-external-store@npm:^1":
+  version: 1.5.0
+  resolution: "@types/use-sync-external-store@npm:1.5.0"
+  checksum: 39e5be8dc2cca080b490f2f79fed4381ae7eebee3f981208e359856733eafb2479d229db07a552f6c99fe0b5c09b3e46a3e6a870e00a88b50f3e690e73d2649b
   languageName: node
   linkType: hard
 
