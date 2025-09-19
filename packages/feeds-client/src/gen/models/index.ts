@@ -587,8 +587,6 @@ export interface AddCommentReactionRequest {
 
   create_notification_activity?: boolean;
 
-  enforce_unique?: boolean;
-
   skip_push?: boolean;
 
   custom?: Record<string, any>;
@@ -649,8 +647,6 @@ export interface AddReactionRequest {
 
   create_notification_activity?: boolean;
 
-  enforce_unique?: boolean;
-
   skip_push?: boolean;
 
   custom?: Record<string, any>;
@@ -676,6 +672,8 @@ export interface AggregatedActivityResponse {
   updated_at: Date;
 
   user_count: number;
+
+  user_count_truncated: boolean;
 
   activities: ActivityResponse[];
 }
@@ -889,6 +887,8 @@ export interface BanActionRequest {
 }
 
 export interface BanOptions {
+  delete_messages?: 'soft' | 'pruning' | 'hard';
+
   duration?: number;
 
   ip_ban?: boolean;
@@ -920,10 +920,6 @@ export interface BanRequest {
 
 export interface BanResponse {
   duration: string;
-}
-
-export interface BlockContentOptions {
-  reason?: string;
 }
 
 export interface BlockListConfig {
@@ -2102,6 +2098,8 @@ export interface ConfigResponse {
 
   updated_at: Date;
 
+  supported_video_call_harm_types: string[];
+
   ai_image_config?: AIImageConfig;
 
   ai_text_config?: AITextConfig;
@@ -2841,35 +2839,34 @@ export interface FeedMemberUpdatedEvent {
 
 export const FeedOwnCapability = {
   ADD_ACTIVITY: 'add-activity',
+  ADD_ACTIVITY_BOOKMARK: 'add-activity-bookmark',
   ADD_ACTIVITY_REACTION: 'add-activity-reaction',
   ADD_COMMENT: 'add-comment',
   ADD_COMMENT_REACTION: 'add-comment-reaction',
-  BOOKMARK_ACTIVITY: 'bookmark-activity',
   CREATE_FEED: 'create-feed',
-  DELETE_BOOKMARK: 'delete-bookmark',
-  DELETE_COMMENT: 'delete-comment',
+  DELETE_ANY_ACTIVITY: 'delete-any-activity',
+  DELETE_ANY_COMMENT: 'delete-any-comment',
   DELETE_FEED: 'delete-feed',
-  EDIT_BOOKMARK: 'edit-bookmark',
+  DELETE_OWN_ACTIVITY: 'delete-own-activity',
+  DELETE_OWN_ACTIVITY_BOOKMARK: 'delete-own-activity-bookmark',
+  DELETE_OWN_ACTIVITY_REACTION: 'delete-own-activity-reaction',
+  DELETE_OWN_COMMENT: 'delete-own-comment',
+  DELETE_OWN_COMMENT_REACTION: 'delete-own-comment-reaction',
   FOLLOW: 'follow',
-  INVITE_FEED: 'invite-feed',
-  JOIN_FEED: 'join-feed',
-  LEAVE_FEED: 'leave-feed',
-  MANAGE_FEED_GROUP: 'manage-feed-group',
-  MARK_ACTIVITY: 'mark-activity',
   PIN_ACTIVITY: 'pin-activity',
   QUERY_FEED_MEMBERS: 'query-feed-members',
   QUERY_FOLLOWS: 'query-follows',
   READ_ACTIVITIES: 'read-activities',
   READ_FEED: 'read-feed',
-  REMOVE_ACTIVITY: 'remove-activity',
-  REMOVE_ACTIVITY_REACTION: 'remove-activity-reaction',
-  REMOVE_COMMENT_REACTION: 'remove-comment-reaction',
   UNFOLLOW: 'unfollow',
-  UPDATE_ACTIVITY: 'update-activity',
-  UPDATE_COMMENT: 'update-comment',
+  UPDATE_ANY_ACTIVITY: 'update-any-activity',
+  UPDATE_ANY_COMMENT: 'update-any-comment',
   UPDATE_FEED: 'update-feed',
   UPDATE_FEED_FOLLOWERS: 'update-feed-followers',
   UPDATE_FEED_MEMBERS: 'update-feed-members',
+  UPDATE_OWN_ACTIVITY: 'update-own-activity',
+  UPDATE_OWN_ACTIVITY_BOOKMARK: 'update-own-activity-bookmark',
+  UPDATE_OWN_COMMENT: 'update-own-comment',
 } as const;
 
 export type FeedOwnCapability =
@@ -3045,10 +3042,6 @@ export interface Flag {
   review_queue_item?: ReviewQueueItem;
 
   user?: User;
-}
-
-export interface FlagContentOptions {
-  reason?: string;
 }
 
 export interface FlagRequest {
@@ -3472,9 +3465,15 @@ export interface HLSSettingsResponse {
 }
 
 export interface HarmConfig {
+  cooldown_period: number;
+
   severity: number;
 
+  threshold: number;
+
   action_sequences: ActionSequence[];
+
+  harm_types: string[];
 }
 
 export interface HealthCheckEvent {
@@ -5327,11 +5326,7 @@ export interface RuleBuilderAction {
 
   ban_options?: BanOptions;
 
-  flag_content_options?: FlagContentOptions;
-
   flag_user_options?: FlagUserOptions;
-
-  remove_content_options?: BlockContentOptions;
 }
 
 export interface RuleBuilderCondition {
@@ -6462,7 +6457,11 @@ export interface VelocityFilterConfigRule {
 }
 
 export interface VideoCallRuleConfig {
-  rules: Record<string, HarmConfig>;
+  flag_all_labels: boolean;
+
+  flagged_labels: string[];
+
+  rules: HarmConfig[];
 }
 
 export interface VideoContentParameters {
