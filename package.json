@@ -47,6 +47,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-native": "^5.0.0",
+    "eslint-plugin-unused-imports": "^4.2.0",
     "globals": "^16.3.0",
     "nx": "^21.2.2",
     "patch-package": "^8.0.0",
