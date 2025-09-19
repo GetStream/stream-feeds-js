@@ -13,17 +13,16 @@ export const useIsAggregatedActivityRead = ({
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
 
-  const { read_activities: readActivities /* last_read_at: lastReadAt */ } =
+  const { read_activities: readActivities, last_read_at: lastReadAt } =
     useNotificationStatus(feed) ?? {};
 
   const group = aggregatedActivity.group;
 
   return useMemo(
     () =>
-      // FIXME: This part of the condition does not work as marking individual groups as read also updates the last_read_at. Should be uncommented once it's fixed on the backend.
-      // (lastReadAt &&
-      //   aggregatedActivity.updated_at.getTime() <= lastReadAt.getTime()) ||
+      (lastReadAt &&
+        aggregatedActivity.updated_at.getTime() <= lastReadAt.getTime()) ||
       (readActivities ?? []).includes(group),
-    [readActivities, group],
+    [lastReadAt, aggregatedActivity.updated_at, readActivities, group],
   );
 };
