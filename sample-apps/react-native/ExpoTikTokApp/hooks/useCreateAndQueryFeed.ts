@@ -33,7 +33,7 @@ export const useCreateAndQueryFeed = ({
       return;
     }
 
-    feed.getOrCreate(queryOptions).catch((error) => console.error(error));
+    feed.getOrCreate(queryOptions).catch((error: unknown) => console.error(error));
   }, [feed, connectedUser, queryOptions]);
 
   return feed;

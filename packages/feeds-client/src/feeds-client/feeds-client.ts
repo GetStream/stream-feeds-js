@@ -1,8 +1,14 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import {
   ActivityResponse,
+  AddCommentReactionRequest,
+  AddCommentReactionResponse,
+  AddCommentRequest,
+  AddCommentResponse,
   AddReactionRequest,
   DeleteActivityReactionResponse,
+  DeleteCommentReactionResponse,
+  DeleteCommentResponse,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -13,6 +19,10 @@ import {
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
+  UpdateActivityRequest,
+  UpdateActivityResponse,
+  UpdateCommentRequest,
+  UpdateCommentResponse,
   UpdateFollowRequest,
   UserRequest,
   WSEvent,
@@ -41,6 +51,12 @@ import {
   Feed,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
+  handleActivityUpdated,
+  handleCommentAdded,
+  handleCommentDeleted,
+  handleCommentReactionAdded,
+  handleCommentReactionDeleted,
+  handleCommentUpdated,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
@@ -53,6 +69,7 @@ import {
   SyncFailure,
   UnhandledErrorType,
 } from '../common/real-time/event-models';
+import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils/logger';
 
 export type FeedsClientState = {
@@ -331,6 +348,72 @@ export class FeedsClient extends FeedsApi {
     });
   };
 
+  updateActivity = async (
+    request: UpdateActivityRequest & {
+      id: string;
+    },
+  ): Promise<StreamResponse<UpdateActivityResponse>> => {
+    const response = await super.updateActivity(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleActivityUpdated.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  addComment = async (
+    request: AddCommentRequest,
+  ): Promise<StreamResponse<AddCommentResponse>> => {
+    const response = await super.addComment(request);
+    const { comment } = response;
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleCommentAdded.bind(feed)(response, false);
+      const parentActivityId = comment.object_id;
+      if (feed.hasActivity(parentActivityId)) {
+        const activityToUpdate = feed.currentState.activities?.find(
+          (activity) => activity.id === parentActivityId,
+        );
+        if (activityToUpdate) {
+          updateCommentCount.bind(feed)({
+            activity: {
+              ...activityToUpdate,
+              comment_count: activityToUpdate.comment_count + 1,
+            },
+            comment,
+            replyCountUpdater: (prevCount) => prevCount + 1,
+          });
+        }
+      }
+    }
+    return response;
+  };
+
+  updateComment = async (
+    request: UpdateCommentRequest & { id: string },
+  ): Promise<StreamResponse<UpdateCommentResponse>> => {
+    const response = await super.updateComment(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleCommentUpdated.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  deleteComment = async (request: {
+    id: string;
+    hard_delete?: boolean;
+  }): Promise<StreamResponse<DeleteCommentResponse>> => {
+    const response = await super.deleteComment(request);
+    const { activity, comment } = response;
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleCommentDeleted.bind(feed)({ comment }, false);
+      updateCommentCount.bind(feed)({
+        activity,
+        comment,
+        replyCountUpdater: (prevCount) => prevCount - 1,
+      });
+    }
+    return response;
+  };
+
   addReaction = async (
     request: AddReactionRequest & {
       activity_id: string;
@@ -350,6 +433,27 @@ export class FeedsClient extends FeedsApi {
     const response = await super.deleteActivityReaction(request);
     for (const feed of Object.values(this.activeFeeds)) {
       handleActivityReactionDeleted.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  addCommentReaction = async (
+    request: AddCommentReactionRequest & { id: string },
+  ): Promise<StreamResponse<AddCommentReactionResponse>> => {
+    const response = await super.addCommentReaction(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleCommentReactionAdded.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  deleteCommentReaction = async (request: {
+    id: string;
+    type: string;
+  }): Promise<StreamResponse<DeleteCommentReactionResponse>> => {
+    const response = await super.deleteCommentReaction(request);
+    for (const feed of Object.values(this.activeFeeds)) {
+      handleCommentReactionDeleted.bind(feed)(response, false);
     }
     return response;
   };

@@ -311,7 +311,7 @@ describe(handleActivityReactionDeleted.name, () => {
 
       expect((feed as any).stateUpdateQueue).toEqual(new Set());
       expect(activity?.own_reactions.length).toEqual(1);
-      expect(latestOwnReaction).toMatchObject(currentUserPayload.reaction);
+      expect(latestOwnReaction).toBe(currentUserPayload.reaction);
     });
   })
 });

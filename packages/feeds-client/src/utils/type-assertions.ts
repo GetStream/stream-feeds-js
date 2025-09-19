@@ -6,7 +6,6 @@ import {
   FollowResponse,
 } from '../gen/models';
 import { StreamFile } from '../types';
-import { CommentParent } from '../types';
 import { DeleteReactionResponse } from '@stream-io/node-sdk';
 
 export const isFollowResponse = (data: object): data is FollowResponse => {
@@ -20,7 +19,7 @@ export const isReactionResponse = (
   | AddCommentReactionResponse
   | DeleteReactionResponse
   | DeleteCommentReactionResponse
-) & { fid: string } => {
+) => {
   return (
     'reaction' in data &&
     ('activity' in data || 'comment' in data)
@@ -28,7 +27,7 @@ export const isReactionResponse = (
 };
 
 export const isCommentResponse = (
-  entity: CommentParent,
+  entity: object,
 ): entity is CommentResponse => {
   return typeof (entity as CommentResponse)?.object_id === 'string';
 };

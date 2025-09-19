@@ -74,7 +74,7 @@ export function handleFollowDeleted(
 
   if (
     !shouldUpdateState({
-      stateUpdateQueueId: getStateUpdateQueueId(follow, 'deleted'),
+      stateUpdateQueueId: getStateUpdateQueueId(follow, 'follow-deleted'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
       fromWs,

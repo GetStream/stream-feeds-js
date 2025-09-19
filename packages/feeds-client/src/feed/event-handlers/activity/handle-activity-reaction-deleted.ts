@@ -7,7 +7,7 @@ import {
   updateEntityInArray,
 } from '../../../utils';
 
-type ActivityReactionDeletedPayload = PartializeAllBut<
+export type ActivityReactionDeletedPayload = PartializeAllBut<
   EventPayload<'feeds.activity.reaction.deleted'>,
   'activity' | 'reaction'
 >;

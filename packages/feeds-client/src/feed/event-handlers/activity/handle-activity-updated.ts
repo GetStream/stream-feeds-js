@@ -1,18 +1,24 @@
 import { Feed } from '../../../feed';
+import { ActivityPinResponse, ActivityResponse } from '../../../gen/models';
+import { EventPayload, PartializeAllBut } from '../../../types-internal';
 import {
-  ActivityPinResponse,
-  ActivityResponse,
-  ActivityUpdatedEvent,
-} from '../../../gen/models';
-import { EventPayload } from '../../../types-internal';
-import { updateEntityInArray } from '../../../utils';
+  getStateUpdateQueueId,
+  shouldUpdateState,
+  updateEntityInArray,
+} from '../../../utils';
+import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
+
+export type ActivityUpdatedPayload = PartializeAllBut<
+  EventPayload<'feeds.activity.updated'>,
+  'activity'
+>;
 
 const sharedUpdateActivity = ({
   currentActivity,
   event,
 }: {
   currentActivity: ActivityResponse;
-  event: ActivityUpdatedEvent;
+  event: ActivityUpdatedPayload;
 }) => {
   return {
     ...event.activity,
@@ -22,7 +28,7 @@ const sharedUpdateActivity = ({
 };
 
 export const updateActivityInState = (
-  event: ActivityUpdatedEvent,
+  event: ActivityUpdatedPayload,
   activities: ActivityResponse[] | undefined,
 ) =>
   updateEntityInArray({
@@ -36,7 +42,7 @@ export const updateActivityInState = (
   });
 
 export const updatePinnedActivityInState = (
-  event: ActivityUpdatedEvent,
+  event: ActivityUpdatedPayload,
   pinnedActivities: ActivityPinResponse[] | undefined,
 ) =>
   updateEntityInArray({
@@ -62,23 +68,40 @@ export const updatePinnedActivityInState = (
 
 export function handleActivityUpdated(
   this: Feed,
-  event: EventPayload<'feeds.activity.updated'>,
+  payload: ActivityUpdatedPayload,
+  fromWs?: boolean,
 ) {
+  if (
+    !shouldUpdateState({
+      stateUpdateQueueId: getStateUpdateQueueId(payload, 'activity-updated'),
+      stateUpdateQueue: this.stateUpdateQueue,
+      watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(
+        this,
+        payload,
+      ),
+    })
+  ) {
+    return;
+  }
   const {
     activities: currentActivities,
     pinned_activities: currentPinnedActivities,
   } = this.currentState;
 
   const [result1, result2] = [
-    updateActivityInState(event, currentActivities),
-    updatePinnedActivityInState(event, currentPinnedActivities),
+    this.hasActivity(payload.activity.id)
+      ? updateActivityInState(payload, currentActivities)
+      : undefined,
+    updatePinnedActivityInState(payload, currentPinnedActivities),
   ];
 
-  if (result1.changed || result2.changed) {
-    this.client.hydratePollCache([event.activity]);
+  if (result1?.changed || result2.changed) {
+    this.client.hydratePollCache([payload.activity]);
 
     this.state.partialNext({
-      activities: result1.entities,
+      activities: result1?.changed ? result1.entities : currentActivities,
       pinned_activities: result2.entities,
     });
   }
