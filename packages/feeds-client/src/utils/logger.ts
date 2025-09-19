@@ -4,7 +4,8 @@ type AvailableScopes =
   | 'api-client'
   | 'event-dispatcher'
   | 'token-manager'
-  | 'stable-ws-connection';
+  | 'stable-ws-connection'
+  | 'helpers';
 
 export type ConfigureLoggersOptions =
   loggerInternal.ConfigureLoggersOptions<AvailableScopes>;
