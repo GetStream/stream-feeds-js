@@ -1,5 +1,6 @@
 # Changelog
 
+
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
 ## [0.2.10](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.9...@stream-io/feeds-client-0.2.10) (2025-09-22)
