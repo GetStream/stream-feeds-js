@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.1...@stream-io/feeds-react-sdk-0.1.2) (2025-09-22)
+
+
+### Bug Fixes
+
+* properly align projectRoot ([#127](https://github.com/GetStream/stream-feeds-js/issues/127)) ([9c5f6b3](https://github.com/GetStream/stream-feeds-js/commit/9c5f6b32930f1263fa61d49086f6ae95ecb49a36))
+
 ## [0.1.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.0...@stream-io/feeds-react-sdk-0.1.1) (2025-09-18)
 
 
