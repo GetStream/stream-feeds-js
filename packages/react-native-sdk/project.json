@@ -3,7 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "packages/react-native-sdk",
   "projectType": "library",
-  "tags": [],
   "targets": {
     "version": {
       "executor": "@jscutlery/semver:version",
@@ -24,6 +23,7 @@
             { "type": "test", "hidden": true }
           ]
         },
+        "trackDeps": true,
         "push": true,
         "skipCommitTypes": ["ci", "refactor", "test", "docs"],
         "postTargets": [
