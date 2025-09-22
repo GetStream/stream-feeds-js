@@ -1,7 +1,11 @@
 # Changelog
 
-
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
+
+## [0.2.11](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.10...@stream-io/feeds-client-0.2.11) (2025-09-22)
+
+
+* force new release ([5139482](https://github.com/GetStream/stream-feeds-js/commit/5139482135ab45a23a0b9d72f15613786b63d927))
 
 ## [0.2.10](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.9...@stream-io/feeds-client-0.2.10) (2025-09-22)
 
