@@ -1,7 +1,7 @@
 {
   "name": "@stream-io/feeds-react-sdk",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/react-sdk/src",
+  "sourceRoot": "packages/react-sdk",
   "projectType": "library",
   "tags": [],
   "targets": {
