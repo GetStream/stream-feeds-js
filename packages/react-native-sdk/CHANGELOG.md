@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.2...@stream-io/feeds-react-native-sdk-0.1.3) (2025-09-22)
+
+
+### Bug Fixes
+
+* add trackDeps option ([c04374c](https://github.com/GetStream/stream-feeds-js/commit/c04374c5faa104b8981fff632590a17f734e12f9))
+
 ## [0.1.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.1...@stream-io/feeds-react-native-sdk-0.1.2) (2025-09-22)
 
 
