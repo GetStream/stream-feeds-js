@@ -31,7 +31,7 @@ export const Notification = ({
         break;
       }
       case 'reaction': {
-        notification.text += `${group.user_count} new reactions on your post${targetActivity?.text ? ' ' + targetActivity?.text : ''}`;
+        notification.text += `${group.user_count}${group.user_count_truncated ? '+' : ''} new reactions on your post${targetActivity?.text ? ' ' + targetActivity?.text : ''}`;
         break;
       }
       case 'follow': {
@@ -51,7 +51,7 @@ export const Notification = ({
         break;
       }
       case 'comment_reaction': {
-        text += `${group.user_count} new reactions to your comment`;
+        text += `${group.activity_count} new reactions to your comment on post${targetActivity?.text ? ' ' + targetActivity?.text : ''}`;
         break;
       }
       default: {
