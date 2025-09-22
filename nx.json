@@ -1,78 +1,20 @@
 {
-  "defaultBase": "main",
-  "release": {
-    "projects": [
-      "@stream-io/feeds-client",
-      "@stream-io/feeds-react-native-sdk",
-      "@stream-io/feeds-react-sdk"
-    ],
-    "projectsRelationship": "independent",
-    "conventionalCommits": {
-      "types": {
-        "feat": {
-          "semverBump": "patch",
-          "changelog": {
-            "title": "Features"
-          }
-        },
-        "fix": {
-          "semverBump": "patch",
-          "changelog": {
-            "title": "Bug Fixes"
-          }
-        },
-        "chore": {
-          "semverBump": "patch",
-          "changelog": {
-            "title": "Other"
-          }
-        },
-        "docs": {
-          "changelog": false,
-          "semverBump": "none"
-        },
-        "style": {
-          "changelog": false,
-          "semverBump": "patch"
-        },
-        "refactor": {
-          "changelog": false,
-          "semverBump": "patch"
-        },
-        "perf": {
-          "semverBump": "patch",
-          "changelog": {
-            "title": "Performance"
-          }
-        },
-        "test": {
-          "changelog": false,
-          "semverBump": "none"
-        }
-      }
-    },
-    "version": {
-      "currentVersionResolver": "git-tag",
-      "specifierSource": "conventional-commits",
-      "preserveLocalDependencyProtocols": false
-    },
-    "targetDefaults": {
-      "nx-release-publish": {
-        "options": {
-          "packageRoot": "packages/{projectName}"
-        }
-      }
-    },
-    "changelog": {
-      "projectChangelogs": {
-        "renderOptions": {
-          "authors": false,
-          "commitReferences": true,
-          "versionTitleDate": true,
-          "applyUsernameToAuthors": false
-        },
-        "createRelease": "github"
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": []
       }
     }
+  },
+  "defaultBase": "main",
+  "targetDependencies": {
+    "version": [
+      {
+        "target": "version",
+        "projects": "dependencies"
+      }
+    ]
   }
 }
