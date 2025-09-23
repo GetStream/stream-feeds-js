@@ -62,6 +62,7 @@ const config: ExpoConfig = {
       },
     ],
     './config-plugins/with-notifee-maven',
+    './config-plugins/with-keyboard-inset-main-activity-listener'
   ],
   experiments: {
     typedRoutes: true,
