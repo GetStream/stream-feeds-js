@@ -1,5 +1,5 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
-import {
+import type {
   ActivityResponse,
   AddCommentReactionRequest,
   AddCommentReactionResponse,
@@ -27,7 +27,7 @@ import {
   UserRequest,
   WSEvent,
 } from '../gen/models';
-import { FeedsEvent, StreamFile, TokenOrProvider } from '../types';
+import type { FeedsEvent, StreamFile, TokenOrProvider } from '../types';
 import { StateStore } from '@stream-io/state-store';
 import { TokenManager } from '../common/TokenManager';
 import { ConnectionIdManager } from '../common/ConnectionIdManager';
@@ -40,7 +40,7 @@ import {
   streamDevToken,
 } from '../common/utils';
 import { decodeWSEvent } from '../gen/model-decoders/event-decoder-mapping';
-import {
+import type {
   FeedsClientOptions,
   NetworkChangedEvent,
   StreamResponse,
@@ -65,8 +65,9 @@ import {
   handleWatchStopped,
 } from '../feed';
 import { handleUserUpdated } from './event-handlers';
+import type {
+  SyncFailure} from '../common/real-time/event-models';
 import {
-  SyncFailure,
   UnhandledErrorType,
 } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';

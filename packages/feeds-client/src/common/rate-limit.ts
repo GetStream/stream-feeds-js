@@ -1,4 +1,4 @@
-import { RateLimit } from './types';
+import type { RateLimit } from './types';
 
 export const getRateLimitFromResponseHeader = (
   response_headers: Record<string, string>,

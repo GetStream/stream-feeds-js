@@ -1,18 +1,18 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { ActivityRemovedFromFeedEvent, UserRequest } from '../src/gen/models';
+import type { ActivityRemovedFromFeedEvent, UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
   waitForEvent,
 } from './utils';
-import { FeedsClient } from '../src/feeds-client';
-import {
+import type { FeedsClient } from '../src/feeds-client';
+import type {
   ActivityAddedEvent,
   ActivityUpdatedEvent,
   ActivityDeletedEvent,
 } from '../src/gen/models';
-import { Feed } from '../src/feed';
+import type { Feed } from '../src/feed';
 
 describe('Activity state updates via WebSocket events', () => {
   let client: FeedsClient;

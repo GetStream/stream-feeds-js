@@ -1,7 +1,7 @@
-import {
+import type {
   FollowResponse,
 } from '../gen/models';
-import {
+import type {
   ActivityReactionAddedPayload,
   ActivityReactionDeletedPayload,
   ActivityUpdatedPayload,

@@ -10,8 +10,8 @@ import {
   generateCommentResponse,
   generateUserResponseCommonFields,
 } from '../../../test-utils';
-import { CommentResponse, UserResponseCommonFields } from '../../../gen/models';
-import { EventPayload } from '../../../types-internal';
+import type { CommentResponse, UserResponseCommonFields } from '../../../gen/models';
+import type { EventPayload } from '../../../types-internal';
 import { shouldUpdateState } from '../../../utils';
 
 describe(handleCommentAdded.name, () => {

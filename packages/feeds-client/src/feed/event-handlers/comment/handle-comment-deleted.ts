@@ -1,5 +1,6 @@
-import { Feed } from '../../feed';
-import { EventPayload, type PartializeAllBut } from '../../../types-internal';
+import type { Feed } from '../../feed';
+import type { EventPayload} from '../../../types-internal';
+import { type PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 import {
   eventTriggeredByConnectedUser

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { isCommentResponse, CommentParent } from '@self';
+import type { CommentParent } from '@self';
+import { isCommentResponse } from '@self';
 import { useStableCallback } from '../internal';
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
 

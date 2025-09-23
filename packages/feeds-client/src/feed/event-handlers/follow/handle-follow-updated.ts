@@ -1,6 +1,6 @@
 import type { Feed, FeedState } from '../../feed';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
-import { EventPayload, PartializeAllBut } from '../../../types-internal';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 
 export function handleFollowUpdated(
   this: Feed,

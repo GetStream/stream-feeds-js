@@ -11,8 +11,8 @@ import {
   generateCommentReactionDeletedEvent,
 } from '../../../test-utils';
 import { shouldUpdateState } from '../../../utils';
-import { CommentResponse, FeedsReactionResponse } from '../../../gen/models';
-import { EventPayload } from '../../../types-internal';
+import type { CommentResponse, FeedsReactionResponse } from '../../../gen/models';
+import type { EventPayload } from '../../../types-internal';
 
 describe(handleCommentReactionDeleted.name, () => {
   let feed: Feed;

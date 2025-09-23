@@ -11,7 +11,7 @@ import {
   getHumanId,
 } from '../../../test-utils';
 import { shouldUpdateState } from '../../../utils';
-import { EventPayload } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 
 describe(handleActivityReactionAdded.name, () => {
   let feed: Feed;

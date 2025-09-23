@@ -1,14 +1,16 @@
-import axios, {
+import type {
   AxiosError,
   AxiosInstance,
   AxiosResponse,
   RawAxiosRequestHeaders,
 } from 'axios';
-import { RequestMetadata, StreamApiError, FeedsClientOptions } from './types';
+import axios from 'axios';
+import type { RequestMetadata, FeedsClientOptions } from './types';
+import { StreamApiError } from './types';
 import { getRateLimitFromResponseHeader } from './rate-limit';
 import { KnownCodes, randomId } from './utils';
-import { TokenManager } from './TokenManager';
-import { ConnectionIdManager } from './ConnectionIdManager';
+import type { TokenManager } from './TokenManager';
+import type { ConnectionIdManager } from './ConnectionIdManager';
 import { getLogger } from '../utils/logger';
 // this gets replaced during the build process (var version = 'x.y.z';)
 import { version } from '../../package.json';

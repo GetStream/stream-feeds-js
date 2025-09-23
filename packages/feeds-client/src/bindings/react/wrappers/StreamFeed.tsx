@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { StreamFeedContext } from '../contexts/StreamFeedContext';
 import type { Feed } from '@self';
 

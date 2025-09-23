@@ -1,4 +1,4 @@
-import {
+import type {
   ActivityPinResponse,
   ActivityResponse,
   BookmarkFolderResponse,
@@ -14,7 +14,7 @@ import {
   UserResponse, UserResponseCommonFields,
 } from '../gen/models';
 import { humanId } from 'human-id';
-import { EventPayload } from '../types-internal';
+import type { EventPayload } from '../types-internal';
 
 export const getHumanId = () => humanId({ capitalize: false, separator: '-' });
 

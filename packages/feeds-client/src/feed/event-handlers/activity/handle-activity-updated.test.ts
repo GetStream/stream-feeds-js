@@ -13,9 +13,9 @@ import {
   generateUserResponseCommonFields,
   getHumanId,
 } from '../../../test-utils';
-import { EventPayload } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 import { shouldUpdateState } from '../../../utils';
-import { ActivityResponse } from '../../../gen/models';
+import type { ActivityResponse } from '../../../gen/models';
 
 describe(handleActivityUpdated.name, () => {
   let feed: Feed;

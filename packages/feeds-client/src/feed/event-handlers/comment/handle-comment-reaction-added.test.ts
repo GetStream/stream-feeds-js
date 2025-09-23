@@ -10,12 +10,12 @@ import {
   generateCommentReactionAddedEvent,
   generateFeedReactionResponse,
 } from '../../../test-utils';
-import {
+import type {
   CommentResponse,
   FeedsReactionResponse,
 } from '../../../gen/models';
 import { shouldUpdateState } from '../../../utils'
-import { EventPayload } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 
 describe(handleCommentReactionAdded.name, () => {
   let feed: Feed;
