@@ -587,6 +587,8 @@ export interface AddCommentReactionRequest {
 
   create_notification_activity?: boolean;
 
+  enforce_unique?: boolean;
+
   skip_push?: boolean;
 
   custom?: Record<string, any>;
@@ -646,6 +648,8 @@ export interface AddReactionRequest {
   type: string;
 
   create_notification_activity?: boolean;
+
+  enforce_unique?: boolean;
 
   skip_push?: boolean;
 
@@ -2923,9 +2927,13 @@ export interface FeedResponse {
 
   filter_tags?: string[];
 
+  own_capabilities?: FeedOwnCapability[];
+
   own_follows?: FollowResponse[];
 
   custom?: Record<string, any>;
+
+  own_membership?: FeedMemberResponse;
 }
 
 export interface FeedUpdatedEvent {
@@ -3409,8 +3417,6 @@ export interface GetOrCreateFeedResponse {
 
   members: FeedMemberResponse[];
 
-  own_capabilities: FeedOwnCapability[];
-
   pinned_activities: ActivityPinResponse[];
 
   feed: FeedResponse;
@@ -3419,8 +3425,6 @@ export interface GetOrCreateFeedResponse {
 
   prev?: string;
 
-  own_follows?: FollowResponse[];
-
   followers_pagination?: PagerResponse;
 
   following_pagination?: PagerResponse;
@@ -3428,8 +3432,6 @@ export interface GetOrCreateFeedResponse {
   member_pagination?: PagerResponse;
 
   notification_status?: NotificationStatusResponse;
-
-  own_membership?: FeedMemberResponse;
 }
 
 export interface GoogleVisionConfig {
