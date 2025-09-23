@@ -29,8 +29,12 @@ export const Activity = ({
   const [editedActivityText, setEditedActivityText] = useState('');
   const dialogRef = useRef<HTMLDialogElement>(null);
 
-  const canEdit = ownCapabilities.includes(FeedOwnCapability.UPDATE_ACTIVITY);
-  const canDelete = ownCapabilities.includes(FeedOwnCapability.REMOVE_ACTIVITY);
+  const canEdit =
+    ownCapabilities.includes(FeedOwnCapability.UPDATE_ANY_ACTIVITY) ||
+    ownCapabilities.includes(FeedOwnCapability.UPDATE_OWN_ACTIVITY);
+  const canDelete =
+    ownCapabilities.includes(FeedOwnCapability.DELETE_ANY_ACTIVITY) ||
+    ownCapabilities.includes(FeedOwnCapability.DELETE_OWN_ACTIVITY);
   const canSendReaction = ownCapabilities.includes(
     FeedOwnCapability.ADD_ACTIVITY_REACTION,
   );
