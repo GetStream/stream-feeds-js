@@ -1,5 +1,5 @@
 import type { Feed } from '../../feed';
-import { ActivityPinResponse, ActivityResponse } from '../../../gen/models';
+import type { ActivityPinResponse, ActivityResponse } from '../../../gen/models';
 import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import {
   getStateUpdateQueueId,

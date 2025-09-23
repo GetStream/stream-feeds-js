@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ActivityResponse } from '../../../gen/models';
+import type { ActivityResponse } from '../../../gen/models';
 import { FeedsClient } from '../../../feeds-client';
 import {
   addActivitiesToState as addActivitiesToStateOriginal,

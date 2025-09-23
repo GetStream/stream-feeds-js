@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { FeedsClient } from '../src/feeds-client';
-import { FeedsEvent } from '../src/types';
+import type { FeedsClient } from '../src/feeds-client';
+import type { FeedsEvent } from '../src/types';
 import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
 } from './utils';
-import { UserRequest } from '../src/gen/models';
+import type { UserRequest } from '../src/gen/models';
+import type {
+  UnhandledErrorEvent} from '../src/common/real-time/event-models';
 import {
-  UnhandledErrorEvent,
   UnhandledErrorType,
 } from '../src/common/real-time/event-models';
 

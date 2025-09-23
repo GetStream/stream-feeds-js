@@ -1,4 +1,4 @@
-import { FeedsEvent } from '../types';
+import type { FeedsEvent } from '../types';
 import { getLogger } from '../utils/logger';
 
 export class EventDispatcher<

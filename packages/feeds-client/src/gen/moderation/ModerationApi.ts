@@ -1,5 +1,5 @@
-import { ApiClient, StreamResponse } from '../../gen-imports';
-import {
+import type { ApiClient, StreamResponse } from '../../gen-imports';
+import type {
   BanRequest,
   BanResponse,
   DeleteModerationConfigResponse,

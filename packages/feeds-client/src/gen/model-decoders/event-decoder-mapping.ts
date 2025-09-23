@@ -1,4 +1,4 @@
-import { WSEvent } from '../models';
+import type { WSEvent } from '../models';
 import { decoders } from '../model-decoders/decoders';
 
 const eventDecoderMapping: Record<

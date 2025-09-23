@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { FeedsClient } from '../src/feeds-client';
+import type { FeedsClient } from '../src/feeds-client';
 import {
   createTestClient,
   createTestTokenGenerator,
@@ -7,8 +7,8 @@ import {
   getServerClient,
   waitForEvent,
 } from './utils';
-import { UserRequest } from '../src/gen/models';
-import { StreamClient } from '@stream-io/node-sdk';
+import type { UserRequest } from '../src/gen/models';
+import type { StreamClient } from '@stream-io/node-sdk';
 
 describe('Feed follow and unfollow', () => {
   describe('state update without watching', () => {

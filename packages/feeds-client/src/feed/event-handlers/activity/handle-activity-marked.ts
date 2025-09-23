@@ -1,9 +1,9 @@
-import {
+import type {
   ActivityMarkEvent,
   NotificationStatusResponse,
 } from '../../../gen/models';
-import { EventPayload, UpdateStateResult } from '../../../types-internal';
-import { Feed } from '../../feed';
+import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import type { Feed } from '../../feed';
 
 export const updateNotificationStatusFromActivityMarked = (
   event: ActivityMarkEvent,

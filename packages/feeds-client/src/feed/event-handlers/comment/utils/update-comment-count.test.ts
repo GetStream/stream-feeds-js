@@ -5,7 +5,7 @@ import * as commentHandlers from '../handle-comment-updated';
 import * as activityHandlers from '../../activity';
 import { FeedsClient } from '../../../../feeds-client';
 import { Feed } from '../../../feed';
-import { ActivityResponse, CommentResponse } from '../../../../gen/models';
+import type { ActivityResponse, CommentResponse } from '../../../../gen/models';
 import {
   generateCommentResponse,
   generateFeedResponse,
@@ -14,6 +14,7 @@ import {
 } from '../../../../test-utils';
 
 vi.mock('../../activity', async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const actual = await importOriginal<typeof import('../../activity')>();
   return {
     ...actual,
@@ -22,6 +23,7 @@ vi.mock('../../activity', async (importOriginal) => {
 });
 
 vi.mock('../handle-comment-updated', async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   const actual = await importOriginal<typeof import('../handle-comment-updated')>();
   return {
     ...actual,

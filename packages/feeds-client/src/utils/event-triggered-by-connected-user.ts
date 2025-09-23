@@ -1,5 +1,5 @@
-import { Feed } from '../feed';
-import { UserResponseCommonFields } from '../gen/models';
+import type { Feed } from '../feed';
+import type { UserResponseCommonFields } from '../gen/models';
 
 export function eventTriggeredByConnectedUser(
   this: Feed,

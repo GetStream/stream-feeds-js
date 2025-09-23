@@ -1,4 +1,5 @@
-import { PropsWithChildren, useEffect } from 'react';
+import type { PropsWithChildren} from 'react';
+import { useEffect } from 'react';
 import { StreamFeeds as StreamFeedsWrapper } from '@stream-io/feeds-client/react-bindings';
 import type { StreamFeedsContextProps } from '@stream-io/feeds-client/react-bindings';
 import NetInfo from '@react-native-community/netinfo';

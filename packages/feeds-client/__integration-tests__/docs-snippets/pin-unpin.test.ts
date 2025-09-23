@@ -4,9 +4,9 @@ import {
   createTestTokenGenerator,
   getTestUser,
 } from '../utils';
-import { FeedsClient } from '../../src/feeds-client';
-import { Feed } from '../../src/feed';
-import { ActivityResponse, UserRequest } from '../../src/gen/models';
+import type { FeedsClient } from '../../src/feeds-client';
+import type { Feed } from '../../src/feed';
+import type { ActivityResponse, UserRequest } from '../../src/gen/models';
 
 describe('Pin and unpin page', () => {
   let client: FeedsClient;

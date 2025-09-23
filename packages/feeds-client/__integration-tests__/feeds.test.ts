@@ -1,12 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { UserRequest } from '../src/gen/models';
+import type { UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
 } from './utils';
-import { FeedsClient } from '../src/feeds-client';
-import { Feed } from '../src/feed';
+import type { FeedsClient } from '../src/feeds-client';
+import type { Feed } from '../src/feed';
 
 describe('Feeds API basic test', () => {
   let client: FeedsClient;

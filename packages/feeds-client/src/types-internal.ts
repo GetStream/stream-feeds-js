@@ -1,4 +1,4 @@
-import { WSEvent } from './gen/models';
+import type { WSEvent } from './gen/models';
 
 export type UpdateStateResult<T> = T & {
   changed: boolean;

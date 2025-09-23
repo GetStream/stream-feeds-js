@@ -9,9 +9,9 @@ import {
   generateOwnUser, generateUserResponseCommonFields,
   getHumanId,
 } from '../../../test-utils';
-import { CommentResponse, UserResponseCommonFields } from '../../../gen/models';
+import type { CommentResponse, UserResponseCommonFields } from '../../../gen/models';
 import { shouldUpdateState } from '../../../utils';
-import { EventPayload } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 
 describe(handleCommentDeleted.name, () => {
   let feed: Feed;

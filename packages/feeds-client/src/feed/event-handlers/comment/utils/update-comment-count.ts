@@ -1,5 +1,5 @@
-import { ActivityResponse, Feed } from '@self';
-import { CommentResponse } from '@self';
+import type { ActivityResponse, Feed } from '@self';
+import type { CommentResponse } from '@self';
 import { handleCommentUpdated } from '../handle-comment-updated';
 import { handleActivityUpdated } from '../../activity';
 

@@ -5,8 +5,8 @@ import {
   getTestUser,
 } from './utils';
 import { sleep } from '../src/common/utils';
-import { FeedsClient } from '../src/feeds-client';
-import { UserRequest } from '../src/gen/models';
+import type { FeedsClient } from '../src/feeds-client';
+import type { UserRequest } from '../src/gen/models';
 
 describe('API requests and error handling', () => {
   let client: FeedsClient;

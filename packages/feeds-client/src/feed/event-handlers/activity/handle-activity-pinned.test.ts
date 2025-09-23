@@ -8,7 +8,7 @@ import {
   generateActivityPinResponse,
   generateFeedResponse,
 } from '../../../test-utils/response-generators';
-import { ActivityPinResponse } from '../../../gen/models';
+import type { ActivityPinResponse } from '../../../gen/models';
 
 describe(handleActivityPinned.name, () => {
   let feed: Feed;

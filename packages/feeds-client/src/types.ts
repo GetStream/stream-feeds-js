@@ -1,9 +1,9 @@
-import {
+import type {
   ConnectionChangedEvent,
   UnhandledErrorEvent,
 } from './common/real-time/event-models';
-import { NetworkChangedEvent } from './common/types';
-import {
+import type { NetworkChangedEvent } from './common/types';
+import type {
   PagerResponse,
   WSEvent,
 } from './gen/models';
@@ -11,7 +11,7 @@ import type {
   ActivityResponse,
   CommentResponse,
 } from './gen/models';
-import { FeedsClient } from './feeds-client';
+import type { FeedsClient } from './feeds-client';
 
 export type FeedsEvent = WSEvent | ConnectionChangedEvent | NetworkChangedEvent | UnhandledErrorEvent;
 export type ActivityIdOrCommentId = string;

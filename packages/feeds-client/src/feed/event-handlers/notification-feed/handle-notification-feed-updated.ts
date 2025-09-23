@@ -1,5 +1,5 @@
 import type { Feed } from '../../../feed';
-import {
+import type {
   AggregatedActivityResponse,
   NotificationFeedUpdatedEvent,
   NotificationStatusResponse,
