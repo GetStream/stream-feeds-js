@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, View } from 'react-native';
-import Video from 'react-native-video';
+
+const Video = lazy(() => import('react-native-video'));
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -24,22 +25,30 @@ export const PagerVideo = ({
 
   return (
     <View style={styles.page}>
-      <Video
-        style={styles.video}
-        source={{ uri: source }}
-        repeat={true}
-        paused={paused}
-        resizeMode="contain"
-        controls={false}
-        onLoadStart={() => setIsLoading(true)}
-        onLoad={() => setIsLoading(false)}
-      />
+      <Suspense
+        fallback={
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        }
+      >
+        <Video
+          style={styles.video}
+          source={{ uri: source }}
+          repeat={true}
+          paused={paused}
+          resizeMode="contain"
+          controls={false}
+          onLoadStart={() => setIsLoading(true)}
+          onLoad={() => setIsLoading(false)}
+        />
 
-      {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#fff" />
-        </View>
-      )}
+        {isLoading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#fff" />
+          </View>
+        )}
+      </Suspense>
     </View>
   );
 };
