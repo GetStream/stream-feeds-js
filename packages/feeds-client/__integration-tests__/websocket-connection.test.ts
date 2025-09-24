@@ -21,7 +21,7 @@ describe('WebSocket connection', () => {
     client.state.subscribe(spy);
 
     expect(spy).toHaveBeenCalledWith(
-      { connected_user: undefined, is_ws_connection_healthy: false },
+      { connected_user: undefined, is_ws_connection_healthy: false, own_capabilities_by_fid: {} },
       undefined,
     );
 
