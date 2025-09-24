@@ -54,7 +54,22 @@ export function handleActivityAdded(
     'start',
   );
   if (result.changed) {
-    this.client.hydratePollCache([event.activity]);
+    const activity = event.activity;
+    this.client.hydratePollCache([activity]);
+
+    const currentFeed = activity.current_feed;
+    
+    if (currentFeed) {
+      if (currentFeed?.own_capabilities) {
+        this.client.hydrateCapabilitiesCache([currentFeed]);
+      } else {
+        this.client.queryFeeds({ filter: { feed: currentFeed.feed }}).catch(error => {
+          // FIXME: move to bubbling local error event
+          console.error(error);
+        })
+      }
+    }
+
     this.state.partialNext({ activities: result.activities });
   }
 }
