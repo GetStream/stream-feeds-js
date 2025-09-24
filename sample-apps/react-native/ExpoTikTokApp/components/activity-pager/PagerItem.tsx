@@ -15,7 +15,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Reaction } from '@/components/common/Reaction';
 import { Bookmark } from '@/components/common/Bookmark';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationPreview } from '@/components/common/LocationPreview';
 import { ShareButton } from '@/components/common/Share';
 import { AnnotatedText } from '@/components/common/tokenized-text/AnnotatedText';
@@ -33,7 +32,7 @@ const UnmemoizedPagerItem = ({
   const router = useRouter();
 
   const overlayStyle = useMemo(
-    () => ({ bottom: 50 }),
+    () => ({ bottom: Platform.OS === 'android' ? 70 : 50 }),
     [],
   );
 

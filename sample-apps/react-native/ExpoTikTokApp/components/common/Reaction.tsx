@@ -54,8 +54,8 @@ export const Reaction = ({
     ? ownCapabilities.can_add_comment_reaction
     : ownCapabilities.can_add_activity_reaction;
   const canRemoveReaction = isComment
-    ? ownCapabilities.can_remove_comment_reaction
-    : ownCapabilities.can_remove_activity_reaction;
+    ? ownCapabilities.can_delete_own_comment_reaction
+    : ownCapabilities.can_delete_own_activity_reaction;
 
   const client = useFeedsClient();
 
