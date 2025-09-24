@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.12](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.11...@stream-io/feeds-client-0.2.12) (2025-09-24)
+
+
+* **feeds-client:** enable verbatim module syntax ([#124](https://github.com/GetStream/stream-feeds-js/issues/124)) ([0a66d09](https://github.com/GetStream/stream-feeds-js/commit/0a66d09c4f7aca7e4d22f64616df95ea873838a4))
+
+
+### Features
+
+* support for new capabilities ([#128](https://github.com/GetStream/stream-feeds-js/issues/128)) ([ce76d92](https://github.com/GetStream/stream-feeds-js/commit/ce76d9232667ab54f4ef5f01819d09553bd52bf0))
+
 ## [0.2.11](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.10...@stream-io/feeds-client-0.2.11) (2025-09-22)
 
 
