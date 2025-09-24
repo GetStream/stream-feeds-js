@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { FeedsClient } from '../src/feeds-client';
+import type { FeedsClient, UserRequest } from '../src';
 import {
   createTestClient,
   createTestTokenGenerator,
@@ -7,7 +7,6 @@ import {
   getTestUser,
   waitForEvent,
 } from './utils';
-import { UserRequest } from '../src/gen/models';
 
 describe('Aggregated Feed Pagination Integration Tests', () => {
   let client: FeedsClient;
