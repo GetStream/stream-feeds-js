@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.5](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.4...@stream-io/feeds-react-native-sdk-0.1.5) (2025-09-24)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.2.12`
+
+* **feeds-client:** enable verbatim module syntax ([#124](https://github.com/GetStream/stream-feeds-js/issues/124)) ([0a66d09](https://github.com/GetStream/stream-feeds-js/commit/0a66d09c4f7aca7e4d22f64616df95ea873838a4))
+
 ## [0.1.4](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.3...@stream-io/feeds-react-native-sdk-0.1.4) (2025-09-22)
 
 ### Dependency Updates
