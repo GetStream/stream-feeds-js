@@ -16,7 +16,7 @@ import type {
   ImageUploadRequest,
   OwnUser,
   PollResponse,
-  PollVotesResponse,
+  PollVotesResponse, QueryActivitiesRequest,
   QueryFeedsRequest,
   QueryPollVotesRequest,
   UpdateActivityRequest,
@@ -75,6 +75,7 @@ import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/han
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
   is_ws_connection_healthy: boolean;
+  own_capabilities_by_fid: Record<string, FeedResponse['own_capabilities']>;
 };
 
 type FID = string;
@@ -110,6 +111,7 @@ export class FeedsClient extends FeedsApi {
     this.state = new StateStore<FeedsClientState>({
       connected_user: undefined,
       is_ws_connection_healthy: false,
+      own_capabilities_by_fid: {},
     });
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
@@ -274,6 +276,27 @@ export class FeedsClient extends FeedsApi {
         pollFromCache.reinitializeState(pollResponse);
       }
     }
+  }
+
+  public hydrateCapabilitiesCache(feedResponses: FeedResponse[]) {
+    let ownCapabilitiesCache = {
+      ...this.state.getLatestValue().own_capabilities_by_fid,
+    };
+    for (const feedResponse of feedResponses) {
+      const { feed, own_capabilities } = feedResponse;
+
+      if (
+        !Object.prototype.hasOwnProperty.call(ownCapabilitiesCache, feed) &&
+        own_capabilities
+      ) {
+        ownCapabilitiesCache = {
+          ...ownCapabilitiesCache,
+          [feed]: own_capabilities,
+        };
+      }
+    }
+
+    this.state.partialNext({ own_capabilities_by_fid: ownCapabilitiesCache });
   }
 
   connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
@@ -516,9 +539,14 @@ export class FeedsClient extends FeedsApi {
 
     this.connectionIdManager.reset();
     this.tokenManager.reset();
+
+    // clear all caches
+    this.polls_by_id.clear();
+
     this.state.partialNext({
       connected_user: undefined,
       is_ws_connection_healthy: false,
+      own_capabilities_by_fid: {},
     });
   };
 
@@ -532,7 +560,9 @@ export class FeedsClient extends FeedsApi {
   async queryFeeds(request?: QueryFeedsRequest) {
     const response = await this._queryFeeds(request);
 
-    const feeds = response.feeds.map((feedResponse) =>
+    const feedResponses = response.feeds;
+
+    const feeds = feedResponses.map((feedResponse) =>
       this.getOrCreateActiveFeed(
         feedResponse.group_id,
         feedResponse.id,
@@ -541,6 +571,8 @@ export class FeedsClient extends FeedsApi {
       ),
     );
 
+    this.hydrateCapabilitiesCache(feedResponses);
+
     return {
       feeds,
       next: response.next,
@@ -548,6 +580,22 @@ export class FeedsClient extends FeedsApi {
       metadata: response.metadata,
       duration: response.duration,
     };
+  }
+
+  async queryActivities(request?: QueryActivitiesRequest) {
+    const response = await super.queryActivities(request);
+    const activityCurrentFeeds = response.activities.map(activity => activity.current_feed);
+    const feedsToHydrateFrom = [];
+
+    for (const feed of activityCurrentFeeds) {
+      if (feed) {
+        feedsToHydrateFrom.push(feed);
+      }
+    }
+
+    this.hydrateCapabilitiesCache(feedsToHydrateFrom);
+
+    return response;
   }
 
   updateNetworkConnectionStatus = (
