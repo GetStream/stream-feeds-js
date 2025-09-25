@@ -32,7 +32,7 @@ export const useOwnCapabilities = (feedFromProps?: Feed) => {
   const { feedOwnCapabilities = stableEmptyArray } =
     useStateStore(client?.state, selector) ?? {};
 
-  console.log('GETTING CAPA: ', feedOwnCapabilities);
+  // console.log('GETTING CAPA: ', feed?.feed, feedOwnCapabilities);
 
   return useMemo(() => {
     const capabilitiesSet = new Set(feedOwnCapabilities);

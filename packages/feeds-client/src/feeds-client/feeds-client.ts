@@ -68,7 +68,11 @@ import { handleUserUpdated } from './event-handlers';
 import type { SyncFailure } from '../common/real-time/event-models';
 import { UnhandledErrorType } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
-import { configureLoggers } from '../utils/logger';
+import { configureLoggers } from '../utils';
+import { throttle, type ThrottledCallback } from '../utils/throttling';
+import {
+  queueBatchedOwnCapabilities
+} from '../utils/throttling/throttled-get-batched-own-capabilities';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -277,22 +281,28 @@ export class FeedsClient extends FeedsApi {
   }
 
   public hydrateCapabilitiesCache(feedResponses: FeedResponse[]) {
-    let ownCapabilitiesCache = {
-      ...this.state.getLatestValue().own_capabilities_by_fid,
-    };
+    let ownCapabilitiesCache = this.state.getLatestValue().own_capabilities_by_fid;
+
+    const capabilitiesToFetchQueue: string[] = [];
+
     for (const feedResponse of feedResponses) {
       const { feed, own_capabilities } = feedResponse;
 
       if (
-        !Object.prototype.hasOwnProperty.call(ownCapabilitiesCache, feed) &&
-        own_capabilities
+        !Object.prototype.hasOwnProperty.call(ownCapabilitiesCache, feed)
       ) {
-        ownCapabilitiesCache = {
-          ...ownCapabilitiesCache,
-          [feed]: own_capabilities,
-        };
+        if (own_capabilities) {
+          ownCapabilitiesCache = {
+            ...ownCapabilitiesCache,
+            [feed]: own_capabilities,
+          };
+        } else {
+          capabilitiesToFetchQueue.push(feed);
+        }
       }
     }
+
+    queueBatchedOwnCapabilities.bind(this)({ feeds: capabilitiesToFetchQueue });
 
     this.state.partialNext({ own_capabilities_by_fid: ownCapabilitiesCache });
   }
@@ -533,6 +543,20 @@ export class FeedsClient extends FeedsApi {
   feed = (groupId: string, id: string) => {
     return this.getOrCreateActiveFeed(groupId, id);
   };
+
+  protected throttledGetBatchedOwnCapabilities = throttle(
+    ((feeds: string[], callback: (feeds: string[]) => void | Promise<void>) => {
+      this.queryFeeds({ filter: { feed: { $in: feeds } }}).catch(error => {
+        // FIXME: move to bubbling local error event
+        console.error(error);
+      })
+      callback(feeds);
+      // FIXME: use proper type
+    }) as ThrottledCallback,
+    // FIXME: use const
+    2000,
+    { trailing: true },
+  );
 
   async queryFeeds(request?: QueryFeedsRequest) {
     const response = await this._queryFeeds(request);
