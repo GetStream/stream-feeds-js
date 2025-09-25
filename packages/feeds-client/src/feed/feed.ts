@@ -277,7 +277,16 @@ export class Feed extends FeedApi {
     try {
       const response = await super.getOrCreate(request);
 
-      this.client.hydrateCapabilitiesCache([response.feed]);
+      console.log('RESP: ', response)
+
+      const currentActivityFeeds = [];
+      for (const activity of response.activities) {
+        if (activity.current_feed) {
+          currentActivityFeeds.push(activity.current_feed);
+        }
+      }
+
+      this.client.hydrateCapabilitiesCache([response.feed, ...currentActivityFeeds]);
 
       if (request?.next) {
         const { activities: currentActivities = [] } = this.currentState;

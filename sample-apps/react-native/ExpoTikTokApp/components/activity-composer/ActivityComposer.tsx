@@ -155,21 +155,25 @@ export const ActivityComposer = () => {
           : {}),
         ...(mentionedUsers ? { mentioned_user_ids: mentionedUsers } : {}),
       };
-      if (editingActivity) {
-        await client?.updateActivity({
-          ...activityData,
-          id: editingActivity.id,
-        });
-      } else if (hasHashtags) {
-        await client?.addActivity({
-          ...activityData,
-          feeds: [
-            feed.feed,
-            ...createdHashtagFeeds.map((hashtagFeed) => hashtagFeed.feed),
-          ],
-        });
-      } else {
-        await feed.addActivity(activityData);
+
+      for (let i = 1; i < 4; i++) {
+        activityData.text = `${i}. ${activityData.text}`;
+        if (editingActivity) {
+          await client?.updateActivity({
+            ...activityData,
+            id: editingActivity.id,
+          });
+        } else if (hasHashtags) {
+          await client?.addActivity({
+            ...activityData,
+            feeds: [
+              feed.feed,
+              ...createdHashtagFeeds.map((hashtagFeed) => hashtagFeed.feed),
+            ],
+          });
+        } else {
+          await feed.addActivity(activityData);
+        }
       }
 
       setMedia([]);

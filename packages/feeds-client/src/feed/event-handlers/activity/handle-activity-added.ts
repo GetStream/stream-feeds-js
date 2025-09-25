@@ -1,6 +1,7 @@
 import type { Feed } from '../../feed';
 import type { ActivityResponse } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import { queueBatchedOwnCapabilities } from '../../../utils/throttling/throttled-get-batched-own-capabilities';
 
 export function addActivitiesToState(
   this: Feed,
@@ -58,16 +59,9 @@ export function handleActivityAdded(
     this.client.hydratePollCache([activity]);
 
     const currentFeed = activity.current_feed;
-    
+
     if (currentFeed) {
-      if (currentFeed?.own_capabilities) {
-        this.client.hydrateCapabilitiesCache([currentFeed]);
-      } else {
-        this.client.queryFeeds({ filter: { feed: currentFeed.feed }}).catch(error => {
-          // FIXME: move to bubbling local error event
-          console.error(error);
-        })
-      }
+      this.client.hydrateCapabilitiesCache([currentFeed]);
     }
 
     this.state.partialNext({ activities: result.activities });
