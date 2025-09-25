@@ -16,7 +16,8 @@ import type {
   ImageUploadRequest,
   OwnUser,
   PollResponse,
-  PollVotesResponse, QueryActivitiesRequest,
+  PollVotesResponse,
+  QueryActivitiesRequest,
   QueryFeedsRequest,
   QueryPollVotesRequest,
   UpdateActivityRequest,
@@ -71,6 +72,8 @@ import { UnhandledErrorType } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
+import { throttle, type ThrottledCallback } from '../utils/throttling';
+import { queueBatchedOwnCapabilities } from '../utils/throttling/throttled-get-batched-own-capabilities';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -279,22 +282,27 @@ export class FeedsClient extends FeedsApi {
   }
 
   public hydrateCapabilitiesCache(feedResponses: FeedResponse[]) {
-    let ownCapabilitiesCache = {
-      ...this.state.getLatestValue().own_capabilities_by_fid,
-    };
+    let ownCapabilitiesCache =
+      this.state.getLatestValue().own_capabilities_by_fid;
+
+    const capabilitiesToFetchQueue: string[] = [];
+
     for (const feedResponse of feedResponses) {
       const { feed, own_capabilities } = feedResponse;
 
-      if (
-        !Object.prototype.hasOwnProperty.call(ownCapabilitiesCache, feed) &&
-        own_capabilities
-      ) {
-        ownCapabilitiesCache = {
-          ...ownCapabilitiesCache,
-          [feed]: own_capabilities,
-        };
+      if (!Object.prototype.hasOwnProperty.call(ownCapabilitiesCache, feed)) {
+        if (own_capabilities) {
+          ownCapabilitiesCache = {
+            ...ownCapabilitiesCache,
+            [feed]: own_capabilities,
+          };
+        } else {
+          capabilitiesToFetchQueue.push(feed);
+        }
       }
     }
+
+    queueBatchedOwnCapabilities.bind(this)({ feeds: capabilitiesToFetchQueue });
 
     this.state.partialNext({ own_capabilities_by_fid: ownCapabilitiesCache });
   }
@@ -557,6 +565,20 @@ export class FeedsClient extends FeedsApi {
     return this.getOrCreateActiveFeed(groupId, id);
   };
 
+  protected throttledGetBatchedOwnCapabilities = throttle(
+    ((feeds: string[], callback: (feeds: string[]) => void | Promise<void>) => {
+      this.queryFeeds({ filter: { feed: { $in: feeds } } }).catch((error) => {
+        // FIXME: move to bubbling local error event
+        console.error(error);
+      });
+      callback(feeds);
+      // FIXME: use proper type
+    }) as ThrottledCallback,
+    // FIXME: use const
+    2000,
+    { trailing: true },
+  );
+
   async queryFeeds(request?: QueryFeedsRequest) {
     const response = await this._queryFeeds(request);
 
@@ -584,7 +606,9 @@ export class FeedsClient extends FeedsApi {
 
   async queryActivities(request?: QueryActivitiesRequest) {
     const response = await super.queryActivities(request);
-    const activityCurrentFeeds = response.activities.map(activity => activity.current_feed);
+    const activityCurrentFeeds = response.activities.map(
+      (activity) => activity.current_feed,
+    );
     const feedsToHydrateFrom = [];
 
     for (const feed of activityCurrentFeeds) {
