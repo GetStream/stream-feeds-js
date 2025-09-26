@@ -572,6 +572,7 @@ export class FeedsClient extends FeedsApi {
 
   protected throttledGetBatchedOwnCapabilities = throttle(
     ((feeds: string[], callback: (feeds: string[]) => void | Promise<void>) => {
+      // TODO: Replace this with the actual getBatchCapabilities endpoint when it is ready
       this.queryFeeds({ filter: { feed: { $in: feeds } } }).catch((error) => {
         this.eventDispatcher.dispatch({
           type: 'errors.unhandled',
