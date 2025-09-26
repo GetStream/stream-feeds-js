@@ -1,7 +1,6 @@
 import type { Feed } from '../../feed';
 import type { ActivityResponse } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
-import { queueBatchedOwnCapabilities } from '../../../utils/throttling/throttled-get-batched-own-capabilities';
 
 export function addActivitiesToState(
   this: Feed,
