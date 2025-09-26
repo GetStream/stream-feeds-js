@@ -43,9 +43,9 @@ export const Reaction = ({
   type: IconType;
   entity: ActivityResponse | CommentResponse;
 } & Partial<IconProps>) => {
-  const ownCapabilities = useOwnCapabilities();
-
   const isComment = isCommentResponse(entity);
+  const ownCapabilities = useOwnCapabilities(isComment ? undefined : entity.current_feed);
+
   const hasOwnReaction = useMemo(
     () => !!entity.own_reactions?.find((r) => r.type === type),
     [entity.own_reactions, type],
