@@ -1,5 +1,5 @@
-import type { OwnUser } from '../../gen/models';
-import type { StreamApiError } from '../../../dist/types/common/types';
+import type { OwnUser } from '@self';
+import type { StreamApiError } from '@self';
 
 export interface ConnectionChangedEvent {
   type: 'connection.changed';

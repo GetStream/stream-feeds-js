@@ -74,10 +74,12 @@ import {
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
-import { throttle, type ThrottledCallback } from '../utils/throttling';
+import { throttle } from '../utils/throttling';
 import {
-  QUEUE_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
+  DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
+  type GetBatchedOwnCapabilitiesThrottledCallback,
   queueBatchedOwnCapabilities,
+  type ThrottledGetBatchedOwnCapabilities,
 } from '../utils/throttling/throttled-get-batched-own-capabilities';
 
 export type FeedsClientState = {
@@ -106,6 +108,8 @@ export class FeedsClient extends FeedsApi {
 
   private healthyConnectionChangedEventCount = 0;
 
+  protected throttledGetBatchOwnCapabilities!: ThrottledGetBatchedOwnCapabilities;
+
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
     const connectionIdManager = new ConnectionIdManager();
@@ -125,6 +129,11 @@ export class FeedsClient extends FeedsApi {
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
+
+    this.setGetBatchOwnCapabilitiesThrottlingInterval(
+      options?.query_batch_own_capabilties_throttling_interval ??
+        DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
+    );
 
     configureLoggers(options?.configure_loggers_options);
 
@@ -240,6 +249,30 @@ export class FeedsClient extends FeedsApi {
       }
     });
   }
+
+  private setGetBatchOwnCapabilitiesThrottlingInterval = (
+    throttlingMs: number,
+  ) => {
+    this.throttledGetBatchOwnCapabilities =
+      throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
+        (feeds, callback) => {
+          // TODO: Replace this with the actual getBatchCapabilities endpoint when it is ready
+          this.queryFeeds({ filter: { feed: { $in: feeds } } }).catch(
+            (error) => {
+              this.eventDispatcher.dispatch({
+                type: 'errors.unhandled',
+                error_type:
+                  UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+                error,
+              });
+            },
+          );
+          callback(feeds);
+        },
+        throttlingMs,
+        { trailing: true },
+      );
+  };
 
   private recoverOnReconnect = async () => {
     this.healthyConnectionChangedEventCount++;
@@ -569,23 +602,6 @@ export class FeedsClient extends FeedsApi {
   feed = (groupId: string, id: string) => {
     return this.getOrCreateActiveFeed(groupId, id);
   };
-
-  protected throttledGetBatchedOwnCapabilities = throttle(
-    ((feeds: string[], callback: (feeds: string[]) => void | Promise<void>) => {
-      // TODO: Replace this with the actual getBatchCapabilities endpoint when it is ready
-      this.queryFeeds({ filter: { feed: { $in: feeds } } }).catch((error) => {
-        this.eventDispatcher.dispatch({
-          type: 'errors.unhandled',
-          error_type: UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
-          error,
-        });
-        console.error(error);
-      });
-      callback(feeds);
-    }) as ThrottledCallback,
-    QUEUE_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
-    { trailing: true },
-  );
 
   async queryFeeds(request?: QueryFeedsRequest) {
     const response = await this._queryFeeds(request);
