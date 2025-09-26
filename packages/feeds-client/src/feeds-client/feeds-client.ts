@@ -72,13 +72,13 @@ import {
 } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils';
-import { throttle } from '../utils/throttling';
 import {
+  throttle,
   DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
   type GetBatchedOwnCapabilitiesThrottledCallback,
   queueBatchedOwnCapabilities,
   type ThrottledGetBatchedOwnCapabilities,
-} from '../utils/throttling/throttled-get-batched-own-capabilities';
+} from '../utils/throttling';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
