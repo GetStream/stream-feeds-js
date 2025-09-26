@@ -5,6 +5,8 @@ export type GetBatchedOwnCapabilities = {
   feeds: string[];
 };
 
+export const QUEUE_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL = 2000;
+
 const queuedFeeds: Set<string> = new Set();
 
 export function queueBatchedOwnCapabilities(

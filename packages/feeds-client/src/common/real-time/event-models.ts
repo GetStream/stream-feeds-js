@@ -1,4 +1,5 @@
 import type { OwnUser } from '../../gen/models';
+import type { StreamApiError } from '../../../dist/types/common/types';
 
 export interface ConnectionChangedEvent {
   type: 'connection.changed';
@@ -39,9 +40,10 @@ export interface ConnectedEvent {
 
 export enum UnhandledErrorType {
   ReconnectionReconciliation = 'reconnection-reconciliation',
+  FetchingOwnCapabilitiesOnNewActivity = 'fetching-own-capabilities-on-new-activity',
 }
 
-export type SyncFailure = { feed: string, reason: unknown };
+export type SyncFailure = { feed: string; reason: unknown };
 
 export type UnhandledErrorEvent = {
   type: 'errors.unhandled';
@@ -50,5 +52,9 @@ export type UnhandledErrorEvent = {
   | {
       error_type: UnhandledErrorType.ReconnectionReconciliation;
       failures: SyncFailure[];
+    }
+  | {
+      error_type: UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity;
+      error: StreamApiError;
     }
 );
