@@ -1,5 +1,10 @@
 export type ThrottledCallback = (...args: unknown[]) => unknown;
 
+// export type ThrottledFunction<T extends unknown[]> = (this: unknown, ...args: T) => void;
+
+export type ThrottledFunction<T extends unknown[]> =
+  ((...args: T) => void);
+
 /**
  * Throttle a function so it runs at most once per `timeout` ms.
  *
@@ -24,17 +29,17 @@ export type ThrottledCallback = (...args: unknown[]) => unknown;
  * const sendThrottled = throttle(send, 2000, { leading: true, trailing: true });
  * // call `sendThrottled` freely; it won’t invoke `send` more than once every 2s
  */
-export const throttle = <T extends ThrottledCallback>(
-  fn: T,
+export const throttle = <T extends unknown[]>(
+  fn: (...args: T) => void,
   timeout = 200,
   { leading = true, trailing = false }: { leading?: boolean; trailing?: boolean } = {},
 ) => {
   let timer: NodeJS.Timeout | null = null;
-  let storedArgs: Parameters<T> | null = null;
+  let storedArgs: T | null = null;
   let storedThis: unknown = null;
   let lastInvokeTime = 0; // timestamp of last actual invocation
 
-  const invoke = (args: Parameters<T>, thisArg: unknown) => {
+  const invoke = (args: T, thisArg: unknown) => {
     lastInvokeTime = Date.now();
     fn.apply(thisArg, args);
   };
@@ -51,7 +56,7 @@ export const throttle = <T extends ThrottledCallback>(
     }, delay);
   };
 
-  return function (this: any, ...args: Parameters<T>) {
+  return function (this: unknown, ...args: T) {
     const now = Date.now();
 
     // if we have never invoked and `leading` is `false`, treat `lastInvokeTime` as now
