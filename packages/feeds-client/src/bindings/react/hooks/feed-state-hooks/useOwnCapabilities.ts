@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import { type Feed, FeedOwnCapability, type FeedsClientState } from '@self';
+import type { FeedOwnCapability, Feed, FeedsClientState } from '@self';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
