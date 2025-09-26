@@ -3,17 +3,12 @@ export type ThrottledCallback = (...args: unknown[]) => unknown;
 /**
  * Throttle a function so it runs at most once per `timeout` ms.
  *
- * - single–timer approach: we keep one pending timer for the trailing edge
  * - `leading`: fire immediately when the window opens
  * - `trailing`: remember the latest args/this and fire once when the window closes
- * - avoids boundary double-invoke: if we just led with the same args, we clear the stored ones
- * - preserves `this` on trailing (uses `fn.apply(this, args)`)
  *
  * defaults: `{ leading: true, trailing: false }`
- * (lodash’s default is `{ leading: true, trailing: true }` — enable `trailing` if you want that)
  *
  * notes:
- * - uses `Date.now()`; if you need a monotonic clock, swap in `performance.now()`
  * - make one throttled instance and reuse it; re-creating it resets internal state
  *
  * @typeParam T - the function type being throttled

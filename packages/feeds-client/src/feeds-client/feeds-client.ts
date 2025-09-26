@@ -67,13 +67,18 @@ import {
   handleWatchStopped,
 } from '../feed';
 import { handleUserUpdated } from './event-handlers';
-import type { SyncFailure } from '../common/real-time/event-models';
-import { UnhandledErrorType } from '../common/real-time/event-models';
+import {
+  type SyncFailure,
+  UnhandledErrorType,
+} from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 import { throttle, type ThrottledCallback } from '../utils/throttling';
-import { queueBatchedOwnCapabilities } from '../utils/throttling/throttled-get-batched-own-capabilities';
+import {
+  QUEUE_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
+  queueBatchedOwnCapabilities,
+} from '../utils/throttling/throttled-get-batched-own-capabilities';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -568,14 +573,16 @@ export class FeedsClient extends FeedsApi {
   protected throttledGetBatchedOwnCapabilities = throttle(
     ((feeds: string[], callback: (feeds: string[]) => void | Promise<void>) => {
       this.queryFeeds({ filter: { feed: { $in: feeds } } }).catch((error) => {
-        // FIXME: move to bubbling local error event
+        this.eventDispatcher.dispatch({
+          type: 'errors.unhandled',
+          error_type: UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+          error,
+        });
         console.error(error);
       });
       callback(feeds);
-      // FIXME: use proper type
     }) as ThrottledCallback,
-    // FIXME: use const
-    2000,
+    QUEUE_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
     { trailing: true },
   );
 
