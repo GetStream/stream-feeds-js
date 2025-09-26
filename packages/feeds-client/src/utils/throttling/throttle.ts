@@ -1,7 +1,5 @@
 export type ThrottledCallback = (...args: unknown[]) => unknown;
 
-// export type ThrottledFunction<T extends unknown[]> = (this: unknown, ...args: T) => void;
-
 export type ThrottledFunction<T extends unknown[]> =
   ((...args: T) => void);
 
@@ -37,7 +35,7 @@ export const throttle = <T extends unknown[]>(
   let timer: NodeJS.Timeout | null = null;
   let storedArgs: T | null = null;
   let storedThis: unknown = null;
-  let lastInvokeTime = 0; // timestamp of last actual invocation
+  let lastInvokeTime: number | undefined; // timestamp of last actual invocation
 
   const invoke = (args: T, thisArg: unknown) => {
     lastInvokeTime = Date.now();
@@ -59,10 +57,12 @@ export const throttle = <T extends unknown[]>(
   return function (this: unknown, ...args: T) {
     const now = Date.now();
 
-    // if we have never invoked and `leading` is `false`, treat `lastInvokeTime` as now
-    if (lastInvokeTime === 0 && !leading) lastInvokeTime = now;
+    const hasBeenInvoked = lastInvokeTime != null;
 
-    const timeSinceLast = now - lastInvokeTime;
+    // if we have never invoked and `leading` is `false`, treat `lastInvokeTime` as now
+    if (!hasBeenInvoked && !leading) lastInvokeTime = now;
+
+    const timeSinceLast = hasBeenInvoked ? (now - lastInvokeTime!) : timeout;
     const remaining = timeout - timeSinceLast;
 
     // capture latest args for possible trailing invocation
