@@ -277,8 +277,6 @@ export class Feed extends FeedApi {
     try {
       const response = await super.getOrCreate(request);
 
-      console.log('RESP: ', response)
-
       const currentActivityFeeds = [];
       for (const activity of response.activities) {
         if (activity.current_feed) {
