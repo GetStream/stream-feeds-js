@@ -1,15 +1,18 @@
 import type {
   ActivityResponse,
-  CommentResponse} from '@stream-io/feeds-react-native-sdk';
+  CommentResponse,
+} from '@stream-io/feeds-react-native-sdk';
 import {
   useOwnCapabilities,
   isCommentResponse,
-  useFeedsClient, FeedOwnCapability,
+  useFeedsClient,
+  FeedOwnCapability,
 } from '@stream-io/feeds-react-native-sdk';
 import { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { useStableCallback } from '@/hooks/useStableCallback';
+import { useActivityContext } from '@/contexts/ActivityContext';
 
 const iconMap = {
   like: {
@@ -36,15 +39,21 @@ type IconProps = { size: number; color: string };
 
 export const Reaction = ({
   type,
-  entity,
+  activity: actitivyFromProps,
+  comment,
   size = 20,
   color = 'white',
 }: {
   type: IconType;
-  entity: ActivityResponse | CommentResponse;
+  activity?: ActivityResponse;
+  comment?: CommentResponse;
 } & Partial<IconProps>) => {
+  const activityFromContext = useActivityContext();
+  const activity = actitivyFromProps ?? activityFromContext;
+  const entity = comment ?? activity;
+
   const isComment = isCommentResponse(entity);
-  const ownCapabilities = useOwnCapabilities(isComment ? undefined : entity.current_feed);
+  const ownCapabilities = useOwnCapabilities(activity.current_feed);
 
   const hasOwnReaction = useMemo(
     () => !!entity.own_reactions?.find((r) => r.type === type),

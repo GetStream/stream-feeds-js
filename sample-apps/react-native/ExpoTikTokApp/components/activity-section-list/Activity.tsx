@@ -1,5 +1,6 @@
+import type {
+  ActivityResponse} from '@stream-io/feeds-react-native-sdk';
 import {
-  ActivityResponse,
   useClientConnectedUser,
   useFeedContext,
 } from '@stream-io/feeds-react-native-sdk';
@@ -72,7 +73,7 @@ export const Activity = ({
         ) : null}
         {feed ? (
           <View style={styles.heartIcon}>
-            <Reaction type="like" entity={activity} />
+            <Reaction type="like" activity={activity} />
           </View>
         ) : null}
       </View>

@@ -1,8 +1,6 @@
 import React from 'react';
-import {
-  CommentResponse,
-  useClientConnectedUser,
-} from '@stream-io/feeds-react-native-sdk';
+import type { CommentResponse } from '@stream-io/feeds-react-native-sdk';
+import { useClientConnectedUser } from '@stream-io/feeds-react-native-sdk';
 import { useComments } from '@stream-io/feeds-react-native-sdk';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useStableCallback } from '@/hooks/useStableCallback';
@@ -12,9 +10,7 @@ import { COMMENTS_LOADING_CONFIG } from '@/constants/stream';
 import { openSheetWith } from '@/store/bottom-sheet-state-store';
 import { useRouter } from 'expo-router';
 import { setParent } from '@/store/comment-input-state-store';
-import {
-  AnnotatedText
-} from '@/components/common/tokenized-text/AnnotatedText';
+import { AnnotatedText } from '@/components/common/tokenized-text/AnnotatedText';
 
 export const Comment = ({
   comment,
@@ -64,10 +60,7 @@ export const Comment = ({
         />
         <View style={styles.commentContent}>
           <Text style={styles.commentUser}>{comment.user.id}</Text>
-          <AnnotatedText
-            entity={comment}
-            style={styles.commentText}
-          />
+          <AnnotatedText entity={comment} style={styles.commentText} />
           <View style={styles.metaRow}>
             <Text style={styles.commentDate}>{formattedDate}</Text>
             {isFirstLevel ? (
@@ -80,11 +73,11 @@ export const Comment = ({
 
         <View style={styles.commentActionsContainer}>
           <View style={styles.reactionContainer}>
-            <Reaction type="like" color="black" entity={comment} />
+            <Reaction type="like" color="black" comment={comment} />
             <Text style={styles.reactionCount}>
               {comment.reaction_groups?.like?.count ?? 0}
             </Text>
-            <Reaction type="downvote" color="black" entity={comment} />
+            <Reaction type="downvote" color="black" comment={comment} />
           </View>
         </View>
       </View>

@@ -1,4 +1,5 @@
-import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
+import type { PropsWithChildren} from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 type ActivityPagerContextValue = {
   activeId?: string;
