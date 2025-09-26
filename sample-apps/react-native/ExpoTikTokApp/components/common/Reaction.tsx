@@ -4,7 +4,7 @@ import type {
 import {
   useOwnCapabilities,
   isCommentResponse,
-  useFeedsClient,
+  useFeedsClient, FeedOwnCapability,
 } from '@stream-io/feeds-react-native-sdk';
 import { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -52,11 +52,11 @@ export const Reaction = ({
   );
 
   const canAddReaction = isComment
-    ? ownCapabilities.can_add_comment_reaction
-    : ownCapabilities.can_add_activity_reaction;
+    ? ownCapabilities.includes(FeedOwnCapability.ADD_COMMENT_REACTION)
+    : ownCapabilities.includes(FeedOwnCapability.ADD_ACTIVITY_REACTION);
   const canRemoveReaction = isComment
-    ? ownCapabilities.can_delete_own_comment_reaction
-    : ownCapabilities.can_delete_own_activity_reaction;
+    ? ownCapabilities.includes(FeedOwnCapability.DELETE_OWN_COMMENT_REACTION)
+    : ownCapabilities.includes(FeedOwnCapability.DELETE_OWN_ACTIVITY_REACTION);
 
   const client = useFeedsClient();
 
