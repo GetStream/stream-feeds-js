@@ -303,19 +303,19 @@ describe('throttle', () => {
   });
 
   it('should have correct total invocations on spamming a lot of calls with leading and trailing', () => {
-    const spy = vi.fn();
+    const spy = vi.fn().mockResolvedValue(1);
     const calls = 200;
 
     const t = throttle(spy, 2000, { trailing: true });
 
     for (let i = 0; i < calls; i++) {
       t(i);
-      if (i < calls - 1) vi.advanceTimersByTime(100);
+      if (i < calls - 1) vi.setSystemTime(i * 100);
     }
     expect(spy).toHaveBeenCalledTimes(10);
 
     // one pending trailing for 20000ms is still queued; flush it
-    vi.runAllTimers();
+    vi.runOnlyPendingTimers();
 
     expect(spy).toHaveBeenCalledTimes(11);
     expect(spy).toHaveBeenLastCalledWith(199);
