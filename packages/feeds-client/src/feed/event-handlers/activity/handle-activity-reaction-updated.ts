@@ -19,19 +19,25 @@ export type ActivityReactionUpdatedPayload = PartializeAllBut<
 const sharedUpdateActivity = ({
   payload,
   currentActivity,
+  eventBelongsToCurrentUser,
 }: {
   payload: ActivityReactionUpdatedPayload;
   currentActivity: ActivityResponse;
   eventBelongsToCurrentUser: boolean;
 }) => {
   const { activity: newActivity, reaction: newReaction } = payload;
+  let ownReactions = currentActivity.own_reactions;
+
+  if (eventBelongsToCurrentUser) {
+    ownReactions = [newReaction];
+  }
 
   return {
     ...currentActivity,
     latest_reactions: newActivity.latest_reactions,
     reaction_groups: newActivity.reaction_groups,
     reaction_count: newActivity.reaction_count,
-    own_reactions: [newReaction],
+    own_reactions: ownReactions,
   };
 };
 
