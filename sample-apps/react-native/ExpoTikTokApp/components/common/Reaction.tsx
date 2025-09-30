@@ -1,6 +1,7 @@
-import {
+import type {
   ActivityResponse,
-  CommentResponse,
+  CommentResponse} from '@stream-io/feeds-react-native-sdk';
+import {
   useOwnCapabilities,
   isCommentResponse,
   useFeedsClient,
@@ -65,11 +66,13 @@ export const Reaction = ({
           id: entity.id,
           type,
           create_notification_activity: true,
+          enforce_unique: true,
         })
       : client?.addActivityReaction({
           activity_id: entity.id,
           type,
           create_notification_activity: true,
+          enforce_unique: true,
         }));
   });
 

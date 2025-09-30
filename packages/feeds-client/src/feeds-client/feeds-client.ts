@@ -68,7 +68,10 @@ import { handleUserUpdated } from './event-handlers';
 import type { SyncFailure } from '../common/real-time/event-models';
 import { UnhandledErrorType } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
-import { configureLoggers } from '../utils/logger';
+import { configureLoggers } from '../utils';
+import {
+  handleCommentReactionUpdated
+} from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -449,9 +452,14 @@ export class FeedsClient extends FeedsApi {
   addCommentReaction = async (
     request: AddCommentReactionRequest & { id: string },
   ): Promise<StreamResponse<AddCommentReactionResponse>> => {
+    const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addCommentReaction(request);
     for (const feed of Object.values(this.activeFeeds)) {
-      handleCommentReactionAdded.bind(feed)(response, false);
+      if (shouldEnforceUnique) {
+        handleCommentReactionUpdated.bind(feed)(response, false);
+      } else {
+        handleCommentReactionAdded.bind(feed)(response, false);
+      }
     }
     return response;
   };

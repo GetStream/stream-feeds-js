@@ -57,6 +57,9 @@ import type {
   PagerResponseWithLoadingStates,
 } from '../types';
 import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
+import {
+  handleCommentReactionUpdated
+} from './event-handlers/comment/handle-comment-reaction-updated';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -173,7 +176,7 @@ export class Feed extends FeedApi {
     'feeds.follow.updated': handleFollowUpdated.bind(this),
     'feeds.comment.reaction.added': handleCommentReactionAdded.bind(this),
     'feeds.comment.reaction.deleted': handleCommentReactionDeleted.bind(this),
-    'feeds.comment.reaction.updated': Feed.noop,
+    'feeds.comment.reaction.updated': handleCommentReactionUpdated.bind(this),
     'feeds.feed_member.added': handleFeedMemberAdded.bind(this),
     'feeds.feed_member.removed': handleFeedMemberRemoved.bind(this),
     'feeds.feed_member.updated': handleFeedMemberUpdated.bind(this),
