@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.13](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.12...@stream-io/feeds-client-0.2.13) (2025-09-30)
+
+
+### Features
+
+* allow pagination for feeds with aggregated activities ([#119](https://github.com/GetStream/stream-feeds-js/issues/119)) ([42a5522](https://github.com/GetStream/stream-feeds-js/commit/42a55224c7285d7758656ff3aa5b3a539dc85dfe))
+
 ## [0.2.12](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.11...@stream-io/feeds-client-0.2.12) (2025-09-24)
 
 
