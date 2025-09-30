@@ -306,7 +306,7 @@ describe('Deferred own_capabilities hydration', () => {
       // always leave enough of a timeout for the fetch to fire 3 times;
       // it should of course fire only 2 and be done at most in 2000 + some
       // delta ms, but just in case this behaviour gets broken
-      { timeout: 6000, interval: 50 },
+      { timeout: 6050, interval: 50 },
     );
 
     expect(getCapabilitiesSpy).toHaveBeenCalledTimes(2);
