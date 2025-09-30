@@ -50,7 +50,7 @@ import { StreamPoll } from '../common/Poll';
 import {
   Feed,
   handleActivityReactionAdded,
-  handleActivityReactionDeleted,
+  handleActivityReactionDeleted, handleActivityReactionUpdated,
   handleActivityUpdated,
   handleCommentAdded,
   handleCommentDeleted,
@@ -423,9 +423,14 @@ export class FeedsClient extends FeedsApi {
       activity_id: string;
     },
   ) => {
+    const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addReaction(request);
     for (const feed of Object.values(this.activeFeeds)) {
-      handleActivityReactionAdded.bind(feed)(response, false);
+      if (shouldEnforceUnique) {
+        handleActivityReactionUpdated.bind(feed)(response, false);
+      } else {
+        handleActivityReactionAdded.bind(feed)(response, false);
+      }
     }
     return response;
   };
