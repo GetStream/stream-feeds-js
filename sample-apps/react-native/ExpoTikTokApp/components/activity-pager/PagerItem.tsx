@@ -66,7 +66,7 @@ const UnmemoizedPagerItem = ({
 
         <View style={[styles.sidebar, overlayStyle]}>
           <View style={styles.iconContainer}>
-            <Reaction type="like" entity={activity} size={32} />
+            <Reaction type="like" activity={activity} size={32} />
             <Text style={styles.iconLabel}>
               {activity.reaction_groups.like?.count ?? 0}
             </Text>
