@@ -1,5 +1,5 @@
 import React from 'react';
-import {
+import type {
   ActivityResponse,
   useFeedActivities,
 } from '@stream-io/feeds-react-native-sdk';
@@ -23,17 +23,10 @@ const keyExtractor = (item: ActivityResponse) => item.id;
 export const ActivitySectionList = ({
   activities,
   is_loading: isLoading,
-  loadNextPage: loadNextPageProp,
+  loadNextPage,
   error,
-  has_next_page: hasNextPage,
 }: ReturnType<typeof useFeedActivities> & { error?: Error }) => {
   const hasActivities = activities?.length && activities.length > 0;
-
-  const loadNextPage = useStableCallback(() => {
-    if (!isLoading && hasNextPage) {
-      void loadNextPageProp();
-    }
-  });
 
   const ListFooterComponent = useCallback(
     () => (isLoading && hasActivities ? <ActivityIndicator /> : null),
