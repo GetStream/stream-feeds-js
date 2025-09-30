@@ -51,6 +51,7 @@ import {
   Feed,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
+  handleActivityReactionUpdated,
   handleActivityUpdated,
   handleCommentAdded,
   handleCommentDeleted,
@@ -69,9 +70,7 @@ import type { SyncFailure } from '../common/real-time/event-models';
 import { UnhandledErrorType } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils';
-import {
-  handleCommentReactionUpdated
-} from '../feed/event-handlers/comment/handle-comment-reaction-updated';
+import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -420,9 +419,14 @@ export class FeedsClient extends FeedsApi {
       activity_id: string;
     },
   ) => {
+    const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addActivityReaction(request);
     for (const feed of Object.values(this.activeFeeds)) {
-      handleActivityReactionAdded.bind(feed)(response, false);
+      if (shouldEnforceUnique) {
+        handleActivityReactionUpdated.bind(feed)(response, false);
+      } else {
+        handleActivityReactionAdded.bind(feed)(response, false);
+      }
     }
     return response;
   };

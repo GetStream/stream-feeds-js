@@ -44,22 +44,13 @@ export function handleCommentReactionUpdated(
 
     const newComments = entityState?.comments?.concat([]) ?? [];
 
-    let ownReactions = newComments[commentIndex].own_reactions;
-
-    ownReactions = [
-      ...ownReactions.filter(
-        (ownReaction) => ownReaction.type === reaction.type,
-      ),
-      reaction,
-    ];
-
     newComments[commentIndex] = {
       ...newComments[commentIndex],
       reaction_count: comment.reaction_count ?? 0,
       // TODO: FIXME this should be handled by the backend
       latest_reactions: comment.latest_reactions ?? [],
       reaction_groups: comment.reaction_groups ?? {},
-      own_reactions: ownReactions,
+      own_reactions: [reaction],
     };
 
     return {
