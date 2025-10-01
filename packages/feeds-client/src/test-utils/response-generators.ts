@@ -532,6 +532,32 @@ export function generateCommentReactionDeletedEvent(
   };
 }
 
+export function generateCommentReactionUpdatedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.comment.reaction.updated'>>,
+    'comment' | 'reaction' | 'activity' | 'type'
+  > & {
+    comment?: Parameters<typeof generateCommentResponse>[0];
+    reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+    activity?: Parameters<typeof generateActivityResponse>[0];
+  } = {},
+): EventPayload<'feeds.comment.reaction.updated'> {
+  const comment = generateCommentResponse(overrides.comment);
+  const reaction = generateFeedReactionResponse(overrides.reaction);
+  const activity = generateActivityResponse(overrides.activity);
+
+  return {
+    type: 'feeds.comment.reaction.updated',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    comment,
+    reaction,
+    activity,
+  };
+}
+
 export function generateFeedMemberAddedEvent(
   overrides: Omit<
     Partial<EventPayload<'feeds.feed_member.added'>>,
