@@ -1,12 +1,23 @@
-import { cookies } from 'next/headers';
 import { streamServerClient } from '../client';
 
-export async function GET() {
-  const userId = (await cookies()).get('user_id')?.value;
+export async function GET(
+  req: Request,
+  ctx: { params?: Record<string, string> } = {},
+) {
+  // 1) query string: ?user_id=... or ?userId=...
+  const url = new URL(req.url);
+  const queryUserId =
+    url.searchParams.get('user_id') ?? url.searchParams.get('userId');
+
+  // 2) dynamic route param: /api/token/[userId]
+  const routeUserId = ctx.params?.userId;
+
+  const userId = queryUserId ?? routeUserId;
 
   if (!userId) {
-    return new Response(undefined, {
+    return new Response(JSON.stringify({ error: 'missing_user_id' }), {
       status: 401,
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -14,8 +25,7 @@ export async function GET() {
 
   return new Response(JSON.stringify({ token }), {
     status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
   });
 }
+
