@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Feed, handleCommentReactionUpdated } from '../../../feed';
 import { FeedsClient } from '../../../feeds-client';
-import { handleCommentReactionAdded } from './handle-comment-reaction-added';
 import {
   generateCommentResponse,
   generateFeedResponse,
@@ -17,7 +16,7 @@ import type {
 import { shouldUpdateState } from '../../../utils';
 import type { EventPayload } from '../../../types-internal';
 
-describe(handleCommentReactionAdded.name, () => {
+describe(handleCommentReactionUpdated.name, () => {
   let feed: Feed;
   let client: FeedsClient;
   let currentUserId: string;

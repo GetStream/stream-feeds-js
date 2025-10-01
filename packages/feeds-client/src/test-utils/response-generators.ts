@@ -283,6 +283,32 @@ export function generateActivityReactionAddedEvent(
   };
 }
 
+export function generateActivityReactionUpdatedEvent(
+  overrides: Omit<
+    Partial<EventPayload<'feeds.activity.reaction.updated'>>,
+    'activity' | 'type' | 'reaction' | 'user'
+  > & {
+    activity?: Parameters<typeof generateActivityResponse>[0];
+    reaction?: Parameters<typeof generateFeedReactionResponse>[0];
+    user?: Parameters<typeof generateUserResponse>[0];
+  } = {},
+): EventPayload<'feeds.activity.reaction.updated'> {
+  const activity = generateActivityResponse(overrides.activity);
+  const reaction = generateFeedReactionResponse(overrides.reaction);
+  const user = generateUserResponse(overrides.user);
+
+  return {
+    type: 'feeds.activity.reaction.updated',
+    created_at: new Date(),
+    fid: '',
+    custom: {},
+    ...overrides,
+    user,
+    reaction,
+    activity,
+  };
+}
+
 export function generateActivityReactionDeletedEvent(
   overrides: Omit<
     Partial<EventPayload<'feeds.activity.reaction.deleted'>>,
