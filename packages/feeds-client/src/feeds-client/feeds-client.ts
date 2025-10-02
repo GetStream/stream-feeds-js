@@ -427,7 +427,13 @@ export class FeedsClient extends FeedsApi {
   /**
    * @deprecated Use addActivityReaction instead
    */
-  addReaction = this.addActivityReaction;
+  addReaction = (
+    request: AddReactionRequest & {
+      activity_id: string;
+    },
+  ) => {
+    return this.addActivityReaction(request);
+  };
 
   deleteActivityReaction = async (request: {
     activity_id: string;
