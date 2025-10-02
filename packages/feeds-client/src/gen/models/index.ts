@@ -5552,8 +5552,6 @@ export interface SpeechSegmentConfig {
 }
 
 export interface StoriesConfig {
-  expiration_behaviour?: 'hide_for_everyone' | 'visible_for_author';
-
   skip_watched?: boolean;
 
   track_watched?: boolean;
