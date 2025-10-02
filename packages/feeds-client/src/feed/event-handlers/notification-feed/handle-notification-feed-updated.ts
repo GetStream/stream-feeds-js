@@ -6,12 +6,12 @@ import type {
   StoriesFeedUpdatedEvent,
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
-import { uniqueArrayMerge } from '../../../utils';
+import { replaceUniqueArrayMerge, uniqueArrayMerge } from '../../../utils';
 
 export const addAggregatedActivitiesToState = (
   newAggregatedActivities: AggregatedActivityResponse[],
   aggregatedActivities: AggregatedActivityResponse[] | undefined,
-  position: 'start' | 'end',
+  position: 'start' | 'end' | 'replace',
 ) => {
   let result: UpdateStateResult<{
     aggregated_activities: AggregatedActivityResponse[];
@@ -28,18 +28,29 @@ export const addAggregatedActivitiesToState = (
     };
   }
 
-  result.aggregated_activities =
-    position === 'start'
-      ? uniqueArrayMerge(
-          newAggregatedActivities,
-          aggregatedActivities ?? [],
-          (a) => a.group,
-        )
-      : uniqueArrayMerge(
-          aggregatedActivities ?? [],
-          newAggregatedActivities,
-          (a) => a.group,
-        );
+  switch (position) {
+    case 'start':
+      result.aggregated_activities = uniqueArrayMerge(
+        newAggregatedActivities,
+        aggregatedActivities ?? [],
+        (a) => a.group,
+      );
+      break;
+    case 'end':
+      result.aggregated_activities = uniqueArrayMerge(
+        aggregatedActivities ?? [],
+        newAggregatedActivities,
+        (a) => a.group,
+      );
+      break;
+    case 'replace':
+      result.aggregated_activities = replaceUniqueArrayMerge(
+        aggregatedActivities,
+        newAggregatedActivities,
+        (a) => a.group,
+      );
+      break;
+  }
 
   return result;
 };
@@ -137,39 +148,43 @@ export function handleNotificationFeedUpdated(
   }
 }
 
-export const updateStoriesFeedFromEvent = (
+export function updateStoriesFeedFromEvent(
+  aggregatedActivities: AggregatedActivityResponse[] | undefined,
   event: StoriesFeedUpdatedEvent,
 ): UpdateStateResult<{
   data?: {
     aggregated_activities?: AggregatedActivityResponse[];
   };
-}> => {
-  const updates: {
-    aggregated_activities?: AggregatedActivityResponse[];
-  } = {};
-
-  if (event.aggregated_activities) {
-    updates.aggregated_activities = event.aggregated_activities;
+}> {
+  if (!aggregatedActivities) {
+    return {
+      changed: false,
+    };
   }
 
-  // Only return changed if we have actual updates
-  if (Object.keys(updates).length > 0) {
-    return {
-      changed: true,
-      data: updates,
-    };
+  if (event.aggregated_activities) {
+    const result = addAggregatedActivitiesToState(
+      event.aggregated_activities,
+      aggregatedActivities,
+      'replace',
+    );
+
+    return result;
   }
 
   return {
     changed: false,
   };
-};
+}
 
 export function handleStoriesFeedUpdated(
   this: Feed,
   event: EventPayload<'feeds.stories_feed.updated'>,
 ) {
-  const result = updateStoriesFeedFromEvent(event);
+  const result = updateStoriesFeedFromEvent(
+    this.currentState.aggregated_activities,
+    event,
+  );
   if (result.changed) {
     this.state.partialNext({
       aggregated_activities: result.data?.aggregated_activities,
