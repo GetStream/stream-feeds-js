@@ -66,7 +66,7 @@ export const Reaction = ({
           type,
           create_notification_activity: true,
         })
-      : client?.addReaction({
+      : client?.addActivityReaction({
           activity_id: entity.id,
           type,
           create_notification_activity: true,

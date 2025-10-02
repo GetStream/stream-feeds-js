@@ -34,7 +34,7 @@ describe('Quick start page', () => {
     timeline = client.feed('timeline', crypto.randomUUID());
     await timeline.getOrCreate();
     // Add a reaction to activity
-    await client.addReaction({
+    await client.addActivityReaction({
       activity_id: activity1.activity.id,
       type: 'like',
     });

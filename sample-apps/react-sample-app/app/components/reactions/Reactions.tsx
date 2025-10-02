@@ -34,7 +34,7 @@ export const Reactions = ({
     const isActivity = !('object_type' in object);
     try {
       await (isActivity
-        ? client?.addReaction({
+        ? client?.addActivityReaction({
             activity_id: object.id,
             type,
             create_notification_activity: true,

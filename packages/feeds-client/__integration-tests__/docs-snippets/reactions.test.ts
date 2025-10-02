@@ -28,7 +28,7 @@ describe('Reactions page', () => {
   });
 
   it(`Reactions`, async () => {
-    const addResponse = await client.addReaction({
+    const addResponse = await client.addActivityReaction({
       activity_id: activity.id,
       type: 'like',
       custom: {

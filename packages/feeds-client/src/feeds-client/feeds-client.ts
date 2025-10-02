@@ -65,11 +65,8 @@ import {
   handleWatchStopped,
 } from '../feed';
 import { handleUserUpdated } from './event-handlers';
-import type {
-  SyncFailure} from '../common/real-time/event-models';
-import {
-  UnhandledErrorType,
-} from '../common/real-time/event-models';
+import type { SyncFailure } from '../common/real-time/event-models';
+import { UnhandledErrorType } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils/logger';
 
@@ -415,16 +412,27 @@ export class FeedsClient extends FeedsApi {
     return response;
   };
 
-  addReaction = async (
+  addActivityReaction = async (
     request: AddReactionRequest & {
       activity_id: string;
     },
   ) => {
-    const response = await super.addReaction(request);
+    const response = await super.addActivityReaction(request);
     for (const feed of Object.values(this.activeFeeds)) {
       handleActivityReactionAdded.bind(feed)(response, false);
     }
     return response;
+  };
+
+  /**
+   * @deprecated Use addActivityReaction instead
+   */
+  addReaction = (
+    request: AddReactionRequest & {
+      activity_id: string;
+    },
+  ) => {
+    return this.addActivityReaction(request);
   };
 
   deleteActivityReaction = async (request: {

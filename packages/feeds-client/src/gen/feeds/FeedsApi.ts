@@ -571,7 +571,7 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async addReaction(
+  async addActivityReaction(
     request: AddReactionRequest & { activity_id: string },
   ): Promise<StreamResponse<AddReactionResponse>> {
     const pathParams = {
@@ -888,9 +888,9 @@ export class FeedsApi {
     request: AddCommentRequest,
   ): Promise<StreamResponse<AddCommentResponse>> {
     const body = {
-      comment: request?.comment,
       object_id: request?.object_id,
       object_type: request?.object_type,
+      comment: request?.comment,
       create_notification_activity: request?.create_notification_activity,
       parent_id: request?.parent_id,
       skip_push: request?.skip_push,
