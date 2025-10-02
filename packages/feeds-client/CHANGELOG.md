@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.14](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.13...@stream-io/feeds-client-0.2.14) (2025-10-02)
+
+
+### Features
+
+* stories feed implementation ([#132](https://github.com/GetStream/stream-feeds-js/issues/132)) ([99fac15](https://github.com/GetStream/stream-feeds-js/commit/99fac15fd256ec41750433a9e3d2fbb8744dc7aa))
+
 ## [0.2.13](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.12...@stream-io/feeds-client-0.2.13) (2025-09-30)
 
 
