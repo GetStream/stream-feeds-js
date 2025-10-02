@@ -1,4 +1,4 @@
-import type { Feed } from '../../../feed';
+import type { Feed } from '../..';
 import type {
   AggregatedActivityResponse,
   NotificationFeedUpdatedEvent,
@@ -45,7 +45,7 @@ export const addAggregatedActivitiesToState = (
       break;
     case 'replace':
       result.aggregated_activities = replaceUniqueArrayMerge(
-        aggregatedActivities,
+        aggregatedActivities ?? [],
         newAggregatedActivities,
         (a) => a.group,
       );

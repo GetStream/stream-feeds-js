@@ -8,7 +8,7 @@ import {
   updateNotificationFeedFromEvent,
   addAggregatedActivitiesToState,
   updateNotificationStatus,
-} from './handle-notification-feed-updated';
+} from './handle-aggregated-feed-updated';
 
 const createMockNotificationFeedUpdatedEvent = (
   overrides: Partial<NotificationFeedUpdatedEvent> = {},
