@@ -1,6 +1,6 @@
 import { useUserContext } from '@/contexts/UserContext';
+import type { GetOrCreateFeedRequest } from '@stream-io/feeds-react-native-sdk';
 import {
-  GetOrCreateFeedRequest,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
@@ -29,11 +29,17 @@ export const useCreateAndQueryFeed = ({
   }, [client, id, groupId]);
 
   useEffect(() => {
-    if (!feed || !connectedUser || typeof feed.state.getLatestValue().activities !== 'undefined') {
+    if (
+      !feed ||
+      !connectedUser ||
+      typeof feed.state.getLatestValue().activities !== 'undefined'
+    ) {
       return;
     }
 
-    feed.getOrCreate(queryOptions).catch((error: unknown) => console.error(error));
+    feed
+      .getOrCreate(queryOptions)
+      .catch((error: unknown) => console.error(error));
   }, [feed, connectedUser, queryOptions]);
 
   return feed;

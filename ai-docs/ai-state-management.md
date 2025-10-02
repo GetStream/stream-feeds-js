@@ -25,14 +25,7 @@ The project uses reactive state management using the `StateStore` class. There a
 
 ## State updates
 
-State update code is located in the `state-updates` folder. These methods return an `UpdateStateResult` structure. For example for activities it looks like this:
-
-```ts
-{
-  data: { activities: [{/* activity */}] },
-  changed: true
-}
-```
+State update code is located in the `src/feed/event-handlers` folder.
 
 When updating the state we need to change the reference of the key we want to update. For example if we add a new activity we need to return a new array, it's not enough to append the new activity for the existing array.
 
@@ -50,7 +43,7 @@ Tests can be run with the `yarn test` command in `packages/feeds-client` folder.
 
 ### Unit tests
 
-In the `state-updates` folder we can add unit tests, for example for the `state-updates/activity-utils.ts` file the unit test file would be: `state-updates/activity-utils.test.ts`.
+In the `src/feed/event-handlers` folder we can add unit tests, test files have `.test.ts` suffix.
 
 Unit tests should use the state update methods only to make sure all edge cases a properly covered.
 

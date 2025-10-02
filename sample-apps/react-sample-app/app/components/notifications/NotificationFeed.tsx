@@ -3,22 +3,51 @@ import type { AggregatedActivityResponse } from '@stream-io/feeds-client';
 import {
   useAggregatedActivities,
   useNotificationStatus,
+  useStateStore,
 } from '@stream-io/feeds-client/react-bindings';
 import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-export const NotificationFeed = () => {
+export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const { ownNotifications } = useFeedContext();
+  const [seenActivities, setSeenActivities] = useState<string[]>([]);
+  const [lastSeenAt, setLastSeenAt] = useState<Date | undefined>(undefined);
 
-  const {
-    // last_read_at: lastReadAt,
-    last_seen_at: lastSeenAt,
-    read_activities: readActivities = [],
-    seen_activities: seenActivities = [],
-  } = useNotificationStatus(ownNotifications) ?? {};
+  const { last_read_at: lastReadAt, read_activities: readActivities = [] } =
+    useNotificationStatus(ownNotifications) ?? {};
+
+  useEffect(() => {
+    if (!ownNotifications) {
+      return;
+    }
+    const unsubscribe = ownNotifications.state.subscribeWithSelector(
+      (state) => ({
+        notification_status: state.notification_status,
+      }),
+      ({ notification_status }) => {
+        if (!isMenuOpen) {
+          setLastSeenAt(notification_status?.last_seen_at);
+          setSeenActivities(notification_status?.seen_activities ?? []);
+        }
+      },
+    );
+
+    return unsubscribe;
+  }, [isMenuOpen, ownNotifications]);
+
+  const { next, isLoading } = useStateStore(
+    ownNotifications?.state,
+    (state) => ({
+      next: state.next,
+      isLoading: state.is_loading_activities,
+    }),
+  ) ?? {
+    next: undefined,
+    isLoading: false,
+  };
 
   const { aggregated_activities: aggregatedActivities = [] } =
     useAggregatedActivities(ownNotifications) ?? {};
@@ -35,6 +64,10 @@ export const NotificationFeed = () => {
     },
     [ownNotifications, logErrorAndDisplayNotification],
   );
+
+  const getNextPage = () => {
+    ownNotifications?.getNextPage().catch(logErrorAndDisplayNotification);
+  };
 
   const markAllRead = async () => {
     try {
@@ -57,9 +90,8 @@ export const NotificationFeed = () => {
           <Notification
             group={group}
             isRead={
-              // FIXME: this part of the condition does not work as marking individual groups as read also updates the last_read_at
-              // (lastReadAt &&
-              //   group.updated_at.getTime() <= lastReadAt.getTime()) ||
+              (lastReadAt &&
+                group.updated_at.getTime() <= lastReadAt.getTime()) ||
               readActivities.includes(group.group)
             }
             isSeen={
@@ -89,9 +121,9 @@ export const NotificationFeed = () => {
       )}
       <PaginatedList
         items={aggregatedActivities}
-        hasNext={false}
-        isLoading={false}
-        onLoadMore={() => {}}
+        hasNext={!!next}
+        isLoading={isLoading}
+        onLoadMore={getNextPage}
         renderItem={renderItem}
         itemsName="notifications"
       />
