@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.15](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.14...@stream-io/feeds-client-0.2.15) (2025-10-02)
+
+
+### Bug Fixes
+
+* rename method ([#133](https://github.com/GetStream/stream-feeds-js/issues/133)) ([e471e2e](https://github.com/GetStream/stream-feeds-js/commit/e471e2ebb6efd82a563472087adc69755f4ef4b9))
+
 ## [0.2.14](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.13...@stream-io/feeds-client-0.2.14) (2025-10-02)
 
 
