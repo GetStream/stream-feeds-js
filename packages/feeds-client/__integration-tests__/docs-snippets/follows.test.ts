@@ -115,6 +115,31 @@ describe('Follows page', () => {
     await saraFeed.delete({ hard_delete: true });
   });
 
+  it(`Update follow`, async () => {
+    const saraFeed = client.feed('user', crypto.randomUUID());
+    await saraFeed.getOrCreate({
+      // You need to set followers visibility to have follow requests
+      data: { visibility: 'followers' },
+    });
+    const adamTimeline = timeline;
+    await adamTimeline.getOrCreate();
+    await client.follow({
+      source: adamTimeline.feed,
+      target: saraFeed.feed,
+    });
+
+    await client.updateFollow({
+      source: adamTimeline.feed,
+      target: saraFeed.feed,
+      push_preference: 'none',
+      custom: {
+        inner_circle: false,
+      },
+    });
+
+    await saraFeed.delete({ hard_delete: true });
+  });
+
   afterAll(async () => {
     await feed.delete({ hard_delete: true });
     await timeline.delete({ hard_delete: true });
