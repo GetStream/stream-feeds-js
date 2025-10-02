@@ -412,7 +412,7 @@ export class FeedsClient extends FeedsApi {
     return response;
   };
 
-  addReaction = async (
+  addActivityReaction = async (
     request: AddReactionRequest & {
       activity_id: string;
     },
@@ -423,6 +423,11 @@ export class FeedsClient extends FeedsApi {
     }
     return response;
   };
+
+  /**
+   * @deprecated Use addActivityReaction instead
+   */
+  addReaction = this.addActivityReaction;
 
   deleteActivityReaction = async (request: {
     activity_id: string;
