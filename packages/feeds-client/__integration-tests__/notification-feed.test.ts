@@ -97,7 +97,7 @@ describe.skip('Notification Feed Test Setup', () => {
     const activity = user2TimelineFeed.state.getLatestValue().activities?.[0]!;
 
     await Promise.all([
-      client2.addReaction({
+      client2.addActivityReaction({
         activity_id: activity.id,
         type: 'like',
         create_notification_activity: true,

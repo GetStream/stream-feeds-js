@@ -87,7 +87,7 @@ describe('Notification feed', () => {
       create_notification_activity: true,
     });
     // Eric reacts to Jane's activity
-    await ericClient.addReaction({
+    await ericClient.addActivityReaction({
       activity_id: janeActivity.id,
       // When true Jane's notification feed will be updated with reaction activity
       type: 'like',

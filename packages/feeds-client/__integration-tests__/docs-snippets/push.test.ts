@@ -35,7 +35,7 @@ describe('Push introduction page', () => {
       // skip_push: false (default) - sends push immediately
     });
 
-    await client.addReaction({
+    await client.addActivityReaction({
       activity_id: activity.id,
       type: 'like',
       // skip_push: false (default) - sends push immediately
@@ -52,7 +52,7 @@ describe('Push introduction page', () => {
       skip_push: true, // Send via notification feed instead of direct push
     });
     // Reaction that creates notification activity
-    await client.addReaction({
+    await client.addActivityReaction({
       activity_id: activity.id,
       type: 'like',
       create_notification_activity: true,

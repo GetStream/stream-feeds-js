@@ -30,7 +30,7 @@ export const useReactionActions = ({
   const addReaction = useStableCallback(async () => {
     await (isComment
       ? client?.addCommentReaction({ id: entity.id, type })
-      : client?.addReaction({ activity_id: entity.id, type }));
+      : client?.addActivityReaction({ activity_id: entity.id, type }));
   });
 
   const removeReaction = useStableCallback(async () => {
