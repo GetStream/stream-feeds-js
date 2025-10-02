@@ -44,6 +44,7 @@ import {
   handleActivityReactionDeleted,
   handleCommentReactionAdded,
   handleCommentReactionDeleted,
+  handleStoriesFeedUpdated,
 } from './event-handlers';
 import { capitalize } from '../common/utils';
 import type {
@@ -175,6 +176,7 @@ export class Feed extends FeedApi {
     'feeds.feed_member.removed': handleFeedMemberRemoved.bind(this),
     'feeds.feed_member.updated': handleFeedMemberUpdated.bind(this),
     'feeds.notification_feed.updated': handleNotificationFeedUpdated.bind(this),
+    'feeds.stories_feed.updated': handleStoriesFeedUpdated.bind(this),
     // the poll events should be removed from here
     'feeds.poll.closed': Feed.noop,
     'feeds.poll.deleted': Feed.noop,
