@@ -463,6 +463,8 @@ export interface ActivityResponse {
 
   hidden?: boolean;
 
+  is_watched?: boolean;
+
   text?: string;
 
   visibility_tag?: string;
@@ -680,6 +682,8 @@ export interface AggregatedActivityResponse {
   user_count_truncated: boolean;
 
   activities: ActivityResponse[];
+
+  is_watched?: boolean;
 }
 
 export interface AggregationConfig {
@@ -5548,9 +5552,27 @@ export interface SpeechSegmentConfig {
 }
 
 export interface StoriesConfig {
-  expiration_behaviour?: 'hide_for_everyone' | 'visible_for_author';
-
   skip_watched?: boolean;
+
+  track_watched?: boolean;
+}
+
+export interface StoriesFeedUpdatedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  feed_visibility?: string;
+
+  received_at?: Date;
+
+  aggregated_activities?: AggregatedActivityResponse[];
+
+  user?: UserResponseCommonFields;
 }
 
 export interface SubmitActionRequest {
@@ -6571,6 +6593,7 @@ export type WSClientEvent =
   | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
   | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
   | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
+  | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
   | ({ type: 'health.check' } & HealthCheckEvent)
   | ({ type: 'user.updated' } & UserUpdatedEvent);
 
@@ -6617,6 +6640,7 @@ export type WSEvent =
   | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
   | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
   | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
+  | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
   | ({ type: 'health.check' } & HealthCheckEvent)
   | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
   | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)

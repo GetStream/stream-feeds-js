@@ -124,6 +124,9 @@ const eventDecoderMapping: Record<
   'feeds.poll.vote_removed': (data: Record<string, any>) =>
     decoders.PollVoteRemovedFeedEvent(data),
 
+  'feeds.stories_feed.updated': (data: Record<string, any>) =>
+    decoders.StoriesFeedUpdatedEvent(data),
+
   'health.check': (data: Record<string, any>) =>
     decoders.HealthCheckEvent(data),
 
