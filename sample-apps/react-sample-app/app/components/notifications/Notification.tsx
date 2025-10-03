@@ -12,52 +12,74 @@ export const Notification = ({
   isSeen: boolean;
   onMarkRead: () => {};
 }) => {
-  const notificationText = useMemo(() => {
+  const notification = useMemo(() => {
     const verb = group.activities[0].type;
 
-    let text = '';
+    const targetActivity = group.activities[0].notification_context?.target;
+    const notification = {
+      text: '',
+      image: targetActivity?.text
+        ? undefined
+        : targetActivity?.attachments?.[0]?.image_url,
+    };
+
+    const targetActivityTruncatedText = targetActivity?.text
+      ? ` "${
+          targetActivity.text.length > 20
+            ? targetActivity?.text?.slice(0, 20) + '...'
+            : targetActivity?.text
+        }"`
+      : '';
+    const previewCount = 5;
+    const previewActors = Array.from(
+      new Set(group.activities.map(({ user }) => user.name)),
+    ).slice(0, previewCount);
+    notification.text = previewActors.join(', ');
+    const remainingActors = group.user_count - previewActors.length;
+
+    if (remainingActors > 1) {
+      notification.text += ` and ${remainingActors}${group.user_count_truncated ? '+' : ''} more people`;
+    } else if (remainingActors === 1) {
+      notification.text += ' and 1 more person';
+    }
 
     switch (verb) {
       case 'comment': {
-        text += `${group.activity_count} new comments`;
+        notification.text += ` commented on your post${targetActivityTruncatedText}`;
         break;
       }
       case 'reaction': {
-        text += `${group.activity_count} likes`;
+        notification.text += ` reacted to your post${targetActivityTruncatedText}`;
         break;
       }
       case 'follow': {
-        const previewCount = 5;
-        text = Array.from(
-          new Set(group.activities.map(({ user }) => user.name)),
-        )
-          .slice(0, previewCount)
-          .join(', ');
-        const remainingActors = group.user_count - previewCount;
-        if (remainingActors > 1) {
-          text += ` and ${remainingActors}${group.user_count_truncated ? '+' : ''} more people`;
-        } else if (remainingActors === 1) {
-          text += ' and 1 more person';
-        }
-        text += ` started following you`;
+        notification.text += ` started following you`;
         break;
       }
       case 'comment_reaction': {
-        text += `${group.activity_count} new reactions to your comment`;
+        notification.text += ` reacted to your comment on post${targetActivityTruncatedText}`;
         break;
       }
       default: {
-        text += 'Unknown type';
+        notification.text += 'Unknown type';
         break;
       }
     }
 
-    return text;
+    return notification;
   }, [group]);
 
   return (
     <div className="flex items-center justify-between gap-1">
-      <div>{notificationText}</div>
+      {notification.text && <div>{notification.text}</div>}
+      {notification.image && (
+        <img
+          src={notification.image}
+          alt="Notification image"
+          width={40}
+          height={40}
+        />
+      )}
       <div className="flex items-center gap-1.5">
         {!isRead && (
           <button

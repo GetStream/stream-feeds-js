@@ -73,8 +73,8 @@ export const waitForEvent = (
 ) => {
   return new Promise((resolve, reject) => {
     // @ts-expect-error client expects WSEvents
-    client.on(type, () => {
-      resolve(undefined);
+    client.on(type, (e) => {
+      resolve(e);
       clearTimeout(timeout);
     });
     const timeout = setTimeout(() => {

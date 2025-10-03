@@ -91,7 +91,7 @@ export const NewActivity = ({ feed }: { feed: Feed }) => {
       <button
         type="submit"
         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-        disabled={isSending || activityText === ''}
+        disabled={isSending || (activityText === '' && !files?.length)}
       >
         {isSending ? <LoadingIndicator /> : 'Post'}
       </button>

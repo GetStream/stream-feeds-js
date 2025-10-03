@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import type { FeedsClient, UserRequest } from '../src';
+import type {
+  FeedsClient,
+  NotificationFeedUpdatedEvent,
+  UserRequest,
+} from '../src';
 import {
   createTestClient,
   createTestTokenGenerator,
@@ -58,13 +62,17 @@ describe('Aggregated Feed Pagination Integration Tests', () => {
         .aggregated_activities!.map((a) => a.group),
     });
 
-    await waitForEvent(feed, 'feeds.notification_feed.updated', {
+    const event = await waitForEvent(feed, 'feeds.notification_feed.updated', {
       shouldReject: true,
     });
 
     expect(feed.state.getLatestValue().notification_status?.unseen).toBe(1);
     expect(
       feed.state.getLatestValue().notification_status?.seen_activities?.length,
+    ).toBe(2);
+    expect(
+      (event as NotificationFeedUpdatedEvent)?.notification_status
+        ?.seen_activities?.length,
     ).toBe(2);
   });
 
