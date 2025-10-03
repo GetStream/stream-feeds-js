@@ -50,7 +50,7 @@ describe('Quick start page', () => {
       type: 'love',
     });
 
-    notifications = client.feed('notification', 'john');
+    notifications = client.feed('notification', 'john' + crypto.randomUUID());
     await notifications.getOrCreate();
     // Mark notifications as read
     await notifications.markActivity({
