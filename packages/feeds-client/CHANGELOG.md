@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.15...@stream-io/feeds-client-0.2.16) (2025-10-07)
+
+
+### Features
+
+* New own_capabilities batch endpoint ([#134](https://github.com/GetStream/stream-feeds-js/issues/134)) ([973f297](https://github.com/GetStream/stream-feeds-js/commit/973f297d74e073ecde7f0acb64b14466b0fb4726))
+
 ## [0.2.15](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.14...@stream-io/feeds-client-0.2.15) (2025-10-02)
 
 
