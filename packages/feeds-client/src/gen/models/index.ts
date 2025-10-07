@@ -4177,6 +4177,16 @@ export interface OnlyUserID {
   id: string;
 }
 
+export interface OwnCapabilitiesBatchRequest {
+  feeds: string[];
+}
+
+export interface OwnCapabilitiesBatchResponse {
+  duration: string;
+
+  capabilities: Record<string, string[]>;
+}
+
 export interface OwnUser {
   banned: boolean;
 

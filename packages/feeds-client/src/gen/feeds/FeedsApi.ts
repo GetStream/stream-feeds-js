@@ -59,6 +59,8 @@ import type {
   ListBlockListResponse,
   ListDevicesResponse,
   MarkActivityRequest,
+  OwnCapabilitiesBatchRequest,
+  OwnCapabilitiesBatchResponse,
   PinActivityRequest,
   PinActivityResponse,
   PollOptionResponse,
@@ -1519,6 +1521,32 @@ export class FeedsApi {
     );
 
     decoders.CreateFeedsBatchResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async ownCapabilitiesBatch(
+    request: OwnCapabilitiesBatchRequest & { connection_id?: string },
+  ): Promise<StreamResponse<OwnCapabilitiesBatchResponse>> {
+    const queryParams = {
+      connection_id: request?.connection_id,
+    };
+    const body = {
+      feeds: request?.feeds,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<OwnCapabilitiesBatchResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/feeds/own_capabilities/batch',
+      undefined,
+      queryParams,
+      body,
+      'application/json',
+    );
+
+    decoders.OwnCapabilitiesBatchResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
