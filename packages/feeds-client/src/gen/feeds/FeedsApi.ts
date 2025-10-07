@@ -1532,7 +1532,7 @@ export class FeedsApi {
       connection_id: request?.connection_id,
     };
     const body = {
-      feed_ids: request?.feed_ids,
+      feeds: request?.feeds,
     };
 
     const response = await this.apiClient.sendRequest<

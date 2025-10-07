@@ -4178,7 +4178,7 @@ export interface OnlyUserID {
 }
 
 export interface OwnCapabilitiesBatchRequest {
-  feed_ids: string[];
+  feeds: string[];
 }
 
 export interface OwnCapabilitiesBatchResponse {
