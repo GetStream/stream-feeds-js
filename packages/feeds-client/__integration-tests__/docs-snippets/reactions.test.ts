@@ -40,16 +40,14 @@ describe('Reactions page', () => {
   });
 
   it(`Reactions`, async () => {
-    // Adding a reaction without triggering push notifications
     await client.addActivityReaction({
       activity_id: activity.id,
       type: 'like',
       custom: {
         emoji: '❤️',
       },
-      // When set to true, and there is an existing reaction from the user, the reaction will be updated instead of creating a new one
+      // Optionally override existing reaction
       enforce_unique: true,
-      skip_push: true,
     });
 
     // Add a reaction to a comment
@@ -59,6 +57,8 @@ describe('Reactions page', () => {
       custom: {
         emoji: '👍',
       },
+      // Optionally override existing reaction
+      enforce_unique: true,
     });
     // Adding a comment reaction without triggering push notifications
     await client.addCommentReaction({
