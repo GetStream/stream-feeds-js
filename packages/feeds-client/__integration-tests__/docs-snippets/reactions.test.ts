@@ -47,7 +47,7 @@ describe('Reactions page', () => {
       custom: {
         emoji: '❤️',
       },
-      // When set to true, existing reaction will be updated instead of creating a new one
+      // When set to true, and there is an existing reaction from the user, the reaction will be updated instead of creating a new one
       enforce_unique: true,
       skip_push: true,
     });
