@@ -1,5 +1,5 @@
 import type { Feed } from '../../feed';
-import type { EventPayload} from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 import { type PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 
@@ -53,7 +53,6 @@ export function handleCommentReactionAdded(
     newComments[commentIndex] = {
       ...newComments[commentIndex],
       reaction_count: comment.reaction_count ?? 0,
-      // TODO: FIXME this should be handled by the backend
       latest_reactions: comment.latest_reactions ?? [],
       reaction_groups: comment.reaction_groups ?? {},
       own_reactions: ownReactions,

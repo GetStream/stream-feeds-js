@@ -53,7 +53,6 @@ export function handleCommentReactionUpdated(
     newComments[commentIndex] = {
       ...newComments[commentIndex],
       reaction_count: comment.reaction_count ?? 0,
-      // TODO: FIXME this should be handled by the backend
       latest_reactions: comment.latest_reactions ?? [],
       reaction_groups: comment.reaction_groups ?? {},
       own_reactions: ownReactions,

@@ -1,9 +1,12 @@
 import { streamServerClient } from '../client';
+import { cookies } from 'next/headers';
 
 export async function GET(
   req: Request,
   ctx: { params?: Record<string, string> } = {},
 ) {
+  const cookieId = (await cookies()).get('user_id')?.value;
+
   // 1) query string: ?user_id=... or ?userId=...
   const url = new URL(req.url);
   const queryUserId =
@@ -12,7 +15,7 @@ export async function GET(
   // 2) dynamic route param: /api/token/[userId]
   const routeUserId = ctx.params?.userId;
 
-  const userId = queryUserId ?? routeUserId;
+  const userId = cookieId ?? queryUserId ?? routeUserId;
 
   if (!userId) {
     return new Response(JSON.stringify({ error: 'missing_user_id' }), {
@@ -28,4 +31,3 @@ export async function GET(
     headers: { 'Content-Type': 'application/json' },
   });
 }
-
