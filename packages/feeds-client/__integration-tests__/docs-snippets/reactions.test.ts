@@ -40,14 +40,27 @@ describe('Reactions page', () => {
   });
 
   it(`Reactions`, async () => {
-    await client.addActivityReaction({
-      activity_id: activity.id,
+    // Add a reaction to an activity
+    const addResponse = await client.addActivityReaction({
+      activity_id: 'activity_123',
       type: 'like',
       custom: {
         emoji: '❤️',
       },
       // Optionally override existing reaction
       enforce_unique: true,
+    });
+
+    console.log(addResponse.reaction);
+
+    // Adding a reaction without triggering push notifications
+    await client.addActivityReaction({
+      activity_id: 'activity_123',
+      type: 'like',
+      custom: {
+        emoji: '❤️',
+      },
+      skip_push: true,
     });
 
     // Add a reaction to a comment
