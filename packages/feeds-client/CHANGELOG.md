@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.17](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.16...@stream-io/feeds-client-0.2.17) (2025-10-09)
+
+
+### Features
+
+* add support for unique reactions ([#130](https://github.com/GetStream/stream-feeds-js/issues/130)) ([004722f](https://github.com/GetStream/stream-feeds-js/commit/004722f9b369f1e3757de9aaf41b17b24107832a))
+* new aggregation format for notifications ([#131](https://github.com/GetStream/stream-feeds-js/issues/131)) ([318f5f5](https://github.com/GetStream/stream-feeds-js/commit/318f5f53b7a422c9815546de4a2af439565397b8))
+
+
+### Bug Fixes
+
+* Change response to FeedOwnCapability instead of string ([#135](https://github.com/GetStream/stream-feeds-js/issues/135)) ([c45b38a](https://github.com/GetStream/stream-feeds-js/commit/c45b38a1b638e1a208dc4e70abd5a130cf63f7e2))
+
 ## [0.2.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.15...@stream-io/feeds-client-0.2.16) (2025-10-07)
 
 
