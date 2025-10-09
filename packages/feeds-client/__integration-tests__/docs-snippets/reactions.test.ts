@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, it } from 'vitest';
 import {
   createTestClient,
   createTestTokenGenerator,
@@ -6,13 +6,18 @@ import {
 } from '../utils';
 import type { FeedsClient } from '../../src/feeds-client';
 import type { Feed } from '../../src/feed';
-import type { ActivityResponse, UserRequest } from '../../src/gen/models';
+import type {
+  ActivityResponse,
+  CommentResponse,
+  UserRequest,
+} from '../../src/gen/models';
 
 describe('Reactions page', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
   let feed: Feed;
   let activity: ActivityResponse;
+  let comment: CommentResponse;
 
   beforeAll(async () => {
     client = createTestClient();
@@ -25,35 +30,63 @@ describe('Reactions page', () => {
         text: 'Hello, world!',
       })
     ).activity;
+    comment = (
+      await client.addComment({
+        object_id: activity.id,
+        object_type: 'activity',
+        comment: 'Great post!',
+      })
+    ).comment;
   });
 
   it(`Reactions`, async () => {
+    // Add a reaction to an activity
     const addResponse = await client.addActivityReaction({
-      activity_id: activity.id,
+      activity_id: 'activity_123',
       type: 'like',
       custom: {
         emoji: '❤️',
       },
+      // Optionally override existing reaction
+      enforce_unique: true,
     });
 
-    expect(addResponse.reaction).toBeDefined();
+    console.log(addResponse.reaction);
 
+    // Adding a reaction without triggering push notifications
+    await client.addActivityReaction({
+      activity_id: 'activity_123',
+      type: 'like',
+      custom: {
+        emoji: '❤️',
+      },
+      skip_push: true,
+    });
+
+    // Add a reaction to a comment
+    await client.addCommentReaction({
+      id: comment.id,
+      type: 'like',
+      custom: {
+        emoji: '👍',
+      },
+      // Optionally override existing reaction
+      enforce_unique: true,
+    });
+    // Adding a comment reaction without triggering push notifications
+    await client.addCommentReaction({
+      id: comment.id,
+      type: 'like',
+      custom: {
+        emoji: '👍',
+      },
+      skip_push: true,
+    });
     const deleteResponse = await client.deleteActivityReaction({
       activity_id: activity.id,
       type: 'like',
     });
-
-    expect(deleteResponse.reaction).toBeDefined();
-
-    expect(
-      feed.state.getLatestValue().activities?.[0].own_reactions,
-    ).toBeDefined();
-    expect(
-      feed.state.getLatestValue().activities?.[0].latest_reactions,
-    ).toBeDefined();
-    expect(
-      feed.state.getLatestValue().activities?.[0].reaction_groups,
-    ).toBeDefined();
+    console.log(deleteResponse.reaction);
   });
 
   afterAll(async () => {

@@ -65,7 +65,6 @@ describe('Comments page', () => {
   });
 
   it(`Reading comments`, async () => {
-
     await feed.getOrCreate();
 
     // Supported values for sort: first, last, top, controversial, best
@@ -116,6 +115,8 @@ describe('Comments page', () => {
     await client.addCommentReaction({
       id: comment.id,
       type: 'like',
+      // When set to true, and there is an existing reaction from the user, the reaction will be updated instead of creating a new one
+      enforce_unique: true,
     });
 
     await client.deleteCommentReaction({

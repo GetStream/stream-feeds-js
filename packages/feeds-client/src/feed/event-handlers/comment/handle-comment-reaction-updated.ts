@@ -3,14 +3,14 @@ import type { EventPayload } from '../../../types-internal';
 import { type PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
 
-export type CommentReactionAddedPayload = PartializeAllBut<
-  EventPayload<'feeds.comment.reaction.added'>,
+export type CommentReactionUpdatedPayload = PartializeAllBut<
+  EventPayload<'feeds.comment.reaction.updated'>,
   'comment' | 'reaction'
 >;
 
-export function handleCommentReactionAdded(
+export function handleCommentReactionUpdated(
   this: Feed,
-  payload: CommentReactionAddedPayload,
+  payload: CommentReactionUpdatedPayload,
   fromWs?: boolean,
 ) {
   const { comment, reaction } = payload;
@@ -22,7 +22,7 @@ export function handleCommentReactionAdded(
     !shouldUpdateState({
       stateUpdateQueueId: getStateUpdateQueueId(
         payload,
-        'comment-reaction-created',
+        'comment-reaction-updated',
       ),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
@@ -47,7 +47,7 @@ export function handleCommentReactionAdded(
     let ownReactions = newComments[commentIndex].own_reactions;
 
     if (isOwnReaction) {
-      ownReactions = ownReactions.concat(reaction) ?? [reaction];
+      ownReactions = [reaction];
     }
 
     newComments[commentIndex] = {

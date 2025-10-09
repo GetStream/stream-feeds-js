@@ -12,13 +12,21 @@ import type {
   CommentUpdatedPayload,
 } from '../feed';
 import { ensureExhausted } from './ensure-exhausted';
+import type {
+  CommentReactionUpdatedPayload
+} from '../feed/event-handlers/comment/handle-comment-reaction-updated';
+import type {
+  ActivityReactionUpdatedPayload
+} from '../feed/event-handlers/activity/handle-activity-reaction-updated';
 
 export type StateUpdateQueuePrefix =
   | 'activity-updated'
   | 'activity-reaction-created'
   | 'activity-reaction-deleted'
+  | 'activity-reaction-updated'
   | 'comment-reaction-created'
   | 'comment-reaction-deleted'
+  | 'comment-reaction-updated'
   | 'follow-created'
   | 'follow-deleted'
   | 'follow-updated'
@@ -30,8 +38,10 @@ type StateUpdateQueuePayloadByPrefix = {
   'activity-updated': ActivityUpdatedPayload;
   'activity-reaction-created': ActivityReactionAddedPayload;
   'activity-reaction-deleted': ActivityReactionDeletedPayload;
+  'activity-reaction-updated': ActivityReactionUpdatedPayload;
   'comment-reaction-created': CommentReactionAddedPayload;
   'comment-reaction-deleted': CommentReactionDeletedPayload;
+  'comment-reaction-updated': CommentReactionUpdatedPayload;
   'follow-created': FollowResponse;
   'follow-deleted': FollowResponse;
   'follow-updated': FollowResponse;
@@ -163,7 +173,8 @@ export function getStateUpdateQueueId(
       return toJoin.concat([data.activity.id]).join('-')
     }
     case 'activity-reaction-created':
-    case 'activity-reaction-deleted': {
+    case 'activity-reaction-deleted':
+    case 'activity-reaction-updated': {
       return toJoin
         .concat([
           data.activity.id,
@@ -172,7 +183,8 @@ export function getStateUpdateQueueId(
         .join('-');
     }
     case 'comment-reaction-created':
-    case 'comment-reaction-deleted': {
+    case 'comment-reaction-deleted':
+    case 'comment-reaction-updated': {
       return toJoin
         .concat([
           data.comment.id,
