@@ -1,6 +1,6 @@
-export const apiKey = '892s22ypvt6m';
-// export const tokenCreationUrl = 'https://pronto.getstream.io/api/auth/create-token?environment=feeds-react-native-sample-app';
-export const tokenCreationUrl = 'http://localhost:3001/api/create-token';
+export const apiKey = 'm3mpnb9j9jb3';
+export const tokenCreationUrl =
+  'https://pronto.getstream.io/api/auth/create-token?environment=feeds-react-native-sample-app';
 export const placesApiKey = process.env.EXPO_PUBLIC_PLACES_API_KEY;
 export const mapApiKey = process.env.EXPO_PUBLIC_MAPS_API_KEY;
 
