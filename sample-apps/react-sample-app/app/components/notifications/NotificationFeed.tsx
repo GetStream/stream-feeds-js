@@ -80,7 +80,9 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
   };
 
   const hasUnreadNotifications = aggregatedActivities.some(
-    (group) => !readActivities.includes(group.group),
+    (group) =>
+      !readActivities.includes(group.group) &&
+      (!lastReadAt || group.updated_at.getTime() > lastReadAt.getTime()),
   );
 
   const renderItem = useCallback(
@@ -96,7 +98,7 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
             }
             isSeen={
               (lastSeenAt &&
-                group.updated_at.getTime() < lastSeenAt.getTime()) ||
+                group.updated_at.getTime() <= lastSeenAt.getTime()) ||
               seenActivities.includes(group.group)
             }
             onMarkRead={() => markRead(group)}
