@@ -4184,7 +4184,7 @@ export interface OwnCapabilitiesBatchRequest {
 export interface OwnCapabilitiesBatchResponse {
   duration: string;
 
-  capabilities: Record<string, string[]>;
+  capabilities: Record<string, FeedOwnCapability[]>;
 }
 
 export interface OwnUser {
