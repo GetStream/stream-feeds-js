@@ -1,5 +1,8 @@
 import type { Feed } from '../../../feed';
-import type { ActivityPinResponse, ActivityResponse } from '../../../gen/models';
+import type {
+  ActivityPinResponse,
+  ActivityResponse,
+} from '../../../gen/models';
 import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import {
   getStateUpdateQueueId,
@@ -99,6 +102,10 @@ export function handleActivityUpdated(
 
   if (result1?.changed || result2.changed) {
     this.client.hydratePollCache([payload.activity]);
+
+    if (payload.activity.current_feed) {
+      this.client.hydrateCapabilitiesCache([payload.activity.current_feed]);
+    }
 
     this.state.partialNext({
       activities: result1?.changed ? result1.entities : currentActivities,
