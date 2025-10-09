@@ -54,7 +54,15 @@ export function handleActivityAdded(
     'start',
   );
   if (result.changed) {
-    this.client.hydratePollCache([event.activity]);
+    const activity = event.activity;
+    this.client.hydratePollCache([activity]);
+
+    const currentFeed = activity.current_feed;
+
+    if (currentFeed) {
+      this.client.hydrateCapabilitiesCache([currentFeed]);
+    }
+
     this.state.partialNext({ activities: result.activities });
   }
 }

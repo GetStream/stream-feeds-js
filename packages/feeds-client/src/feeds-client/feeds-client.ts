@@ -17,6 +17,7 @@ import type {
   OwnUser,
   PollResponse,
   PollVotesResponse,
+  QueryActivitiesRequest,
   QueryFeedsRequest,
   QueryPollVotesRequest,
   UpdateActivityRequest,
@@ -66,15 +67,25 @@ import {
   handleWatchStopped,
 } from '../feed';
 import { handleUserUpdated } from './event-handlers';
-import type { SyncFailure } from '../common/real-time/event-models';
-import { UnhandledErrorType } from '../common/real-time/event-models';
+import {
+  type SyncFailure,
+  UnhandledErrorType,
+} from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
 import { configureLoggers } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
+import {
+  throttle,
+  DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
+  type GetBatchedOwnCapabilitiesThrottledCallback,
+  queueBatchedOwnCapabilities,
+  type ThrottledGetBatchedOwnCapabilities,
+} from '../utils/throttling';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
   is_ws_connection_healthy: boolean;
+  own_capabilities_by_fid: Record<string, FeedResponse['own_capabilities']>;
 };
 
 type FID = string;
@@ -97,6 +108,8 @@ export class FeedsClient extends FeedsApi {
 
   private healthyConnectionChangedEventCount = 0;
 
+  protected throttledGetBatchOwnCapabilities!: ThrottledGetBatchedOwnCapabilities;
+
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
     const connectionIdManager = new ConnectionIdManager();
@@ -110,11 +123,17 @@ export class FeedsClient extends FeedsApi {
     this.state = new StateStore<FeedsClientState>({
       connected_user: undefined,
       is_ws_connection_healthy: false,
+      own_capabilities_by_fid: {},
     });
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
+
+    this.setGetBatchOwnCapabilitiesThrottlingInterval(
+      options?.query_batch_own_capabilties_throttling_interval ??
+        DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
+    );
 
     configureLoggers(options?.configure_loggers_options);
 
@@ -231,6 +250,30 @@ export class FeedsClient extends FeedsApi {
     });
   }
 
+  private setGetBatchOwnCapabilitiesThrottlingInterval = (
+    throttlingMs: number,
+  ) => {
+    this.throttledGetBatchOwnCapabilities =
+      throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
+        (feeds, callback) => {
+          // TODO: Replace this with the actual getBatchCapabilities endpoint when it is ready
+          this.queryFeeds({ filter: { feed: { $in: feeds } } }).catch(
+            (error) => {
+              this.eventDispatcher.dispatch({
+                type: 'errors.unhandled',
+                error_type:
+                  UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+                error,
+              });
+            },
+          );
+          callback(feeds);
+        },
+        throttlingMs,
+        { trailing: true },
+      );
+  };
+
   private recoverOnReconnect = async () => {
     this.healthyConnectionChangedEventCount++;
 
@@ -274,6 +317,32 @@ export class FeedsClient extends FeedsApi {
         pollFromCache.reinitializeState(pollResponse);
       }
     }
+  }
+
+  public hydrateCapabilitiesCache(feedResponses: FeedResponse[]) {
+    let ownCapabilitiesCache =
+      this.state.getLatestValue().own_capabilities_by_fid;
+
+    const capabilitiesToFetchQueue: string[] = [];
+
+    for (const feedResponse of feedResponses) {
+      const { feed, own_capabilities } = feedResponse;
+
+      if (!Object.prototype.hasOwnProperty.call(ownCapabilitiesCache, feed)) {
+        if (own_capabilities) {
+          ownCapabilitiesCache = {
+            ...ownCapabilitiesCache,
+            [feed]: own_capabilities,
+          };
+        } else {
+          capabilitiesToFetchQueue.push(feed);
+        }
+      }
+    }
+
+    queueBatchedOwnCapabilities.bind(this)({ feeds: capabilitiesToFetchQueue });
+
+    this.state.partialNext({ own_capabilities_by_fid: ownCapabilitiesCache });
   }
 
   connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
@@ -516,9 +585,14 @@ export class FeedsClient extends FeedsApi {
 
     this.connectionIdManager.reset();
     this.tokenManager.reset();
+
+    // clear all caches
+    this.polls_by_id.clear();
+
     this.state.partialNext({
       connected_user: undefined,
       is_ws_connection_healthy: false,
+      own_capabilities_by_fid: {},
     });
   };
 
@@ -532,7 +606,9 @@ export class FeedsClient extends FeedsApi {
   async queryFeeds(request?: QueryFeedsRequest) {
     const response = await this._queryFeeds(request);
 
-    const feeds = response.feeds.map((feedResponse) =>
+    const feedResponses = response.feeds;
+
+    const feeds = feedResponses.map((feedResponse) =>
       this.getOrCreateActiveFeed(
         feedResponse.group_id,
         feedResponse.id,
@@ -541,6 +617,8 @@ export class FeedsClient extends FeedsApi {
       ),
     );
 
+    this.hydrateCapabilitiesCache(feedResponses);
+
     return {
       feeds,
       next: response.next,
@@ -548,6 +626,24 @@ export class FeedsClient extends FeedsApi {
       metadata: response.metadata,
       duration: response.duration,
     };
+  }
+
+  async queryActivities(request?: QueryActivitiesRequest) {
+    const response = await super.queryActivities(request);
+    const activityCurrentFeeds = response.activities.map(
+      (activity) => activity.current_feed,
+    );
+    const feedsToHydrateFrom = [];
+
+    for (const feed of activityCurrentFeeds) {
+      if (feed) {
+        feedsToHydrateFrom.push(feed);
+      }
+    }
+
+    this.hydrateCapabilitiesCache(feedsToHydrateFrom);
+
+    return response;
   }
 
   updateNetworkConnectionStatus = (
