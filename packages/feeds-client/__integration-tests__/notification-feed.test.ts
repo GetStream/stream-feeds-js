@@ -12,7 +12,7 @@ import type { UserRequest } from '../src/gen/models';
 import type { FeedsClient } from '../src/feeds-client';
 import type { Feed } from '../src/feed';
 
-describe.skip('Notification Feed Test Setup', () => {
+describe.skip('Notification Feed', () => {
   let client1: FeedsClient;
   let client2: FeedsClient;
 
@@ -73,6 +73,11 @@ describe.skip('Notification Feed Test Setup', () => {
   });
 
   it(`user 2 follows user 1 - user 1 receives notification`, async () => {
+    console.log(
+      'itt',
+      user1NotificationFeed.state.getLatestValue().notification_status,
+    );
+
     await Promise.all([
       user2TimelineFeed.follow(user1UserFeed.feed, {
         create_notification_activity: true,

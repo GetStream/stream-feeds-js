@@ -46,20 +46,6 @@ export interface APIError {
   exception_fields?: Record<string, string>;
 }
 
-export interface APNS {
-  body: string;
-
-  title: string;
-
-  content_available?: number;
-
-  mutable_content?: number;
-
-  sound?: string;
-
-  data?: Record<string, any>;
-}
-
 export interface AWSRekognitionRule {
   action:
     | 'flag'
@@ -108,30 +94,6 @@ export interface Action {
   value?: string;
 }
 
-export interface ActionLog {
-  created_at: Date;
-
-  id: string;
-
-  reason: string;
-
-  reporter_type: string;
-
-  review_queue_item_id: string;
-
-  target_user_id: string;
-
-  type: string;
-
-  custom: Record<string, any>;
-
-  review_queue_item?: ReviewQueueItem;
-
-  target_user?: User;
-
-  user?: User;
-}
-
 export interface ActionLogResponse {
   created_at: Date;
 
@@ -144,6 +106,8 @@ export interface ActionLogResponse {
   type: string;
 
   user_id: string;
+
+  ai_providers: string[];
 
   custom: Record<string, any>;
 
@@ -216,6 +180,8 @@ export interface ActivityFeedbackRequest {
   report?: boolean;
 
   show_less?: boolean;
+
+  show_more?: boolean;
 }
 
 export interface ActivityFeedbackResponse {
@@ -605,11 +571,11 @@ export interface AddCommentReactionResponse {
 }
 
 export interface AddCommentRequest {
-  comment: string;
-
   object_id: string;
 
   object_type: string;
+
+  comment?: string;
 
   create_notification_activity?: boolean;
 
@@ -711,6 +677,10 @@ export interface AppResponseFields {
 
   name: string;
 
+  region: string;
+
+  shard: string;
+
   file_upload_config: FileUploadConfig;
 
   image_upload_config: FileUploadConfig;
@@ -774,26 +744,12 @@ export interface Attachment {
   giphy?: Images;
 }
 
-export interface AudioSettings {
-  access_request_enabled: boolean;
-
-  default_device: 'speaker' | 'earpiece';
-
-  mic_default_on: boolean;
-
-  opus_dtx_enabled: boolean;
-
-  redundant_coding_enabled: boolean;
-
-  speaker_default_on: boolean;
-
-  noise_cancellation?: NoiseCancellationSettings;
-}
-
 export interface AudioSettingsResponse {
   access_request_enabled: boolean;
 
   default_device: 'speaker' | 'earpiece';
+
+  hifi_audio_enabled: boolean;
 
   mic_default_on: boolean;
 
@@ -850,12 +806,6 @@ export interface AutomodToxicityConfig {
   rules: AutomodRule[];
 
   async?: boolean;
-}
-
-export interface BackstageSettings {
-  enabled: boolean;
-
-  join_ahead_time_seconds?: number;
 }
 
 export interface BackstageSettingsResponse {
@@ -945,6 +895,10 @@ export interface BlockListOptions {
 }
 
 export interface BlockListResponse {
+  is_leet_check_enabled: boolean;
+
+  is_plural_check_enabled: boolean;
+
   name: string;
 
   type: string;
@@ -1123,14 +1077,6 @@ export interface BookmarkUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface BroadcastSettings {
-  enabled: boolean;
-
-  hls?: HLSSettings;
-
-  rtmp?: RTMPSettings;
-}
-
 export interface BroadcastSettingsResponse {
   enabled: boolean;
 
@@ -1139,160 +1085,12 @@ export interface BroadcastSettingsResponse {
   rtmp: RTMPSettingsResponse;
 }
 
-export interface Call {
-  app_pk: number;
-
-  backstage: boolean;
-
-  channel_cid: string;
-
-  cid: string;
-
-  created_at: Date;
-
-  created_by_user_id: string;
-
-  current_session_id: string;
-
-  id: string;
-
-  last_session_id: string;
-
-  team: string;
-
-  thumbnail_url: string;
-
-  type: string;
-
-  updated_at: Date;
-
-  blocked_user_i_ds: string[];
-
-  blocked_users: User[];
-
-  egresses: CallEgress[];
-
-  members: CallMember[];
-
-  custom: Record<string, any>;
-
-  deleted_at?: Date;
-
-  egress_updated_at?: Date;
-
-  ended_at?: Date;
-
-  join_ahead_time_seconds?: number;
-
-  last_heartbeat_at?: Date;
-
-  member_count?: number;
-
-  starts_at?: Date;
-
-  call_type?: CallType;
-
-  created_by?: User;
-
-  member_lookup?: MemberLookup;
-
-  session?: CallSession;
-
-  settings?: CallSettings;
-
-  settings_overrides?: CallSettings;
-}
-
-export interface CallEgress {
-  app_pk: number;
-
-  call_id: string;
-
-  call_type: string;
-
-  egress_id: string;
-
-  egress_type: string;
-
-  instance_ip: string;
-
-  started_at: Date;
-
-  state: string;
-
-  updated_at: Date;
-
-  stopped_at?: Date;
-
-  config?: EgressTaskConfig;
-}
-
 export interface CallIngressResponse {
   rtmp: RTMPIngress;
 
   srt: SRTIngress;
 
   whip: WHIPIngress;
-}
-
-export interface CallMember {
-  created_at: Date;
-
-  role: string;
-
-  updated_at: Date;
-
-  user_id: string;
-
-  custom: Record<string, any>;
-
-  deleted_at?: Date;
-
-  user?: User;
-}
-
-export interface CallParticipant {
-  banned: boolean;
-
-  id: string;
-
-  joined_at: Date;
-
-  online: boolean;
-
-  role: string;
-
-  user_session_id: string;
-
-  custom: Record<string, any>;
-
-  teams_role: Record<string, string>;
-
-  avg_response_time?: number;
-
-  ban_expires?: Date;
-
-  created_at?: Date;
-
-  deactivated_at?: Date;
-
-  deleted_at?: Date;
-
-  invisible?: boolean;
-
-  language?: string;
-
-  last_active?: Date;
-
-  last_engaged_at?: Date;
-
-  revoke_tokens_issued_before?: Date;
-
-  updated_at?: Date;
-
-  teams?: string[];
-
-  privacy_settings?: PrivacySettings;
 }
 
 export interface CallParticipantResponse {
@@ -1355,50 +1153,6 @@ export interface CallResponse {
   thumbnails?: ThumbnailResponse;
 }
 
-export interface CallSession {
-  anonymous_participant_count: number;
-
-  app_pk: number;
-
-  call_id: string;
-
-  call_type: string;
-
-  created_at: Date;
-
-  session_id: string;
-
-  active_sf_us: SFUIDLastSeen[];
-
-  participants: CallParticipant[];
-
-  sfui_ds: string[];
-
-  accepted_by: Record<string, Date>;
-
-  missed_by: Record<string, Date>;
-
-  participants_count_by_role: Record<string, number>;
-
-  rejected_by: Record<string, Date>;
-
-  user_permission_overrides: Record<string, Record<string, boolean>>;
-
-  deleted_at?: Date;
-
-  ended_at?: Date;
-
-  live_ended_at?: Date;
-
-  live_started_at?: Date;
-
-  ring_at?: Date;
-
-  started_at?: Date;
-
-  timer_ends_at?: Date;
-}
-
 export interface CallSessionResponse {
   anonymous_participant_count: number;
 
@@ -1423,36 +1177,6 @@ export interface CallSessionResponse {
   started_at?: Date;
 
   timer_ends_at?: Date;
-}
-
-export interface CallSettings {
-  audio?: AudioSettings;
-
-  backstage?: BackstageSettings;
-
-  broadcasting?: BroadcastSettings;
-
-  frame_recording?: FrameRecordSettings;
-
-  geofencing?: GeofenceSettings;
-
-  ingress?: IngressSettings;
-
-  limits?: LimitsSettings;
-
-  recording?: RecordSettings;
-
-  ring?: RingSettings;
-
-  screensharing?: ScreensharingSettings;
-
-  session?: SessionSettings;
-
-  thumbnails?: ThumbnailsSettings;
-
-  transcription?: TranscriptionSettings;
-
-  video?: VideoSettings;
 }
 
 export interface CallSettingsResponse {
@@ -1483,24 +1207,6 @@ export interface CallSettingsResponse {
   video: VideoSettingsResponse;
 
   ingress?: IngressSettingsResponse;
-}
-
-export interface CallType {
-  app_pk: number;
-
-  created_at: Date;
-
-  external_storage: string;
-
-  name: string;
-
-  pk: number;
-
-  updated_at: Date;
-
-  notification_settings?: NotificationSettings;
-
-  settings?: CallSettings;
 }
 
 export interface CastPollVoteRequest {
@@ -1745,6 +1451,8 @@ export interface ChannelMemberLookup {
   archived: boolean;
 
   banned: boolean;
+
+  blocked: boolean;
 
   hidden: boolean;
 
@@ -2059,12 +1767,6 @@ export interface CommentUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface CompositeAppSettings {
-  json_encoded_settings?: string;
-
-  url?: string;
-}
-
 export interface ConfigOverrides {
   commands: string[];
 
@@ -2155,6 +1857,10 @@ export interface CreateBlockListRequest {
   name: string;
 
   words: string[];
+
+  is_leet_check_enabled?: boolean;
+
+  is_plural_check_enabled?: boolean;
 
   team?: string;
 
@@ -2335,6 +2041,14 @@ export interface DeleteUserRequest {
   mark_messages_deleted?: boolean;
 }
 
+export interface DeliveryReceipts {
+  enabled: boolean;
+}
+
+export interface DeliveryReceiptsResponse {
+  enabled: boolean;
+}
+
 export interface Device {
   created_at: Date;
 
@@ -2441,24 +2155,6 @@ export interface EgressResponse {
   hls?: EgressHLSResponse;
 }
 
-export interface EgressTaskConfig {
-  egress_user?: EgressUser;
-
-  frame_recording_egress_config?: FrameRecordingEgressConfig;
-
-  hls_egress_config?: HLSEgressConfig;
-
-  recording_egress_config?: RecordingEgressConfig;
-
-  rtmp_egress_config?: RTMPEgressConfig;
-
-  stt_egress_config?: STTEgressConfig;
-}
-
-export interface EgressUser {
-  token?: string;
-}
-
 export interface EnrichedActivity {
   foreign_id?: string;
 
@@ -2513,50 +2209,6 @@ export interface EnrichedReaction {
   user?: Data;
 }
 
-export interface EntityCreator {
-  ban_count: number;
-
-  banned: boolean;
-
-  deleted_content_count: number;
-
-  id: string;
-
-  online: boolean;
-
-  role: string;
-
-  custom: Record<string, any>;
-
-  teams_role: Record<string, string>;
-
-  avg_response_time?: number;
-
-  ban_expires?: Date;
-
-  created_at?: Date;
-
-  deactivated_at?: Date;
-
-  deleted_at?: Date;
-
-  invisible?: boolean;
-
-  language?: string;
-
-  last_active?: Date;
-
-  last_engaged_at?: Date;
-
-  revoke_tokens_issued_before?: Date;
-
-  updated_at?: Date;
-
-  teams?: string[];
-
-  privacy_settings?: PrivacySettings;
-}
-
 export interface EntityCreatorResponse {
   ban_count: number;
 
@@ -2599,46 +2251,6 @@ export interface EntityCreatorResponse {
   revoke_tokens_issued_before?: Date;
 
   teams_role?: Record<string, string>;
-}
-
-export interface EventNotificationSettings {
-  enabled: boolean;
-
-  apns: APNS;
-
-  fcm: FCM;
-}
-
-export interface ExternalStorage {
-  abs_account_name?: string;
-
-  abs_client_id?: string;
-
-  abs_client_secret?: string;
-
-  abs_tenant_id?: string;
-
-  bucket?: string;
-
-  gcs_credentials?: string;
-
-  path?: string;
-
-  s3_api_key?: string;
-
-  s3_custom_endpoint?: string;
-
-  s3_region?: string;
-
-  s3_secret_key?: string;
-
-  storage_name?: string;
-
-  storage_type?: number;
-}
-
-export interface FCM {
-  data?: Record<string, any>;
 }
 
 export interface FeedCreatedEvent {
@@ -3022,40 +2634,6 @@ export interface FileUploadResponse {
   thumb_url?: string;
 }
 
-export interface Flag {
-  created_at: Date;
-
-  entity_id: string;
-
-  entity_type: string;
-
-  updated_at: Date;
-
-  result: Array<Record<string, any>>;
-
-  entity_creator_id?: string;
-
-  is_streamed_content?: boolean;
-
-  moderation_payload_hash?: string;
-
-  reason?: string;
-
-  review_queue_item_id?: string;
-
-  type?: string;
-
-  labels?: string[];
-
-  custom?: Record<string, any>;
-
-  moderation_payload?: ModerationPayload;
-
-  review_queue_item?: ReviewQueueItem;
-
-  user?: User;
-}
-
 export interface FlagRequest {
   entity_id: string;
 
@@ -3174,24 +2752,6 @@ export interface FollowUpdatedEvent {
   received_at?: Date;
 }
 
-export interface FrameRecordSettings {
-  capture_interval_in_seconds: number;
-
-  mode: 'available' | 'disabled' | 'auto-on';
-
-  quality?: string;
-}
-
-export interface FrameRecordingEgressConfig {
-  capture_interval_in_seconds?: number;
-
-  storage_name?: string;
-
-  external_storage?: ExternalStorage;
-
-  quality?: Quality;
-}
-
 export interface FrameRecordingResponse {
   status: string;
 }
@@ -3264,10 +2824,6 @@ export interface FullUserResponse {
   privacy_settings?: PrivacySettingsResponse;
 
   teams_role?: Record<string, string>;
-}
-
-export interface GeofenceSettings {
-  names: string[];
 }
 
 export interface GeofenceSettingsResponse {
@@ -3442,26 +2998,6 @@ export interface GoogleVisionConfig {
   enabled?: boolean;
 }
 
-export interface HLSEgressConfig {
-  playlist_url?: string;
-
-  start_unix_nano?: number;
-
-  qualities?: Quality[];
-
-  composite_app_settings?: CompositeAppSettings;
-}
-
-export interface HLSSettings {
-  auto_on: boolean;
-
-  enabled: boolean;
-
-  quality_tracks: string[];
-
-  layout?: LayoutSettings;
-}
-
 export interface HLSSettingsResponse {
   auto_on: boolean;
 
@@ -3566,28 +3102,12 @@ export interface Images {
   original: ImageData;
 }
 
-export interface IngressAudioEncodingOptions {
-  bitrate: number;
-
-  channels: '1' | '2';
-
-  enable_dtx: boolean;
-}
-
 export interface IngressAudioEncodingResponse {
   bitrate: number;
 
   channels: number;
 
   enable_dtx: boolean;
-}
-
-export interface IngressSettings {
-  enabled: boolean;
-
-  audio_encoding_options?: IngressAudioEncodingOptions;
-
-  video_encoding_options?: Record<string, IngressVideoEncodingOptions>;
 }
 
 export interface IngressSettingsResponse {
@@ -3598,24 +3118,18 @@ export interface IngressSettingsResponse {
   video_encoding_options?: Record<string, IngressVideoEncodingResponse>;
 }
 
-export interface IngressVideoEncodingOptions {
-  layers: IngressVideoLayer[];
+export interface IngressSourceResponse {
+  fps: number;
+
+  height: number;
+
+  width: number;
 }
 
 export interface IngressVideoEncodingResponse {
   layers: IngressVideoLayerResponse[];
-}
 
-export interface IngressVideoLayer {
-  bitrate: number;
-
-  codec: 'h264' | 'vp8';
-
-  frame_rate: number;
-
-  max_dimension: number;
-
-  min_dimension: number;
+  source: IngressSourceResponse;
 }
 
 export interface IngressVideoLayerResponse {
@@ -3665,28 +3179,6 @@ export interface LabelThresholds {
   flag?: number;
 }
 
-export interface LayoutSettings {
-  external_app_url: string;
-
-  external_css_url: string;
-
-  name: 'spotlight' | 'grid' | 'single-participant' | 'mobile' | 'custom';
-
-  detect_orientation?: boolean;
-
-  options?: Record<string, any>;
-}
-
-export interface LimitsSettings {
-  max_participants_exclude_roles: string[];
-
-  max_duration_seconds?: number;
-
-  max_participants?: number;
-
-  max_participants_exclude_owner?: boolean;
-}
-
 export interface LimitsSettingsResponse {
   max_participants_exclude_roles: string[];
 
@@ -3725,10 +3217,6 @@ export interface MarkReviewedRequest {
   content_to_mark_as_reviewed_limit?: number;
 
   disable_marking_content_as_reviewed?: boolean;
-}
-
-export interface MemberLookup {
-  limit: number;
 }
 
 export interface MembershipLevelResponse {
@@ -3966,15 +3454,21 @@ export interface ModerationActionConfig {
 }
 
 export interface ModerationCustomActionEvent {
+  action_id: string;
+
   created_at: Date;
+
+  custom: Record<string, any>;
+
+  review_queue_item: ReviewQueueItemResponse;
 
   type: string;
 
-  item?: ReviewQueueItem;
+  received_at?: Date;
 
-  message?: Message;
+  action_options?: Record<string, any>;
 
-  user?: User;
+  message?: MessageResponse;
 }
 
 export interface ModerationFlagResponse {
@@ -4024,13 +3518,15 @@ export interface ModerationFlaggedEvent {
 export interface ModerationMarkReviewedEvent {
   created_at: Date;
 
+  custom: Record<string, any>;
+
+  item: ReviewQueueItemResponse;
+
   type: string;
 
-  item?: ReviewQueueItem;
+  received_at?: Date;
 
-  message?: Message;
-
-  user?: User;
+  message?: MessageResponse;
 }
 
 export interface ModerationPayload {
@@ -4111,20 +3607,6 @@ export interface NotificationFeedUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface NotificationSettings {
-  enabled: boolean;
-
-  call_live_started: EventNotificationSettings;
-
-  call_missed: EventNotificationSettings;
-
-  call_notification: EventNotificationSettings;
-
-  call_ring: EventNotificationSettings;
-
-  session_started: EventNotificationSettings;
-}
-
 export interface NotificationStatusResponse {
   unread: number;
 
@@ -4158,8 +3640,6 @@ export interface NotificationTrigger {
 
   type: string;
 }
-
-export interface NullTime {}
 
 export interface OCRRule {
   action:
@@ -4624,12 +4104,16 @@ export interface PollVotesResponse {
 }
 
 export interface PrivacySettings {
+  delivery_receipts?: DeliveryReceipts;
+
   read_receipts?: ReadReceipts;
 
   typing_indicators?: TypingIndicators;
 }
 
 export interface PrivacySettingsResponse {
+  delivery_receipts?: DeliveryReceiptsResponse;
+
   read_receipts?: ReadReceiptsResponse;
 
   typing_indicators?: TypingIndicatorsResponse;
@@ -4669,20 +4153,6 @@ export interface PushPreferences {
   feeds_level?: string;
 
   feeds_preferences?: FeedsPreferences;
-}
-
-export interface Quality {
-  bitdepth?: number;
-
-  framerate?: number;
-
-  height?: number;
-
-  name?: string;
-
-  video_bitrate?: number;
-
-  width?: number;
 }
 
 export interface QueryActivitiesRequest {
@@ -4995,34 +4465,8 @@ export interface QueryUsersResponse {
   users: FullUserResponse[];
 }
 
-export interface RTMPEgressConfig {
-  rtmp_location?: string;
-
-  composite_app_settings?: CompositeAppSettings;
-
-  quality?: Quality;
-}
-
 export interface RTMPIngress {
   address: string;
-}
-
-export interface RTMPLocation {
-  name: string;
-
-  stream_key: string;
-
-  stream_url: string;
-}
-
-export interface RTMPSettings {
-  enabled: boolean;
-
-  quality_name?: string;
-
-  layout?: LayoutSettings;
-
-  location?: RTMPLocation;
 }
 
 export interface RTMPSettingsResponse {
@@ -5095,36 +4539,12 @@ export interface ReadReceiptsResponse {
   enabled: boolean;
 }
 
-export interface RecordSettings {
-  mode: string;
-
-  audio_only?: boolean;
-
-  quality?: string;
-
-  layout?: LayoutSettings;
-}
-
 export interface RecordSettingsResponse {
   audio_only: boolean;
 
   mode: string;
 
   quality: string;
-}
-
-export interface RecordingEgressConfig {
-  audio_only?: boolean;
-
-  storage_name?: string;
-
-  composite_app_settings?: CompositeAppSettings;
-
-  external_storage?: ExternalStorage;
-
-  quality?: Quality;
-
-  video_orientation_hint?: VideoOrientation;
 }
 
 export interface RejectFeedMemberInviteRequest {}
@@ -5182,84 +4602,6 @@ export interface Response {
 }
 
 export interface RestoreActionRequest {}
-
-export interface ReviewQueueItem {
-  ai_text_severity: string;
-
-  bounce_count: number;
-
-  config_key: string;
-
-  content_changed: boolean;
-
-  created_at: Date;
-
-  entity_id: string;
-
-  entity_type: string;
-
-  flags_count: number;
-
-  has_image: boolean;
-
-  has_text: boolean;
-
-  has_video: boolean;
-
-  id: string;
-
-  moderation_payload_hash: string;
-
-  recommended_action: string;
-
-  reviewed_by: string;
-
-  severity: number;
-
-  status: string;
-
-  updated_at: Date;
-
-  actions: ActionLog[];
-
-  bans: Ban[];
-
-  flag_labels: string[];
-
-  flag_types: string[];
-
-  flags: Flag[];
-
-  languages: string[];
-
-  reporter_ids: string[];
-
-  teams: string[];
-
-  archived_at: NullTime;
-
-  completed_at: NullTime;
-
-  reviewed_at: NullTime;
-
-  activity?: EnrichedActivity;
-
-  assigned_to?: User;
-
-  call?: Call;
-
-  entity_creator?: EntityCreator;
-
-  feeds_v2_activity?: EnrichedActivity;
-
-  feeds_v2_reaction?: Reaction;
-
-  message?: Message;
-
-  moderation_payload?: ModerationPayload;
-
-  reaction?: Reaction;
-}
 
 export interface ReviewQueueItemResponse {
   ai_text_severity: string;
@@ -5321,14 +4663,6 @@ export interface ReviewQueueItemResponse {
   reaction?: Reaction;
 }
 
-export interface RingSettings {
-  auto_cancel_timeout_ms: number;
-
-  incoming_call_timeout_ms: number;
-
-  missed_call_timeout_ms: number;
-}
-
 export interface RingSettingsResponse {
   auto_cancel_timeout_ms: number;
 
@@ -5338,7 +4672,15 @@ export interface RingSettingsResponse {
 }
 
 export interface RuleBuilderAction {
-  type?: string;
+  type:
+    | 'ban_user'
+    | 'flag_user'
+    | 'flag_content'
+    | 'block_content'
+    | 'shadow_content'
+    | 'bounce_flag_content'
+    | 'bounce_content'
+    | 'bounce_remove_content';
 
   ban_options?: BanOptions;
 
@@ -5399,44 +4741,8 @@ export interface RuleBuilderRule {
   groups?: RuleBuilderConditionGroup[];
 }
 
-export interface SFUIDLastSeen {
-  id: string;
-
-  last_seen: Date;
-
-  process_start_time: number;
-}
-
 export interface SRTIngress {
   address: string;
-}
-
-export interface STTEgressConfig {
-  closed_captions_enabled?: boolean;
-
-  language?: string;
-
-  storage_name?: string;
-
-  translations_enabled?: boolean;
-
-  upload_transcriptions?: boolean;
-
-  whisper_server_base_url?: string;
-
-  translation_languages?: string[];
-
-  external_storage?: ExternalStorage;
-
-  speech_segment_config?: SpeechSegmentConfig;
-}
-
-export interface ScreensharingSettings {
-  access_request_enabled: boolean;
-
-  enabled: boolean;
-
-  target_resolution?: TargetResolution;
 }
 
 export interface ScreensharingSettingsResponse {
@@ -5445,10 +4751,6 @@ export interface ScreensharingSettingsResponse {
   enabled: boolean;
 
   target_resolution?: TargetResolution;
-}
-
-export interface SessionSettings {
-  inactivity_timeout_seconds: number;
 }
 
 export interface SessionSettingsResponse {
@@ -5579,6 +4881,8 @@ export interface StoriesFeedUpdatedEvent {
   feed_visibility?: string;
 
   received_at?: Date;
+
+  activities?: ActivityResponse[];
 
   aggregated_activities?: AggregatedActivityResponse[];
 
@@ -5729,64 +5033,11 @@ export interface ThumbnailResponse {
   image_url: string;
 }
 
-export interface ThumbnailsSettings {
-  enabled: boolean;
-}
-
 export interface ThumbnailsSettingsResponse {
   enabled: boolean;
 }
 
 export interface Time {}
-
-export interface TranscriptionSettings {
-  closed_caption_mode: 'available' | 'disabled' | 'auto-on';
-
-  language:
-    | 'auto'
-    | 'en'
-    | 'fr'
-    | 'es'
-    | 'de'
-    | 'it'
-    | 'nl'
-    | 'pt'
-    | 'pl'
-    | 'ca'
-    | 'cs'
-    | 'da'
-    | 'el'
-    | 'fi'
-    | 'id'
-    | 'ja'
-    | 'ru'
-    | 'sv'
-    | 'ta'
-    | 'th'
-    | 'tr'
-    | 'hu'
-    | 'ro'
-    | 'zh'
-    | 'ar'
-    | 'tl'
-    | 'he'
-    | 'hi'
-    | 'hr'
-    | 'ko'
-    | 'ms'
-    | 'no'
-    | 'uk'
-    | 'bg'
-    | 'et'
-    | 'sl'
-    | 'sk';
-
-  mode: 'available' | 'disabled' | 'auto-on';
-
-  speech_segment_config?: SpeechSegmentConfig;
-
-  translation?: TranslationSettings;
-}
 
 export interface TranscriptionSettingsResponse {
   closed_caption_mode: 'available' | 'disabled' | 'auto-on';
@@ -5920,6 +5171,10 @@ export interface UpdateActivityResponse {
 }
 
 export interface UpdateBlockListRequest {
+  is_leet_check_enabled?: boolean;
+
+  is_plural_check_enabled?: boolean;
+
   team?: string;
 
   words?: string[];
@@ -6506,28 +5761,12 @@ export interface VideoEndCallRequest {}
 
 export interface VideoKickUserRequest {}
 
-export interface VideoOrientation {
-  orientation?: number;
-}
-
 export interface VideoRuleParameters {
   threshold?: number;
 
   time_window?: string;
 
   harm_labels?: string[];
-}
-
-export interface VideoSettings {
-  access_request_enabled: boolean;
-
-  camera_default_on: boolean;
-
-  camera_facing: 'front' | 'back' | 'external';
-
-  enabled: boolean;
-
-  target_resolution: TargetResolution;
 }
 
 export interface VideoSettingsResponse {
@@ -6605,6 +5844,8 @@ export type WSClientEvent =
   | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
   | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
   | ({ type: 'health.check' } & HealthCheckEvent)
+  | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
   | ({ type: 'user.updated' } & UserUpdatedEvent);
 
 export type WSEvent =

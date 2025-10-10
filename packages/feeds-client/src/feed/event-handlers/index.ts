@@ -4,5 +4,7 @@ export * from './feed-member';
 export * from './bookmark';
 export * from './activity';
 export * from './feed';
-export * from './aggregated-feed';
+export * from './notification-feed';
+export * from './story-feeds';
 export * from './watch';
+export * from './add-aggregated-activities-to-state';

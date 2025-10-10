@@ -170,6 +170,8 @@ export class FeedsApi {
     const body = {
       name: request?.name,
       words: request?.words,
+      is_leet_check_enabled: request?.is_leet_check_enabled,
+      is_plural_check_enabled: request?.is_plural_check_enabled,
       team: request?.team,
       type: request?.type,
     };
@@ -220,6 +222,8 @@ export class FeedsApi {
       name: request?.name,
     };
     const body = {
+      is_leet_check_enabled: request?.is_leet_check_enabled,
+      is_plural_check_enabled: request?.is_plural_check_enabled,
       team: request?.team,
       words: request?.words,
     };
@@ -499,6 +503,7 @@ export class FeedsApi {
       reason: request?.reason,
       report: request?.report,
       show_less: request?.show_less,
+      show_more: request?.show_more,
     };
 
     const response = await this.apiClient.sendRequest<

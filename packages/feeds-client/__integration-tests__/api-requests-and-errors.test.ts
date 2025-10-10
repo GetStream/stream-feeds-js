@@ -32,7 +32,9 @@ describe('API requests and error handling', () => {
     expect(typeof headers.Authorization).toBe('string');
     expect(headers['stream-auth-type']).toBe('jwt');
     expect(typeof headers['x-client-request-id']).toBe('string');
-    expect(headers['X-Stream-Client']).toMatch(/stream-feeds-js-(v\d+\.\d+\.\d+)/);
+    expect(headers['X-Stream-Client']).toMatch(
+      /stream-feeds-js-(v\d+\.\d+\.\d+)/,
+    );
   });
 
   it('should return response body', async () => {
@@ -49,55 +51,55 @@ describe('API requests and error handling', () => {
     expect(response.users).toBeDefined();
   });
 
-  it.skipIf(import.meta.env.VITE_API_URL?.includes('localhost'))(
-    'should return rate limit information',
-    async () => {
-      client = createTestClient();
-      connectUserPromise = client.connectUser(
-        user,
-        createTestTokenGenerator(user),
+  it.skipIf(
+    import.meta.env.VITE_API_URL?.includes('localhost') ||
+      import.meta.env.VITE_API_URL?.includes('127.0.0.1'),
+  )('should return rate limit information', async () => {
+    client = createTestClient();
+    connectUserPromise = client.connectUser(
+      user,
+      createTestTokenGenerator(user),
+    );
+
+    const response = await client.queryUsers({
+      payload: { filter_conditions: {} },
+    });
+
+    expect(typeof response.metadata.rate_limit.rate_limit).toBe('number');
+    expect(typeof response.metadata.rate_limit.rate_limit_remaining).toBe(
+      'number',
+    );
+    expect(response.metadata.rate_limit.rate_limit_reset instanceof Date).toBe(
+      true,
+    );
+  });
+
+  it.skipIf(
+    import.meta.env.VITE_API_URL?.includes('localhost') ||
+      import.meta.env.VITE_API_URL?.includes('127.0.0.1'),
+  )('should handle error response from Stream API', async () => {
+    client = createTestClient();
+    connectUserPromise = client.connectUser(
+      user,
+      createTestTokenGenerator(user),
+    );
+
+    try {
+      await client.queryUsers();
+      throw new Error(`Test failed because method didn't throw`);
+    } catch (error: any) {
+      expect(error.message).toBe(
+        'Stream error code 4: QueryUsers failed with error: "invalid json data"',
       );
+      expect(error.code).toBe(4);
+      expect(error.metadata).toBeDefined();
+      expect(error.metadata.response_code).toBe(400);
 
-      const response = await client.queryUsers({
-        payload: { filter_conditions: {} },
-      });
+      const rate_limit = error.metadata.rate_limit;
 
-      expect(typeof response.metadata.rate_limit.rate_limit).toBe('number');
-      expect(typeof response.metadata.rate_limit.rate_limit_remaining).toBe(
-        'number',
-      );
-      expect(
-        response.metadata.rate_limit.rate_limit_reset instanceof Date,
-      ).toBe(true);
-    },
-  );
-
-  it.skipIf(import.meta.env.VITE_API_URL?.includes('localhost'))(
-    'should handle error response from Stream API',
-    async () => {
-      client = createTestClient();
-      connectUserPromise = client.connectUser(
-        user,
-        createTestTokenGenerator(user),
-      );
-
-      try {
-        await client.queryUsers();
-        throw new Error(`Test failed because method didn't throw`);
-      } catch (error: any) {
-        expect(error.message).toBe(
-          'Stream error code 4: QueryUsers failed with error: "invalid json data"',
-        );
-        expect(error.code).toBe(4);
-        expect(error.metadata).toBeDefined();
-        expect(error.metadata.response_code).toBe(400);
-
-        const rate_limit = error.metadata.rate_limit;
-
-        expect(rate_limit.rate_limit).toBeDefined();
-      }
-    },
-  );
+      expect(rate_limit.rate_limit).toBeDefined();
+    }
+  });
 
   it('should handle token expiration', async () => {
     client = createTestClient();

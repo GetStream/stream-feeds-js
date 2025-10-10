@@ -42,7 +42,7 @@ describe('Reactions page', () => {
   it(`Reactions`, async () => {
     // Add a reaction to an activity
     const addResponse = await client.addActivityReaction({
-      activity_id: 'activity_123',
+      activity_id: activity.id,
       type: 'like',
       custom: {
         emoji: '❤️',
@@ -55,7 +55,7 @@ describe('Reactions page', () => {
 
     // Adding a reaction without triggering push notifications
     await client.addActivityReaction({
-      activity_id: 'activity_123',
+      activity_id: activity.id,
       type: 'like',
       custom: {
         emoji: '❤️',

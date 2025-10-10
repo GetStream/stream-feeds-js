@@ -525,8 +525,18 @@ export class FeedsClient extends FeedsApi {
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
 
-  feed = (groupId: string, id: string) => {
-    return this.getOrCreateActiveFeed(groupId, id);
+  feed = (
+    groupId: string,
+    id: string,
+    options?: { addNewActivitiesTo?: 'start' | 'end' },
+  ) => {
+    return this.getOrCreateActiveFeed(
+      groupId,
+      id,
+      undefined,
+      undefined,
+      options?.addNewActivitiesTo,
+    );
   };
 
   async queryFeeds(request?: QueryFeedsRequest) {
@@ -640,11 +650,19 @@ export class FeedsClient extends FeedsApi {
     id: string,
     data?: FeedResponse,
     watch?: boolean,
+    addNewActivitiesTo?: 'start' | 'end',
   ) => {
     const fid = `${group}:${id}`;
 
     if (!this.activeFeeds[fid]) {
-      this.activeFeeds[fid] = new Feed(this, group, id, data, watch);
+      this.activeFeeds[fid] = new Feed(
+        this,
+        group,
+        id,
+        data,
+        watch,
+        addNewActivitiesTo,
+      );
     }
 
     const feed = this.activeFeeds[fid];

@@ -1,6 +1,6 @@
 import type { Feed } from '../../feed';
 import type { ActivityResponse } from '../../../gen/models';
-import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 
 export function addActivitiesToState(
   this: Feed,
@@ -8,19 +8,17 @@ export function addActivitiesToState(
   activities: ActivityResponse[] | undefined,
   position: 'start' | 'end',
 ) {
-  let result: UpdateStateResult<{ activities: ActivityResponse[] }>;
   if (activities === undefined) {
-    activities = [];
-    result = {
-      changed: true,
-      activities,
-    };
-  } else {
-    result = {
+    return {
       changed: false,
-      activities,
+      activities: [],
     };
   }
+
+  let result = {
+    changed: false,
+    activities,
+  };
 
   const newActivitiesDeduplicated: ActivityResponse[] = [];
   newActivities.forEach((newActivityResponse) => {
@@ -51,7 +49,7 @@ export function handleActivityAdded(
   const result = addActivitiesToState.bind(this)(
     [event.activity],
     currentActivities,
-    'start',
+    this.currentState.addNewActivitiesTo,
   );
   if (result.changed) {
     this.client.hydratePollCache([event.activity]);
