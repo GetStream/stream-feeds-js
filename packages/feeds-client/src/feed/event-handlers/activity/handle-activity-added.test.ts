@@ -36,7 +36,7 @@ describe(handleActivityAdded.name, () => {
     );
   });
 
-  it('initializes activities when state is empty and adds new activity to the start', () => {
+  it('if activities are not initialized, it does nothing', () => {
     const event = generateActivityAddedEvent();
 
     const stateBefore = feed.currentState;
@@ -47,10 +47,7 @@ describe(handleActivityAdded.name, () => {
     handleActivityAdded.call(feed, event);
 
     const stateAfter = feed.currentState;
-    expect(stateAfter.activities).toBeDefined();
-    expect(stateAfter.activities).toHaveLength(1);
-    expect(stateAfter.activities?.[0]).toBe(event.activity);
-    expect(hydrateSpy).toHaveBeenCalledWith([event.activity]);
+    expect(stateAfter.activities).toBeUndefined();
   });
 
   it('prepends new activity when activities already exist', () => {
@@ -65,6 +62,19 @@ describe(handleActivityAdded.name, () => {
     expect(stateAfter.activities).toHaveLength(2);
     expect(stateAfter.activities?.[0]).toBe(event.activity);
     expect(stateAfter.activities?.[1]).toBe(existing);
+  });
+
+  it('add new activity to the end if addNewActivitiesTo is end', () => {
+    feed.state.partialNext({ addNewActivitiesTo: 'end' });
+    const existing = generateActivityResponse();
+    feed.state.partialNext({ activities: [existing] });
+    const event = generateActivityAddedEvent();
+    handleActivityAdded.call(feed, event);
+
+    const stateAfter = feed.currentState;
+    expect(stateAfter.activities).toHaveLength(2);
+    expect(stateAfter.activities?.[0]).toBe(existing);
+    expect(stateAfter.activities?.[1]).toBe(event.activity);
   });
 
   it('does not duplicate if activity already exists', () => {

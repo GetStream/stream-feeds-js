@@ -1233,9 +1233,11 @@ decoders.ModerationCustomActionEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
-    message: { type: 'Message', isSingle: true },
+    review_queue_item: { type: 'ReviewQueueItemResponse', isSingle: true },
 
-    user: { type: 'User', isSingle: true },
+    received_at: { type: 'DatetimeType', isSingle: true },
+
+    message: { type: 'MessageResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1266,9 +1268,11 @@ decoders.ModerationMarkReviewedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 
-    message: { type: 'Message', isSingle: true },
+    item: { type: 'ReviewQueueItemResponse', isSingle: true },
 
-    user: { type: 'User', isSingle: true },
+    received_at: { type: 'DatetimeType', isSingle: true },
+
+    message: { type: 'MessageResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1744,6 +1748,8 @@ decoders.StoriesFeedUpdatedEvent = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
+
+    activities: { type: 'ActivityResponse', isSingle: false },
 
     aggregated_activities: {
       type: 'AggregatedActivityResponse',
