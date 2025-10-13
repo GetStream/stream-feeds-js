@@ -7,8 +7,6 @@ import {
   createMockAggregatedActivity,
   createMockNotificationFeedUpdatedEvent,
   createMockNotificationStatus,
-  generateActivityResponse,
-  generateFeedReactionResponse,
 } from '../../../test-utils';
 
 describe('notification-feed-utils', () => {
