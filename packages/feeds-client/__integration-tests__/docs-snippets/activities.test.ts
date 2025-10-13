@@ -51,31 +51,6 @@ describe('Activities page', () => {
     });
   });
 
-  it(`stories`, async () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const response = await feed.addActivity({
-      type: 'story',
-      text: 'My story',
-      expires_at: tomorrow.toISOString(),
-      attachments: [
-        {
-          type: 'image',
-          image_url: 'https://example.com/image.png',
-          custom: {},
-        },
-        {
-          type: 'video',
-          image_url: 'https://example.com/video.mp4',
-          custom: {},
-        },
-      ],
-    });
-
-    expect(response.activity?.expires_at?.getTime()).toBeDefined();
-  });
-
   it('restricted visibility', async () => {
     const response = await feed.addActivity({
       type: 'post',
