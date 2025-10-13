@@ -94,7 +94,7 @@ export const updateNotificationFeedFromEvent = (
     aggregated_activities?: AggregatedActivityResponse[];
   } = {};
 
-  if (event.notification_status && currentNotificationStatus) {
+  if (event.notification_status) {
     const notificationStatusResult = updateNotificationStatus(
       event.notification_status,
       currentNotificationStatus,

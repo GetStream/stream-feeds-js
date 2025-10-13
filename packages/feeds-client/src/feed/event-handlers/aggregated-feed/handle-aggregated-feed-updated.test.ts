@@ -57,13 +57,16 @@ describe('notification-feed-utils', () => {
       expect(result.changed).toBe(false);
     });
 
-    it(`shouldn't update notification_status when event has notification_status but currentNotificationStatus is undefined`, () => {
+    it(`should update notification_status when event has notification_status and currentNotificationStatus is undefined`, () => {
       const event = createMockNotificationFeedUpdatedEvent({
         notification_status: createMockNotificationStatus(),
       });
       const result = updateNotificationFeedFromEvent(event, [], undefined);
 
-      expect(result.changed).toBe(false);
+      expect(result.changed).toBe(true);
+      expect(result.data?.notification_status).toStrictEqual(
+        createMockNotificationStatus(),
+      );
     });
 
     it(`shouldn't update aggregated_activities when event has aggregated_activities but currentAggregatedActivities is undefined`, () => {
