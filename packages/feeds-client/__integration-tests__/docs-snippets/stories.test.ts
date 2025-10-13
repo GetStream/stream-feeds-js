@@ -90,7 +90,7 @@ describe('Stories page', () => {
       limit: 100,
     });
 
-    const johnStories = saraStoryTimeline.state.getLatestValue().activities!;
+    const johnStories = johnStoryFeed.state.getLatestValue().activities!;
 
     // Display all of John's active stories
     johnStories.forEach((activity) => {
@@ -99,7 +99,7 @@ describe('Stories page', () => {
     });
 
     // Mark a story as watched
-    await saraStoryTimeline.markActivity({
+    await johnStoryFeed.markActivity({
       mark_watched: [johnStories[0].id],
     });
   });
