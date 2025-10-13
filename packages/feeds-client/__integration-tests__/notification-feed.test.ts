@@ -12,7 +12,7 @@ import type { UserRequest } from '../src/gen/models';
 import type { FeedsClient } from '../src/feeds-client';
 import type { Feed } from '../src/feed';
 
-describe.skip('Notification Feed Test Setup', () => {
+describe('Notification Feed Test Setup', () => {
   let client1: FeedsClient;
   let client2: FeedsClient;
 
