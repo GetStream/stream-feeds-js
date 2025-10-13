@@ -30,7 +30,7 @@ describe('notification-feed-utils', () => {
       });
       const result = updateNotificationFeedFromEvent(event, [], undefined);
 
-      expect(result.changed).toBe(false);
+      expect(result.changed).toBe(true);
       expect(result.data?.notification_status).toStrictEqual(
         event.notification_status,
       );

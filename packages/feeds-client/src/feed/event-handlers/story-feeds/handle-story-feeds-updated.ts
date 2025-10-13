@@ -68,7 +68,7 @@ export function updateStoriesFeedFromEvent(
     };
   }
 
-  let result = {
+  const result = {
     changed: true,
     data: {
       aggregated_activities: aggregatedActivities,

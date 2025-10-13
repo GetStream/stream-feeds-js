@@ -48,6 +48,7 @@ describe(handleActivityAdded.name, () => {
 
     const stateAfter = feed.currentState;
     expect(stateAfter.activities).toBeUndefined();
+    expect(hydrateSpy).not.toHaveBeenCalled();
   });
 
   it('prepends new activity when activities already exist', () => {

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   createTestClient,
@@ -74,7 +72,7 @@ describe('Stories Feed', () => {
 
   it(`user 2 marks the story as watched`, async () => {
     await user2StoriesFeed.getOrCreate({ watch: true });
-    user2StoriesFeed.on('feeds.stories_feed.updated', (event) => {});
+    user2StoriesFeed.on('feeds.stories_feed.updated', (_) => {});
 
     await Promise.all([
       user2StoriesFeed.markActivity({

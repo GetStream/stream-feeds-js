@@ -6,11 +6,7 @@ import {
 } from '../utils';
 import type { FeedsClient } from '../../src/feeds-client';
 import type { Feed } from '../../src/feed';
-import type {
-  ActivityResponse,
-  CommentResponse,
-  UserRequest,
-} from '../../src/gen/models';
+import type { UserRequest } from '../../src/gen/models';
 
 describe('Stories page', () => {
   let johnClient: FeedsClient;
@@ -31,7 +27,7 @@ describe('Stories page', () => {
     johnStoryFeed = johnClient.feed('story', john.id);
     await johnStoryFeed.getOrCreate();
 
-    let tomorrow = new Date();
+    const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     await johnStoryFeed.addActivity({
@@ -54,7 +50,7 @@ describe('Stories page', () => {
   });
 
   it(`Reading story timeline and marking avtivities as watched`, async () => {
-    const saraStoryTimeline = saraClient.feed('stories', sara.id);
+    saraStoryTimeline = saraClient.feed('stories', sara.id);
     await saraStoryTimeline.getOrCreate({ watch: true });
 
     // Since story timeline is aggregated by user id, we read aggregated activities
@@ -77,20 +73,20 @@ describe('Stories page', () => {
 
   it(`Reading story feed`, async () => {
     // Sara reads John's story feed
-    const johnStoryFeed = saraClient.feed('story', john.id, {
+    const johnFeed = saraClient.feed('story', john.id, {
       // By default new activities are added to the start of the list, but this is not what we want for stories
       addNewActivitiesTo: 'end',
     });
 
     // Alternatively set after feed is created
-    johnStoryFeed.addNewActivitiesTo = 'end';
+    johnFeed.addNewActivitiesTo = 'end';
 
-    await johnStoryFeed.getOrCreate({
+    await johnFeed.getOrCreate({
       watch: true,
       limit: 100,
     });
 
-    const johnStories = johnStoryFeed.state.getLatestValue().activities!;
+    const johnStories = johnFeed.state.getLatestValue().activities!;
 
     // Display all of John's active stories
     johnStories.forEach((activity) => {
@@ -99,7 +95,7 @@ describe('Stories page', () => {
     });
 
     // Mark a story as watched
-    await johnStoryFeed.markActivity({
+    await johnFeed.markActivity({
       mark_watched: [johnStories[0].id],
     });
   });
