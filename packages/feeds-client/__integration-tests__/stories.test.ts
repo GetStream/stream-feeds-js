@@ -143,9 +143,7 @@ describe('Stories Feed', () => {
     ]);
 
     expect(feed.state.getLatestValue().activities![0].is_watched).toBe(true);
-    expect(
-      feed.state.getLatestValue().activities![1].is_watched,
-    ).toBeUndefined();
+    expect(feed.state.getLatestValue().activities![1].is_watched).toBe(false);
   });
 
   afterAll(async () => {
