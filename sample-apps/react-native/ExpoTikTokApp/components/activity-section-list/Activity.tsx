@@ -1,5 +1,5 @@
+import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import {
-  ActivityResponse,
   useClientConnectedUser,
   useFeedContext,
 } from '@stream-io/feeds-react-native-sdk';
@@ -8,9 +8,9 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import postPlaceholder from '@/assets/images/post-placeholder.png';
 import { Reaction } from '@/components/common/Reaction';
 import { useRouter } from 'expo-router';
-import FastImage from 'react-native-fast-image';
 import { useMemo } from 'react';
 import { ActivityAction } from '@/components/activity-section-list/ActivityAction';
+import { ImageWithRetry } from '@/components/common/ImageWithRetry';
 
 export const Activity = ({
   activity,
@@ -60,7 +60,7 @@ export const Activity = ({
       style={styles.card}
     >
       <View style={styles.imageWrapper}>
-        <FastImage
+        <ImageWithRetry
           source={imageSource}
           style={styles.image}
           resizeMode="cover"

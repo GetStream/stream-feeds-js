@@ -25,7 +25,7 @@ const tokenProviderFactory = (userId: string) => async () => {
 
 const CLIENT_OPTIONS = {
   configure_loggers_options: { default: { level: 'debug' } },
-  timeout: 10000
+  timeout: 10000,
 };
 
 export const useCreateClient = (user: LocalUser) => {
