@@ -56,8 +56,8 @@ export const createTestTokenGenerator = (
   };
 };
 
-export const getTestUser = () => {
-  return { id: `emily-${randomId()}` };
+export const getTestUser = (name = 'emily') => {
+  return { id: `${name}-${randomId()}` };
 };
 
 export const waitForEvent = (

@@ -131,6 +131,12 @@ export type FeedState = Omit<
    * `true` if the feed is receiving real-time updates via WebSocket
    */
   watch: boolean;
+
+  /**
+   * When a new activity is received from a WebSocket event by default it's added to the start of the list. You can change this to `end` to add it to the end of the list.
+   * Useful for story feeds.
+   */
+  addNewActivitiesTo: 'start' | 'end';
 };
 
 type EventHandlerByEventType = {
@@ -212,6 +218,7 @@ export class Feed extends FeedApi {
     id: string,
     data?: FeedResponse,
     watch = false,
+    addNewActivitiesTo: 'start' | 'end' = 'start',
   ) {
     super(client, groupId, id);
     this.state = new StateStore<FeedState>({
@@ -223,6 +230,7 @@ export class Feed extends FeedApi {
       is_loading_activities: false,
       comments_by_entity_id: {},
       watch,
+      addNewActivitiesTo,
     });
     this.client = client;
 
@@ -248,6 +256,10 @@ export class Feed extends FeedApi {
 
   get currentState() {
     return this.state.getLatestValue();
+  }
+
+  set addNewActivitiesTo(value: 'start' | 'end') {
+    this.state.partialNext({ addNewActivitiesTo: value });
   }
 
   hasActivity(activityId: string) {

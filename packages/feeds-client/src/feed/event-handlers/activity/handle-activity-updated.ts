@@ -10,25 +10,14 @@ import {
   updateEntityInArray,
 } from '../../../utils';
 import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
+import { updateActivity } from '../activity-updater';
 
 export type ActivityUpdatedPayload = PartializeAllBut<
   EventPayload<'feeds.activity.updated'>,
   'activity'
 >;
 
-const sharedUpdateActivity = ({
-  currentActivity,
-  event,
-}: {
-  currentActivity: ActivityResponse;
-  event: ActivityUpdatedPayload;
-}) => {
-  return {
-    ...event.activity,
-    own_reactions: currentActivity.own_reactions,
-    own_bookmarks: currentActivity.own_bookmarks,
-  };
-};
+const sharedUpdateActivity = updateActivity;
 
 export const updateActivityInState = (
   event: ActivityUpdatedPayload,
@@ -40,7 +29,7 @@ export const updateActivityInState = (
     updater: (matchedActivity) =>
       sharedUpdateActivity({
         currentActivity: matchedActivity,
-        event,
+        newActivtiy: event.activity,
       }),
   });
 
@@ -55,7 +44,7 @@ export const updatePinnedActivityInState = (
     updater: (matchedPinnedActivity) => {
       const newActivity = sharedUpdateActivity({
         currentActivity: matchedPinnedActivity.activity,
-        event,
+        newActivtiy: event.activity,
       });
 
       if (newActivity === matchedPinnedActivity.activity) {

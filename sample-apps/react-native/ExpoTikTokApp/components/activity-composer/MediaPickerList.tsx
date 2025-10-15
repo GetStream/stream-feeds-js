@@ -1,13 +1,9 @@
-import {
-  isImageFile,
-  isVideoFile,
-  StreamFile,
-} from '@stream-io/feeds-react-native-sdk';
+import type { StreamFile } from '@stream-io/feeds-react-native-sdk';
+import { isImageFile, isVideoFile } from '@stream-io/feeds-react-native-sdk';
 import React, { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Pressable,
   StyleSheet,
   View,
@@ -18,6 +14,7 @@ import videoPlaceholder from '@/assets/images/video-placeholder.png';
 // @ts-expect-error something broken with local assets, will fix later
 import filePlaceholder from '@/assets/images/file-placeholder.png';
 import { Ionicons } from '@expo/vector-icons';
+import { ImageWithRetry } from '@/components/common/ImageWithRetry';
 
 const keyExtractor = (item: StreamFile, index: number) =>
   `${item.name}_${index}`;
@@ -59,10 +56,11 @@ const MediaThumbnail = ({
 }) => {
   const { media } = usePostCreationContext();
   const asset = useMemo(() => media?.[index], [index, media]);
+
   return (
     <View style={styles.thumbnailContainer}>
       {isImageFile(file) ? (
-        <Image
+        <ImageWithRetry
           source={{
             uri: asset?.image_url ?? (file as { uri: string }).uri,
           }}
@@ -70,7 +68,7 @@ const MediaThumbnail = ({
           resizeMode="cover"
         />
       ) : asset ? (
-        <Image
+        <ImageWithRetry
           source={
             asset.thumb_url
               ? { uri: asset.thumb_url }

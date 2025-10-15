@@ -11,7 +11,11 @@ import type {
   OwnUser,
   OwnUserResponse,
   PinActivityResponse,
-  UserResponse, UserResponseCommonFields,
+  UserResponse,
+  UserResponseCommonFields,
+  NotificationFeedUpdatedEvent,
+  NotificationStatusResponse,
+  AggregatedActivityResponse,
 } from '../gen/models';
 import { humanId } from 'human-id';
 import type { EventPayload } from '../types-internal';
@@ -667,3 +671,35 @@ export function generateActivityPinnedEvent(
     user,
   };
 }
+
+export const createMockNotificationFeedUpdatedEvent = (
+  overrides: Partial<NotificationFeedUpdatedEvent> = {},
+): NotificationFeedUpdatedEvent => ({
+  created_at: new Date(),
+  fid: 'user:notification',
+  custom: {},
+  type: 'feeds.notification_feed.updated',
+  ...overrides,
+});
+
+export const createMockNotificationStatus = (
+  overrides: Partial<NotificationStatusResponse> = {},
+): NotificationStatusResponse => ({
+  unread: 0,
+  unseen: 0,
+  ...overrides,
+});
+
+export const createMockAggregatedActivity = (
+  overrides: Partial<AggregatedActivityResponse> = {},
+): AggregatedActivityResponse => ({
+  activity_count: 1,
+  created_at: new Date(),
+  group: 'test-group',
+  user_count_truncated: false,
+  score: 1,
+  updated_at: new Date(),
+  user_count: 1,
+  activities: [],
+  ...overrides,
+});
