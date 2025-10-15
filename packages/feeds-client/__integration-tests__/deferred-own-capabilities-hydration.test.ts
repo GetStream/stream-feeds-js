@@ -131,9 +131,16 @@ describe('Deferred own_capabilities hydration', () => {
     }
   });
 
-  it('should properly populate capabilities on queryActivities', async () => {
-    const client = createTestClient();
+  it(`should not populate capabilities on queryActivities - backend doesn't return it`, async () => {
+    const throttleTimeout = 1000;
+    const client = createTestClient({
+      query_batch_own_capabilties_throttling_interval: throttleTimeout,
+    });
     await client.connectUser(ownUser, createTestTokenGenerator(ownUser));
+    const getCapabilitiesSpy = vi.spyOn(
+      client as any,
+      'throttledGetBatchOwnCapabilities',
+    );
 
     const initialCapabilities =
       client.state.getLatestValue().own_capabilities_by_fid;
@@ -143,22 +150,9 @@ describe('Deferred own_capabilities hydration', () => {
       filter: { id: { $in: initialActivities.map((a) => a.id) } },
     });
 
-    // waiting in case some queried activities do not contain `current_feed.own_capabilities`
-    await vi.waitFor(
-      () => {
-        const newCapabilities =
-          client.state.getLatestValue().own_capabilities_by_fid;
-        expect(Object.keys(newCapabilities).length).toBe(
-          initialActivities.length,
-        );
-        for (const activity of initialActivities) {
-          if (activity.current_feed?.feed) {
-            expect(newCapabilities[activity.current_feed?.feed]).toBeDefined();
-          }
-        }
-      },
-      { timeout: 1000, interval: 50 },
-    );
+    await new Promise((resolve) => setTimeout(resolve, throttleTimeout));
+
+    expect(getCapabilitiesSpy).not.toHaveBeenCalled();
   });
 
   it('should not add extra capabilities in the cache if they already exist', async () => {

@@ -18,7 +18,6 @@ import type {
   OwnUser,
   PollResponse,
   PollVotesResponse,
-  QueryActivitiesRequest,
   QueryFeedsRequest,
   QueryPollVotesRequest,
   UpdateActivityRequest,
@@ -649,24 +648,6 @@ export class FeedsClient extends FeedsApi {
       }),
     );
     this.hydrateCapabilitiesCache(feedResponses);
-    return response;
-  }
-
-  async queryActivities(request?: QueryActivitiesRequest) {
-    const response = await super.queryActivities(request);
-    const activityCurrentFeeds = response.activities.map(
-      (activity) => activity.current_feed,
-    );
-    const feedsToHydrateFrom = [];
-
-    for (const feed of activityCurrentFeeds) {
-      if (feed) {
-        feedsToHydrateFrom.push(feed);
-      }
-    }
-
-    this.hydrateCapabilitiesCache(feedsToHydrateFrom);
-
     return response;
   }
 
