@@ -157,11 +157,11 @@ describe('Deferred own_capabilities hydration', () => {
 
   it('should not add extra capabilities in the cache if they already exist', async () => {
     const client = createTestClient();
+    await client.connectUser(ownUser, createTestTokenGenerator(ownUser));
     const getCapabilitiesSpy = vi.spyOn(
       client as any,
       'throttledGetBatchOwnCapabilities',
     );
-    await client.connectUser(ownUser, createTestTokenGenerator(ownUser));
     const ownFeed = client.feed(feedGroup, feedId);
 
     await ownFeed.getOrCreate({
@@ -188,11 +188,11 @@ describe('Deferred own_capabilities hydration', () => {
 
   it('should hydrate with extra capabilities if they do not exist in the cache', async () => {
     const client = createTestClient();
+    await client.connectUser(ownUser, createTestTokenGenerator(ownUser));
     const getCapabilitiesSpy = vi.spyOn(
       client as any,
       'throttledGetBatchOwnCapabilities',
     );
-    await client.connectUser(ownUser, createTestTokenGenerator(ownUser));
     const ownFeed = client.feed(feedGroup, feedId);
 
     await ownFeed.getOrCreate({

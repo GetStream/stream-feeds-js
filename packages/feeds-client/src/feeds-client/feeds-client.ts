@@ -111,6 +111,7 @@ export class FeedsClient extends FeedsApi {
 
   protected throttledGetBatchOwnCapabilities!: ThrottledGetBatchedOwnCapabilities;
   private cancelGetBatchOwnCapabilitiesTimer!: () => void;
+  private query_batch_own_capabilties_throttling_interval!: number;
 
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
@@ -132,10 +133,9 @@ export class FeedsClient extends FeedsApi {
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
 
-    this.setGetBatchOwnCapabilitiesThrottlingInterval(
+    this.query_batch_own_capabilties_throttling_interval =
       options?.query_batch_own_capabilties_throttling_interval ??
-        DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
-    );
+      DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL;
 
     configureLoggers(options?.configure_loggers_options);
 
@@ -360,6 +360,10 @@ export class FeedsClient extends FeedsApi {
     }
 
     this.tokenManager.setTokenOrProvider(tokenProvider);
+
+    this.setGetBatchOwnCapabilitiesThrottlingInterval(
+      this.query_batch_own_capabilties_throttling_interval,
+    );
 
     try {
       addConnectionEventListeners(this.updateNetworkConnectionStatus);
