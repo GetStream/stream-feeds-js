@@ -255,7 +255,7 @@ describe('Deferred own_capabilities hydration', () => {
 
   it('should throttle new capabilities hydration', async () => {
     const client = createTestClient();
-    const getCapabilitiesSpy = vi.spyOn(client as any, 'queryFeeds');
+    const getCapabilitiesSpy = vi.spyOn(client as any, 'ownCapabilitiesBatch');
     await client.connectUser(ownUser, createTestTokenGenerator(ownUser));
     const ownFeed = client.feed(feedGroup, feedId);
 
@@ -311,10 +311,10 @@ describe('Deferred own_capabilities hydration', () => {
 
     expect(getCapabilitiesSpy).toHaveBeenCalledTimes(2);
     expect(getCapabilitiesSpy.mock.calls[0][0]).toStrictEqual({
-      filter: { feed: { $in: [otherFeeds[0].feed] } },
+      feeds: [otherFeeds[0].feed],
     });
     expect(getCapabilitiesSpy.mock.calls[1][0]).toStrictEqual({
-      filter: { feed: { $in: [otherFeeds[1].feed, otherFeeds[2].feed] } },
+      feeds: [otherFeeds[1].feed, otherFeeds[2].feed],
     });
   });
 

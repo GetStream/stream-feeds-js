@@ -14,6 +14,7 @@ import type {
   FollowBatchRequest,
   FollowRequest,
   ImageUploadRequest,
+  OwnCapabilitiesBatchRequest,
   OwnUser,
   PollResponse,
   PollVotesResponse,
@@ -256,17 +257,16 @@ export class FeedsClient extends FeedsApi {
     this.throttledGetBatchOwnCapabilities =
       throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
         (feeds, callback) => {
-          // TODO: Replace this with the actual getBatchCapabilities endpoint when it is ready
-          this.queryFeeds({ filter: { feed: { $in: feeds } } }).catch(
-            (error) => {
-              this.eventDispatcher.dispatch({
-                type: 'errors.unhandled',
-                error_type:
-                  UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
-                error,
-              });
-            },
-          );
+          this.ownCapabilitiesBatch({
+            feeds,
+          }).catch((error) => {
+            this.eventDispatcher.dispatch({
+              type: 'errors.unhandled',
+              error_type:
+                UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+              error,
+            });
+          });
           callback(feeds);
         },
         throttlingMs,
@@ -319,7 +319,9 @@ export class FeedsClient extends FeedsApi {
     }
   }
 
-  public hydrateCapabilitiesCache(feedResponses: FeedResponse[]) {
+  public hydrateCapabilitiesCache(
+    feedResponses: Pick<FeedResponse, 'feed' | 'own_capabilities'>[],
+  ) {
     let ownCapabilitiesCache =
       this.state.getLatestValue().own_capabilities_by_fid;
 
@@ -636,6 +638,18 @@ export class FeedsClient extends FeedsApi {
       metadata: response.metadata,
       duration: response.duration,
     };
+  }
+
+  async ownCapabilitiesBatch(request: OwnCapabilitiesBatchRequest) {
+    const response = await super.ownCapabilitiesBatch(request);
+    const feedResponses = Object.entries(response.capabilities).map(
+      ([feed, own_capabilities]) => ({
+        feed,
+        own_capabilities,
+      }),
+    );
+    this.hydrateCapabilitiesCache(feedResponses);
+    return response;
   }
 
   async queryActivities(request?: QueryActivitiesRequest) {

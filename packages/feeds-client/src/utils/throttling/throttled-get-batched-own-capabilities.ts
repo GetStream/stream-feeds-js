@@ -1,7 +1,6 @@
 import type { FeedsClient } from '@self';
 import type { ThrottledFunction } from './throttle';
 
-// TODO: This should be replaced with the actual type once backend implements it
 export type GetBatchedOwnCapabilities = {
   feeds: string[];
 };
