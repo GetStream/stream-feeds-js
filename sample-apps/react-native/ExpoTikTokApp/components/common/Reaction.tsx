@@ -1,15 +1,18 @@
 import type {
   ActivityResponse,
-  CommentResponse} from '@stream-io/feeds-react-native-sdk';
+  CommentResponse,
+} from '@stream-io/feeds-react-native-sdk';
 import {
   useOwnCapabilities,
   isCommentResponse,
   useFeedsClient,
+  FeedOwnCapability,
 } from '@stream-io/feeds-react-native-sdk';
 import { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { useStableCallback } from '@/hooks/useStableCallback';
+import { useActivityContext } from '@/contexts/ActivityContext';
 
 const iconMap = {
   like: {
@@ -36,27 +39,33 @@ type IconProps = { size: number; color: string };
 
 export const Reaction = ({
   type,
-  entity,
+  activity: actitivyFromProps,
+  comment,
   size = 20,
   color = 'white',
 }: {
   type: IconType;
-  entity: ActivityResponse | CommentResponse;
+  activity?: ActivityResponse;
+  comment?: CommentResponse;
 } & Partial<IconProps>) => {
-  const ownCapabilities = useOwnCapabilities();
+  const activityFromContext = useActivityContext();
+  const activity = actitivyFromProps ?? activityFromContext;
+  const entity = comment ?? activity;
 
   const isComment = isCommentResponse(entity);
+  const ownCapabilities = useOwnCapabilities(activity.current_feed);
+
   const hasOwnReaction = useMemo(
     () => !!entity.own_reactions?.find((r) => r.type === type),
     [entity.own_reactions, type],
   );
 
   const canAddReaction = isComment
-    ? ownCapabilities.can_add_comment_reaction
-    : ownCapabilities.can_add_activity_reaction;
+    ? ownCapabilities.includes(FeedOwnCapability.ADD_COMMENT_REACTION)
+    : ownCapabilities.includes(FeedOwnCapability.ADD_ACTIVITY_REACTION);
   const canRemoveReaction = isComment
-    ? ownCapabilities.can_delete_own_comment_reaction
-    : ownCapabilities.can_delete_own_activity_reaction;
+    ? ownCapabilities.includes(FeedOwnCapability.DELETE_OWN_COMMENT_REACTION)
+    : ownCapabilities.includes(FeedOwnCapability.DELETE_OWN_ACTIVITY_REACTION);
 
   const client = useFeedsClient();
 

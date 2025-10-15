@@ -155,6 +155,7 @@ export const ActivityComposer = () => {
           : {}),
         ...(mentionedUsers ? { mentioned_user_ids: mentionedUsers } : {}),
       };
+
       if (editingActivity) {
         await client?.updateActivity({
           ...activityData,

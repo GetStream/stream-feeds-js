@@ -23,7 +23,7 @@ export const Activity = ({
   ownCapabilities: string[];
 }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
-  const { client } = useUserContext();
+  const { client, user } = useUserContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedActivityText, setEditedActivityText] = useState('');
@@ -31,10 +31,12 @@ export const Activity = ({
 
   const canEdit =
     ownCapabilities.includes(FeedOwnCapability.UPDATE_ANY_ACTIVITY) ||
-    ownCapabilities.includes(FeedOwnCapability.UPDATE_OWN_ACTIVITY);
+    (ownCapabilities.includes(FeedOwnCapability.UPDATE_OWN_ACTIVITY) &&
+      activity.user.id === user?.id);
   const canDelete =
     ownCapabilities.includes(FeedOwnCapability.DELETE_ANY_ACTIVITY) ||
-    ownCapabilities.includes(FeedOwnCapability.DELETE_OWN_ACTIVITY);
+    (ownCapabilities.includes(FeedOwnCapability.DELETE_OWN_ACTIVITY) &&
+      activity.user.id === user?.id);
   const canSendReaction = ownCapabilities.includes(
     FeedOwnCapability.ADD_ACTIVITY_REACTION,
   );

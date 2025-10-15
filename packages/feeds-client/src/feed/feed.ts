@@ -62,7 +62,7 @@ import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
-  'feed' | 'duration'
+  'feed' | 'own_capabilities' | 'duration'
 > & {
   /**
    * True when loading state using `getOrCreate`
@@ -288,6 +288,16 @@ export class Feed extends FeedApi {
 
     try {
       const response = await super.getOrCreate(request);
+
+      const currentActivityFeeds = [];
+      for (const activity of response.activities) {
+        if (activity.current_feed) {
+          currentActivityFeeds.push(activity.current_feed);
+        }
+      }
+
+      this.client.hydrateCapabilitiesCache([response.feed, ...currentActivityFeeds]);
+
       if (request?.next) {
         const { activities: currentActivities = [] } = this.currentState;
 
@@ -849,11 +859,16 @@ export class Feed extends FeedApi {
     });
   }
 
-  addActivity(request: Omit<ActivityRequest, 'feeds'>) {
-    return this.feedsApi.addActivity({
+  async addActivity(request: Omit<ActivityRequest, 'feeds'>) {
+    const response = await this.client.addActivity({
       ...request,
       feeds: [this.feed],
     });
+    const currentFeed = response.activity.current_feed;
+    if (currentFeed) {
+      this.client.hydrateCapabilitiesCache([currentFeed]);
+    }
+    return response;
   }
 
   on = this.eventDispatcher.on;

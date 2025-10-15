@@ -72,7 +72,7 @@ export const Activity = ({
         ) : null}
         {feed ? (
           <View style={styles.heartIcon}>
-            <Reaction type="like" entity={activity} />
+            <Reaction type="like" activity={activity} />
           </View>
         ) : null}
       </View>
