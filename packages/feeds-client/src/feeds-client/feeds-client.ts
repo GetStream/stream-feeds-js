@@ -320,7 +320,7 @@ export class FeedsClient extends FeedsApi {
   }
 
   public hydrateCapabilitiesCache(
-    feedResponses: Pick<FeedResponse, 'feed' | 'own_capabilities'>[],
+    feedResponses: Array<Pick<FeedResponse, 'feed' | 'own_capabilities'>>,
   ) {
     let ownCapabilitiesCache =
       this.state.getLatestValue().own_capabilities_by_fid;
