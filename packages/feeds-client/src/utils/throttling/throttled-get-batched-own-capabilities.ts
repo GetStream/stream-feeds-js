@@ -36,3 +36,7 @@ export function queueBatchedOwnCapabilities(
     );
   }
 }
+
+export function clearQueuedFeeds() {
+  queuedFeeds.clear();
+}

@@ -17,7 +17,7 @@ describe('throttle', () => {
 
   it('leading:true, trailing:false (default): fires immediately, drops during window, fires again after window on next call', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200);
+    const t = throttle(spy as ThrottledCallback, 200).throttledFn;
 
     t('a');
     expect(spy).toHaveBeenCalledTimes(1);
@@ -38,7 +38,9 @@ describe('throttle', () => {
 
   it('leading:true, trailing:true: first call fires immediately; subsequent calls within window schedule one trailing with latest args', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     expect(spy).toHaveBeenCalledTimes(1);
@@ -58,7 +60,9 @@ describe('throttle', () => {
 
   it('leading:true, trailing:true: no double-invoke at boundary (new leading cancels pending trailing)', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     expect(spy).toHaveBeenCalledTimes(1);
@@ -80,7 +84,9 @@ describe('throttle', () => {
 
   it('leading:true, trailing:true: single call does not later trigger trailing (guard against double with same args)', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     expect(spy).toHaveBeenCalledTimes(1);
@@ -92,7 +98,9 @@ describe('throttle', () => {
 
   it('leading:true, trailing:true: trailing uses the latest args within the window', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     advance(50);
@@ -110,7 +118,7 @@ describe('throttle', () => {
     const t = throttle(spy as ThrottledCallback, 200, {
       leading: false,
       trailing: true,
-    });
+    }).throttledFn;
 
     t('a');
     expect(spy).toHaveBeenCalledTimes(0);
@@ -139,7 +147,7 @@ describe('throttle', () => {
     const t = throttle(spy as ThrottledCallback, 200, {
       leading: false,
       trailing: false,
-    });
+    }).throttledFn;
 
     t('a');
     t('b');
@@ -155,7 +163,10 @@ describe('throttle', () => {
         seen.push([this, v]);
       },
     };
-    const throttled = throttle(obj.fn, 200, { leading: false, trailing: true });
+    const throttled = throttle(obj.fn, 200, {
+      leading: false,
+      trailing: true,
+    }).throttledFn;
 
     // Call as a method so `this` is obj
     (obj as any).call = throttled;
@@ -169,7 +180,9 @@ describe('throttle', () => {
 
   it('schedules trailing for the exact remaining time, not the full timeout', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     advance(50);
@@ -185,7 +198,9 @@ describe('throttle', () => {
 
   it('after a trailing fires, a call inside the next window does NOT invoke immediately (still throttled)', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     advance(200);
@@ -206,7 +221,9 @@ describe('throttle', () => {
 
   it('does not fire trailing after a new leading crosses the boundary (no boundary double)', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     advance(180);
@@ -228,7 +245,9 @@ describe('throttle', () => {
 
   it('multiple calls in a burst within a window still produce at most one trailing (latest args)', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t(1);
     for (let i = 2; i <= 10; i++) t(i);
@@ -244,7 +263,7 @@ describe('throttle', () => {
     const t = throttle(spy as ThrottledCallback, 200, {
       leading: false,
       trailing: false,
-    });
+    }).throttledFn;
 
     for (let i = 0; i < 10; i++) t(i);
     advance(1000);
@@ -253,7 +272,9 @@ describe('throttle', () => {
 
   it('leading:true, trailing:true: next call well after window leads immediately, not waiting for any lingering timer', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     advance(200);
@@ -265,7 +286,9 @@ describe('throttle', () => {
 
   it('works with different timeouts (sanity check)', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 50, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 50, {
+      trailing: true,
+    }).throttledFn;
 
     t(1);
     advance(30);
@@ -288,7 +311,9 @@ describe('throttle', () => {
 
   it('does not leak extra invocations after long idle periods', () => {
     const spy = vi.fn();
-    const t = throttle(spy as ThrottledCallback, 200, { trailing: true });
+    const t = throttle(spy as ThrottledCallback, 200, {
+      trailing: true,
+    }).throttledFn;
 
     t('a');
     advance(180);
@@ -306,7 +331,7 @@ describe('throttle', () => {
     const spy = vi.fn().mockResolvedValue(1);
     const calls = 200;
 
-    const t = throttle(spy, 2000, { trailing: true });
+    const t = throttle(spy, 2000, { trailing: true }).throttledFn;
 
     for (let i = 0; i < calls; i++) {
       t(i);
@@ -319,5 +344,27 @@ describe('throttle', () => {
 
     expect(spy).toHaveBeenCalledTimes(11);
     expect(spy).toHaveBeenLastCalledWith(199);
+  });
+
+  it('should cancel the timer when cancelTimer is called', async () => {
+    const spy = vi.fn();
+    const { throttledFn: t, cancelTimer: cancel } = throttle(
+      spy as ThrottledCallback,
+      200,
+      {
+        trailing: true,
+      },
+    );
+
+    // First call goes through
+    t('a');
+    // Second call is throttled
+    t('b');
+    cancel();
+
+    vi.runOnlyPendingTimers();
+
+    // Second call never happened because we canceled
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });

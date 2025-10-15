@@ -80,6 +80,7 @@ import {
   type GetBatchedOwnCapabilitiesThrottledCallback,
   queueBatchedOwnCapabilities,
   type ThrottledGetBatchedOwnCapabilities,
+  clearQueuedFeeds,
 } from '../utils/throttling';
 
 export type FeedsClientState = {
@@ -109,6 +110,7 @@ export class FeedsClient extends FeedsApi {
   private healthyConnectionChangedEventCount = 0;
 
   protected throttledGetBatchOwnCapabilities!: ThrottledGetBatchedOwnCapabilities;
+  private cancelGetBatchOwnCapabilitiesTimer!: () => void;
 
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
@@ -253,24 +255,27 @@ export class FeedsClient extends FeedsApi {
   private setGetBatchOwnCapabilitiesThrottlingInterval = (
     throttlingMs: number,
   ) => {
-    this.throttledGetBatchOwnCapabilities =
-      throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
-        (feeds, callback) => {
-          this.ownCapabilitiesBatch({
-            feeds,
-          }).catch((error) => {
-            this.eventDispatcher.dispatch({
-              type: 'errors.unhandled',
-              error_type:
-                UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
-              error,
-            });
+    const {
+      throttledFn: throttledGetBatchOwnCapabilities,
+      cancelTimer: cancel,
+    } = throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
+      (feeds, callback) => {
+        this.ownCapabilitiesBatch({
+          feeds,
+        }).catch((error) => {
+          this.eventDispatcher.dispatch({
+            type: 'errors.unhandled',
+            error_type: UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+            error,
           });
-          callback(feeds);
-        },
-        throttlingMs,
-        { trailing: true },
-      );
+        });
+        callback(feeds);
+      },
+      throttlingMs,
+      { trailing: true },
+    );
+    this.throttledGetBatchOwnCapabilities = throttledGetBatchOwnCapabilities;
+    this.cancelGetBatchOwnCapabilitiesTimer = cancel;
   };
 
   private recoverOnReconnect = async () => {
@@ -595,6 +600,9 @@ export class FeedsClient extends FeedsApi {
       is_ws_connection_healthy: false,
       own_capabilities_by_fid: {},
     });
+
+    this.cancelGetBatchOwnCapabilitiesTimer();
+    clearQueuedFeeds();
   };
 
   on = this.eventDispatcher.on;
