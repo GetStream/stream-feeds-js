@@ -17,6 +17,7 @@ describe('Feeds capabilities page', () => {
     client = createTestClient();
     await client.connectUser(user, createTestTokenGenerator(user));
     feed = client.feed('user', crypto.randomUUID());
+    await feed.getOrCreate();
     await client.upsertActivities({
       activities: new Array(10).fill(null).map((_, i) => ({
         type: 'post',
