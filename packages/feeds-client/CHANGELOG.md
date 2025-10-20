@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.20](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.19...@stream-io/feeds-client-0.2.20) (2025-10-20)
+
+
+### Bug Fixes
+
+* only send maximum 100 feeds to batch capabilities endpoint ([#141](https://github.com/GetStream/stream-feeds-js/issues/141)) ([5d662da](https://github.com/GetStream/stream-feeds-js/commit/5d662dac991296025612ddad8db076259a04e910))
+
 ## [0.2.19](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.18...@stream-io/feeds-client-0.2.19) (2025-10-20)
 
 
