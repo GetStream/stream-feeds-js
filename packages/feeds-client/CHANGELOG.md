@@ -2,6 +2,22 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.19](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.18...@stream-io/feeds-client-0.2.19) (2025-10-20)
+
+
+* fix failing docs snippet test ([b2ccd01](https://github.com/GetStream/stream-feeds-js/commit/b2ccd014150877640f7b50ff954310360839cb1b))
+
+
+### Features
+
+* ingest own capabilities from responses ([#129](https://github.com/GetStream/stream-feeds-js/issues/129)) ([224d79b](https://github.com/GetStream/stream-feeds-js/commit/224d79b5b8cd1b20c56dd976c163f7071b19c675))
+
+
+### Bug Fixes
+
+* issue with commonjs exports ([#140](https://github.com/GetStream/stream-feeds-js/issues/140)) ([d8c60b5](https://github.com/GetStream/stream-feeds-js/commit/d8c60b5f284223c181e2ddf1ee651f6f86aa74f2))
+* reset throttle state on disconnect user ([#139](https://github.com/GetStream/stream-feeds-js/issues/139)) ([c4406ef](https://github.com/GetStream/stream-feeds-js/commit/c4406ef65a3defd958d9ced3683e947575b5dae7))
+
 ## [0.2.18](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.17...@stream-io/feeds-client-0.2.18) (2025-10-14)
 
 
