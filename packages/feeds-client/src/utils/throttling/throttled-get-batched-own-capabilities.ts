@@ -1,6 +1,8 @@
 import type { FeedsClient } from '@self';
 import type { ThrottledFunction } from './throttle';
 
+const BATCH_OWN_CAPABILITIES_API_LIMIT = 100;
+
 export type GetBatchedOwnCapabilities = {
   feeds: string[];
 };
@@ -27,7 +29,7 @@ export function queueBatchedOwnCapabilities(
 
   if (queuedFeeds.size > 0) {
     this.throttledGetBatchOwnCapabilities(
-      [...queuedFeeds],
+      [...queuedFeeds].slice(0, BATCH_OWN_CAPABILITIES_API_LIMIT),
       (feedsToClear: string[]) => {
         for (const feed of feedsToClear) {
           queuedFeeds.delete(feed);
