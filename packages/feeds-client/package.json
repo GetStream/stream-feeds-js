@@ -2,7 +2,8 @@
   "name": "@stream-io/feeds-client",
   "version": "0.2.18",
   "packageManager": "yarn@3.2.4",
-  "main": "./dist/es/index.mjs",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/es/index.mjs",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -39,7 +40,10 @@
   "files": [
     "dist",
     "src",
-    "index.ts",
+    "!src/**/*.test.ts",
+    "react-bindings.js",
+    "react-bindings.mjs",
+    "react-bindings.d.ts",
     "package.json",
     "README.md",
     "LICENSE",
