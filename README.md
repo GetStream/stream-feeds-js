@@ -1,6 +1,6 @@
 # Stream Feeds for JavaScript
 
-⚠️ Activity feeds v3 is currently in closed alpha, not yet ready to be used in production.
+⚠️ Activity feeds v3 is currently in beta.
 
 ## Repository Contents
 
