@@ -1,6 +1,6 @@
-export const apiKey = 'm3mpnb9j9jb3';
+export const apiKey = 'z3hzbmmtrdtv';
 export const tokenCreationUrl =
-  'https://pronto.getstream.io/api/auth/create-token?environment=feeds-react-native-sample-app';
+  'https://pronto.getstream.io/api/auth/create-token?environment=feeds-expo-tiktok-sample-app';
 export const placesApiKey = process.env.EXPO_PUBLIC_PLACES_API_KEY;
 export const mapApiKey = process.env.EXPO_PUBLIC_MAPS_API_KEY;
 

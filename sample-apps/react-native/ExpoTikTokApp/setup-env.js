@@ -12,7 +12,7 @@ require('dotenv').config();
   const users = JSON.parse(
     await fs.readFile(path.resolve('users.json'), 'utf-8'),
   );
-  const nodeClient = new StreamClient(key, secret, { basePath: 'http://localhost:3030' });
+  const nodeClient = new StreamClient(key, secret);
 
   console.log('Creating users...');
   await nodeClient.upsertUsers(users);
