@@ -2,6 +2,17 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.21...@stream-io/feeds-client-0.3.0) (2025-10-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove unstable util hooks (#146)
+
+### Features
+
+* remove unstable util hooks ([#146](https://github.com/GetStream/stream-feeds-js/issues/146)) ([ac2f6b2](https://github.com/GetStream/stream-feeds-js/commit/ac2f6b26887286695f1c6a31a5616ef4fc0166e0))
+
 ## [0.2.21](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.20...@stream-io/feeds-client-0.2.21) (2025-10-22)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-client",
-  "version": "0.2.21",
+  "version": "0.3.0",
   "packageManager": "yarn@3.2.4",
   "main": "./dist/cjs/index.js",
   "module": "./dist/es/index.mjs",
