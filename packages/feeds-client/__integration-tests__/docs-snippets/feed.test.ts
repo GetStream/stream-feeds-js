@@ -133,7 +133,6 @@ describe('Feeds page', () => {
 
     await feed.getOrCreate({
       filter: {
-        fid: feed.feed,
         filter_tags: ['blue'],
       },
     });

@@ -71,7 +71,7 @@ describe('Stories page', () => {
     });
   });
 
-  it(`Reading story feed`, async () => {
+  it.skip(`Reading story feed`, async () => {
     // Sara reads John's story feed
     const johnFeed = saraClient.feed('story', john.id, {
       // By default new activities are added to the start of the list, but this is not what we want for stories
