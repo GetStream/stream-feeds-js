@@ -5961,6 +5961,7 @@ __metadata:
     react: 19.0.0
     react-native: 0.79.5
     react-native-builder-bob: 0.40.12
+    react-native-url-polyfill: ^3.0.0
     react-test-renderer: 19.0.0
     rimraf: ^6.0.1
     typescript: 5.8.3
@@ -18461,6 +18462,17 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 71bebbead1d8f886b80b70cf9d69b0179e035fb425fae84fbcbb2930167220cb90c2ee70b26d3fd94f940fa3e6ce325b0ec2e283d039d5abb29bf6898c58e485
+  languageName: node
+  linkType: hard
+
+"react-native-url-polyfill@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "react-native-url-polyfill@npm:3.0.0"
+  dependencies:
+    whatwg-url-without-unicode: 8.0.0-3
+  peerDependencies:
+    react-native: "*"
+  checksum: 3d6e02b8c32933bca588b70e86c1b2981cd2d9f4055f7ce5ba5f321596ffae5ce89fea41af8d13eca7b4f29daf685406354c761696e5a4bdfb5698468e54a527
   languageName: node
   linkType: hard
 
