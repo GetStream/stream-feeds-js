@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-react-sdk",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Feeds SDK for React",
   "type": "module",
   "exports": {
