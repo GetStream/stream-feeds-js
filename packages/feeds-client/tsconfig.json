@@ -20,7 +20,7 @@
     "declarationMap": true,
     "jsx": "react-jsx",
     "paths": {
-      "@self": ["../feeds-client/src/index.ts"]
+      "@self": ["./src/index.ts"]
     }
   },
   "files": ["./vite-env.d.ts"],

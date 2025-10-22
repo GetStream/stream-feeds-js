@@ -1,5 +1,6 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
+import { default as dts } from 'vite-plugin-dts';
 import { dependencies, peerDependencies } from './package.json';
 
 const external = [
@@ -19,7 +20,7 @@ export default defineConfig({
       },
       name: '@stream-io/feeds-client',
     },
-    emptyOutDir: false,
+    emptyOutDir: true,
     outDir: 'dist',
     minify: false,
     sourcemap: true,
@@ -28,6 +29,12 @@ export default defineConfig({
       external,
     },
   },
+  plugins: [
+    {
+      ...dts({ outDir: resolve(__dirname, './dist/types') }),
+      apply: 'build',
+    },
+  ],
   resolve: {
     alias: {
       '@self': resolve(__dirname, './src'),
