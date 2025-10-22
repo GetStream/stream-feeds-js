@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.15](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.14...@stream-io/feeds-react-native-sdk-0.1.15) (2025-10-22)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.0`
+
+### Bug Fixes
+
+* add a url polyfill for the react native sdk ([#145](https://github.com/GetStream/stream-feeds-js/issues/145)) ([b4beaa3](https://github.com/GetStream/stream-feeds-js/commit/b4beaa3fe0c5731d9367c6661e5ccc4bd149b4e6))
+
 ## [0.1.14](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.13...@stream-io/feeds-react-native-sdk-0.1.14) (2025-10-22)
 
 ### Dependency Updates
