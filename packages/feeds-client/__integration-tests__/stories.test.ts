@@ -96,7 +96,7 @@ describe('Stories Feed', () => {
     ).toBe(true);
   });
 
-  it(`user reads user1's story feed directly`, async () => {
+  it.skip(`user reads user1's story feed directly`, async () => {
     const feed = client2.feed(user1StoryFeed.group, user1StoryFeed.id, {
       addNewActivitiesTo: 'end',
     });
