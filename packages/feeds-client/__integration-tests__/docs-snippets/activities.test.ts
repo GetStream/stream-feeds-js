@@ -125,6 +125,33 @@ describe('Activities page', () => {
     });
   });
 
+  it('Partial activity updates', async () => {
+    const activity = (
+      await feed.addActivity({
+        type: 'post',
+        text: 'Hello, world!',
+      })
+    ).activity;
+
+    // Partially set some fields
+    client.updateActivityPartial({
+      id: activity.id,
+      set: {
+        text: 'Japan has over 6,800 islands.',
+        custom: {
+          topic: 'fun facts',
+          color: 'blue',
+        },
+      },
+    });
+
+    // Partially unset some fields
+    client.updateActivityPartial({
+      id: activity.id,
+      unset: ['custom.color'],
+    });
+  });
+
   afterAll(async () => {
     await feed.delete({ hard_delete: true });
     await client.disconnectUser();
