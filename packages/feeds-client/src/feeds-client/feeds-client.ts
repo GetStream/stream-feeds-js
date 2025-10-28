@@ -83,6 +83,7 @@ import {
   type ThrottledGetBatchedOwnCapabilities,
   clearQueuedFeeds,
 } from '../utils/throttling';
+import { Activity } from '../activity/activity';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -91,6 +92,8 @@ export type FeedsClientState = {
 };
 
 type FID = string;
+
+type ActivityId = string;
 
 export class FeedsClient extends FeedsApi {
   readonly state: StateStore<FeedsClientState>;
@@ -106,6 +109,7 @@ export class FeedsClient extends FeedsApi {
 
   private readonly polls_by_id: Map<string, StreamPoll>;
 
+  private activeActivities: Record<ActivityId, Activity> = {};
   private activeFeeds: Record<FID, Feed> = {};
 
   private healthyConnectionChangedEventCount = 0;
@@ -143,8 +147,7 @@ export class FeedsClient extends FeedsApi {
     this.on('all', (event) => {
       const fid = event.fid;
 
-      const feed: Feed | undefined =
-        typeof fid === 'string' ? this.activeFeeds[fid] : undefined;
+      const feeds = this.findAllActiveFeedsByFid(fid);
 
       switch (event.type) {
         case 'connection.changed': {
@@ -154,14 +157,14 @@ export class FeedsClient extends FeedsApi {
           if (online) {
             this.recoverOnReconnect();
           } else {
-            for (const activeFeed of Object.values(this.activeFeeds)) {
+            for (const activeFeed of this.allActiveFeeds) {
               handleWatchStopped.bind(activeFeed)();
             }
           }
           break;
         }
         case 'feeds.feed.created': {
-          if (feed) break;
+          if (this.activeFeeds[event.feed.id]) break;
 
           this.getOrCreateActiveFeed(
             event.feed.group_id,
@@ -172,9 +175,14 @@ export class FeedsClient extends FeedsApi {
           break;
         }
         case 'feeds.feed.deleted': {
-          feed?.handleWSEvent(event as unknown as WSEvent);
+          feeds.forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
           if (typeof fid === 'string') {
             delete this.activeFeeds[fid];
+            for (const activity of Object.values(this.activeActivities).filter(
+              (a) => a.feed.feed === fid,
+            )) {
+              delete this.activeActivities[activity.id];
+            }
           }
           break;
         }
@@ -188,7 +196,7 @@ export class FeedsClient extends FeedsApi {
           if (event.poll?.id) {
             this.polls_by_id.delete(event.poll.id);
 
-            for (const activeFeed of Object.values(this.activeFeeds)) {
+            for (const activeFeed of this.allActiveFeeds) {
               const currentActivities = activeFeed.currentState.activities;
               if (currentActivities) {
                 const newActivities = [];
@@ -236,17 +244,15 @@ export class FeedsClient extends FeedsApi {
         case 'feeds.bookmark.deleted':
         case 'feeds.bookmark.updated': {
           const activityId = event.bookmark.activity.id;
-          // TODO: find faster way later on
-          const feeds = this.findActiveFeedsByActivityId(activityId);
+          const feeds = this.findAllActiveFeedsByActivityId(activityId);
           feeds.forEach((f) => f.handleWSEvent(event));
 
           break;
         }
         case 'feeds.activity.feedback': {
           const activityId = event.activity_feedback.activity_id;
-          const feeds = this.findActiveFeedsByActivityId(activityId);
+          const feeds = this.findAllActiveFeedsByActivityId(activityId);
           feeds.forEach((f) => f.handleWSEvent(event));
-
           break;
         }
         case 'user.updated': {
@@ -254,7 +260,7 @@ export class FeedsClient extends FeedsApi {
           break;
         }
         default: {
-          feed?.handleWSEvent(event as unknown as WSEvent);
+          feeds.forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
         }
       }
     });
@@ -292,6 +298,7 @@ export class FeedsClient extends FeedsApi {
     // we skip the first event as we could potentially be querying twice
     if (this.healthyConnectionChangedEventCount > 1) {
       const entries = Object.entries(this.activeFeeds);
+      // TODO: add synchronization for activities
 
       const results = await Promise.allSettled(
         entries.map(([, feed]) => feed.synchronize()),
@@ -310,6 +317,13 @@ export class FeedsClient extends FeedsApi {
       });
     }
   };
+
+  private get allActiveFeeds() {
+    return [
+      ...Object.values(this.activeFeeds),
+      ...Object.values(this.activeActivities).map((a) => a.feed),
+    ];
+  }
 
   public pollFromState = (id: string) => this.polls_by_id.get(id);
 
@@ -441,7 +455,7 @@ export class FeedsClient extends FeedsApi {
     },
   ): Promise<StreamResponse<UpdateActivityResponse>> => {
     const response = await super.updateActivity(request);
-    for (const feed of Object.values(this.activeFeeds)) {
+    for (const feed of this.allActiveFeeds) {
       handleActivityUpdated.bind(feed)(response, false);
     }
     return response;
@@ -452,7 +466,7 @@ export class FeedsClient extends FeedsApi {
   ): Promise<StreamResponse<AddCommentResponse>> => {
     const response = await super.addComment(request);
     const { comment } = response;
-    for (const feed of Object.values(this.activeFeeds)) {
+    for (const feed of Object.values(this.allActiveFeeds)) {
       handleCommentAdded.bind(feed)(response, false);
       const parentActivityId = comment.object_id;
       if (feed.hasActivity(parentActivityId)) {
@@ -478,7 +492,7 @@ export class FeedsClient extends FeedsApi {
     request: UpdateCommentRequest & { id: string },
   ): Promise<StreamResponse<UpdateCommentResponse>> => {
     const response = await super.updateComment(request);
-    for (const feed of Object.values(this.activeFeeds)) {
+    for (const feed of Object.values(this.allActiveFeeds)) {
       handleCommentUpdated.bind(feed)(response, false);
     }
     return response;
@@ -490,7 +504,7 @@ export class FeedsClient extends FeedsApi {
   }): Promise<StreamResponse<DeleteCommentResponse>> => {
     const response = await super.deleteComment(request);
     const { activity, comment } = response;
-    for (const feed of Object.values(this.activeFeeds)) {
+    for (const feed of Object.values(this.allActiveFeeds)) {
       handleCommentDeleted.bind(feed)({ comment }, false);
       updateCommentCount.bind(feed)({
         activity,
@@ -508,7 +522,7 @@ export class FeedsClient extends FeedsApi {
   ) => {
     const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addActivityReaction(request);
-    for (const feed of Object.values(this.activeFeeds)) {
+    for (const feed of Object.values(this.allActiveFeeds)) {
       if (shouldEnforceUnique) {
         handleActivityReactionUpdated.bind(feed)(response, false);
       } else {
@@ -534,7 +548,7 @@ export class FeedsClient extends FeedsApi {
     type: string;
   }): Promise<StreamResponse<DeleteActivityReactionResponse>> => {
     const response = await super.deleteActivityReaction(request);
-    for (const feed of Object.values(this.activeFeeds)) {
+    for (const feed of Object.values(this.allActiveFeeds)) {
       handleActivityReactionDeleted.bind(feed)(response, false);
     }
     return response;
@@ -545,7 +559,7 @@ export class FeedsClient extends FeedsApi {
   ): Promise<StreamResponse<AddCommentReactionResponse>> => {
     const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addCommentReaction(request);
-    for (const feed of Object.values(this.activeFeeds)) {
+    for (const feed of Object.values(this.allActiveFeeds)) {
       if (shouldEnforceUnique) {
         handleCommentReactionUpdated.bind(feed)(response, false);
       } else {
@@ -560,7 +574,7 @@ export class FeedsClient extends FeedsApi {
     type: string;
   }): Promise<StreamResponse<DeleteCommentReactionResponse>> => {
     const response = await super.deleteCommentReaction(request);
-    for (const feed of Object.values(this.activeFeeds)) {
+    for (const feed of Object.values(this.allActiveFeeds)) {
       handleCommentReactionDeleted.bind(feed)(response, false);
     }
     return response;
@@ -606,6 +620,9 @@ export class FeedsClient extends FeedsApi {
 
     // clear all caches
     this.polls_by_id.clear();
+
+    this.activeActivities = {};
+    this.activeFeeds = {};
 
     this.state.partialNext({
       connected_user: undefined,
@@ -701,10 +718,8 @@ export class FeedsClient extends FeedsApi {
       response.follow.source_feed.feed,
       response.follow.target_feed.feed,
     ].forEach((fid) => {
-      const feed = this.activeFeeds[fid];
-      if (feed) {
-        handleFollowUpdated.bind(feed)(response, false);
-      }
+      const feeds = this.findAllActiveFeedsByFid(fid);
+      feeds.forEach((f) => handleFollowUpdated.bind(f)(response, false));
     });
 
     return response;
@@ -718,10 +733,8 @@ export class FeedsClient extends FeedsApi {
       response.follow.source_feed.feed,
       response.follow.target_feed.feed,
     ].forEach((fid) => {
-      const feed = this.activeFeeds[fid];
-      if (feed) {
-        handleFollowCreated.bind(feed)(response, false);
-      }
+      const feeds = this.findAllActiveFeedsByFid(fid);
+      feeds.forEach((f) => handleFollowCreated.bind(f)(response, false));
     });
 
     return response;
@@ -731,10 +744,8 @@ export class FeedsClient extends FeedsApi {
     const response = await super.followBatch(request);
 
     response.follows.forEach((follow) => {
-      const feed = this.activeFeeds[follow.source_feed.feed];
-      if (feed) {
-        handleFollowCreated.bind(feed)({ follow });
-      }
+      const feeds = this.findAllActiveFeedsByFid(follow.source_feed.feed);
+      feeds.forEach((f) => handleFollowCreated.bind(f)({ follow }, false));
     });
 
     return response;
@@ -744,10 +755,8 @@ export class FeedsClient extends FeedsApi {
     const response = await super.unfollow(request);
 
     [request.source, request.target].forEach((fid) => {
-      const feed = this.activeFeeds[fid];
-      if (feed) {
-        handleFollowDeleted.bind(feed)(response, false);
-      }
+      const feeds = this.findAllActiveFeedsByFid(fid);
+      feeds.forEach((f) => handleFollowDeleted.bind(f)(response, false));
     });
 
     return response;
@@ -760,11 +769,10 @@ export class FeedsClient extends FeedsApi {
       connection_id: connectionId,
     });
 
-    const feed =
-      this.activeFeeds[`${request.feed_group_id}:${request.feed_id}`];
-    if (feed) {
-      handleWatchStopped.bind(feed)();
-    }
+    const feeds = this.findAllActiveFeedsByFid(
+      `${request.feed_group_id}:${request.feed_id}`,
+    );
+    feeds.forEach((f) => handleWatchStopped.bind(f)());
 
     return response;
   }
@@ -802,10 +810,26 @@ export class FeedsClient extends FeedsApi {
     return feed;
   };
 
-  private findActiveFeedsByActivityId(activityId: string) {
-    return Object.values(this.activeFeeds).filter(
+  private findAllActiveFeedsByActivityId(activityId: string) {
+    return [
+      ...Object.values(this.activeFeeds),
+      ...Object.values(this.activeActivities).map((a) => a.feed),
+    ].filter(
       (feed) =>
         feed.hasActivity(activityId) || feed.hasPinnedActivity(activityId),
     );
+  }
+
+  private findAllActiveFeedsByFid(fid: string | undefined) {
+    if (!fid) return [];
+
+    const activeFeed = this.activeFeeds[fid];
+
+    return [
+      ...(activeFeed ? [activeFeed] : []),
+      ...Object.values(this.activeActivities)
+        .filter((a) => a.feed.feed === fid)
+        .map((a) => a.feed),
+    ];
   }
 }
