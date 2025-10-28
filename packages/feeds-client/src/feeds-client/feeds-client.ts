@@ -93,8 +93,6 @@ export type FeedsClientState = {
 
 type FID = string;
 
-type ActivityId = string;
-
 export class FeedsClient extends FeedsApi {
   readonly state: StateStore<FeedsClientState>;
   readonly moderation: ModerationClient;
@@ -109,7 +107,7 @@ export class FeedsClient extends FeedsApi {
 
   private readonly polls_by_id: Map<string, StreamPoll>;
 
-  private activeActivities: Record<ActivityId, Activity> = {};
+  private activeActivities: Activity[] = [];
   private activeFeeds: Record<FID, Feed> = {};
 
   private healthyConnectionChangedEventCount = 0;
@@ -178,11 +176,9 @@ export class FeedsClient extends FeedsApi {
           feeds.forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
           if (typeof fid === 'string') {
             delete this.activeFeeds[fid];
-            for (const activity of Object.values(this.activeActivities).filter(
-              (a) => a.feed.feed === fid,
-            )) {
-              delete this.activeActivities[activity.id];
-            }
+            this.activeActivities = this.activeActivities.filter(
+              (a) => a.feed.feed !== fid,
+            );
           }
           break;
         }
@@ -321,7 +317,7 @@ export class FeedsClient extends FeedsApi {
   private get allActiveFeeds() {
     return [
       ...Object.values(this.activeFeeds),
-      ...Object.values(this.activeActivities).map((a) => a.feed),
+      ...this.activeActivities.map((a) => a.feed),
     ];
   }
 
@@ -621,7 +617,7 @@ export class FeedsClient extends FeedsApi {
     // clear all caches
     this.polls_by_id.clear();
 
-    this.activeActivities = {};
+    this.activeActivities = [];
     this.activeFeeds = {};
 
     this.state.partialNext({
@@ -661,6 +657,34 @@ export class FeedsClient extends FeedsApi {
       undefined,
       options?.addNewActivitiesTo,
       options?.activityAddedEventFilter,
+    );
+  };
+
+  watchActivity = ({
+    activity,
+    feed,
+  }: {
+    activity: ActivityResponse;
+    feed?: string;
+  }) => {
+    const fid = feed ?? activity.current_feed?.feed;
+    if (!fid) {
+      throw new Error(
+        'No feed is provided, this can happen if the activity belongs to multiple feeds and activity.current_feed is not set. Please provide the feed parameter, you can use activity.feeds array to find the correct feed.',
+      );
+    }
+    return this.getOrCreateActiveActivity({ activity, fid: fid }).state;
+  };
+
+  unwatchActivity = ({
+    activity,
+    feed,
+  }: {
+    activity: ActivityResponse;
+    feed?: string;
+  }) => {
+    this.activeActivities = this.activeActivities.filter(
+      (a) => a.id !== activity.id && a.feed.feed !== feed,
     );
   };
 
@@ -810,10 +834,30 @@ export class FeedsClient extends FeedsApi {
     return feed;
   };
 
+  private getOrCreateActiveActivity = ({
+    activity,
+    fid,
+  }: {
+    activity: ActivityResponse;
+    fid: string;
+  }) => {
+    let activeActivity = this.activeActivities.find(
+      (a) => a.id === activity.id && a.feed.feed === fid,
+    );
+
+    if (!activeActivity) {
+      const [group, id] = fid.split(':');
+      const feed = new Feed(this, group, id);
+      activeActivity = new Activity(activity, feed, this);
+      this.activeActivities.push(activeActivity);
+    }
+    return activeActivity;
+  };
+
   private findAllActiveFeedsByActivityId(activityId: string) {
     return [
       ...Object.values(this.activeFeeds),
-      ...Object.values(this.activeActivities).map((a) => a.feed),
+      ...this.activeActivities.map((a) => a.feed),
     ].filter(
       (feed) =>
         feed.hasActivity(activityId) || feed.hasPinnedActivity(activityId),
@@ -827,7 +871,7 @@ export class FeedsClient extends FeedsApi {
 
     return [
       ...(activeFeed ? [activeFeed] : []),
-      ...Object.values(this.activeActivities)
+      ...this.activeActivities
         .filter((a) => a.feed.feed === fid)
         .map((a) => a.feed),
     ];
