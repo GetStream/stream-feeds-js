@@ -17,6 +17,7 @@ export async function connectActivityToFeed(
     await this.getOrCreateFeed({
       feed_group_id: group,
       feed_id: id,
+      watch,
     });
   }
 

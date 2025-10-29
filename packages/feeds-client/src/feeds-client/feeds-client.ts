@@ -13,6 +13,7 @@ import type {
   FileUploadRequest,
   FollowBatchRequest,
   FollowRequest,
+  GetOrCreateFeedRequest,
   ImageUploadRequest,
   OwnCapabilitiesBatchRequest,
   OwnUser,
@@ -92,6 +93,8 @@ export type FeedsClientState = {
 
 type FID = string;
 
+type ActivityId = string;
+
 export class FeedsClient extends FeedsApi {
   readonly state: StateStore<FeedsClientState>;
   readonly moderation: ModerationClient;
@@ -106,7 +109,7 @@ export class FeedsClient extends FeedsApi {
 
   private readonly polls_by_id: Map<string, StreamPoll>;
 
-  private activeActivities: Activity[] = [];
+  protected activeActivities: Record<ActivityId, Activity> = {};
   protected activeFeeds: Record<FID, Feed> = {};
 
   private healthyConnectionChangedEventCount = 0;
@@ -175,9 +178,11 @@ export class FeedsClient extends FeedsApi {
           feeds.forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
           if (typeof fid === 'string') {
             delete this.activeFeeds[fid];
-            this.activeActivities = this.activeActivities.filter(
-              (a) => a.feed?.feed !== fid,
-            );
+            Object.keys(this.activeActivities).forEach((activityId) => {
+              if (this.activeActivities[activityId].feed?.feed === fid) {
+                delete this.activeActivities[activityId];
+              }
+            });
           }
           break;
         }
@@ -249,6 +254,9 @@ export class FeedsClient extends FeedsApi {
         }
         default: {
           feeds.forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
+          if (event.type === 'feeds.activity.deleted') {
+            delete this.activeActivities[event.activity.id];
+          }
         }
       }
     });
@@ -309,7 +317,9 @@ export class FeedsClient extends FeedsApi {
   private get allActiveFeeds() {
     return [
       ...Object.values(this.activeFeeds),
-      ...this.activeActivities.filter((a) => !!a.feed).map((a) => a.feed!),
+      ...Object.values(this.activeActivities)
+        .filter((a) => !!a.feed)
+        .map((a) => a.feed!),
     ];
   }
 
@@ -609,7 +619,7 @@ export class FeedsClient extends FeedsApi {
     // clear all caches
     this.polls_by_id.clear();
 
-    this.activeActivities = [];
+    this.activeActivities = {};
     this.activeFeeds = {};
 
     this.state.partialNext({
@@ -637,6 +647,15 @@ export class FeedsClient extends FeedsApi {
       undefined,
       options?.addNewActivitiesTo,
     );
+  };
+
+  activity = (id: ActivityId) => {
+    let activity = this.activeActivities[id];
+    if (!activity) {
+      activity = new Activity(id, this);
+      this.activeActivities[id] = activity;
+    }
+    return activity;
   };
 
   async queryFeeds(request?: QueryFeedsRequest) {
@@ -752,6 +771,26 @@ export class FeedsClient extends FeedsApi {
     return response;
   }
 
+  async getOrCreateFeed(
+    request: GetOrCreateFeedRequest & {
+      feed_group_id: string;
+      feed_id: string;
+      connection_id?: string;
+    },
+  ) {
+    const response = await super.getOrCreateFeed(request);
+
+    console.log('itt', request);
+    if (request.watch) {
+      const feeds = this.findAllActiveFeedsByFid(
+        `${request.feed_group_id}:${request.feed_id}`,
+      );
+      feeds.forEach((f) => handleWatchStarted.bind(f)());
+    }
+
+    return response;
+  }
+
   private readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
@@ -786,7 +825,9 @@ export class FeedsClient extends FeedsApi {
   private findAllActiveFeedsByActivityId(activityId: string) {
     return [
       ...Object.values(this.activeFeeds),
-      ...this.activeActivities.filter((a) => !!a.feed).map((a) => a.feed!),
+      ...Object.values(this.activeActivities)
+        .filter((a) => !!a.feed)
+        .map((a) => a.feed!),
     ].filter((feed) => feed.hasActivity(activityId));
   }
 
@@ -797,7 +838,7 @@ export class FeedsClient extends FeedsApi {
 
     return [
       ...(activeFeed ? [activeFeed] : []),
-      ...this.activeActivities
+      ...Object.values(this.activeActivities)
         .filter((a) => a.feed?.feed === fid)
         .map((a) => a.feed!),
     ];
