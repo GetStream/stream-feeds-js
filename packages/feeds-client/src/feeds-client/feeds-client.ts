@@ -107,7 +107,7 @@ export class FeedsClient extends FeedsApi {
   private readonly polls_by_id: Map<string, StreamPoll>;
 
   private activeActivities: Activity[] = [];
-  private activeFeeds: Record<FID, Feed> = {};
+  protected activeFeeds: Record<FID, Feed> = {};
 
   private healthyConnectionChangedEventCount = 0;
 
@@ -176,7 +176,7 @@ export class FeedsClient extends FeedsApi {
           if (typeof fid === 'string') {
             delete this.activeFeeds[fid];
             this.activeActivities = this.activeActivities.filter(
-              (a) => a.feed.feed !== fid,
+              (a) => a.feed?.feed !== fid,
             );
           }
           break;
@@ -309,7 +309,7 @@ export class FeedsClient extends FeedsApi {
   private get allActiveFeeds() {
     return [
       ...Object.values(this.activeFeeds),
-      ...this.activeActivities.map((a) => a.feed),
+      ...this.activeActivities.filter((a) => !!a.feed).map((a) => a.feed!),
     ];
   }
 
@@ -454,7 +454,7 @@ export class FeedsClient extends FeedsApi {
   ): Promise<StreamResponse<AddCommentResponse>> => {
     const response = await super.addComment(request);
     const { comment } = response;
-    for (const feed of Object.values(this.allActiveFeeds)) {
+    for (const feed of this.allActiveFeeds) {
       handleCommentAdded.bind(feed)(response, false);
       const parentActivityId = comment.object_id;
       if (feed.hasActivity(parentActivityId)) {
@@ -480,7 +480,7 @@ export class FeedsClient extends FeedsApi {
     request: UpdateCommentRequest & { id: string },
   ): Promise<StreamResponse<UpdateCommentResponse>> => {
     const response = await super.updateComment(request);
-    for (const feed of Object.values(this.allActiveFeeds)) {
+    for (const feed of this.allActiveFeeds) {
       handleCommentUpdated.bind(feed)(response, false);
     }
     return response;
@@ -492,7 +492,7 @@ export class FeedsClient extends FeedsApi {
   }): Promise<StreamResponse<DeleteCommentResponse>> => {
     const response = await super.deleteComment(request);
     const { activity, comment } = response;
-    for (const feed of Object.values(this.allActiveFeeds)) {
+    for (const feed of this.allActiveFeeds) {
       handleCommentDeleted.bind(feed)({ comment }, false);
       updateCommentCount.bind(feed)({
         activity,
@@ -510,7 +510,7 @@ export class FeedsClient extends FeedsApi {
   ) => {
     const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addActivityReaction(request);
-    for (const feed of Object.values(this.allActiveFeeds)) {
+    for (const feed of this.allActiveFeeds) {
       if (shouldEnforceUnique) {
         handleActivityReactionUpdated.bind(feed)(response, false);
       } else {
@@ -536,7 +536,7 @@ export class FeedsClient extends FeedsApi {
     type: string;
   }): Promise<StreamResponse<DeleteActivityReactionResponse>> => {
     const response = await super.deleteActivityReaction(request);
-    for (const feed of Object.values(this.allActiveFeeds)) {
+    for (const feed of this.allActiveFeeds) {
       handleActivityReactionDeleted.bind(feed)(response, false);
     }
     return response;
@@ -547,7 +547,7 @@ export class FeedsClient extends FeedsApi {
   ): Promise<StreamResponse<AddCommentReactionResponse>> => {
     const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addCommentReaction(request);
-    for (const feed of Object.values(this.allActiveFeeds)) {
+    for (const feed of this.allActiveFeeds) {
       if (shouldEnforceUnique) {
         handleCommentReactionUpdated.bind(feed)(response, false);
       } else {
@@ -562,7 +562,7 @@ export class FeedsClient extends FeedsApi {
     type: string;
   }): Promise<StreamResponse<DeleteCommentReactionResponse>> => {
     const response = await super.deleteCommentReaction(request);
-    for (const feed of Object.values(this.allActiveFeeds)) {
+    for (const feed of this.allActiveFeeds) {
       handleCommentReactionDeleted.bind(feed)(response, false);
     }
     return response;
@@ -636,34 +636,6 @@ export class FeedsClient extends FeedsApi {
       undefined,
       undefined,
       options?.addNewActivitiesTo,
-    );
-  };
-
-  watchActivity = ({
-    activity,
-    feed,
-  }: {
-    activity: ActivityResponse;
-    feed?: string;
-  }) => {
-    const fid = feed ?? activity.current_feed?.feed;
-    if (!fid) {
-      throw new Error(
-        'No feed is provided, this can happen if the activity belongs to multiple feeds and activity.current_feed is not set. Please provide the feed parameter, you can use activity.feeds array to find the correct feed.',
-      );
-    }
-    return this.getOrCreateActiveActivity({ activity, fid: fid }).state;
-  };
-
-  unwatchActivity = ({
-    activity,
-    feed,
-  }: {
-    activity: ActivityResponse;
-    feed?: string;
-  }) => {
-    this.activeActivities = this.activeActivities.filter(
-      (a) => a.id !== activity.id && a.feed.feed !== feed,
     );
   };
 
@@ -811,30 +783,10 @@ export class FeedsClient extends FeedsApi {
     return feed;
   };
 
-  private getOrCreateActiveActivity = ({
-    activity,
-    fid,
-  }: {
-    activity: ActivityResponse;
-    fid: string;
-  }) => {
-    let activeActivity = this.activeActivities.find(
-      (a) => a.id === activity.id && a.feed.feed === fid,
-    );
-
-    if (!activeActivity) {
-      const [group, id] = fid.split(':');
-      const feed = new Feed(this, group, id);
-      activeActivity = new Activity(activity, feed, this);
-      this.activeActivities.push(activeActivity);
-    }
-    return activeActivity;
-  };
-
   private findAllActiveFeedsByActivityId(activityId: string) {
     return [
       ...Object.values(this.activeFeeds),
-      ...this.activeActivities.map((a) => a.feed),
+      ...this.activeActivities.filter((a) => !!a.feed).map((a) => a.feed!),
     ].filter((feed) => feed.hasActivity(activityId));
   }
 
@@ -846,8 +798,8 @@ export class FeedsClient extends FeedsApi {
     return [
       ...(activeFeed ? [activeFeed] : []),
       ...this.activeActivities
-        .filter((a) => a.feed.feed === fid)
-        .map((a) => a.feed),
+        .filter((a) => a.feed?.feed === fid)
+        .map((a) => a.feed!),
     ];
   }
 }
