@@ -170,14 +170,36 @@ export interface ActivityDeletedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface ActivityFeedbackEvent {
+  created_at: Date;
+
+  activity_feedback: ActivityFeedbackEventPayload;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface ActivityFeedbackEventPayload {
+  action: string;
+
+  activity_id: string;
+
+  created_at: Date;
+
+  updated_at: Date;
+
+  value: string;
+
+  user: UserResponse;
+}
+
 export interface ActivityFeedbackRequest {
   hide?: boolean;
-
-  mute_user?: boolean;
-
-  reason?: string;
-
-  report?: boolean;
 
   show_less?: boolean;
 
@@ -379,9 +401,13 @@ export interface ActivityResponse {
 
   created_at: Date;
 
+  hidden: boolean;
+
   id: string;
 
   popularity: number;
+
+  preview: boolean;
 
   reaction_count: number;
 
@@ -427,8 +453,6 @@ export interface ActivityResponse {
 
   expires_at?: Date;
 
-  hidden?: boolean;
-
   is_watched?: boolean;
 
   text?: string;
@@ -450,6 +474,8 @@ export interface ActivityResponse {
 
 export interface ActivitySelectorConfig {
   cutoff_time: Date;
+
+  cutoff_window?: string;
 
   min_popularity?: number;
 
@@ -1981,6 +2007,8 @@ export interface DeleteActivityReactionResponse {
 
 export interface DeleteActivityRequest {
   hard_delete?: boolean;
+
+  reason?: string;
 }
 
 export interface DeleteActivityResponse {
@@ -2021,6 +2049,8 @@ export interface DeleteFeedResponse {
 
 export interface DeleteMessageRequest {
   hard_delete?: boolean;
+
+  reason?: string;
 }
 
 export interface DeleteModerationConfigResponse {
@@ -2029,6 +2059,8 @@ export interface DeleteModerationConfigResponse {
 
 export interface DeleteReactionRequest {
   hard_delete?: boolean;
+
+  reason?: string;
 }
 
 export interface DeleteUserRequest {
@@ -2039,6 +2071,8 @@ export interface DeleteUserRequest {
   hard_delete?: boolean;
 
   mark_messages_deleted?: boolean;
+
+  reason?: string;
 }
 
 export interface DeliveryReceipts {
@@ -2552,6 +2586,52 @@ export interface FeedResponse {
   own_membership?: FeedMemberResponse;
 }
 
+export interface FeedSuggestionResponse {
+  created_at: Date;
+
+  description: string;
+
+  feed: string;
+
+  follower_count: number;
+
+  following_count: number;
+
+  group_id: string;
+
+  id: string;
+
+  member_count: number;
+
+  name: string;
+
+  pin_count: number;
+
+  updated_at: Date;
+
+  created_by: UserResponse;
+
+  deleted_at?: Date;
+
+  reason?: string;
+
+  recommendation_score?: number;
+
+  visibility?: string;
+
+  filter_tags?: string[];
+
+  own_capabilities?: FeedOwnCapability[];
+
+  own_follows?: FollowResponse[];
+
+  algorithm_scores?: Record<string, number>;
+
+  custom?: Record<string, any>;
+
+  own_membership?: FeedMemberResponse;
+}
+
 export interface FeedUpdatedEvent {
   created_at: Date;
 
@@ -2883,7 +2963,9 @@ export interface GetConfigResponse {
 export interface GetFollowSuggestionsResponse {
   duration: string;
 
-  suggestions: FeedResponse[];
+  suggestions: FeedSuggestionResponse[];
+
+  algorithm_used?: string;
 }
 
 export interface GetOGResponse {
@@ -5803,6 +5885,7 @@ export type WSClientEvent =
   | ({ type: 'app.updated' } & AppUpdatedEvent)
   | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
   | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
   | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
   | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
   | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
@@ -5852,6 +5935,7 @@ export type WSEvent =
   | ({ type: 'app.updated' } & AppUpdatedEvent)
   | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
   | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
   | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
   | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
   | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
