@@ -307,6 +307,7 @@ export class FeedsApi {
       id: request?.id,
       parent_id: request?.parent_id,
       poll_id: request?.poll_id,
+      restrict_replies: request?.restrict_replies,
       text: request?.text,
       visibility: request?.visibility,
       visibility_tag: request?.visibility_tag,
@@ -499,9 +500,6 @@ export class FeedsApi {
     };
     const body = {
       hide: request?.hide,
-      mute_user: request?.mute_user,
-      reason: request?.reason,
-      report: request?.report,
       show_less: request?.show_less,
       show_more: request?.show_more,
     };
@@ -733,6 +731,7 @@ export class FeedsApi {
     const body = {
       expires_at: request?.expires_at,
       poll_id: request?.poll_id,
+      restrict_replies: request?.restrict_replies,
       text: request?.text,
       visibility: request?.visibility,
       attachments: request?.attachments,

@@ -170,14 +170,36 @@ export interface ActivityDeletedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface ActivityFeedbackEvent {
+  created_at: Date;
+
+  activity_feedback: ActivityFeedbackEventPayload;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
+export interface ActivityFeedbackEventPayload {
+  action: string;
+
+  activity_id: string;
+
+  created_at: Date;
+
+  updated_at: Date;
+
+  value: string;
+
+  user: UserResponse;
+}
+
 export interface ActivityFeedbackRequest {
   hide?: boolean;
-
-  mute_user?: boolean;
-
-  reason?: string;
-
-  report?: boolean;
 
   show_less?: boolean;
 
@@ -351,6 +373,8 @@ export interface ActivityRequest {
 
   poll_id?: string;
 
+  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
+
   text?: string;
 
   visibility?: 'public' | 'private' | 'tag';
@@ -431,6 +455,8 @@ export interface ActivityResponse {
 
   is_watched?: boolean;
 
+  restrict_replies?: string;
+
   text?: string;
 
   visibility_tag?: string;
@@ -450,6 +476,8 @@ export interface ActivityResponse {
 
 export interface ActivitySelectorConfig {
   cutoff_time: Date;
+
+  cutoff_window?: string;
 
   min_popularity?: number;
 
@@ -508,6 +536,8 @@ export interface AddActivityRequest {
   parent_id?: string;
 
   poll_id?: string;
+
+  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
   text?: string;
 
@@ -675,11 +705,11 @@ export interface AppResponseFields {
 
   auto_translation_enabled: boolean;
 
+  id: number;
+
   name: string;
 
-  region: string;
-
-  shard: string;
+  placement: string;
 
   file_upload_config: FileUploadConfig;
 
@@ -1280,6 +1310,8 @@ export interface ChannelConfig {
 
   custom_events: boolean;
 
+  delivery_events: boolean;
+
   mark_messages_pending: boolean;
 
   max_message_length: number;
@@ -1347,6 +1379,8 @@ export interface ChannelConfigWithInfo {
   created_at: Date;
 
   custom_events: boolean;
+
+  delivery_events: boolean;
 
   mark_messages_pending: boolean;
 
@@ -1489,6 +1523,7 @@ export const ChannelOwnCapability = {
   DELETE_ANY_MESSAGE: 'delete-any-message',
   DELETE_CHANNEL: 'delete-channel',
   DELETE_OWN_MESSAGE: 'delete-own-message',
+  DELIVERY_EVENTS: 'delivery-events',
   FLAG_MESSAGE: 'flag-message',
   FREEZE_CHANNEL: 'freeze-channel',
   JOIN_CHANNEL: 'join-channel',
@@ -1981,6 +2016,8 @@ export interface DeleteActivityReactionResponse {
 
 export interface DeleteActivityRequest {
   hard_delete?: boolean;
+
+  reason?: string;
 }
 
 export interface DeleteActivityResponse {
@@ -2021,6 +2058,8 @@ export interface DeleteFeedResponse {
 
 export interface DeleteMessageRequest {
   hard_delete?: boolean;
+
+  reason?: string;
 }
 
 export interface DeleteModerationConfigResponse {
@@ -2029,6 +2068,8 @@ export interface DeleteModerationConfigResponse {
 
 export interface DeleteReactionRequest {
   hard_delete?: boolean;
+
+  reason?: string;
 }
 
 export interface DeleteUserRequest {
@@ -2039,6 +2080,8 @@ export interface DeleteUserRequest {
   hard_delete?: boolean;
 
   mark_messages_deleted?: boolean;
+
+  reason?: string;
 }
 
 export interface DeliveryReceipts {
@@ -2298,7 +2341,7 @@ export interface FeedGroup {
 
   default_visibility: string;
 
-  id: string;
+  group_id: string;
 
   updated_at: Date;
 
@@ -2546,6 +2589,52 @@ export interface FeedResponse {
   own_capabilities?: FeedOwnCapability[];
 
   own_follows?: FollowResponse[];
+
+  custom?: Record<string, any>;
+
+  own_membership?: FeedMemberResponse;
+}
+
+export interface FeedSuggestionResponse {
+  created_at: Date;
+
+  description: string;
+
+  feed: string;
+
+  follower_count: number;
+
+  following_count: number;
+
+  group_id: string;
+
+  id: string;
+
+  member_count: number;
+
+  name: string;
+
+  pin_count: number;
+
+  updated_at: Date;
+
+  created_by: UserResponse;
+
+  deleted_at?: Date;
+
+  reason?: string;
+
+  recommendation_score?: number;
+
+  visibility?: string;
+
+  filter_tags?: string[];
+
+  own_capabilities?: FeedOwnCapability[];
+
+  own_follows?: FollowResponse[];
+
+  algorithm_scores?: Record<string, number>;
 
   custom?: Record<string, any>;
 
@@ -2883,7 +2972,9 @@ export interface GetConfigResponse {
 export interface GetFollowSuggestionsResponse {
   duration: string;
 
-  suggestions: FeedResponse[];
+  suggestions: FeedSuggestionResponse[];
+
+  algorithm_used?: string;
 }
 
 export interface GetOGResponse {
@@ -4616,6 +4707,8 @@ export interface ReviewQueueItemResponse {
 
   id: string;
 
+  latest_moderator_action: string;
+
   recommended_action: string;
 
   reviewed_by: string;
@@ -4757,7 +4850,9 @@ export interface SessionSettingsResponse {
   inactivity_timeout_seconds: number;
 }
 
-export interface ShadowBlockActionRequest {}
+export interface ShadowBlockActionRequest {
+  reason?: string;
+}
 
 export interface SharedLocation {
   channel_cid: string;
@@ -4921,6 +5016,8 @@ export interface SubmitActionRequest {
   delete_user?: DeleteUserRequest;
 
   mark_reviewed?: MarkReviewedRequest;
+
+  shadow_block?: ShadowBlockActionRequest;
 
   unban?: UnbanActionRequest;
 }
@@ -5146,6 +5243,8 @@ export interface UpdateActivityRequest {
   expires_at?: Date;
 
   poll_id?: string;
+
+  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
   text?: string;
 
@@ -5803,6 +5902,7 @@ export type WSClientEvent =
   | ({ type: 'app.updated' } & AppUpdatedEvent)
   | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
   | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
   | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
   | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
   | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
@@ -5852,6 +5952,7 @@ export type WSEvent =
   | ({ type: 'app.updated' } & AppUpdatedEvent)
   | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
   | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
   | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
   | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
   | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
