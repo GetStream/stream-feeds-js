@@ -84,6 +84,25 @@ describe('Feed watch and unwatch', () => {
     );
   });
 
+  it(`should watch activity and feed as well`, async () => {
+    await feed.stopWatching();
+
+    expect(feed.currentState.watch).toBe(false);
+
+    const activityResponse = (
+      await feed.addActivity({
+        type: 'post',
+        text: 'test',
+      })
+    ).activity;
+
+    const activity = client.activity(activityResponse.id);
+    await activity.get({ watch: true });
+
+    expect(feed.currentState.watch).toBe(true);
+    expect(activity.currentState.watch).toBe(true);
+  });
+
   afterAll(async () => {
     await feed.delete();
     await client.disconnectUser();

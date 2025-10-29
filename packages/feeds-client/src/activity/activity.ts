@@ -2,26 +2,18 @@ import { StateStore } from '@stream-io/state-store';
 import type { Feed, FeedState } from '../feed';
 import type { FeedsClient } from '../feeds-client';
 import type { ActivityResponse } from '../gen/models';
-import { connectActivityToFeed } from '../feeds-client/connect-activity-to-feed';
+import { connectActivityToFeed } from '../feeds-client/active-activity';
 
 export type ActivityState = Partial<ActivityResponse> &
   Pick<FeedState, 'comments_by_entity_id'> & {
     /**
-     * True when being synchronized after connection recovered
+     * True when state is being fetched from API
      */
     is_loading: boolean;
     /**
      * True when the activity is being watched and receives real-time updates
      */
     watch: boolean;
-    /**
-     * @internal
-     *
-     * The last request config used to load comments for this activity.
-     */
-    last_get_comments_request?: Parameters<
-      Feed['loadNextPageActivityComments']
-    >;
   };
 
 export class Activity {
@@ -39,13 +31,21 @@ export class Activity {
     });
   }
 
+  get currentState() {
+    return this.state.getLatestValue();
+  }
+
+  /**
+   * Fetch activity and load it into state
+   * @param watch - Whether to watch the feed the activity belongs to for real-time updates
+   * @param feed - The feed to watch. Use only if the activity belongs to multiple feeds and you want to specify the feed explicitly.
+   * @param feedSelector - A function to select the feed from the activity response. Use only if the activity belongs to multiple feeds and you want to specify the feed explicitly.
+   */
   async get({
-    comments,
     watch,
     feed,
     feedSelector,
   }: {
-    comments: Parameters<Feed['loadNextPageActivityComments']>;
     watch?: boolean;
     feed?: string;
     feedSelector?: (activityResponse: ActivityResponse) => string;
@@ -62,6 +62,12 @@ export class Activity {
         activityResponse.current_feed?.feed ??
         activityResponse.feeds[0]);
 
+    if (!activityResponse.feeds.includes(fid)) {
+      throw new Error(
+        `Activity ${this.id} does not belong to feed ${fid}. Please provide a valid feed parameter.`,
+      );
+    }
+
     await this.setFeed({
       fid: fid,
       watch: watch ?? false,
@@ -69,6 +75,13 @@ export class Activity {
     });
   }
 
+  /**
+   * Stop receiving real-time updates for the activity by stopping the watch on the feed the activity belongs to.
+   *
+   * Only call this method if you don't have any component in your application that needs to receive real-time updates for the given feed.
+   *
+   * @returns
+   */
   stopWatching() {
     return this.feed?.stopWatching();
   }
@@ -89,10 +102,10 @@ export class Activity {
     watch: boolean;
     initialState: ActivityResponse;
   }) {
-    this.feed = await connectActivityToFeed.bind(this.feedsClient, {
+    this.feed = await connectActivityToFeed.bind(this.feedsClient)({
       fid,
       watch,
-    })();
+    });
 
     this.feed.state.partialNext({
       activities: [initialState],
