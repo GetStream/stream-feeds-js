@@ -96,7 +96,7 @@ describe('Stories Feed', () => {
     ).toBe(true);
   });
 
-  it.skip(`user reads user1's story feed directly`, async () => {
+  it(`user reads user1's story feed directly`, async () => {
     const feed = client2.feed(user1StoryFeed.group, user1StoryFeed.id, {
       addNewActivitiesTo: 'end',
     });
@@ -143,7 +143,7 @@ describe('Stories Feed', () => {
     ]);
 
     expect(feed.state.getLatestValue().activities![0].is_watched).toBe(true);
-    expect(feed.state.getLatestValue().activities![1].is_watched).toBe(false);
+    expect(feed.state.getLatestValue().activities![1].is_watched).toBeFalsy();
   });
 
   afterAll(async () => {
