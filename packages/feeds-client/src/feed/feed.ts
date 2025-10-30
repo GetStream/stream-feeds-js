@@ -268,6 +268,12 @@ export class Feed extends FeedApi {
     return this.indexedActivityIds.has(activityId);
   }
 
+  hasPinnedActivity(activityId: string) {
+    return this.currentState.pinned_activities?.some(
+      (pinnedActivity) => pinnedActivity.activity.id === activityId,
+    );
+  }
+
   async synchronize() {
     const { last_get_or_create_request_config } = this.state.getLatestValue();
     if (last_get_or_create_request_config?.watch) {

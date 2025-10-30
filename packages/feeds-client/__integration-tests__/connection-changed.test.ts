@@ -7,11 +7,8 @@ import {
   getTestUser,
 } from './utils';
 import type { UserRequest } from '../src/gen/models';
-import type {
-  UnhandledErrorEvent} from '../src/common/real-time/event-models';
-import {
-  UnhandledErrorType,
-} from '../src/common/real-time/event-models';
+import type { UnhandledErrorEvent } from '../src/common/real-time/event-models';
+import { UnhandledErrorType } from '../src/common/real-time/event-models';
 
 const shouldWatchIndex = (index: number) => index % 2 === 0;
 
@@ -43,8 +40,6 @@ describe('Connection status change', () => {
       expect(feed.currentState.watch).toBe(shouldWatch);
     }
 
-    // Accessing private property to simulate losing connection
-    // eslint-disable-next-line dot-notation
     client['eventDispatcher'].dispatch({
       type: 'connection.changed',
       online: false,
@@ -54,10 +49,8 @@ describe('Connection status change', () => {
       expect(feed.currentState.watch).toBe(false);
     }
 
-    const spies = feeds.map(feed => vi.spyOn(feed, 'getOrCreate'));
+    const spies = feeds.map((feed) => vi.spyOn(feed, 'getOrCreate'));
 
-    // Accessing private property to simulate losing connection
-    // eslint-disable-next-line dot-notation
     client['eventDispatcher'].dispatch({
       type: 'connection.changed',
       online: true,
@@ -86,8 +79,6 @@ describe('Connection status change', () => {
       expect(feed.currentState.watch).toBe(shouldWatch);
     }
 
-    // Accessing private property to simulate losing connection
-    // eslint-disable-next-line dot-notation
     client['eventDispatcher'].dispatch({
       type: 'connection.changed',
       online: false,
@@ -108,7 +99,9 @@ describe('Connection status change', () => {
 
       if (isWatched && watchedCount > 1) {
         failedQueryFeedsIdentifiers.push(feed.feed);
-        return vi.spyOn(feed, 'getOrCreate').mockRejectedValue(new Error('This feed has failed its query !'));
+        return vi
+          .spyOn(feed, 'getOrCreate')
+          .mockRejectedValue(new Error('This feed has failed its query !'));
       }
 
       return vi.spyOn(feed, 'getOrCreate');
@@ -118,10 +111,8 @@ describe('Connection status change', () => {
 
     client.on('errors.unhandled', (e) => {
       eventCollector.push(e);
-    })
+    });
 
-    // Accessing private property to simulate losing connection
-    // eslint-disable-next-line dot-notation
     client['eventDispatcher'].dispatch({
       type: 'connection.changed',
       online: true,
@@ -142,7 +133,9 @@ describe('Connection status change', () => {
       }
     }
 
-    await expect.poll(() => eventCollector.length, { interval: 50, timeout: 2000 }).toBe(1);
+    await expect
+      .poll(() => eventCollector.length, { interval: 50, timeout: 2000 })
+      .toBe(1);
 
     const event = eventCollector[0];
 
@@ -155,15 +148,17 @@ describe('Connection status change', () => {
     const failures = (event as UnhandledErrorEvent).failures;
 
     expect(failures.length).to.eq(2);
-    console.log(failedQueryFeedsIdentifiers)
+    console.log(failedQueryFeedsIdentifiers);
     expect(failures.length).to.eq(failedQueryFeedsIdentifiers.length);
 
     for (const failure of failures) {
       expect(failedQueryFeedsIdentifiers.includes(failure.feed)).to.eq(true);
       expect(failure.reason).toBeInstanceOf(Error);
-      expect((failure.reason as Error).message).to.eq('This feed has failed its query !')
+      expect((failure.reason as Error).message).to.eq(
+        'This feed has failed its query !',
+      );
     }
-  })
+  });
 
   afterEach(async () => {
     for (const feed of feeds) {
@@ -171,5 +166,5 @@ describe('Connection status change', () => {
     }
     await client.disconnectUser();
     vi.resetAllMocks();
-  })
+  });
 });

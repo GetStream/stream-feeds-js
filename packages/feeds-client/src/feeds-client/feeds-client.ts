@@ -236,14 +236,14 @@ export class FeedsClient extends FeedsApi {
         case 'feeds.bookmark.updated': {
           const activityId = event.bookmark.activity.id;
           // TODO: find faster way later on
-          const feeds = this.findActiveFeedByActivityId(activityId);
+          const feeds = this.findActiveFeedsByActivityId(activityId);
           feeds.forEach((f) => f.handleWSEvent(event));
 
           break;
         }
         case 'feeds.activity.feedback': {
           const activityId = event.activity_feedback.activity_id;
-          const feeds = this.findActiveFeedByActivityId(activityId);
+          const feeds = this.findActiveFeedsByActivityId(activityId);
           feeds.forEach((f) => f.handleWSEvent(event));
 
           break;
@@ -786,11 +786,10 @@ export class FeedsClient extends FeedsApi {
     return feed;
   };
 
-  private findActiveFeedByActivityId(activityId: string) {
-    return Object.values(this.activeFeeds).filter((feed) =>
-      feed.currentState.activities?.some(
-        (activity) => activity.id === activityId,
-      ),
+  private findActiveFeedsByActivityId(activityId: string) {
+    return Object.values(this.activeFeeds).filter(
+      (feed) =>
+        feed.hasActivity(activityId) || feed.hasPinnedActivity(activityId),
     );
   }
 }
