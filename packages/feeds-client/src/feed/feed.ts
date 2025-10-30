@@ -59,6 +59,7 @@ import type {
   PagerResponseWithLoadingStates,
 } from '../types';
 import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
+import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -207,6 +208,7 @@ export class Feed extends FeedApi {
     'user.muted': Feed.noop,
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
+    'feeds.activity.feedback': handleActivityFeedback.bind(this),
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -296,7 +298,10 @@ export class Feed extends FeedApi {
         }
       }
 
-      this.client.hydrateCapabilitiesCache([response.feed, ...currentActivityFeeds]);
+      this.client.hydrateCapabilitiesCache([
+        response.feed,
+        ...currentActivityFeeds,
+      ]);
 
       if (request?.next) {
         const { activities: currentActivities = [] } = this.currentState;
