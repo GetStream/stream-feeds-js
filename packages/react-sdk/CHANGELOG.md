@@ -7,6 +7,14 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 ### Dependency Updates
 
 * `@stream-io/feeds-client` updated to version `0.3.1`
+
+* **@stream-io/feeds-react-sdk:** release version 0.1.16 ([34360ae](https://github.com/GetStream/stream-feeds-js/commit/34360ae0328b66888080fc93cb30e00e38629c03))
+
+## [0.1.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.15...@stream-io/feeds-react-sdk-0.1.16) (2025-10-30)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.1`
 ## [0.1.15](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.14...@stream-io/feeds-react-sdk-0.1.15) (2025-10-22)
 
 ### Dependency Updates
