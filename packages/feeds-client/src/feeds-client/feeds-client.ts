@@ -241,6 +241,13 @@ export class FeedsClient extends FeedsApi {
 
           break;
         }
+        case 'feeds.activity.feedback': {
+          const activityId = event.activity_feedback.activity_id;
+          const feeds = this.findActiveFeedByActivityId(activityId);
+          feeds.forEach((f) => f.handleWSEvent(event));
+
+          break;
+        }
         case 'user.updated': {
           handleUserUpdated.call(this, event);
           break;

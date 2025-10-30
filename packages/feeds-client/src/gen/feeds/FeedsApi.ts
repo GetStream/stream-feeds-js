@@ -499,9 +499,6 @@ export class FeedsApi {
     };
     const body = {
       hide: request?.hide,
-      mute_user: request?.mute_user,
-      reason: request?.reason,
-      report: request?.report,
       show_less: request?.show_less,
       show_more: request?.show_more,
     };

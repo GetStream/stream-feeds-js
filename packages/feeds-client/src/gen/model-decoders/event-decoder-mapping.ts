@@ -13,6 +13,9 @@ const eventDecoderMapping: Record<
   'feeds.activity.deleted': (data: Record<string, any>) =>
     decoders.ActivityDeletedEvent(data),
 
+  'feeds.activity.feedback': (data: Record<string, any>) =>
+    decoders.ActivityFeedbackEvent(data),
+
   'feeds.activity.marked': (data: Record<string, any>) =>
     decoders.ActivityMarkEvent(data),
 
