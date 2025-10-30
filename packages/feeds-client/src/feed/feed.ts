@@ -207,6 +207,8 @@ export class Feed extends FeedApi {
     'user.muted': Feed.noop,
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
+    // User event
+    'feeds.activity.feedback': Feed.noop,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -296,7 +298,10 @@ export class Feed extends FeedApi {
         }
       }
 
-      this.client.hydrateCapabilitiesCache([response.feed, ...currentActivityFeeds]);
+      this.client.hydrateCapabilitiesCache([
+        response.feed,
+        ...currentActivityFeeds,
+      ]);
 
       if (request?.next) {
         const { activities: currentActivities = [] } = this.currentState;

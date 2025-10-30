@@ -82,6 +82,7 @@ import {
   type ThrottledGetBatchedOwnCapabilities,
   clearQueuedFeeds,
 } from '../utils/throttling';
+import { handleActivityFeedback } from '../feed/event-handlers/activity/handle-activity-feedback';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -238,6 +239,13 @@ export class FeedsClient extends FeedsApi {
           // TODO: find faster way later on
           const feeds = this.findActiveFeedByActivityId(activityId);
           feeds.forEach((f) => f.handleWSEvent(event));
+
+          break;
+        }
+        case 'feeds.activity.feedback': {
+          const activityId = event.activity_feedback.activity_id;
+          const feeds = this.findActiveFeedByActivityId(activityId);
+          feeds.forEach((f) => handleActivityFeedback.bind(f)(event));
 
           break;
         }
