@@ -244,12 +244,15 @@ export class ModerationApi {
       action_type: request?.action_type,
       item_id: request?.item_id,
       ban: request?.ban,
+      block: request?.block,
       custom: request?.custom,
       delete_activity: request?.delete_activity,
+      delete_comment: request?.delete_comment,
       delete_message: request?.delete_message,
       delete_reaction: request?.delete_reaction,
       delete_user: request?.delete_user,
       mark_reviewed: request?.mark_reviewed,
+      shadow_block: request?.shadow_block,
       unban: request?.unban,
     };
 
