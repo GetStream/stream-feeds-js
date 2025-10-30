@@ -8,6 +8,15 @@ This file was generated using [@jscutlery/semver](https://github.com/jscutlery/s
 
 * `@stream-io/feeds-client` updated to version `0.3.1`
 
+* **@stream-io/feeds-react-native-sdk:** release version 0.1.16 ([512c27e](https://github.com/GetStream/stream-feeds-js/commit/512c27e4f45c63128d01abaa1fc8f8fe4f1e7381))
+* **@stream-io/feeds-react-native-sdk:** release version 0.1.16 ([185723c](https://github.com/GetStream/stream-feeds-js/commit/185723cece1c39c3179eb68c6fd5728b101348cc))
+
+## [0.1.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.15...@stream-io/feeds-react-native-sdk-0.1.16) (2025-10-30)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.1`
+
 * **@stream-io/feeds-react-native-sdk:** release version 0.1.16 ([185723c](https://github.com/GetStream/stream-feeds-js/commit/185723cece1c39c3179eb68c6fd5728b101348cc))
 
 ## [0.1.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.15...@stream-io/feeds-react-native-sdk-0.1.16) (2025-10-30)
