@@ -185,7 +185,7 @@ export interface ActivityFeedbackEvent {
 }
 
 export interface ActivityFeedbackEventPayload {
-  action: string;
+  action: 'hide' | 'show_more' | 'show_less';
 
   activity_id: string;
 
