@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.0...@stream-io/feeds-client-0.3.1) (2025-10-30)
+
+
+* add docs test for update partial ([c4b3d73](https://github.com/GetStream/stream-feeds-js/commit/c4b3d739ff5e88dc288fb95f67f09732a95d2c37))
+* add sharing activity snippet ([fb4db2d](https://github.com/GetStream/stream-feeds-js/commit/fb4db2d2aaf9422830defbdb54fb34f0c72f145f))
+* reenable failing tests ([8c3a02a](https://github.com/GetStream/stream-feeds-js/commit/8c3a02adbe566c3e44a28d57cda1a2a23fe94589))
+
+
+### Features
+
+* activity feedback event handler; follow suggestion API changes ([#150](https://github.com/GetStream/stream-feeds-js/issues/150)) ([65f4d3e](https://github.com/GetStream/stream-feeds-js/commit/65f4d3edde3c6e5a96d5b5bd87d95bab83cde6ef))
+
 ## [0.3.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.21...@stream-io/feeds-client-0.3.0) (2025-10-22)
 
 
