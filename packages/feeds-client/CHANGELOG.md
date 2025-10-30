@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.1...@stream-io/feeds-client-0.3.2) (2025-10-30)
+
+
+* add new docs snippet tests ([35c888d](https://github.com/GetStream/stream-feeds-js/commit/35c888d4f0f55a14e7df55a3bc1e7c28acc04130))
+
+
+### Features
+
+* [FEEDS-702] Gen new openapi spec for restrict replies field ([#152](https://github.com/GetStream/stream-feeds-js/issues/152)) ([2ebb6fb](https://github.com/GetStream/stream-feeds-js/commit/2ebb6fb0dffd18ad65e39f479924a19cdeb488b5))
+
 ## [0.3.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.0...@stream-io/feeds-client-0.3.1) (2025-10-30)
 
 
