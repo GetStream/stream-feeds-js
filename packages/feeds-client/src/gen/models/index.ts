@@ -359,6 +359,8 @@ export interface ActivityRequest {
 
   attachments?: Attachment[];
 
+  collection_refs?: string[];
+
   filter_tags?: string[];
 
   interest_tags?: string[];
@@ -412,6 +414,8 @@ export interface ActivityResponse {
   own_bookmarks: BookmarkResponse[];
 
   own_reactions: FeedsReactionResponse[];
+
+  collections: Record<string, EnrichedCollectionResponse>;
 
   custom: Record<string, any>;
 
@@ -516,6 +520,8 @@ export interface AddActivityRequest {
   visibility_tag?: string;
 
   attachments?: Attachment[];
+
+  collection_refs?: string[];
 
   filter_tags?: string[];
 
@@ -1585,6 +1591,28 @@ export interface ChannelResponse {
   truncated_by?: UserResponse;
 }
 
+export interface CollectionRequest {
+  name: string;
+
+  custom: Record<string, any>;
+
+  id?: string;
+}
+
+export interface CollectionResponse {
+  created_at: Date;
+
+  id: string;
+
+  name: string;
+
+  updated_at: Date;
+
+  custom: Record<string, any>;
+
+  user_id?: string;
+}
+
 export interface Command {
   args: string;
 
@@ -1873,6 +1901,16 @@ export interface CreateBlockListResponse {
   blocklist?: BlockListResponse;
 }
 
+export interface CreateCollectionsRequest {
+  collections: CollectionRequest[];
+}
+
+export interface CreateCollectionsResponse {
+  duration: string;
+
+  collections: CollectionResponse[];
+}
+
 export interface CreateDeviceRequest {
   id: string;
 
@@ -1995,6 +2033,10 @@ export interface DeleteBookmarkResponse {
   duration: string;
 
   bookmark: BookmarkResponse;
+}
+
+export interface DeleteCollectionsResponse {
+  duration: string;
 }
 
 export interface DeleteCommentReactionResponse {
@@ -2179,6 +2221,22 @@ export interface EnrichedActivity {
   reaction_counts?: Record<string, number>;
 
   target?: Data;
+}
+
+export interface EnrichedCollectionResponse {
+  created_at: Date;
+
+  id: string;
+
+  name: string;
+
+  status: 'ok' | 'notfound';
+
+  updated_at: Date;
+
+  custom: Record<string, any>;
+
+  user_id?: string;
 }
 
 export interface EnrichedReaction {
@@ -4531,6 +4589,12 @@ export interface ReactionResponse {
   user: UserResponse;
 }
 
+export interface ReadCollectionsResponse {
+  duration: string;
+
+  collections: CollectionResponse[];
+}
+
 export interface ReadReceipts {
   enabled: boolean;
 }
@@ -5153,6 +5217,8 @@ export interface UpdateActivityRequest {
 
   attachments?: Attachment[];
 
+  collection_refs?: string[];
+
   feeds?: string[];
 
   filter_tags?: string[];
@@ -5212,6 +5278,24 @@ export interface UpdateBookmarkResponse {
   duration: string;
 
   bookmark: BookmarkResponse;
+}
+
+export interface UpdateCollectionRequest {
+  id: string;
+
+  name: string;
+
+  custom: Record<string, any>;
+}
+
+export interface UpdateCollectionsRequest {
+  collections: UpdateCollectionRequest[];
+}
+
+export interface UpdateCollectionsResponse {
+  duration: string;
+
+  collections: CollectionResponse[];
 }
 
 export interface UpdateCommentRequest {

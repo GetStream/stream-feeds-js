@@ -23,6 +23,8 @@ import type {
   CastPollVoteRequest,
   CreateBlockListRequest,
   CreateBlockListResponse,
+  CreateCollectionsRequest,
+  CreateCollectionsResponse,
   CreateDeviceRequest,
   CreateFeedsBatchRequest,
   CreateFeedsBatchResponse,
@@ -36,6 +38,7 @@ import type {
   DeleteActivityResponse,
   DeleteBookmarkFolderResponse,
   DeleteBookmarkResponse,
+  DeleteCollectionsResponse,
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
   DeleteFeedResponse,
@@ -90,6 +93,7 @@ import type {
   QueryPollsResponse,
   QueryUsersPayload,
   QueryUsersResponse,
+  ReadCollectionsResponse,
   RejectFeedMemberInviteRequest,
   RejectFeedMemberInviteResponse,
   RejectFollowRequest,
@@ -112,6 +116,8 @@ import type {
   UpdateBookmarkFolderResponse,
   UpdateBookmarkRequest,
   UpdateBookmarkResponse,
+  UpdateCollectionsRequest,
+  UpdateCollectionsResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
   UpdateFeedMembersRequest,
@@ -311,6 +317,7 @@ export class FeedsApi {
       visibility: request?.visibility,
       visibility_tag: request?.visibility_tag,
       attachments: request?.attachments,
+      collection_refs: request?.collection_refs,
       filter_tags: request?.filter_tags,
       interest_tags: request?.interest_tags,
       mentioned_user_ids: request?.mentioned_user_ids,
@@ -736,6 +743,7 @@ export class FeedsApi {
       text: request?.text,
       visibility: request?.visibility,
       attachments: request?.attachments,
+      collection_refs: request?.collection_refs,
       feeds: request?.feeds,
       filter_tags: request?.filter_tags,
       interest_tags: request?.interest_tags,
@@ -857,6 +865,84 @@ export class FeedsApi {
     );
 
     decoders.QueryBookmarksResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteCollections(request: {
+    collection_refs: string[];
+  }): Promise<StreamResponse<DeleteCollectionsResponse>> {
+    const queryParams = {
+      collection_refs: request?.collection_refs,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteCollectionsResponse>
+    >('DELETE', '/api/v2/feeds/collections', undefined, queryParams);
+
+    decoders.DeleteCollectionsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async readCollections(request: {
+    collection_refs: string[];
+  }): Promise<StreamResponse<ReadCollectionsResponse>> {
+    const queryParams = {
+      collection_refs: request?.collection_refs,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ReadCollectionsResponse>
+    >('GET', '/api/v2/feeds/collections', undefined, queryParams);
+
+    decoders.ReadCollectionsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateCollections(
+    request: UpdateCollectionsRequest,
+  ): Promise<StreamResponse<UpdateCollectionsResponse>> {
+    const body = {
+      collections: request?.collections,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateCollectionsResponse>
+    >(
+      'PATCH',
+      '/api/v2/feeds/collections',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.UpdateCollectionsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async createCollections(
+    request: CreateCollectionsRequest,
+  ): Promise<StreamResponse<CreateCollectionsResponse>> {
+    const body = {
+      collections: request?.collections,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<CreateCollectionsResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/collections',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.CreateCollectionsResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
