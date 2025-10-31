@@ -191,6 +191,8 @@ decoders.ActivityResponse = (input?: Record<string, any>) => {
 
     own_reactions: { type: 'FeedsReactionResponse', isSingle: false },
 
+    collections: { type: 'EnrichedCollectionResponse', isSingle: false },
+
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
 
     user: { type: 'UserResponse', isSingle: true },
@@ -616,6 +618,15 @@ decoders.ChannelResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.CollectionResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.Command = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -740,6 +751,13 @@ decoders.CreateBlockListResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.CreateCollectionsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    collections: { type: 'CollectionResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.CreateFeedsBatchResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     feeds: { type: 'FeedResponse', isSingle: false },
@@ -827,6 +845,15 @@ decoders.DraftResponse = (input?: Record<string, any>) => {
 decoders.EgressRTMPResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     started_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.EnrichedCollectionResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1670,6 +1697,13 @@ decoders.ReactionResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.ReadCollectionsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    collections: { type: 'CollectionResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.RejectFeedMemberInviteResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     member: { type: 'FeedMemberResponse', isSingle: true },
@@ -1889,6 +1923,13 @@ decoders.UpdateBookmarkFolderResponse = (input?: Record<string, any>) => {
 decoders.UpdateBookmarkResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     bookmark: { type: 'BookmarkResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpdateCollectionsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    collections: { type: 'CollectionResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
