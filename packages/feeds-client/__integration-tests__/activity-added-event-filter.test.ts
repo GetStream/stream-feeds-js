@@ -9,7 +9,7 @@ import {
 } from './utils';
 import type { FeedsClient } from '../src/feeds-client';
 import type { Feed } from '../src/feed';
-import { StreamClient } from '@stream-io/node-sdk';
+import { type StreamClient } from '@stream-io/node-sdk';
 
 describe('Feeds - activtyAddedEventFilter filters WS events', () => {
   let client: FeedsClient;
