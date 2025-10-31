@@ -13,6 +13,7 @@ import type {
   ThreadedCommentResponse,
   FollowRequest,
   QueryCommentsRequest,
+  ActivityAddedEvent,
 } from '../gen/models';
 import type { StreamResponse } from '../gen-imports';
 import { StateStore } from '@stream-io/state-store';
@@ -221,6 +222,7 @@ export class Feed extends FeedApi {
     data?: FeedResponse,
     watch = false,
     addNewActivitiesTo: 'start' | 'end' = 'start',
+    public activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean,
   ) {
     super(client, groupId, id);
     this.state = new StateStore<FeedState>({

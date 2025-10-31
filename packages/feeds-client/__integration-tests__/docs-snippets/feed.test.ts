@@ -107,6 +107,11 @@ describe('Feeds page', () => {
   });
 
   it(`filtering activities`, async () => {
+    feed = client.feed(feed.group, feed.id, {
+      activityAddedEventFilter: (event) =>
+        event.activity.filter_tags.includes('blue'),
+    });
+
     // Add a few activities
     await client.upsertActivities({
       activities: [

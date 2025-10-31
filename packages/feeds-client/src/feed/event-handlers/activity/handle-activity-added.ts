@@ -45,6 +45,11 @@ export function handleActivityAdded(
   this: Feed,
   event: EventPayload<'feeds.activity.added'>,
 ) {
+  if (this.activityAddedEventFilter) {
+    if (!this.activityAddedEventFilter(event)) {
+      return;
+    }
+  }
   const currentActivities = this.currentState.activities;
   const result = addActivitiesToState.bind(this)(
     [event.activity],
