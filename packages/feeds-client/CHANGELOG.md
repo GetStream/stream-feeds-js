@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.2...@stream-io/feeds-client-0.3.3) (2025-10-31)
+
+
+### Features
+
+* client-side features to support reading feeds with filter ([#155](https://github.com/GetStream/stream-feeds-js/issues/155)) ([8552de1](https://github.com/GetStream/stream-feeds-js/commit/8552de1566560b436b1e62189f0497f8d14fe57f))
+
+
+### Bug Fixes
+
+* check pinned activities as well when updating from user events ([#153](https://github.com/GetStream/stream-feeds-js/issues/153)) ([d895b94](https://github.com/GetStream/stream-feeds-js/commit/d895b94544eaf58d94467e02f12fce0c5f2f620e))
+
 ## [0.3.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.1...@stream-io/feeds-client-0.3.2) (2025-10-30)
 
 
