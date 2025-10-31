@@ -1,5 +1,6 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import type {
+  ActivityAddedEvent,
   ActivityResponse,
   AddCommentReactionRequest,
   AddCommentReactionResponse,
@@ -619,10 +620,22 @@ export class FeedsClient extends FeedsApi {
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
 
+  /**
+   *
+   * @param groupId for example `user`, `notification` or id of a custom feed group
+   * @param id
+   * @param options
+   * @param options.addNewActivitiesTo - when a new activity is received from a WebSocket event by default it's added to the start of the list. You can change this to `end` to add it to the end of the list. Useful for story feeds.
+   * @param options.activityAddedEventFilter - a callback that is called when a new activity is received from a WebSocket event. You can use this to prevent the activity from being added to the feed. Useful for feed filtering, or if you don't want new activities to be added to the feed.
+   * @returns
+   */
   feed = (
     groupId: string,
     id: string,
-    options?: { addNewActivitiesTo?: 'start' | 'end' },
+    options?: {
+      addNewActivitiesTo?: 'start' | 'end';
+      activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
+    },
   ) => {
     return this.getOrCreateActiveFeed(
       groupId,
@@ -630,6 +643,7 @@ export class FeedsClient extends FeedsApi {
       undefined,
       undefined,
       options?.addNewActivitiesTo,
+      options?.activityAddedEventFilter,
     );
   };
 
@@ -761,6 +775,7 @@ export class FeedsClient extends FeedsApi {
     data?: FeedResponse,
     watch?: boolean,
     addNewActivitiesTo?: 'start' | 'end',
+    activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean,
   ) => {
     const fid = `${group}:${id}`;
 
@@ -772,6 +787,7 @@ export class FeedsClient extends FeedsApi {
         data,
         watch,
         addNewActivitiesTo,
+        activityAddedEventFilter,
       );
     }
 
