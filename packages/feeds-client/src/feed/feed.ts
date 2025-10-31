@@ -865,6 +865,7 @@ export class Feed extends FeedApi {
       following_pagination: {
         limit: 0,
       },
+      filter: currentState.last_get_or_create_request_config?.filter,
       next: currentState.next,
       limit: currentState.last_get_or_create_request_config?.limit ?? 20,
     });

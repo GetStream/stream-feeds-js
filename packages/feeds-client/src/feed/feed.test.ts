@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FeedsClient } from '../feeds-client';
 import { Feed } from './feed';
 import type { ActivityResponse } from '../gen/models';
@@ -86,5 +86,66 @@ describe('Feed derived state updates', () => {
       expect(indexedActivityIdsAfter.has(activity.id)).toBe(true);
     }
     expect(indexedActivityIdsBefore).toBe(indexedActivityIdsAfter);
+  });
+
+  it(`should send filter when loading next page and initial request had filters`, async () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        filter: {
+          filter_tags: ['green'],
+        },
+        limit: 10,
+      },
+      next: 'next',
+    });
+
+    const spy = vi.spyOn(feed, 'getOrCreate').mockImplementation(() =>
+      // @ts-expect-error - mock implementation
+      Promise.resolve({
+        activities: [],
+        next: 'next',
+        prev: undefined,
+        limit: 10,
+        feed: generateFeedResponse({}),
+      }),
+    );
+
+    await feed.getNextPage();
+
+    const params = spy.mock.calls[0][0];
+    expect(params?.filter).toStrictEqual({ filter_tags: ['green'] });
+    expect(params?.next).toEqual('next');
+    expect(params?.limit).toEqual(10);
+
+    spy.mockRestore();
+  });
+
+  it(`should not send filter when loading next page and initial request didn't have filters`, async () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        limit: 10,
+      },
+      next: 'next',
+    });
+
+    const spy = vi.spyOn(feed, 'getOrCreate').mockImplementation(() =>
+      // @ts-expect-error - mock implementation
+      Promise.resolve({
+        activities: [],
+        next: 'next',
+        prev: undefined,
+        limit: 10,
+        feed: generateFeedResponse({}),
+      }),
+    );
+
+    await feed.getNextPage();
+
+    const params = spy.mock.calls[0][0];
+    expect(params?.filter).toBeUndefined();
+    expect(params?.next).toEqual('next');
+    expect(params?.limit).toEqual(10);
+
+    spy.mockRestore();
   });
 });
