@@ -3,6 +3,7 @@ import type { Feed, FeedState } from '../feed';
 import type { FeedsClient } from '../feeds-client';
 import type { ActivityResponse } from '../gen/models';
 import { connectActivityToFeed } from '../feeds-client/active-activity';
+import type { GetCommentsRequest } from '@self';
 
 export type ActivityState = Partial<ActivityResponse> &
   Pick<FeedState, 'comments_by_entity_id'> & {
@@ -45,11 +46,19 @@ export class Activity {
     watch,
     feed,
     feedSelector,
+    comments,
   }: {
     watch?: boolean;
     feed?: string;
     feedSelector?: (activityResponse: ActivityResponse) => string;
-  }) {
+    comments?: Partial<
+      Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
+    >;
+  } = {}) {
+    this.state.partialNext({
+      is_loading: true,
+    });
+
     const activityResponse = (
       await this.feedsClient.getActivity({
         id: this.id,
@@ -73,6 +82,16 @@ export class Activity {
       watch: watch ?? false,
       initialState: activityResponse,
     });
+
+    if (this.feed) {
+      this.feed.activityAddedEventFilter = () => false;
+    }
+
+    if (comments) {
+      await this.loadNextPageActivityComments(comments);
+    }
+
+    this.subscribeToFeedState();
   }
 
   /**
@@ -86,12 +105,28 @@ export class Activity {
     return this.feed?.stopWatching();
   }
 
+  loadNextPageActivityComments(
+    request?: Partial<
+      Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
+    >,
+  ) {
+    const activity = this.feed?.currentState.activities?.[0];
+    if (!activity) {
+      return;
+    }
+    return this.feed?.loadNextPageActivityComments(activity, request);
+  }
+
+  loadNextPageCommentReplies(
+    ...params: Parameters<Feed['loadNextPageCommentReplies']>
+  ) {
+    return this.feed?.loadNextPageCommentReplies(...params);
+  }
+
   /**
    * @internal
    */
-  async synchronize() {
-    // TODO
-  }
+  async synchronize() {}
 
   private async setFeed({
     fid,
@@ -110,12 +145,15 @@ export class Activity {
     this.feed.state.partialNext({
       activities: [initialState],
     });
+  }
 
-    this.feed.state.subscribeWithSelector(
+  private subscribeToFeedState() {
+    this.feed?.state.subscribeWithSelector(
       (state) => ({
         activity: state.activities?.find((activity) => activity.id === this.id),
         comments_by_entity_id: state.comments_by_entity_id,
         watch: state.watch,
+        is_loading: state.is_loading,
       }),
       (state) => {
         if (state.activity) {
@@ -123,6 +161,7 @@ export class Activity {
             ...state.activity,
             comments_by_entity_id: state.comments_by_entity_id,
             watch: state.watch,
+            is_loading: state.is_loading,
           });
         }
       },

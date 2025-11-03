@@ -801,7 +801,6 @@ export class FeedsClient extends FeedsApi {
   ) {
     const response = await super.getOrCreateFeed(request);
 
-    console.log('itt', request);
     if (request.watch) {
       const feeds = this.findAllActiveFeedsByFid(
         `${request.feed_group_id}:${request.feed_id}`,

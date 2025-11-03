@@ -27,6 +27,7 @@ describe('active-activity', () => {
     expect(watchFeedSpy).toHaveBeenCalledWith({
       feed_group_id: 'test',
       feed_id: '123',
+      watch: true,
     });
 
     expect(feed.currentState.watch).toBe(true);
@@ -53,6 +54,7 @@ describe('active-activity', () => {
     expect(watchFeedSpy).toHaveBeenCalledWith({
       feed_group_id: 'test',
       feed_id: '123',
+      watch: true,
     });
 
     expect(feed.currentState.watch).toBe(true);
