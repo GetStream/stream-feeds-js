@@ -109,7 +109,8 @@ describe('Feed Pagination Integration Tests', () => {
     expect(state.activities?.[1].id).toBe(activity2.activity.id);
     expect(state.activities?.[2].id).toBe(activity1.activity.id);
     expect(indexedActivityIds.size).toEqual(
-      firstPageResponse.activities.length + secondPageResponse.activities.length,
+      firstPageResponse.activities.length +
+        (secondPageResponse?.activities?.length ?? 0),
     );
     expect(indexedActivityIds.size).toEqual(activities.length);
     for (const activityResponse of activities) {

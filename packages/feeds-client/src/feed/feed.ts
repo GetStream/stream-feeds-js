@@ -857,6 +857,10 @@ export class Feed extends FeedApi {
   async getNextPage() {
     const currentState = this.currentState;
 
+    if (!currentState.next) {
+      return;
+    }
+
     return await this.getOrCreate({
       member_pagination: {
         limit: 0,
