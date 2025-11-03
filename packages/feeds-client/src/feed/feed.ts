@@ -854,6 +854,10 @@ export class Feed extends FeedApi {
     return response;
   }
 
+  /**
+   * Fetches the next page of activities for the feed.
+   * @returns The response from the API or `undefined` if there is no next page.
+   */
   async getNextPage() {
     const currentState = this.currentState;
 
