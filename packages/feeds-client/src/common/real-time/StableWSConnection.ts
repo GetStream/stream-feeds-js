@@ -11,7 +11,7 @@ import type { TokenManager } from '../TokenManager';
 import { EventDispatcher } from '../EventDispatcher';
 import type { ConnectionIdManager } from '../ConnectionIdManager';
 import type { ConnectedEvent } from './event-models';
-import { getLogger } from '../../utils/logger';
+import { feedsLoggerSystem } from '../../utils/logger';
 
 // Type guards to check WebSocket error type
 const isCloseEvent = (
@@ -78,7 +78,7 @@ export class StableWSConnection {
   wsID: number;
   private readonly dispatcher = new EventDispatcher();
   private readonly clientId: string;
-  private readonly logger = getLogger('stable-ws-connection');
+  private readonly logger = feedsLoggerSystem.getLogger('stable-ws-connection');
 
   constructor(
     private readonly config: WSConfig,

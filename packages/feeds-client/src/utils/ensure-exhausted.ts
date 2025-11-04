@@ -1,5 +1,5 @@
-import { getLogger } from './logger';
+import { feedsLoggerSystem } from './logger';
 
 export const ensureExhausted = (x: never, message: string) => {
-  getLogger('helpers').warn(message, x);
+  feedsLoggerSystem.getLogger('helpers').warn(message, x);
 };

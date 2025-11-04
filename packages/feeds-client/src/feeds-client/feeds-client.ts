@@ -73,7 +73,7 @@ import {
   UnhandledErrorType,
 } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
-import { configureLoggers } from '../utils';
+import { feedsLoggerSystem } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 import {
   throttle,
@@ -138,7 +138,7 @@ export class FeedsClient extends FeedsApi {
       options?.query_batch_own_capabilties_throttling_interval ??
       DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL;
 
-    configureLoggers(options?.configure_loggers_options);
+    feedsLoggerSystem.configureLoggers(options?.configure_loggers_options);
 
     this.on('all', (event) => {
       const fid = event.fid;
