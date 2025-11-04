@@ -1,5 +1,5 @@
 import type { FeedsEvent } from '../types';
-import { getLogger } from '../utils/logger';
+import { feedsLoggerSystem } from '../utils/logger';
 
 export class EventDispatcher<
   Type extends string = FeedsEvent['type'],
@@ -9,7 +9,7 @@ export class EventDispatcher<
     Record<Type | 'all', Array<(event: Event) => void> | undefined>
   > = {};
 
-  private readonly logger = getLogger('event-dispatcher');
+  private readonly logger = feedsLoggerSystem.getLogger('event-dispatcher');
 
   dispatch = (event: Event) => {
     const listeners = [
