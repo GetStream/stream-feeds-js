@@ -145,9 +145,9 @@ describe('Connection status change', () => {
         vi.spyOn(activity, 'get').mockRejectedValue(
           new Error('This activity has failed its query !'),
         );
+      } else {
+        vi.spyOn(activity, 'get');
       }
-
-      vi.spyOn(activity, 'get');
     });
 
     const eventCollector: FeedsEvent[] = [];
@@ -179,13 +179,28 @@ describe('Connection status change', () => {
       failedQueryFeedsIdentifiers.length +
         failedQueryActivitiesIdentifiers.length,
     );
+    expect(failedQueryActivitiesIdentifiers.length).to.be.greaterThan(0);
+    expect(failedQueryFeedsIdentifiers.length).to.be.greaterThan(0);
 
     for (const failure of failures) {
-      expect(failedQueryFeedsIdentifiers.includes(failure.feed)).to.eq(true);
-      expect(failure.reason).toBeInstanceOf(Error);
-      expect((failure.reason as Error).message).to.eq(
-        'This feed has failed its query !',
-      );
+      if (failure.activity_id) {
+        expect(
+          failedQueryActivitiesIdentifiers.includes(failure.activity_id),
+        ).to.eq(true);
+        expect(failure.reason).toBeInstanceOf(Error);
+        expect((failure.reason as Error).message).to.eq(
+          'This activity has failed its query !',
+        );
+        expect(failure.feed).to.eq(
+          activities.find((a) => a.id === failure.activity_id)?.feed?.feed,
+        );
+      } else {
+        expect(failedQueryFeedsIdentifiers.includes(failure.feed)).to.eq(true);
+        expect(failure.reason).toBeInstanceOf(Error);
+        expect((failure.reason as Error).message).to.eq(
+          'This feed has failed its query !',
+        );
+      }
     }
   });
 

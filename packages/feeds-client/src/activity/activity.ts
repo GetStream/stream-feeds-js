@@ -106,7 +106,14 @@ export class Activity {
    * @returns
    */
   stopWatching() {
-    return this.feed?.stopWatching();
+    return this.feed?.stopWatching().then(() => {
+      this.state.partialNext({
+        last_get_request_config: {
+          ...this.currentState.last_get_request_config,
+          watch: false,
+        },
+      });
+    });
   }
 
   loadNextPageActivityComments(
@@ -139,13 +146,12 @@ export class Activity {
    * @internal
    */
   async synchronize() {
-    if (!this.currentState.watch) {
+    if (!this.currentState.last_get_request_config?.watch) {
       return;
     }
     if (!this.feed) {
       return;
     }
-    this.feed = undefined;
     return this.get(this.currentState.last_get_request_config);
   }
 

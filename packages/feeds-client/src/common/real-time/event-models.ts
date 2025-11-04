@@ -43,7 +43,11 @@ export enum UnhandledErrorType {
   FetchingOwnCapabilitiesOnNewActivity = 'fetching-own-capabilities-on-new-activity',
 }
 
-export type SyncFailure = { feed: string; reason: unknown };
+export type SyncFailure = {
+  feed: string;
+  reason: unknown;
+  activity_id?: string;
+};
 
 export type UnhandledErrorEvent = {
   type: 'errors.unhandled';

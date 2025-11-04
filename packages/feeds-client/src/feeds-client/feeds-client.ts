@@ -314,9 +314,9 @@ export class FeedsClient extends FeedsApi {
           return [];
         }
         const feed =
-          feedEntries[index][0] ||
-          activityEntries[index - feedEntries.length][0];
-        const activityId = activityEntries[index - feedEntries.length][0];
+          feedEntries[index]?.[0] ||
+          activityEntries[index - feedEntries.length][1].feed!.feed;
+        const activityId = activityEntries[index - feedEntries.length]?.[0];
         return [{ feed, reason: result.reason, activity_id: activityId }];
       });
 

@@ -294,8 +294,8 @@ describe('Activity tests', () => {
 
     const spy = vi.fn();
     activity.state.subscribe(spy);
-    await activity.get({ comments: { sort: 'first' } });
-    spy.mockReset();
+    await activity.get({ comments: { sort: 'first' }, watch: true });
+    spy.mockClear();
     activityGetSpy.mockClear();
     commentsSpy.mockClear();
 
