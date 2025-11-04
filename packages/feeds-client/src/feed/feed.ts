@@ -59,7 +59,12 @@ import type {
   LoadingStates,
   PagerResponseWithLoadingStates,
 } from '../types';
-import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
+import {
+  checkHasAnotherPage,
+  Constants,
+  getLogger,
+  uniqueArrayMerge,
+} from '../utils';
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
 import { deepEqual } from '../utils/deep-equal';
 
@@ -929,7 +934,10 @@ export class Feed extends FeedApi {
     }
 
     if (typeof eventHandler === 'undefined') {
-      console.warn(`Received unknown event type: ${event.type}`, event);
+      getLogger('event-dispatcher').warn(
+        `Received unknown feed event, type: ${event.type}`,
+        event,
+      );
     }
 
     this.eventDispatcher.dispatch(event);

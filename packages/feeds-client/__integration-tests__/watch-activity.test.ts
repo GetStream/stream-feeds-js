@@ -1,6 +1,6 @@
-import { StreamClient } from '@stream-io/node-sdk';
-import { ActivityResponse, Feed, FeedsClient, UserRequest } from '../src';
-import { Activity } from '../src/activity/activity';
+import type { StreamClient } from '@stream-io/node-sdk';
+import type { ActivityResponse, Feed, FeedsClient, UserRequest } from '../src';
+import type { Activity } from '../src/activity/activity';
 import {
   getTestUser,
   createTestClient,
@@ -13,7 +13,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 describe('Watch activity', () => {
   let client: FeedsClient;
   let feed: Feed;
-  const activities: Array<ActivityResponse> = [];
+  const activities: ActivityResponse[] = [];
   const user: UserRequest = getTestUser();
   const feedGroup = 'user';
   const feedId = crypto.randomUUID();
@@ -149,7 +149,6 @@ describe('Watch activity', () => {
   });
 
   it(`adding a new activity shouldn't update the activity state`, async () => {
-    const activity2 = client.activity(activities[1].id);
     await activity.get({ watch: true });
     const spy = vi.fn();
     activity.state.subscribe(spy);

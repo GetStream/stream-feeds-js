@@ -245,15 +245,15 @@ export class FeedsClient extends FeedsApi {
         case 'feeds.bookmark.deleted':
         case 'feeds.bookmark.updated': {
           const activityId = event.bookmark.activity.id;
-          const feeds = this.findAllActiveFeedsByActivityId(activityId);
-          feeds.forEach((f) => f.handleWSEvent(event));
+          const allFeeds = this.findAllActiveFeedsByActivityId(activityId);
+          allFeeds.forEach((f) => f.handleWSEvent(event));
 
           break;
         }
         case 'feeds.activity.feedback': {
           const activityId = event.activity_feedback.activity_id;
-          const feeds = this.findAllActiveFeedsByActivityId(activityId);
-          feeds.forEach((f) => f.handleWSEvent(event));
+          const allFeeds = this.findAllActiveFeedsByActivityId(activityId);
+          allFeeds.forEach((f) => f.handleWSEvent(event));
           break;
         }
         case 'user.updated': {

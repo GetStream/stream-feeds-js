@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+ 
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -73,11 +73,6 @@ describe('Notification Feed Test Setup', () => {
   });
 
   it(`user 2 follows user 1 - user 1 receives notification`, async () => {
-    console.log(
-      'itt',
-      user1NotificationFeed.state.getLatestValue().notification_status,
-    );
-
     await Promise.all([
       user2TimelineFeed.follow(user1UserFeed.feed, {
         create_notification_activity: true,

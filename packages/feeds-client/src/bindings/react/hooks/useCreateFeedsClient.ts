@@ -43,7 +43,6 @@ export const useCreateFeedsClient = ({
       .connectUser(cachedUserData, tokenOrProvider)
       .then(() => {
         setError(null);
-        console.log('Successfully connected user: ', cachedUserData.id);
       })
       .catch((err) => {
         setError(err);
@@ -60,11 +59,6 @@ export const useCreateFeedsClient = ({
         })
         .catch((err) => {
           setError(err);
-        })
-        .then(() => {
-          console.log(
-            `Connection for user "${cachedUserData.id}" has been closed`,
-          );
         });
     };
   }, [apiKey, cachedUserData, cachedOptions, tokenOrProvider]);
