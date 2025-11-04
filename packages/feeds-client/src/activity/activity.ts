@@ -122,8 +122,8 @@ export class Activity {
     >,
   ) {
     const activity = this.feed?.currentState.activities?.[0];
-    if (!activity) {
-      return;
+    if (!activity || !this.feed) {
+      throw new Error('Initialize activity first');
     }
     if (!this.currentState.last_get_request_config?.comments) {
       this.state.partialNext({
@@ -133,13 +133,16 @@ export class Activity {
         },
       });
     }
-    return this.feed?.loadNextPageActivityComments(activity, request);
+    return this.feed.loadNextPageActivityComments(activity, request);
   }
 
   loadNextPageCommentReplies(
     ...params: Parameters<Feed['loadNextPageCommentReplies']>
   ) {
-    return this.feed?.loadNextPageCommentReplies(...params);
+    if (!this.feed) {
+      throw new Error('Initialize activity first');
+    }
+    return this.feed.loadNextPageCommentReplies(...params);
   }
 
   /**

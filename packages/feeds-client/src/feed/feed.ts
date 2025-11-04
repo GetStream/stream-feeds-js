@@ -600,7 +600,7 @@ export class Feed extends FeedApi {
   }
 
   public async loadNextPageActivityComments(
-    activity: ActivityResponse,
+    activity: ActivityResponse | string,
     request?: Partial<
       Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
     >,
@@ -622,13 +622,14 @@ export class Feed extends FeedApi {
       return;
     }
 
+    const entityId = typeof activity === 'string' ? activity : activity.id;
     await this.loadNextPageComments({
-      entityId: activity.id,
+      entityId: entityId,
       base: () =>
         this.client.getComments({
           ...request,
           sort,
-          object_id: activity.id,
+          object_id: entityId,
           object_type: 'activity',
           next: currentNextCursor,
         }),
