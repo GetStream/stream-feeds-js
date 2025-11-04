@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.5](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.4...@stream-io/feeds-client-0.3.5) (2025-11-04)
+
+
+### Features
+
+* Migrate to instance-based logger ([#159](https://github.com/GetStream/stream-feeds-js/issues/159)) ([f2854e0](https://github.com/GetStream/stream-feeds-js/commit/f2854e090da8526f87f89bccd95659de6d2a5069))
+
 ## [0.3.4](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.3...@stream-io/feeds-client-0.3.4) (2025-11-04)
 
 
