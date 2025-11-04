@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.4](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.3...@stream-io/feeds-client-0.3.4) (2025-11-04)
+
+
+### Bug Fixes
+
+* forward all relevant config options from getOrCreate in getNextPage ([#158](https://github.com/GetStream/stream-feeds-js/issues/158)) ([a6216a8](https://github.com/GetStream/stream-feeds-js/commit/a6216a83d26f7045e8fcc38b6ff142e5bc75f7e6))
+* getNextPage returns undefined if there is no more page to fetch ([#157](https://github.com/GetStream/stream-feeds-js/issues/157)) ([7bf9093](https://github.com/GetStream/stream-feeds-js/commit/7bf90938585032aec9160b6f07885dd5a681953f))
+
 ## [0.3.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.2...@stream-io/feeds-client-0.3.3) (2025-10-31)
 
 
