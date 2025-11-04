@@ -88,13 +88,38 @@ describe('Feed derived state updates', () => {
     expect(indexedActivityIdsBefore).toBe(indexedActivityIdsAfter);
   });
 
-  it(`should send filter when loading next page and initial request had filters`, async () => {
+  it(`should send all params from getOrCreate request that affect activity list when loading next page`, async () => {
     feed.state.partialNext({
       last_get_or_create_request_config: {
+        limit: 10,
         filter: {
           filter_tags: ['green'],
         },
-        limit: 10,
+        external_ranking: {
+          user_score: 0.8,
+        },
+        watch: true,
+        activity_selector_options: {
+          sort: [
+            {
+              field: 'created_at',
+              direction: 'desc',
+            },
+          ],
+        },
+        interest_weights: {
+          technology: 0.8,
+          travel: -1,
+        },
+        followers_pagination: {
+          limit: 10,
+        },
+        following_pagination: {
+          limit: 10,
+        },
+        member_pagination: {
+          limit: 10,
+        },
       },
       next: 'next',
     });
@@ -112,39 +137,22 @@ describe('Feed derived state updates', () => {
 
     await feed.getNextPage();
 
-    const params = spy.mock.calls[0][0];
-    expect(params?.filter).toStrictEqual({ filter_tags: ['green'] });
-    expect(params?.next).toEqual('next');
-    expect(params?.limit).toEqual(10);
-
-    spy.mockRestore();
-  });
-
-  it(`should not send filter when loading next page and initial request didn't have filters`, async () => {
-    feed.state.partialNext({
-      last_get_or_create_request_config: {
-        limit: 10,
-      },
+    const config = {
+      ...feed.currentState.last_get_or_create_request_config,
       next: 'next',
-    });
-
-    const spy = vi.spyOn(feed, 'getOrCreate').mockImplementation(() =>
-      // @ts-expect-error - mock implementation
-      Promise.resolve({
-        activities: [],
-        next: 'next',
-        prev: undefined,
-        limit: 10,
-        feed: generateFeedResponse({}),
-      }),
-    );
-
-    await feed.getNextPage();
-
+      watch: undefined,
+      member_pagination: {
+        limit: 0,
+      },
+      followers_pagination: {
+        limit: 0,
+      },
+      following_pagination: {
+        limit: 0,
+      },
+    };
     const params = spy.mock.calls[0][0];
-    expect(params?.filter).toBeUndefined();
-    expect(params?.next).toEqual('next');
-    expect(params?.limit).toEqual(10);
+    expect(params).toStrictEqual(config);
 
     spy.mockRestore();
   });

@@ -866,6 +866,7 @@ export class Feed extends FeedApi {
     }
 
     return await this.getOrCreate({
+      ...currentState.last_get_or_create_request_config,
       member_pagination: {
         limit: 0,
       },
@@ -875,9 +876,8 @@ export class Feed extends FeedApi {
       following_pagination: {
         limit: 0,
       },
-      filter: currentState.last_get_or_create_request_config?.filter,
+      watch: undefined,
       next: currentState.next,
-      limit: currentState.last_get_or_create_request_config?.limit ?? 20,
     });
   }
 
