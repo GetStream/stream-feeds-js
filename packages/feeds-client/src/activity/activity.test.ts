@@ -106,6 +106,7 @@ describe('Activity tests', () => {
       is_loading: false,
       watch: false,
       comments_by_entity_id: {},
+      last_get_request_config: {},
       ...acitivityResponse,
     });
   });
@@ -167,6 +168,7 @@ describe('Activity tests', () => {
           },
         },
       },
+      last_get_request_config: { comments: { sort: 'first' } },
       is_loading: false,
       watch: false,
       ...acitivityResponse,
@@ -257,5 +259,63 @@ describe('Activity tests', () => {
     expect(activity.feed?.feed).toBe(feed2);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.lastCall?.[0]).toBe(acitivityResponse);
+  });
+
+  it(`should synchronize activity state`, async () => {
+    const client = new FeedsClient('mock-api-key');
+    const acitivityResponse = generateActivityResponse({
+      id: 'activity-1',
+      feeds: ['user:123'],
+    });
+    const activityGetSpy = vi
+      .spyOn(client, 'getActivity')
+      .mockImplementation(() =>
+        // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
+        Promise.resolve({
+          activity: acitivityResponse,
+        }),
+      );
+    vi.spyOn(client, 'getOrCreateFeed').mockImplementation(() =>
+      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
+      Promise.resolve(),
+    );
+    const commentResponse = generateCommentResponse({
+      id: 'comment-1',
+      object_id: 'activity-1',
+      object_type: 'activity',
+    });
+    const commentsSpy = vi.spyOn(client, 'getComments').mockImplementation(() =>
+      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
+      Promise.resolve({
+        comments: [commentResponse],
+      }),
+    );
+    const activity = new Activity('activity-1', client);
+
+    const spy = vi.fn();
+    activity.state.subscribe(spy);
+    await activity.get({ comments: { sort: 'first' } });
+    spy.mockReset();
+    activityGetSpy.mockClear();
+    commentsSpy.mockClear();
+
+    const request = activity.synchronize();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.lastCall?.[0].is_loading).toBe(true);
+
+    await request;
+
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy.mock.lastCall?.[0].is_loading).toBe(false);
+
+    expect(activityGetSpy).toHaveBeenCalledTimes(1);
+    expect(commentsSpy).toHaveBeenCalledTimes(1);
+    expect(commentsSpy).toHaveBeenCalledWith({
+      sort: 'first',
+      object_id: 'activity-1',
+      object_type: 'activity',
+      next: undefined,
+    });
   });
 });

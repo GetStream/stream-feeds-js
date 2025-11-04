@@ -301,18 +301,24 @@ export class FeedsClient extends FeedsApi {
 
     // we skip the first event as we could potentially be querying twice
     if (this.healthyConnectionChangedEventCount > 1) {
-      const entries = Object.entries(this.activeFeeds);
-      // TODO: add synchronization for activities
+      const feedEntries = Object.entries(this.activeFeeds);
+      const activityEntries = Object.entries(this.activeActivities);
 
-      const results = await Promise.allSettled(
-        entries.map(([, feed]) => feed.synchronize()),
-      );
+      const results = await Promise.allSettled([
+        ...feedEntries.map(([, feed]) => feed.synchronize()),
+        ...activityEntries.map(([, activity]) => activity.synchronize()),
+      ]);
 
-      const failures: SyncFailure[] = results.flatMap((result, index) =>
-        result.status === 'rejected'
-          ? [{ feed: entries[index][0], reason: result.reason }]
-          : [],
-      );
+      const failures: SyncFailure[] = results.flatMap((result, index) => {
+        if (result.status === 'fulfilled') {
+          return [];
+        }
+        const feed =
+          feedEntries[index][0] ||
+          activityEntries[index - feedEntries.length][0];
+        const activityId = activityEntries[index - feedEntries.length][0];
+        return [{ feed, reason: result.reason, activity_id: activityId }];
+      });
 
       this.eventDispatcher.dispatch({
         type: 'errors.unhandled',

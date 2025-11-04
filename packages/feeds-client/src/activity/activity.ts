@@ -5,6 +5,15 @@ import type { ActivityResponse } from '../gen/models';
 import { connectActivityToFeed } from '../feeds-client/active-activity';
 import type { GetCommentsRequest } from '@self';
 
+type GetActivityConfig = {
+  watch?: boolean;
+  feed?: string;
+  feedSelector?: (activityResponse: ActivityResponse) => string;
+  comments?: Partial<
+    Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
+  >;
+};
+
 export type ActivityState = Partial<ActivityResponse> &
   Pick<FeedState, 'comments_by_entity_id'> & {
     /**
@@ -15,6 +24,10 @@ export type ActivityState = Partial<ActivityResponse> &
      * True when the activity is being watched and receives real-time updates
      */
     watch: boolean;
+    /**
+     * @internal
+     */
+    last_get_request_config?: GetActivityConfig;
   };
 
 export class Activity {
@@ -42,21 +55,12 @@ export class Activity {
    * @param feed - The feed to watch. Use only if the activity belongs to multiple feeds and you want to specify the feed explicitly.
    * @param feedSelector - A function to select the feed from the activity response. Use only if the activity belongs to multiple feeds and you want to specify the feed explicitly.
    */
-  async get({
-    watch,
-    feed,
-    feedSelector,
-    comments,
-  }: {
-    watch?: boolean;
-    feed?: string;
-    feedSelector?: (activityResponse: ActivityResponse) => string;
-    comments?: Partial<
-      Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
-    >;
-  } = {}) {
+  async get(request: GetActivityConfig = {}) {
+    const { watch, feed, feedSelector, comments } = request;
+
     this.state.partialNext({
       is_loading: true,
+      last_get_request_config: request,
     });
 
     const activityResponse = (
@@ -114,6 +118,14 @@ export class Activity {
     if (!activity) {
       return;
     }
+    if (!this.currentState.last_get_request_config?.comments) {
+      this.state.partialNext({
+        last_get_request_config: {
+          ...this.currentState.last_get_request_config,
+          comments: request,
+        },
+      });
+    }
     return this.feed?.loadNextPageActivityComments(activity, request);
   }
 
@@ -126,7 +138,16 @@ export class Activity {
   /**
    * @internal
    */
-  async synchronize() {}
+  async synchronize() {
+    if (!this.currentState.watch) {
+      return;
+    }
+    if (!this.feed) {
+      return;
+    }
+    this.feed = undefined;
+    return this.get(this.currentState.last_get_request_config);
+  }
 
   private async setFeed({
     fid,

@@ -15,6 +15,7 @@ const shouldWatchIndex = (index: number) => index % 2 === 0;
 describe('Connection status change', () => {
   let client: FeedsClient;
   let feeds: Array<ReturnType<FeedsClient['feed']>> = [];
+  let activities: Array<ReturnType<FeedsClient['activity']>> = [];
   const user: UserRequest = getTestUser();
   const feedGroup = 'user';
 
@@ -31,6 +32,20 @@ describe('Connection status change', () => {
 
       feeds.push(feed);
     }
+    activities = [];
+    for (let i = 0; i < 2; i++) {
+      const activityId = crypto.randomUUID();
+      const activity = client.activity(activityId);
+      const feed = client.feed(feedGroup, crypto.randomUUID());
+      await feed.getOrCreate();
+      await feed.addActivity({
+        id: activityId,
+        type: 'post',
+        text: 'test',
+      });
+      await activity.get({ watch: shouldWatchIndex(i) });
+      activities.push(activity);
+    }
   });
 
   it('should set watch to false in watched feeds when losing connection, and to true when reconnecting', async () => {
@@ -38,6 +53,11 @@ describe('Connection status change', () => {
       const feed = feeds[i];
       const shouldWatch = shouldWatchIndex(i);
       expect(feed.currentState.watch).toBe(shouldWatch);
+    }
+
+    for (let i = 0; i < activities.length; i++) {
+      const activity = activities[i];
+      expect(activity.currentState.watch).toBe(shouldWatchIndex(i));
     }
 
     client['eventDispatcher'].dispatch({
@@ -49,7 +69,14 @@ describe('Connection status change', () => {
       expect(feed.currentState.watch).toBe(false);
     }
 
+    for (const activity of activities) {
+      expect(activity.currentState.watch).toBe(false);
+    }
+
     const spies = feeds.map((feed) => vi.spyOn(feed, 'getOrCreate'));
+    const activitySpies = activities.map((activity) =>
+      vi.spyOn(activity, 'get'),
+    );
 
     client['eventDispatcher'].dispatch({
       type: 'connection.changed',
@@ -70,28 +97,32 @@ describe('Connection status change', () => {
         expect(spy).not.toHaveBeenCalled();
       }
     }
+
+    for (let i = 0; i < activitySpies.length; i++) {
+      const spy = activitySpies[i];
+      const shouldRewatch = shouldWatchIndex(i);
+
+      if (shouldRewatch) {
+        expect(spy).toHaveBeenCalledWith(
+          expect.objectContaining({ watch: true }),
+        );
+      } else {
+        expect(spy).not.toHaveBeenCalled();
+      }
+    }
   });
 
   it('should dispatch the correct errors.unhandled local event when getOrCreate fails during reconciliation', async () => {
-    for (let i = 0; i < feeds.length; i++) {
-      const feed = feeds[i];
-      const shouldWatch = shouldWatchIndex(i);
-      expect(feed.currentState.watch).toBe(shouldWatch);
-    }
-
     client['eventDispatcher'].dispatch({
       type: 'connection.changed',
       online: false,
     });
 
-    for (const feed of feeds) {
-      expect(feed.currentState.watch).toBe(false);
-    }
-
     let watchedCount = 0;
     const failedQueryFeedsIdentifiers: string[] = [];
+    const failedQueryActivitiesIdentifiers: string[] = [];
 
-    const spies = feeds.map((feed, index) => {
+    feeds.forEach((feed, index) => {
       const isWatched = shouldWatchIndex(index);
       if (isWatched) {
         watchedCount++;
@@ -99,12 +130,24 @@ describe('Connection status change', () => {
 
       if (isWatched && watchedCount > 1) {
         failedQueryFeedsIdentifiers.push(feed.feed);
-        return vi
-          .spyOn(feed, 'getOrCreate')
-          .mockRejectedValue(new Error('This feed has failed its query !'));
+        vi.spyOn(feed, 'getOrCreate').mockRejectedValue(
+          new Error('This feed has failed its query !'),
+        );
       }
 
       return vi.spyOn(feed, 'getOrCreate');
+    });
+
+    activities.forEach((activity, index) => {
+      const isWatched = shouldWatchIndex(index);
+      if (isWatched) {
+        failedQueryActivitiesIdentifiers.push(activity.id);
+        vi.spyOn(activity, 'get').mockRejectedValue(
+          new Error('This activity has failed its query !'),
+        );
+      }
+
+      vi.spyOn(activity, 'get');
     });
 
     const eventCollector: FeedsEvent[] = [];
@@ -117,21 +160,6 @@ describe('Connection status change', () => {
       type: 'connection.changed',
       online: true,
     });
-
-    for (let i = 0; i < spies.length; i++) {
-      const spy = spies[i];
-      const shouldRewatch = shouldWatchIndex(i);
-
-      if (shouldRewatch) {
-        expect(spy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            watch: true,
-          }),
-        );
-      } else {
-        expect(spy).not.toHaveBeenCalled();
-      }
-    }
 
     await expect
       .poll(() => eventCollector.length, { interval: 50, timeout: 2000 })
@@ -147,9 +175,10 @@ describe('Connection status change', () => {
 
     const failures = (event as UnhandledErrorEvent).failures;
 
-    expect(failures.length).to.eq(2);
-    console.log(failedQueryFeedsIdentifiers);
-    expect(failures.length).to.eq(failedQueryFeedsIdentifiers.length);
+    expect(failures.length).to.eq(
+      failedQueryFeedsIdentifiers.length +
+        failedQueryActivitiesIdentifiers.length,
+    );
 
     for (const failure of failures) {
       expect(failedQueryFeedsIdentifiers.includes(failure.feed)).to.eq(true);
@@ -162,7 +191,10 @@ describe('Connection status change', () => {
 
   afterEach(async () => {
     for (const feed of feeds) {
-      await feed.delete();
+      await feed.delete({ hard_delete: true });
+    }
+    for (const activity of activities) {
+      await activity.feed?.delete({ hard_delete: true });
     }
     await client.disconnectUser();
     vi.resetAllMocks();
