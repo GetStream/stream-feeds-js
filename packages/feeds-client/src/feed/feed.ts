@@ -215,7 +215,7 @@ export class Feed extends FeedApi {
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
     new EventDispatcher<WSEvent['type'], WSEvent>();
-  private inPrgoressGetOrCreate?: {
+  private inProgressGetOrCreate?: {
     request?: GetOrCreateFeedRequest;
     promise: Promise<StreamResponse<GetOrCreateFeedResponse>>;
   };
@@ -284,7 +284,7 @@ export class Feed extends FeedApi {
   async synchronize() {
     const { last_get_or_create_request_config } = this.state.getLatestValue();
     if (last_get_or_create_request_config?.watch) {
-      this.inPrgoressGetOrCreate = undefined;
+      this.inProgressGetOrCreate = undefined;
       await this.getOrCreate(last_get_or_create_request_config);
     }
   }
@@ -292,10 +292,10 @@ export class Feed extends FeedApi {
   async getOrCreate(request?: GetOrCreateFeedRequest) {
     if (
       !request?.next &&
-      this.inPrgoressGetOrCreate &&
-      deepEqual(request, this.inPrgoressGetOrCreate.request)
+      this.inProgressGetOrCreate &&
+      deepEqual(request, this.inProgressGetOrCreate.request)
     ) {
-      return this.inPrgoressGetOrCreate.promise;
+      return this.inProgressGetOrCreate.promise;
     }
 
     if (this.currentState.is_loading_activities) {
@@ -314,7 +314,7 @@ export class Feed extends FeedApi {
       const responsePromise = super.getOrCreate(request);
 
       if (!request?.next) {
-        this.inPrgoressGetOrCreate = { request, promise: responsePromise };
+        this.inProgressGetOrCreate = { request, promise: responsePromise };
       }
 
       const response = await responsePromise;
@@ -417,7 +417,7 @@ export class Feed extends FeedApi {
         is_loading_activities: false,
       });
       if (!request?.next) {
-        this.inPrgoressGetOrCreate = undefined;
+        this.inProgressGetOrCreate = undefined;
       }
     }
   }
