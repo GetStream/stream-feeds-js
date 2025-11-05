@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.6](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.5...@stream-io/feeds-client-0.3.6) (2025-11-05)
+
+
+### Bug Fixes
+
+* don't throw error if getOrCreate is called twice with same config ([#160](https://github.com/GetStream/stream-feeds-js/issues/160)) ([200ade9](https://github.com/GetStream/stream-feeds-js/commit/200ade940691c64101d41375ce675139858e8409))
+
 ## [0.3.5](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.4...@stream-io/feeds-client-0.3.5) (2025-11-04)
 
 
