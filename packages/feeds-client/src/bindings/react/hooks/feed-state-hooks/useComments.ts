@@ -12,6 +12,7 @@ import {
 import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import type { Activity, ActivityState } from '../../../../activity/activity';
+import { useActivityContext } from '../../contexts/StreamActivityContext';
 
 const isActivityOrFeed = (
   parent: CommentParent | Activity | Feed,
@@ -41,6 +42,9 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   ) => Promise<void>;
 };
 
+export function useComments<
+  T extends CommentParent,
+>(_: {}): UseCommentsReturnType<T>;
 export function useComments<T extends CommentParent>(_: {
   parent: Activity;
 }): UseCommentsReturnType<T>;
@@ -58,21 +62,23 @@ export function useComments<T extends CommentParent>(_: {
 }): UseCommentsReturnType<T> | undefined;
 export function useComments<T extends CommentParent>({
   feed: feedFromProps,
-  activity,
-  parent,
+  activity: activityFromProps,
+  parent: parentFromProps,
 }: {
   feed?: Feed;
   activity?: Activity;
   /**
    * The parent (activity or comment) for which to fetch comments.
    */
-  parent: T | Activity;
+  parent?: T | Activity;
 }) {
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
+  const activity = activityFromProps ?? useActivityContext();
+  const parent = parentFromProps ?? activity;
   const feedOrActivity = feed ?? activity ?? parent;
 
-  if (!isActivityOrFeed(feedOrActivity)) {
+  if (!parent || !feedOrActivity || !isActivityOrFeed(feedOrActivity)) {
     throw new Error('Invalid parent');
   }
 
