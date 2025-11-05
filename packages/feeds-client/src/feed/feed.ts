@@ -214,6 +214,10 @@ export class Feed extends FeedApi {
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
     new EventDispatcher<WSEvent['type'], WSEvent>();
+  private inPrgoressGetOrCreate?: {
+    request?: GetOrCreateFeedRequest;
+    promise: Promise<StreamResponse<GetOrCreateFeedResponse>>;
+  };
 
   constructor(
     client: FeedsClient,
@@ -279,11 +283,21 @@ export class Feed extends FeedApi {
   async synchronize() {
     const { last_get_or_create_request_config } = this.state.getLatestValue();
     if (last_get_or_create_request_config?.watch) {
+      this.inPrgoressGetOrCreate = undefined;
       await this.getOrCreate(last_get_or_create_request_config);
     }
   }
 
   async getOrCreate(request?: GetOrCreateFeedRequest) {
+    if (
+      !request?.next &&
+      this.inPrgoressGetOrCreate &&
+      JSON.stringify(request) ===
+        JSON.stringify(this.inPrgoressGetOrCreate.request)
+    ) {
+      return this.inPrgoressGetOrCreate.promise;
+    }
+
     if (this.currentState.is_loading_activities) {
       throw new Error('Only one getOrCreate call is allowed at a time');
     }
@@ -297,7 +311,13 @@ export class Feed extends FeedApi {
     // and pre-populate comments_by_entity_id (once comment_sort and comment_limit are supported)
 
     try {
-      const response = await super.getOrCreate(request);
+      const responsePromise = super.getOrCreate(request);
+
+      if (!request?.next) {
+        this.inPrgoressGetOrCreate = { request, promise: responsePromise };
+      }
+
+      const response = await responsePromise;
 
       const currentActivityFeeds = [];
       for (const activity of response.activities) {
@@ -396,6 +416,9 @@ export class Feed extends FeedApi {
         is_loading: false,
         is_loading_activities: false,
       });
+      if (!request?.next) {
+        this.inPrgoressGetOrCreate = undefined;
+      }
     }
   }
 
