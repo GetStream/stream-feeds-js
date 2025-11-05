@@ -61,6 +61,7 @@ import type {
 } from '../types';
 import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
+import { deepEqual } from '../utils/deep-equal';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -292,8 +293,7 @@ export class Feed extends FeedApi {
     if (
       !request?.next &&
       this.inPrgoressGetOrCreate &&
-      JSON.stringify(request) ===
-        JSON.stringify(this.inPrgoressGetOrCreate.request)
+      deepEqual(request, this.inPrgoressGetOrCreate.request)
     ) {
       return this.inPrgoressGetOrCreate.promise;
     }

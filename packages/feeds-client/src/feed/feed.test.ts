@@ -175,9 +175,23 @@ describe(`getOrCreate`, () => {
     expect(params).toStrictEqual(config);
   });
 
-  it(`should prevent duplicate getOrCreate calls with same config`, async () => {
+  it(`should prevent duplicate getOrCreate calls with same config`, () => {
     const promise1 = feed.getOrCreate();
     const promise2 = feed.getOrCreate();
+
+    expect(client.getOrCreateFeed).toHaveBeenCalledTimes(1);
+    expect(promise1).toEqual(promise2);
+  });
+
+  it(`should prevent duplicate getOrCreate calls with same config - non-empty filter`, () => {
+    const promise1 = feed.getOrCreate({
+      filter: { filter_tags: ['green'] },
+      watch: true,
+    });
+    const promise2 = feed.getOrCreate({
+      watch: true,
+      filter: { filter_tags: ['green'] },
+    });
 
     expect(client.getOrCreateFeed).toHaveBeenCalledTimes(1);
     expect(promise1).toEqual(promise2);
@@ -190,17 +204,17 @@ describe(`getOrCreate`, () => {
     expect(client.getOrCreateFeed).toHaveBeenCalledTimes(2);
   });
 
-  it(`should still throw error if we send two requests at the same time with different config (we will fix this later)`, async () => {
+  it(`should still throw error if we send two requests at the same time with different config (we will fix this later)`, () => {
     feed.getOrCreate({ filter: { filter_tags: ['green'] } });
-    await expect(
+    expect(
       feed.getOrCreate({ filter: { filter_tags: ['blue'] } }),
     ).rejects.toThrow('Only one getOrCreate call is allowed at a time');
   });
 
-  it(`should still throw error if we send getOrCreate and getNextPage at the same time`, async () => {
+  it(`should still throw error if we send getOrCreate and getNextPage at the same time`, () => {
     feed.state.partialNext({ next: 'next' });
     feed.getNextPage();
-    await expect(
+    expect(
       feed.getOrCreate({ filter: { filter_tags: ['green'] } }),
     ).rejects.toThrow('Only one getOrCreate call is allowed at a time');
   });
