@@ -9,7 +9,7 @@ export const deepEqual = (x: any, y: any) => {
   ) {
     if (Object.keys(x).length != Object.keys(y).length) return false;
 
-    for (var prop in x) {
+    for (const prop in x) {
       if (y.hasOwnProperty(prop)) {
         if (!deepEqual(x[prop], y[prop])) return false;
       } else return false;
