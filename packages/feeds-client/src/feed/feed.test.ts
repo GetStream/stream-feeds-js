@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { type Mock } from 'vitest';
 import { FeedsClient } from '../feeds-client';
 import { Feed } from './feed';
 import type { ActivityResponse } from '../gen/models';
