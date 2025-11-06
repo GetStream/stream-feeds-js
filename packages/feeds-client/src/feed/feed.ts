@@ -62,7 +62,7 @@ import type {
 import {
   checkHasAnotherPage,
   Constants,
-  getLogger,
+  feedsLoggerSystem,
   uniqueArrayMerge,
 } from '../utils';
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
@@ -935,10 +935,9 @@ export class Feed extends FeedApi {
     }
 
     if (typeof eventHandler === 'undefined') {
-      getLogger('event-dispatcher').warn(
-        `Received unknown feed event, type: ${event.type}`,
-        event,
-      );
+      feedsLoggerSystem
+        .getLogger('event-dispatcher')
+        .warn(`Received unknown feed event, type: ${event.type}`, event);
     }
 
     this.eventDispatcher.dispatch(event);
