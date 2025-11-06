@@ -1,9 +1,17 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Feed,
   type ActivityResponse,
   type CommentResponse,
-  useComments
+  useComments,
+  Activity,
 } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
@@ -13,20 +21,28 @@ export const DEFAULT_PAGINATION_SORT = 'first' as const;
 
 export const ActivityCommentSection = ({
   activity,
-  feed,
+  feedOrActivity,
 }: {
-  feed: Feed;
+  feedOrActivity: Feed | Activity;
   activity: ActivityResponse;
 }) => {
   const { client } = useUserContext();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const activityOrResponse = useMemo(() => {
+    if ('is_inited' in activity) {
+      return client?.activity(activity.id);
+    }
+
+    return activity;
+  }, [activity, client]);
 
   const {
     comments = [],
     loadNextPage,
     is_loading_next_page: isLoadingNextPage,
     has_next_page: hasNextPage,
-  } = useComments({ feed, parent: activity });
+  } = useComments({ feedOrActivity, parent: activityOrResponse });
 
   const [parent, setParent] = useState<null | CommentResponse>(null);
 
@@ -36,15 +52,15 @@ export const ActivityCommentSection = ({
   }, []);
 
   useEffect(() => {
-    if (comments?.length) return;
+    if (!hasNextPage) return;
 
-    void feed.loadNextPageActivityComments(activity, {
+    void loadNextPage({
       sort: DEFAULT_PAGINATION_SORT,
       limit: 5,
       depth: 5,
       replies_limit: 5,
     });
-  }, [activity, comments, feed]);
+  }, [hasNextPage, loadNextPage]);
 
   const scrollToComment = (comment: CommentResponse) => {
     const element = document.querySelector(`[data-comment-id="${comment.id}"]`);
@@ -144,7 +160,7 @@ export const ActivityCommentSection = ({
           hasNext={hasNextPage}
           renderItem={(c) => (
             <Comment
-              feed={feed}
+              feedOrActivity={feedOrActivity}
               level={0}
               key={c.id}
               setParent={setParentComment}

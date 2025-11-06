@@ -606,7 +606,9 @@ export class Feed extends FeedApi {
     >,
   ) {
     const currentEntityState =
-      this.currentState.comments_by_entity_id[activity.id];
+      this.currentState.comments_by_entity_id[
+        typeof activity === 'string' ? activity : activity.id
+      ];
     const currentPagination = currentEntityState?.pagination;
     const currentNextCursor = currentPagination?.next;
     const currentSort = currentPagination?.sort;

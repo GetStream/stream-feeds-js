@@ -1,4 +1,5 @@
 import {
+  Activity as StreamActivity,
   ActivityResponse,
   Feed,
   FeedOwnCapability,
@@ -16,11 +17,11 @@ import { Poll } from '@/app/components/Poll';
 export const Activity = ({
   activity,
   ownCapabilities,
-  feed,
+  feedOrActivity,
 }: {
-  feed: Feed;
+  feedOrActivity: Feed | StreamActivity;
   activity: ActivityResponse;
-  ownCapabilities: string[];
+  ownCapabilities: readonly FeedOwnCapability[];
 }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const { client, user } = useUserContext();
@@ -219,7 +220,10 @@ export const Activity = ({
       </div>
 
       <Dialog ref={dialogRef}>
-        <ActivityCommentSection feed={feed} activity={activity} />
+        <ActivityCommentSection
+          feedOrActivity={feedOrActivity}
+          activity={activity}
+        />
       </Dialog>
     </>
   );

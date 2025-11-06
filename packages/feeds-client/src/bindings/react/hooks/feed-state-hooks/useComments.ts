@@ -23,7 +23,7 @@ const isActivityOrFeed = (
 const isActivity = (
   activityOrFeed: Activity | Feed,
 ): activityOrFeed is Activity => {
-  return 'feed' in activityOrFeed;
+  return 'subscribeToFeedState' in activityOrFeed;
 };
 
 type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
@@ -49,7 +49,7 @@ export function useComments<T extends CommentParent>(_: {
   parent: Activity;
 }): UseCommentsReturnType<T>;
 export function useComments<T extends CommentParent>(_: {
-  activity: Activity;
+  feedOrActivity: Feed | Activity;
   parent: T;
 }): UseCommentsReturnType<T> | undefined;
 export function useComments<T extends CommentParent>(_: {
@@ -62,24 +62,28 @@ export function useComments<T extends CommentParent>(_: {
 }): UseCommentsReturnType<T> | undefined;
 export function useComments<T extends CommentParent>({
   feed: feedFromProps,
-  activity: activityFromProps,
+  feedOrActivity: feedOrActivityFromProps,
   parent: parentFromProps,
 }: {
   feed?: Feed;
-  activity?: Activity;
+  feedOrActivity?: Feed | Activity;
   /**
    * The parent (activity or comment) for which to fetch comments.
    */
   parent?: T | Activity;
 }) {
-  const activity = activityFromProps ?? useActivityContext();
+  const activityFromContext = useActivityContext();
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
-  const parent = parentFromProps ?? activity;
-  const feedOrActivity = activity ?? feed ?? parent;
+  const parent = parentFromProps ?? activityFromContext;
+  const feedOrActivity = feedOrActivityFromProps ?? feed ?? parent;
 
-  if (!parent || !feedOrActivity || !isActivityOrFeed(feedOrActivity)) {
+  if (!parent) {
     throw new Error('Invalid parent');
+  }
+
+  if (!feedOrActivity || !isActivityOrFeed(feedOrActivity)) {
+    throw new Error('Provide feed or activity or parent');
   }
 
   const selector = useCallback(

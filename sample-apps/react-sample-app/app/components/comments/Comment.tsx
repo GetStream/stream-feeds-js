@@ -1,14 +1,16 @@
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import clsx from 'clsx';
 import type {
   Feed,
-  FeedState,
   CommentResponse,
+  Activity,
+  ActivityResponse,
+  ActivityState,
 } from '@stream-io/feeds-react-sdk';
 import {
   useComments,
-  useStateStore,
   FeedOwnCapability,
+  useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
@@ -17,50 +19,48 @@ import { Reactions } from '../reactions/Reactions';
 
 const levels = ['ml-8', 'ml-16', 'ml-24', 'ml-32', 'ml-40'];
 
+const isActivity = (
+  feedOrActivity: Activity | Feed,
+): feedOrActivity is Activity => {
+  return 'subscribeToFeedState' in feedOrActivity;
+};
+
 export const Comment = ({
   comment,
   setParent,
   level,
-  feed,
+  feedOrActivity,
 }: {
   comment: CommentResponse;
   level: number;
   setParent: (c: CommentResponse) => void;
-  feed: Feed;
+  feedOrActivity: Activity | Feed;
 }) => {
   const { client, user } = useUserContext();
-  const selector = useCallback(
-    (state: FeedState) => ({
-      canEdit:
-        (state.own_capabilities?.includes(FeedOwnCapability.UPDATE_COMMENT) ??
-          false) &&
-        comment.user.id === user?.id,
-      canDelete:
-        (state.own_capabilities?.includes(FeedOwnCapability.DELETE_COMMENT) ??
-          false) &&
-        comment.user.id === user?.id,
-      canAddCommentReaction:
-        state.own_capabilities?.includes(
-          FeedOwnCapability.ADD_COMMENT_REACTION,
-        ) ?? false,
-      canRemoveCommentReaction:
-        state.own_capabilities?.includes(
-          FeedOwnCapability.REMOVE_COMMENT_REACTION,
-        ) ?? false,
-    }),
-    [comment.user.id, user?.id],
+  const feed = isActivity(feedOrActivity)
+    ? feedOrActivity.feed
+    : feedOrActivity;
+  const activity = isActivity(feedOrActivity) ? feedOrActivity : undefined;
+  const ownCapabilities = useOwnCapabilities(feed ? feed : activity!.feed);
+
+  const canEdit =
+    ownCapabilities.includes(FeedOwnCapability.UPDATE_ANY_COMMENT) ||
+    (ownCapabilities.includes(FeedOwnCapability.UPDATE_OWN_COMMENT) &&
+      comment.user.id === user?.id);
+  const canDelete =
+    ownCapabilities.includes(FeedOwnCapability.DELETE_ANY_COMMENT) ||
+    (ownCapabilities.includes(FeedOwnCapability.DELETE_OWN_COMMENT) &&
+      comment.user.id === user?.id);
+  const canAddCommentReaction = ownCapabilities.includes(
+    FeedOwnCapability.ADD_COMMENT_REACTION,
   );
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { canDelete, canEdit, canAddCommentReaction } = useStateStore(
-    feed.state,
-    selector,
-  );
   const {
     comments = [],
     has_next_page: hasNextPage,
     is_loading_next_page: isLoadingNextPage,
     loadNextPage,
-  } = useComments({ feed, parent: comment });
+  } = useComments({ feed, activity, parent: comment });
 
   return (
     <>
@@ -166,7 +166,7 @@ export const Comment = ({
         hasNext={hasNextPage}
         renderItem={(c) => (
           <Comment
-            feed={feed}
+            feedOrActivity={feedOrActivity}
             level={level + 1}
             key={c.id}
             setParent={setParent}

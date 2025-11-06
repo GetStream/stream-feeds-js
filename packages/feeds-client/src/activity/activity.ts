@@ -14,7 +14,12 @@ type GetActivityConfig = {
   >;
 };
 
-export type ActivityState = Partial<ActivityResponse> &
+export type ActivityState = (
+  | (Partial<ActivityResponse> & { is_inited: false })
+  | ({ [key in keyof ActivityResponse]: ActivityResponse[key] } & {
+      is_inited: true;
+    })
+) &
   Pick<FeedState, 'comments_by_entity_id'> & {
     /**
      * True when state is being fetched from API
@@ -42,6 +47,7 @@ export class Activity {
       comments_by_entity_id: {},
       is_loading: false,
       watch: false,
+      is_inited: false,
     });
   }
 
@@ -192,6 +198,7 @@ export class Activity {
             comments_by_entity_id: state.comments_by_entity_id,
             watch: state.watch,
             is_loading: state.is_loading,
+            is_inited: true,
           });
         }
       },
