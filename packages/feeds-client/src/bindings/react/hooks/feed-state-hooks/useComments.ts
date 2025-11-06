@@ -72,11 +72,11 @@ export function useComments<T extends CommentParent>({
    */
   parent?: T | Activity;
 }) {
+  const activity = activityFromProps ?? useActivityContext();
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
-  const activity = activityFromProps ?? useActivityContext();
   const parent = parentFromProps ?? activity;
-  const feedOrActivity = feed ?? activity ?? parent;
+  const feedOrActivity = activity ?? feed ?? parent;
 
   if (!parent || !feedOrActivity || !isActivityOrFeed(feedOrActivity)) {
     throw new Error('Invalid parent');
