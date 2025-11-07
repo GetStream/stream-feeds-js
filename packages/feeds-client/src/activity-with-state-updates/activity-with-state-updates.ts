@@ -1,53 +1,45 @@
 import { StateStore } from '@stream-io/state-store';
-import type { Feed, FeedState } from '../feed';
+import { Feed, type FeedState } from '../feed';
 import type { FeedsClient } from '../feeds-client';
 import type { ActivityResponse } from '../gen/models';
-import { connectActivityToFeed } from '../feeds-client/active-activity';
+import {
+  connectActivityToFeed,
+  isAnyFeedWatched,
+} from '../feeds-client/active-activity';
 import type { GetCommentsRequest } from '@self';
 
 type GetActivityConfig = {
-  watch?: boolean;
-  feed?: string;
-  feedSelector?: (activityResponse: ActivityResponse) => string;
   comments?: Partial<
     Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
   >;
 };
 
-export type ActivityState = (
-  | (Partial<ActivityResponse> & { is_inited: false })
-  | ({ [key in keyof ActivityResponse]: ActivityResponse[key] } & {
-      is_inited: true;
-    })
-) &
-  Pick<FeedState, 'comments_by_entity_id'> & {
+export type ActivityState = { activity?: ActivityResponse } & Pick<
+  FeedState,
+  'comments_by_entity_id'
+> & {
     /**
      * True when state is being fetched from API
      */
     is_loading: boolean;
-    /**
-     * True when the activity is being watched and receives real-time updates
-     */
-    watch: boolean;
     /**
      * @internal
      */
     last_get_request_config?: GetActivityConfig;
   };
 
-export class Activity {
+export class ActivityWithStateUpdates {
   readonly state: StateStore<ActivityState>;
-  public feed: Feed | undefined;
+  protected feed: Feed | undefined;
 
   constructor(
     public readonly id: string,
     private readonly feedsClient: FeedsClient,
   ) {
     this.state = new StateStore<ActivityState>({
+      activity: undefined,
       comments_by_entity_id: {},
       is_loading: false,
-      watch: false,
-      is_inited: false,
     });
   }
 
@@ -62,7 +54,7 @@ export class Activity {
    * @param feedSelector - A function to select the feed from the activity response. Use only if the activity belongs to multiple feeds and you want to specify the feed explicitly.
    */
   async get(request: GetActivityConfig = {}) {
-    const { watch, feed, feedSelector, comments } = request;
+    const { comments } = request;
 
     this.state.partialNext({
       is_loading: true,
@@ -75,21 +67,8 @@ export class Activity {
       })
     ).activity;
 
-    const fid = feedSelector
-      ? feedSelector(activityResponse)
-      : (feed ??
-        activityResponse.current_feed?.feed ??
-        activityResponse.feeds[0]);
-
-    if (!activityResponse.feeds.includes(fid)) {
-      throw new Error(
-        `Activity ${this.id} does not belong to feed ${fid}. Please provide a valid feed parameter.`,
-      );
-    }
-
-    await this.setFeed({
-      fid: fid,
-      watch: watch ?? false,
+    this.setFeed({
+      fid: activityResponse.feeds[0],
       initialState: activityResponse,
     });
 
@@ -102,24 +81,8 @@ export class Activity {
     }
 
     this.subscribeToFeedState();
-  }
 
-  /**
-   * Stop receiving real-time updates for the activity by stopping the watch on the feed the activity belongs to.
-   *
-   * Only call this method if you don't have any component in your application that needs to receive real-time updates for the given feed.
-   *
-   * @returns
-   */
-  stopWatching() {
-    return this.feed?.stopWatching().then(() => {
-      this.state.partialNext({
-        last_get_request_config: {
-          ...this.currentState.last_get_request_config,
-          watch: false,
-        },
-      });
-    });
+    return activityResponse;
   }
 
   loadNextPageActivityComments(
@@ -155,28 +118,21 @@ export class Activity {
    * @internal
    */
   async synchronize() {
-    if (!this.currentState.last_get_request_config?.watch) {
-      return;
-    }
-    if (!this.feed) {
+    const allFids = this.currentState.activity?.feeds ?? [];
+    if (!isAnyFeedWatched.call(this.feedsClient, allFids)) {
       return;
     }
     return this.get(this.currentState.last_get_request_config);
   }
 
-  private async setFeed({
+  private setFeed({
     fid,
-    watch,
     initialState,
   }: {
     fid: string;
-    watch: boolean;
     initialState: ActivityResponse;
   }) {
-    this.feed = await connectActivityToFeed.bind(this.feedsClient)({
-      fid,
-      watch,
-    });
+    this.feed = connectActivityToFeed.call(this.feedsClient, { fid });
 
     this.feed.state.partialNext({
       activities: [initialState],
@@ -188,17 +144,14 @@ export class Activity {
       (state) => ({
         activity: state.activities?.find((activity) => activity.id === this.id),
         comments_by_entity_id: state.comments_by_entity_id,
-        watch: state.watch,
         is_loading: state.is_loading,
       }),
       (state) => {
         if (state.activity) {
           this.state.partialNext({
-            ...state.activity,
+            activity: state.activity,
             comments_by_entity_id: state.comments_by_entity_id,
-            watch: state.watch,
             is_loading: state.is_loading,
-            is_inited: true,
           });
         }
       },

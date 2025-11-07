@@ -96,11 +96,13 @@ describe('Feed watch and unwatch', () => {
       })
     ).activity;
 
-    const activity = client.activity(activityResponse.id);
-    await activity.get({ watch: true });
+    const activity = client.activityWithStateUpdates(activityResponse.id);
+    await activity.get();
+
+    await feed.getOrCreate({ watch: true });
 
     expect(feed.currentState.watch).toBe(true);
-    expect(activity.currentState.watch).toBe(true);
+    expect(activity['feed']?.currentState.watch).toBe(true);
   });
 
   afterAll(async () => {
