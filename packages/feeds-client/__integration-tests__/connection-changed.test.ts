@@ -37,13 +37,13 @@ describe('Connection status change', () => {
       const activityId = crypto.randomUUID();
       const activity = client.activity(activityId);
       const feed = client.feed(feedGroup, crypto.randomUUID());
-      await feed.getOrCreate();
+      await feed.getOrCreate({ watch: shouldWatchIndex(i) });
       await feed.addActivity({
         id: activityId,
         type: 'post',
         text: 'test',
       });
-      await activity.get({ watch: shouldWatchIndex(i) });
+      await activity.get();
       activities.push(activity);
     }
   });
@@ -57,7 +57,7 @@ describe('Connection status change', () => {
 
     for (let i = 0; i < activities.length; i++) {
       const activity = activities[i];
-      expect(activity.currentState.watch).toBe(shouldWatchIndex(i));
+      expect(activity.feed?.currentState.watch).toBe(shouldWatchIndex(i));
     }
 
     client['eventDispatcher'].dispatch({
@@ -70,7 +70,7 @@ describe('Connection status change', () => {
     }
 
     for (const activity of activities) {
-      expect(activity.currentState.watch).toBe(false);
+      expect(activity.feed?.currentState.watch).toBe(false);
     }
 
     const spies = feeds.map((feed) => vi.spyOn(feed, 'getOrCreate'));
@@ -88,11 +88,7 @@ describe('Connection status change', () => {
       const shouldRewatch = shouldWatchIndex(i);
 
       if (shouldRewatch) {
-        expect(spy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            watch: true,
-          }),
-        );
+        expect(spy).toHaveBeenCalled();
       } else {
         expect(spy).not.toHaveBeenCalled();
       }
@@ -103,9 +99,7 @@ describe('Connection status change', () => {
       const shouldRewatch = shouldWatchIndex(i);
 
       if (shouldRewatch) {
-        expect(spy).toHaveBeenCalledWith(
-          expect.objectContaining({ watch: true }),
-        );
+        expect(spy).toHaveBeenCalled();
       } else {
         expect(spy).not.toHaveBeenCalled();
       }

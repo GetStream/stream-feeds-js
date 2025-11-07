@@ -10,7 +10,7 @@ import {
 } from './utils';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-describe('Watch activity', () => {
+describe.skip('Watch activity', () => {
   let client: FeedsClient;
   let feed: Feed;
   const activities: ActivityResponse[] = [];

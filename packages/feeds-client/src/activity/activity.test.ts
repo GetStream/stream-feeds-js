@@ -14,31 +14,6 @@ describe('Activity tests', () => {
     expect(activity.id).toBe('123');
   });
 
-  it(`should save watch state`, async () => {
-    const client = new FeedsClient('mock-api-key');
-    vi.spyOn(client, 'getActivity').mockImplementation(() =>
-      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
-      Promise.resolve({
-        activity: generateActivityResponse({
-          id: '123',
-          feeds: ['user:123'],
-        }),
-      }),
-    );
-    vi.spyOn(client, 'getOrCreateFeed').mockImplementation(() =>
-      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
-      Promise.resolve(),
-    );
-    const activity = new Activity('123', client);
-    await activity.get();
-
-    expect(activity.currentState.watch).toBe(false);
-
-    await activity.get({ watch: true });
-
-    expect(activity.currentState.watch).toBe(true);
-  });
-
   it(`should set is loading to true when initiating get request`, async () => {
     const client = new FeedsClient('mock-api-key');
     const acitivityResponse = generateActivityResponse({
@@ -175,34 +150,7 @@ describe('Activity tests', () => {
     });
   });
 
-  it(`should autoselect current_feed if activity belongs to single feed`, async () => {
-    const client = new FeedsClient('mock-api-key');
-    const feed = generateFeedResponse({
-      feed: 'user:123',
-    });
-    const acitivityResponse = generateActivityResponse({
-      id: 'activity-1',
-      feeds: [feed.feed],
-      current_feed: feed,
-    });
-    vi.spyOn(client, 'getActivity').mockImplementation(() =>
-      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
-      Promise.resolve({
-        activity: acitivityResponse,
-      }),
-    );
-    vi.spyOn(client, 'getOrCreateFeed').mockImplementation(() =>
-      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
-      Promise.resolve(),
-    );
-    const activity = new Activity('activity-1', client);
-
-    await activity.get();
-
-    expect(activity.feed?.feed).toBe(feed.feed);
-  });
-
-  it(`should autoselect first feed if activity belongs to multiple feeds`, async () => {
+  it(`should autoselect first feed and create feed object`, async () => {
     const client = new FeedsClient('mock-api-key');
     const feed = generateFeedResponse({
       feed: 'user:123',
@@ -218,10 +166,7 @@ describe('Activity tests', () => {
         activity: acitivityResponse,
       }),
     );
-    vi.spyOn(client, 'getOrCreateFeed').mockImplementation(() =>
-      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
-      Promise.resolve(),
-    );
+
     const activity = new Activity('activity-1', client);
 
     await activity.get();
@@ -229,40 +174,9 @@ describe('Activity tests', () => {
     expect(activity.feed?.feed).toBe(feed.feed);
   });
 
-  it(`should accept feed selector, if function is provided`, async () => {
+  it(`should synchronize activity state, but only if feed is watched`, async () => {
     const client = new FeedsClient('mock-api-key');
-    const feed = 'user:123';
-    const feed2 = 'user:456';
-    const acitivityResponse = generateActivityResponse({
-      id: 'activity-1',
-      feeds: [feed, feed2],
-      current_feed: undefined,
-    });
-    vi.spyOn(client, 'getActivity').mockImplementation(() =>
-      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
-      Promise.resolve({
-        activity: acitivityResponse,
-      }),
-    );
-    vi.spyOn(client, 'getOrCreateFeed').mockImplementation(() =>
-      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
-      Promise.resolve(),
-    );
-    const activity = new Activity('activity-1', client);
-
-    const spy = vi.fn();
-    spy.mockImplementation(() => feed2);
-    await activity.get({
-      feedSelector: spy,
-    });
-
-    expect(activity.feed?.feed).toBe(feed2);
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy.mock.lastCall?.[0]).toBe(acitivityResponse);
-  });
-
-  it(`should synchronize activity state`, async () => {
-    const client = new FeedsClient('mock-api-key');
+    const feed = client.feed('user', '123');
     const acitivityResponse = generateActivityResponse({
       id: 'activity-1',
       feeds: ['user:123'],
@@ -275,10 +189,7 @@ describe('Activity tests', () => {
           activity: acitivityResponse,
         }),
       );
-    vi.spyOn(client, 'getOrCreateFeed').mockImplementation(() =>
-      // @ts-expect-error - we don't care about the full return value, so type mismatch is fine
-      Promise.resolve(),
-    );
+
     const commentResponse = generateCommentResponse({
       id: 'comment-1',
       object_id: 'activity-1',
@@ -294,10 +205,20 @@ describe('Activity tests', () => {
 
     const spy = vi.fn();
     activity.state.subscribe(spy);
-    await activity.get({ comments: { sort: 'first' }, watch: true });
+    await activity.get({ comments: { sort: 'first' } });
     spy.mockClear();
     activityGetSpy.mockClear();
     commentsSpy.mockClear();
+
+    await activity.synchronize();
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        watch: true,
+      },
+    });
 
     const request = activity.synchronize();
 

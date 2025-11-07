@@ -1,110 +1,55 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { FeedsClient } from './feeds-client';
-import { connectActivityToFeed } from './active-activity';
+import { connectActivityToFeed, isAnyFeedWatched } from './active-activity';
 import { Feed } from '../feed/feed';
 
 describe('active-activity', () => {
   let client: FeedsClient;
-  let watchFeedSpy: ReturnType<typeof vi.spyOn<any, 'getOrCreateFeed'>>;
 
   beforeEach(() => {
     client = new FeedsClient('mock-api-key');
-    watchFeedSpy = vi
-      .spyOn(client, 'getOrCreateFeed')
-      // @ts-expect-error - we don't care about the return value, so type mismatch is fine
-      .mockImplementation(() => Promise.resolve(undefined));
   });
 
-  it('should start watching if watch is true, and feed is not in active feeds', async () => {
-    client['activeFeeds'] = {};
-
-    const fid = 'test:123';
-    const feed = await connectActivityToFeed.bind(client)({
-      fid,
-      watch: true,
-    });
-
-    expect(watchFeedSpy).toHaveBeenCalledWith({
-      feed_group_id: 'test',
-      feed_id: '123',
-      watch: true,
-    });
-
-    expect(feed.currentState.watch).toBe(true);
-  });
-
-  it('should start watching if watch is true, and feed is in active feeds but not watched', async () => {
+  it(`should set watch flag from existing active feed`, () => {
     const fid = 'test:123';
     client['activeFeeds'] = {
-      [fid]: new Feed(client, 'test', '123', undefined, false),
+      [fid]: new Feed(client, 'test', '123', undefined, true),
     };
-    watchFeedSpy = vi
-      .spyOn(client, 'getOrCreateFeed')
-      // @ts-expect-error - we don't care about the return value, so type mismatch is fine
-      .mockImplementation(() => {
-        client['activeFeeds'][fid].currentState.watch = true;
-        return Promise.resolve(undefined);
-      });
 
-    const feed = await connectActivityToFeed.bind(client)({
+    const feed = connectActivityToFeed.bind(client)({
       fid,
-      watch: true,
-    });
-
-    expect(watchFeedSpy).toHaveBeenCalledWith({
-      feed_group_id: 'test',
-      feed_id: '123',
-      watch: true,
     });
 
     expect(feed.currentState.watch).toBe(true);
   });
 
-  it(`should not start watching if watch is false`, async () => {
+  it(`should set watch flag to false if there is no existing active feed`, () => {
+    const fid = 'test:123';
     client['activeFeeds'] = {};
 
-    const fid = 'test:123';
-    const feed = await connectActivityToFeed.bind(client)({
+    const feed = connectActivityToFeed.bind(client)({
       fid,
-      watch: false,
     });
-
-    expect(watchFeedSpy).not.toHaveBeenCalled();
 
     expect(feed.currentState.watch).toBe(false);
   });
 
-  it(`should not start watching if watch is true but feed is in active feeds and already watched`, async () => {
-    const fid = 'test:123';
+  it(`should return true if any of the feeds is watched`, () => {
+    const watchedFeed = new Feed(client, 'test', '123', undefined, true);
+    watchedFeed.state.partialNext({
+      last_get_or_create_request_config: {
+        watch: true,
+      },
+    });
     client['activeFeeds'] = {
-      [fid]: new Feed(client, 'test', '123', undefined, true),
+      'test:123': watchedFeed,
+      'test:456': new Feed(client, 'test', '456', undefined, false),
     };
 
-    const feed = await connectActivityToFeed.bind(client)({
-      fid,
-      watch: true,
-    });
+    expect(isAnyFeedWatched.call(client, ['test:123', 'test:456'])).toBe(true);
 
-    expect(watchFeedSpy).not.toHaveBeenCalled();
-    expect(feed.currentState.watch).toBe(true);
-  });
+    expect(isAnyFeedWatched.call(client, ['test:456', 'test:789'])).toBe(false);
 
-  it(`should not start watching if watch is false, but feed is in active feeds and already watched`, async () => {
-    const fid = 'test:123';
-    client['activeFeeds'] = {
-      [fid]: new Feed(client, 'test', '123', undefined, true),
-    };
-
-    const feed = await connectActivityToFeed.bind(client)({
-      fid,
-      watch: false,
-    });
-
-    expect(watchFeedSpy).not.toHaveBeenCalled();
-    expect(feed.currentState.watch).toBe(true);
-  });
-
-  afterEach(() => {
-    watchFeedSpy.mockRestore();
+    expect(isAnyFeedWatched.call(client, ['test:789'])).toBe(false);
   });
 });
