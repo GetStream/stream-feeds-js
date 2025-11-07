@@ -84,7 +84,8 @@ import {
   type ThrottledGetBatchedOwnCapabilities,
   clearQueuedFeeds,
 } from '../utils/throttling';
-import { Activity } from '../activity/activity';
+import { ActivityWithStateUpdates } from '../activity-with-state-updates/activity-with-state-updates';
+import { getFeed } from '../activity-with-state-updates/get-feed';
 
 export type FeedsClientState = {
   connected_user: OwnUser | undefined;
@@ -110,7 +111,7 @@ export class FeedsClient extends FeedsApi {
 
   private readonly polls_by_id: Map<string, StreamPoll>;
 
-  protected activeActivities: Record<ActivityId, Activity> = {};
+  protected activeActivities: Record<ActivityId, ActivityWithStateUpdates> = {};
   protected activeFeeds: Record<FID, Feed> = {};
 
   private healthyConnectionChangedEventCount = 0;
@@ -180,7 +181,8 @@ export class FeedsClient extends FeedsApi {
           if (typeof fid === 'string') {
             delete this.activeFeeds[fid];
             Object.keys(this.activeActivities).forEach((activityId) => {
-              if (this.activeActivities[activityId].feed?.feed === fid) {
+              const activity = this.activeActivities[activityId];
+              if (getFeed.call(activity)?.feed === fid) {
                 delete this.activeActivities[activityId];
               }
             });
@@ -313,11 +315,11 @@ export class FeedsClient extends FeedsApi {
         if (result.status === 'fulfilled') {
           return [];
         }
+        const activity = activityEntries[index - feedEntries.length]?.[1];
         const feed =
-          feedEntries[index]?.[0] ||
-          activityEntries[index - feedEntries.length][1].feed!.feed;
-        const activityId = activityEntries[index - feedEntries.length]?.[0];
-        return [{ feed, reason: result.reason, activity_id: activityId }];
+          feedEntries[index]?.[0] ?? (activity && getFeed.call(activity)?.feed);
+
+        return [{ feed, reason: result.reason, activity_id: activity?.id }];
       });
 
       this.eventDispatcher.dispatch({
@@ -332,8 +334,8 @@ export class FeedsClient extends FeedsApi {
     return [
       ...Object.values(this.activeFeeds),
       ...Object.values(this.activeActivities)
-        .filter((a) => !!a.feed)
-        .map((a) => a.feed!),
+        .filter((a) => !!getFeed.call(a))
+        .map((a) => getFeed.call(a)!),
     ];
   }
 
@@ -676,10 +678,18 @@ export class FeedsClient extends FeedsApi {
     );
   };
 
-  activity = (id: ActivityId) => {
+  /**
+   * If you want to get an activity with state updates outside of a feed, use this method.
+   *
+   * Usually it's used when you implement an activity details page.
+   *
+   * @param id - The id of the activity
+   * @returns The activity with state updates
+   */
+  activityWithStateUpdates = (id: ActivityId) => {
     let activity = this.activeActivities[id];
     if (!activity) {
-      activity = new Activity(id, this);
+      activity = new ActivityWithStateUpdates(id, this);
       this.activeActivities[id] = activity;
     }
     return activity;
@@ -855,8 +865,8 @@ export class FeedsClient extends FeedsApi {
     return [
       ...Object.values(this.activeFeeds),
       ...Object.values(this.activeActivities)
-        .filter((a) => !!a.feed)
-        .map((a) => a.feed!),
+        .filter((a) => !!getFeed.call(a))
+        .map((a) => getFeed.call(a)!),
     ].filter(
       (feed) =>
         feed.hasActivity(activityId) || feed.hasPinnedActivity(activityId),
@@ -871,8 +881,8 @@ export class FeedsClient extends FeedsApi {
     return [
       ...(activeFeed ? [activeFeed] : []),
       ...Object.values(this.activeActivities)
-        .filter((a) => a.feed?.feed === fid)
-        .map((a) => a.feed!),
+        .filter((a) => getFeed.call(a)?.feed === fid)
+        .map((a) => getFeed.call(a)!),
     ];
   }
 
@@ -897,12 +907,13 @@ export class FeedsClient extends FeedsApi {
     return [
       ...Object.values(this.activeFeeds),
       ...Object.values(this.activeActivities)
-        .filter(
-          (a) =>
-            a.feed?.feed === fid ||
-            (activityId && a.feed?.hasActivity(activityId)),
-        )
-        .map((a) => a.feed!),
+        .filter((a) => {
+          const feed = getFeed.call(a);
+          return (
+            feed?.feed === fid || (activityId && feed?.hasActivity(activityId))
+          );
+        })
+        .map((a) => getFeed.call(a)!),
     ];
   }
 }

@@ -6,22 +6,25 @@ import { useCallback } from 'react';
 
 const stableEmptyArray: readonly FeedOwnCapability[] = [];
 
-export const useOwnCapabilities = (feedFromProps?: Feed) => {
+export const useOwnCapabilities = (feedFromProps?: Feed | string) => {
   const client = useFeedsClient();
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
-  const fid = feed?.feed;
+  const fid = typeof feed === 'string' ? feed : feed?.feed;
 
-  const selector = useCallback((currentState: FeedsClientState) => {
-    if (!fid) {
-      return { feedOwnCapabilities: stableEmptyArray };
-    }
+  const selector = useCallback(
+    (currentState: FeedsClientState) => {
+      if (!fid) {
+        return { feedOwnCapabilities: stableEmptyArray };
+      }
 
-    return {
-      feedOwnCapabilities:
-        currentState.own_capabilities_by_fid[fid] ?? stableEmptyArray,
-    };
-  }, [fid]);
+      return {
+        feedOwnCapabilities:
+          currentState.own_capabilities_by_fid[fid] ?? stableEmptyArray,
+      };
+    },
+    [fid],
+  );
 
   const { feedOwnCapabilities = stableEmptyArray } =
     useStateStore(client?.state, selector) ?? {};

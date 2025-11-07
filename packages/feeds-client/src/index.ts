@@ -7,4 +7,4 @@ export * from './common/types';
 export * from './common/search';
 export * from './common/Poll';
 export * from './utils';
-export * from './activity/activity';
+export * from './activity-with-state-updates/activity-with-state-updates';

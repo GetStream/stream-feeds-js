@@ -5,52 +5,72 @@ import { LoadingIndicator } from '@/app/components/LoadingIndicator';
 import { useParams } from 'next/navigation';
 import { useErrorContext } from '@/app/error-context';
 import {
+  Feed,
   useOwnCapabilities,
   useStateStore,
   type ActivityState,
 } from '@stream-io/feeds-react-sdk';
 import { Activity } from '@/app/components/Activity';
 
-const selector = (nextState: ActivityState) => nextState;
+const selector = (nextState: ActivityState) => ({
+  activity: nextState.activity,
+  isLoading: nextState.is_loading,
+});
 
 export default function ProfilePage() {
   const params = useParams<{ id: string }>();
   const { client } = useUserContext();
-  const { logErrorAndDisplayNotification } = useErrorContext();
+  const { logErrorAndDisplayNotification, logError } = useErrorContext();
 
-  const activity = useMemo(() => {
+  const activityWithStateUpdates = useMemo(() => {
     if (!client) return undefined;
 
-    return client.activity(params.id);
+    return client.activityWithStateUpdates(params.id);
   }, [client]);
 
   useEffect(() => {
-    if (!activity) {
+    if (!activityWithStateUpdates) {
       return;
     }
 
-    activity.get({ watch: true }).catch(logErrorAndDisplayNotification);
+    let feed: Feed | undefined;
+    let shouldStopWatching: boolean = false;
+    activityWithStateUpdates
+      .get()
+      .then((response) => {
+        const fid = response.feeds[0];
+        const [group, id] = fid.split(':')[0];
+        feed = client?.feed(group, id);
+        if (!feed?.currentState.watch) {
+          shouldStopWatching = true;
+          feed?.getOrCreate({ watch: true }).catch(logError);
+        }
+      })
+      .catch(logErrorAndDisplayNotification);
 
     return () => {
-      activity?.stopWatching();
+      if (shouldStopWatching) {
+        feed?.stopWatching();
+      }
     };
-  }, [logErrorAndDisplayNotification, activity, client]);
+  }, [logErrorAndDisplayNotification, activityWithStateUpdates, client]);
 
-  const state = useStateStore(activity?.state, selector) ?? {
-    is_inited: false,
-  };
+  const { activity, isLoading } = useStateStore(
+    activityWithStateUpdates?.state,
+    selector,
+  ) ?? { activity: undefined, isLoading: false };
 
-  const ownCapabilities = useOwnCapabilities(activity?.feed) ?? [];
-
-  if (!activity || !state.is_inited) {
+  if (!activityWithStateUpdates || !isLoading || !activity) {
     return <LoadingIndicator color="blue" />;
   }
+
+  const ownCapabilities = useOwnCapabilities(activity.feeds[0]) ?? [];
 
   return (
     <>
       <Activity
-        activity={state}
-        feedOrActivity={activity}
+        activity={activity}
+        feedOrActivity={activityWithStateUpdates}
         ownCapabilities={ownCapabilities}
       />
     </>

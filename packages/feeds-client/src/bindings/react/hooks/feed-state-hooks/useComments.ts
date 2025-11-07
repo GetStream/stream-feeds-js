@@ -11,18 +11,20 @@ import {
 } from '@self';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
-import type { Activity, ActivityState } from '../../../../activity/activity';
-import { useActivityContext } from '../../contexts/StreamActivityContext';
+import type {
+  ActivityWithStateUpdates,
+  ActivityState,
+} from '../../../../activity-with-state-updates/activity-with-state-updates';
 
 const isActivityOrFeed = (
-  parent: CommentParent | Activity | Feed,
-): parent is Activity | Feed => {
+  parent: CommentParent | ActivityWithStateUpdates | Feed,
+): parent is ActivityWithStateUpdates | Feed => {
   return 'state' in parent;
 };
 
 const isActivity = (
-  activityOrFeed: Activity | Feed,
-): activityOrFeed is Activity => {
+  activityOrFeed: ActivityWithStateUpdates | Feed,
+): activityOrFeed is ActivityWithStateUpdates => {
   return 'subscribeToFeedState' in activityOrFeed;
 };
 
@@ -42,14 +44,11 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   ) => Promise<void>;
 };
 
-export function useComments<
-  T extends CommentParent,
->(_: {}): UseCommentsReturnType<T>;
 export function useComments<T extends CommentParent>(_: {
-  parent: Activity;
+  parent: ActivityWithStateUpdates;
 }): UseCommentsReturnType<T>;
 export function useComments<T extends CommentParent>(_: {
-  feedOrActivity: Feed | Activity;
+  feedOrActivity: Feed | ActivityWithStateUpdates;
   parent: T;
 }): UseCommentsReturnType<T> | undefined;
 export function useComments<T extends CommentParent>(_: {
@@ -66,16 +65,15 @@ export function useComments<T extends CommentParent>({
   parent: parentFromProps,
 }: {
   feed?: Feed;
-  feedOrActivity?: Feed | Activity;
+  feedOrActivity?: Feed | ActivityWithStateUpdates;
   /**
    * The parent (activity or comment) for which to fetch comments.
    */
-  parent?: T | Activity;
+  parent?: T | ActivityWithStateUpdates;
 }) {
-  const activityFromContext = useActivityContext();
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
-  const parent = parentFromProps ?? activityFromContext;
+  const parent = parentFromProps;
   const feedOrActivity = feedOrActivityFromProps ?? feed ?? parent;
 
   if (!parent) {

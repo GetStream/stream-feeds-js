@@ -14,13 +14,10 @@ type GetActivityConfig = {
   >;
 };
 
-export type ActivityState = (
-  | (Partial<ActivityResponse> & { is_inited: false })
-  | ({ [key in keyof ActivityResponse]: ActivityResponse[key] } & {
-      is_inited: true;
-    })
-) &
-  Pick<FeedState, 'comments_by_entity_id'> & {
+export type ActivityState = { activity?: ActivityResponse } & Pick<
+  FeedState,
+  'comments_by_entity_id'
+> & {
     /**
      * True when state is being fetched from API
      */
@@ -31,19 +28,18 @@ export type ActivityState = (
     last_get_request_config?: GetActivityConfig;
   };
 
-export class Activity {
+export class ActivityWithStateUpdates {
   readonly state: StateStore<ActivityState>;
-  public feed: Feed | undefined;
+  protected feed: Feed | undefined;
 
   constructor(
     public readonly id: string,
     private readonly feedsClient: FeedsClient,
   ) {
     this.state = new StateStore<ActivityState>({
+      activity: undefined,
       comments_by_entity_id: {},
       is_loading: false,
-      watch: false,
-      is_inited: false,
     });
   }
 
@@ -85,6 +81,8 @@ export class Activity {
     }
 
     this.subscribeToFeedState();
+
+    return activityResponse;
   }
 
   loadNextPageActivityComments(
@@ -120,7 +118,7 @@ export class Activity {
    * @internal
    */
   async synchronize() {
-    const allFids = this.currentState.feeds ?? [];
+    const allFids = this.currentState.activity?.feeds ?? [];
     if (!isAnyFeedWatched.call(this.feedsClient, allFids)) {
       return;
     }
@@ -151,10 +149,9 @@ export class Activity {
       (state) => {
         if (state.activity) {
           this.state.partialNext({
-            ...state.activity,
+            activity: state.activity,
             comments_by_entity_id: state.comments_by_entity_id,
             is_loading: state.is_loading,
-            is_inited: true,
           });
         }
       },

@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Activity } from './activity';
+import {
+  ActivityState,
+  ActivityWithStateUpdates,
+} from './activity-with-state-updates';
 import { FeedsClient } from '../feeds-client';
 import {
   generateActivityResponse,
@@ -7,9 +10,12 @@ import {
   generateFeedResponse,
 } from '../test-utils';
 
-describe('Activity tests', () => {
+describe('ActivityWithStateUpdates tests', () => {
   it(`should create activity`, async () => {
-    const activity = new Activity('123', new FeedsClient('mock-api-key'));
+    const activity = new ActivityWithStateUpdates(
+      '123',
+      new FeedsClient('mock-api-key'),
+    );
 
     expect(activity.id).toBe('123');
   });
@@ -31,7 +37,7 @@ describe('Activity tests', () => {
       Promise.resolve(),
     );
 
-    const activity = new Activity('123', client);
+    const activity = new ActivityWithStateUpdates('123', client);
 
     const spy = vi.fn();
     activity.state.subscribe(spy);
@@ -65,7 +71,7 @@ describe('Activity tests', () => {
       Promise.resolve(),
     );
 
-    const activity = new Activity('123', client);
+    const activity = new ActivityWithStateUpdates('123', client);
 
     const spy = vi.fn();
     activity.state.subscribe(spy);
@@ -76,13 +82,12 @@ describe('Activity tests', () => {
 
     expect(spy).toHaveBeenCalledTimes(1);
 
-    const param = spy.mock.calls[0][0];
-    expect(param).toStrictEqual({
+    const state = spy.mock.calls[0][0];
+    expect(state).toStrictEqual({
       is_loading: false,
-      watch: false,
       comments_by_entity_id: {},
       last_get_request_config: {},
-      ...acitivityResponse,
+      activity: acitivityResponse,
     });
   });
 
@@ -113,7 +118,7 @@ describe('Activity tests', () => {
         comments: [commentResponse],
       }),
     );
-    const activity = new Activity('activity-1', client);
+    const activity = new ActivityWithStateUpdates('activity-1', client);
 
     const spy = vi.fn();
     activity.state.subscribe(spy);
@@ -145,8 +150,7 @@ describe('Activity tests', () => {
       },
       last_get_request_config: { comments: { sort: 'first' } },
       is_loading: false,
-      watch: false,
-      ...acitivityResponse,
+      activity: acitivityResponse,
     });
   });
 
@@ -167,11 +171,11 @@ describe('Activity tests', () => {
       }),
     );
 
-    const activity = new Activity('activity-1', client);
+    const activity = new ActivityWithStateUpdates('activity-1', client);
 
     await activity.get();
 
-    expect(activity.feed?.feed).toBe(feed.feed);
+    expect(activity['feed']?.feed).toBe(feed.feed);
   });
 
   it(`should synchronize activity state, but only if feed is watched`, async () => {
@@ -201,7 +205,7 @@ describe('Activity tests', () => {
         comments: [commentResponse],
       }),
     );
-    const activity = new Activity('activity-1', client);
+    const activity = new ActivityWithStateUpdates('activity-1', client);
 
     const spy = vi.fn();
     activity.state.subscribe(spy);
