@@ -7,33 +7,16 @@ import {
   type FeedState,
   checkHasAnotherPage,
   isCommentResponse,
-  StateStore,
 } from '@self';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
-import type {
-  ActivityWithStateUpdates,
-  ActivityState,
-} from '../../../../activity-with-state-updates/activity-with-state-updates';
-
-const isActivityOrFeed = (
-  parent: CommentParent | ActivityWithStateUpdates | Feed,
-): parent is ActivityWithStateUpdates | Feed => {
-  return 'state' in parent;
-};
-
-const isActivity = (
-  activityOrFeed: ActivityWithStateUpdates | Feed,
-): activityOrFeed is ActivityWithStateUpdates => {
-  return 'subscribeToFeedState' in activityOrFeed;
-};
 
 type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   comments: NonNullable<
-    (FeedState | ActivityState)['comments_by_entity_id'][T['id']]
+    FeedState['comments_by_entity_id'][T['id']]
   >['comments'];
   comments_pagination: NonNullable<
-    (FeedState | ActivityState)['comments_by_entity_id'][T['id']]
+    FeedState['comments_by_entity_id'][T['id']]
   >['pagination'];
   has_next_page: boolean;
   is_loading_next_page: boolean;
@@ -44,13 +27,10 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   ) => Promise<void>;
 };
 
-export function useComments<T extends CommentParent>(_: {
-  parent: ActivityWithStateUpdates;
-}): UseCommentsReturnType<T>;
-export function useComments<T extends CommentParent>(_: {
-  feedOrActivity: Feed | ActivityWithStateUpdates;
-  parent: T;
-}): UseCommentsReturnType<T> | undefined;
+/**
+ * @deprecated Use `useActivityComments` instead.
+ * @param
+ */
 export function useComments<T extends CommentParent>(_: {
   feed: Feed;
   parent: T;
@@ -61,62 +41,40 @@ export function useComments<T extends CommentParent>(_: {
 }): UseCommentsReturnType<T> | undefined;
 export function useComments<T extends CommentParent>({
   feed: feedFromProps,
-  feedOrActivity: feedOrActivityFromProps,
-  parent: parentFromProps,
+  parent,
 }: {
   feed?: Feed;
-  feedOrActivity?: Feed | ActivityWithStateUpdates;
   /**
    * The parent (activity or comment) for which to fetch comments.
    */
-  parent?: T | ActivityWithStateUpdates;
+  parent: T;
 }) {
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
-  const parent = parentFromProps;
-  const feedOrActivity = feedOrActivityFromProps ?? feed ?? parent;
-
-  if (!parent) {
-    throw new Error('Invalid parent');
-  }
-
-  if (!feedOrActivity || !isActivityOrFeed(feedOrActivity)) {
-    throw new Error('Provide feed or activity or parent');
-  }
 
   const selector = useCallback(
-    (state: FeedState | ActivityState) => ({
+    (state: FeedState) => ({
       comments: state.comments_by_entity_id?.[parent.id]?.comments,
       comments_pagination: state.comments_by_entity_id?.[parent.id]?.pagination,
     }),
     [parent.id],
   );
 
-  const data = useStateStore(
-    feedOrActivity.state as StateStore<FeedState | ActivityState>,
-    selector,
-  );
+  const data = useStateStore(feed?.state, selector);
 
   const loadNextPage = useMemo<
     UseCommentsReturnType<T>['loadNextPage'] | undefined
   >(() => {
-    if (!feedOrActivity) return undefined;
+    if (!feed) return undefined;
 
     return (request) => {
       if (isCommentResponse(parent)) {
-        return feedOrActivity.loadNextPageCommentReplies(parent, request);
+        return feed.loadNextPageCommentReplies(parent, request);
       } else {
-        if (isActivity(feedOrActivity)) {
-          return feedOrActivity.loadNextPageActivityComments(request);
-        } else {
-          return feedOrActivity.loadNextPageActivityComments(
-            parent.id,
-            request,
-          );
-        }
+        return feed.loadNextPageActivityComments(parent, request);
       }
     };
-  }, [feedOrActivity, parent]);
+  }, [feed, parent]);
 
   return useMemo(() => {
     if (!data) {
