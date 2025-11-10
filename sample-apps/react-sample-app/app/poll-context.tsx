@@ -1,6 +1,10 @@
 'use client';
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
-import type { ActivityResponse, Poll, StreamPoll } from '@stream-io/feeds-react-sdk';
+import type {
+  ActivityResponse,
+  PollResponseData,
+  StreamPoll,
+} from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 
 type PollContextValue = {
@@ -10,7 +14,7 @@ type PollContextValue = {
 
 type PollContextProps = {
   activity: ActivityResponse;
-  poll: Poll;
+  poll: PollResponseData;
 };
 
 const PollContext = createContext<PollContextValue | undefined>(undefined);

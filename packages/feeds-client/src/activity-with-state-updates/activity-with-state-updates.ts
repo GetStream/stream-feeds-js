@@ -71,6 +71,8 @@ export class ActivityWithStateUpdates {
       })
     ).activity;
 
+    this.feedsClient.hydratePollCache([activityResponse]);
+
     this.setFeed({
       // We set feed to first containing feed
       // But in WS event handler we match events by activity id, so as long as any of the containg feeds are watched, we'll do a state update

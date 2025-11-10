@@ -69,14 +69,16 @@ export const ActivitySearchResultItem = ({
   item,
 }: ActivitySearchResultItemProps) => {
   return (
-    <button
-      className="text-left flex gap-2 p-1 items-center rounded-md hover:bg-slate-100"
-      data-testid="search-result-activity"
-      role="option"
-    >
-      <div className="">{item.text}</div>
-      <div></div>
-    </button>
+    <Link href={`/activity/${item.id}`}>
+      <button
+        className="text-left flex gap-2 p-1 items-center rounded-md hover:bg-slate-100"
+        data-testid="search-result-activity"
+        role="option"
+      >
+        <div className="">{item.text}</div>
+        <div></div>
+      </button>
+    </Link>
   );
 };
 

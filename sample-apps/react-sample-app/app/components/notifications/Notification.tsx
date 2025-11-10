@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import type { AggregatedActivityResponse } from '@stream-io/feeds-react-sdk';
+import Link from 'next/link';
+import { useUserContext } from '@/app/user-context';
 
 export const Notification = ({
   group,
@@ -12,15 +14,21 @@ export const Notification = ({
   isSeen: boolean;
   onMarkRead: () => {};
 }) => {
+  const { user } = useUserContext();
   const notification = useMemo(() => {
     const verb = group.activities[0].type;
 
     const targetActivity = group.activities[0].notification_context?.target;
+    const trigger = group.activities[0].notification_context?.trigger;
     const notification = {
       text: '',
       image: targetActivity?.text
         ? undefined
         : targetActivity?.attachments?.[0]?.image_url,
+      link:
+        trigger?.type === 'follow'
+          ? `/users/${user?.id}`
+          : `/activity/${targetActivity?.id}`,
     };
 
     const targetActivityTruncatedText = targetActivity?.text
@@ -67,32 +75,34 @@ export const Notification = ({
     }
 
     return notification;
-  }, [group]);
+  }, [group, user?.id]);
 
   return (
-    <div className="flex items-center justify-between gap-1">
-      {notification.text && <div>{notification.text}</div>}
-      {notification.image && (
-        <img
-          src={notification.image}
-          alt="Notification image"
-          width={40}
-          height={40}
-        />
-      )}
-      <div className="flex items-center gap-1.5">
-        {!isRead && (
-          <button
-            className="w-max px-1 py-0.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-            onClick={onMarkRead}
-          >
-            Mark read
-          </button>
+    <Link href={notification.link}>
+      <div className="flex items-center justify-between gap-1">
+        {notification.text && <div>{notification.text}</div>}
+        {notification.image && (
+          <img
+            src={notification.image}
+            alt="Notification image"
+            width={40}
+            height={40}
+          />
         )}
-        {!isSeen && (
-          <div className="absolute right-1 rounded-full w-2 h-2 bg-blue-500" />
-        )}
+        <div className="flex items-center gap-1.5">
+          {!isRead && (
+            <button
+              className="w-max px-1 py-0.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+              onClick={onMarkRead}
+            >
+              Mark read
+            </button>
+          )}
+          {!isSeen && (
+            <div className="absolute right-1 rounded-full w-2 h-2 bg-blue-500" />
+          )}
+        </div>
       </div>
-    </div>
+    </Link>
   );
 };
