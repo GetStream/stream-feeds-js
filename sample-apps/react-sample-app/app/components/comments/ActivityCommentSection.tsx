@@ -1,17 +1,10 @@
-import {
-  FormEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Feed,
   type ActivityResponse,
   type CommentResponse,
-  useComments,
-  Activity,
+  ActivityWithStateUpdates,
+  useActivityComments,
 } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
@@ -20,29 +13,26 @@ import { Comment } from './Comment';
 export const DEFAULT_PAGINATION_SORT = 'first' as const;
 
 export const ActivityCommentSection = ({
+  feed,
+  activityWithStateUpdates,
   activity,
-  feedOrActivity,
 }: {
-  feedOrActivity: Feed | Activity;
+  feed?: Feed;
+  activityWithStateUpdates?: ActivityWithStateUpdates;
   activity: ActivityResponse;
 }) => {
   const { client } = useUserContext();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  const activityOrResponse = useMemo(() => {
-    if ('is_inited' in activity) {
-      return client?.activity(activity.id);
-    }
-
-    return activity;
-  }, [activity, client]);
 
   const {
     comments = [],
     loadNextPage,
     is_loading_next_page: isLoadingNextPage,
     has_next_page: hasNextPage,
-  } = useComments({ feedOrActivity, parent: activityOrResponse });
+  } = useActivityComments({
+    feed,
+    activity: activityWithStateUpdates ?? activity,
+  });
 
   const [parent, setParent] = useState<null | CommentResponse>(null);
 
@@ -160,7 +150,8 @@ export const ActivityCommentSection = ({
           hasNext={hasNextPage}
           renderItem={(c) => (
             <Comment
-              feedOrActivity={feedOrActivity}
+              feed={feed}
+              activityWithStateUpdates={activityWithStateUpdates}
               level={0}
               key={c.id}
               setParent={setParentComment}

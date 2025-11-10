@@ -5,9 +5,9 @@ import {
   type Feed,
   type FeedState,
   checkHasAnotherPage,
-  ActivityWithStateUpdates,
+  type ActivityWithStateUpdates,
   type ActivityState,
-  StateStore,
+  type StateStore,
 } from '@self';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
@@ -52,6 +52,11 @@ export function useActivityComments(_: {
   activity: ActivityWithStateUpdates;
   parentComment: CommentResponse;
 }): UseCommentsReturnType<CommentResponse>;
+export function useActivityComments(_: {
+  feed?: Feed;
+  activity?: ActivityResponse | ActivityWithStateUpdates;
+  parentComment?: CommentResponse;
+}): UseCommentsReturnType<ActivityResponse | CommentResponse>;
 export function useActivityComments({
   feed: feedFromProps,
   parentComment,
@@ -61,7 +66,8 @@ export function useActivityComments({
   parentComment?: CommentResponse;
   activity?: ActivityResponse | ActivityWithStateUpdates;
 }) {
-  const feed = feedFromProps ?? useFeedContext();
+  const feedFromContext = useFeedContext();
+  const feed = feedFromProps ?? feedFromContext;
   const feedOrActivity = feed ?? activity;
 
   if (!feedOrActivity) {
@@ -72,7 +78,11 @@ export function useActivityComments({
     throw new Error('Feed or activity does not support loading comments');
   }
 
-  const entityId = activity?.id ?? parentComment?.id ?? '';
+  if (!(activity || parentComment)) {
+    throw new Error('Activity or parent comment is required');
+  }
+
+  const entityId = parentComment?.id ?? activity?.id ?? '';
   const selector = useCallback(
     (state: FeedState | ActivityState) => ({
       comments: state.comments_by_entity_id?.[entityId]?.comments,
@@ -90,24 +100,27 @@ export function useActivityComments({
     | UseCommentsReturnType<ActivityResponse | CommentResponse>['loadNextPage']
     | undefined
   >(() => {
-    if (!feed) return undefined;
+    if (!(activity || parentComment)) {
+      return undefined;
+    }
 
     return (request) => {
-      if (activity) {
-        return feedOrActivity.loadNextPageActivityComments(
-          activity?.id,
-          request,
-        );
-      } else if (parentComment) {
+      if (parentComment) {
         return feedOrActivity.loadNextPageCommentReplies(
           parentComment,
           request,
         );
       } else {
-        throw new Error('Activity or parent comment is required');
+        if (activity && canLoadComments(activity)) {
+          return activity.loadNextPageActivityComments(request);
+        } else if (feed) {
+          return feed.loadNextPageActivityComments(activity?.id ?? '', request);
+        } else {
+          throw new Error('Activity or feed is required');
+        }
       }
     };
-  }, [feed, parent]);
+  }, [feedOrActivity, feed, parentComment, activity]);
 
   return useMemo(() => {
     if (!data) {

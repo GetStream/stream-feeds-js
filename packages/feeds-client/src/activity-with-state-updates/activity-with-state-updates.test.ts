@@ -1,8 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  ActivityState,
-  ActivityWithStateUpdates,
-} from './activity-with-state-updates';
+import { ActivityWithStateUpdates } from './activity-with-state-updates';
 import { FeedsClient } from '../feeds-client';
 import {
   generateActivityResponse,

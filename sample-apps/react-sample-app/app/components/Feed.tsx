@@ -4,12 +4,14 @@ import {
   useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
 import { useState } from 'react';
-import { Activity } from './Activity';
+import { Activity } from './activity/Activity';
 import { PaginatedList } from './PaginatedList';
 import { useStateStore } from '@stream-io/feeds-react-sdk';
+import { useUserContext } from '../user-context';
 
 export const Feed = ({ feed }: { feed: StreamFeed }) => {
   const [error, setError] = useState<Error>();
+  const { client } = useUserContext();
 
   const { hasNextPage, isLoading, activities } = useStateStore(
     feed.state,
@@ -20,7 +22,7 @@ export const Feed = ({ feed }: { feed: StreamFeed }) => {
     }),
   );
 
-  const ownCapabilities = useOwnCapabilities(feed);
+  const ownCapabilities = useOwnCapabilities({ feed, client });
 
   const getNextPage = () => {
     setError(undefined);
@@ -29,9 +31,9 @@ export const Feed = ({ feed }: { feed: StreamFeed }) => {
 
   const renderItem = (activity: ActivityResponse) => {
     return (
-      <li className="w-full">
+      <li className="w-full" key={activity.id}>
         <Activity
-          feedOrActivity={feed}
+          feed={feed}
           activity={activity}
           ownCapabilities={ownCapabilities}
         />

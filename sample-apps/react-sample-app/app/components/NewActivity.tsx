@@ -6,7 +6,7 @@ import {
 } from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
 import { FormEvent, useState } from 'react';
-import { ActivityComposer } from './ActivityComposer';
+import { ActivityComposer } from './activity/ActivityComposer';
 import { LoadingIndicator } from './LoadingIndicator';
 import { useUserContext } from '../user-context';
 

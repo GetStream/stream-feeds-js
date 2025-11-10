@@ -1,5 +1,5 @@
 import { StateStore } from '@stream-io/state-store';
-import { Feed, type FeedState } from '../feed';
+import type { Feed, FeedState } from '../feed';
 import type { FeedsClient } from '../feeds-client';
 import type { ActivityResponse } from '../gen/models';
 import {
@@ -47,6 +47,10 @@ export class ActivityWithStateUpdates {
     return this.state.getLatestValue();
   }
 
+  get feeds() {
+    return this.currentState.activity?.feeds ?? [];
+  }
+
   /**
    * Fetch activity and load it into state
    * @param watch - Whether to watch the feed the activity belongs to for real-time updates
@@ -68,6 +72,9 @@ export class ActivityWithStateUpdates {
     ).activity;
 
     this.setFeed({
+      // We set feed to first containing feed
+      // But in WS event handler we match events by activity id, so as long as any of the containg feeds are watched, we'll do a state update
+      // This is a bit hacky, proper solution would be to refactor all activity event handlers and detach them from feed instance
       fid: activityResponse.feeds[0],
       initialState: activityResponse,
     });
@@ -144,14 +151,13 @@ export class ActivityWithStateUpdates {
       (state) => ({
         activity: state.activities?.find((activity) => activity.id === this.id),
         comments_by_entity_id: state.comments_by_entity_id,
-        is_loading: state.is_loading,
       }),
       (state) => {
         if (state.activity) {
           this.state.partialNext({
             activity: state.activity,
             comments_by_entity_id: state.comments_by_entity_id,
-            is_loading: state.is_loading,
+            is_loading: false,
           });
         }
       },

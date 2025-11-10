@@ -24,7 +24,7 @@ export function connectActivityToFeed(
 }
 
 export function isAnyFeedWatched(this: FeedsClient, fids: string[]) {
-  for (let fid of fids) {
+  for (const fid of fids) {
     const feed = this.activeFeeds[fid];
     if (feed && feed.currentState.last_get_or_create_request_config?.watch) {
       return true;

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { FeedsClient } from './feeds-client';
 import { connectActivityToFeed, isAnyFeedWatched } from './active-activity';
 import { Feed } from '../feed/feed';

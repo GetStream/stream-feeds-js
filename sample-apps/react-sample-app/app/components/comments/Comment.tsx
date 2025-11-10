@@ -1,15 +1,13 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import clsx from 'clsx';
 import type {
   Feed,
   CommentResponse,
-  Activity,
-  ActivityResponse,
-  ActivityState,
+  ActivityWithStateUpdates,
 } from '@stream-io/feeds-react-sdk';
 import {
-  useComments,
   FeedOwnCapability,
+  useActivityComments,
   useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
@@ -19,29 +17,26 @@ import { Reactions } from '../reactions/Reactions';
 
 const levels = ['ml-8', 'ml-16', 'ml-24', 'ml-32', 'ml-40'];
 
-const isActivity = (
-  feedOrActivity: Activity | Feed,
-): feedOrActivity is Activity => {
-  return 'subscribeToFeedState' in feedOrActivity;
-};
-
 export const Comment = ({
   comment,
   setParent,
   level,
-  feedOrActivity,
+  feed,
+  activityWithStateUpdates,
 }: {
   comment: CommentResponse;
   level: number;
   setParent: (c: CommentResponse) => void;
-  feedOrActivity: Activity | Feed;
+  feed?: Feed;
+  activityWithStateUpdates?: ActivityWithStateUpdates;
 }) => {
   const { client, user } = useUserContext();
-  const feed = isActivity(feedOrActivity)
-    ? feedOrActivity.feed
-    : feedOrActivity;
-  const activity = isActivity(feedOrActivity) ? feedOrActivity : undefined;
-  const ownCapabilities = useOwnCapabilities(feed ? feed : activity!.feed);
+
+  const fid = useMemo(() => {
+    return feed?.feed ?? activityWithStateUpdates?.feeds[0];
+  }, [feed, activityWithStateUpdates]);
+
+  const ownCapabilities = useOwnCapabilities({ feed: fid, client });
 
   const canEdit =
     ownCapabilities.includes(FeedOwnCapability.UPDATE_ANY_COMMENT) ||
@@ -60,7 +55,11 @@ export const Comment = ({
     has_next_page: hasNextPage,
     is_loading_next_page: isLoadingNextPage,
     loadNextPage,
-  } = useComments({ feed, activity, parent: comment });
+  } = useActivityComments({
+    feed,
+    activity: activityWithStateUpdates,
+    parentComment: comment,
+  });
 
   return (
     <>
@@ -166,7 +165,8 @@ export const Comment = ({
         hasNext={hasNextPage}
         renderItem={(c) => (
           <Comment
-            feedOrActivity={feedOrActivity}
+            feed={feed}
+            activityWithStateUpdates={activityWithStateUpdates}
             level={level + 1}
             key={c.id}
             setParent={setParent}
