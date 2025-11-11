@@ -87,7 +87,7 @@ export class ActivityWithStateUpdates {
 
     this.setFeed({
       // We set feed to first containing feed
-      // But in WS event handler we match events by activity id, so as long as any of the containg feeds are watched, we'll do a state update
+      // But in WS event handler we match events by any of the containing feeds, so as long as any of the containing feeds are watched, we'll do a state update
       // This is a bit hacky, proper solution would be to refactor all activity event handlers and detach them from feed instance
       fid: activityResponse.feeds[0],
       initialState: activityResponse,
