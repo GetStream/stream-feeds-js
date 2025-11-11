@@ -33,3 +33,10 @@ export function isAnyFeedWatched(this: FeedsClient, fids: string[]) {
 
   return false;
 }
+
+export function disconnectActivityFromFeed(this: FeedsClient, id: string) {
+  const activeFeed = this.activeActivities[id];
+  if (activeFeed) {
+    delete this.activeActivities[id];
+  }
+}

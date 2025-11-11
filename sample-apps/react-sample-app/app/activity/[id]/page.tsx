@@ -77,6 +77,7 @@ function ActivityPageContent() {
       .catch(logErrorAndDisplayNotification);
 
     return () => {
+      activityWithStateUpdates?.disconnect();
       if (shouldStopWatching) {
         feed?.stopWatching();
       }

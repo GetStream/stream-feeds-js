@@ -4,6 +4,7 @@ import type { FeedsClient } from '../feeds-client';
 import type { ActivityResponse } from '../gen/models';
 import {
   connectActivityToFeed,
+  disconnectActivityFromFeed,
   isAnyFeedWatched,
 } from '../feeds-client/active-activity';
 import type { GetCommentsRequest } from '@self';
@@ -135,6 +136,12 @@ export class ActivityWithStateUpdates {
       throw new Error('Initialize activity first');
     }
     return this.feed.loadNextPageCommentReplies(...params);
+  }
+
+  disconnect() {
+    console.log('itt - disconnect - disconnectActivityFromFeed', this.id);
+    this.unsubscribeFromFeedState?.();
+    disconnectActivityFromFeed.call(this.feedsClient, this.id);
   }
 
   /**
