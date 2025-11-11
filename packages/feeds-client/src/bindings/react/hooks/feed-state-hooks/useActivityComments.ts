@@ -95,7 +95,7 @@ export function useActivityComments({
         }
       }
     },
-    [feedOrActivity, feed, parentComment?.id, activity?.id],
+    [feedOrActivity, feed, parentComment, activity],
   );
 
   return useMemo(() => {
