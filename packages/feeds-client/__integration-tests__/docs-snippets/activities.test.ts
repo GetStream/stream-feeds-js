@@ -51,6 +51,23 @@ describe('Activities page', () => {
     });
   });
 
+  it(`sharing activities`, async () => {
+    const activityToShare = (
+      await feed.addActivity({
+        type: 'post',
+        text: 'Very interesting activity',
+      })
+    ).activity;
+
+    const response = await feed.addActivity({
+      type: 'post',
+      text: `Couldn't agree more!`,
+      parent_id: activityToShare.id,
+    });
+
+    console.log(response.activity?.parent);
+  });
+
   it('restricted visibility', async () => {
     const response = await feed.addActivity({
       type: 'post',

@@ -1,5 +1,6 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import type {
+  ActivityAddedEvent,
   ActivityResponse,
   AddCommentReactionRequest,
   AddCommentReactionResponse,
@@ -72,7 +73,7 @@ import {
   UnhandledErrorType,
 } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
-import { configureLoggers } from '../utils';
+import { feedsLoggerSystem } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 import {
   throttle,
@@ -137,7 +138,7 @@ export class FeedsClient extends FeedsApi {
       options?.query_batch_own_capabilties_throttling_interval ??
       DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL;
 
-    configureLoggers(options?.configure_loggers_options);
+    feedsLoggerSystem.configureLoggers(options?.configure_loggers_options);
 
     this.on('all', (event) => {
       const fid = event.fid;
@@ -236,7 +237,14 @@ export class FeedsClient extends FeedsApi {
         case 'feeds.bookmark.updated': {
           const activityId = event.bookmark.activity.id;
           // TODO: find faster way later on
-          const feeds = this.findActiveFeedByActivityId(activityId);
+          const feeds = this.findActiveFeedsByActivityId(activityId);
+          feeds.forEach((f) => f.handleWSEvent(event));
+
+          break;
+        }
+        case 'feeds.activity.feedback': {
+          const activityId = event.activity_feedback.activity_id;
+          const feeds = this.findActiveFeedsByActivityId(activityId);
           feeds.forEach((f) => f.handleWSEvent(event));
 
           break;
@@ -612,10 +620,22 @@ export class FeedsClient extends FeedsApi {
   on = this.eventDispatcher.on;
   off = this.eventDispatcher.off;
 
+  /**
+   *
+   * @param groupId for example `user`, `notification` or id of a custom feed group
+   * @param id
+   * @param options
+   * @param options.addNewActivitiesTo - when a new activity is received from a WebSocket event by default it's added to the start of the list. You can change this to `end` to add it to the end of the list. Useful for story feeds.
+   * @param options.activityAddedEventFilter - a callback that is called when a new activity is received from a WebSocket event. You can use this to prevent the activity from being added to the feed. Useful for feed filtering, or if you don't want new activities to be added to the feed.
+   * @returns
+   */
   feed = (
     groupId: string,
     id: string,
-    options?: { addNewActivitiesTo?: 'start' | 'end' },
+    options?: {
+      addNewActivitiesTo?: 'start' | 'end';
+      activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
+    },
   ) => {
     return this.getOrCreateActiveFeed(
       groupId,
@@ -623,6 +643,7 @@ export class FeedsClient extends FeedsApi {
       undefined,
       undefined,
       options?.addNewActivitiesTo,
+      options?.activityAddedEventFilter,
     );
   };
 
@@ -754,6 +775,7 @@ export class FeedsClient extends FeedsApi {
     data?: FeedResponse,
     watch?: boolean,
     addNewActivitiesTo?: 'start' | 'end',
+    activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean,
   ) => {
     const fid = `${group}:${id}`;
 
@@ -765,6 +787,7 @@ export class FeedsClient extends FeedsApi {
         data,
         watch,
         addNewActivitiesTo,
+        activityAddedEventFilter,
       );
     }
 
@@ -779,11 +802,10 @@ export class FeedsClient extends FeedsApi {
     return feed;
   };
 
-  private findActiveFeedByActivityId(activityId: string) {
-    return Object.values(this.activeFeeds).filter((feed) =>
-      feed.currentState.activities?.some(
-        (activity) => activity.id === activityId,
-      ),
+  private findActiveFeedsByActivityId(activityId: string) {
+    return Object.values(this.activeFeeds).filter(
+      (feed) =>
+        feed.hasActivity(activityId) || feed.hasPinnedActivity(activityId),
     );
   }
 }

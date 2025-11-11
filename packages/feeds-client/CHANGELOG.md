@@ -2,6 +2,89 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.6](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.5...@stream-io/feeds-client-0.3.6) (2025-11-05)
+
+
+### Bug Fixes
+
+* don't throw error if getOrCreate is called twice with same config ([#160](https://github.com/GetStream/stream-feeds-js/issues/160)) ([200ade9](https://github.com/GetStream/stream-feeds-js/commit/200ade940691c64101d41375ce675139858e8409))
+
+## [0.3.5](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.4...@stream-io/feeds-client-0.3.5) (2025-11-04)
+
+
+### Features
+
+* Migrate to instance-based logger ([#159](https://github.com/GetStream/stream-feeds-js/issues/159)) ([f2854e0](https://github.com/GetStream/stream-feeds-js/commit/f2854e090da8526f87f89bccd95659de6d2a5069))
+
+## [0.3.4](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.3...@stream-io/feeds-client-0.3.4) (2025-11-04)
+
+
+### Bug Fixes
+
+* forward all relevant config options from getOrCreate in getNextPage ([#158](https://github.com/GetStream/stream-feeds-js/issues/158)) ([a6216a8](https://github.com/GetStream/stream-feeds-js/commit/a6216a83d26f7045e8fcc38b6ff142e5bc75f7e6))
+* getNextPage returns undefined if there is no more page to fetch ([#157](https://github.com/GetStream/stream-feeds-js/issues/157)) ([7bf9093](https://github.com/GetStream/stream-feeds-js/commit/7bf90938585032aec9160b6f07885dd5a681953f))
+
+## [0.3.3](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.2...@stream-io/feeds-client-0.3.3) (2025-10-31)
+
+
+### Features
+
+* client-side features to support reading feeds with filter ([#155](https://github.com/GetStream/stream-feeds-js/issues/155)) ([8552de1](https://github.com/GetStream/stream-feeds-js/commit/8552de1566560b436b1e62189f0497f8d14fe57f))
+
+
+### Bug Fixes
+
+* check pinned activities as well when updating from user events ([#153](https://github.com/GetStream/stream-feeds-js/issues/153)) ([d895b94](https://github.com/GetStream/stream-feeds-js/commit/d895b94544eaf58d94467e02f12fce0c5f2f620e))
+
+## [0.3.2](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.1...@stream-io/feeds-client-0.3.2) (2025-10-30)
+
+
+* add new docs snippet tests ([35c888d](https://github.com/GetStream/stream-feeds-js/commit/35c888d4f0f55a14e7df55a3bc1e7c28acc04130))
+
+
+### Features
+
+* [FEEDS-702] Gen new openapi spec for restrict replies field ([#152](https://github.com/GetStream/stream-feeds-js/issues/152)) ([2ebb6fb](https://github.com/GetStream/stream-feeds-js/commit/2ebb6fb0dffd18ad65e39f479924a19cdeb488b5))
+
+## [0.3.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.0...@stream-io/feeds-client-0.3.1) (2025-10-30)
+
+
+* **@stream-io/feeds-client:** release version 0.3.1 ([a824636](https://github.com/GetStream/stream-feeds-js/commit/a82463672e03f03dd7318d3c7b7cf91bd5de0a96))
+* **@stream-io/feeds-client:** release version 0.3.1 ([1fbc6fd](https://github.com/GetStream/stream-feeds-js/commit/1fbc6fd1ddd71c83a2a285249b234005a851fcf2))
+* add docs test for update partial ([c4b3d73](https://github.com/GetStream/stream-feeds-js/commit/c4b3d739ff5e88dc288fb95f67f09732a95d2c37))
+* add sharing activity snippet ([fb4db2d](https://github.com/GetStream/stream-feeds-js/commit/fb4db2d2aaf9422830defbdb54fb34f0c72f145f))
+* reenable failing tests ([8c3a02a](https://github.com/GetStream/stream-feeds-js/commit/8c3a02adbe566c3e44a28d57cda1a2a23fe94589))
+
+
+### Features
+
+* activity feedback event handler; follow suggestion API changes ([#150](https://github.com/GetStream/stream-feeds-js/issues/150)) ([65f4d3e](https://github.com/GetStream/stream-feeds-js/commit/65f4d3edde3c6e5a96d5b5bd87d95bab83cde6ef))
+
+## [0.3.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.0...@stream-io/feeds-client-0.3.1) (2025-10-30)
+
+
+* **@stream-io/feeds-client:** release version 0.3.1 ([1fbc6fd](https://github.com/GetStream/stream-feeds-js/commit/1fbc6fd1ddd71c83a2a285249b234005a851fcf2))
+* add docs test for update partial ([c4b3d73](https://github.com/GetStream/stream-feeds-js/commit/c4b3d739ff5e88dc288fb95f67f09732a95d2c37))
+* add sharing activity snippet ([fb4db2d](https://github.com/GetStream/stream-feeds-js/commit/fb4db2d2aaf9422830defbdb54fb34f0c72f145f))
+* reenable failing tests ([8c3a02a](https://github.com/GetStream/stream-feeds-js/commit/8c3a02adbe566c3e44a28d57cda1a2a23fe94589))
+
+
+### Features
+
+* activity feedback event handler; follow suggestion API changes ([#150](https://github.com/GetStream/stream-feeds-js/issues/150)) ([65f4d3e](https://github.com/GetStream/stream-feeds-js/commit/65f4d3edde3c6e5a96d5b5bd87d95bab83cde6ef))
+
+## [0.3.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.0...@stream-io/feeds-client-0.3.1) (2025-10-30)
+
+
+* add docs test for update partial ([c4b3d73](https://github.com/GetStream/stream-feeds-js/commit/c4b3d739ff5e88dc288fb95f67f09732a95d2c37))
+* add sharing activity snippet ([fb4db2d](https://github.com/GetStream/stream-feeds-js/commit/fb4db2d2aaf9422830defbdb54fb34f0c72f145f))
+* reenable failing tests ([8c3a02a](https://github.com/GetStream/stream-feeds-js/commit/8c3a02adbe566c3e44a28d57cda1a2a23fe94589))
+
+
+### Features
+
+* activity feedback event handler; follow suggestion API changes ([#150](https://github.com/GetStream/stream-feeds-js/issues/150)) ([65f4d3e](https://github.com/GetStream/stream-feeds-js/commit/65f4d3edde3c6e5a96d5b5bd87d95bab83cde6ef))
+
 ## [0.3.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.2.21...@stream-io/feeds-client-0.3.0) (2025-10-22)
 
 

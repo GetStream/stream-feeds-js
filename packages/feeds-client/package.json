@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-client",
-  "version": "0.3.0",
+  "version": "0.3.6",
   "packageManager": "yarn@3.2.4",
   "main": "./dist/cjs/index.js",
   "module": "./dist/es/index.mjs",
@@ -50,7 +50,7 @@
     "CHANGELOG.md"
   ],
   "dependencies": {
-    "@stream-io/logger": "^1.1.4",
+    "@stream-io/logger": "^2.0.0",
     "@stream-io/state-store": "^1.1.6",
     "axios": "^1.7.7"
   },

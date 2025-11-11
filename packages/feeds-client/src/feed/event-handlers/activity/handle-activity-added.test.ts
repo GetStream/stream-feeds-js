@@ -94,4 +94,16 @@ describe(handleActivityAdded.name, () => {
     expect(stateAfter.activities).toHaveLength(1);
     expect(stateAfter.activities?.[0]).toBe(existing);
   });
+
+  it(`onActivityAdded filters out activity if it returns false`, () => {
+    feed.state.partialNext({ activities: [] });
+    feed.activityAddedEventFilter = (_) => {
+      return false;
+    };
+    const event = generateActivityAddedEvent();
+    handleActivityAdded.call(feed, event);
+    const stateAfter = feed.currentState;
+
+    expect(stateAfter.activities).toHaveLength(0);
+  });
 });

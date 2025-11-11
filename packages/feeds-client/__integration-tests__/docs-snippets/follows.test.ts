@@ -140,6 +140,27 @@ describe('Follows page', () => {
     await saraFeed.delete({ hard_delete: true });
   });
 
+  it(`follow suggestions`, async () => {
+    // Get follow suggestions for a user
+    const suggestions = await client.getFollowSuggestions({
+      feed_group_id: 'user',
+      limit: 10,
+    });
+
+    console.log('Algorithm used:', suggestions.algorithm_used);
+    console.log('Duration:', suggestions.duration);
+
+    suggestions.suggestions.forEach((suggestion) => {
+      console.log('Suggested feed:', suggestion.feed);
+      console.log('Name:', suggestion.name);
+      console.log('Description:', suggestion.description);
+      console.log('Follower count:', suggestion.follower_count);
+      console.log('Recommendation score:', suggestion.recommendation_score);
+      console.log('Reason:', suggestion.reason);
+      console.log('Algorithm scores:', suggestion.algorithm_scores);
+    });
+  });
+
   afterAll(async () => {
     await feed.delete({ hard_delete: true });
     await timeline.delete({ hard_delete: true });

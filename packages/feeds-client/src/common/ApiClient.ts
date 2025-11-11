@@ -11,7 +11,7 @@ import { getRateLimitFromResponseHeader } from './rate-limit';
 import { KnownCodes, randomId } from './utils';
 import type { TokenManager } from './TokenManager';
 import type { ConnectionIdManager } from './ConnectionIdManager';
-import { getLogger } from '../utils/logger';
+import { feedsLoggerSystem } from '../utils/logger';
 // this gets replaced during the build process (var version = 'x.y.z';)
 import { version } from '../../package.json';
 
@@ -30,7 +30,7 @@ export class ApiClient {
   private readonly axiosInstance: AxiosInstance;
   private timeout: number;
   public extraHeaderInformation: ExtraHeaderInformation = {};
-  private readonly logger = getLogger('api-client');
+  private readonly logger = feedsLoggerSystem.getLogger('api-client');
 
   constructor(
     public readonly apiKey: string,

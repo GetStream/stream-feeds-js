@@ -2,6 +2,53 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.21](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.20...@stream-io/feeds-react-sdk-0.1.21) (2025-11-05)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.6`
+## [0.1.20](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.19...@stream-io/feeds-react-sdk-0.1.20) (2025-11-04)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.5`
+## [0.1.19](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.18...@stream-io/feeds-react-sdk-0.1.19) (2025-11-04)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.4`
+## [0.1.18](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.17...@stream-io/feeds-react-sdk-0.1.18) (2025-10-31)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.3`
+## [0.1.17](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.16...@stream-io/feeds-react-sdk-0.1.17) (2025-10-30)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.2`
+## [0.1.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.15...@stream-io/feeds-react-sdk-0.1.16) (2025-10-30)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.1`
+
+* **@stream-io/feeds-react-sdk:** release version 0.1.16 ([62f0e3a](https://github.com/GetStream/stream-feeds-js/commit/62f0e3afd17841126e1e90424658b3e30e9b7279))
+* **@stream-io/feeds-react-sdk:** release version 0.1.16 ([34360ae](https://github.com/GetStream/stream-feeds-js/commit/34360ae0328b66888080fc93cb30e00e38629c03))
+
+## [0.1.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.15...@stream-io/feeds-react-sdk-0.1.16) (2025-10-30)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.1`
+
+* **@stream-io/feeds-react-sdk:** release version 0.1.16 ([34360ae](https://github.com/GetStream/stream-feeds-js/commit/34360ae0328b66888080fc93cb30e00e38629c03))
+
+## [0.1.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.15...@stream-io/feeds-react-sdk-0.1.16) (2025-10-30)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.1`
 ## [0.1.15](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-0.1.14...@stream-io/feeds-react-sdk-0.1.15) (2025-10-22)
 
 ### Dependency Updates

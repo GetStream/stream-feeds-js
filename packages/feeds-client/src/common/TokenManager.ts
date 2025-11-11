@@ -1,4 +1,4 @@
-import { getLogger } from '../utils/logger';
+import { feedsLoggerSystem } from '../utils/logger';
 import { isFunction, sleep } from './utils';
 
 /**
@@ -11,7 +11,7 @@ export class TokenManager {
   type: 'static' | 'provider';
   token?: string;
   tokenProvider?: string | (() => Promise<string>);
-  private readonly logger = getLogger('token-manager');
+  private readonly logger = feedsLoggerSystem.getLogger('token-manager');
 
   constructor() {
     this.loadTokenPromise = null;

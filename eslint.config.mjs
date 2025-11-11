@@ -5,10 +5,10 @@ import pluginReact from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import importPlugin from 'eslint-plugin-import';
 /*
-* Please do not remove eslint-plugin-unused-imports. It's used to clean
-* up OpenAPI spec generated code of unused imports. If we find a better
-* solution to this, it can of course go as it has no particular other use.
-*/
+ * Please do not remove eslint-plugin-unused-imports. It's used to clean
+ * up OpenAPI spec generated code of unused imports. If we find a better
+ * solution to this, it can of course go as it has no particular other use.
+ */
 import unusedImports from 'eslint-plugin-unused-imports';
 
 /** @type {import('eslint').Linter.Config[]} */
@@ -42,7 +42,7 @@ export default [
       'prefer-const': 'warn',
       '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
       '@typescript-eslint/consistent-indexed-object-style': 'error',
-      "@typescript-eslint/consistent-type-imports": "error",
+      '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/ban-ts-comment': 'error',
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -67,6 +67,13 @@ export default [
       'react/react-in-jsx-scope': 'off',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'error',
+    },
+  },
+  {
+    // sometimes tests need to access private properties
+    files: ['**/*.test.ts'],
+    rules: {
+      'dot-notation': 'off',
     },
   },
   {
