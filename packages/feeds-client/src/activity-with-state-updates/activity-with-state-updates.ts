@@ -139,7 +139,6 @@ export class ActivityWithStateUpdates {
   }
 
   disconnect() {
-    console.log('itt - disconnect - disconnectActivityFromFeed', this.id);
     this.unsubscribeFromFeedState?.();
     disconnectActivityFromFeed.call(this.feedsClient, this.id);
   }
