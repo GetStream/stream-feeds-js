@@ -15,7 +15,7 @@ import {
 } from './utils';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-describe.skip('Activity with state updates', () => {
+describe('Activity with state updates', () => {
   let client: FeedsClient;
   let feed: Feed;
   const activities: ActivityResponse[] = [];
@@ -49,20 +49,20 @@ describe.skip('Activity with state updates', () => {
 
     const comment1 = await client.addComment({
       object_id: activity1.id,
-      object_type: 'activityWithStateUpdates',
+      object_type: 'activity',
       comment: 'Test comment 1',
     });
 
     await client.addComment({
       object_id: activity1.id,
-      object_type: 'activityWithStateUpdates',
+      object_type: 'activity',
       comment: 'Test comment 2',
       parent_id: comment1.comment.id,
     });
 
     await client.addComment({
       object_id: activity1.id,
-      object_type: 'activityWithStateUpdates',
+      object_type: 'activity',
       comment: 'Test comment 3',
     });
 
@@ -99,7 +99,7 @@ describe.skip('Activity with state updates', () => {
     ).toBeDefined();
   });
 
-  it(`update state in response to activityWithStateUpdates event`, async () => {
+  it(`update state in response to activity updated event`, async () => {
     await feed.getOrCreate({ watch: true });
     const spy = vi.fn();
     activityWithStateUpdates.state.subscribe(spy);
@@ -107,16 +107,16 @@ describe.skip('Activity with state updates', () => {
 
     serverClient.feeds.updateActivity({
       id: activityWithStateUpdates.id,
-      text: 'Updated activityWithStateUpdates 1',
+      text: 'Updated activity 1',
       user_id: user.id,
     });
 
-    await waitForEvent(feed, 'feeds.activity.updated');
+    await waitForEvent(feed, 'feeds.activity.updated', {
+      shouldReject: true,
+    });
 
     expect(spy).toHaveBeenCalled();
-    expect(spy.mock.lastCall?.[0].text).toBe(
-      'Updated activityWithStateUpdates 1',
-    );
+    expect(spy.mock.lastCall?.[0].activity.text).toBe('Updated activity 1');
   });
 
   it(`should load next page of comments`, async () => {
