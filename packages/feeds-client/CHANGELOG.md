@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.7](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.6...@stream-io/feeds-client-0.3.7) (2025-11-11)
+
+
+### Features
+
+* [FEEDS-849] support for Feeds collections ([#154](https://github.com/GetStream/stream-feeds-js/issues/154)) ([d00be39](https://github.com/GetStream/stream-feeds-js/commit/d00be39f4a53fd50c9a4648311c9fa84d85fc2cf))
+
 ## [0.3.6](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.5...@stream-io/feeds-client-0.3.6) (2025-11-05)
 
 
