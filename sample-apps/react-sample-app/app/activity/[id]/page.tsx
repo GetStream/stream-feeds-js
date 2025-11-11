@@ -64,7 +64,14 @@ function ActivityPageContent() {
         setFeed(feed);
         if (!feed?.currentState.watch && !feed?.currentState.is_loading) {
           shouldStopWatching = true;
-          return feed?.getOrCreate({ watch: true }).catch(logError);
+          return feed
+            ?.getOrCreate({
+              watch: true,
+              limit: 0,
+              followers_pagination: { limit: 0 },
+              following_pagination: { limit: 0 },
+            })
+            .catch(logError);
         }
       })
       .catch(logErrorAndDisplayNotification);

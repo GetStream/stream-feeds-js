@@ -889,10 +889,9 @@ export class FeedsClient extends FeedsApi {
   /**
    * When updating from WS events we need a special logic:
    * - Find active feeds that match a given fid.
-   * - Find active feed from activities that match either fid or activity id
+   * - Find active feed from activities where fid matches any of the feeds the activity is posted to.
    *
-   * This logic is different from `findAllActiveFeedsByActivityId` which matches by activity id only:
-   * If an activity is posted to multiple feeds, all feed receives WS event when it's updated. So for WS events matching by activity id only would result in duplicate state updates.
+   * This logic is different from `findAllActiveFeedsByFid` which only checks the first feed an activity is posted to.
    *
    * @param fid
    * @param activityId
@@ -900,17 +899,19 @@ export class FeedsClient extends FeedsApi {
    */
   private findAllActiveFeedsFromWSEvent(event: FeedsEvent) {
     const fid = 'fid' in event ? event.fid : undefined;
-    const activityId = 'activity' in event ? event.activity?.id : undefined;
 
-    if (!activityId && !fid) return [];
+    if (!fid) return [];
+
+    const activeFeed = fid ? this.activeFeeds[fid] : undefined;
 
     return [
-      ...Object.values(this.activeFeeds),
+      ...(activeFeed ? [activeFeed] : []),
       ...Object.values(this.activeActivities)
         .filter((a) => {
           const feed = getFeed.call(a);
           return (
-            feed?.feed === fid || (activityId && feed?.hasActivity(activityId))
+            feed?.feed === fid ||
+            a.currentState.activity?.feeds.some((f) => f === fid)
           );
         })
         .map((a) => getFeed.call(a)!),

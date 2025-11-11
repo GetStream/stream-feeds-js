@@ -37,26 +37,6 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   ) => Promise<void>;
 };
 
-export function useActivityComments(_: {
-  feed: Feed;
-  activity: ActivityResponse;
-}): UseCommentsReturnType<ActivityResponse>;
-export function useActivityComments(_: {
-  feed: Feed;
-  parentComment: CommentResponse;
-}): UseCommentsReturnType<CommentResponse>;
-export function useActivityComments(_: {
-  activity: ActivityWithStateUpdates;
-}): UseCommentsReturnType<ActivityResponse>;
-export function useActivityComments(_: {
-  activity: ActivityWithStateUpdates;
-  parentComment: CommentResponse;
-}): UseCommentsReturnType<CommentResponse>;
-export function useActivityComments(_: {
-  feed?: Feed;
-  activity?: ActivityResponse | ActivityWithStateUpdates;
-  parentComment?: CommentResponse;
-}): UseCommentsReturnType<ActivityResponse | CommentResponse>;
 export function useActivityComments({
   feed: feedFromProps,
   parentComment,
@@ -96,15 +76,10 @@ export function useActivityComments({
     selector,
   );
 
-  const loadNextPage = useMemo<
-    | UseCommentsReturnType<ActivityResponse | CommentResponse>['loadNextPage']
-    | undefined
-  >(() => {
-    if (!(activity || parentComment)) {
-      return undefined;
-    }
-
-    return (request) => {
+  const loadNextPage = useCallback<
+    UseCommentsReturnType<ActivityResponse | CommentResponse>['loadNextPage']
+  >(
+    (request) => {
       if (parentComment) {
         return feedOrActivity.loadNextPageCommentReplies(
           parentComment,
@@ -119,14 +94,11 @@ export function useActivityComments({
           throw new Error('Activity or feed is required');
         }
       }
-    };
-  }, [feedOrActivity, feed, parentComment, activity]);
+    },
+    [feedOrActivity, feed, parentComment?.id, activity?.id],
+  );
 
   return useMemo(() => {
-    if (!data) {
-      return undefined;
-    }
-
     return {
       ...data,
       has_next_page: checkHasAnotherPage(

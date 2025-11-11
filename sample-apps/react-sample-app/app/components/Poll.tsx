@@ -26,7 +26,6 @@ const pollSelector = (state: PollState) => ({
 
 const PollUI = () => {
   const { name } = usePollStateStore(pollSelector);
-  console.log('itt', name);
   return (
     <div className="bg-[#1c1c1e] text-white rounded-xl p-4 w-64 space-y-4 shadow-lg">
       <div>

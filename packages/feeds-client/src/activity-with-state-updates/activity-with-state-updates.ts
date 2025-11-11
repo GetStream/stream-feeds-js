@@ -7,6 +7,7 @@ import {
   isAnyFeedWatched,
 } from '../feeds-client/active-activity';
 import type { GetCommentsRequest } from '@self';
+import { deepEqual } from '../utils/deep-equal';
 
 type GetActivityConfig = {
   comments?: Partial<
@@ -31,6 +32,11 @@ export type ActivityState = { activity?: ActivityResponse } & Pick<
 export class ActivityWithStateUpdates {
   readonly state: StateStore<ActivityState>;
   protected feed: Feed | undefined;
+  private unsubscribeFromFeedState?: () => void;
+  private inProgressGet?: {
+    request?: GetActivityConfig;
+    promise: Promise<ActivityResponse>;
+  };
 
   constructor(
     public readonly id: string,
@@ -58,6 +64,10 @@ export class ActivityWithStateUpdates {
    * @param feedSelector - A function to select the feed from the activity response. Use only if the activity belongs to multiple feeds and you want to specify the feed explicitly.
    */
   async get(request: GetActivityConfig = {}) {
+    if (this.inProgressGet && deepEqual(this.inProgressGet.request, request)) {
+      return this.inProgressGet.promise;
+    }
+
     const { comments } = request;
 
     this.state.partialNext({
@@ -65,11 +75,13 @@ export class ActivityWithStateUpdates {
       last_get_request_config: request,
     });
 
-    const activityResponse = (
-      await this.feedsClient.getActivity({
+    const getActivityRequest = this.feedsClient
+      .getActivity({
         id: this.id,
       })
-    ).activity;
+      .then((response) => response.activity);
+    this.inProgressGet = { request, promise: getActivityRequest };
+    const activityResponse = await getActivityRequest;
 
     this.feedsClient.hydratePollCache([activityResponse]);
 
@@ -90,6 +102,8 @@ export class ActivityWithStateUpdates {
     }
 
     this.subscribeToFeedState();
+
+    this.inProgressGet = undefined;
 
     return activityResponse;
   }
@@ -131,6 +145,7 @@ export class ActivityWithStateUpdates {
     if (!isAnyFeedWatched.call(this.feedsClient, allFids)) {
       return;
     }
+    this.inProgressGet = undefined;
     return this.get(this.currentState.last_get_request_config);
   }
 
@@ -149,7 +164,8 @@ export class ActivityWithStateUpdates {
   }
 
   private subscribeToFeedState() {
-    this.feed?.state.subscribeWithSelector(
+    this.unsubscribeFromFeedState?.();
+    this.unsubscribeFromFeedState = this.feed?.state.subscribeWithSelector(
       (state) => ({
         activity: state.activities?.find((activity) => activity.id === this.id),
         comments_by_entity_id: state.comments_by_entity_id,
