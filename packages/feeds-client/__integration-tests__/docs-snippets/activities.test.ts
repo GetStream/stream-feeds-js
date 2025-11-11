@@ -193,15 +193,16 @@ describe('Activities page', () => {
       console.log(state.comments_by_entity_id);
     });
     // Comment pagination
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     activityWithStateUpdates.loadNextPageActivityComments;
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     activityWithStateUpdates.loadNextPageCommentReplies;
-
     // Optionally start watching the feed
     // If activity belongs to multiple feeds, it's up to you to choose which feed to watch
     const fid = activityWithStateUpdates.currentState.activity!.feeds[0];
     const [group, id] = fid.split(':');
     feed = client.feed(group, id);
-    let shouldWatch = false;
+    const shouldWatch = false;
     if (!feed.currentState.watch) {
       await feed.getOrCreate({
         watch: true,
