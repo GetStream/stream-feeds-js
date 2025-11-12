@@ -191,6 +191,8 @@ describe('Activities page', () => {
     activityWithStateUpdates.state.subscribe((state) => {
       console.log(state.activity);
       console.log(state.comments_by_entity_id);
+      // True if activity is being fetched
+      console.log(state.is_loading);
     });
     // Comment pagination
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
