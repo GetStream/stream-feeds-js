@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.8](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.7...@stream-io/feeds-client-0.3.8) (2025-11-12)
+
+
+### Features
+
+* watch activity ([#149](https://github.com/GetStream/stream-feeds-js/issues/149)) ([9e9c423](https://github.com/GetStream/stream-feeds-js/commit/9e9c42307a6571e826de8a3b1d83a411f4577d4d))
+
 ## [0.3.7](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.6...@stream-io/feeds-client-0.3.7) (2025-11-11)
 
 
