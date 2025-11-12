@@ -18,7 +18,7 @@ export const useOwnCapabilities = ({
 }: {
   feed?: Feed | string | FeedResponse;
   client?: FeedsClient;
-}) => {
+} = {}) => {
   const client = useFeedsClient() ?? clientFromProps;
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
