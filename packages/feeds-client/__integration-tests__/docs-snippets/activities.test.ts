@@ -169,6 +169,65 @@ describe('Activities page', () => {
     });
   });
 
+  it(`get activity`, async () => {
+    const activityId = (
+      await feed.addActivity({
+        type: 'post',
+        text: 'Hello, world!',
+      })
+    ).activity.id;
+
+    const activityWithStateUpdates =
+      client.activityWithStateUpdates(activityId);
+    await activityWithStateUpdates.get({
+      // Optionally fetch comments too
+      comments: {
+        limit: 10,
+        depth: 2,
+      },
+    });
+
+    // Subscribe to state updates
+    activityWithStateUpdates.state.subscribe((state) => {
+      console.log(state.activity);
+      console.log(state.comments_by_entity_id);
+      // True if activity is being fetched
+      console.log(state.is_loading);
+    });
+    // Comment pagination
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    activityWithStateUpdates.loadNextPageActivityComments;
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    activityWithStateUpdates.loadNextPageCommentReplies;
+    // Optionally start watching the feed
+    // If activity belongs to multiple feeds, it's up to you to choose which feed to watch
+    const fid = activityWithStateUpdates.currentState.activity!.feeds[0];
+    const [group, id] = fid.split(':');
+    feed = client.feed(group, id);
+    const shouldWatch = false;
+    if (!feed.currentState.watch) {
+      await feed.getOrCreate({
+        watch: true,
+        limit: 0,
+        followers_pagination: { limit: 0 },
+        following_pagination: { limit: 0 },
+      });
+    }
+
+    // When leaving the page...
+    // dispose activity, this avoids refetching the activity if WebSocket reconnects
+    activityWithStateUpdates.dispose();
+    // you should stop watching the feed, unless your app has another component that watches the same feed
+    if (shouldWatch) {
+      await feed.stopWatching();
+    }
+
+    // If you don't care about state updates
+    await client.getActivity({
+      id: activityId,
+    });
+  });
+
   afterAll(async () => {
     await feed.delete({ hard_delete: true });
     await client.disconnectUser();

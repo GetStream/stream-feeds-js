@@ -59,7 +59,12 @@ import type {
   LoadingStates,
   PagerResponseWithLoadingStates,
 } from '../types';
-import { checkHasAnotherPage, Constants, uniqueArrayMerge } from '../utils';
+import {
+  checkHasAnotherPage,
+  Constants,
+  feedsLoggerSystem,
+  uniqueArrayMerge,
+} from '../utils';
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
 import { deepEqual } from '../utils/deep-equal';
 
@@ -595,13 +600,15 @@ export class Feed extends FeedApi {
   }
 
   public async loadNextPageActivityComments(
-    activity: ActivityResponse,
+    activity: ActivityResponse | string,
     request?: Partial<
       Omit<GetCommentsRequest, 'object_id' | 'object_type' | 'next'>
     >,
   ) {
     const currentEntityState =
-      this.currentState.comments_by_entity_id[activity.id];
+      this.currentState.comments_by_entity_id[
+        typeof activity === 'string' ? activity : activity.id
+      ];
     const currentPagination = currentEntityState?.pagination;
     const currentNextCursor = currentPagination?.next;
     const currentSort = currentPagination?.sort;
@@ -617,13 +624,14 @@ export class Feed extends FeedApi {
       return;
     }
 
+    const entityId = typeof activity === 'string' ? activity : activity.id;
     await this.loadNextPageComments({
-      entityId: activity.id,
+      entityId: entityId,
       base: () =>
         this.client.getComments({
           ...request,
           sort,
-          object_id: activity.id,
+          object_id: entityId,
           object_type: 'activity',
           next: currentNextCursor,
         }),
@@ -929,7 +937,9 @@ export class Feed extends FeedApi {
     }
 
     if (typeof eventHandler === 'undefined') {
-      console.warn(`Received unknown event type: ${event.type}`, event);
+      feedsLoggerSystem
+        .getLogger('event-dispatcher')
+        .warn(`Received unknown feed event, type: ${event.type}`, event);
     }
 
     this.eventDispatcher.dispatch(event);

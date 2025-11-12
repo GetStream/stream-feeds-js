@@ -14,7 +14,6 @@ export const Poll = ({ activity }: { activity: ActivityResponse }) => {
   }
 
   return (
-    // @ts-expect-error - TODO: breaks prod build
     <PollContextProvider activity={activity} poll={activity.poll}>
       <PollUI />
     </PollContextProvider>

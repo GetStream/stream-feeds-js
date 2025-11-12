@@ -3,7 +3,8 @@ import {
   Feed,
   type ActivityResponse,
   type CommentResponse,
-  useComments
+  ActivityWithStateUpdates,
+  useActivityComments,
 } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
@@ -12,10 +13,12 @@ import { Comment } from './Comment';
 export const DEFAULT_PAGINATION_SORT = 'first' as const;
 
 export const ActivityCommentSection = ({
-  activity,
   feed,
+  activityWithStateUpdates,
+  activity,
 }: {
-  feed: Feed;
+  feed?: Feed;
+  activityWithStateUpdates?: ActivityWithStateUpdates;
   activity: ActivityResponse;
 }) => {
   const { client } = useUserContext();
@@ -26,7 +29,10 @@ export const ActivityCommentSection = ({
     loadNextPage,
     is_loading_next_page: isLoadingNextPage,
     has_next_page: hasNextPage,
-  } = useComments({ feed, parent: activity });
+  } = useActivityComments({
+    feed,
+    activity: activityWithStateUpdates ?? activity,
+  });
 
   const [parent, setParent] = useState<null | CommentResponse>(null);
 
@@ -36,15 +42,15 @@ export const ActivityCommentSection = ({
   }, []);
 
   useEffect(() => {
-    if (comments?.length) return;
+    if (!hasNextPage) return;
 
-    void feed.loadNextPageActivityComments(activity, {
+    void loadNextPage({
       sort: DEFAULT_PAGINATION_SORT,
       limit: 5,
       depth: 5,
       replies_limit: 5,
     });
-  }, [activity, comments, feed]);
+  }, [hasNextPage, loadNextPage]);
 
   const scrollToComment = (comment: CommentResponse) => {
     const element = document.querySelector(`[data-comment-id="${comment.id}"]`);
@@ -145,6 +151,7 @@ export const ActivityCommentSection = ({
           renderItem={(c) => (
             <Comment
               feed={feed}
+              activityWithStateUpdates={activityWithStateUpdates}
               level={0}
               key={c.id}
               setParent={setParentComment}

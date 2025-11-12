@@ -22,7 +22,7 @@ describe('Feeds client tests', () => {
       pinned_activities: [{ activity: activity1 }],
     });
 
-    const feeds = client['findActiveFeedsByActivityId'](activity1.id);
+    const feeds = client['findAllActiveFeedsByActivityId'](activity1.id);
     expect(feeds).toHaveLength(2);
     expect(feeds).toContain(feedA);
     expect(feeds).toContain(feedC);

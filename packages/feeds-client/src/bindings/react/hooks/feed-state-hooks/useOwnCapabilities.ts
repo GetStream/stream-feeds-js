@@ -12,16 +12,19 @@ export const useOwnCapabilities = (feedFromProps?: Feed) => {
   const feed = feedFromProps ?? feedFromContext;
   const fid = feed?.feed;
 
-  const selector = useCallback((currentState: FeedsClientState) => {
-    if (!fid) {
-      return { feedOwnCapabilities: stableEmptyArray };
-    }
+  const selector = useCallback(
+    (currentState: FeedsClientState) => {
+      if (!fid) {
+        return { feedOwnCapabilities: stableEmptyArray };
+      }
 
-    return {
-      feedOwnCapabilities:
-        currentState.own_capabilities_by_fid[fid] ?? stableEmptyArray,
-    };
-  }, [fid]);
+      return {
+        feedOwnCapabilities:
+          currentState.own_capabilities_by_fid[fid] ?? stableEmptyArray,
+      };
+    },
+    [fid],
+  );
 
   const { feedOwnCapabilities = stableEmptyArray } =
     useStateStore(client?.state, selector) ?? {};

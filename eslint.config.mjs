@@ -70,17 +70,22 @@ export default [
     },
   },
   {
-    // sometimes tests need to access private properties
-    files: ['**/*.test.ts'],
+    files: ['packages/**/*.ts'],
     rules: {
-      'dot-notation': 'off',
+      'no-console': 'error',
     },
   },
   {
-    // This pattern helps keep docs snippets shorter
+    files: ['**/*.test.ts'],
+    rules: {
+      'dot-notation': 'off',
+      '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
+    },
+  },
+  {
     files: ['**/__integration-tests__/docs-snippets/*.test.ts'],
     rules: {
-      '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
+      'no-console': 'off',
     },
   },
 ];

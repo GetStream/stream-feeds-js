@@ -108,6 +108,7 @@ export const generateFeedResponse = (
     custom: {},
     ...overrides,
     feed,
+    own_capabilities: [],
     created_by: generateUserResponse(overrides.created_by),
   };
 };

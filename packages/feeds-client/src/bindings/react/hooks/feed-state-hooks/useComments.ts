@@ -27,6 +27,10 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   ) => Promise<void>;
 };
 
+/**
+ * @deprecated Use `useActivityComments` instead.
+ * @param
+ */
 export function useComments<T extends CommentParent>(_: {
   feed: Feed;
   parent: T;
