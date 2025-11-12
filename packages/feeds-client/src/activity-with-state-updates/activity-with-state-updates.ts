@@ -138,7 +138,7 @@ export class ActivityWithStateUpdates {
     return this.feed.loadNextPageCommentReplies(...params);
   }
 
-  disconnect() {
+  dispose() {
     this.unsubscribeFromFeedState?.();
     disconnectActivityFromFeed.call(this.feedsClient, this.id);
   }

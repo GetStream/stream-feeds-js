@@ -56,7 +56,7 @@ function ActivityPageContent() {
     setActivityWithStateUpdates(client.activityWithStateUpdates(params.id));
 
     return () => {
-      activityWithStateUpdates?.disconnect();
+      activityWithStateUpdates?.dispose();
     };
   }, [client, params?.id]);
 

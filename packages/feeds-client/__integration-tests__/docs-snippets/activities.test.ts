@@ -215,8 +215,8 @@ describe('Activities page', () => {
     }
 
     // When leaving the page...
-    // disconnect activity, this avoids refetching the activity if WebSocket reconnects
-    activityWithStateUpdates.disconnect();
+    // dispose activity, this avoids refetching the activity if WebSocket reconnects
+    activityWithStateUpdates.dispose();
     // you should stop watching the feed, unless your app has another component that watches the same feed
     if (shouldWatch) {
       await feed.stopWatching();
