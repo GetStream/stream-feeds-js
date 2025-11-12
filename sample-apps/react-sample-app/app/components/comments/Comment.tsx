@@ -36,7 +36,7 @@ export const Comment = ({
     return feed?.feed ?? activityWithStateUpdates?.feeds[0];
   }, [feed, activityWithStateUpdates]);
 
-  const ownCapabilities = useOwnCapabilities({ feed: fid, client });
+  const ownCapabilities = useOwnCapabilities({ feed: fid });
 
   const canEdit =
     ownCapabilities.includes(FeedOwnCapability.UPDATE_ANY_COMMENT) ||

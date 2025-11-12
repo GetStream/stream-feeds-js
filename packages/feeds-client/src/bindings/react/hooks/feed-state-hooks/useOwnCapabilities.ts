@@ -1,10 +1,4 @@
-import type {
-  FeedOwnCapability,
-  Feed,
-  FeedsClientState,
-  FeedsClient,
-  FeedResponse,
-} from '@self';
+import type { FeedOwnCapability, Feed, FeedsClientState } from '@self';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
@@ -12,17 +6,11 @@ import { useCallback } from 'react';
 
 const stableEmptyArray: readonly FeedOwnCapability[] = [];
 
-export const useOwnCapabilities = ({
-  feed: feedFromProps,
-  client: clientFromProps,
-}: {
-  feed?: Feed | string | FeedResponse;
-  client?: FeedsClient;
-} = {}) => {
-  const client = useFeedsClient() ?? clientFromProps;
+export const useOwnCapabilities = (feedFromProps?: Feed) => {
+  const client = useFeedsClient();
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
-  const fid = typeof feed === 'string' ? feed : feed?.feed;
+  const fid = feed?.feed;
 
   const selector = useCallback(
     (currentState: FeedsClientState) => {

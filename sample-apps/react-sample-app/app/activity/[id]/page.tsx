@@ -7,7 +7,6 @@ import { useErrorContext } from '@/app/error-context';
 import {
   Feed,
   FeedOwnCapability,
-  useOwnCapabilities,
   useStateStore,
   type ActivityState,
 } from '@stream-io/feeds-react-sdk';
@@ -17,6 +16,7 @@ import { ActivityMetadata } from '@/app/components/activity/ActivityMetadata';
 import { ActivityActions } from '@/app/components/activity/ActivityActions';
 import { ActivityContent } from '@/app/components/activity/ActivityContent';
 import { ActivityCommentSection } from '@/app/components/comments/ActivityCommentSection';
+import { useOwnCapabilities } from '@/app/hooks/useOwnCapabilities';
 
 // I need the isMounted to prevent this error from Next:
 // "Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering."
@@ -84,7 +84,7 @@ function ActivityPageContent() {
     };
   }, [logErrorAndDisplayNotification, activityWithStateUpdates, client]);
 
-  const ownCapabilities = useOwnCapabilities({ feed, client });
+  const ownCapabilities = useOwnCapabilities({ feed });
 
   const activitySelector = useCallback((state: ActivityState) => {
     return {
