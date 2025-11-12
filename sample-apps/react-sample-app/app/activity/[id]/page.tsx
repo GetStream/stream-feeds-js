@@ -5,6 +5,7 @@ import { LoadingIndicator } from '@/app/components/LoadingIndicator';
 import { useParams } from 'next/navigation';
 import { useErrorContext } from '@/app/error-context';
 import {
+  ActivityWithStateUpdates,
   Feed,
   FeedOwnCapability,
   useStateStore,
@@ -42,11 +43,21 @@ function ActivityPageContent() {
   const [editedActivityText, setEditedActivityText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [feed, setFeed] = useState<Feed | undefined>();
+  const [activityWithStateUpdates, setActivityWithStateUpdates] = useState<
+    ActivityWithStateUpdates | undefined
+  >();
 
-  const activityWithStateUpdates = useMemo(() => {
-    if (!client || !params?.id) return undefined;
+  useEffect(() => {
+    if (!client || !params?.id) {
+      setActivityWithStateUpdates(undefined);
+      return;
+    }
 
-    return client.activityWithStateUpdates(params.id);
+    setActivityWithStateUpdates(client.activityWithStateUpdates(params.id));
+
+    return () => {
+      activityWithStateUpdates?.disconnect();
+    };
   }, [client, params?.id]);
 
   useEffect(() => {
@@ -77,7 +88,6 @@ function ActivityPageContent() {
       .catch(logErrorAndDisplayNotification);
 
     return () => {
-      activityWithStateUpdates?.disconnect();
       if (shouldStopWatching) {
         feed?.stopWatching();
       }
