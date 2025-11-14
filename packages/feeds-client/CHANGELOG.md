@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.9](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.8...@stream-io/feeds-client-0.3.9) (2025-11-14)
+
+
+### Bug Fixes
+
+* add missing current_feed in activity.updated ([e6f0d94](https://github.com/GetStream/stream-feeds-js/commit/e6f0d94c9862549844df58a3152d3eb3177b43fb))
+
 ## [0.3.8](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.7...@stream-io/feeds-client-0.3.8) (2025-11-12)
 
 
