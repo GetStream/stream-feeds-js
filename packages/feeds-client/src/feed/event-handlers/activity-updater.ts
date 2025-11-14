@@ -7,6 +7,14 @@ export const updateActivity = ({
   currentActivity: ActivityResponse;
   newActivtiy: ActivityResponse;
 }) => {
+  if (
+    !newActivtiy.current_feed &&
+    newActivtiy.feeds.length === 1 &&
+    currentActivity.current_feed
+  ) {
+    newActivtiy.current_feed = currentActivity.current_feed;
+  }
+
   return {
     ...newActivtiy,
     own_reactions: currentActivity.own_reactions,
