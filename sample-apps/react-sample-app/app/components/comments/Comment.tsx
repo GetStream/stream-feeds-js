@@ -8,12 +8,12 @@ import type {
 import {
   FeedOwnCapability,
   useActivityComments,
-  useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
 import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { DEFAULT_PAGINATION_SORT } from './ActivityCommentSection';
 import { Reactions } from '../reactions/Reactions';
+import { useOwnCapabilities } from '@/app/hooks/useOwnCapabilities';
 
 const levels = ['ml-8', 'ml-16', 'ml-24', 'ml-32', 'ml-40'];
 
