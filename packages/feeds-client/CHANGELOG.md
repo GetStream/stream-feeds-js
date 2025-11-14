@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.10](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.9...@stream-io/feeds-client-0.3.10) (2025-11-14)
+
+
+### Bug Fixes
+
+* add missing current_feed when updating from WS event ([#164](https://github.com/GetStream/stream-feeds-js/issues/164)) ([3516b19](https://github.com/GetStream/stream-feeds-js/commit/3516b1939eeb9e966c65b1d7fd5980d305f96726))
+
 ## [0.3.9](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.8...@stream-io/feeds-client-0.3.9) (2025-11-14)
 
 
