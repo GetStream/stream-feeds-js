@@ -53,7 +53,7 @@ export const Reaction = ({
   const entity = comment ?? activity;
 
   const isComment = isCommentResponse(entity);
-  const ownCapabilities = useOwnCapabilities({ feed: activity.current_feed });
+  const ownCapabilities = useOwnCapabilities(activity.current_feed);
 
   const hasOwnReaction = useMemo(
     () => !!entity.own_reactions?.find((r) => r.type === type),
