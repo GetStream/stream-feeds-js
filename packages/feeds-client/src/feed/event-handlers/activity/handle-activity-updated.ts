@@ -82,6 +82,17 @@ export function handleActivityUpdated(
     pinned_activities: currentPinnedActivities,
   } = this.currentState;
 
+  const currentActivity = currentActivities?.find(
+    (a) => a.id === payload.activity.id,
+  );
+  if (
+    !payload.activity.current_feed &&
+    payload.activity.feeds.length === 1 &&
+    currentActivity?.current_feed
+  ) {
+    payload.activity.current_feed = currentActivity.current_feed;
+  }
+
   const [result1, result2] = [
     this.hasActivity(payload.activity.id)
       ? updateActivityInState(payload, currentActivities)
