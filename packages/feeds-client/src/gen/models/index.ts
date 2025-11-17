@@ -619,6 +619,8 @@ export interface AddCommentRequest {
 
   create_notification_activity?: boolean;
 
+  id?: string;
+
   parent_id?: string;
 
   skip_push?: boolean;
@@ -1076,6 +1078,8 @@ export interface BookmarkFolderResponse {
 
   updated_at: Date;
 
+  user: UserResponseCommonFields;
+
   custom?: Record<string, any>;
 }
 
@@ -1100,7 +1104,7 @@ export interface BookmarkResponse {
 
   activity: ActivityResponse;
 
-  user: UserResponse;
+  user: UserResponseCommonFields;
 
   custom?: Record<string, any>;
 
@@ -1295,6 +1299,8 @@ export interface Channel {
   team?: string;
 
   active_live_locations?: SharedLocation[];
+
+  filter_tags?: string[];
 
   invites?: ChannelMember[];
 
@@ -1667,6 +1673,8 @@ export interface ChannelResponse {
 
   truncated_at?: Date;
 
+  filter_tags?: string[];
+
   members?: ChannelMemberResponse[];
 
   own_capabilities?: ChannelOwnCapability[];
@@ -1687,17 +1695,17 @@ export interface CollectionRequest {
 }
 
 export interface CollectionResponse {
-  created_at: Date;
-
   id: string;
 
   name: string;
 
-  updated_at: Date;
+  created_at?: Date;
 
-  custom: Record<string, any>;
+  updated_at?: Date;
 
   user_id?: string;
+
+  custom?: Record<string, any>;
 }
 
 export interface Command {
@@ -1979,7 +1987,13 @@ export interface CreateBlockListRequest {
 
   team?: string;
 
-  type?: 'regex' | 'domain' | 'domain_allowlist' | 'email' | 'word';
+  type?:
+    | 'regex'
+    | 'domain'
+    | 'domain_allowlist'
+    | 'email'
+    | 'email_allowlist'
+    | 'word';
 }
 
 export interface CreateBlockListResponse {
@@ -2349,19 +2363,19 @@ export interface EnrichedActivity {
 }
 
 export interface EnrichedCollectionResponse {
-  created_at: Date;
-
   id: string;
 
   name: string;
 
   status: 'ok' | 'notfound';
 
-  updated_at: Date;
+  created_at?: Date;
 
-  custom: Record<string, any>;
+  updated_at?: Date;
 
   user_id?: string;
+
+  custom?: Record<string, any>;
 }
 
 export interface EnrichedReaction {
@@ -2813,6 +2827,20 @@ export interface FeedsPreferences {
   custom_activity_types?: Record<string, string>;
 }
 
+export interface FeedsPreferencesResponse {
+  comment?: string;
+
+  comment_reaction?: string;
+
+  follow?: string;
+
+  mention?: string;
+
+  reaction?: string;
+
+  custom_activity_types?: Record<string, string>;
+}
+
 export interface FeedsReactionResponse {
   activity_id: string;
 
@@ -2861,6 +2889,12 @@ export interface FileUploadResponse {
   file?: string;
 
   thumb_url?: string;
+}
+
+export interface FilterConfigResponse {
+  llm_labels: string[];
+
+  ai_text_labels?: string[];
 }
 
 export interface FlagRequest {
@@ -3175,8 +3209,6 @@ export interface GetOrCreateFeedRequest {
   view?: string;
 
   watch?: boolean;
-
-  activity_selector_options?: Record<string, any>;
 
   data?: FeedInput;
 
@@ -3806,6 +3838,16 @@ export interface NoiseCancellationSettings {
   mode: 'available' | 'disabled' | 'auto-on';
 }
 
+export interface NotificationComment {
+  comment: string;
+
+  id: string;
+
+  user_id: string;
+
+  attachments?: Attachment[];
+}
+
 export interface NotificationConfig {
   track_read?: boolean;
 
@@ -3864,6 +3906,8 @@ export interface NotificationTarget {
   user_id?: string;
 
   attachments?: Attachment[];
+
+  comment?: NotificationComment;
 }
 
 export interface NotificationTrigger {
@@ -4011,7 +4055,7 @@ export interface OwnUserResponse {
 
   privacy_settings?: PrivacySettingsResponse;
 
-  push_preferences?: PushPreferences;
+  push_preferences?: PushPreferencesResponse;
 
   teams_role?: Record<string, string>;
 
@@ -4386,6 +4430,18 @@ export interface PushPreferences {
   feeds_preferences?: FeedsPreferences;
 }
 
+export interface PushPreferencesResponse {
+  call_level?: string;
+
+  chat_level?: string;
+
+  disabled_until?: Date;
+
+  feeds_level?: string;
+
+  feeds_preferences?: FeedsPreferencesResponse;
+}
+
 export interface QueryActivitiesRequest {
   limit?: number;
 
@@ -4674,6 +4730,8 @@ export interface QueryReviewQueueResponse {
   next?: string;
 
   prev?: string;
+
+  filter_config?: FilterConfigResponse;
 }
 
 export interface QueryUsersPayload {
@@ -4717,19 +4775,37 @@ export interface RankingConfig {
 }
 
 export interface Reaction {
+  activity_id: string;
+
   created_at: Date;
 
-  message_id: string;
-
-  score: number;
-
-  type: string;
+  kind: string;
 
   updated_at: Date;
 
-  custom: Record<string, any>;
+  user_id: string;
 
-  user_id?: string;
+  deleted_at?: Date;
+
+  id?: string;
+
+  parent?: string;
+
+  score?: number;
+
+  target_feeds?: string[];
+
+  children_counts?: Record<string, any>;
+
+  data?: Record<string, any>;
+
+  latest_children?: Record<string, Reaction[]>;
+
+  moderation?: Record<string, any>;
+
+  own_children?: Record<string, Reaction[]>;
+
+  target_feeds_extra_data?: Record<string, any>;
 
   user?: User;
 }
@@ -4819,9 +4895,9 @@ export interface ReminderResponseData {
 
   channel?: ChannelResponse;
 
-  message?: Message;
+  message?: MessageResponse;
 
-  user?: User;
+  user?: UserResponse;
 }
 
 export interface RepliesMeta {
