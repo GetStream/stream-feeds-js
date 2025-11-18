@@ -1,4 +1,4 @@
-import type { OwnUser } from '@self';
+import type { ConnectedUser } from '@self';
 import type { StreamApiError } from '@self';
 
 export interface ConnectionChangedEvent {
@@ -29,7 +29,7 @@ export interface ConnectedEvent {
    * @type {OwnUserResponse}
    * @memberof ConnectedEvent
    */
-  me: OwnUser;
+  me: ConnectedUser;
   /**
    * The type of event: "connection.ok" in this case
    * @type {string}

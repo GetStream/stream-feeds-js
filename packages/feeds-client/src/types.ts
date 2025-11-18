@@ -3,7 +3,7 @@ import type {
   UnhandledErrorEvent,
 } from './common/real-time/event-models';
 import type { NetworkChangedEvent } from './common/types';
-import type { PagerResponse, WSEvent } from './gen/models';
+import type { OwnUser, PagerResponse, WSEvent } from './gen/models';
 import type { ActivityResponse, CommentResponse } from './gen/models';
 import type { FeedsClient } from './feeds-client';
 
@@ -34,3 +34,5 @@ export type TokenProvider = () => Promise<string>;
 export type StreamFile = File | { name: string; uri: string; type: string };
 
 export type CommentParent = ActivityResponse | CommentResponse;
+
+export type ConnectedUser = OwnUser & { name?: string; image?: string };
