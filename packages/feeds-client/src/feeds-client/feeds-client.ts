@@ -17,7 +17,6 @@ import type {
   GetOrCreateFeedRequest,
   ImageUploadRequest,
   OwnCapabilitiesBatchRequest,
-  OwnUser,
   PollResponse,
   PollVotesResponse,
   QueryFeedsRequest,
@@ -30,7 +29,12 @@ import type {
   UserRequest,
   WSEvent,
 } from '../gen/models';
-import type { FeedsEvent, StreamFile, TokenOrProvider } from '../types';
+import type {
+  ConnectedUser,
+  FeedsEvent,
+  StreamFile,
+  TokenOrProvider,
+} from '../types';
 import { StateStore } from '@stream-io/state-store';
 import { TokenManager } from '../common/TokenManager';
 import { ConnectionIdManager } from '../common/ConnectionIdManager';
@@ -88,7 +92,7 @@ import { ActivityWithStateUpdates } from '../activity-with-state-updates/activit
 import { getFeed } from '../activity-with-state-updates/get-feed';
 
 export type FeedsClientState = {
-  connected_user: OwnUser | undefined;
+  connected_user: ConnectedUser | undefined;
   is_ws_connection_healthy: boolean;
   own_capabilities_by_fid: Record<string, FeedResponse['own_capabilities']>;
 };
