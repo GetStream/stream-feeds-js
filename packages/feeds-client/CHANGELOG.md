@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.12](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.11...@stream-io/feeds-client-0.3.12) (2025-11-18)
+
+
+### Bug Fixes
+
+* OwnUser type misses name and image ([#166](https://github.com/GetStream/stream-feeds-js/issues/166)) ([fa8121d](https://github.com/GetStream/stream-feeds-js/commit/fa8121daae8dd75dc469b7e8158c130fc40a0065))
+
 ## [0.3.11](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.10...@stream-io/feeds-client-0.3.11) (2025-11-17)
 
 
