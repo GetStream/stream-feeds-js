@@ -33,6 +33,41 @@ yarn build
 yarn start
 ```
 
+### Run react tutorial app
+
+Prerequisites:
+
+- Build/run JS client
+- Create a `.env` file in `sample-apps/react-sample-app` with one of the following content:
+
+Use this if you want to use a single user only:
+
+```
+VITE_API_KEY=your_api_key_here
+VITE_USER_ID=your_user_id_here
+VITE_USER_NAME=Your Name
+VITE_USER_TOKEN=your_user_token_here
+```
+
+If your app [is configured to accept development tokens](https://getstream.io/activity-feeds/docs/javascript/tokens-and-authentication/#developer-tokens), you can use dev tokens to test with muliple users, in this case just provide an API key:
+
+```
+VITE_API_KEY=your_api_key_here
+```
+
+If you have a token provider backend, you can also provide a URL that takes `user_id` as a query param:
+
+```
+VITE_API_KEY=your_api_key_here
+VITE_TOKEN_URL=optional,no need for user info in this case
+```
+
+After the above steps run the following command in `sample-apps/react-tutorial`:
+
+```
+yarn dev
+```
+
 ### Run react sample app
 
 Prerequisites:
