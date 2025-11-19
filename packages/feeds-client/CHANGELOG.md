@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.13](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.12...@stream-io/feeds-client-0.3.13) (2025-11-19)
+
+
+### Features
+
+* Add url enrichment fields for activities and comments ([#168](https://github.com/GetStream/stream-feeds-js/issues/168)) ([7389873](https://github.com/GetStream/stream-feeds-js/commit/73898737b3f555183b402c523461e2cbb860465a))
+
 ## [0.3.12](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.11...@stream-io/feeds-client-0.3.12) (2025-11-18)
 
 
