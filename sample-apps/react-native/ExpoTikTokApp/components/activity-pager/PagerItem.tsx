@@ -56,7 +56,12 @@ const UnmemoizedPagerItem = ({
   if (videoAttachment?.asset_url) {
     return (
       <View style={styles.page}>
-        <PagerVideo source={videoAttachment.asset_url} isActive={isActive} />
+        <PagerVideo
+          source={videoAttachment.asset_url}
+          title={videoAttachment.title ?? videoAttachment.asset_url}
+          duration={videoAttachment.custom.duration}
+          isActive={isActive}
+        />
 
         <View style={[styles.overlay, overlayStyle]}>
           <Text style={styles.title}>@{activity.user.id}</Text>

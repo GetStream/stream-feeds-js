@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
+import type { ConfigureLoggersOptions } from '@stream-io/feeds-react-native-sdk';
 import { useCreateFeedsClient } from '@stream-io/feeds-react-native-sdk';
-import { apiKey, tokenCreationUrl } from '@/constants/stream';
+import { apiKey, baseUrl, tokenCreationUrl } from '@/constants/stream';
 import type { LocalUser } from '@/contexts/UserContext';
 
 const tokenProviderFactory = (userId: string) => async () => {
@@ -24,7 +25,10 @@ const tokenProviderFactory = (userId: string) => async () => {
 };
 
 const CLIENT_OPTIONS = {
-  configure_loggers_options: { default: { level: 'debug' } },
+  configure_loggers_options: {
+    default: { level: 'debug' },
+  } as ConfigureLoggersOptions,
+  ...(baseUrl ? { base_url: baseUrl } : {}),
   timeout: 10000,
 };
 
