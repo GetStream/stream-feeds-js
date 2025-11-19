@@ -4119,6 +4119,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mux/mux-data-react-native-video@npm:^0.19.4":
+  version: 0.19.4
+  resolution: "@mux/mux-data-react-native-video@npm:0.19.4"
+  dependencies:
+    mux-embed: 5.13.0
+  peerDependencies:
+    react: ^18.1.0
+    react-native-video: ^6.9.0
+  checksum: 883b4988128cc7fd1dd16a7dbef484c77715680341d0de61966663e627e201b1cda8f04ba13ead29e622669747a4a1701df17824ec39b7d26b181ef88474789b
+  languageName: node
+  linkType: hard
+
 "@napi-rs/wasm-runtime@npm:0.2.4":
   version: 0.2.4
   resolution: "@napi-rs/wasm-runtime@npm:0.2.4"
@@ -11820,6 +11832,7 @@ __metadata:
   dependencies:
     "@babel/core": ^7.25.2
     "@expo/vector-icons": ^15.0.2
+    "@mux/mux-data-react-native-video": ^0.19.4
     "@notifee/react-native": ^9.1.8
     "@react-native-async-storage/async-storage": 2.2.0
     "@react-native-community/netinfo": 11.4.1
@@ -16646,6 +16659,13 @@ __metadata:
   version: 0.0.8
   resolution: "mute-stream@npm:0.0.8"
   checksum: ff48d251fc3f827e5b1206cda0ffdaec885e56057ee86a3155e1951bc940fd5f33531774b1cc8414d7668c10a8907f863f6561875ee6e8768931a62121a531a1
+  languageName: node
+  linkType: hard
+
+"mux-embed@npm:5.13.0":
+  version: 5.13.0
+  resolution: "mux-embed@npm:5.13.0"
+  checksum: d95aa344c4830f5d99e41e4b61e6b2c3a54c92c62510d70be2c4cb1ce6f18012ce889343f7ad1f10262762b5efb5107e164f0ef4d6101f02203f5bc69eff78f7
   languageName: node
   linkType: hard
 
