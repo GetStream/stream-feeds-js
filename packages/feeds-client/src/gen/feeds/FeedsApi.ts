@@ -314,6 +314,7 @@ export class FeedsApi {
       parent_id: request?.parent_id,
       poll_id: request?.poll_id,
       restrict_replies: request?.restrict_replies,
+      skip_enrich_url: request?.skip_enrich_url,
       text: request?.text,
       visibility: request?.visibility,
       visibility_tag: request?.visibility_tag,
@@ -739,6 +740,7 @@ export class FeedsApi {
       expires_at: request?.expires_at,
       poll_id: request?.poll_id,
       restrict_replies: request?.restrict_replies,
+      skip_enrich_url: request?.skip_enrich_url,
       text: request?.text,
       visibility: request?.visibility,
       attachments: request?.attachments,
@@ -986,6 +988,7 @@ export class FeedsApi {
       create_notification_activity: request?.create_notification_activity,
       id: request?.id,
       parent_id: request?.parent_id,
+      skip_enrich_url: request?.skip_enrich_url,
       skip_push: request?.skip_push,
       attachments: request?.attachments,
       mentioned_user_ids: request?.mentioned_user_ids,
@@ -1102,6 +1105,7 @@ export class FeedsApi {
     };
     const body = {
       comment: request?.comment,
+      skip_enrich_url: request?.skip_enrich_url,
       skip_push: request?.skip_push,
       custom: request?.custom,
     };
