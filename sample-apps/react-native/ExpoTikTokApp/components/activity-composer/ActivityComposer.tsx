@@ -65,14 +65,12 @@ export const ActivityComposer = () => {
       const localFiles: Array<StreamFile & { duration?: number | null }> = [];
       for (const rawFile of [...(rawFiles ?? [])]) {
         const { uri } = rawFile;
-        console.log('RAWFILE', rawFile)
         const file = {
           uri: rawFile.uri,
           name: rawFile.fileName ?? (uri as string).split('/').reverse()[0],
           duration: rawFile.duration,
           type: rawFile.mimeType ?? 'image/jpeg',
         };
-        console.log('FILE', file)
         if (isImageFile(file)) {
           requests.push(
             client?.uploadImage({
@@ -141,8 +139,6 @@ export const ActivityComposer = () => {
         });
         createdHashtagFeeds = response?.feeds ?? [];
       }
-
-      console.log('TEST: ', media)
 
       const activityData = {
         type: 'post',
