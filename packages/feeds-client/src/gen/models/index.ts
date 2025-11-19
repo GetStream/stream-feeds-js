@@ -375,6 +375,8 @@ export interface ActivityRequest {
 
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
+  skip_enrich_url?: boolean;
+
   text?: string;
 
   visibility?: 'public' | 'private' | 'tag';
@@ -547,6 +549,8 @@ export interface AddActivityRequest {
 
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
+  skip_enrich_url?: boolean;
+
   text?: string;
 
   visibility?: 'public' | 'private' | 'tag';
@@ -622,6 +626,8 @@ export interface AddCommentRequest {
   id?: string;
 
   parent_id?: string;
+
+  skip_enrich_url?: boolean;
 
   skip_push?: boolean;
 
@@ -2818,6 +2824,8 @@ export interface FeedsPreferences {
 
   comment_reaction?: 'all' | 'none';
 
+  comment_reply?: 'all' | 'none';
+
   follow?: 'all' | 'none';
 
   mention?: 'all' | 'none';
@@ -3849,6 +3857,8 @@ export interface NotificationComment {
 }
 
 export interface NotificationConfig {
+  deduplication_window?: string;
+
   track_read?: boolean;
 
   track_seen?: boolean;
@@ -5478,6 +5488,8 @@ export interface UpdateActivityRequest {
 
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
+  skip_enrich_url?: boolean;
+
   text?: string;
 
   visibility?: string;
@@ -5567,6 +5579,8 @@ export interface UpdateCollectionsResponse {
 
 export interface UpdateCommentRequest {
   comment?: string;
+
+  skip_enrich_url?: boolean;
 
   skip_push?: boolean;
 
