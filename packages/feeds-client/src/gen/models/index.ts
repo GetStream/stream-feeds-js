@@ -2905,6 +2905,10 @@ export interface FilterConfigResponse {
   ai_text_labels?: string[];
 }
 
+export interface FlagCountRuleParameters {
+  threshold?: number;
+}
+
 export interface FlagRequest {
   entity_id: string;
 
@@ -3924,6 +3928,8 @@ export interface NotificationTrigger {
   text: string;
 
   type: string;
+
+  comment?: NotificationComment;
 }
 
 export interface OCRRule {
@@ -5023,6 +5029,8 @@ export interface RuleBuilderCondition {
 
   content_count_rule_params?: ContentCountRuleParameters;
 
+  content_flag_count_rule_params?: FlagCountRuleParameters;
+
   image_content_params?: ImageContentParameters;
 
   image_rule_params?: ImageRuleParameters;
@@ -5034,6 +5042,8 @@ export interface RuleBuilderCondition {
   user_created_within_params?: UserCreatedWithinParameters;
 
   user_custom_property_params?: UserCustomPropertyParameters;
+
+  user_flag_count_rule_params?: FlagCountRuleParameters;
 
   user_rule_params?: UserRuleParameters;
 
