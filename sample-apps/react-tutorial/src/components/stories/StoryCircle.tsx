@@ -18,11 +18,11 @@ export const StoryCircle = ({
       onClick={onClick}
     >
       <div
-        className={`rounded-full ${
-          isActive ? 'bg-gradient-to-br from-warning to-error p-[2.5px]' : ''
+        className={`rounded-full p-[2.5px] ${
+          isActive ? 'bg-gradient-to-br from-warning to-error' : ''
         }`}
       >
-        <div className={`rounded-full ${isActive ? 'bg-base-100 p-0.5' : ''}`}>
+        <div className="rounded-full bg-base-100 p-0.5">
           <div className="w-18 h-18 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-lg font-semibold">
             <span>{user?.name?.[0]}</span>
           </div>
