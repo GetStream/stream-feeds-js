@@ -18,57 +18,51 @@ export const SearchResults = ({ searchQuery }: { searchQuery: string }) => {
   );
   const [nextFeeds, setNextFeeds] = useState<string | undefined>(undefined);
 
-  const searchActivities = useCallback(
-    async (query: string, next?: string) => {
-      if (!client) return;
-      const result = await client.queryActivities({
-        filter: {
-          text: { $autocomplete: query },
-        },
-        limit: 10,
-        next,
-      });
-      setActivitySearchResults((current) => [
-        ...(next ? current : []),
-        ...result.activities,
-      ]);
-      setNextActivities(result.next);
-    },
-    [client],
-  );
+  const searchActivities = useCallback(async () => {
+    if (!client) return;
+    const result = await client.queryActivities({
+      filter: {
+        text: { $autocomplete: searchQuery },
+      },
+      limit: 10,
+      next: nextActivities,
+    });
+    setActivitySearchResults((current) => [
+      ...(nextActivities ? current : []),
+      ...result.activities,
+    ]);
+    setNextActivities(result.next);
+  }, [client, searchQuery, nextActivities]);
 
-  const searchFeeds = useCallback(
-    async (query: string, next?: string) => {
-      if (!client) return;
-      const result = await client.queryFeeds({
-        filter: {
-          $and: [
-            { group_id: 'user' },
-            {
-              $or: [
-                { name: { $autocomplete: query } },
-                { description: { $autocomplete: query } },
-                { ['created_by.name']: { $autocomplete: query } },
-              ],
-            },
-          ],
-        },
-        limit: 10,
-        next,
-      });
-      setFeedSearchResults((current) => [
-        ...(next ? current : []),
-        ...result.feeds,
-      ]);
-      setNextFeeds(result.next);
-    },
-    [client],
-  );
+  const searchFeeds = useCallback(async () => {
+    if (!client) return;
+    const result = await client.queryFeeds({
+      filter: {
+        $and: [
+          { group_id: 'user' },
+          {
+            $or: [
+              { name: { $autocomplete: searchQuery } },
+              { description: { $autocomplete: searchQuery } },
+              { ['created_by.name']: { $autocomplete: searchQuery } },
+            ],
+          },
+        ],
+      },
+      limit: 10,
+      next: nextFeeds,
+    });
+    setFeedSearchResults((current) => [
+      ...(nextFeeds ? current : []),
+      ...result.feeds,
+    ]);
+    setNextFeeds(result.next);
+  }, [client, searchQuery, nextFeeds]);
 
   useEffect(() => {
     if (searchQuery) {
-      searchActivities(searchQuery);
-      searchFeeds(searchQuery);
+      searchActivities();
+      searchFeeds();
     }
   }, [searchQuery, searchActivities, searchFeeds]);
 
@@ -97,7 +91,7 @@ export const SearchResults = ({ searchQuery }: { searchQuery: string }) => {
             {nextActivities && (
               <button
                 className="btn btn-soft btn-primary"
-                onClick={() => searchActivities(searchQuery, nextActivities)}
+                onClick={searchActivities}
               >
                 Load more
               </button>
@@ -119,7 +113,7 @@ export const SearchResults = ({ searchQuery }: { searchQuery: string }) => {
             {nextFeeds && (
               <button
                 className="btn btn-soft btn-primary"
-                onClick={() => searchFeeds(searchQuery, nextFeeds)}
+                onClick={searchFeeds}
               >
                 Load more
               </button>

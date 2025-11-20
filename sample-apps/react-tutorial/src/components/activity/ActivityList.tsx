@@ -1,7 +1,8 @@
-import { useFeedActivities } from '@stream-io/feeds-react-sdk';
+import { useFeedActivities, useFeedContext } from '@stream-io/feeds-react-sdk';
 import { Activity } from './Activity';
 
 export const ActivityList = () => {
+  const feed = useFeedContext();
   const { activities, loadNextPage, has_next_page } = useFeedActivities();
 
   return (
@@ -10,7 +11,11 @@ export const ActivityList = () => {
         <div className="card card-border bg-base-100 w-96">
           <div className="card-body items-center text-center">
             <h2 className="card-title">No posts yet</h2>
-            <p>Write something to start your timeline ✨</p>
+            <p>
+              {feed?.group === 'timeline'
+                ? 'Write something to start your timeline ✨'
+                : 'Popular activities will show up here once your application has more content'}
+            </p>
           </div>
         </div>
       ) : (
