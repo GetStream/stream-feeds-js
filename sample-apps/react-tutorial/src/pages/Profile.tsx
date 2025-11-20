@@ -46,16 +46,14 @@ export const Profile = () => {
         next,
       })
       .then((response) => {
-        setBookmarks([...bookmarks, ...response.bookmarks]);
+        setBookmarks([...(next ? bookmarks : []), ...response.bookmarks]);
         setNext(response.next);
       });
-  }, [client, next, bookmarks]);
+  }, [client, next]);
 
   useEffect(() => {
-    if (bookmarks.length === 0) {
-      loadBookmarks();
-    }
-  }, [client, loadBookmarks, bookmarks.length]);
+    loadBookmarks();
+  }, [client, loadBookmarks]);
 
   return (
     <div className="w-full flex flex-col items-center justify-start gap-4">
@@ -80,7 +78,7 @@ export const Profile = () => {
         <div className="card card-border bg-base-100 w-96">
           <div className="card-body items-center text-center">
             <h2 className="card-title">No bookmarks yet</h2>
-            <p>TBookmark posts to see them here ⭐</p>
+            <p>Bookmark posts to see them here ⭐</p>
           </div>
         </div>
       ) : (
