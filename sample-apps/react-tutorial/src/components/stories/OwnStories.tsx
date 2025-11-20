@@ -17,6 +17,7 @@ export const OwnStories = () => {
   const ownStoryFeed = useFeedContext();
   const client = useFeedsClient();
   const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { activities } = useFeedActivities();
 
@@ -29,12 +30,17 @@ export const OwnStories = () => {
       if (!client) {
         return;
       }
+      setIsLoading(true);
       const { file: image_url } = await client.uploadImage({ file });
-      await ownStoryFeed?.addActivity({
-        type: 'post',
-        attachments: [{ type: 'image', image_url, custom: {} }],
-        expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
-      });
+      try {
+        await ownStoryFeed?.addActivity({
+          type: 'post',
+          attachments: [{ type: 'image', image_url, custom: {} }],
+          expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
+        });
+      } finally {
+        setIsLoading(false);
+      }
     },
     [ownStoryFeed, client],
   );
@@ -54,7 +60,13 @@ export const OwnStories = () => {
         />
 
         <label className="absolute bottom-6 right-0 cursor-pointer">
-          <div className="btn btn-xs btn-primary btn-circle">+</div>
+          <div className="btn btn-xs btn-primary btn-circle">
+            {isLoading ? (
+              <span className="loading loading-spinner loading-xs"></span>
+            ) : (
+              '+'
+            )}
+          </div>
           <input
             type="file"
             accept="image/*,video/*"

@@ -2,20 +2,23 @@ import {
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { useOwnFeedContext } from '../own-feeds-context';
 
 export const ToggleFollowButton = ({
   userId,
-  isFollowing,
+  isFollowing: initialIsFollowing,
 }: {
   userId: string;
   isFollowing: boolean;
 }) => {
+  const { ownTimeline, ownStoryTimeline } = useOwnFeedContext();
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
+  const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
 
-  const follow = useCallback(() => {
-    client?.followBatch({
+  const follow = useCallback(async () => {
+    await client?.followBatch({
       follows: [
         {
           source: `timeline:${currentUser?.id}`,
@@ -28,18 +31,24 @@ export const ToggleFollowButton = ({
         },
       ],
     });
-  }, [client, userId, currentUser?.id]);
+    setIsFollowing(true);
+    await ownTimeline?.getOrCreate({ watch: true });
+    await ownStoryTimeline?.getOrCreate({ watch: true });
+  }, [client, userId, currentUser?.id, ownTimeline, ownStoryTimeline]);
 
-  const unfollow = useCallback(() => {
-    client?.unfollow({
+  const unfollow = useCallback(async () => {
+    await client?.unfollow({
       source: `timeline:${currentUser?.id}`,
       target: `user:${userId}`,
     });
-    client?.unfollow({
+    await client?.unfollow({
       source: `stories:${currentUser?.id}`,
       target: `story:${userId}`,
     });
-  }, [client, userId, currentUser?.id]);
+    setIsFollowing(false);
+    await ownTimeline?.getOrCreate({ watch: true });
+    await ownStoryTimeline?.getOrCreate({ watch: true });
+  }, [client, userId, currentUser?.id, ownTimeline, ownStoryTimeline]);
 
   const toggleFollow = useCallback(() => {
     if (isFollowing) {
