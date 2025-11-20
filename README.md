@@ -37,7 +37,8 @@ yarn start
 
 Prerequisites:
 
-- Build/run JS client
+- Install dependecies: `yarn`
+- Build React SDK and tutorial: `build:react-tutorial`
 - Create a `.env` file in `sample-apps/react-sample-app` with one of the following content:
 
 Use this if you want to use a single user only:
