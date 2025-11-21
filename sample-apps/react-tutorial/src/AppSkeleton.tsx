@@ -5,7 +5,7 @@ import {
 import { useCallback, useRef, useState } from 'react';
 import { FollowSuggestions } from './components/FollowSuggestions';
 import { useOwnFeedsContext } from './own-feeds-context';
-import { Explore } from './pages/Expolre';
+import { Explore } from './pages/Explore';
 import { Profile } from './pages/Profile';
 import { Notifications } from './pages/Notifications';
 import { Home } from './pages/Home';
