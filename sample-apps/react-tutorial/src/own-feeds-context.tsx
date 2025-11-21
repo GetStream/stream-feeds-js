@@ -47,9 +47,8 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       const _ownFeed = client.feed('user', connectedUser.id);
       setOwnFeed(_ownFeed);
       const _ownTimeline = client.feed('timeline', connectedUser.id, {
-        // Decide when to add new activities from WebSocket
-        // To avoid list changing unexpectedly, we only add activities that are from the current user
-        // Users can explicitly refresh the feed to see new activities
+        // Social media apps usually don't add new activities from WebSocket
+        // users need to pull to refresh
         activityAddedEventFilter: (event) => {
           return event.activity.user?.id === connectedUser.id;
         },
@@ -73,11 +72,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
           });
         }
       });
-      const _ownNotifications = client.feed('notification', connectedUser.id, {
-        activityAddedEventFilter: (_) => {
-          return true;
-        },
-      });
+      const _ownNotifications = client.feed('notification', connectedUser.id);
       setOwnNotifications(_ownNotifications);
       _ownNotifications?.getOrCreate({ watch: true });
       const _ownStoryTimeline = client.feed('stories', connectedUser.id);
