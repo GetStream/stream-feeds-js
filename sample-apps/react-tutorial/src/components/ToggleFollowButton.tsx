@@ -29,6 +29,7 @@ export const ToggleFollowButton = ({
       create_notification_activity: true,
     });
     setIsFollowing(true);
+    // Reload timelines to see new activities
     await ownTimeline?.getOrCreate({ watch: true });
     await ownStoryTimeline?.getOrCreate({ watch: true });
   }, [client, userId, currentUser?.id, ownTimeline, ownStoryTimeline]);
@@ -43,6 +44,7 @@ export const ToggleFollowButton = ({
       target: `story:${userId}`,
     });
     setIsFollowing(false);
+    // Reload timelines to remove activities
     await ownTimeline?.getOrCreate({ watch: true });
     await ownStoryTimeline?.getOrCreate({ watch: true });
   }, [client, userId, currentUser?.id, ownTimeline, ownStoryTimeline]);

@@ -36,6 +36,7 @@ export const OwnStories = () => {
         await ownStoryFeed?.addActivity({
           type: 'post',
           attachments: [{ type: 'image', image_url, custom: {} }],
+          // Expires after 24h
           expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
         });
       } finally {

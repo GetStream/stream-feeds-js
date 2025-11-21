@@ -79,6 +79,8 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       setOwnStoryTimeline(_ownStoryTimeline);
       _ownStoryTimeline?.getOrCreate({ watch: true });
       const _ownStoryFeed = client.feed('story', connectedUser.id, {
+        // In a regular feed, latest activites from WebSocket are added to start of the list
+        // but we want stories to be ordered chronologically, so we add them to the end of the list
         addNewActivitiesTo: 'end',
       });
       setOwnStoryFeed(_ownStoryFeed);
