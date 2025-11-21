@@ -22,7 +22,7 @@ export const SearchResults = ({ searchQuery }: { searchQuery: string }) => {
     if (!client) return;
     const result = await client.queryActivities({
       filter: {
-        text: { $autocomplete: searchQuery },
+        text: { $q: searchQuery },
       },
       limit: 10,
       next: nextActivities,
@@ -38,16 +38,8 @@ export const SearchResults = ({ searchQuery }: { searchQuery: string }) => {
     if (!client) return;
     const result = await client.queryFeeds({
       filter: {
-        $and: [
-          { group_id: 'user' },
-          {
-            $or: [
-              { name: { $autocomplete: searchQuery } },
-              { description: { $autocomplete: searchQuery } },
-              { ['created_by.name']: { $autocomplete: searchQuery } },
-            ],
-          },
-        ],
+        group_id: 'user',
+        ['created_by.name']: { $q: searchQuery },
       },
       limit: 10,
       next: nextFeeds,

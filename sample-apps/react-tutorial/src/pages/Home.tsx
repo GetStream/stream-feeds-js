@@ -1,5 +1,5 @@
 import { StreamFeed } from '@stream-io/feeds-react-sdk';
-import { useOwnFeedContext } from '../own-feeds-context';
+import { useOwnFeedsContext } from '../own-feeds-context';
 import { ActivityComposer } from '../components/activity/ActivityComposer';
 import { ActivityList } from '../components/activity/ActivityList';
 import { OwnStories } from '../components/stories/OwnStories';
@@ -7,7 +7,7 @@ import { StoryTimeline } from '../components/stories/StoryTimeline';
 
 export const Home = () => {
   const { ownTimeline, ownFeed, ownStoryTimeline, ownStoryFeed } =
-    useOwnFeedContext();
+    useOwnFeedsContext();
 
   if (!ownTimeline || !ownFeed || !ownStoryTimeline || !ownStoryFeed) {
     return null;

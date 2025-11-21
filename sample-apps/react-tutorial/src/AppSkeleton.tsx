@@ -4,7 +4,7 @@ import {
 } from '@stream-io/feeds-react-sdk';
 import { useCallback, useRef, useState } from 'react';
 import { FollowSuggestions } from './components/FollowSuggestions';
-import { useOwnFeedContext } from './own-feeds-context';
+import { useOwnFeedsContext } from './own-feeds-context';
 import { Explore } from './pages/Expolre';
 import { Profile } from './pages/Profile';
 import { Notifications } from './pages/Notifications';
@@ -16,7 +16,7 @@ export const AppSkeleton = () => {
     'home' | 'notifications' | 'profile' | 'explore' | 'search'
   >('home');
   const currentUser = useClientConnectedUser();
-  const { ownNotifications } = useOwnFeedContext();
+  const { ownNotifications } = useOwnFeedsContext();
   const notificationStatus = useNotificationStatus(ownNotifications);
   const unreadCount = notificationStatus?.unread ?? 0;
   const [searchQuery, setSearchQuery] = useState('');

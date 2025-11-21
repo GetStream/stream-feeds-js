@@ -5,7 +5,7 @@ import {
   useFeedsClient,
   useStateStore,
 } from '@stream-io/feeds-react-sdk';
-import { useOwnFeedContext } from '../own-feeds-context';
+import { useOwnFeedsContext } from '../own-feeds-context';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
 
@@ -22,7 +22,7 @@ const followingCountSelector = (state: FeedState) => ({
 export const Profile = () => {
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
-  const { ownFeed, ownTimeline } = useOwnFeedContext();
+  const { ownFeed, ownTimeline } = useOwnFeedsContext();
   const [bookmarks, setBookmarks] = useState<BookmarkResponse[]>([]);
   const [next, setNext] = useState<string | undefined>(undefined);
 

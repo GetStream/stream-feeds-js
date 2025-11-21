@@ -11,7 +11,7 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 const urlParams = new URLSearchParams(window.location.search);
 const userIdFromUrl = urlParams.get('user_id');
 const USER_ID =
-  import.meta.env.VITE_USER_ID ?? userIdFromUrl ?? generateUsername('-');
+  import.meta.env.VITE_USER_ID ?? userIdFromUrl ?? generateUsername();
 
 // Set user_id as URL parameter if not already present
 if (!userIdFromUrl) {

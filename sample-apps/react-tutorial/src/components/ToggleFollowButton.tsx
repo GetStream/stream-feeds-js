@@ -3,7 +3,7 @@ import {
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
 import { useCallback, useState } from 'react';
-import { useOwnFeedContext } from '../own-feeds-context';
+import { useOwnFeedsContext } from '../own-feeds-context';
 
 export const ToggleFollowButton = ({
   userId,
@@ -12,24 +12,21 @@ export const ToggleFollowButton = ({
   userId: string;
   isFollowing: boolean;
 }) => {
-  const { ownTimeline, ownStoryTimeline } = useOwnFeedContext();
+  const { ownTimeline, ownStoryTimeline } = useOwnFeedsContext();
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
 
   const follow = useCallback(async () => {
-    await client?.followBatch({
-      follows: [
-        {
-          source: `timeline:${currentUser?.id}`,
-          create_notification_activity: true,
-          target: `user:${userId}`,
-        },
-        {
-          source: `stories:${currentUser?.id}`,
-          target: `story:${userId}`,
-        },
-      ],
+    await client?.follow({
+      source: `timeline:${currentUser?.id}`,
+      target: `user:${userId}`,
+      create_notification_activity: true,
+    });
+    await client?.follow({
+      source: `stories:${currentUser?.id}`,
+      target: `story:${userId}`,
+      create_notification_activity: true,
     });
     setIsFollowing(true);
     await ownTimeline?.getOrCreate({ watch: true });

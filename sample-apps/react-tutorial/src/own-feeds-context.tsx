@@ -101,4 +101,4 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
   );
 };
 
-export const useOwnFeedContext = () => useContext(OwnFeedsContext);
+export const useOwnFeedsContext = () => useContext(OwnFeedsContext);
