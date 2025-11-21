@@ -26,7 +26,6 @@ export const ToggleFollowButton = ({
     await client?.follow({
       source: `stories:${currentUser?.id}`,
       target: `story:${userId}`,
-      create_notification_activity: true,
     });
     setIsFollowing(true);
     // Reload timelines to see new activities
