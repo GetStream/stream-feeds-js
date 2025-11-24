@@ -73,8 +73,12 @@ export const AppSkeleton = () => {
           <div className="w-[30%] flex flex-col items-stretch justify-start gap-4">
             <div className="join w-full">
               <div className="w-full">
-                <label className="input join-item">
-                  <input ref={searchInputRef} placeholder="🔍 Search..." />{' '}
+                <label className="input join-item w-full">
+                  <input
+                    className="w-full"
+                    ref={searchInputRef}
+                    placeholder="🔍 Search..."
+                  />{' '}
                 </label>
               </div>
               <button

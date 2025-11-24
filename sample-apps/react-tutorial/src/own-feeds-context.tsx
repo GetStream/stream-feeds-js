@@ -75,6 +75,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       const _ownNotifications = client.feed('notification', connectedUser.id);
       setOwnNotifications(_ownNotifications);
       _ownNotifications?.getOrCreate({ watch: true });
+      // For stories feed there is no WebSocket event for new stories, so we don't need activityAddedEventFilter
       const _ownStoryTimeline = client.feed('stories', connectedUser.id);
       setOwnStoryTimeline(_ownStoryTimeline);
       _ownStoryTimeline?.getOrCreate({ watch: true });
