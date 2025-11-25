@@ -65,13 +65,6 @@ export function Header() {
                 >
                   My posts
                 </Link>
-                <Link
-                  href="/users"
-                  className="block px-4 py-2 text-gray-800 rounded-md hover:bg-gray-100"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Users
-                </Link>
               </div>
             </div>
           </li>
