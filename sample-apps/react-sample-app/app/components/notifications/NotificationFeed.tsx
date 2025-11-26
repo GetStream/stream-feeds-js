@@ -1,4 +1,4 @@
-import { useFeedContext } from '../../feed-context';
+import { useFeedContext } from '../../own-feeds-context';
 import type { AggregatedActivityResponse } from '@stream-io/feeds-client';
 import {
   useAggregatedActivities,

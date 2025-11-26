@@ -5,7 +5,7 @@ import {
   useStateStore,
   type ActivityResponse,
 } from '@stream-io/feeds-react-sdk';
-import { useFeedContext } from '@/app/feed-context';
+import { useFeedContext } from '@/app/own-feeds-context';
 import Link from 'next/link';
 
 export type SearchResultItemComponents = Record<

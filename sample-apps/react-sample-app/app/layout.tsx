@@ -3,7 +3,10 @@ import localFont from 'next/font/local';
 import './globals.css';
 import { UserContextProvider } from './user-context';
 import { Header } from './components/Header';
-import { FeedContextProvider } from './feed-context';
+import {
+  FeedContextProvider,
+  OwnFeedsContextProvider,
+} from './own-feeds-context';
 import { ErrorContextProvider } from './error-context';
 import { AppNotificationsContextProvider } from './app-notifications-context';
 import AppNotifications from './components/AppNotifications';
@@ -39,7 +42,7 @@ export default function RootLayout({
           <AppNotificationsContextProvider>
             <ErrorContextProvider>
               <UserContextProvider>
-                <FeedContextProvider>
+                <OwnFeedsContextProvider>
                   <Header></Header>
                   <div
                     id="scrollContainer"
@@ -50,7 +53,7 @@ export default function RootLayout({
                       <AppNotifications></AppNotifications>
                     </div>
                   </div>
-                </FeedContextProvider>
+                </OwnFeedsContextProvider>
               </UserContextProvider>
             </ErrorContextProvider>
           </AppNotificationsContextProvider>

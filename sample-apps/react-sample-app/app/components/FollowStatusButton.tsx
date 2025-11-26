@@ -1,5 +1,5 @@
 import type { Feed, FeedState } from '@stream-io/feeds-react-sdk';
-import { useFeedContext } from '../feed-context';
+import { useFeedContext } from '../own-feeds-context';
 import { useStateStore } from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
 

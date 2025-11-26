@@ -5,7 +5,7 @@ import { useStateStore } from '@stream-io/feeds-react-sdk';
 import Link from 'next/link';
 
 import { useUserContext } from '../user-context';
-import { useFeedContext } from '../feed-context';
+import { useFeedContext } from '../own-feeds-context';
 import { PaginatedList } from '../components/PaginatedList';
 import { FollowStatusButton } from './FollowStatusButton';
 

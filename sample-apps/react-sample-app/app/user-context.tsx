@@ -6,12 +6,15 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { FeedsClient, type UserRequest } from '@stream-io/feeds-react-sdk';
+import {
+  FeedsClient,
+  useCreateFeedsClient,
+  type UserRequest,
+} from '@stream-io/feeds-react-sdk';
 import * as usersJSON from '../users.json';
 import { useRouter } from 'next/navigation';
 import { useAppNotificationsContext } from './app-notifications-context';
 
-const tokenProviderURL = process.env.NEXT_PUBLIC_STREAM_TOKEN_URL!;
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY!;
 const apiUrl = process.env.NEXT_PUBLIC_API_URL!;
 
@@ -37,7 +40,6 @@ const users = Array.from(usersJSON);
 
 type UserContextValue = {
   users: UserRequest[];
-  client?: FeedsClient;
   user?: UserRequest;
   logIn: (user: UserRequest) => Promise<void>;
   logOut: () => Promise<void>;
@@ -45,7 +47,6 @@ type UserContextValue = {
 
 const UserContext = createContext<UserContextValue>({
   user: undefined,
-  client: undefined,
   users,
   logIn: () => Promise.resolve(),
   logOut: () => Promise.resolve(),
@@ -54,7 +55,6 @@ const UserContext = createContext<UserContextValue>({
 export const UserContextProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter();
   const { resetNotifications } = useAppNotificationsContext();
-  const [client, setClient] = useState<FeedsClient | undefined>();
   const [user, setUser] = useState<UserRequest | undefined>();
 
   const logIn = async (user: UserRequest) => {
@@ -69,17 +69,17 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
         const data = await response.json();
         return data.token;
       };
-      const _client = new FeedsClient(apiKey, {
-        base_url: apiUrl,
-        configure_loggers_options: { default: { level: 'debug' } },
+      const client = useCreateFeedsClient({
+        apiKey,
+        tokenOrProvider: tokenProvider,
+        userData: user,
       });
-      const connectPromise = _client.connectUser(user, tokenProvider);
-      setClient(_client);
+      const connectPromise = client?.connectUser(user, tokenProvider);
       // @ts-expect-error Exposing the client to globalThis for debugging purposes
-      globalThis.client = _client;
+      globalThis.client = client;
       await connectPromise;
     } catch (error) {
-      logOut().catch((err) => {
+      logOut().catch((err: unknown) => {
         throw err;
       });
       throw error;
@@ -114,7 +114,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
   };
 
   return (
-    <UserContext.Provider value={{ client, user, users, logIn, logOut }}>
+    <UserContext.Provider value={{ user, users, logIn, logOut }}>
       {children}
     </UserContext.Provider>
   );

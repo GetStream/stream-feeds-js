@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useFeedContext } from '../../feed-context';
+import { useFeedContext } from '../../own-feeds-context';
 import { NotificationFeed } from './NotificationFeed';
 import { useErrorContext } from '@/app/error-context';
 import { useNotificationStatus } from '@stream-io/feeds-react-sdk';

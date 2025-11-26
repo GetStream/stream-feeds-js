@@ -1,7 +1,7 @@
 'use client';
 import { Feed } from '../components/Feed';
 import { LoadingIndicator } from '../components/LoadingIndicator';
-import { useFeedContext } from '../feed-context';
+import { useFeedContext } from '../own-feeds-context';
 import { NewActivity } from '../components/NewActivity';
 
 export default function Timeline() {

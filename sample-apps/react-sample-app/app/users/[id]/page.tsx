@@ -1,6 +1,6 @@
 'use client';
 import { FeedMetadata } from '@/app/components/FeedMetadata';
-import { useFeedContext } from '../../feed-context';
+import { useFeedContext } from '../../own-feeds-context';
 import { useEffect, useMemo } from 'react';
 import { useUserContext } from '@/app/user-context';
 import { LoadingIndicator } from '@/app/components/LoadingIndicator';
