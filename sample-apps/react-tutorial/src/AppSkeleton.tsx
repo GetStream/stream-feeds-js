@@ -4,8 +4,8 @@ import {
 } from '@stream-io/feeds-react-sdk';
 import { useCallback, useRef, useState } from 'react';
 import { FollowSuggestions } from './components/FollowSuggestions';
-import { useOwnFeedContext } from './own-feeds-context';
-import { Explore } from './pages/Expolre';
+import { useOwnFeedsContext } from './own-feeds-context';
+import { Explore } from './pages/Explore';
 import { Profile } from './pages/Profile';
 import { Notifications } from './pages/Notifications';
 import { Home } from './pages/Home';
@@ -16,7 +16,7 @@ export const AppSkeleton = () => {
     'home' | 'notifications' | 'profile' | 'explore' | 'search'
   >('home');
   const currentUser = useClientConnectedUser();
-  const { ownNotifications } = useOwnFeedContext();
+  const { ownNotifications } = useOwnFeedsContext();
   const notificationStatus = useNotificationStatus(ownNotifications);
   const unreadCount = notificationStatus?.unread ?? 0;
   const [searchQuery, setSearchQuery] = useState('');
@@ -73,8 +73,12 @@ export const AppSkeleton = () => {
           <div className="w-[30%] flex flex-col items-stretch justify-start gap-4">
             <div className="join w-full">
               <div className="w-full">
-                <label className="input join-item">
-                  <input ref={searchInputRef} placeholder="🔍 Search..." />{' '}
+                <label className="input join-item w-full">
+                  <input
+                    className="w-full"
+                    ref={searchInputRef}
+                    placeholder="🔍 Search..."
+                  />{' '}
                 </label>
               </div>
               <button
