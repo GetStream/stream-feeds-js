@@ -17,6 +17,7 @@ export const FeedSearchResult = ({
         {feed.created_by?.name}
       </div>
       <ToggleFollowButton
+        key={feed.own_follows?.length}
         isFollowing={(feed.own_follows?.length ?? 0) > 0}
         userId={feed.created_by?.id ?? ''}
       />
