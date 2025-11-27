@@ -1,4 +1,5 @@
-import { ActivityResponse, useFeedContext } from '@stream-io/feeds-react-sdk';
+import type { ActivityResponse} from '@stream-io/feeds-react-sdk';
+import { useFeedContext } from '@stream-io/feeds-react-sdk';
 import { useState, useEffect, useCallback } from 'react';
 
 export const StoryViewer = ({

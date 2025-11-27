@@ -1,6 +1,7 @@
+import type {
+  FeedSuggestionResponse} from '@stream-io/feeds-react-sdk';
 import {
-  useFeedsClient,
-  FeedSuggestionResponse,
+  useFeedsClient
 } from '@stream-io/feeds-react-sdk';
 import { useState, useEffect } from 'react';
 import { FeedSearchResult } from './FeedSearchResult';

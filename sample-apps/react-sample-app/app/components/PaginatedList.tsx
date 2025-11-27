@@ -1,4 +1,5 @@
-import { ReactNode, useEffect } from 'react';
+import type { ReactNode} from 'react';
+import { useEffect } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { useErrorContext } from '../error-context';
 

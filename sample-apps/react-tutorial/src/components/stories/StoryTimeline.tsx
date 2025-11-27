@@ -1,5 +1,6 @@
+import type {
+  AggregatedActivityResponse} from '@stream-io/feeds-react-sdk';
 import {
-  AggregatedActivityResponse,
   useAggregatedActivities,
 } from '@stream-io/feeds-react-sdk';
 import { useState, useCallback } from 'react';

@@ -1,5 +1,6 @@
 import { useErrorContext } from '@/app/error-context';
-import { ActivityResponse, useFeedsClient } from '@stream-io/feeds-react-sdk';
+import type { ActivityResponse} from '@stream-io/feeds-react-sdk';
+import { useFeedsClient } from '@stream-io/feeds-react-sdk';
 
 export const ToggleBookmark = ({
   activity,

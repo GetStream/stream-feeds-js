@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
-import {
+import type {
   ActivityResponse,
   PollState,
   PollOption as StreamPollOption,
-  useFeedsClient,
-  useStateStore,
 } from '@stream-io/feeds-react-sdk';
+import { useFeedsClient, useStateStore } from '@stream-io/feeds-react-sdk';
 import { PollContextProvider, usePollContext } from '@/app/poll-context';
 
 export const Poll = ({ activity }: { activity: ActivityResponse }) => {
@@ -60,7 +59,7 @@ const PollButtons = () => {
           answer_text: `Random answer ${Math.floor(Math.random() * 1000000) + 1}`,
         },
       }),
-    [activity.id, poll.id],
+    [activity.id, poll.id, client],
   );
   const handleEndVote = useCallback(
     () => client?.closePoll({ poll_id: poll.id }),
@@ -126,7 +125,7 @@ const PollOption = ({ option }: { option: StreamPollOption }) => {
             poll_id: poll.id,
             vote: { option_id: option.id },
           }),
-    [client, activity.id, poll.id, ownVote],
+    [client, activity.id, poll.id, ownVote, option.id],
   );
   return (
     <div className="flex items-center justify-between text-sm">

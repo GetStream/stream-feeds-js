@@ -1,12 +1,13 @@
 'use client';
 import React from 'react';
+import type {
+  AppNotificationType} from '../app-notifications-context';
 import {
-  AppNotificationType,
   useAppNotificationsContext,
 } from '../app-notifications-context';
 
 const AppNotifications = () => {
-  const backgroundColors: { [key in AppNotificationType]: string } = {
+  const backgroundColors: Record<AppNotificationType, string> = {
     info: 'bg-blue-500',
     success: 'bg-green-500',
     warning: 'bg-yellow-500',

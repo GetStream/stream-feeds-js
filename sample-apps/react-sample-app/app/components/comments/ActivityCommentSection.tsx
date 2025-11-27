@@ -1,9 +1,11 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import {
+import type { FormEvent} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type {
   Feed,
+  ActivityWithStateUpdates} from '@stream-io/feeds-react-sdk';
+import {
   type ActivityResponse,
   type CommentResponse,
-  ActivityWithStateUpdates,
   useActivityComments,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';

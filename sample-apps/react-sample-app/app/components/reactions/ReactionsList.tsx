@@ -4,7 +4,7 @@ import {
   type CommentResponse,
   type FeedsReactionResponse,
 } from '@stream-io/feeds-react-sdk';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PaginatedList } from '../PaginatedList';
 
 export const ReactionsList = ({
@@ -20,11 +20,7 @@ export const ReactionsList = ({
   const [next, setNext] = useState<string>();
   const client = useFeedsClient();
 
-  useEffect(() => {
-    void loadMore();
-  }, [client]);
-
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (!client) {
       return;
     }
@@ -50,12 +46,16 @@ export const ReactionsList = ({
           }));
       setReactions([...reactions, ...response.reactions]);
       setNext(response.next);
-    } catch (error) {
-      setError(error as Error);
+    } catch (e) {
+      setError(e as Error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [object, type, next, client, reactions]);
+
+  useEffect(() => {
+    void loadMore();
+  }, [client, loadMore]);
 
   const renderItem = (reaction: FeedsReactionResponse) => {
     return (

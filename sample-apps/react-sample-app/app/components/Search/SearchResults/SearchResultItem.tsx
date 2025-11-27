@@ -1,7 +1,8 @@
-import { ComponentType } from 'react';
-import {
+import type { ComponentType } from 'react';
+import type {
   Feed,
-  FeedState,
+  FeedState} from '@stream-io/feeds-react-sdk';
+import {
   useStateStore,
   type ActivityResponse,
 } from '@stream-io/feeds-react-sdk';

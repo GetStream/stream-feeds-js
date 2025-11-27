@@ -17,7 +17,7 @@ export default function ErrorBoundaryPage({
     if (error) {
       logError(error);
     }
-  }, [error]);
+  }, [error, logError]);
 
   return <Error error={error} reset={() => reset()}></Error>;
 }

@@ -1,7 +1,5 @@
-import {
-  AggregatedActivityResponse,
-  useIsAggregatedActivityRead,
-} from '@stream-io/feeds-react-sdk';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-react-sdk';
+import { useIsAggregatedActivityRead } from '@stream-io/feeds-react-sdk';
 import { useMemo } from 'react';
 
 export const Notification = ({
@@ -26,21 +24,21 @@ export const Notification = ({
 
     notificationText += `${userCount} ${userCount === 1 ? 'person' : 'people'}`;
 
-    let icon = '';
+    let notificationIcon = '';
 
     switch (action) {
       case 'comment': {
-        icon = '💬';
+        notificationIcon = '💬';
         notificationText += ` commented on your post${activityText}`;
         break;
       }
       case 'reaction': {
-        icon = '❤️';
+        notificationIcon = '❤️';
         notificationText += ` reacted to your post${activityText}`;
         break;
       }
       case 'follow': {
-        icon = '👤';
+        notificationIcon = '👤';
         notificationText += ` started following you`;
         break;
       }
@@ -52,7 +50,7 @@ export const Notification = ({
 
     return {
       text: notificationText,
-      icon,
+      icon: notificationIcon,
     };
   }, [notification]);
 

@@ -4,13 +4,8 @@ import {
   useFeedsClient,
   type Feed,
 } from '@stream-io/feeds-react-sdk';
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import type { PropsWithChildren } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useErrorContext } from './error-context';
 
 type OwnFeedsContextValue = {
@@ -57,7 +52,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
         ?.getOrCreate({ watch: true })
         .catch(throwUnrecoverableError);
     }
-  }, [user, client]);
+  }, [user, client, throwUnrecoverableError]);
 
   return (
     <OwnFeedsContext.Provider

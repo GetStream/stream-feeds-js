@@ -6,7 +6,8 @@ import {
   useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
-import { FormEvent, useMemo, useState } from 'react';
+import type { FormEvent} from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityComposer } from './activity/ActivityComposer';
 import { LoadingIndicator } from './LoadingIndicator';
 

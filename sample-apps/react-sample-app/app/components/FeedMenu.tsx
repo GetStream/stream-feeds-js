@@ -5,9 +5,7 @@ type Action = 'null';
 export const FeedMenu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [enabledActions] = useState<Action[]>([]);
-  const actionMapping: {
-    [key in Action]: { label: string; icon: string; handler: () => void };
-  } = {
+  const actionMapping: Record<Action, { label: string; icon: string; handler: () => void }> = {
     null: {
       label: '',
       icon: '',

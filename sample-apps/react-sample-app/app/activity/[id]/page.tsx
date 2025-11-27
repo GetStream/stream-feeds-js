@@ -3,9 +3,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { LoadingIndicator } from '@/app/components/LoadingIndicator';
 import { useParams } from 'next/navigation';
 import { useErrorContext } from '@/app/error-context';
-import {
+import type {
   ActivityWithStateUpdates,
   Feed,
+} from '@stream-io/feeds-react-sdk';
+import {
   FeedOwnCapability,
   useFeedsClient,
   useOwnCapabilities,
@@ -53,10 +55,13 @@ function ActivityPageContent() {
       return;
     }
 
-    setActivityWithStateUpdates(client.activityWithStateUpdates(params.id));
+    const _activityWithStateUpdates = client.activityWithStateUpdates(
+      params.id,
+    );
+    setActivityWithStateUpdates(_activityWithStateUpdates);
 
     return () => {
-      activityWithStateUpdates?.dispose();
+      _activityWithStateUpdates?.dispose();
     };
   }, [client, params?.id]);
 
@@ -66,16 +71,17 @@ function ActivityPageContent() {
     }
 
     let shouldStopWatching: boolean = false;
+    let _feed: Feed | undefined;
     activityWithStateUpdates
       .get()
       .then((response) => {
         const fid = response.feeds[0];
         const [group, id] = fid.split(':');
-        const feed = client?.feed(group, id);
-        setFeed(feed);
-        if (!feed?.currentState.watch && !feed?.currentState.is_loading) {
+        _feed = client?.feed(group, id);
+        setFeed(_feed);
+        if (!_feed?.currentState.watch && !_feed?.currentState.is_loading) {
           shouldStopWatching = true;
-          return feed
+          return _feed
             ?.getOrCreate({
               watch: true,
               limit: 0,
@@ -89,10 +95,15 @@ function ActivityPageContent() {
 
     return () => {
       if (shouldStopWatching) {
-        feed?.stopWatching();
+        _feed?.stopWatching();
       }
     };
-  }, [logErrorAndDisplayNotification, activityWithStateUpdates, client]);
+  }, [
+    logErrorAndDisplayNotification,
+    logError,
+    activityWithStateUpdates,
+    client,
+  ]);
 
   const ownCapabilities = useOwnCapabilities(feed);
 

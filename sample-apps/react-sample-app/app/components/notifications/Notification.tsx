@@ -22,7 +22,7 @@ export const Notification = ({
 
     const targetActivity = group.activities[0].notification_context?.target;
     const trigger = group.activities[0].notification_context?.trigger;
-    const notification = {
+    const _notification = {
       text: '',
       image: targetActivity?.text
         ? undefined
@@ -42,32 +42,32 @@ export const Notification = ({
       : '';
     const previewCount = 5;
     const previewActors = Array.from(
-      new Set(group.activities.map(({ user }) => user.name)),
+      new Set(group.activities.map(({ user: u }) => u.name)),
     ).slice(0, previewCount);
-    notification.text = previewActors.join(', ');
+    _notification.text = previewActors.join(', ');
     const remainingActors = group.user_count - previewActors.length;
 
     if (remainingActors > 1) {
-      notification.text += ` and ${remainingActors}${group.user_count_truncated ? '+' : ''} more people`;
+      _notification.text += ` and ${remainingActors}${group.user_count_truncated ? '+' : ''} more people`;
     } else if (remainingActors === 1) {
-      notification.text += ' and 1 more person';
+      _notification.text += ' and 1 more person';
     }
 
     switch (verb) {
       case 'comment': {
-        notification.text += ` commented on your post${targetActivityTruncatedText}`;
+        _notification.text += ` commented on your post${targetActivityTruncatedText}`;
         break;
       }
       case 'reaction': {
-        notification.text += ` reacted to your post${targetActivityTruncatedText}`;
+        _notification.text += ` reacted to your post${targetActivityTruncatedText}`;
         break;
       }
       case 'follow': {
-        notification.text += ` started following you`;
+        _notification.text += ` started following you`;
         break;
       }
       case 'comment_reaction': {
-        notification.text += ` reacted to your comment on post${targetActivityTruncatedText}`;
+        _notification.text += ` reacted to your comment on post${targetActivityTruncatedText}`;
         break;
       }
       default: {
@@ -76,7 +76,7 @@ export const Notification = ({
       }
     }
 
-    return notification;
+    return _notification;
   }, [group, user?.id]);
 
   return (

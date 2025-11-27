@@ -1,8 +1,9 @@
 'use client';
+import type {
+  UserRequest} from '@stream-io/feeds-react-sdk';
 import {
   StreamFeeds,
-  useCreateFeedsClient,
-  UserRequest,
+  useCreateFeedsClient
 } from '@stream-io/feeds-react-sdk';
 import { OwnFeedsContextProvider } from './own-feeds-context';
 import { useUserContext } from './user-context';

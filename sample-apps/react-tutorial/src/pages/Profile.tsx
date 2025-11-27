@@ -1,6 +1,5 @@
+import type { BookmarkResponse, FeedState } from '@stream-io/feeds-react-sdk';
 import {
-  BookmarkResponse,
-  FeedState,
   useClientConnectedUser,
   useFeedsClient,
   useStateStore,
@@ -46,7 +45,10 @@ export const Profile = () => {
         next,
       })
       .then((response) => {
-        setBookmarks([...(next ? bookmarks : []), ...response.bookmarks]);
+        setBookmarks((current) => [
+          ...(next ? current : []),
+          ...response.bookmarks,
+        ]);
         setNext(response.next);
       });
   }, [client, next]);

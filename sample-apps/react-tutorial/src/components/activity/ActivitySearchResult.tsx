@@ -1,4 +1,4 @@
-import { ActivityResponse } from '@stream-io/feeds-react-sdk';
+import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 
 export const ActivitySearchResult = ({
   activity,
@@ -34,7 +34,7 @@ export const ActivitySearchResult = ({
                 }`}
               >
                 ❤️&nbsp;
-                {activity.reaction_groups['like']?.count ?? 0}
+                {activity.reaction_groups.like?.count ?? 0}
               </button>
               <button
                 type="button"

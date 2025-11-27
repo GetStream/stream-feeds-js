@@ -1,6 +1,7 @@
 import { useErrorContext } from '@/app/error-context';
+import type {
+  ActivityResponse} from '@stream-io/feeds-react-sdk';
 import {
-  ActivityResponse,
   FeedOwnCapability,
   useClientConnectedUser,
   useFeedsClient,

@@ -18,7 +18,7 @@ export default function ErrorPage() {
       throwUnrecoverableError(err);
     });
     router.push('/login');
-  }, [logOut]);
+  }, [logOut, client, router, throwUnrecoverableError]);
 
   return <Error error={unrecoverableError} reset={reset}></Error>;
 }

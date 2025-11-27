@@ -1,11 +1,6 @@
 'use client';
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import type { PropsWithChildren } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { type UserRequest } from '@stream-io/feeds-react-sdk';
 import * as usersJSON from '../users.json';
 import { useAppNotificationsContext } from './app-notifications-context';
@@ -48,9 +43,9 @@ export const UserContextProvider = ({ children }: PropsWithChildren) => {
   const { resetNotifications } = useAppNotificationsContext();
   const [user, setUser] = useState<UserRequest | undefined>();
 
-  const logIn = (user?: UserRequest) => {
-    document.cookie = user ? `user_id=${user.id}` : '';
-    setUser(user);
+  const logIn = (_user?: UserRequest) => {
+    document.cookie = _user ? `user_id=${_user.id}` : '';
+    setUser(_user);
   };
 
   useEffect(() => {

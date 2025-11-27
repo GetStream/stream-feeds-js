@@ -1,7 +1,8 @@
-import {
-  useFeedsClient,
+import type {
   ActivityResponse,
-  Feed,
+  Feed} from '@stream-io/feeds-react-sdk';
+import {
+  useFeedsClient
 } from '@stream-io/feeds-react-sdk';
 import { useState, useCallback, useEffect } from 'react';
 import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';

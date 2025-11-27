@@ -1,5 +1,6 @@
+import type {
+  ActivityResponse} from '@stream-io/feeds-react-sdk';
 import {
-  ActivityResponse,
   useFeedContext,
   useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
