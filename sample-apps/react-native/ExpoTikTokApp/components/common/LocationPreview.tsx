@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Place } from '@/components/search/PlaceSearchDropdown';
+import type { Place } from '@/components/search/PlaceSearchDropdown';
 import { useRouter } from 'expo-router';
 import { mapApiKey } from '@/constants/stream';
 

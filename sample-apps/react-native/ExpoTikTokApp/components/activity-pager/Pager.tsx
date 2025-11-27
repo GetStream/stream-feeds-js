@@ -1,13 +1,15 @@
 import { useFeedActivities } from '@stream-io/feeds-react-native-sdk';
 import React, { useEffect, useRef, useState } from 'react';
 import { useStableCallback } from '@/hooks/useStableCallback';
+import type {
+  NativeScrollEvent,
+  NativeSyntheticEvent} from 'react-native';
 import {
   Dimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   Platform,
 } from 'react-native';
-import { FlashList, FlashListRef } from '@shopify/flash-list';
+import type { FlashListRef } from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { ActivityPagerContextProvider } from '@/contexts/ActivityPagerContext';
 import { PagerItem } from '@/components/activity-pager/PagerItem';

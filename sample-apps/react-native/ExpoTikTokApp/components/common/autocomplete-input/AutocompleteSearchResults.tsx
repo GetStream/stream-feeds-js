@@ -2,7 +2,8 @@ import {
   StreamSearchResults, useSearchContext,
   useSearchSources,
 } from '@stream-io/feeds-react-native-sdk';
-import { PropsWithChildren, useEffect, useMemo } from 'react';
+import type { PropsWithChildren} from 'react';
+import { useEffect, useMemo } from 'react';
 
 export const AutocompleteSearchResults = ({ children }: PropsWithChildren) => {
   const searchController = useSearchContext();

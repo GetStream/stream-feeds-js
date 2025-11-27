@@ -14,8 +14,9 @@ import 'react-native-reanimated';
 import { StreamFeeds } from '@stream-io/feeds-react-native-sdk';
 import LoginScreen from '@/components/LoginScreen';
 
+import type {
+  LocalUser} from '@/contexts/UserContext';
 import {
-  LocalUser,
   UserContextProvider,
   useUserContext,
 } from '@/contexts/UserContext';

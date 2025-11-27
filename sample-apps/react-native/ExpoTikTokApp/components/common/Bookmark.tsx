@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import React from 'react';
+import type {
+  ActivityResponse} from '@stream-io/feeds-react-native-sdk';
 import {
-  ActivityResponse,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';
 import { useStableCallback } from '@/hooks/useStableCallback';

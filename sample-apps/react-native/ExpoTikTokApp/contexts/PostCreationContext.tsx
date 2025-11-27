@@ -1,11 +1,12 @@
+import type {
+  PropsWithChildren} from 'react';
 import {
   createContext,
-  PropsWithChildren,
   useContext,
   useMemo,
   useState,
 } from 'react';
-import { Place } from '@/components/search/PlaceSearchDropdown';
+import type { Place } from '@/components/search/PlaceSearchDropdown';
 import type { Attachment } from '@stream-io/feeds-react-native-sdk';
 import { useActivityActionState } from '@/hooks/useActivityActionState';
 

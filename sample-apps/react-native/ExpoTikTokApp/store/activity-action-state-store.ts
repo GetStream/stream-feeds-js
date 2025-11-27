@@ -1,5 +1,6 @@
+import type {
+  ActivityResponse} from '@stream-io/feeds-react-native-sdk';
 import {
-  ActivityResponse,
   StateStore,
 } from '@stream-io/feeds-react-native-sdk';
 

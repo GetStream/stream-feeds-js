@@ -1,4 +1,4 @@
-import { Feed, User } from '@stream-io/feeds-react-native-sdk';
+import type { Feed, User } from '@stream-io/feeds-react-native-sdk';
 import { useSearchResultsContext } from '@stream-io/feeds-react-native-sdk';
 import {
   Image,

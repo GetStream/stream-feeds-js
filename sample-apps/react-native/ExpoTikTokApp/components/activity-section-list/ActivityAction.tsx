@@ -2,7 +2,7 @@ import { Platform, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useStableCallback } from '@/hooks/useStableCallback';
 import { openSheetWith } from '@/store/bottom-sheet-state-store';
-import { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
+import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { useRouter } from 'expo-router';
 
 export const ActivityAction = ({

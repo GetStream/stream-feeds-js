@@ -1,4 +1,5 @@
-import { CommentParent, StateStore } from '@stream-io/feeds-react-native-sdk';
+import type { CommentParent} from '@stream-io/feeds-react-native-sdk';
+import { StateStore } from '@stream-io/feeds-react-native-sdk';
 
 export type CommentInputState = {
   editingEntity?: CommentParent;

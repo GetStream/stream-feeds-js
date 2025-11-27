@@ -1,7 +1,8 @@
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import { FlatList, Platform, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/common/Themed';
-import { StableCallback, useStableCallback } from '@/hooks/useStableCallback';
+import type { StableCallback} from '@/hooks/useStableCallback';
+import { useStableCallback } from '@/hooks/useStableCallback';
 import { closeSheet, setHeight } from '@/store/bottom-sheet-state-store';
 
 type ActionType = () => void | Promise<void>;

@@ -1,5 +1,6 @@
-import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
-import { Feed } from '@stream-io/feeds-react-native-sdk';
+import type { PropsWithChildren} from 'react';
+import { createContext, useContext, useMemo } from 'react';
+import type { Feed } from '@stream-io/feeds-react-native-sdk';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 
