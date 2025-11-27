@@ -44,14 +44,17 @@ export const ReactionsList = ({
             ...payload,
             id: object.id,
           }));
-      setReactions([...reactions, ...response.reactions]);
+      setReactions((current) => [
+        ...(next ? current : []),
+        ...response.reactions,
+      ]);
       setNext(response.next);
     } catch (e) {
       setError(e as Error);
     } finally {
       setIsLoading(false);
     }
-  }, [object, type, next, client, reactions]);
+  }, [object, type, next, client]);
 
   useEffect(() => {
     void loadMore();
