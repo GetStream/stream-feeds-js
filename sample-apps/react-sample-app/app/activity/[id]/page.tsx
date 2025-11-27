@@ -1,6 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useUserContext } from '@/app/user-context';
+import { useCallback, useEffect, useState } from 'react';
 import { LoadingIndicator } from '@/app/components/LoadingIndicator';
 import { useParams } from 'next/navigation';
 import { useErrorContext } from '@/app/error-context';
@@ -8,6 +7,8 @@ import {
   ActivityWithStateUpdates,
   Feed,
   FeedOwnCapability,
+  useFeedsClient,
+  useOwnCapabilities,
   useStateStore,
   type ActivityState,
 } from '@stream-io/feeds-react-sdk';
@@ -17,7 +18,6 @@ import { ActivityMetadata } from '@/app/components/activity/ActivityMetadata';
 import { ActivityActions } from '@/app/components/activity/ActivityActions';
 import { ActivityContent } from '@/app/components/activity/ActivityContent';
 import { ActivityCommentSection } from '@/app/components/comments/ActivityCommentSection';
-import { useOwnCapabilities } from '@/app/hooks/useOwnCapabilities';
 
 // I need the isMounted to prevent this error from Next:
 // "Missing getServerSnapshot, which is required for server-rendered content. Will revert to client rendering."
@@ -38,7 +38,7 @@ export default function ActivityPage() {
 
 function ActivityPageContent() {
   const params = useParams<{ id: string }>();
-  const { client } = useUserContext();
+  const client = useFeedsClient();
   const { logErrorAndDisplayNotification, logError } = useErrorContext();
   const [editedActivityText, setEditedActivityText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -94,7 +94,7 @@ function ActivityPageContent() {
     };
   }, [logErrorAndDisplayNotification, activityWithStateUpdates, client]);
 
-  const ownCapabilities = useOwnCapabilities({ feed });
+  const ownCapabilities = useOwnCapabilities(feed);
 
   const activitySelector = useCallback((state: ActivityState) => {
     return {

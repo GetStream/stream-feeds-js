@@ -2,17 +2,13 @@
 import type { UserRequest } from '@stream-io/feeds-react-sdk';
 import { useRouter } from 'next/navigation';
 import { useUserContext } from '../user-context';
-import { useErrorContext } from '../error-context';
 
 export default function Login() {
   const { users, logIn } = useUserContext();
-  const { throwUnrecoverableError } = useErrorContext();
   const router = useRouter();
 
-  const login = (user: UserRequest) => {
-    logIn(user).catch((err) => {
-      throwUnrecoverableError(err);
-    });
+  const login = async (user: UserRequest) => {
+    logIn(user);
     router.push('/timeline');
   };
 

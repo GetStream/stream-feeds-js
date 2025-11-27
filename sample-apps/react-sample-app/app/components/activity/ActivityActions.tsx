@@ -1,8 +1,9 @@
 import { useErrorContext } from '@/app/error-context';
-import { useUserContext } from '@/app/user-context';
 import {
   ActivityResponse,
   FeedOwnCapability,
+  useClientConnectedUser,
+  useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
 import { useState } from 'react';
 
@@ -20,7 +21,8 @@ export const ActivityActions = ({
   onEditCancel: () => void;
 }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
-  const { client, user } = useUserContext();
+  const user = useClientConnectedUser();
+  const client = useFeedsClient();
   const [isEditing, setIsEditing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

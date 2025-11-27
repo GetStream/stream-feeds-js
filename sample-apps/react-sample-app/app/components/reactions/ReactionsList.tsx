@@ -1,8 +1,8 @@
-import { useUserContext } from '@/app/user-context';
-import type {
-  ActivityResponse,
-  CommentResponse,
-  FeedsReactionResponse,
+import {
+  useFeedsClient,
+  type ActivityResponse,
+  type CommentResponse,
+  type FeedsReactionResponse,
 } from '@stream-io/feeds-react-sdk';
 import React, { useEffect, useState } from 'react';
 import { PaginatedList } from '../PaginatedList';
@@ -18,7 +18,7 @@ export const ReactionsList = ({
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [next, setNext] = useState<string>();
-  const { client } = useUserContext();
+  const client = useFeedsClient();
 
   useEffect(() => {
     void loadMore();

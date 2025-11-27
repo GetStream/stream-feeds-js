@@ -1,19 +1,37 @@
 'use client';
 import { FeedMetadata } from '@/app/components/FeedMetadata';
-import { useFeedContext } from '../../own-feeds-context';
-import { useEffect, useMemo } from 'react';
-import { useUserContext } from '@/app/user-context';
+import { useOwnFeedsContext } from '../../own-feeds-context';
+import { useEffect, useMemo, useState } from 'react';
 import { LoadingIndicator } from '@/app/components/LoadingIndicator';
 import { useParams } from 'next/navigation';
 import { NewActivity } from '@/app/components/NewActivity';
 import { Feed } from '@/app/components/Feed';
-import { initializeFeed } from '@/app/hooks/initializeFeed';
 import { useErrorContext } from '@/app/error-context';
+import {
+  StreamFeed,
+  useClientConnectedUser,
+  useFeedsClient,
+} from '@stream-io/feeds-react-sdk';
 
 export default function ProfilePage() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return <LoadingIndicator color="blue" />;
+  }
+
+  return <ProfilePageContent />;
+}
+
+function ProfilePageContent() {
   const params = useParams<{ id: string }>();
-  const { user, client } = useUserContext();
-  const { ownFeed, ownTimeline } = useFeedContext();
+  const user = useClientConnectedUser();
+  const client = useFeedsClient();
+  const { ownFeed, ownTimeline } = useOwnFeedsContext();
   const { logErrorAndDisplayNotification } = useErrorContext();
 
   const feed = useMemo(() => {
@@ -41,14 +59,21 @@ export default function ProfilePage() {
       return;
     }
 
-    initializeFeed(feed, {
-      watch: true,
-      followers_pagination: { limit: 10 },
-    }).catch(logErrorAndDisplayNotification);
-    initializeFeed(timeline, {
-      watch: true,
-      following_pagination: { limit: 10 },
-    }).catch(logErrorAndDisplayNotification);
+    // Our own feeds are initialized in the OwnFeedsContextProvider
+    if (user?.id !== params.id) {
+      feed
+        .getOrCreate({
+          watch: true,
+          followers_pagination: { limit: 10 },
+        })
+        .catch(logErrorAndDisplayNotification);
+      timeline
+        .getOrCreate({
+          watch: true,
+          following_pagination: { limit: 10 },
+        })
+        .catch(logErrorAndDisplayNotification);
+    }
 
     return () => {
       if (
@@ -85,10 +110,12 @@ export default function ProfilePage() {
     <>
       <div className="w-full flex flex-col items-center gap-5">
         <div className="w-full">
-          <FeedMetadata userFeed={feed} timelineFeed={timeline} />
+          <FeedMetadata timelineFeed={timeline} userFeed={feed} />
         </div>
-        <NewActivity feed={feed} />
-        <Feed feed={feed} />
+        <StreamFeed feed={feed}>
+          <NewActivity />
+          <Feed />
+        </StreamFeed>
       </div>
     </>
   );

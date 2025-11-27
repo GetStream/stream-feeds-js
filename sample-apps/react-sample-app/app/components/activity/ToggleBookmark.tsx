@@ -1,13 +1,12 @@
 import { useErrorContext } from '@/app/error-context';
-import { useUserContext } from '@/app/user-context';
-import { ActivityResponse } from '@stream-io/feeds-react-sdk';
+import { ActivityResponse, useFeedsClient } from '@stream-io/feeds-react-sdk';
 
 export const ToggleBookmark = ({
   activity,
 }: {
   activity: ActivityResponse;
 }) => {
-  const { client } = useUserContext();
+  const client = useFeedsClient();
   const { logErrorAndDisplayNotification } = useErrorContext();
   const hasOwnBookmark = activity.own_bookmarks?.length > 0;
 

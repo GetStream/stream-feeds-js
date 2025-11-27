@@ -3,10 +3,10 @@ import {
   ActivityResponse,
   PollState,
   PollOption as StreamPollOption,
+  useFeedsClient,
+  useStateStore,
 } from '@stream-io/feeds-react-sdk';
-import { useUserContext } from '@/app/user-context';
 import { PollContextProvider, usePollContext } from '@/app/poll-context';
-import { usePollStateStore } from '@/app/hooks/usePollStateStore';
 
 export const Poll = ({ activity }: { activity: ActivityResponse }) => {
   if (!activity.poll) {
@@ -25,7 +25,8 @@ const pollSelector = (state: PollState) => ({
 });
 
 const PollUI = () => {
-  const { name } = usePollStateStore(pollSelector);
+  const { poll } = usePollContext();
+  const { name } = useStateStore(poll?.state, pollSelector);
   return (
     <div className="bg-[#1c1c1e] text-white rounded-xl p-4 w-64 space-y-4 shadow-lg">
       <div>
@@ -40,7 +41,7 @@ const PollUI = () => {
 };
 
 const PollButtons = () => {
-  const { client } = useUserContext();
+  const client = useFeedsClient();
   const { poll, activity } = usePollContext();
   const handleSuggestOption = useCallback(
     () =>
@@ -88,7 +89,8 @@ const pollOptionsSelector = (state: PollState) => ({
 });
 
 const PollOptions = () => {
-  const { options } = usePollStateStore(pollOptionsSelector);
+  const { poll } = usePollContext();
+  const { options } = useStateStore(poll?.state, pollOptionsSelector);
 
   return (
     <div className="space-y-3">
@@ -100,7 +102,7 @@ const PollOptions = () => {
 };
 
 const PollOption = ({ option }: { option: StreamPollOption }) => {
-  const { client } = useUserContext();
+  const client = useFeedsClient();
   const { poll, activity } = usePollContext();
   const selector = useCallback(
     (state: PollState) => ({
@@ -110,7 +112,7 @@ const PollOption = ({ option }: { option: StreamPollOption }) => {
     }),
     [option.id],
   );
-  const { isClosed, voteCount, ownVote } = usePollStateStore(selector);
+  const { isClosed, voteCount, ownVote } = useStateStore(poll?.state, selector);
   const changePollVote = useCallback(
     () =>
       ownVote

@@ -1,7 +1,7 @@
-import { useUserContext } from '@/app/user-context';
-import type {
-  ActivityResponse,
-  CommentResponse,
+import {
+  useFeedsClient,
+  type ActivityResponse,
+  type CommentResponse,
 } from '@stream-io/feeds-react-sdk';
 import { useRef } from 'react';
 import { ReactionsList } from './ReactionsList';
@@ -25,7 +25,7 @@ export const Reactions = ({
 }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const { client } = useUserContext();
+  const client = useFeedsClient();
 
   const counts = object.reaction_groups?.[type]?.count ?? 0;
   const hasOwnReaction = !!object.own_reactions?.find((r) => r.type === type);

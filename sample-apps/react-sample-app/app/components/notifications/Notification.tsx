@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
-import type { AggregatedActivityResponse } from '@stream-io/feeds-react-sdk';
+import {
+  useClientConnectedUser,
+  type AggregatedActivityResponse,
+} from '@stream-io/feeds-react-sdk';
 import Link from 'next/link';
-import { useUserContext } from '@/app/user-context';
 
 export const Notification = ({
   group,
@@ -12,9 +14,9 @@ export const Notification = ({
   group: AggregatedActivityResponse;
   isRead: boolean;
   isSeen: boolean;
-  onMarkRead: () => {};
+  onMarkRead: () => void;
 }) => {
-  const { user } = useUserContext();
+  const user = useClientConnectedUser();
   const notification = useMemo(() => {
     const verb = group.activities[0].type;
 

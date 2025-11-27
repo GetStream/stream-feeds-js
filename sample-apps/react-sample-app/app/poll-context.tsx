@@ -1,11 +1,11 @@
 'use client';
 import { createContext, PropsWithChildren, useContext, useMemo } from 'react';
-import type {
-  ActivityResponse,
-  PollResponseData,
-  StreamPoll,
+import {
+  useFeedsClient,
+  type ActivityResponse,
+  type PollResponseData,
+  type StreamPoll,
 } from '@stream-io/feeds-react-sdk';
-import { useUserContext } from '@/app/user-context';
 
 type PollContextValue = {
   poll: StreamPoll;
@@ -24,7 +24,7 @@ export const PollContextProvider = ({
   activity,
   poll,
 }: PropsWithChildren<PollContextProps>) => {
-  const { client } = useUserContext();
+  const client = useFeedsClient();
   const pollFromState = client?.pollFromState(poll.id);
 
   if (!pollFromState) {

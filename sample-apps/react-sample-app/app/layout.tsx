@@ -2,15 +2,10 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { UserContextProvider } from './user-context';
-import { Header } from './components/Header';
-import {
-  FeedContextProvider,
-  OwnFeedsContextProvider,
-} from './own-feeds-context';
 import { ErrorContextProvider } from './error-context';
 import { AppNotificationsContextProvider } from './app-notifications-context';
-import AppNotifications from './components/AppNotifications';
 import { pageTitle } from './page-title';
+import { LayoutSwitcher } from './layout-switcher';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -42,18 +37,7 @@ export default function RootLayout({
           <AppNotificationsContextProvider>
             <ErrorContextProvider>
               <UserContextProvider>
-                <OwnFeedsContextProvider>
-                  <Header></Header>
-                  <div
-                    id="scrollContainer"
-                    className="max-h-full h-full overflow-auto"
-                  >
-                    <div className="w-3/4 py-5 max-h-full h-full min-h-0 m-auto flex flex-col justify-items-start">
-                      {children}
-                      <AppNotifications></AppNotifications>
-                    </div>
-                  </div>
-                </OwnFeedsContextProvider>
+                <LayoutSwitcher>{children}</LayoutSwitcher>
               </UserContextProvider>
             </ErrorContextProvider>
           </AppNotificationsContextProvider>

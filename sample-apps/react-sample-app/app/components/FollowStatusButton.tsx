@@ -1,10 +1,9 @@
 import type { Feed, FeedState } from '@stream-io/feeds-react-sdk';
-import { useFeedContext } from '../own-feeds-context';
 import { useStateStore } from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
+import { useOwnFeedsContext } from '../own-feeds-context';
 
 const selector = ({ own_follows = [] }: FeedState) => {
-  // TODO: we need to be able to get this info in queryFeeds result as well
   const own_follow = own_follows.find(
     (_) => _.source_feed.group_id === 'timeline',
   );
@@ -16,7 +15,7 @@ const selector = ({ own_follows = [] }: FeedState) => {
 export const FollowStatusButton = ({ feed }: { feed: Feed }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
 
-  const { ownTimeline } = useFeedContext();
+  const { ownTimeline } = useOwnFeedsContext();
 
   const { follow_status: followStatus } = useStateStore(feed.state, selector);
 

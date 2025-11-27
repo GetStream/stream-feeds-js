@@ -5,8 +5,8 @@ import {
   useStateStore,
   type ActivityResponse,
 } from '@stream-io/feeds-react-sdk';
-import { useFeedContext } from '@/app/own-feeds-context';
 import Link from 'next/link';
+import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
 export type SearchResultItemComponents = Record<
   string,
@@ -26,7 +26,7 @@ const selector = (nextValue: FeedState) => ({
   created_by: nextValue.created_by,
 });
 export const FeedSearchResultItem = ({ item }: FeedSearchResultItemProps) => {
-  const { ownTimeline } = useFeedContext();
+  const { ownTimeline } = useOwnFeedsContext();
 
   const { own_follows: ownFollows, created_by: createdBy } = useStateStore(
     item.state,

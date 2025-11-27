@@ -5,8 +5,8 @@ import {
   type CommentResponse,
   ActivityWithStateUpdates,
   useActivityComments,
+  useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
-import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { Comment } from './Comment';
 
@@ -21,7 +21,7 @@ export const ActivityCommentSection = ({
   activityWithStateUpdates?: ActivityWithStateUpdates;
   activity: ActivityResponse;
 }) => {
-  const { client } = useUserContext();
+  const client = useFeedsClient();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {

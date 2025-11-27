@@ -7,12 +7,14 @@ import {
   ActivitySearchSource,
   FeedSearchSource,
   SearchController,
+  useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
 import { Search } from './Search';
 import { NotificationBell } from './notifications/NotificationBell';
 
 export function Header() {
-  const { user, logOut, client } = useUserContext();
+  const { user, logOut } = useUserContext();
+  const client = useFeedsClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 
@@ -87,7 +89,8 @@ export function Header() {
                   className="flex"
                   title="Log out"
                   onClick={() => {
-                    logOut().catch((err) => {
+                    logOut();
+                    client?.disconnectUser().catch((err) => {
                       throw err;
                     });
                     router.push('/login');

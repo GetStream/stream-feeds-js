@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useFeedContext } from '../../own-feeds-context';
 import { NotificationFeed } from './NotificationFeed';
 import { useErrorContext } from '@/app/error-context';
 import { useNotificationStatus } from '@stream-io/feeds-react-sdk';
+import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
 export const NotificationBell = () => {
   const { logErrorAndDisplayNotification } = useErrorContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { ownNotifications } = useFeedContext();
+  const { ownNotifications } = useOwnFeedsContext();
   const { unseen = 0 } = useNotificationStatus(ownNotifications) ?? {};
 
   useEffect(() => {

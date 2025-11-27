@@ -1,23 +1,39 @@
-import { useFeedContext } from '../../own-feeds-context';
 import type { AggregatedActivityResponse } from '@stream-io/feeds-client';
 import {
+  StreamFeed,
   useAggregatedActivities,
+  useFeedContext,
+  useIsAggregatedActivityRead,
   useNotificationStatus,
   useStateStore,
-} from '@stream-io/feeds-client/react-bindings';
+} from '@stream-io/feeds-react-sdk';
 import { Notification } from './Notification';
 import { PaginatedList } from '../PaginatedList';
 import { useErrorContext } from '@/app/error-context';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
 export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
+  const { ownNotifications } = useOwnFeedsContext();
+
+  if (!ownNotifications) {
+    return null;
+  }
+
+  return (
+    <StreamFeed feed={ownNotifications}>
+      <NotificationFeedUI isMenuOpen={isMenuOpen} />
+    </StreamFeed>
+  );
+};
+
+const NotificationFeedUI = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
   const { logErrorAndDisplayNotification } = useErrorContext();
-  const { ownNotifications } = useFeedContext();
   const [seenActivities, setSeenActivities] = useState<string[]>([]);
   const [lastSeenAt, setLastSeenAt] = useState<Date | undefined>(undefined);
+  const ownNotifications = useFeedContext();
 
-  const { last_read_at: lastReadAt, read_activities: readActivities = [] } =
-    useNotificationStatus(ownNotifications) ?? {};
+  const { unread = 0 } = useNotificationStatus(ownNotifications) ?? {};
 
   useEffect(() => {
     if (!ownNotifications) {
@@ -79,39 +95,24 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
     }
   };
 
-  const hasUnreadNotifications = aggregatedActivities.some(
-    (group) =>
-      !readActivities.includes(group.group) &&
-      (!lastReadAt || group.updated_at.getTime() > lastReadAt.getTime()),
-  );
-
   const renderItem = useCallback(
-    (group: AggregatedActivityResponse, index: number) => {
+    (group: AggregatedActivityResponse) => {
       return (
-        <li key={`notification:${index}`} className="w-full">
-          <Notification
-            group={group}
-            isRead={
-              (lastReadAt &&
-                group.updated_at.getTime() <= lastReadAt.getTime()) ||
-              readActivities.includes(group.group)
-            }
-            isSeen={
-              (lastSeenAt &&
-                group.updated_at.getTime() <= lastSeenAt.getTime()) ||
-              seenActivities.includes(group.group)
-            }
-            onMarkRead={() => markRead(group)}
-          />
-        </li>
+        <NotificationItem
+          key={group.group}
+          group={group}
+          lastSeenAt={lastSeenAt}
+          seenActivities={seenActivities}
+          onMarkRead={markRead}
+        />
       );
     },
-    [readActivities, lastSeenAt, seenActivities, markRead],
+    [lastSeenAt, seenActivities, markRead],
   );
 
   return (
     <>
-      {hasUnreadNotifications && (
+      {unread > 0 && (
         <div className="flex justify-end mb-4">
           <button
             onClick={markAllRead}
@@ -130,5 +131,41 @@ export const NotificationFeed = ({ isMenuOpen }: { isMenuOpen: boolean }) => {
         itemsName="notifications"
       />
     </>
+  );
+};
+
+const NotificationItem = ({
+  group,
+  lastSeenAt,
+  seenActivities,
+  onMarkRead,
+}: {
+  group: AggregatedActivityResponse;
+  lastSeenAt: Date | undefined;
+  seenActivities: string[];
+  onMarkRead: (group: AggregatedActivityResponse) => void;
+}) => {
+  const isRead = useIsAggregatedActivityRead({
+    aggregatedActivity: group,
+  });
+
+  // We only want to remove indicator after notification list is closed
+  // If you don't need this, you can use useIsAggregatedActivitySeen instead
+  const isSeen = useMemo(
+    () =>
+      (lastSeenAt && group.updated_at.getTime() <= lastSeenAt.getTime()) ||
+      seenActivities.includes(group.group),
+    [lastSeenAt, seenActivities, group.group, group.updated_at],
+  );
+
+  return (
+    <li className="w-full">
+      <Notification
+        group={group}
+        isRead={isRead}
+        isSeen={isSeen}
+        onMarkRead={() => onMarkRead(group)}
+      />
+    </li>
   );
 };

@@ -1,13 +1,10 @@
-import type { Feed } from '@stream-io/feeds-react-sdk';
 import { useState } from 'react';
-import { useUserContext } from '../user-context';
 
 type Action = 'null';
 
-export const FeedMenu = ({ feed }: { feed: Feed }) => {
-  const { user } = useUserContext();
+export const FeedMenu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [enabledActions, setEnabledActions] = useState<Action[]>([]);
+  const [enabledActions] = useState<Action[]>([]);
   const actionMapping: {
     [key in Action]: { label: string; icon: string; handler: () => void };
   } = {
