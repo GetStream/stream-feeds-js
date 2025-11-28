@@ -1,11 +1,13 @@
+import type {
+  Feed} from '@stream-io/feeds-react-sdk';
 import {
-  Feed,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
+import type {
+  PropsWithChildren} from 'react';
 import {
   createContext,
-  PropsWithChildren,
   useContext,
   useEffect,
   useState,

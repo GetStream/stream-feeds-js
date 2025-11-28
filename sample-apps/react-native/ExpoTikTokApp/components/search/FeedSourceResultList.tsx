@@ -1,5 +1,6 @@
+import type {
+  Feed} from '@stream-io/feeds-react-native-sdk';
 import {
-  Feed,
   useClientConnectedUser,
   useFeedMetadata,
   useSearchResult,

@@ -2,12 +2,13 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { View, ScrollView, Text, StyleSheet, Pressable } from 'react-native';
 
 import * as ImagePicker from 'expo-image-picker';
-import {
+import type {
   Attachment,
   CreateFeedsBatchResponse,
+  StreamFile} from '@stream-io/feeds-react-native-sdk';
+import {
   isImageFile,
   isVideoFile,
-  StreamFile,
   useFeedContext,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';

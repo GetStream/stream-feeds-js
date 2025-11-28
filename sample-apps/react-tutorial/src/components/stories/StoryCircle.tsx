@@ -1,4 +1,4 @@
-import { UserResponse } from '@stream-io/feeds-react-sdk';
+import type { UserResponse } from '@stream-io/feeds-react-sdk';
 
 export const StoryCircle = ({
   isActive,

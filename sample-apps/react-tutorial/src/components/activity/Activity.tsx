@@ -1,5 +1,5 @@
+import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import {
-  ActivityResponse,
   useActivityComments,
   useClientConnectedUser,
   useFeedsClient,
@@ -25,18 +25,20 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
     }
   }, [loadNextPage, comments.length, activity.comment_count]);
 
-  const toggleReaction = useCallback(() => {
-    activity.own_reactions?.length > 0
-      ? client?.deleteActivityReaction({
-          activity_id: activity.id,
-          type: 'like',
-        })
-      : client?.addActivityReaction({
-          activity_id: activity.id,
-          type: 'like',
-          create_notification_activity: true,
-        });
-  }, [client, activity.id, activity.own_reactions]);
+  const toggleReaction = useCallback(
+    () =>
+      activity.own_reactions?.length > 0
+        ? client?.deleteActivityReaction({
+            activity_id: activity.id,
+            type: 'like',
+          })
+        : client?.addActivityReaction({
+            activity_id: activity.id,
+            type: 'like',
+            create_notification_activity: true,
+          }),
+    [client, activity.id, activity.own_reactions],
+  );
 
   const addComment = useCallback(async () => {
     await client?.addComment({
@@ -48,15 +50,17 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
     setCommentDraft('');
   }, [client, activity.id, commentDraft]);
 
-  const toggleBookmark = useCallback(() => {
-    activity.own_bookmarks?.length > 0
-      ? client?.deleteBookmark({
-          activity_id: activity.id,
-        })
-      : client?.addBookmark({
-          activity_id: activity.id,
-        });
-  }, [client, activity.id, activity.own_bookmarks]);
+  const toggleBookmark = useCallback(
+    () =>
+      activity.own_bookmarks?.length > 0
+        ? client?.deleteBookmark({
+            activity_id: activity.id,
+          })
+        : client?.addBookmark({
+            activity_id: activity.id,
+          }),
+    [client, activity.id, activity.own_bookmarks],
+  );
 
   return (
     <div className="w-full p-4 bg-base-100 card border border-base-300">
@@ -97,7 +101,7 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
                 onClick={toggleReaction}
               >
                 ❤️&nbsp;
-                {activity.reaction_groups['like']?.count ?? 0}
+                {activity.reaction_groups.like?.count ?? 0}
               </button>
               <button
                 type="button"

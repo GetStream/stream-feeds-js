@@ -1,4 +1,4 @@
-import { FeedResponse, FeedState } from '@stream-io/feeds-react-sdk';
+import type { FeedResponse, FeedState } from '@stream-io/feeds-react-sdk';
 import { ToggleFollowButton } from './ToggleFollowButton';
 
 export const FeedSearchResult = ({

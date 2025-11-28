@@ -1,7 +1,8 @@
 import { StreamFeed } from '@stream-io/feeds-react-native-sdk';
 import { useLocalSearchParams } from 'expo-router';
 import { useCreateAndQueryFeed } from '@/hooks/useCreateAndQueryFeed';
-import { PropsWithChildren, useMemo } from 'react';
+import type { PropsWithChildren} from 'react';
+import { useMemo } from 'react';
 
 export const FollowsWrapper = ({ groupId, children }: PropsWithChildren<{ groupId: string }>) => {
   const { userId: userIdParam } = useLocalSearchParams();

@@ -1,6 +1,9 @@
 import type { FeedState, Feed } from '@stream-io/feeds-react-sdk';
-import { FeedOwnCapability } from '@stream-io/feeds-react-sdk';
-import { useRef, useState } from 'react';
+import {
+  FeedOwnCapability,
+  useOwnCapabilities,
+} from '@stream-io/feeds-react-sdk';
+import { useMemo, useRef, useState } from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { FollowRelationships } from './FollowRelationships';
 import { FollowStatusButton } from './FollowStatusButton';
@@ -9,7 +12,6 @@ import { useStateStore } from '@stream-io/feeds-react-sdk';
 import { Dialog } from './Dialog';
 
 const selector = ({
-  own_capabilities = [],
   follower_count = 0,
   following_count = 0,
   created_by,
@@ -21,8 +23,6 @@ const selector = ({
     createdBy: created_by,
     followerCount: follower_count - 1,
     followingCount: following_count - 1,
-    canReadFeed: own_capabilities.includes(FeedOwnCapability.READ_FEED),
-    canQueryFollows: own_capabilities.includes(FeedOwnCapability.QUERY_FOLLOWS),
     followStatus: f?.status,
   };
 };
@@ -45,8 +45,12 @@ export const FeedMetadata = ({
   const followerCount = userFeedState.followerCount;
   const followingCount = timelineFeedState?.followingCount;
 
-  const canQueryFollowers = userFeedState.canQueryFollows;
-  const canQueryFollowings = timelineFeedState?.canQueryFollows;
+  const ownCapabilities = useOwnCapabilities(userFeed);
+
+  const canQueryFollows = useMemo(
+    () => ownCapabilities.includes(FeedOwnCapability.QUERY_FOLLOWS),
+    [ownCapabilities],
+  );
 
   const openDialog = () => {
     dialogRef.current?.showModal();
@@ -75,8 +79,8 @@ export const FeedMetadata = ({
                   <LoadingIndicator color="blue" />
                 )}
                 <button
-                  disabled={!canQueryFollowers}
-                  className={`no-underline ${canQueryFollowers ? 'hover:underline' : ''}`}
+                  disabled={!canQueryFollows}
+                  className={`no-underline ${canQueryFollows ? 'hover:underline' : ''}`}
                   onClick={() => {
                     setSelectedRelationship('followers');
                     openDialog();
@@ -91,8 +95,8 @@ export const FeedMetadata = ({
                     <LoadingIndicator color="blue" />
                   )}
                   <button
-                    disabled={!canQueryFollowings}
-                    className={`no-underline ${canQueryFollowings ? 'hover:underline' : ''}`}
+                    disabled={!canQueryFollows}
+                    className={`no-underline ${canQueryFollows ? 'hover:underline' : ''}`}
                     onClick={() => {
                       setSelectedRelationship('following');
                       openDialog();
@@ -106,7 +110,7 @@ export const FeedMetadata = ({
             <FollowStatusButton feed={userFeed} />
           </div>
         </div>
-        <FeedMenu feed={userFeed} />
+        <FeedMenu />
       </div>
       <Dialog ref={dialogRef}>
         <div className="flex flex-col">

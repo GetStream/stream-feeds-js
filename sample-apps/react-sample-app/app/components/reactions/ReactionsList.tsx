@@ -1,10 +1,10 @@
-import { useUserContext } from '@/app/user-context';
-import type {
-  ActivityResponse,
-  CommentResponse,
-  FeedsReactionResponse,
+import {
+  useFeedsClient,
+  type ActivityResponse,
+  type CommentResponse,
+  type FeedsReactionResponse,
 } from '@stream-io/feeds-react-sdk';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PaginatedList } from '../PaginatedList';
 
 export const ReactionsList = ({
@@ -18,13 +18,9 @@ export const ReactionsList = ({
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [next, setNext] = useState<string>();
-  const { client } = useUserContext();
+  const client = useFeedsClient();
 
-  useEffect(() => {
-    void loadMore();
-  }, [client]);
-
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (!client) {
       return;
     }
@@ -48,14 +44,21 @@ export const ReactionsList = ({
             ...payload,
             id: object.id,
           }));
-      setReactions([...reactions, ...response.reactions]);
+      setReactions((current) => [
+        ...(next ? current : []),
+        ...response.reactions,
+      ]);
       setNext(response.next);
-    } catch (error) {
-      setError(error as Error);
+    } catch (e) {
+      setError(e as Error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [object, type, next, client]);
+
+  useEffect(() => {
+    void loadMore();
+  }, [client, loadMore]);
 
   const renderItem = (reaction: FeedsReactionResponse) => {
     return (

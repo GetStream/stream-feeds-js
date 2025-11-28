@@ -1,40 +1,42 @@
+import type {
+  ActivityResponse} from '@stream-io/feeds-react-sdk';
 import {
-  ActivityResponse,
-  Feed as StreamFeed,
+  useFeedContext,
+  useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
 import { useState } from 'react';
 import { Activity } from './activity/Activity';
 import { PaginatedList } from './PaginatedList';
 import { useStateStore } from '@stream-io/feeds-react-sdk';
-import { useOwnCapabilities } from '../hooks/useOwnCapabilities';
 
-export const Feed = ({ feed }: { feed: StreamFeed }) => {
+export const Feed = () => {
   const [error, setError] = useState<Error>();
+  const feed = useFeedContext();
 
   const { hasNextPage, isLoading, activities } = useStateStore(
-    feed.state,
+    feed?.state,
     (state) => ({
       isLoading: state.is_loading_activities,
       hasNextPage: typeof state.next !== 'undefined',
       activities: state.activities ?? [],
     }),
-  );
+  ) ?? {
+    hasNextPage: false,
+    isLoading: false,
+    activities: [],
+  };
 
-  const ownCapabilities = useOwnCapabilities({ feed });
+  const ownCapabilities = useOwnCapabilities();
 
   const getNextPage = () => {
     setError(undefined);
-    feed.getNextPage().catch(setError);
+    feed?.getNextPage().catch(setError);
   };
 
   const renderItem = (activity: ActivityResponse) => {
     return (
       <li className="w-full" key={activity.id}>
-        <Activity
-          feed={feed}
-          activity={activity}
-          ownCapabilities={ownCapabilities}
-        />
+        <Activity activity={activity} ownCapabilities={ownCapabilities} />
       </li>
     );
   };

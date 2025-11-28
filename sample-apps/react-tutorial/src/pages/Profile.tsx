@@ -1,6 +1,5 @@
+import type { BookmarkResponse, FeedState } from '@stream-io/feeds-client';
 import {
-  BookmarkResponse,
-  FeedState,
   useClientConnectedUser,
   useFeedsClient,
   useStateStore,
@@ -39,17 +38,23 @@ export const Profile = () => {
     followingCount: 0,
   };
 
-  const loadBookmarks = useCallback(() => {
-    client
-      ?.queryBookmarks({
-        limit: 10,
-        next,
-      })
-      .then((response) => {
-        setBookmarks([...(next ? bookmarks : []), ...response.bookmarks]);
-        setNext(response.next);
-      });
-  }, [client, next]);
+  const loadBookmarks = useCallback(
+    (nextCursor?: string) => {
+      client
+        ?.queryBookmarks({
+          limit: 2,
+          next: nextCursor,
+        })
+        .then((response) => {
+          setBookmarks((current) => [
+            ...(nextCursor ? current : []),
+            ...response.bookmarks,
+          ]);
+          setNext(response.next);
+        });
+    },
+    [client],
+  );
 
   useEffect(() => {
     loadBookmarks();
@@ -92,7 +97,7 @@ export const Profile = () => {
           {next && (
             <button
               className="btn btn-soft btn-primary"
-              onClick={loadBookmarks}
+              onClick={() => loadBookmarks(next)}
             >
               Load more
             </button>

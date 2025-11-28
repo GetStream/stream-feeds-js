@@ -1,32 +1,31 @@
 'use client';
-import type { Feed } from '@stream-io/feeds-react-sdk';
 import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-import { useUserContext } from './user-context';
+  useClientConnectedUser,
+  useFeedsClient,
+  type Feed,
+} from '@stream-io/feeds-react-sdk';
+import type { PropsWithChildren } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useErrorContext } from './error-context';
 
-type FeedContextValue = {
+type OwnFeedsContextValue = {
   ownFeed: Feed | undefined;
   ownTimeline: Feed | undefined;
   ownNotifications: Feed | undefined;
 };
 
-const FeedContext = createContext<FeedContextValue>({
+const OwnFeedsContext = createContext<OwnFeedsContextValue>({
   ownFeed: undefined,
   ownTimeline: undefined,
   ownNotifications: undefined,
 });
 
-export const FeedContextProvider = ({ children }: PropsWithChildren) => {
+export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
   const [ownFeed, setOwnFeed] = useState<Feed | undefined>();
   const [ownTimeline, setOwnTimeline] = useState<Feed | undefined>();
   const [ownNotifications, setOwnNotifications] = useState<Feed | undefined>();
-  const { user, client } = useUserContext();
+  const client = useFeedsClient();
+  const user = useClientConnectedUser();
   const { throwUnrecoverableError } = useErrorContext();
 
   useEffect(() => {
@@ -53,13 +52,15 @@ export const FeedContextProvider = ({ children }: PropsWithChildren) => {
         ?.getOrCreate({ watch: true })
         .catch(throwUnrecoverableError);
     }
-  }, [user, client]);
+  }, [user, client, throwUnrecoverableError]);
 
   return (
-    <FeedContext.Provider value={{ ownFeed, ownTimeline, ownNotifications }}>
+    <OwnFeedsContext.Provider
+      value={{ ownFeed, ownTimeline, ownNotifications }}
+    >
       {children}
-    </FeedContext.Provider>
+    </OwnFeedsContext.Provider>
   );
 };
 
-export const useFeedContext = () => useContext(FeedContext);
+export const useOwnFeedsContext = () => useContext(OwnFeedsContext);

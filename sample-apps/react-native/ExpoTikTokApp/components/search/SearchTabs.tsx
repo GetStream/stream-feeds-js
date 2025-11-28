@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import {
   useSearchContext,
   useSearchSources,
-  SearchSource,
 } from '@stream-io/feeds-react-native-sdk';
 
 const tabsNameMap = {

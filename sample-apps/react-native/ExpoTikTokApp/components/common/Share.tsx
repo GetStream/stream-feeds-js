@@ -1,11 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Share, TouchableOpacity } from 'react-native';
 import React from 'react';
-import {
-  Attachment,
-  isImageFile,
-  isVideoFile,
-} from '@stream-io/feeds-react-native-sdk';
+import type {
+  Attachment} from '@stream-io/feeds-react-native-sdk';
+
+
 import { useStableCallback } from '@/hooks/useStableCallback';
 
 const pretext = 'Check out this cool';

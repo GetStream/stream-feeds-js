@@ -1,7 +1,8 @@
 import { useBottomSheetState } from '@/hooks/useBottomSheetState';
 import { Alert } from 'react-native';
+import type {
+  CommentResponse} from '@stream-io/feeds-react-native-sdk';
 import {
-  CommentResponse,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';

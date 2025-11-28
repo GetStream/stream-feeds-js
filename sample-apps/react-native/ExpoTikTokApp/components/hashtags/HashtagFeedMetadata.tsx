@@ -1,7 +1,8 @@
-import React, { useMemo, useState, useCallback } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import {
-  FeedState, useFeedActivities,
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import type {
+  FeedState} from '@stream-io/feeds-react-native-sdk';
+import { useFeedActivities,
   useFeedContext,
   useStateStore,
 } from '@stream-io/feeds-react-native-sdk';

@@ -1,3 +1,5 @@
+import type {
+  FirebaseMessagingTypes} from '@react-native-firebase/messaging';
 import {
   getMessaging,
   getInitialNotification as fbGetInitialNotification,
@@ -7,15 +9,15 @@ import {
   onNotificationOpenedApp,
   hasPermission,
   getToken,
-  AuthorizationStatus,
-  FirebaseMessagingTypes,
+  AuthorizationStatus
 } from '@react-native-firebase/messaging';
 import { getApp } from '@react-native-firebase/app';
 
 import notifee, { EventType } from '@notifee/react-native';
 import { PermissionsAndroid, Platform } from 'react-native';
+import type {
+  CreateDeviceRequest} from '@stream-io/feeds-react-native-sdk';
 import {
-  CreateDeviceRequest,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';

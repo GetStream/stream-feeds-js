@@ -7,12 +7,14 @@ import {
   ActivitySearchSource,
   FeedSearchSource,
   SearchController,
+  useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
 import { Search } from './Search';
 import { NotificationBell } from './notifications/NotificationBell';
 
 export function Header() {
-  const { user, logOut, client } = useUserContext();
+  const { user, logOut } = useUserContext();
+  const client = useFeedsClient();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 
@@ -65,13 +67,6 @@ export function Header() {
                 >
                   My posts
                 </Link>
-                <Link
-                  href="/users"
-                  className="block px-4 py-2 text-gray-800 rounded-md hover:bg-gray-100"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Users
-                </Link>
               </div>
             </div>
           </li>
@@ -94,7 +89,8 @@ export function Header() {
                   className="flex"
                   title="Log out"
                   onClick={() => {
-                    logOut().catch((err) => {
+                    logOut();
+                    client?.disconnectUser().catch((err) => {
                       throw err;
                     });
                     router.push('/login');

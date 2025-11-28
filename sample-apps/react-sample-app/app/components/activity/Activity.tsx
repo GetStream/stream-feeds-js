@@ -1,7 +1,8 @@
+import type {
+  ActivityResponse} from '@stream-io/feeds-react-sdk';
 import {
-  ActivityResponse,
-  Feed,
   FeedOwnCapability,
+  useFeedContext,
 } from '@stream-io/feeds-react-sdk';
 import { Reactions } from '../reactions/Reactions';
 import { useEffect, useRef, useState } from 'react';
@@ -15,15 +16,14 @@ import { ToggleBookmark } from './ToggleBookmark';
 export const Activity = ({
   activity,
   ownCapabilities,
-  feed,
 }: {
-  feed: Feed;
   activity: ActivityResponse;
   ownCapabilities: readonly FeedOwnCapability[];
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [editedActivityText, setEditedActivityText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const feed = useFeedContext();
 
   const canSendReaction = ownCapabilities.includes(
     FeedOwnCapability.ADD_ACTIVITY_REACTION,

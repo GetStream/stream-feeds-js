@@ -1,5 +1,6 @@
+import type {
+  FeedState} from '@stream-io/feeds-react-sdk';
 import {
-  FeedState,
   useFeedActivities,
   useFeedContext,
   useFeedsClient,

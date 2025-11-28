@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
+import type {
+  FollowResponse} from '@stream-io/feeds-react-native-sdk';
 import {
-  FollowResponse,
   useClientConnectedUser,
   useFeedsClient,
   useFollowers,
