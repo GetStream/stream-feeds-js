@@ -2412,6 +2412,42 @@ export interface EnrichedReaction {
   user?: Data;
 }
 
+export interface EnrichmentOptions {
+  skip_activity?: boolean;
+
+  skip_activity_collections?: boolean;
+
+  skip_activity_comments?: boolean;
+
+  skip_activity_current_feed?: boolean;
+
+  skip_activity_mentioned_users?: boolean;
+
+  skip_activity_own_bookmarks?: boolean;
+
+  skip_activity_parents?: boolean;
+
+  skip_activity_poll?: boolean;
+
+  skip_activity_reactions?: boolean;
+
+  skip_activity_refresh_image_urls?: boolean;
+
+  skip_all?: boolean;
+
+  skip_feed_member_user?: boolean;
+
+  skip_followers?: boolean;
+
+  skip_following?: boolean;
+
+  skip_own_capabilities?: boolean;
+
+  skip_own_follows?: boolean;
+
+  skip_pins?: boolean;
+}
+
 export interface EntityCreatorResponse {
   ban_count: number;
 
@@ -3212,6 +3248,8 @@ export interface GetOGResponse {
 }
 
 export interface GetOrCreateFeedRequest {
+  id_around?: string;
+
   limit?: number;
 
   next?: string;
@@ -3223,6 +3261,8 @@ export interface GetOrCreateFeedRequest {
   watch?: boolean;
 
   data?: FeedInput;
+
+  enrichment_options?: EnrichmentOptions;
 
   external_ranking?: Record<string, any>;
 
