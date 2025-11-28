@@ -66,7 +66,9 @@ export class ApiClient {
     ) {
       this.logger.info('Getting connection_id for watch or presence request');
       const connectionId = await this.connectionIdManager.getConnectionId();
-      queryParams.connection_id = connectionId;
+      if (connectionId) {
+        queryParams.connection_id = connectionId;
+      }
     }
 
     let requestUrl = url;
@@ -211,7 +213,7 @@ export class ApiClient {
 
   private get commonHeaders(): Record<string, string> {
     return {
-      'stream-auth-type': 'jwt',
+      'stream-auth-type': this.tokenManager.isAnonymous ? 'anonymous' : 'jwt',
       'X-Stream-Client': this.generateStreamClientHeader(),
     };
   }

@@ -11,6 +11,7 @@ export class TokenManager {
   type: 'static' | 'provider';
   token?: string;
   tokenProvider?: string | (() => Promise<string>);
+  private _isAnonymous: boolean = false;
   private readonly logger = feedsLoggerSystem.getLogger('token-manager');
 
   constructor() {
@@ -19,15 +20,24 @@ export class TokenManager {
     this.type = 'static';
   }
 
+  get isAnonymous() {
+    return this._isAnonymous;
+  }
+
   /**
    * Set the static string token or token provider.
    * Token provider should return a token string or a promise which resolves to string token.
    *
-   * @param {TokenOrProvider} tokenOrProvider - the token or token provider.
-   * @param {UserResponse} user - the user object.
-   * @param {boolean} isAnonymous - whether the user is anonymous or not.
+   * @param {TokenOrProvider} tokenOrProvider - the token or token provider. Providing `undefined` will set the token manager to anonymous mode.
    */
   setTokenOrProvider = (tokenOrProvider?: string | (() => Promise<string>)) => {
+    if (tokenOrProvider === undefined) {
+      this._isAnonymous = true;
+      tokenOrProvider = '';
+    } else {
+      this._isAnonymous = false;
+    }
+
     if (isFunction(tokenOrProvider)) {
       this.tokenProvider = tokenOrProvider;
       this.type = 'provider';
@@ -44,7 +54,9 @@ export class TokenManager {
    * Useful for client disconnection or switching user.
    */
   reset = () => {
+    this._isAnonymous = false;
     this.token = undefined;
+    this.tokenProvider = undefined;
     this.loadTokenPromise = null;
   };
 
@@ -96,6 +108,10 @@ export class TokenManager {
 
   // Returns the current token, or fetches in a new one if there is no current token
   getToken = () => {
+    if (this._isAnonymous) {
+      return '';
+    }
+
     if (this.token) {
       return this.token;
     }
