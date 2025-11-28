@@ -18,7 +18,11 @@ describe('Connecting anonymous user', () => {
       createTestTokenGenerator(getTestUser()),
     );
     feed = client.feed('user', crypto.randomUUID());
-    await feed.getOrCreate();
+    await feed.getOrCreate({
+      data: {
+        visibility: 'public',
+      },
+    });
     await feed.addActivity({
       type: 'post',
       text: 'Hello, world!',
