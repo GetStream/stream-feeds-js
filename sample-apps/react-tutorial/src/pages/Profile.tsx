@@ -1,4 +1,4 @@
-import type { BookmarkResponse, FeedState } from '@stream-io/feeds-react-sdk';
+import type { BookmarkResponse, FeedState } from '@stream-io/feeds-client';
 import {
   useClientConnectedUser,
   useFeedsClient,
@@ -38,20 +38,23 @@ export const Profile = () => {
     followingCount: 0,
   };
 
-  const loadBookmarks = useCallback(() => {
-    client
-      ?.queryBookmarks({
-        limit: 10,
-        next,
-      })
-      .then((response) => {
-        setBookmarks((current) => [
-          ...(next ? current : []),
-          ...response.bookmarks,
-        ]);
-        setNext(response.next);
-      });
-  }, [client, next]);
+  const loadBookmarks = useCallback(
+    (next?: string) => {
+      client
+        ?.queryBookmarks({
+          limit: 2,
+          next,
+        })
+        .then((response) => {
+          setBookmarks((current) => [
+            ...(next ? current : []),
+            ...response.bookmarks,
+          ]);
+          setNext(response.next);
+        });
+    },
+    [client],
+  );
 
   useEffect(() => {
     loadBookmarks();
@@ -94,7 +97,7 @@ export const Profile = () => {
           {next && (
             <button
               className="btn btn-soft btn-primary"
-              onClick={loadBookmarks}
+              onClick={() => loadBookmarks(next)}
             >
               Load more
             </button>
