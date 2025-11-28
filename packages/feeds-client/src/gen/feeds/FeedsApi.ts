@@ -1281,12 +1281,14 @@ export class FeedsApi {
       feed_id: request?.feed_id,
     };
     const body = {
+      id_around: request?.id_around,
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,
       view: request?.view,
       watch: request?.watch,
       data: request?.data,
+      enrichment_options: request?.enrichment_options,
       external_ranking: request?.external_ranking,
       filter: request?.filter,
       followers_pagination: request?.followers_pagination,
