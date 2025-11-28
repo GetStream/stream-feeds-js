@@ -39,15 +39,15 @@ export const Profile = () => {
   };
 
   const loadBookmarks = useCallback(
-    (next?: string) => {
+    (nextCursor?: string) => {
       client
         ?.queryBookmarks({
           limit: 2,
-          next,
+          next: nextCursor,
         })
         .then((response) => {
           setBookmarks((current) => [
-            ...(next ? current : []),
+            ...(nextCursor ? current : []),
             ...response.bookmarks,
           ]);
           setNext(response.next);
