@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.14](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.13...@stream-io/feeds-client-0.3.14) (2025-11-28)
+
+
+* [FEEDS-991] regenerate SDK ([#170](https://github.com/GetStream/stream-feeds-js/issues/170)) ([cdf3cb2](https://github.com/GetStream/stream-feeds-js/commit/cdf3cb2af6abbd326ad74f5e88e4a657ee39bb77))
+
+
+### Features
+
+* Add enrichment options for getOrCreateFeed ([#173](https://github.com/GetStream/stream-feeds-js/issues/173)) ([e662fb7](https://github.com/GetStream/stream-feeds-js/commit/e662fb789a620cf6e174b183d9f42c22b5d11f26))
+
 ## [0.3.13](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.12...@stream-io/feeds-client-0.3.13) (2025-11-19)
 
 
