@@ -5,7 +5,7 @@ import {
   getTestUser,
 } from './utils';
 import type { FeedsClient } from '../src/feeds-client';
-import { Feed } from '../src';
+import type { Feed } from '../src/feed';
 
 describe('Connecting anonymous user', () => {
   let client: FeedsClient;
