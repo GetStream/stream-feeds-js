@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.15](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.14...@stream-io/feeds-client-0.3.15) (2025-11-28)
+
+
+### Features
+
+* support anonymous user connect ([#174](https://github.com/GetStream/stream-feeds-js/issues/174)) ([3463ccf](https://github.com/GetStream/stream-feeds-js/commit/3463ccfc4bfd952ee79a531a0c9928bfd53e8096))
+
 ## [0.3.14](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.13...@stream-io/feeds-client-0.3.14) (2025-11-28)
 
 
