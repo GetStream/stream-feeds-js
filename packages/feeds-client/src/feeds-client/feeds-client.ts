@@ -93,6 +93,7 @@ import { getFeed } from '../activity-with-state-updates/get-feed';
 
 export type FeedsClientState = {
   connected_user: ConnectedUser | undefined;
+  is_anonymous: boolean;
   is_ws_connection_healthy: boolean;
   own_capabilities_by_fid: Record<string, FeedResponse['own_capabilities']>;
 };
@@ -136,6 +137,7 @@ export class FeedsClient extends FeedsApi {
     super(apiClient);
     this.state = new StateStore<FeedsClientState>({
       connected_user: undefined,
+      is_anonymous: false,
       is_ws_connection_healthy: false,
       own_capabilities_by_fid: {},
     });
@@ -391,7 +393,25 @@ export class FeedsClient extends FeedsApi {
     this.state.partialNext({ own_capabilities_by_fid: ownCapabilitiesCache });
   }
 
-  connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
+  connectAnonymous = () => {
+    this.connectionIdManager.resolveConnectionidPromise();
+    this.tokenManager.setTokenOrProvider(undefined);
+    this.setGetBatchOwnCapabilitiesThrottlingInterval(
+      this.query_batch_own_capabilties_throttling_interval,
+    );
+    this.state.partialNext({
+      connected_user: undefined,
+      is_anonymous: true,
+      is_ws_connection_healthy: false,
+    });
+
+    return Promise.resolve();
+  };
+
+  connectUser = async (
+    user: UserRequest | { id: '!anon' },
+    tokenProvider?: TokenOrProvider,
+  ) => {
     if (
       this.state.getLatestValue().connected_user !== undefined ||
       this.wsConnection
@@ -631,6 +651,7 @@ export class FeedsClient extends FeedsApi {
       await this.wsConnection?.disconnect();
       this.wsConnection = undefined;
     }
+
     removeConnectionEventListeners(this.updateNetworkConnectionStatus);
 
     this.connectionIdManager.reset();

@@ -454,7 +454,7 @@ export class StableWSConnection {
     }
 
     const token = await this.tokenManager.getToken();
-    if (!token) {
+    if (!token && !this.tokenManager.isAnonymous) {
       logger.warn(`Token not set, can't connect authenticate`);
       return;
     }

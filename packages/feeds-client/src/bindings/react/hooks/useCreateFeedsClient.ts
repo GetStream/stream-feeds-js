@@ -12,14 +12,23 @@ import {
 export const useCreateFeedsClient = ({
   apiKey,
   tokenOrProvider,
-  userData,
+  userData: userDataOrAnonymous,
   options,
 }: {
   apiKey: string;
-  tokenOrProvider: TokenOrProvider;
-  userData: UserRequest;
+  tokenOrProvider?: TokenOrProvider;
+  userData: UserRequest | 'anonymous';
   options?: FeedsClientOptions;
 }) => {
+  const userData =
+    userDataOrAnonymous === 'anonymous' ? undefined : userDataOrAnonymous;
+
+  if (userDataOrAnonymous === 'anonymous' && !tokenOrProvider) {
+    throw new Error(
+      'Token provider can only be emitted when connecting anonymous user',
+    );
+  }
+
   const [client, setClient] = useState<FeedsClient | null>(
     () => new FeedsClient(apiKey, options),
   );
@@ -32,21 +41,23 @@ export const useCreateFeedsClient = ({
     throw error;
   }
 
-  if (userData.id !== cachedUserData.id) {
+  if (userData?.id !== cachedUserData?.id) {
     setCachedUserData(userData);
   }
 
   useEffect(() => {
     const _client = new FeedsClient(apiKey, cachedOptions);
 
-    const connectionPromise = _client
-      .connectUser(cachedUserData, tokenOrProvider)
-      .then(() => {
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err);
-      });
+    const connectionPromise = cachedUserData
+      ? _client
+          .connectUser(cachedUserData, tokenOrProvider)
+          .then(() => {
+            setError(null);
+          })
+          .catch((err) => {
+            setError(err);
+          })
+      : _client.connectAnonymous();
 
     setClient(_client);
 
