@@ -87,6 +87,13 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
             )}
           </div>
           <p className="w-full">{activity.text}</p>
+          {activity.attachments.length > 0 && (
+            <img
+              src={activity.attachments[0].image_url}
+              alt="Uploaded image"
+              className="w-50 h-50 object-cover rounded-lg"
+            />
+          )}
           <div className="w-full flex flex-col gap-2">
             <div className="flex flex-row gap-2">
               <button type="button" className="btn cursor-default">

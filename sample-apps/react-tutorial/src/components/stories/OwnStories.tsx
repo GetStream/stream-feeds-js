@@ -1,5 +1,4 @@
-import type {
-  FeedState} from '@stream-io/feeds-react-sdk';
+import type { FeedState } from '@stream-io/feeds-react-sdk';
 import {
   useFeedActivities,
   useFeedContext,
@@ -71,7 +70,7 @@ export const OwnStories = () => {
           </div>
           <input
             type="file"
-            accept="image/*,video/*"
+            accept="image/*"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
