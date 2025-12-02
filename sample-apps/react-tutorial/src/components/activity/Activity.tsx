@@ -98,7 +98,7 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
             <div className="flex flex-row gap-2">
               <button type="button" className="btn cursor-default">
                 💬&nbsp;
-                {comments.length}
+                {activity.comment_count}
               </button>
               <button
                 type="button"
