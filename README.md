@@ -6,39 +6,20 @@
 
 - JS client for feeds v3
 - React hooks for feeds v3
-- React Native client for feeds v3 (coming soon)
-- React client for feeds v3 (coming soon)
+- React Native client for feeds v3
+- React client for feeds v3
 - React and React Native sample apps
 
-## Local Setup
+## React sample apps
 
-### Prerequisites
+### Simple React app with stories
 
-You'll need to have [node 22](https://nodejs.org/en/download) installed on your computer
-
-### Install dependencies
-
-In the repository root run the following command to install all dependencies of all packages in this monorepo:
-
-```
-yarn
-```
-
-### Build and run JS client
-
-```
-cd packages/feeds-client
-yarn build
-# or
-yarn start
-```
-
-### Run react tutorial app
+Deployed version: https://feeds-react-tutorial-getstreamio.vercel.app/
 
 Prerequisites:
 
 - Install dependecies: `yarn`
-- Build React SDK and tutorial: `build:react-tutorial`
+- Build React SDK: `yarn build:client` and `yarn build:react-sdk`
 - Create a `.env` file in `sample-apps/react-sample-app` with one of the following content:
 
 Use this if you want to use a single user only:
@@ -69,11 +50,12 @@ After the above steps run the following command in `sample-apps/react-tutorial`:
 yarn dev
 ```
 
-### Run react sample app
+### Advanced React app
 
 Prerequisites:
 
-- Build/run JS client
+- Install dependecies: `yarn`
+- Build React SDK: `yarn build:client` and `yarn build:react-sdk`
 - Create a `.env` file in `sample-apps/react-sample-app` with the following content:
 
 ```
@@ -89,4 +71,27 @@ After the above steps run the following command in `sample-apps/react-sample-app
 
 ```
 yarn dev
+```
+
+## Local Setup
+
+### Prerequisites
+
+You'll need to have [node 22](https://nodejs.org/en/download) installed on your computer
+
+### Install dependencies
+
+In the repository root run the following command to install all dependencies of all packages in this monorepo:
+
+```
+yarn
+```
+
+### Build and run JS client
+
+```
+cd packages/feeds-client
+yarn build
+# or
+yarn start
 ```
