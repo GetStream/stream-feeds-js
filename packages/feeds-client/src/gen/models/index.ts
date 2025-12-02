@@ -48,12 +48,12 @@ export interface APIError {
 
 export interface AWSRekognitionRule {
   action:
-    | 'flag'
-    | 'shadow'
-    | 'remove'
-    | 'bounce'
-    | 'bounce_flag'
-    | 'bounce_remove';
+      | 'flag'
+      | 'shadow'
+      | 'remove'
+      | 'bounce'
+      | 'bounce_flag'
+      | 'bounce_remove';
 
   label: string;
 
@@ -617,15 +617,15 @@ export interface AddCommentReactionResponse {
 }
 
 export interface AddCommentRequest {
+  object_id: string;
+
+  object_type: string;
+
   comment?: string;
 
   create_notification_activity?: boolean;
 
   id?: string;
-
-  object_id?: string;
-
-  object_type?: string;
 
   parent_id?: string;
 
@@ -822,12 +822,12 @@ export interface AutomodPlatformCircumventionConfig {
 
 export interface AutomodRule {
   action:
-    | 'flag'
-    | 'shadow'
-    | 'remove'
-    | 'bounce'
-    | 'bounce_flag'
-    | 'bounce_remove';
+      | 'flag'
+      | 'shadow'
+      | 'remove'
+      | 'bounce'
+      | 'bounce_flag'
+      | 'bounce_remove';
 
   label: string;
 
@@ -970,13 +970,13 @@ export interface BlockListResponse {
 
 export interface BlockListRule {
   action:
-    | 'flag'
-    | 'mask_flag'
-    | 'shadow'
-    | 'remove'
-    | 'bounce'
-    | 'bounce_flag'
-    | 'bounce_remove';
+      | 'flag'
+      | 'mask_flag'
+      | 'shadow'
+      | 'remove'
+      | 'bounce'
+      | 'bounce_flag'
+      | 'bounce_remove';
 
   name: string;
 
@@ -1011,12 +1011,12 @@ export interface BlockedUserResponse {
 
 export interface BodyguardRule {
   action:
-    | 'flag'
-    | 'shadow'
-    | 'remove'
-    | 'bounce'
-    | 'bounce_flag'
-    | 'bounce_remove';
+      | 'flag'
+      | 'shadow'
+      | 'remove'
+      | 'bounce'
+      | 'bounce_flag'
+      | 'bounce_remove';
 
   label: string;
 
@@ -1025,12 +1025,12 @@ export interface BodyguardRule {
 
 export interface BodyguardSeverityRule {
   action:
-    | 'flag'
-    | 'shadow'
-    | 'remove'
-    | 'bounce'
-    | 'bounce_flag'
-    | 'bounce_remove';
+      | 'flag'
+      | 'shadow'
+      | 'remove'
+      | 'bounce'
+      | 'bounce_flag'
+      | 'bounce_remove';
 
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
@@ -1086,7 +1086,7 @@ export interface BookmarkFolderResponse {
 
   updated_at: Date;
 
-  user: UserResponse;
+  user: UserResponseCommonFields;
 
   custom?: Record<string, any>;
 }
@@ -1112,7 +1112,7 @@ export interface BookmarkResponse {
 
   activity: ActivityResponse;
 
-  user: UserResponse;
+  user: UserResponseCommonFields;
 
   custom?: Record<string, any>;
 
@@ -1628,7 +1628,7 @@ export const ChannelOwnCapability = {
 } as const;
 
 export type ChannelOwnCapability =
-  (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
+    (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
 
 export interface ChannelPushPreferences {
   chat_level?: string;
@@ -1996,12 +1996,12 @@ export interface CreateBlockListRequest {
   team?: string;
 
   type?:
-    | 'regex'
-    | 'domain'
-    | 'domain_allowlist'
-    | 'email'
-    | 'email_allowlist'
-    | 'word';
+      | 'regex'
+      | 'domain'
+      | 'domain_allowlist'
+      | 'email'
+      | 'email_allowlist'
+      | 'word';
 }
 
 export interface CreateBlockListResponse {
@@ -2731,15 +2731,7 @@ export const FeedOwnCapability = {
 } as const;
 
 export type FeedOwnCapability =
-  (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
-
-export interface FeedOwnData {
-  own_capabilities?: FeedOwnCapability[];
-
-  own_follows?: FollowResponse[];
-
-  own_membership?: FeedMemberResponse;
-}
+    (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
 
 export interface FeedRequest {
   feed_group_id: string;
@@ -3019,12 +3011,6 @@ export interface FollowDeletedEvent {
   feed_visibility?: string;
 
   received_at?: Date;
-}
-
-export interface FollowPair {
-  source: string;
-
-  target: string;
 }
 
 export interface FollowRequest {
@@ -3489,13 +3475,13 @@ export interface LLMConfig {
 
 export interface LLMRule {
   action:
-    | 'flag'
-    | 'shadow'
-    | 'remove'
-    | 'bounce'
-    | 'bounce_flag'
-    | 'bounce_remove'
-    | 'keep';
+      | 'flag'
+      | 'shadow'
+      | 'remove'
+      | 'bounce'
+      | 'bounce_flag'
+      | 'bounce_remove'
+      | 'keep';
 
   description: string;
 
@@ -3990,12 +3976,12 @@ export interface NotificationTrigger {
 
 export interface OCRRule {
   action:
-    | 'flag'
-    | 'shadow'
-    | 'remove'
-    | 'bounce'
-    | 'bounce_flag'
-    | 'bounce_remove';
+      | 'flag'
+      | 'shadow'
+      | 'remove'
+      | 'bounce'
+      | 'bounce_flag'
+      | 'bounce_remove';
 
   label: string;
 }
@@ -4004,16 +3990,14 @@ export interface OnlyUserID {
   id: string;
 }
 
-export interface OwnBatchRequest {
+export interface OwnCapabilitiesBatchRequest {
   feeds: string[];
-
-  fields?: 'own_follows' | 'own_capabilities' | 'own_membership';
 }
 
-export interface OwnBatchResponse {
+export interface OwnCapabilitiesBatchResponse {
   duration: string;
 
-  data: Record<string, FeedOwnData>;
+  capabilities: Record<string, FeedOwnCapability[]>;
 }
 
 export interface OwnUser {
@@ -5066,14 +5050,14 @@ export interface RingSettingsResponse {
 
 export interface RuleBuilderAction {
   type:
-    | 'ban_user'
-    | 'flag_user'
-    | 'flag_content'
-    | 'block_content'
-    | 'shadow_content'
-    | 'bounce_flag_content'
-    | 'bounce_content'
-    | 'bounce_remove_content';
+      | 'ban_user'
+      | 'flag_user'
+      | 'flag_content'
+      | 'block_content'
+      | 'shadow_content'
+      | 'bounce_flag_content'
+      | 'bounce_content'
+      | 'bounce_remove_content';
 
   ban_options?: BanOptions;
 
@@ -5290,22 +5274,22 @@ export interface StoriesFeedUpdatedEvent {
 
 export interface SubmitActionRequest {
   action_type:
-    | 'mark_reviewed'
-    | 'delete_message'
-    | 'delete_activity'
-    | 'delete_comment'
-    | 'delete_reaction'
-    | 'ban'
-    | 'custom'
-    | 'unban'
-    | 'restore'
-    | 'delete_user'
-    | 'unblock'
-    | 'block'
-    | 'shadow_block'
-    | 'unmask'
-    | 'kick_user'
-    | 'end_call';
+      | 'mark_reviewed'
+      | 'delete_message'
+      | 'delete_activity'
+      | 'delete_comment'
+      | 'delete_reaction'
+      | 'ban'
+      | 'custom'
+      | 'unban'
+      | 'restore'
+      | 'delete_user'
+      | 'unblock'
+      | 'block'
+      | 'shadow_block'
+      | 'unmask'
+      | 'kick_user'
+      | 'end_call';
 
   item_id: string;
 
@@ -5450,43 +5434,43 @@ export interface TranscriptionSettingsResponse {
   closed_caption_mode: 'available' | 'disabled' | 'auto-on';
 
   language:
-    | 'auto'
-    | 'en'
-    | 'fr'
-    | 'es'
-    | 'de'
-    | 'it'
-    | 'nl'
-    | 'pt'
-    | 'pl'
-    | 'ca'
-    | 'cs'
-    | 'da'
-    | 'el'
-    | 'fi'
-    | 'id'
-    | 'ja'
-    | 'ru'
-    | 'sv'
-    | 'ta'
-    | 'th'
-    | 'tr'
-    | 'hu'
-    | 'ro'
-    | 'zh'
-    | 'ar'
-    | 'tl'
-    | 'he'
-    | 'hi'
-    | 'hr'
-    | 'ko'
-    | 'ms'
-    | 'no'
-    | 'uk'
-    | 'bg'
-    | 'et'
-    | 'sl'
-    | 'sk';
+      | 'auto'
+      | 'en'
+      | 'fr'
+      | 'es'
+      | 'de'
+      | 'it'
+      | 'nl'
+      | 'pt'
+      | 'pl'
+      | 'ca'
+      | 'cs'
+      | 'da'
+      | 'el'
+      | 'fi'
+      | 'id'
+      | 'ja'
+      | 'ru'
+      | 'sv'
+      | 'ta'
+      | 'th'
+      | 'tr'
+      | 'hu'
+      | 'ro'
+      | 'zh'
+      | 'ar'
+      | 'tl'
+      | 'he'
+      | 'hi'
+      | 'hr'
+      | 'ko'
+      | 'ms'
+      | 'no'
+      | 'uk'
+      | 'bg'
+      | 'et'
+      | 'sl'
+      | 'sk';
 
   mode: 'available' | 'disabled' | 'auto-on';
 
@@ -5519,16 +5503,6 @@ export interface UnblockUsersRequest {
 
 export interface UnblockUsersResponse {
   duration: string;
-}
-
-export interface UnfollowBatchRequest {
-  follows: FollowPair[];
-}
-
-export interface UnfollowBatchResponse {
-  duration: string;
-
-  follows: FollowResponse[];
 }
 
 export interface UnfollowResponse {
@@ -5857,8 +5831,8 @@ export interface UpsertPushPreferencesResponse {
   duration: string;
 
   user_channel_preferences: Record<
-    string,
-    Record<string, ChannelPushPreferences | null>
+      string,
+      Record<string, ChannelPushPreferences | null>
   >;
 
   user_preferences: Record<string, PushPreferences>;
@@ -6243,106 +6217,106 @@ export interface WSAuthMessage {
 }
 
 export type WSClientEvent =
-  | ({ type: 'app.updated' } & AppUpdatedEvent)
-  | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
-  | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
-  | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
-  | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
-  | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
-  | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
-  | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
-  | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent)
-  | ({
-      type: 'feeds.activity.removed_from_feed';
-    } & ActivityRemovedFromFeedEvent)
-  | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
-  | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
-  | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
-  | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
-  | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
-  | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent)
-  | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
-  | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
-  | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
-  | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
-  | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
-  | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
-  | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
-  | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
-  | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
-  | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
-  | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
-  | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
-  | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
-  | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
-  | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
-  | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
-  | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
-  | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
-  | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent)
-  | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
-  | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
-  | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
-  | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
-  | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
-  | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
-  | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
-  | ({ type: 'health.check' } & HealthCheckEvent)
-  | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
-  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
-  | ({ type: 'user.updated' } & UserUpdatedEvent);
+    | ({ type: 'app.updated' } & AppUpdatedEvent)
+    | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
+    | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+    | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
+    | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
+    | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
+    | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
+    | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+    | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent)
+    | ({
+  type: 'feeds.activity.removed_from_feed';
+} & ActivityRemovedFromFeedEvent)
+    | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
+    | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
+    | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
+    | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
+    | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
+    | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent)
+    | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
+    | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
+    | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
+    | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
+    | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
+    | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
+    | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
+    | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
+    | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
+    | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
+    | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
+    | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
+    | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
+    | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
+    | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
+    | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
+    | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
+    | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
+    | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent)
+    | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
+    | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
+    | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
+    | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
+    | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
+    | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
+    | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
+    | ({ type: 'health.check' } & HealthCheckEvent)
+    | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+    | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
+    | ({ type: 'user.updated' } & UserUpdatedEvent);
 
 export type WSEvent =
-  | ({ type: 'app.updated' } & AppUpdatedEvent)
-  | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
-  | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
-  | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
-  | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
-  | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
-  | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
-  | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
-  | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent)
-  | ({
-      type: 'feeds.activity.removed_from_feed';
-    } & ActivityRemovedFromFeedEvent)
-  | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
-  | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
-  | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
-  | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
-  | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
-  | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent)
-  | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
-  | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
-  | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
-  | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
-  | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
-  | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
-  | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
-  | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
-  | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
-  | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
-  | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
-  | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
-  | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
-  | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
-  | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
-  | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
-  | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
-  | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
-  | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent)
-  | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
-  | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
-  | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
-  | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
-  | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
-  | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
-  | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
-  | ({ type: 'health.check' } & HealthCheckEvent)
-  | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
-  | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
-  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
-  | ({ type: 'user.banned' } & UserBannedEvent)
-  | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
-  | ({ type: 'user.muted' } & UserMutedEvent)
-  | ({ type: 'user.reactivated' } & UserReactivatedEvent)
-  | ({ type: 'user.updated' } & UserUpdatedEvent);
+    | ({ type: 'app.updated' } & AppUpdatedEvent)
+    | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
+    | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+    | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
+    | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
+    | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
+    | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
+    | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+    | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent)
+    | ({
+  type: 'feeds.activity.removed_from_feed';
+} & ActivityRemovedFromFeedEvent)
+    | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
+    | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
+    | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
+    | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
+    | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
+    | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent)
+    | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
+    | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
+    | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
+    | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
+    | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
+    | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
+    | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
+    | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
+    | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
+    | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
+    | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
+    | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
+    | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
+    | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
+    | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
+    | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
+    | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
+    | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
+    | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent)
+    | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
+    | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
+    | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
+    | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
+    | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
+    | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
+    | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
+    | ({ type: 'health.check' } & HealthCheckEvent)
+    | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+    | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
+    | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
+    | ({ type: 'user.banned' } & UserBannedEvent)
+    | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
+    | ({ type: 'user.muted' } & UserMutedEvent)
+    | ({ type: 'user.reactivated' } & UserReactivatedEvent)
+    | ({ type: 'user.updated' } & UserUpdatedEvent);
