@@ -2,6 +2,17 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.15...@stream-io/feeds-client-0.3.16) (2025-12-03)
+
+
+* fix lint issues in sample apps ([#172](https://github.com/GetStream/stream-feeds-js/issues/172)) ([eec1ea5](https://github.com/GetStream/stream-feeds-js/commit/eec1ea5502452310606df6032acb36a724d5e714))
+* update test setup for anon users ([#175](https://github.com/GetStream/stream-feeds-js/issues/175)) ([c818f71](https://github.com/GetStream/stream-feeds-js/commit/c818f71115f47645bf21f460e6a2398d2d3cac69))
+
+
+### Features
+
+* Add activity_count to feed response ([#180](https://github.com/GetStream/stream-feeds-js/issues/180)) ([40fa693](https://github.com/GetStream/stream-feeds-js/commit/40fa693cced4ced64986961fe5a7f59e04addd82))
+
 ## [0.3.15](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.14...@stream-io/feeds-client-0.3.15) (2025-11-28)
 
 
