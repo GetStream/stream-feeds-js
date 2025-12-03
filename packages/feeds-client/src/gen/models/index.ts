@@ -2752,6 +2752,8 @@ export interface FeedRequest {
 }
 
 export interface FeedResponse {
+  activity_count: number;
+
   created_at: Date;
 
   description: string;
@@ -2792,6 +2794,8 @@ export interface FeedResponse {
 }
 
 export interface FeedSuggestionResponse {
+  activity_count: number;
+
   created_at: Date;
 
   description: string;
