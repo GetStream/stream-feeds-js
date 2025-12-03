@@ -1,54 +1,17 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import {
-  useActivityComments,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { ToggleFollowButton } from '../ToggleFollowButton';
+import { ToggleReaction } from './ToggleReaction';
+import { CommentList } from '../comments/CommentList';
+import { CommentComposer } from '../comments/CommentComposer';
 
 export const Activity = ({ activity }: { activity: ActivityResponse }) => {
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
-  const {
-    comments = [],
-    loadNextPage,
-    has_next_page,
-  } = useActivityComments({ activity });
-
-  const [commentDraft, setCommentDraft] = useState('');
-
-  // Load initial comments
-  useEffect(() => {
-    if (comments.length === 0 && activity.comment_count > 0) {
-      void loadNextPage({ limit: 5, sort: 'best' });
-    }
-  }, [loadNextPage, comments.length, activity.comment_count]);
-
-  const toggleReaction = useCallback(
-    () =>
-      activity.own_reactions?.length > 0
-        ? client?.deleteActivityReaction({
-            activity_id: activity.id,
-            type: 'like',
-          })
-        : client?.addActivityReaction({
-            activity_id: activity.id,
-            type: 'like',
-            create_notification_activity: true,
-          }),
-    [client, activity.id, activity.own_reactions],
-  );
-
-  const addComment = useCallback(async () => {
-    await client?.addComment({
-      object_id: activity.id,
-      object_type: 'activity',
-      comment: commentDraft,
-      create_notification_activity: true,
-    });
-    setCommentDraft('');
-  }, [client, activity.id, commentDraft]);
 
   const toggleBookmark = useCallback(
     () =>
@@ -100,16 +63,7 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
                 💬&nbsp;
                 {activity.comment_count}
               </button>
-              <button
-                type="button"
-                className={`btn ${
-                  activity.own_reactions?.length > 0 ? 'bg-primary' : ''
-                }`}
-                onClick={toggleReaction}
-              >
-                ❤️&nbsp;
-                {activity.reaction_groups.like?.count ?? 0}
-              </button>
+              <ToggleReaction activity={activity} />
               <button
                 type="button"
                 className={`btn ${
@@ -121,38 +75,8 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
                 {activity.bookmark_count}
               </button>
             </div>
-            <div className="w-full flex flex-row gap-2">
-              <input
-                className="input w-full"
-                placeholder="Post your reply"
-                value={commentDraft}
-                onChange={(e) => setCommentDraft(e.target.value)}
-              />
-              <button
-                className="btn btn-primary"
-                onClick={addComment}
-                disabled={!commentDraft.trim()}
-              >
-                Reply
-              </button>
-            </div>
-            {comments.map((comment) => (
-              <div
-                className="flex flex-row items-center gap-2"
-                key={comment.id}
-              >
-                <span className="font-semibold">{comment.user.name}:</span>
-                <span>{comment.text}</span>
-              </div>
-            ))}
-            {activity.comment_count > 0 && has_next_page && (
-              <button
-                className="btn btn-soft btn-primary"
-                onClick={() => loadNextPage()}
-              >
-                Load more comments
-              </button>
-            )}
+            <CommentComposer activity={activity} />
+            <CommentList activity={activity} />
           </div>
         </div>
       </div>

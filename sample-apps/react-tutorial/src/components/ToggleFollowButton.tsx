@@ -1,7 +1,3 @@
-import {
-  useClientConnectedUser,
-  useFeedsClient,
-} from '@stream-io/feeds-react-sdk';
 import { useCallback, useState } from 'react';
 import { useOwnFeedsContext } from '../own-feeds-context';
 
@@ -13,15 +9,11 @@ export const ToggleFollowButton = ({
   isFollowing: boolean;
 }) => {
   const { ownTimeline, ownStoryTimeline } = useOwnFeedsContext();
-  const client = useFeedsClient();
-  const currentUser = useClientConnectedUser();
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
 
   const follow = useCallback(async () => {
-    await client
-      ?.follow({
-        source: `timeline:${currentUser?.id}`,
-        target: `user:${userId}`,
+    await ownTimeline
+      ?.follow(`user:${userId}`, {
         create_notification_activity: true,
       })
       .catch((e) => {
@@ -33,11 +25,8 @@ export const ToggleFollowButton = ({
           throw e;
         }
       });
-    await client
-      ?.follow({
-        source: `stories:${currentUser?.id}`,
-        target: `story:${userId}`,
-      })
+    await ownStoryTimeline
+      ?.follow(`story:${userId}`)
       // Tutorial users don't have stories feed, so we ignore the error
       .catch((e) => {
         if (e instanceof Error && !e.message.includes(`story:${userId}`)) {
@@ -48,28 +37,20 @@ export const ToggleFollowButton = ({
     // Reload timelines to see new activities
     await ownTimeline?.getOrCreate({ watch: true });
     await ownStoryTimeline?.getOrCreate({ watch: true });
-  }, [client, userId, currentUser?.id, ownTimeline, ownStoryTimeline]);
+  }, [userId, ownTimeline, ownStoryTimeline]);
 
   const unfollow = useCallback(async () => {
-    await client?.unfollow({
-      source: `timeline:${currentUser?.id}`,
-      target: `user:${userId}`,
+    await ownTimeline?.unfollow(`user:${userId}`);
+    await ownStoryTimeline?.unfollow(`story:${userId}`).catch((e) => {
+      if (e instanceof Error && !e.message.includes(`story:${userId}`)) {
+        throw e;
+      }
     });
-    await client
-      ?.unfollow({
-        source: `stories:${currentUser?.id}`,
-        target: `story:${userId}`,
-      })
-      .catch((e) => {
-        if (e instanceof Error && !e.message.includes(`story:${userId}`)) {
-          throw e;
-        }
-      });
     setIsFollowing(false);
     // Reload timelines to remove activities
     await ownTimeline?.getOrCreate({ watch: true });
     await ownStoryTimeline?.getOrCreate({ watch: true });
-  }, [client, userId, currentUser?.id, ownTimeline, ownStoryTimeline]);
+  }, [userId, ownTimeline, ownStoryTimeline]);
 
   const toggleFollow = useCallback(() => {
     if (isFollowing) {
