@@ -1,17 +1,10 @@
-import type {
-  Feed} from '@stream-io/feeds-react-sdk';
+import type { Feed } from '@stream-io/feeds-react-sdk';
 import {
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
-import type {
-  PropsWithChildren} from 'react';
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import type { PropsWithChildren } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 type OwnFeedsContextValue = {
   ownFeed: Feed | undefined;
@@ -68,10 +61,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
           (follow) => follow.source_feed.feed === _ownTimeline.feed,
         );
         if (!alreadyFollows) {
-          client.follow({
-            source: _ownTimeline.feed,
-            target: _ownFeed.feed,
-          });
+          _ownTimeline.follow(_ownFeed);
         }
       });
       const _ownNotifications = client.feed('notification', connectedUser.id);
