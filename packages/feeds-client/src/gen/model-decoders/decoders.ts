@@ -1032,6 +1032,8 @@ decoders.FeedsReactionResponse = (input?: Record<string, any>) => {
 
 decoders.FollowBatchResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    created: { type: 'FollowResponse', isSingle: false },
+
     follows: { type: 'FollowResponse', isSingle: false },
   };
   return decode(typeMappings, input);

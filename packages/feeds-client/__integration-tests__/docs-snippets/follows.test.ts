@@ -13,12 +13,15 @@ describe('Follows page', () => {
   const user: UserRequest = getTestUser();
   let feed: Feed;
   let timeline: Feed;
+  let feed2: Feed;
 
   beforeAll(async () => {
     client = createTestClient();
     await client.connectUser(user, createTestTokenGenerator(user));
     feed = client.feed('user', crypto.randomUUID());
     await feed.getOrCreate();
+    feed2 = client.feed('user', crypto.randomUUID());
+    await feed2.getOrCreate();
   });
 
   it(`Follow & Unfollows`, async () => {
@@ -30,6 +33,20 @@ describe('Follows page', () => {
       custom: {
         reason: 'investment',
       },
+    });
+
+    await client.follow({
+      source: timeline.feed,
+      target: feed2.feed,
+    });
+  });
+
+  it('Unfollow', async () => {
+    await timeline.unfollow(feed.feed);
+
+    await client.unfollow({
+      source: timeline.feed,
+      target: feed2.feed,
     });
   });
 
@@ -159,6 +176,40 @@ describe('Follows page', () => {
       console.log('Reason:', suggestion.reason);
       console.log('Algorithm scores:', suggestion.algorithm_scores);
     });
+  });
+
+  it('Batch follow & unfollow', async () => {
+    const response = await client.getOrCreateFollows({
+      follows: [
+        {
+          source: timeline.feed,
+          target: feed.feed,
+          // Optional
+          push_preference: 'all',
+          custom: {
+            reason: 'investment',
+          },
+        },
+        {
+          source: timeline.feed,
+          target: feed2.feed,
+        },
+      ],
+    });
+
+    console.log('Created follows:', response.created);
+    console.log('Follows:', response.follows);
+
+    await client.getOrCreateUnfollows({
+      follows: [
+        {
+          source: timeline.feed,
+          target: feed.feed,
+        },
+      ],
+    });
+
+    console.log('Follows that were removed:', response.follows);
   });
 
   afterAll(async () => {

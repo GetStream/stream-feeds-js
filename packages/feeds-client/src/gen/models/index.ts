@@ -2990,6 +2990,8 @@ export interface FollowBatchRequest {
 export interface FollowBatchResponse {
   duration: string;
 
+  created: FollowResponse[];
+
   follows: FollowResponse[];
 }
 
@@ -4011,7 +4013,7 @@ export interface OnlyUserID {
 export interface OwnBatchRequest {
   feeds: string[];
 
-  fields?: 'own_follows' | 'own_capabilities' | 'own_membership';
+  fields?: string[];
 }
 
 export interface OwnBatchResponse {
