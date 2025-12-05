@@ -249,7 +249,7 @@ describe('Deferred own_capabilities hydration', () => {
 
   it('should throttle new capabilities hydration', async () => {
     const client = createTestClient();
-    const getCapabilitiesSpy = vi.spyOn(client as any, 'ownCapabilitiesBatch');
+    const getCapabilitiesSpy = vi.spyOn(client as any, 'ownBatch');
     await client.connectUser(ownUser, createTestTokenGenerator(ownUser));
     const ownFeed = client.feed(feedGroup, feedId);
 

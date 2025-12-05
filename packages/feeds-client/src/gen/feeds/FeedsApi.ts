@@ -62,8 +62,8 @@ import type {
   ListBlockListResponse,
   ListDevicesResponse,
   MarkActivityRequest,
-  OwnCapabilitiesBatchRequest,
-  OwnCapabilitiesBatchResponse,
+  OwnBatchRequest,
+  OwnBatchResponse,
   PinActivityRequest,
   PinActivityResponse,
   PollOptionResponse,
@@ -104,6 +104,8 @@ import type {
   SingleFollowResponse,
   UnblockUsersRequest,
   UnblockUsersResponse,
+  UnfollowBatchRequest,
+  UnfollowBatchResponse,
   UnfollowResponse,
   UnpinActivityResponse,
   UpdateActivityPartialRequest,
@@ -979,14 +981,14 @@ export class FeedsApi {
   }
 
   async addComment(
-    request: AddCommentRequest,
+    request?: AddCommentRequest,
   ): Promise<StreamResponse<AddCommentResponse>> {
     const body = {
-      object_id: request?.object_id,
-      object_type: request?.object_type,
       comment: request?.comment,
       create_notification_activity: request?.create_notification_activity,
       id: request?.id,
+      object_id: request?.object_id,
+      object_type: request?.object_type,
       parent_id: request?.parent_id,
       skip_enrich_url: request?.skip_enrich_url,
       skip_push: request?.skip_push,
@@ -1621,28 +1623,29 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async ownCapabilitiesBatch(
-    request: OwnCapabilitiesBatchRequest & { connection_id?: string },
-  ): Promise<StreamResponse<OwnCapabilitiesBatchResponse>> {
+  async ownBatch(
+    request: OwnBatchRequest & { connection_id?: string },
+  ): Promise<StreamResponse<OwnBatchResponse>> {
     const queryParams = {
       connection_id: request?.connection_id,
     };
     const body = {
       feeds: request?.feeds,
+      fields: request?.fields,
     };
 
     const response = await this.apiClient.sendRequest<
-      StreamResponse<OwnCapabilitiesBatchResponse>
+      StreamResponse<OwnBatchResponse>
     >(
       'POST',
-      '/api/v2/feeds/feeds/own_capabilities/batch',
+      '/api/v2/feeds/feeds/own/batch',
       undefined,
       queryParams,
       body,
       'application/json',
     );
 
-    decoders.OwnCapabilitiesBatchResponse?.(response.body);
+    decoders.OwnBatchResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -1783,6 +1786,29 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async getOrCreateFollows(
+    request: FollowBatchRequest,
+  ): Promise<StreamResponse<FollowBatchResponse>> {
+    const body = {
+      follows: request?.follows,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<FollowBatchResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/follows/batch/upsert',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.FollowBatchResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async queryFollows(
     request?: QueryFollowsRequest,
   ): Promise<StreamResponse<QueryFollowsResponse>> {
@@ -1853,6 +1879,29 @@ export class FeedsApi {
     );
 
     decoders.UnfollowResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getOrCreateUnfollows(
+    request: UnfollowBatchRequest,
+  ): Promise<StreamResponse<UnfollowBatchResponse>> {
+    const body = {
+      follows: request?.follows,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UnfollowBatchResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/unfollow/batch/upsert',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.UnfollowBatchResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
