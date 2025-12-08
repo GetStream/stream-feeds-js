@@ -14,6 +14,7 @@ import type {
   FileUploadRequest,
   FollowBatchRequest,
   FollowRequest,
+  FollowResponse,
   GetOrCreateFeedRequest,
   ImageUploadRequest,
   OwnBatchRequest,
@@ -21,6 +22,7 @@ import type {
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
+  UnfollowBatchRequest,
   UpdateActivityRequest,
   UpdateActivityResponse,
   UpdateCommentRequest,
@@ -764,36 +766,41 @@ export class FeedsClient extends FeedsApi {
   // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
   async follow(request: FollowRequest) {
     const response = await super.follow(request);
-
-    [
-      response.follow.source_feed.feed,
-      response.follow.target_feed.feed,
-    ].forEach((fid) => {
-      const feeds = this.findAllActiveFeedsByFid(fid);
-      feeds.forEach((f) => handleFollowCreated.bind(f)(response, false));
-    });
+    this.updateStateFromFollows([response.follow]);
 
     return response;
   }
 
+  /**
+   * @deprecated Use getOrCreateFollows instead
+   * @param request
+   * @returns
+   */
   async followBatch(request: FollowBatchRequest) {
     const response = await super.followBatch(request);
-
-    response.follows.forEach((follow) => {
-      const feeds = this.findAllActiveFeedsByFid(follow.source_feed.feed);
-      feeds.forEach((f) => handleFollowCreated.bind(f)({ follow }, false));
-    });
+    this.updateStateFromFollows(response.follows);
 
     return response;
   }
 
-  async unfollow(request: FollowRequest) {
-    const response = await super.unfollow(request);
+  async getOrCreateFollows(request: FollowBatchRequest) {
+    const response = await super.getOrCreateFollows(request);
 
-    [request.source, request.target].forEach((fid) => {
-      const feeds = this.findAllActiveFeedsByFid(fid);
-      feeds.forEach((f) => handleFollowDeleted.bind(f)(response, false));
-    });
+    this.updateStateFromFollows(response.created);
+
+    return response;
+  }
+
+  async unfollow(request: { source: string; target: string }) {
+    const response = await super.unfollow(request);
+    this.updateStateFromUnfollows([response.follow]);
+
+    return response;
+  }
+
+  async getOrCreateUnfollows(request: UnfollowBatchRequest) {
+    const response = await super.getOrCreateUnfollows(request);
+    this.updateStateFromUnfollows(response.follows);
 
     return response;
   }
@@ -921,5 +928,25 @@ export class FeedsClient extends FeedsApi {
         })
         .map((a) => getFeed.call(a)!),
     ];
+  }
+
+  private updateStateFromFollows(follows: FollowResponse[]) {
+    follows.forEach((follow) => {
+      const feeds = [
+        ...this.findAllActiveFeedsByFid(follow.source_feed.feed),
+        ...this.findAllActiveFeedsByFid(follow.target_feed.feed),
+      ];
+      feeds.forEach((f) => handleFollowCreated.bind(f)({ follow }, false));
+    });
+  }
+
+  private updateStateFromUnfollows(follows: FollowResponse[]) {
+    follows.forEach((follow) => {
+      const feeds = [
+        ...this.findAllActiveFeedsByFid(follow.source_feed.feed),
+        ...this.findAllActiveFeedsByFid(follow.target_feed.feed),
+      ];
+      feeds.forEach((f) => handleFollowDeleted.bind(f)({ follow }, false));
+    });
   }
 }
