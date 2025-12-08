@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.17](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.16...@stream-io/feeds-client-0.3.17) (2025-12-08)
+
+
+### Features
+
+* idempotent follow - getOrCreateFollows ([#183](https://github.com/GetStream/stream-feeds-js/issues/183)) ([f327974](https://github.com/GetStream/stream-feeds-js/commit/f3279748d938add84c245bc21e71a73d92a6973b))
+* use new ownBatch endpoint (this is an internal endpoint) ([#181](https://github.com/GetStream/stream-feeds-js/issues/181)) ([f9dca65](https://github.com/GetStream/stream-feeds-js/commit/f9dca65cfa164e3da60ac3dc0ddecbd8b38770e2))
+
+
+### Bug Fixes
+
+* remove anon login, it won't be supported for now ([#185](https://github.com/GetStream/stream-feeds-js/issues/185)) ([d9230ba](https://github.com/GetStream/stream-feeds-js/commit/d9230bafff5ebf7d0a8cb598585896a02b23048a))
+
 ## [0.3.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.15...@stream-io/feeds-client-0.3.16) (2025-12-03)
 
 
