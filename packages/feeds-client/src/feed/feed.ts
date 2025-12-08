@@ -928,6 +928,20 @@ export class Feed extends FeedApi {
   off = this.eventDispatcher.off;
 
   handleWSEvent(event: WSEvent) {
+    if (
+      'activity' in event &&
+      event.type === 'feeds.activity.removed_from_feed' &&
+      this.hasActivity(event.activity.id) &&
+      !event.activity.current_feed
+    ) {
+      const currentActivity = this.currentState.activities?.find(
+        (a) => a.id === event.activity.id,
+      );
+      if (currentActivity) {
+        event.activity.current_feed = currentActivity.current_feed;
+      }
+    }
+
     const eventHandler = this.eventHandlers[event.type];
 
     // no need to run noop function

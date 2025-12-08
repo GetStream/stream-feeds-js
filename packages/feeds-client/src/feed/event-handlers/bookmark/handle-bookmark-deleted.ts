@@ -38,14 +38,6 @@ const sharedUpdateActivity = ({
     );
   }
 
-  if (
-    !event.bookmark.activity.current_feed &&
-    event.bookmark.activity.feeds.length === 1 &&
-    currentActivity.current_feed
-  ) {
-    event.bookmark.activity.current_feed = currentActivity.current_feed;
-  }
-
   return {
     ...event.bookmark.activity,
     own_bookmarks: newOwnBookmarks,
