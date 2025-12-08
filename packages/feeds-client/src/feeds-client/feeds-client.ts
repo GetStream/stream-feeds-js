@@ -16,7 +16,7 @@ import type {
   FollowRequest,
   GetOrCreateFeedRequest,
   ImageUploadRequest,
-  OwnCapabilitiesBatchRequest,
+  OwnBatchRequest,
   PollResponse,
   PollVotesResponse,
   QueryFeedsRequest,
@@ -286,7 +286,7 @@ export class FeedsClient extends FeedsApi {
       cancelTimer: cancel,
     } = throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
       (feeds, callback) => {
-        this.ownCapabilitiesBatch({
+        this.ownBatch({
           feeds,
         }).catch((error) => {
           this.eventDispatcher.dispatch({
@@ -745,12 +745,12 @@ export class FeedsClient extends FeedsApi {
     };
   }
 
-  async ownCapabilitiesBatch(request: OwnCapabilitiesBatchRequest) {
-    const response = await super.ownCapabilitiesBatch(request);
-    const feedResponses = Object.entries(response.capabilities).map(
-      ([feed, own_capabilities]) => ({
+  async ownBatch(request: OwnBatchRequest) {
+    const response = await super.ownBatch(request);
+    const feedResponses = Object.entries(response.data).map(
+      ([feed, ownFields]) => ({
         feed,
-        own_capabilities,
+        own_capabilities: ownFields.own_capabilities,
       }),
     );
     this.hydrateCapabilitiesCache(feedResponses);

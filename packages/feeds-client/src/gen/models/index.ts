@@ -496,6 +496,8 @@ export interface ActivitySelectorConfig {
   sort?: SortParam[];
 
   filter?: Record<string, any>;
+
+  params?: Record<string, any>;
 }
 
 export interface ActivityUnpinnedEvent {
@@ -615,15 +617,15 @@ export interface AddCommentReactionResponse {
 }
 
 export interface AddCommentRequest {
-  object_id: string;
-
-  object_type: string;
-
   comment?: string;
 
   create_notification_activity?: boolean;
 
   id?: string;
+
+  object_id?: string;
+
+  object_type?: string;
 
   parent_id?: string;
 
@@ -1084,7 +1086,7 @@ export interface BookmarkFolderResponse {
 
   updated_at: Date;
 
-  user: UserResponseCommonFields;
+  user: UserResponse;
 
   custom?: Record<string, any>;
 }
@@ -1110,7 +1112,7 @@ export interface BookmarkResponse {
 
   activity: ActivityResponse;
 
-  user: UserResponseCommonFields;
+  user: UserResponse;
 
   custom?: Record<string, any>;
 
@@ -2731,6 +2733,14 @@ export const FeedOwnCapability = {
 export type FeedOwnCapability =
   (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
 
+export interface FeedOwnData {
+  own_capabilities?: FeedOwnCapability[];
+
+  own_follows?: FollowResponse[];
+
+  own_membership?: FeedMemberResponse;
+}
+
 export interface FeedRequest {
   feed_group_id: string;
 
@@ -3013,6 +3023,12 @@ export interface FollowDeletedEvent {
   feed_visibility?: string;
 
   received_at?: Date;
+}
+
+export interface FollowPair {
+  source: string;
+
+  target: string;
 }
 
 export interface FollowRequest {
@@ -3992,14 +4008,16 @@ export interface OnlyUserID {
   id: string;
 }
 
-export interface OwnCapabilitiesBatchRequest {
+export interface OwnBatchRequest {
   feeds: string[];
+
+  fields?: 'own_follows' | 'own_capabilities' | 'own_membership';
 }
 
-export interface OwnCapabilitiesBatchResponse {
+export interface OwnBatchResponse {
   duration: string;
 
-  capabilities: Record<string, FeedOwnCapability[]>;
+  data: Record<string, FeedOwnData>;
 }
 
 export interface OwnUser {
@@ -5505,6 +5523,16 @@ export interface UnblockUsersRequest {
 
 export interface UnblockUsersResponse {
   duration: string;
+}
+
+export interface UnfollowBatchRequest {
+  follows: FollowPair[];
+}
+
+export interface UnfollowBatchResponse {
+  duration: string;
+
+  follows: FollowResponse[];
 }
 
 export interface UnfollowResponse {
