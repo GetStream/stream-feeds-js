@@ -932,17 +932,32 @@ export class Feed extends FeedApi {
 
     // no need to run noop function
     if (eventHandler !== Feed.noop) {
-      if (
-        'activity' in event &&
-        !event.activity.current_feed &&
-        event.activity.feeds.length > 1 &&
-        this.hasActivity(event.activity.id)
-      ) {
+      if ('activity' in event && this.hasActivity(event.activity.id)) {
         const currentActivity = this.currentState.activities?.find(
           (a) => a.id === event.activity.id,
         );
-        if (currentActivity?.current_feed) {
+
+        // Backfill current_feed if activity is posted to multiple feeds
+        if (
+          event.activity.feeds.length > 1 &&
+          !event.activity.current_feed &&
+          currentActivity?.current_feed
+        ) {
           event.activity.current_feed = currentActivity.current_feed;
+        }
+
+        // Backfill own_ fields if activity is posted to a single feed
+        if (
+          event.activity.feeds.length === 1 &&
+          event.activity.current_feed &&
+          currentActivity?.current_feed
+        ) {
+          event.activity.current_feed.own_capabilities =
+            currentActivity.current_feed.own_capabilities;
+          event.activity.current_feed.own_follows =
+            currentActivity.current_feed.own_follows;
+          event.activity.current_feed.own_membership =
+            currentActivity.current_feed.own_membership;
         }
       }
       // @ts-expect-error intersection of handler arguments results to never

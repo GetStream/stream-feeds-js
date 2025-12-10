@@ -23,9 +23,9 @@ const sharedUpdateActivity = ({
   }
 
   return {
-    ...event.bookmark.activity,
+    ...currentActivity,
+    bookmark_count: event.bookmark.activity.bookmark_count,
     own_bookmarks: newOwnBookmarks,
-    own_reactions: currentActivity.own_reactions,
   };
 };
 
