@@ -18,7 +18,7 @@ TODO
 
 ## 👩‍💻 Free for Makers 👨‍💻
 
-Stream is free for most side and hobby projects. To qualify, your project/company needs to have < 5 team members and < $10k in monthly revenue. Makers get $100 in monthly credit for video for free.
+Stream is free for most side and hobby projects. To qualify, your project/company needs to have < 5 team members and < $10k in monthly revenue. Makers get $100 in monthly credit for feeds for free.
 
 ## 💡 Supported Features 💡
 

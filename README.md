@@ -5,7 +5,7 @@ Bring users together through personalized feeds, threaded discussions, and real-
 ## **Quick Links**
 
 - [Register](https://getstream.io/chat/trial/) to get an API key for Stream Feeds
-- [React SDK](./packages/react-sdk#official-react-sdk-for-stream-feeds)
+- [React SDK](./packages/react-sdk#official-react-sdk-for-steram-feeds)
 - [React Native SDK](./packages/react-native-sdk#official-react-native-sdk-for-stream-feeds)
 - [JavaScript SDK](./packages/feeds-client#official-plain-js-sdk-and-low-level-client-for-stream-feeds)
 - [React sample apps](#react-sample-apps)
@@ -22,7 +22,7 @@ TODO
 
 ## 👩‍💻 Free for Makers 👨‍💻
 
-Stream is free for most side and hobby projects. To qualify, your project/company needs to have < 5 team members and < $10k in monthly revenue. Makers get $100 in monthly credit for video for free.
+Stream is free for most side and hobby projects. To qualify, your project/company needs to have < 5 team members and < $10k in monthly revenue. Makers get $100 in monthly credit for feeds for free.
 
 ## 💡 Supported Features 💡
 
