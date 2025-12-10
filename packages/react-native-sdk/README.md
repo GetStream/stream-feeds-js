@@ -2,11 +2,9 @@
 
 Bring users together through personalized feeds, threaded discussions, and real-time updates that make every interaction feel meaningful.
 
-Supported React versions: >=17.0.0
-
-Supported React Native versions: >=0.73.0
-
-Supported Expo versions: >=51.0.0
+- Supported React versions: >=17.0.0
+- Supported React Native versions: >=0.73.0
+- Supported Expo versions: >=51.0.0
 
 ## **Quick Links**
 
