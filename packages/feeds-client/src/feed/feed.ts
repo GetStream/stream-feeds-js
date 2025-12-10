@@ -928,24 +928,23 @@ export class Feed extends FeedApi {
   off = this.eventDispatcher.off;
 
   handleWSEvent(event: WSEvent) {
-    if (
-      'activity' in event &&
-      event.type === 'feeds.activity.removed_from_feed' &&
-      this.hasActivity(event.activity.id) &&
-      !event.activity.current_feed
-    ) {
-      const currentActivity = this.currentState.activities?.find(
-        (a) => a.id === event.activity.id,
-      );
-      if (currentActivity) {
-        event.activity.current_feed = currentActivity.current_feed;
-      }
-    }
-
     const eventHandler = this.eventHandlers[event.type];
 
     // no need to run noop function
     if (eventHandler !== Feed.noop) {
+      if (
+        'activity' in event &&
+        !event.activity.current_feed &&
+        event.activity.feeds.length > 1 &&
+        this.hasActivity(event.activity.id)
+      ) {
+        const currentActivity = this.currentState.activities?.find(
+          (a) => a.id === event.activity.id,
+        );
+        if (currentActivity?.current_feed) {
+          event.activity.current_feed = currentActivity.current_feed;
+        }
+      }
       // @ts-expect-error intersection of handler arguments results to never
       eventHandler?.(event);
     }
