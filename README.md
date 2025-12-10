@@ -1,7 +1,5 @@
 # Stream Feeds for JavaScript
 
-⚠️ Activity feeds v3 is currently in beta.
-
 ## Repository Contents
 
 - JS client for feeds v3
