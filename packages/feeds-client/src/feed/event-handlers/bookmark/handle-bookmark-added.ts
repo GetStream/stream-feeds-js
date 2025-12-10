@@ -22,18 +22,10 @@ const sharedUpdateActivity = ({
     newOwnBookmarks = [...newOwnBookmarks, event.bookmark];
   }
 
-  if (
-    !event.bookmark.activity.current_feed &&
-    event.bookmark.activity.feeds.length === 1 &&
-    currentActivity.current_feed
-  ) {
-    event.bookmark.activity.current_feed = currentActivity.current_feed;
-  }
-
   return {
-    ...event.bookmark.activity,
+    ...currentActivity,
+    bookmark_count: event.bookmark.activity.bookmark_count,
     own_bookmarks: newOwnBookmarks,
-    own_reactions: currentActivity.own_reactions,
   };
 };
 

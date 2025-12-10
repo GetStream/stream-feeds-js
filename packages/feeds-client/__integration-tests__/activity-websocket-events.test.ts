@@ -1,8 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import type { ActivityRemovedFromFeedEvent, UserRequest } from '../src/gen/models';
+import type {
+  ActivityRemovedFromFeedEvent,
+  UserRequest,
+} from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
+  getServerClient,
   getTestUser,
   waitForEvent,
 } from './utils';
@@ -198,6 +202,49 @@ describe('Activity state updates via WebSocket events', () => {
     const indexedActivityIds = (feed as any).indexedActivityIds;
     expect(indexedActivityIds.size).toEqual(0);
     expect(feed.hasActivity(response.activity.id)).toBe(false);
+
+    await secondFeed.delete({ hard_delete: true });
+  });
+
+  it(`should backfill current_feed if activity is added to multiple feeds`, async () => {
+    const secondFeed = client.feed(feedGroup, crypto.randomUUID());
+    await secondFeed.getOrCreate();
+
+    const activityId = crypto.randomUUID();
+    client.addActivity({
+      type: 'post',
+      feeds: [feed.feed, secondFeed.feed],
+      id: activityId,
+    });
+
+    await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 1000 });
+
+    let activity = feed.currentState.activities?.find(
+      (a) => a.id === activityId,
+    );
+
+    // we can't backfill on activity.added
+    expect(activity?.current_feed).toBe(undefined);
+
+    // Reread feed
+    await feed.getOrCreate();
+
+    activity = feed.currentState.activities?.find((a) => a.id === activityId);
+
+    expect(activity?.current_feed?.feed).toBe(feed.feed);
+
+    const serverClient = getServerClient();
+    serverClient.feeds.updateActivity({
+      id: activityId,
+      text: 'Test activity',
+      user_id: user.id,
+    });
+
+    await waitForEvent(feed, 'feeds.activity.updated', { timeoutMs: 1000 });
+
+    activity = feed.currentState.activities?.find((a) => a.id === activityId);
+
+    expect(activity?.current_feed?.feed).toBe(feed.feed);
 
     await secondFeed.delete({ hard_delete: true });
   });
