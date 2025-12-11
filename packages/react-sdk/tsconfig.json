@@ -1,29 +1,22 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "tsBuildInfoFile": ".ts/tsconfig.tsbuildinfo",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "module": "ES2020",
-    "target": "ES2020",
-    "lib": ["esnext", "dom"],
-    "noEmitOnError": true,
-    "noImplicitAny": true,
-    "declaration": true,
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/.tsbuildinfo",
+    "rootDir": "src",
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "skipLibCheck": true,
+    "target": "es2020",
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "strict": true,
-    "strictNullChecks": true,
-    "sourceMap": true,
-    "inlineSources": true,
-    "jsx": "react-jsx"
+    "module": "nodenext",
+    "outDir": "dist",
+    "declaration": true,
+    "composite": true
   },
-  "exclude": ["**/*.test.ts"],
-  "include": ["./src"],
-  "references": [{ "path": "../feeds-client" }]
+  "buildOptions": {
+    "verbose": true
+  },
+  "include": ["src"]
 }
