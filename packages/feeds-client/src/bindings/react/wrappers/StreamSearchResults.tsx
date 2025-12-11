@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
+
 import { StreamSearchResultsContext } from '../contexts/StreamSearchResultsContext';
-import type { SearchSource } from '@self';
+import type { SearchSource } from '../../../common/search';
 
 /**
  * The props for the StreamSearchResults component. It accepts a `SearchSource` instance.

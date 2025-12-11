@@ -1,7 +1,7 @@
-import type { ActivityResponse, Feed } from '@self';
-import type { CommentResponse } from '@self';
 import { handleCommentUpdated } from '../handle-comment-updated';
 import { handleActivityUpdated } from '../../activity';
+import type { Feed } from '../../../feed';
+import type { ActivityResponse, CommentResponse } from '../../../../gen/models';
 
 export function updateCommentCount(
   this: Feed,

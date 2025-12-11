@@ -1,15 +1,11 @@
 import { useCallback, useMemo } from 'react';
-import {
-  type ActivityResponse,
-  type CommentResponse,
-  type CommentParent,
-  type Feed,
-  type FeedState,
-  checkHasAnotherPage,
-  isCommentResponse,
-} from '@self';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
+
 import { useFeedContext } from '../../contexts/StreamFeedContext';
+import { checkHasAnotherPage, isCommentResponse } from '../../../../utils';
+import type { ActivityResponse, CommentResponse } from '../../../../gen/models';
+import type { Feed, FeedState } from '../../../../feed';
+import type { CommentParent } from '../../../../types';
 
 type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
   comments: NonNullable<

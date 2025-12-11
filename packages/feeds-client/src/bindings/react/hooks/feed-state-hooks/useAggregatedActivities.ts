@@ -1,8 +1,9 @@
-import type { Feed, FeedState } from '@self';
-import { useStateStore } from '@stream-io/state-store/react-bindings';
-import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useMemo } from 'react';
+import { useStateStore } from '@stream-io/state-store/react-bindings';
+
+import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useStableCallback } from '../internal';
+import type { Feed, FeedState } from '../../../../feed';
 
 const selector = ({
   is_loading_activities,

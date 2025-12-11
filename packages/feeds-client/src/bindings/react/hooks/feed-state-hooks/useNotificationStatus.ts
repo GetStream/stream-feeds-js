@@ -1,6 +1,8 @@
-import type { Feed, FeedState, NotificationStatusResponse } from '@self';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
+
 import { useFeedContext } from '../../contexts/StreamFeedContext';
+import type { Feed, FeedState } from '../../../../feed';
+import type { NotificationStatusResponse } from '../../../../gen/models';
 
 const selector = ({ notification_status }: FeedState) =>
   ({

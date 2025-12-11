@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
-import type { Feed } from '@self';
+
+import type { Feed } from '../../../feed';
 
 export const StreamFeedContext = createContext<Feed | undefined>(undefined);
 

@@ -1,8 +1,11 @@
-import type { FeedOwnCapability, Feed, FeedsClientState } from '@self';
+import { useCallback } from 'react';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
+
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
-import { useCallback } from 'react';
+import type { Feed } from '../../../../feed';
+import type { FeedOwnCapability } from '../../../../gen/models';
+import type { FeedsClientState } from '../../../../feeds-client';
 
 const stableEmptyArray: readonly FeedOwnCapability[] = [];
 

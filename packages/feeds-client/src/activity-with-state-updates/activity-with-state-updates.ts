@@ -7,7 +7,7 @@ import {
   disconnectActivityFromFeed,
   isAnyFeedWatched,
 } from '../feeds-client/active-activity';
-import type { GetCommentsRequest } from '@self';
+import type { GetCommentsRequest } from '../types';
 import { deepEqual } from '../utils/deep-equal';
 
 type GetActivityConfig = {
@@ -164,7 +164,7 @@ export class ActivityWithStateUpdates {
   }) {
     this.feed = connectActivityToFeed.call(this.feedsClient, { fid });
 
-    this.feed.state.partialNext({
+    this.feed?.state.partialNext({
       activities: [initialState],
     });
   }

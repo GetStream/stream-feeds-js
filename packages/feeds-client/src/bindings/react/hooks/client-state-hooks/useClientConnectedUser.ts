@@ -1,6 +1,7 @@
-import type { FeedsClientState } from '@self';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
+
 import { useFeedsClient } from '../../contexts/StreamFeedsContext';
+import type { FeedsClientState } from '../../../../feeds-client';
 
 /**
  * A React hook that returns the currently connected user on a `FeedsClient` instance and null otherwise.

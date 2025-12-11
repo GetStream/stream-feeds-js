@@ -1,6 +1,7 @@
-import type { Feed, FeedState } from '@self';
-import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
+
+import { useFeedContext } from '../../contexts/StreamFeedContext';
+import type { Feed, FeedState } from '../../../../feed';
 
 /**
  * A React hook that returns a reactive array of feeds that the current user

@@ -1,4 +1,4 @@
-import type { FeedsClient } from '@self';
+import type { FeedsClient } from '../../feeds-client';
 import type { ThrottledFunction } from './throttle';
 
 const BATCH_OWN_CAPABILITIES_API_LIMIT = 100;

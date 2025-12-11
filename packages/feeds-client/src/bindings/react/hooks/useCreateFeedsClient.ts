@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import {
-  FeedsClient,
-  type FeedsClientOptions,
-  type UserRequest,
-  type TokenOrProvider,
-} from '@self';
+
+import { FeedsClient } from '../../../feeds-client';
+import type { TokenOrProvider } from '../../../types';
+import type { UserRequest } from '../../../gen/models';
+import type { FeedsClientOptions } from '../../../common/types';
 
 /**
  * A React hook to create, connect and return an instance of `FeedsClient`.

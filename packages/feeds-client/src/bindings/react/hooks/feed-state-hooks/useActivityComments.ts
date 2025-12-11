@@ -1,16 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import {
-  type ActivityResponse,
-  type CommentResponse,
-  type Feed,
-  type FeedState,
-  checkHasAnotherPage,
-  type ActivityWithStateUpdates,
-  type ActivityState,
-  type StateStore,
-} from '@self';
-import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
+import type { StateStore } from '@stream-io/state-store';
+
+import { useFeedContext } from '../../contexts/StreamFeedContext';
+import { checkHasAnotherPage } from '../../../../utils';
+import type { Feed, FeedState } from '../../../../feed';
+import type { ActivityState, ActivityWithStateUpdates } from '../../../../activity-with-state-updates/activity-with-state-updates';
+import type { ActivityResponse, CommentResponse } from '../../../../gen/models';
 
 const canLoadComments = (
   feedOrActivity: Feed | ActivityResponse | ActivityWithStateUpdates,
