@@ -16,11 +16,7 @@ export const FeedSearchResult = ({
       <div className="font-semibold flex-grow w-full overflow-hidden text-ellipsis whitespace-nowrap">
         {feed.created_by?.name}
       </div>
-      <ToggleFollowButton
-        key={feed.own_follows?.length}
-        isFollowing={(feed.own_follows?.length ?? 0) > 0}
-        userId={feed.created_by?.id ?? ''}
-      />
+      <ToggleFollowButton userId={feed.created_by?.id ?? ''} />
     </div>
   );
 };
