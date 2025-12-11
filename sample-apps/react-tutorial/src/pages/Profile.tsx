@@ -1,4 +1,4 @@
-import type { BookmarkResponse, FeedState } from '@stream-io/feeds-client';
+import type { BookmarkResponse, FeedState } from '@stream-io/feeds-react-sdk';
 import {
   useClientConnectedUser,
   useFeedsClient,
