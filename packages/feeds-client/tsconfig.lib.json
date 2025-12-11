@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "composite": true,
+    "outDir": "./dist/types",
+    "module": "preserve",
+    "target": "ES2020",
+    "lib": ["esnext", "dom"],
+    "noEmitOnError": true,
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "jsx": "react-jsx"
+  },
+  "exclude": ["**/*.test.ts", "**/test-utils/**/*.ts"],
+  "include": ["./src"],
+  "files": ["package.json", "vite-env.d.ts"]
+}

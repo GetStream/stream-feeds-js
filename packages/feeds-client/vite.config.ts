@@ -1,14 +1,18 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
-import { default as dts } from 'vite-plugin-dts';
-import { dependencies, peerDependencies } from './package.json';
+import { name, dependencies, peerDependencies } from './package.json';
 
 const external = [
-  ...Object.keys(dependencies ?? {}),
-  ...Object.keys(peerDependencies ?? {}),
+  ...Object.keys(dependencies),
+  ...Object.keys(peerDependencies),
 ];
 
 export default defineConfig({
+  optimizeDeps: {
+    esbuildOptions: {
+      tsconfig: resolve(__dirname, 'tsconfig.lib.json'),
+    },
+  },
   build: {
     lib: {
       entry: {
@@ -18,7 +22,7 @@ export default defineConfig({
       fileName(format, entryName) {
         return `${format}/${entryName}.${format === 'cjs' ? 'js' : 'mjs'}`;
       },
-      name: '@stream-io/feeds-client',
+      name,
     },
     emptyOutDir: true,
     outDir: 'dist',
@@ -27,17 +31,6 @@ export default defineConfig({
     target: 'es2020',
     rollupOptions: {
       external,
-    },
-  },
-  plugins: [
-    {
-      ...dts({ outDir: resolve(__dirname, './dist/types') }),
-      apply: 'build',
-    },
-  ],
-  resolve: {
-    alias: {
-      '@self': resolve(__dirname, './src'),
     },
   },
   test: {
