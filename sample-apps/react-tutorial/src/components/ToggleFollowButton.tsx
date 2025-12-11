@@ -19,16 +19,9 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
       return;
     }
 
-    await ownTimeline
-      ?.follow(targetUserFeed, {
-        create_notification_activity: true,
-      })
-      .catch((e) => {
-        // Tutorial users don't have notification feed, so we ignore the error
-        if (e instanceof Error && !e.message.includes(`notification:`)) {
-          throw e;
-        }
-      });
+    await ownTimeline?.follow(targetUserFeed, {
+      // create_notification_activity: true,
+    });
     await ownStoryTimeline
       ?.follow(targetStoryFeed)
       // Tutorial users don't have stories feed, so we ignore the error
@@ -38,7 +31,7 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
         }
       });
     // Reload timelines to see new activities
-    await ownTimeline?.getOrCreate({ watch: true });
+    await ownTimeline?.getOrCreate({ watch: true, limit: 10 });
     await ownStoryTimeline?.getOrCreate({ watch: true });
   }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline]);
 
