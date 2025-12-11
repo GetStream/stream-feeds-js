@@ -28,13 +28,13 @@ export function addActivitiesToState(
   });
 
   if (newActivitiesDeduplicated.length > 0) {
-    // TODO: since feed activities are not necessarily ordered by created_at (personalization) we don't order by created_at
-    // Maybe we can add a flag to the JS client to support order by created_at
     const updatedActivities = [
       ...(position === 'start' ? newActivitiesDeduplicated : []),
       ...activities,
       ...(position === 'end' ? newActivitiesDeduplicated : []),
     ];
+    this.newActivitiesAdded(newActivitiesDeduplicated);
+
     result = { changed: true, activities: updatedActivities };
   }
 

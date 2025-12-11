@@ -1,56 +1,68 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useOwnFeedsContext } from '../own-feeds-context';
+import { useFeedsClient, useOwnFollows } from '@stream-io/feeds-react-sdk';
 
-export const ToggleFollowButton = ({
-  userId,
-  isFollowing: initialIsFollowing,
-}: {
-  userId: string;
-  isFollowing: boolean;
-}) => {
+export const ToggleFollowButton = ({ userId }: { userId: string }) => {
+  const client = useFeedsClient();
   const { ownTimeline, ownStoryTimeline } = useOwnFeedsContext();
-  const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
+
+  const targetUserFeed = useMemo(() => {
+    return client?.feed('user', userId);
+  }, [userId, client]);
+
+  const targetStoryFeed = useMemo(() => {
+    return client?.feed('story', userId);
+  }, [userId, client]);
+
+  const { own_follows: ownFollows } = useOwnFollows(targetUserFeed) ?? {};
+
+  const isFollowing = useMemo(() => {
+    return (ownFollows?.length ?? 0) > 0;
+  }, [ownFollows]);
 
   const follow = useCallback(async () => {
+    if (!targetUserFeed || !targetStoryFeed) {
+      return;
+    }
+
     await ownTimeline
-      ?.follow(`user:${userId}`, {
+      ?.follow(targetUserFeed, {
         create_notification_activity: true,
       })
       .catch((e) => {
         // Tutorial users don't have notification feed, so we ignore the error
-        if (
-          e instanceof Error &&
-          !e.message.includes(`notification:${userId}`)
-        ) {
+        if (e instanceof Error && !e.message.includes(`notification:`)) {
           throw e;
         }
       });
     await ownStoryTimeline
-      ?.follow(`story:${userId}`)
+      ?.follow(targetStoryFeed)
       // Tutorial users don't have stories feed, so we ignore the error
       .catch((e) => {
-        if (e instanceof Error && !e.message.includes(`story:${userId}`)) {
+        if (e instanceof Error && !e.message.includes(`story:`)) {
           throw e;
         }
       });
-    setIsFollowing(true);
     // Reload timelines to see new activities
     await ownTimeline?.getOrCreate({ watch: true });
     await ownStoryTimeline?.getOrCreate({ watch: true });
-  }, [userId, ownTimeline, ownStoryTimeline]);
+  }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline]);
 
   const unfollow = useCallback(async () => {
-    await ownTimeline?.unfollow(`user:${userId}`);
-    await ownStoryTimeline?.unfollow(`story:${userId}`).catch((e) => {
-      if (e instanceof Error && !e.message.includes(`story:${userId}`)) {
+    if (!targetUserFeed || !targetStoryFeed) {
+      return;
+    }
+
+    await ownTimeline?.unfollow(targetUserFeed);
+    await ownStoryTimeline?.unfollow(targetStoryFeed).catch((e) => {
+      if (e instanceof Error && !e.message.includes(`story:`)) {
         throw e;
       }
     });
-    setIsFollowing(false);
     // Reload timelines to remove activities
     await ownTimeline?.getOrCreate({ watch: true });
     await ownStoryTimeline?.getOrCreate({ watch: true });
-  }, [userId, ownTimeline, ownStoryTimeline]);
+  }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline]);
 
   const toggleFollow = useCallback(() => {
     if (isFollowing) {

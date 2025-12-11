@@ -15,6 +15,7 @@ import type {
   FollowBatchRequest,
   FollowRequest,
   FollowResponse,
+  GetFollowSuggestionsResponse,
   GetOrCreateFeedRequest,
   ImageUploadRequest,
   OwnBatchRequest,
@@ -680,8 +681,7 @@ export class FeedsClient extends FeedsApi {
       id,
       undefined,
       undefined,
-      options?.addNewActivitiesTo,
-      options?.activityAddedEventFilter,
+      options,
     );
   };
 
@@ -840,29 +840,59 @@ export class FeedsClient extends FeedsApi {
     return response;
   }
 
-  private readonly getOrCreateActiveFeed = (
+  async getFollowSuggestions(
+    ...params: Parameters<FeedsApi['getFollowSuggestions']>
+  ): Promise<StreamResponse<GetFollowSuggestionsResponse>> {
+    const response = await super.getFollowSuggestions(...params);
+
+    response.suggestions.forEach((suggestion) => {
+      this.getOrCreateActiveFeed(
+        suggestion.group_id,
+        suggestion.id,
+        suggestion,
+      );
+    });
+
+    // TODO: return feed instance here https://linear.app/stream/issue/REACT-669/return-feed-instance-from-followsuggestions-breaking
+    return response;
+  }
+
+  protected readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
     data?: FeedResponse,
     watch?: boolean,
-    addNewActivitiesTo?: 'start' | 'end',
-    activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean,
+    options?: {
+      addNewActivitiesTo?: 'start' | 'end';
+      activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
+    },
   ) => {
     const fid = `${group}:${id}`;
+    let isCreated = false;
 
     if (!this.activeFeeds[fid]) {
+      isCreated = true;
       this.activeFeeds[fid] = new Feed(
         this,
         group,
         id,
         data,
         watch,
-        addNewActivitiesTo,
-        activityAddedEventFilter,
+        options?.addNewActivitiesTo,
+        options?.activityAddedEventFilter,
       );
     }
 
     const feed = this.activeFeeds[fid];
+
+    if (!isCreated && options) {
+      if (options?.addNewActivitiesTo) {
+        feed.addNewActivitiesTo = options.addNewActivitiesTo;
+      }
+      if (options?.activityAddedEventFilter) {
+        feed.activityAddedEventFilter = options.activityAddedEventFilter;
+      }
+    }
 
     if (!feed.currentState.watch) {
       // feed isn't watched and may be stale, update it

@@ -67,6 +67,7 @@ import {
 } from '../utils';
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
 import { deepEqual } from '../utils/deep-equal';
+import { getOrCreateActiveFeed } from '../feeds-client/get-or-create-active-feed';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
@@ -413,7 +414,7 @@ export class Feed extends FeedApi {
         });
       }
 
-      this.client.hydratePollCache(response.activities);
+      this.newActivitiesAdded(response.activities);
 
       return response;
     } finally {
@@ -971,5 +972,19 @@ export class Feed extends FeedApi {
     }
 
     this.eventDispatcher.dispatch(event);
+  }
+
+  protected newActivitiesAdded(activities: ActivityResponse[]) {
+    this.client.hydratePollCache(activities);
+
+    activities.forEach((activity) => {
+      if (activity.current_feed) {
+        getOrCreateActiveFeed.bind(this.client)(
+          activity.current_feed.group_id,
+          activity.current_feed.id,
+          activity.current_feed,
+        );
+      }
+    });
   }
 }

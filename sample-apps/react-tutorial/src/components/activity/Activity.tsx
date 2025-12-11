@@ -41,10 +41,6 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
             </span>
             {activity.current_feed?.feed !== `user:${currentUser?.id}` && (
               <ToggleFollowButton
-                key={activity.current_feed?.own_follows?.length}
-                isFollowing={
-                  (activity.current_feed!.own_follows?.length ?? 0) > 0
-                }
                 userId={activity.current_feed!.created_by.id}
               />
             )}
