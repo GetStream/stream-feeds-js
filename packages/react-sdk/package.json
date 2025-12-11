@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "build": "rimraf ./dist && rimraf ./.ts && tsc",
+    "build": "rimraf ./dist; tsc",
     "prepare": "yarn run build",
     "prepack": "cp ../../LICENSE ./LICENSE",
     "postpack": "rimraf ./LICENSE",
