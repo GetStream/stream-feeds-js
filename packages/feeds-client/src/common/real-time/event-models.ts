@@ -1,5 +1,5 @@
-import type { ConnectedUser } from '@self';
-import type { StreamApiError } from '@self';
+import type { ConnectedUser } from '../../types';
+import type { StreamApiError } from '../types';
 
 export interface ConnectionChangedEvent {
   type: 'connection.changed';

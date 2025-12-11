@@ -17,6 +17,7 @@ import type {
   FollowResponse,
   GetFollowSuggestionsResponse,
   GetOrCreateFeedRequest,
+  ImageSize,
   ImageUploadRequest,
   OwnBatchRequest,
   PollResponse,
@@ -213,7 +214,7 @@ export class FeedsClient extends FeedsApi {
             for (const activeFeed of this.allActiveFeeds) {
               const currentActivities = activeFeed.currentState.activities;
               if (currentActivities) {
-                const newActivities = [];
+                const newActivities: ActivityResponse[] = [];
                 let changed = false;
                 for (const activity of currentActivities) {
                   if (activity.poll?.id === event.poll.id) {
@@ -347,7 +348,7 @@ export class FeedsClient extends FeedsApi {
       ...Object.values(this.activeActivities)
         .filter((a) => !!getFeed.call(a))
         .map((a) => getFeed.call(a)!),
-    ];
+    ] as Feed[];
   }
 
   public pollFromState = (id: string) => this.polls_by_id.get(id);
@@ -450,25 +451,22 @@ export class FeedsClient extends FeedsApi {
     });
   };
 
-  // @ts-expect-error API spec says file should be a string
   uploadFile = (
-    request: Omit<FileUploadRequest, 'file'> & { file: StreamFile },
+    request?: Omit<FileUploadRequest, 'file'> & { file?: StreamFile | string },
   ) => {
     return super.uploadFile({
-      // @ts-expect-error API spec says file should be a string
-      file: request.file,
+      file: request?.file as string,
     });
   };
 
-  // @ts-expect-error API spec says file should be a string
   uploadImage = (
-    request: Omit<ImageUploadRequest, 'file'> & { file: StreamFile },
+    request?: Omit<ImageUploadRequest, 'file'> & { file?: StreamFile | string },
   ) => {
     return super.uploadImage({
-      // @ts-expect-error API spec says file should be a string
-      file: request.file,
-      // @ts-expect-error form data will only work if this is a string
-      upload_sizes: JSON.stringify(request.upload_sizes),
+      file: request?.file as string,
+      upload_sizes: JSON.stringify(
+        request?.upload_sizes,
+      ) as unknown as ImageSize[],
     });
   };
 

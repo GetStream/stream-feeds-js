@@ -1,12 +1,8 @@
-import {
-  updateEntityInArray,
-  type ActivityFeedbackEventPayload,
-  type ActivityPinResponse,
-  type ActivityResponse,
-  type Feed,
-} from '@self';
-import type { EventPayload } from '../../../types-internal';
+import { updateEntityInArray } from '../../../utils';
 import { isPin } from '../is-activity-pin';
+import type { Feed } from '../../feed';
+import type { EventPayload } from '../../../types-internal';
+import type { ActivityFeedbackEventPayload, ActivityPinResponse, ActivityResponse } from '../../../gen/models';
 
 const updateActivityFromFeedback = <
   T extends ActivityResponse | ActivityPinResponse,
