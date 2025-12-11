@@ -1,14 +1,20 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
-import { default as dts } from 'vite-plugin-dts';
-import { dependencies, peerDependencies } from './package.json';
+import { name, dependencies, peerDependencies } from './package.json';
 
 const external = [
-  ...Object.keys(dependencies ?? {}),
-  ...Object.keys(peerDependencies ?? {}),
-];
+  ...Object.keys(dependencies),
+  ...Object.keys(peerDependencies),
+  // regex patterns to match subpaths of external dependencies
+  // e.g. @stream-io/abc and @stream-io/abc/xyz (without this, Vite bundles subpaths)
+].map((dependency) => new RegExp(`^${dependency}(\\/[\\w-]+)?$`));
 
 export default defineConfig({
+  optimizeDeps: {
+    esbuildOptions: {
+      tsconfig: resolve(__dirname, 'tsconfig.lib.json'),
+    },
+  },
   build: {
     lib: {
       entry: {
@@ -18,26 +24,15 @@ export default defineConfig({
       fileName(format, entryName) {
         return `${format}/${entryName}.${format === 'cjs' ? 'js' : 'mjs'}`;
       },
-      name: '@stream-io/feeds-client',
+      name,
     },
-    emptyOutDir: true,
+    emptyOutDir: false,
     outDir: 'dist',
     minify: false,
     sourcemap: true,
     target: 'es2020',
     rollupOptions: {
       external,
-    },
-  },
-  plugins: [
-    {
-      ...dts({ outDir: resolve(__dirname, './dist/types') }),
-      apply: 'build',
-    },
-  ],
-  resolve: {
-    alias: {
-      '@self': resolve(__dirname, './src'),
     },
   },
   test: {
