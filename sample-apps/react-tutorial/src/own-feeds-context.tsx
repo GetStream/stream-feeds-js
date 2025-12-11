@@ -54,6 +54,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       });
       const ownTimelineRequest = _ownTimeline?.getOrCreate({
         watch: true,
+        limit: 10,
       });
       // You typically create these relationships on your server-side, we do this here for simplicity
       Promise.all([ownFeedRequest, ownTimelineRequest]).then(() => {
