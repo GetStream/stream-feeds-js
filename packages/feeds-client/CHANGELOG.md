@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.19](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.18...@stream-io/feeds-client-0.3.19) (2025-12-11)
+
+
+### Bug Fixes
+
+* reactive state updates for follow/unfollow ([#188](https://github.com/GetStream/stream-feeds-js/issues/188)) ([841d436](https://github.com/GetStream/stream-feeds-js/commit/841d43605a5f47cc929b3865f6c13ad26dbbf4c0))
+
 ## [0.3.18](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.17...@stream-io/feeds-client-0.3.18) (2025-12-10)
 
 
