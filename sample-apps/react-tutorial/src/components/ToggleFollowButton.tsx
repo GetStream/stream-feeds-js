@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useOwnFeedsContext } from '../own-feeds-context';
 import { useFeedsClient, useOwnFollows } from '@stream-io/feeds-react-sdk';
 
@@ -6,19 +6,13 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
   const client = useFeedsClient();
   const { ownTimeline, ownStoryTimeline } = useOwnFeedsContext();
 
-  const targetUserFeed = useMemo(() => {
-    return client?.feed('user', userId);
-  }, [userId, client]);
+  const targetUserFeed = client?.feed('user', userId);
 
-  const targetStoryFeed = useMemo(() => {
-    return client?.feed('story', userId);
-  }, [userId, client]);
+  const targetStoryFeed = client?.feed('story', userId);
 
   const { own_follows: ownFollows } = useOwnFollows(targetUserFeed) ?? {};
 
-  const isFollowing = useMemo(() => {
-    return (ownFollows?.length ?? 0) > 0;
-  }, [ownFollows]);
+  const isFollowing = (ownFollows?.length ?? 0) > 0;
 
   const follow = useCallback(async () => {
     if (!targetUserFeed || !targetStoryFeed) {
