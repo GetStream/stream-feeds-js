@@ -81,7 +81,7 @@ import {
   UnhandledErrorType,
 } from '../common/real-time/event-models';
 import { updateCommentCount } from '../feed/event-handlers/comment/utils';
-import { feedsLoggerSystem } from '../utils';
+import { feedsLoggerSystem, ownFeedFields } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 import {
   throttle,
@@ -881,6 +881,9 @@ export class FeedsClient extends FeedsApi {
         options?.addNewActivitiesTo,
         options?.activityAddedEventFilter,
       );
+      this.activeFeeds[fid].state.subscribe((state) => {
+        console.log(`feed state: ${fid}`, state);
+      });
     }
 
     const feed = this.activeFeeds[fid];
@@ -895,8 +898,36 @@ export class FeedsClient extends FeedsApi {
     }
 
     if (!feed.currentState.watch) {
-      // feed isn't watched and may be stale, update it
-      if (data) handleFeedUpdated.call(feed, { feed: data });
+      if (!isCreated && data) {
+        if (
+          (feed.currentState.updated_at?.getTime() ?? 0) <
+          data.updated_at.getTime()
+        ) {
+          handleFeedUpdated.call(feed, { feed: data });
+        } else if (
+          (feed.currentState.updated_at?.getTime() ?? 0) ===
+          data.updated_at.getTime()
+        ) {
+          ownFeedFields.forEach((field) => {
+            const fieldsToUpdate: (keyof FeedResponse)[] = [];
+            if (field in data) {
+              fieldsToUpdate.push(field);
+            }
+            if (fieldsToUpdate.length > 0) {
+              feed.state.partialNext({
+                ...fieldsToUpdate.reduce(
+                  (acc: Partial<FeedResponse>, field) => {
+                    // @ts-expect-error TODO: fix this
+                    acc[field] = data[field];
+                    return acc;
+                  },
+                  {},
+                ),
+              });
+            }
+          });
+        }
+      }
       if (watch) handleWatchStarted.call(feed);
     }
 

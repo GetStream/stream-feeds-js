@@ -6,3 +6,4 @@ export * from './state-update-queue';
 export * from './update-entity-in-array';
 export * from './logger';
 export * from './ensure-exhausted';
+export * from './own-feed-fields';
