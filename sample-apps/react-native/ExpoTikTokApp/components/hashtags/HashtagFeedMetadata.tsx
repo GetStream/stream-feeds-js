@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import type {
-  FeedState} from '@stream-io/feeds-react-native-sdk';
-import { useFeedActivities,
+import type { FeedState } from '@stream-io/feeds-react-native-sdk';
+import { useFeedMetadata } from '@stream-io/feeds-react-native-sdk';
+import {
   useFeedContext,
   useStateStore,
 } from '@stream-io/feeds-react-native-sdk';
@@ -12,7 +12,7 @@ const selector = ({ name, description }: FeedState) => ({ name, description });
 export const HashtagFeedMetadata = () => {
   const feed = useFeedContext();
   const { name, description } = useStateStore(feed?.state, selector) ?? {};
-  const { activities = [] } = useFeedActivities();
+  const { activity_count: activityCount } = useFeedMetadata() ?? {};
 
   return (
     <View style={styles.card}>
@@ -21,7 +21,7 @@ export const HashtagFeedMetadata = () => {
           <Text style={styles.title} numberOfLines={1}>
             #{name}
           </Text>
-          <Text style={styles.subtitle}>{activities.length} posts</Text>
+          <Text style={styles.subtitle}>{activityCount} posts</Text>
         </View>
       </View>
 
