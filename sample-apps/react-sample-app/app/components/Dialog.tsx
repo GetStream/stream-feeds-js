@@ -1,6 +1,7 @@
-import {
+import type {
   ReactNode,
-  Ref,
+  Ref} from 'react';
+import {
   useEffect,
   useImperativeHandle,
   useState,

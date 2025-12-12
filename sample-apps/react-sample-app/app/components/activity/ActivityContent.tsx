@@ -1,4 +1,4 @@
-import { ActivityResponse } from '@stream-io/feeds-react-sdk';
+import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { ActivityComposer } from './ActivityComposer';
 import { Poll } from '../Poll';
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import type {
+  NativeSyntheticEvent,
+  TextInputSelectionChangeEventData,
+  TextInputProps} from 'react-native';
 import {
   StyleSheet,
   TextInput,
   View,
-  NativeSyntheticEvent,
-  TextInputSelectionChangeEventData,
-  TextInputProps,
   Platform,
 } from 'react-native';
 import { AutocompleteSearch } from '@/components/common/autocomplete-input/AutocompleteSearch';
@@ -14,8 +15,9 @@ import {
   useSearchContext,
   useSearchResult,
 } from '@stream-io/feeds-react-native-sdk';
+import type {
+  Suggestion} from '@/components/common/autocomplete-input/SuggestionsList';
 import {
-  Suggestion,
   SuggestionsList,
 } from '@/components/common/autocomplete-input/SuggestionsList';
 import { useStableCallback } from '@/hooks/useStableCallback';

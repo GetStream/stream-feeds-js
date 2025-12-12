@@ -5,7 +5,8 @@ import {
   useFeedsClient,
   UserSearchSource,
 } from '@stream-io/feeds-react-native-sdk';
-import { PropsWithChildren, useMemo } from 'react';
+import type { PropsWithChildren} from 'react';
+import { useMemo } from 'react';
 
 export const AutocompleteSearch = ({ children }: PropsWithChildren) => {
   const client = useFeedsClient();

@@ -375,6 +375,8 @@ export interface ActivityRequest {
 
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
+  skip_enrich_url?: boolean;
+
   text?: string;
 
   visibility?: 'public' | 'private' | 'tag';
@@ -494,6 +496,8 @@ export interface ActivitySelectorConfig {
   sort?: SortParam[];
 
   filter?: Record<string, any>;
+
+  params?: Record<string, any>;
 }
 
 export interface ActivityUnpinnedEvent {
@@ -546,6 +550,8 @@ export interface AddActivityRequest {
   poll_id?: string;
 
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
+
+  skip_enrich_url?: boolean;
 
   text?: string;
 
@@ -611,17 +617,19 @@ export interface AddCommentReactionResponse {
 }
 
 export interface AddCommentRequest {
-  object_id: string;
-
-  object_type: string;
-
   comment?: string;
 
   create_notification_activity?: boolean;
 
   id?: string;
 
+  object_id?: string;
+
+  object_type?: string;
+
   parent_id?: string;
+
+  skip_enrich_url?: boolean;
 
   skip_push?: boolean;
 
@@ -1078,7 +1086,7 @@ export interface BookmarkFolderResponse {
 
   updated_at: Date;
 
-  user: UserResponseCommonFields;
+  user: UserResponse;
 
   custom?: Record<string, any>;
 }
@@ -1104,7 +1112,7 @@ export interface BookmarkResponse {
 
   activity: ActivityResponse;
 
-  user: UserResponseCommonFields;
+  user: UserResponse;
 
   custom?: Record<string, any>;
 
@@ -2406,6 +2414,42 @@ export interface EnrichedReaction {
   user?: Data;
 }
 
+export interface EnrichmentOptions {
+  skip_activity?: boolean;
+
+  skip_activity_collections?: boolean;
+
+  skip_activity_comments?: boolean;
+
+  skip_activity_current_feed?: boolean;
+
+  skip_activity_mentioned_users?: boolean;
+
+  skip_activity_own_bookmarks?: boolean;
+
+  skip_activity_parents?: boolean;
+
+  skip_activity_poll?: boolean;
+
+  skip_activity_reactions?: boolean;
+
+  skip_activity_refresh_image_urls?: boolean;
+
+  skip_all?: boolean;
+
+  skip_feed_member_user?: boolean;
+
+  skip_followers?: boolean;
+
+  skip_following?: boolean;
+
+  skip_own_capabilities?: boolean;
+
+  skip_own_follows?: boolean;
+
+  skip_pins?: boolean;
+}
+
 export interface EntityCreatorResponse {
   ban_count: number;
 
@@ -2689,6 +2733,14 @@ export const FeedOwnCapability = {
 export type FeedOwnCapability =
   (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
 
+export interface FeedOwnData {
+  own_capabilities?: FeedOwnCapability[];
+
+  own_follows?: FollowResponse[];
+
+  own_membership?: FeedMemberResponse;
+}
+
 export interface FeedRequest {
   feed_group_id: string;
 
@@ -2710,6 +2762,8 @@ export interface FeedRequest {
 }
 
 export interface FeedResponse {
+  activity_count: number;
+
   created_at: Date;
 
   description: string;
@@ -2750,6 +2804,8 @@ export interface FeedResponse {
 }
 
 export interface FeedSuggestionResponse {
+  activity_count: number;
+
   created_at: Date;
 
   description: string;
@@ -2817,6 +2873,8 @@ export interface FeedsPreferences {
   comment?: 'all' | 'none';
 
   comment_reaction?: 'all' | 'none';
+
+  comment_reply?: 'all' | 'none';
 
   follow?: 'all' | 'none';
 
@@ -2897,6 +2955,10 @@ export interface FilterConfigResponse {
   ai_text_labels?: string[];
 }
 
+export interface FlagCountRuleParameters {
+  threshold?: number;
+}
+
 export interface FlagRequest {
   entity_id: string;
 
@@ -2927,6 +2989,8 @@ export interface FollowBatchRequest {
 
 export interface FollowBatchResponse {
   duration: string;
+
+  created: FollowResponse[];
 
   follows: FollowResponse[];
 }
@@ -2961,6 +3025,12 @@ export interface FollowDeletedEvent {
   feed_visibility?: string;
 
   received_at?: Date;
+}
+
+export interface FollowPair {
+  source: string;
+
+  target: string;
 }
 
 export interface FollowRequest {
@@ -3200,6 +3270,8 @@ export interface GetOGResponse {
 }
 
 export interface GetOrCreateFeedRequest {
+  id_around?: string;
+
   limit?: number;
 
   next?: string;
@@ -3211,6 +3283,8 @@ export interface GetOrCreateFeedRequest {
   watch?: boolean;
 
   data?: FeedInput;
+
+  enrichment_options?: EnrichmentOptions;
 
   external_ranking?: Record<string, any>;
 
@@ -3849,6 +3923,8 @@ export interface NotificationComment {
 }
 
 export interface NotificationConfig {
+  deduplication_window?: string;
+
   track_read?: boolean;
 
   track_seen?: boolean;
@@ -3914,6 +3990,8 @@ export interface NotificationTrigger {
   text: string;
 
   type: string;
+
+  comment?: NotificationComment;
 }
 
 export interface OCRRule {
@@ -3932,14 +4010,16 @@ export interface OnlyUserID {
   id: string;
 }
 
-export interface OwnCapabilitiesBatchRequest {
+export interface OwnBatchRequest {
   feeds: string[];
+
+  fields?: string[];
 }
 
-export interface OwnCapabilitiesBatchResponse {
+export interface OwnBatchResponse {
   duration: string;
 
-  capabilities: Record<string, FeedOwnCapability[]>;
+  data: Record<string, FeedOwnData>;
 }
 
 export interface OwnUser {
@@ -5013,6 +5093,8 @@ export interface RuleBuilderCondition {
 
   content_count_rule_params?: ContentCountRuleParameters;
 
+  content_flag_count_rule_params?: FlagCountRuleParameters;
+
   image_content_params?: ImageContentParameters;
 
   image_rule_params?: ImageRuleParameters;
@@ -5024,6 +5106,8 @@ export interface RuleBuilderCondition {
   user_created_within_params?: UserCreatedWithinParameters;
 
   user_custom_property_params?: UserCustomPropertyParameters;
+
+  user_flag_count_rule_params?: FlagCountRuleParameters;
 
   user_rule_params?: UserRuleParameters;
 
@@ -5443,6 +5527,16 @@ export interface UnblockUsersResponse {
   duration: string;
 }
 
+export interface UnfollowBatchRequest {
+  follows: FollowPair[];
+}
+
+export interface UnfollowBatchResponse {
+  duration: string;
+
+  follows: FollowResponse[];
+}
+
 export interface UnfollowResponse {
   duration: string;
 
@@ -5477,6 +5571,8 @@ export interface UpdateActivityRequest {
   poll_id?: string;
 
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
+
+  skip_enrich_url?: boolean;
 
   text?: string;
 
@@ -5567,6 +5663,8 @@ export interface UpdateCollectionsResponse {
 
 export interface UpdateCommentRequest {
   comment?: string;
+
+  skip_enrich_url?: boolean;
 
   skip_push?: boolean;
 

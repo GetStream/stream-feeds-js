@@ -1,11 +1,12 @@
+import type {
+  PropsWithChildren} from 'react';
 import {
   createContext,
-  PropsWithChildren,
   useContext,
   useEffect,
   useState,
 } from 'react';
-import { UserRequest } from '@stream-io/feeds-react-native-sdk';
+import type { UserRequest } from '@stream-io/feeds-react-native-sdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type LocalUser = Pick<UserRequest, 'id' | 'name' | 'image'> & { token?: string };

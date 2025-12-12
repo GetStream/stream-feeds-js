@@ -2,6 +2,68 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.19](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.18...@stream-io/feeds-client-0.3.19) (2025-12-11)
+
+
+### Bug Fixes
+
+* reactive state updates for follow/unfollow ([#188](https://github.com/GetStream/stream-feeds-js/issues/188)) ([841d436](https://github.com/GetStream/stream-feeds-js/commit/841d43605a5f47cc929b3865f6c13ad26dbbf4c0))
+
+## [0.3.18](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.17...@stream-io/feeds-client-0.3.18) (2025-12-10)
+
+
+### Bug Fixes
+
+* backfill current feed ([#187](https://github.com/GetStream/stream-feeds-js/issues/187)) ([e215250](https://github.com/GetStream/stream-feeds-js/commit/e215250141aae281464fcec6267934c9a1aecb11))
+
+## [0.3.17](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.16...@stream-io/feeds-client-0.3.17) (2025-12-08)
+
+
+### Features
+
+* idempotent follow - getOrCreateFollows ([#183](https://github.com/GetStream/stream-feeds-js/issues/183)) ([f327974](https://github.com/GetStream/stream-feeds-js/commit/f3279748d938add84c245bc21e71a73d92a6973b))
+* use new ownBatch endpoint (this is an internal endpoint) ([#181](https://github.com/GetStream/stream-feeds-js/issues/181)) ([f9dca65](https://github.com/GetStream/stream-feeds-js/commit/f9dca65cfa164e3da60ac3dc0ddecbd8b38770e2))
+
+
+### Bug Fixes
+
+* remove anon login, it won't be supported for now ([#185](https://github.com/GetStream/stream-feeds-js/issues/185)) ([d9230ba](https://github.com/GetStream/stream-feeds-js/commit/d9230bafff5ebf7d0a8cb598585896a02b23048a))
+
+## [0.3.16](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.15...@stream-io/feeds-client-0.3.16) (2025-12-03)
+
+
+* fix lint issues in sample apps ([#172](https://github.com/GetStream/stream-feeds-js/issues/172)) ([eec1ea5](https://github.com/GetStream/stream-feeds-js/commit/eec1ea5502452310606df6032acb36a724d5e714))
+* update test setup for anon users ([#175](https://github.com/GetStream/stream-feeds-js/issues/175)) ([c818f71](https://github.com/GetStream/stream-feeds-js/commit/c818f71115f47645bf21f460e6a2398d2d3cac69))
+
+
+### Features
+
+* Add activity_count to feed response ([#180](https://github.com/GetStream/stream-feeds-js/issues/180)) ([40fa693](https://github.com/GetStream/stream-feeds-js/commit/40fa693cced4ced64986961fe5a7f59e04addd82))
+
+## [0.3.15](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.14...@stream-io/feeds-client-0.3.15) (2025-11-28)
+
+
+### Features
+
+* support anonymous user connect ([#174](https://github.com/GetStream/stream-feeds-js/issues/174)) ([3463ccf](https://github.com/GetStream/stream-feeds-js/commit/3463ccfc4bfd952ee79a531a0c9928bfd53e8096))
+
+## [0.3.14](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.13...@stream-io/feeds-client-0.3.14) (2025-11-28)
+
+
+* [FEEDS-991] regenerate SDK ([#170](https://github.com/GetStream/stream-feeds-js/issues/170)) ([cdf3cb2](https://github.com/GetStream/stream-feeds-js/commit/cdf3cb2af6abbd326ad74f5e88e4a657ee39bb77))
+
+
+### Features
+
+* Add enrichment options for getOrCreateFeed ([#173](https://github.com/GetStream/stream-feeds-js/issues/173)) ([e662fb7](https://github.com/GetStream/stream-feeds-js/commit/e662fb789a620cf6e174b183d9f42c22b5d11f26))
+
+## [0.3.13](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.12...@stream-io/feeds-client-0.3.13) (2025-11-19)
+
+
+### Features
+
+* Add url enrichment fields for activities and comments ([#168](https://github.com/GetStream/stream-feeds-js/issues/168)) ([7389873](https://github.com/GetStream/stream-feeds-js/commit/73898737b3f555183b402c523461e2cbb860465a))
+
 ## [0.3.12](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.11...@stream-io/feeds-client-0.3.12) (2025-11-18)
 
 

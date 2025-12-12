@@ -4,18 +4,21 @@ import { useRouter } from 'next/navigation';
 import { useUserContext } from '../user-context';
 import { useCallback } from 'react';
 import { Error } from '../components/Error';
+import { useFeedsClient } from '@stream-io/feeds-react-sdk';
 
 export default function ErrorPage() {
   const router = useRouter();
   const { unrecoverableError, throwUnrecoverableError } = useErrorContext();
   const { logOut } = useUserContext();
+  const client = useFeedsClient();
 
   const reset = useCallback(() => {
-    logOut().catch((err) => {
+    logOut();
+    client?.disconnectUser().catch((err) => {
       throwUnrecoverableError(err);
     });
     router.push('/login');
-  }, [logOut]);
+  }, [logOut, client, router, throwUnrecoverableError]);
 
   return <Error error={unrecoverableError} reset={reset}></Error>;
 }

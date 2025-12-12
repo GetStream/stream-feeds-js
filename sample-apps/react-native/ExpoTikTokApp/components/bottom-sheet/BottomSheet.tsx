@@ -1,4 +1,5 @@
-import React, { PropsWithChildren, useEffect, useMemo, useRef } from 'react';
+import type { PropsWithChildren} from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import {
   Dimensions,
   StyleSheet,
@@ -6,10 +7,11 @@ import {
   Pressable,
   Platform,
 } from 'react-native';
+import type {
+  GestureType} from 'react-native-gesture-handler';
 import {
   Gesture,
-  GestureDetector,
-  GestureType,
+  GestureDetector
 } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,

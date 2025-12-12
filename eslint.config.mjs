@@ -15,7 +15,7 @@ import unusedImports from 'eslint-plugin-unused-imports';
 export default [
   { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
   {
-    ignores: ['**/node_modules/**', '**/build/**', '**/dist/**'],
+    ignores: ['**/node_modules/**', '**/build/**', '**/dist/**', '**/.next/**'],
   },
   { languageOptions: { globals: globals.node } },
   { languageOptions: { globals: globals.browser } },

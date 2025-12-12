@@ -2,6 +2,41 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.34](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.33...@stream-io/feeds-react-native-sdk-0.1.34) (2025-12-11)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.19`
+## [0.1.33](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.32...@stream-io/feeds-react-native-sdk-0.1.33) (2025-12-10)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.18`
+## [0.1.32](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.31...@stream-io/feeds-react-native-sdk-0.1.32) (2025-12-08)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.17`
+## [0.1.31](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.30...@stream-io/feeds-react-native-sdk-0.1.31) (2025-12-03)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.16`
+## [0.1.30](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.29...@stream-io/feeds-react-native-sdk-0.1.30) (2025-11-28)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.15`
+## [0.1.29](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.28...@stream-io/feeds-react-native-sdk-0.1.29) (2025-11-28)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.14`
+## [0.1.28](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.27...@stream-io/feeds-react-native-sdk-0.1.28) (2025-11-19)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.13`
 ## [0.1.27](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.26...@stream-io/feeds-react-native-sdk-0.1.27) (2025-11-18)
 
 ### Dependency Updates

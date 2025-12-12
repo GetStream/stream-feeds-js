@@ -1,9 +1,10 @@
 import { Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/common/Themed';
 import React from 'react';
-import {
+import type {
   Feed,
-  FeedState,
+  FeedState} from '@stream-io/feeds-react-native-sdk';
+import {
   useClientConnectedUser,
   useFeedMetadata,
   useStateStore,

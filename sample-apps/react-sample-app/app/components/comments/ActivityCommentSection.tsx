@@ -1,12 +1,14 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import {
+import type { FormEvent} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type {
   Feed,
+  ActivityWithStateUpdates} from '@stream-io/feeds-react-sdk';
+import {
   type ActivityResponse,
   type CommentResponse,
-  ActivityWithStateUpdates,
   useActivityComments,
+  useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
-import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { Comment } from './Comment';
 
@@ -21,7 +23,7 @@ export const ActivityCommentSection = ({
   activityWithStateUpdates?: ActivityWithStateUpdates;
   activity: ActivityResponse;
 }) => {
-  const { client } = useUserContext();
+  const client = useFeedsClient();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {

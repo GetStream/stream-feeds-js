@@ -68,8 +68,6 @@ decoders.ActivityAddedEvent = (input?: Record<string, any>) => {
     activity: { type: 'ActivityResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -81,8 +79,6 @@ decoders.ActivityDeletedEvent = (input?: Record<string, any>) => {
     activity: { type: 'ActivityResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -92,8 +88,6 @@ decoders.ActivityFeedbackEvent = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -103,8 +97,6 @@ decoders.ActivityMarkEvent = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -129,8 +121,6 @@ decoders.ActivityPinnedEvent = (input?: Record<string, any>) => {
     pinned_activity: { type: 'PinActivityResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -144,8 +134,6 @@ decoders.ActivityReactionAddedEvent = (input?: Record<string, any>) => {
     reaction: { type: 'FeedsReactionResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -159,8 +147,6 @@ decoders.ActivityReactionDeletedEvent = (input?: Record<string, any>) => {
     reaction: { type: 'FeedsReactionResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -174,8 +160,6 @@ decoders.ActivityReactionUpdatedEvent = (input?: Record<string, any>) => {
     reaction: { type: 'FeedsReactionResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -187,8 +171,6 @@ decoders.ActivityRemovedFromFeedEvent = (input?: Record<string, any>) => {
     activity: { type: 'ActivityResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -237,8 +219,6 @@ decoders.ActivityUnpinnedEvent = (input?: Record<string, any>) => {
     pinned_activity: { type: 'PinActivityResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -250,8 +230,6 @@ decoders.ActivityUpdatedEvent = (input?: Record<string, any>) => {
     activity: { type: 'ActivityResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -371,8 +349,6 @@ decoders.BookmarkAddedEvent = (input?: Record<string, any>) => {
     bookmark: { type: 'BookmarkResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -384,8 +360,6 @@ decoders.BookmarkDeletedEvent = (input?: Record<string, any>) => {
     bookmark: { type: 'BookmarkResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -397,8 +371,6 @@ decoders.BookmarkFolderDeletedEvent = (input?: Record<string, any>) => {
     bookmark_folder: { type: 'BookmarkFolderResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -409,7 +381,7 @@ decoders.BookmarkFolderResponse = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
-    user: { type: 'UserResponseCommonFields', isSingle: true },
+    user: { type: 'UserResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -421,8 +393,6 @@ decoders.BookmarkFolderUpdatedEvent = (input?: Record<string, any>) => {
     bookmark_folder: { type: 'BookmarkFolderResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -435,7 +405,7 @@ decoders.BookmarkResponse = (input?: Record<string, any>) => {
 
     activity: { type: 'ActivityResponse', isSingle: true },
 
-    user: { type: 'UserResponseCommonFields', isSingle: true },
+    user: { type: 'UserResponse', isSingle: true },
 
     folder: { type: 'BookmarkFolderResponse', isSingle: true },
   };
@@ -449,8 +419,6 @@ decoders.BookmarkUpdatedEvent = (input?: Record<string, any>) => {
     bookmark: { type: 'BookmarkResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -679,8 +647,6 @@ decoders.CommentAddedEvent = (input?: Record<string, any>) => {
     comment: { type: 'CommentResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -692,8 +658,6 @@ decoders.CommentDeletedEvent = (input?: Record<string, any>) => {
     comment: { type: 'CommentResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -709,8 +673,6 @@ decoders.CommentReactionAddedEvent = (input?: Record<string, any>) => {
     reaction: { type: 'FeedsReactionResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -739,8 +701,6 @@ decoders.CommentReactionUpdatedEvent = (input?: Record<string, any>) => {
     reaction: { type: 'FeedsReactionResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -773,8 +733,6 @@ decoders.CommentUpdatedEvent = (input?: Record<string, any>) => {
     comment: { type: 'CommentResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -927,8 +885,6 @@ decoders.FeedCreatedEvent = (input?: Record<string, any>) => {
 
     feed: { type: 'FeedResponse', isSingle: true },
 
-    user: { type: 'UserResponseCommonFields', isSingle: true },
-
     received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
@@ -939,8 +895,6 @@ decoders.FeedDeletedEvent = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -950,8 +904,6 @@ decoders.FeedGroupChangedEvent = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -972,8 +924,6 @@ decoders.FeedMemberAddedEvent = (input?: Record<string, any>) => {
     member: { type: 'FeedMemberResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -983,8 +933,6 @@ decoders.FeedMemberRemovedEvent = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1013,8 +961,15 @@ decoders.FeedMemberUpdatedEvent = (input?: Record<string, any>) => {
     member: { type: 'FeedMemberResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
 
-    user: { type: 'UserResponseCommonFields', isSingle: true },
+decoders.FeedOwnData = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    own_follows: { type: 'FollowResponse', isSingle: false },
+
+    own_membership: { type: 'FeedMemberResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1060,8 +1015,6 @@ decoders.FeedUpdatedEvent = (input?: Record<string, any>) => {
     feed: { type: 'FeedResponse', isSingle: true },
 
     received_at: { type: 'DatetimeType', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1079,6 +1032,8 @@ decoders.FeedsReactionResponse = (input?: Record<string, any>) => {
 
 decoders.FollowBatchResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    created: { type: 'FollowResponse', isSingle: false },
+
     follows: { type: 'FollowResponse', isSingle: false },
   };
   return decode(typeMappings, input);
@@ -1434,8 +1389,6 @@ decoders.NotificationFeedUpdatedEvent = (input?: Record<string, any>) => {
     },
 
     notification_status: { type: 'NotificationStatusResponse', isSingle: true },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1445,6 +1398,13 @@ decoders.NotificationStatusResponse = (input?: Record<string, any>) => {
     last_read_at: { type: 'DatetimeType', isSingle: true },
 
     last_seen_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.OwnBatchResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    data: { type: 'FeedOwnData', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -1899,8 +1859,6 @@ decoders.StoriesFeedUpdatedEvent = (input?: Record<string, any>) => {
       type: 'AggregatedActivityResponse',
       isSingle: false,
     },
-
-    user: { type: 'UserResponseCommonFields', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1931,6 +1889,13 @@ decoders.ThreadedCommentResponse = (input?: Record<string, any>) => {
     replies: { type: 'ThreadedCommentResponse', isSingle: false },
 
     reaction_groups: { type: 'ReactionGroupResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UnfollowBatchResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    follows: { type: 'FollowResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -2143,23 +2108,6 @@ decoders.UserReactivatedEvent = (input?: Record<string, any>) => {
 };
 
 decoders.UserResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    deactivated_at: { type: 'DatetimeType', isSingle: true },
-
-    deleted_at: { type: 'DatetimeType', isSingle: true },
-
-    last_active: { type: 'DatetimeType', isSingle: true },
-
-    revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
-decoders.UserResponseCommonFields = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
 

@@ -1,11 +1,12 @@
 'use client';
 import { Feed } from '../components/Feed';
 import { LoadingIndicator } from '../components/LoadingIndicator';
-import { useFeedContext } from '../feed-context';
+import { useOwnFeedsContext } from '../own-feeds-context';
 import { NewActivity } from '../components/NewActivity';
+import { StreamFeed } from '@stream-io/feeds-react-sdk';
 
 export default function Timeline() {
-  const { ownTimeline, ownFeed } = useFeedContext();
+  const { ownTimeline, ownFeed } = useOwnFeedsContext();
 
   if (!ownTimeline || !ownFeed) {
     return <LoadingIndicator color="blue"></LoadingIndicator>;
@@ -13,8 +14,12 @@ export default function Timeline() {
 
   return (
     <div className="w-full flex flex-col items-center gap-5">
-      <NewActivity feed={ownFeed}></NewActivity>
-      <Feed feed={ownTimeline}></Feed>
+      <StreamFeed feed={ownFeed}>
+        <NewActivity />
+      </StreamFeed>
+      <StreamFeed feed={ownTimeline}>
+        <Feed />
+      </StreamFeed>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import type {
+  ActivityResponse} from '@stream-io/feeds-react-native-sdk';
 import {
-  ActivityResponse,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-native-sdk';

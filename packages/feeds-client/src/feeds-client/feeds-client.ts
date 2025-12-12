@@ -14,13 +14,16 @@ import type {
   FileUploadRequest,
   FollowBatchRequest,
   FollowRequest,
+  FollowResponse,
+  GetFollowSuggestionsResponse,
   GetOrCreateFeedRequest,
   ImageUploadRequest,
-  OwnCapabilitiesBatchRequest,
+  OwnBatchRequest,
   PollResponse,
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
+  UnfollowBatchRequest,
   UpdateActivityRequest,
   UpdateActivityResponse,
   UpdateCommentRequest,
@@ -284,7 +287,7 @@ export class FeedsClient extends FeedsApi {
       cancelTimer: cancel,
     } = throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
       (feeds, callback) => {
-        this.ownCapabilitiesBatch({
+        this.ownBatch({
           feeds,
         }).catch((error) => {
           this.eventDispatcher.dispatch({
@@ -391,7 +394,7 @@ export class FeedsClient extends FeedsApi {
     this.state.partialNext({ own_capabilities_by_fid: ownCapabilitiesCache });
   }
 
-  connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
+  connectUser = async (user: UserRequest, tokenProvider?: TokenOrProvider) => {
     if (
       this.state.getLatestValue().connected_user !== undefined ||
       this.wsConnection
@@ -631,6 +634,7 @@ export class FeedsClient extends FeedsApi {
       await this.wsConnection?.disconnect();
       this.wsConnection = undefined;
     }
+
     removeConnectionEventListeners(this.updateNetworkConnectionStatus);
 
     this.connectionIdManager.reset();
@@ -677,8 +681,7 @@ export class FeedsClient extends FeedsApi {
       id,
       undefined,
       undefined,
-      options?.addNewActivitiesTo,
-      options?.activityAddedEventFilter,
+      options,
     );
   };
 
@@ -724,12 +727,12 @@ export class FeedsClient extends FeedsApi {
     };
   }
 
-  async ownCapabilitiesBatch(request: OwnCapabilitiesBatchRequest) {
-    const response = await super.ownCapabilitiesBatch(request);
-    const feedResponses = Object.entries(response.capabilities).map(
-      ([feed, own_capabilities]) => ({
+  async ownBatch(request: OwnBatchRequest) {
+    const response = await super.ownBatch(request);
+    const feedResponses = Object.entries(response.data).map(
+      ([feed, ownFields]) => ({
         feed,
-        own_capabilities,
+        own_capabilities: ownFields.own_capabilities,
       }),
     );
     this.hydrateCapabilitiesCache(feedResponses);
@@ -763,36 +766,41 @@ export class FeedsClient extends FeedsApi {
   // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
   async follow(request: FollowRequest) {
     const response = await super.follow(request);
-
-    [
-      response.follow.source_feed.feed,
-      response.follow.target_feed.feed,
-    ].forEach((fid) => {
-      const feeds = this.findAllActiveFeedsByFid(fid);
-      feeds.forEach((f) => handleFollowCreated.bind(f)(response, false));
-    });
+    this.updateStateFromFollows([response.follow]);
 
     return response;
   }
 
+  /**
+   * @deprecated Use getOrCreateFollows instead
+   * @param request
+   * @returns
+   */
   async followBatch(request: FollowBatchRequest) {
     const response = await super.followBatch(request);
-
-    response.follows.forEach((follow) => {
-      const feeds = this.findAllActiveFeedsByFid(follow.source_feed.feed);
-      feeds.forEach((f) => handleFollowCreated.bind(f)({ follow }, false));
-    });
+    this.updateStateFromFollows(response.follows);
 
     return response;
   }
 
-  async unfollow(request: FollowRequest) {
-    const response = await super.unfollow(request);
+  async getOrCreateFollows(request: FollowBatchRequest) {
+    const response = await super.getOrCreateFollows(request);
 
-    [request.source, request.target].forEach((fid) => {
-      const feeds = this.findAllActiveFeedsByFid(fid);
-      feeds.forEach((f) => handleFollowDeleted.bind(f)(response, false));
-    });
+    this.updateStateFromFollows(response.created);
+
+    return response;
+  }
+
+  async unfollow(request: { source: string; target: string }) {
+    const response = await super.unfollow(request);
+    this.updateStateFromUnfollows([response.follow]);
+
+    return response;
+  }
+
+  async getOrCreateUnfollows(request: UnfollowBatchRequest) {
+    const response = await super.getOrCreateUnfollows(request);
+    this.updateStateFromUnfollows(response.follows);
 
     return response;
   }
@@ -832,29 +840,59 @@ export class FeedsClient extends FeedsApi {
     return response;
   }
 
-  private readonly getOrCreateActiveFeed = (
+  async getFollowSuggestions(
+    ...params: Parameters<FeedsApi['getFollowSuggestions']>
+  ): Promise<StreamResponse<GetFollowSuggestionsResponse>> {
+    const response = await super.getFollowSuggestions(...params);
+
+    response.suggestions.forEach((suggestion) => {
+      this.getOrCreateActiveFeed(
+        suggestion.group_id,
+        suggestion.id,
+        suggestion,
+      );
+    });
+
+    // TODO: return feed instance here https://linear.app/stream/issue/REACT-669/return-feed-instance-from-followsuggestions-breaking
+    return response;
+  }
+
+  protected readonly getOrCreateActiveFeed = (
     group: string,
     id: string,
     data?: FeedResponse,
     watch?: boolean,
-    addNewActivitiesTo?: 'start' | 'end',
-    activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean,
+    options?: {
+      addNewActivitiesTo?: 'start' | 'end';
+      activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
+    },
   ) => {
     const fid = `${group}:${id}`;
+    let isCreated = false;
 
     if (!this.activeFeeds[fid]) {
+      isCreated = true;
       this.activeFeeds[fid] = new Feed(
         this,
         group,
         id,
         data,
         watch,
-        addNewActivitiesTo,
-        activityAddedEventFilter,
+        options?.addNewActivitiesTo,
+        options?.activityAddedEventFilter,
       );
     }
 
     const feed = this.activeFeeds[fid];
+
+    if (!isCreated && options) {
+      if (options?.addNewActivitiesTo) {
+        feed.addNewActivitiesTo = options.addNewActivitiesTo;
+      }
+      if (options?.activityAddedEventFilter) {
+        feed.activityAddedEventFilter = options.activityAddedEventFilter;
+      }
+    }
 
     if (!feed.currentState.watch) {
       // feed isn't watched and may be stale, update it
@@ -920,5 +958,25 @@ export class FeedsClient extends FeedsApi {
         })
         .map((a) => getFeed.call(a)!),
     ];
+  }
+
+  private updateStateFromFollows(follows: FollowResponse[]) {
+    follows.forEach((follow) => {
+      const feeds = [
+        ...this.findAllActiveFeedsByFid(follow.source_feed.feed),
+        ...this.findAllActiveFeedsByFid(follow.target_feed.feed),
+      ];
+      feeds.forEach((f) => handleFollowCreated.bind(f)({ follow }, false));
+    });
+  }
+
+  private updateStateFromUnfollows(follows: FollowResponse[]) {
+    follows.forEach((follow) => {
+      const feeds = [
+        ...this.findAllActiveFeedsByFid(follow.source_feed.feed),
+        ...this.findAllActiveFeedsByFid(follow.target_feed.feed),
+      ];
+      feeds.forEach((f) => handleFollowDeleted.bind(f)({ follow }, false));
+    });
   }
 }

@@ -14,10 +14,11 @@
     "build:libs": "yarn workspaces foreach -v --topological-dev --no-private run build",
     "build:client": "yarn workspace @stream-io/feeds-client run build",
     "build:react-native-sdk": "yarn workspace @stream-io/feeds-react-native-sdk run build",
-    "build:react-sdk": "yarn workspace @stream-io/feeds-react-native-sdk run build",
+    "build:react-sdk": "yarn workspace @stream-io/feeds-react-sdk run build",
+    "build:react-tutorial": "yarn build:client && yarn build:react-sdk && yarn workspace stream-feeds-react-tutorial run build",
     "clean:all": "yarn workspaces foreach -vt run clean",
-    "lint:all": "eslint --max-warnings=0 --cache 'packages/**/*.{ts,tsx}'",
-    "lint:all:fix": "eslint --max-warnings=0 'packages/**/*.{ts,tsx}' --fix",
+    "lint:all": "eslint --max-warnings=0 --cache '**/*.{ts,tsx}'",
+    "lint:all:fix": "eslint --max-warnings=0 '**/*.{ts,tsx}' --fix",
     "test:ci:all": "yarn workspaces foreach -vt run test-ci",
     "test:ci:libs": "yarn workspaces foreach -vt --no-private run test-ci",
     "test:docs-snippets": "yarn workspaces foreach -vt --no-private run test-docs-snippets",
@@ -54,7 +55,7 @@
     "prettier": "^3.6.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
-    "vercel": "^37.7.1",
+    "vercel": "^48.10.4",
     "vite": "^5.4.8"
   }
 }

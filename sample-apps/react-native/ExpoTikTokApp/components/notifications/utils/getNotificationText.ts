@@ -1,4 +1,4 @@
-import { AggregatedActivityResponse } from '@stream-io/feeds-react-native-sdk';
+import type { AggregatedActivityResponse } from '@stream-io/feeds-react-native-sdk';
 
 export const getNotificationText = (aggregatedActivity: AggregatedActivityResponse) => {
   const { activities } = aggregatedActivity;

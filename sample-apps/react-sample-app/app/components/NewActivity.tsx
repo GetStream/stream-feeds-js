@@ -1,27 +1,29 @@
 import {
-  Feed,
-  FeedState,
+  FeedOwnCapability,
   isImageFile,
-  useStateStore,
+  useFeedContext,
+  useFeedsClient,
+  useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
-import { FormEvent, useState } from 'react';
+import type { FormEvent} from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityComposer } from './activity/ActivityComposer';
 import { LoadingIndicator } from './LoadingIndicator';
-import { useUserContext } from '../user-context';
 
-const selector = ({ own_capabilities = [] }: FeedState) => ({
-  canPost: own_capabilities.includes('add-activity'),
-});
-
-export const NewActivity = ({ feed }: { feed: Feed }) => {
-  const { client } = useUserContext();
+export const NewActivity = () => {
+  const client = useFeedsClient();
+  const feed = useFeedContext();
   const { logErrorAndDisplayNotification } = useErrorContext();
   const [isSending, setIsSending] = useState<boolean>(false);
   const [activityText, setActivityText] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
 
-  const { canPost } = useStateStore(feed.state, selector);
+  const ownCapabilities = useOwnCapabilities();
+  const canPost = useMemo(
+    () => ownCapabilities.includes(FeedOwnCapability.ADD_ACTIVITY),
+    [ownCapabilities],
+  );
 
   const sendActivity = async (event: FormEvent) => {
     const currentTarget = event.currentTarget as HTMLFormElement;
@@ -46,7 +48,7 @@ export const NewActivity = ({ feed }: { feed: Feed }) => {
       }
       const fileResponses = await Promise.all(requests);
 
-      await feed.addActivity({
+      await feed?.addActivity({
         type: 'post',
         text: activityText,
         attachments: fileResponses.map((response, index) => {

@@ -42,13 +42,13 @@ export const updateStateFollowDeleted = (
       ...follow.target_feed,
     };
 
-    if (
-      source.created_by.id === connectedUserId &&
-      currentState.own_follows !== undefined
-    ) {
-      newState.own_follows = currentState.own_follows.filter(
-        (followItem) => followItem.source_feed.feed !== follow.source_feed.feed,
-      );
+    if (source.created_by.id === connectedUserId) {
+      newState.own_follows = currentState.own_follows
+        ? currentState.own_follows.filter(
+            (followItem) =>
+              followItem.source_feed.feed !== follow.source_feed.feed,
+          )
+        : [];
     }
 
     // Only update if followers array already exists

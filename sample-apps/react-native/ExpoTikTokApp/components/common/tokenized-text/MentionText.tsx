@@ -1,6 +1,6 @@
-import { TextProps } from 'react-native';
+import type { TextProps } from 'react-native';
 import { useMemo } from 'react';
-import { CommentParent } from '@stream-io/feeds-react-native-sdk';
+import type { CommentParent } from '@stream-io/feeds-react-native-sdk';
 import { TokenizedText } from '@/components/common/tokenized-text/TokenizedText';
 import { useMentionAnnotations } from '@/components/common/tokenized-text/hooks/useMentionAnnotations';
 

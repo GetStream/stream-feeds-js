@@ -1,7 +1,7 @@
 export class ConnectionIdManager {
-  loadConnectionIdPromise: Promise<string> | undefined;
+  loadConnectionIdPromise: Promise<string | undefined> | undefined;
   connectionId?: string;
-  private resolve?: (connectionId: string) => void;
+  private resolve?: (connectionId?: string) => void;
   private reject?: (reason: any) => void;
 
   reset = () => {
@@ -13,13 +13,15 @@ export class ConnectionIdManager {
 
   resetConnectionIdPromise = () => {
     this.connectionId = undefined;
-    this.loadConnectionIdPromise = new Promise<string>((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
-    });
+    this.loadConnectionIdPromise = new Promise<string | undefined>(
+      (resolve, reject) => {
+        this.resolve = resolve;
+        this.reject = reject;
+      },
+    );
   };
 
-  resolveConnectionidPromise = (connectionId: string) => {
+  resolveConnectionidPromise = (connectionId?: string) => {
     this.connectionId = connectionId;
     this.resolve?.(connectionId);
     this.loadConnectionIdPromise = undefined;

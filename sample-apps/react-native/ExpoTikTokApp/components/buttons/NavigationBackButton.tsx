@@ -4,7 +4,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '@/constants/Colors';
 import React from 'react';
 import { useColorScheme } from 'react-native';
-import { StableCallback, useStableCallback } from '@/hooks/useStableCallback';
+import type { StableCallback} from '@/hooks/useStableCallback';
+import { useStableCallback } from '@/hooks/useStableCallback';
 
 type CallbackType = () => void | Promise<void>;
 

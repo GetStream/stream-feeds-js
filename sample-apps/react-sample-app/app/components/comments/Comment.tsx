@@ -8,12 +8,13 @@ import type {
 import {
   FeedOwnCapability,
   useActivityComments,
+  useClientConnectedUser,
+  useFeedsClient,
+  useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
-import { useUserContext } from '@/app/user-context';
 import { PaginatedList } from '../PaginatedList';
 import { DEFAULT_PAGINATION_SORT } from './ActivityCommentSection';
 import { Reactions } from '../reactions/Reactions';
-import { useOwnCapabilities } from '@/app/hooks/useOwnCapabilities';
 
 const levels = ['ml-8', 'ml-16', 'ml-24', 'ml-32', 'ml-40'];
 
@@ -30,13 +31,14 @@ export const Comment = ({
   feed?: Feed;
   activityWithStateUpdates?: ActivityWithStateUpdates;
 }) => {
-  const { client, user } = useUserContext();
+  const user = useClientConnectedUser();
+  const client = useFeedsClient();
 
   const fid = useMemo(() => {
     return feed?.feed ?? activityWithStateUpdates?.feeds[0];
   }, [feed, activityWithStateUpdates]);
 
-  const ownCapabilities = useOwnCapabilities({ feed: fid });
+  const ownCapabilities = useOwnCapabilities(fid);
 
   const canEdit =
     ownCapabilities.includes(FeedOwnCapability.UPDATE_ANY_COMMENT) ||

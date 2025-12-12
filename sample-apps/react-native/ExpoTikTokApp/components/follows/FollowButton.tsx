@@ -1,4 +1,4 @@
-import { Feed, FollowResponse } from '@stream-io/feeds-react-native-sdk';
+import type { Feed, FollowResponse } from '@stream-io/feeds-react-native-sdk';
 import { useOwnFollows } from '@stream-io/feeds-react-native-sdk';
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
