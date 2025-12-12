@@ -106,9 +106,10 @@ export const generateFeedResponse = (
     name: humanId({ separator: ' ' }),
     pin_count: 0,
     custom: {},
+    own_capabilities: [],
+    activity_count: 0,
     ...overrides,
     feed,
-    own_capabilities: [],
     created_by: generateUserResponse(overrides.created_by),
   };
 };
