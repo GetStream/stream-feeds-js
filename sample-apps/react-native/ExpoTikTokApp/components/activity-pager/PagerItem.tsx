@@ -1,6 +1,6 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-native-sdk';
 import { useFeedContext } from '@stream-io/feeds-react-native-sdk';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Dimensions,
   StyleSheet,
@@ -28,6 +28,7 @@ const UnmemoizedPagerItem = ({
   activity: ActivityResponse;
   isActive: boolean;
 }) => {
+  const [viewCount, setViewCount] = useState<number | undefined>(undefined);
   const feed = useFeedContext();
   const router = useRouter();
 
@@ -53,6 +54,21 @@ const UnmemoizedPagerItem = ({
     [activity.custom.locationName, activity.location],
   );
 
+  useEffect(() => {
+    const source = videoAttachment?.asset_url;
+
+    if (source) {
+      const run = async () => {
+        const url = new URL('http://localhost:3000/api/mux-get-metrics');
+        url.searchParams.set('video_id', source);
+        const response = await fetch(url.toString());
+        const { metrics } = (await response.json()) ?? {};
+        setViewCount(metrics?.data?.total_views);
+      };
+      run();
+    }
+  }, [videoAttachment?.asset_url]);
+
   if (videoAttachment?.asset_url) {
     return (
       <View style={styles.page}>
@@ -64,6 +80,12 @@ const UnmemoizedPagerItem = ({
         />
 
         <View style={[styles.overlay, overlayStyle]}>
+          {viewCount ? (
+            <View style={styles.viewCountContainer}>
+              <Ionicons name="eye" size={24} color="white" style={styles.viewCountIcon} />
+              <Text style={styles.iconLabel}>{viewCount}</Text>
+            </View>
+          ) : null}
           <Text style={styles.title}>@{activity.user.id}</Text>
           <AnnotatedText entity={activity} style={styles.description} />
           {locationData ? <LocationPreview location={locationData} /> : null}
@@ -180,4 +202,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginTop: 4,
   },
+  viewCountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginBottom: 4,
+  },
+  viewCountIcon: {
+    marginRight: 4
+  }
 });

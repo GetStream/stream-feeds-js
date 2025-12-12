@@ -1,9 +1,9 @@
 // ==== DEFAULT ====
 
-export const apiKey = 'z3hzbmmtrdtv';
-export const tokenCreationUrl =
-  'https://pronto.getstream.io/api/auth/create-token?environment=feeds-expo-tiktok-sample-app';
-export const baseUrl = undefined;
+// export const apiKey = 'z3hzbmmtrdtv';
+// export const tokenCreationUrl =
+//   'https://pronto.getstream.io/api/auth/create-token?environment=feeds-expo-tiktok-sample-app';
+// export const baseUrl = undefined;
 
 // ==== END-DEFAULT ====
 
@@ -12,6 +12,16 @@ export const baseUrl = undefined;
 // export const apiKey = '7r69u2vczu6x';
 // export const tokenCreationUrl =
 //   'https://pronto.getstream.io/api/auth/create-token?environment=feeds-expo-mux-app';
+// export const baseUrl = undefined;
+
+export const apiKey = 'qjstzkb76dq6';
+export const tokenCreationUrl =
+  'http://localhost:3000/api/create-token';
+export const baseUrl = undefined;
+
+// export const apiKey = 'dh6t7tj26nfv';
+// export const tokenCreationUrl =
+//   'http://localhost:3000/api/create-token';
 // export const baseUrl = undefined;
 
 // ==== END-MUX ====

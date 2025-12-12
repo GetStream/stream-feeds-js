@@ -89,29 +89,33 @@ export const ActivityComposer = () => {
 
       setFiles((prevFiles) => [...prevFiles, ...localFiles]);
 
-      const fileResponses = await Promise.all(requests);
+      try {
+        const fileResponses = await Promise.all(requests);
 
-      setMedia((prev) => [
-        ...(prev ?? []),
-        ...fileResponses.map((response, index) => {
-          const file = localFiles[index];
-          const isImage = isImageFile(file);
-          const isVideo = isVideoFile(file);
-          return {
-            type: isImage ? 'image' : isVideo ? 'video' : 'file',
-            [isImage ? 'image_url' : 'asset_url']: response?.file,
-            title: file.name,
-            custom: {
-              ...(isVideo && file.duration
-                ? { duration: file.duration }
-                : {})
-            },
-            ...(isVideo && response?.thumb_url
-              ? { thumb_url: response.thumb_url }
-              : {}),
-          };
-        }),
-      ]);
+        setMedia((prev) => [
+          ...(prev ?? []),
+          ...fileResponses.map((response, index) => {
+            const file = localFiles[index];
+            const isImage = isImageFile(file);
+            const isVideo = isVideoFile(file);
+            return {
+              type: isImage ? 'image' : isVideo ? 'video' : 'file',
+              [isImage ? 'image_url' : 'asset_url']: response?.file,
+              title: file.name,
+              custom: {
+                ...(isVideo && file.duration
+                  ? { duration: file.duration }
+                  : {})
+              },
+              ...(isVideo && response?.thumb_url
+                ? { thumb_url: response.thumb_url }
+                : {}),
+            };
+          }),
+        ]);
+      } catch (error) {
+        console.error(error);
+      }
     }
   }, [client, setMedia]);
 
@@ -166,6 +170,10 @@ export const ActivityComposer = () => {
         await client?.updateActivity({
           ...activityData,
           id: editingActivity.id,
+          feeds: [
+            feed.feed,
+            ...createdHashtagFeeds.map((hashtagFeed) => hashtagFeed.feed),
+          ]
         });
       } else if (hasHashtags) {
         await client?.addActivity({
