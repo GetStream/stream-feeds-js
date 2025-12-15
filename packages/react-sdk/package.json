@@ -10,14 +10,16 @@
     }
   },
   "scripts": {
-    "build": "rimraf ./dist; tsc",
+    "clean": "rimraf ./dist",
+    "build": "yarn clean; tsc && echo 'React SDK build complete!'",
     "prepublishOnly": "yarn run build"
   },
   "peerDependencies": {
     "react": "^17 || ^18 || ^19"
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/.tsbuildinfo"
   ],
   "keywords": [
     "react",

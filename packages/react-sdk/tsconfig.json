@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/.tsbuildinfo",
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "rootDir": "src",
     "esModuleInterop": true,
     "skipLibCheck": true,
