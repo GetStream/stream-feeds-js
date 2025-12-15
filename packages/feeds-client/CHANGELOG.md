@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.20](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.19...@stream-io/feeds-client-0.3.20) (2025-12-15)
+
+
+### Bug Fixes
+
+* **react-native:** axios default require in cjs ([#190](https://github.com/GetStream/stream-feeds-js/issues/190)) ([039d952](https://github.com/GetStream/stream-feeds-js/commit/039d952928b599bb7a92b90cedd5470a2573f53d))
+
 ## [0.3.19](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.18...@stream-io/feeds-client-0.3.19) (2025-12-11)
 
 
