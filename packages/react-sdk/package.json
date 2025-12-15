@@ -11,13 +11,10 @@
   },
   "scripts": {
     "build": "rimraf ./dist; tsc",
-    "prepare": "yarn run build",
-    "prepack": "cp ../../LICENSE ./LICENSE",
-    "postpack": "rimraf ./LICENSE",
-    "version": "echo \"export default /$npm_package_version';\" > src/version.ts"
+    "prepublishOnly": "yarn run build"
   },
   "peerDependencies": {
-    "react": "^18 || ^19"
+    "react": "^17 || ^18 || ^19"
   },
   "files": [
     "dist"
