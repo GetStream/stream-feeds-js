@@ -5588,6 +5588,8 @@ export interface UpdateActivityRequest {
 
   interest_tags?: string[];
 
+  mentioned_user_ids?: string[];
+
   custom?: Record<string, any>;
 
   location?: ActivityLocation;
