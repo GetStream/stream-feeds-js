@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.22](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.21...@stream-io/feeds-client-0.3.22) (2025-12-16)
+
+
+### Features
+
+* add new field own_followings ([#193](https://github.com/GetStream/stream-feeds-js/issues/193)) ([b3012a0](https://github.com/GetStream/stream-feeds-js/commit/b3012a01cdc56fa61f9803dd6cf6a91743287fe7))
+
 ## [0.3.21](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.20...@stream-io/feeds-client-0.3.21) (2025-12-16)
 
 
