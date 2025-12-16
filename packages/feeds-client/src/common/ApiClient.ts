@@ -4,7 +4,11 @@ import type {
   AxiosResponse,
   RawAxiosRequestHeaders,
 } from 'axios';
-import axios from 'axios';
+import axiosImport from 'axios';
+// @ts-expect-error This is needed in the event of the CJS variant being hit
+// from the React Native SDK, to prevent the default `require` from being
+// accessed directly from `require('axios')` rather than `require('axios').default`.
+const axios = axiosImport.default ?? axiosImport;
 import type { RequestMetadata, FeedsClientOptions } from './types';
 import { StreamApiError } from './types';
 import { getRateLimitFromResponseHeader } from './rate-limit';
