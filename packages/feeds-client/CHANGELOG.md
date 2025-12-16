@@ -2,6 +2,11 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.21](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.20...@stream-io/feeds-client-0.3.21) (2025-12-16)
+
+
+* add mentioned user id to updateActivity [FEEDS-748] ([#192](https://github.com/GetStream/stream-feeds-js/issues/192)) ([72e9b94](https://github.com/GetStream/stream-feeds-js/commit/72e9b947d9c4a2e6472832c8c09fd1811ae67244))
+
 ## [0.3.20](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.19...@stream-io/feeds-client-0.3.20) (2025-12-15)
 
 
