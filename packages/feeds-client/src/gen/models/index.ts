@@ -2445,6 +2445,8 @@ export interface EnrichmentOptions {
 
   skip_own_capabilities?: boolean;
 
+  skip_own_followings?: boolean;
+
   skip_own_follows?: boolean;
 
   skip_pins?: boolean;
@@ -2736,6 +2738,8 @@ export type FeedOwnCapability =
 export interface FeedOwnData {
   own_capabilities?: FeedOwnCapability[];
 
+  own_followings?: FollowResponse[];
+
   own_follows?: FollowResponse[];
 
   own_membership?: FeedMemberResponse;
@@ -2796,6 +2800,8 @@ export interface FeedResponse {
 
   own_capabilities?: FeedOwnCapability[];
 
+  own_followings?: FollowResponse[];
+
   own_follows?: FollowResponse[];
 
   custom?: Record<string, any>;
@@ -2841,6 +2847,8 @@ export interface FeedSuggestionResponse {
   filter_tags?: string[];
 
   own_capabilities?: FeedOwnCapability[];
+
+  own_followings?: FollowResponse[];
 
   own_follows?: FollowResponse[];
 

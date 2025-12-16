@@ -967,6 +967,8 @@ decoders.FeedMemberUpdatedEvent = (input?: Record<string, any>) => {
 
 decoders.FeedOwnData = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    own_followings: { type: 'FollowResponse', isSingle: false },
+
     own_follows: { type: 'FollowResponse', isSingle: false },
 
     own_membership: { type: 'FeedMemberResponse', isSingle: true },
@@ -984,6 +986,8 @@ decoders.FeedResponse = (input?: Record<string, any>) => {
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
 
+    own_followings: { type: 'FollowResponse', isSingle: false },
+
     own_follows: { type: 'FollowResponse', isSingle: false },
 
     own_membership: { type: 'FeedMemberResponse', isSingle: true },
@@ -1000,6 +1004,8 @@ decoders.FeedSuggestionResponse = (input?: Record<string, any>) => {
     created_by: { type: 'UserResponse', isSingle: true },
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
+
+    own_followings: { type: 'FollowResponse', isSingle: false },
 
     own_follows: { type: 'FollowResponse', isSingle: false },
 
