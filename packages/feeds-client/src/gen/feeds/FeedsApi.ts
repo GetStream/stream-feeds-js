@@ -750,6 +750,7 @@ export class FeedsApi {
       feeds: request?.feeds,
       filter_tags: request?.filter_tags,
       interest_tags: request?.interest_tags,
+      mentioned_user_ids: request?.mentioned_user_ids,
       custom: request?.custom,
       location: request?.location,
     };
