@@ -89,6 +89,25 @@ describe('Reactions page', () => {
     console.log(deleteResponse.reaction);
   });
 
+  it(`Query Reactions`, async () => {
+    await client.queryActivityReactions({
+      activity_id: activity.id,
+      // Provide optional filters
+      filter: {
+        reaction_type: 'like',
+      },
+    });
+
+    await client.queryCommentReactions({
+      id: comment.id,
+      // Provide optional filters
+
+      filter: {
+        reaction_type: 'like',
+      },
+    });
+  });
+
   afterAll(async () => {
     await feed.delete({ hard_delete: true });
     await client.disconnectUser();
