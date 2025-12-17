@@ -63,6 +63,7 @@ import {
   checkHasAnotherPage,
   Constants,
   feedsLoggerSystem,
+  ownFeedFields,
   uniqueArrayMerge,
 } from '../utils';
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
@@ -953,12 +954,13 @@ export class Feed extends FeedApi {
           event.activity.current_feed &&
           currentActivity?.current_feed
         ) {
-          event.activity.current_feed.own_capabilities =
-            currentActivity.current_feed.own_capabilities;
-          event.activity.current_feed.own_follows =
-            currentActivity.current_feed.own_follows;
-          event.activity.current_feed.own_membership =
-            currentActivity.current_feed.own_membership;
+          ownFeedFields.forEach((field) => {
+            if (field in currentActivity.current_feed!) {
+              // @ts-expect-error TODO: fix this
+              event.activity.current_feed![field] =
+                currentActivity.current_feed![field];
+            }
+          });
         }
       }
       // @ts-expect-error intersection of handler arguments results to never
@@ -974,17 +976,48 @@ export class Feed extends FeedApi {
     this.eventDispatcher.dispatch(event);
   }
 
-  protected newActivitiesAdded(activities: ActivityResponse[]) {
+  protected newActivitiesAdded(
+    activities: ActivityResponse[],
+    options: {
+      fromWebSocket: boolean;
+    } = { fromWebSocket: false },
+  ) {
     this.client.hydratePollCache(activities);
+    this.getOrCreateFeeds(activities, options);
+  }
 
-    activities.forEach((activity) => {
-      if (activity.current_feed) {
-        getOrCreateActiveFeed.bind(this.client)(
-          activity.current_feed.group_id,
-          activity.current_feed.id,
-          activity.current_feed,
-        );
-      }
-    });
+  private getOrCreateFeeds(
+    activities: ActivityResponse[],
+    options: {
+      fromWebSocket: boolean;
+    },
+  ) {
+    const enrichmentOptions =
+      this.currentState.last_get_or_create_request_config?.enrichment_options;
+    if (
+      !enrichmentOptions?.skip_activity_current_feed &&
+      !enrichmentOptions?.skip_all
+    ) {
+      const feedsToGetOrCreate = new Map<string, FeedResponse>();
+      activities.forEach((activity) => {
+        if (
+          activity.current_feed &&
+          !feedsToGetOrCreate.has(activity.current_feed.feed)
+        ) {
+          feedsToGetOrCreate.set(
+            activity.current_feed.feed,
+            activity.current_feed,
+          );
+        }
+      });
+      feedsToGetOrCreate.values().forEach((feed) => {
+        getOrCreateActiveFeed.bind(this.client)({
+          group: feed.group_id,
+          id: feed.id,
+          data: feed,
+          fromWebSocket: options.fromWebSocket,
+        });
+      });
+    }
   }
 }

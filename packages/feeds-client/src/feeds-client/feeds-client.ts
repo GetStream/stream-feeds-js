@@ -93,6 +93,10 @@ import {
 } from '../utils/throttling';
 import { ActivityWithStateUpdates } from '../activity-with-state-updates/activity-with-state-updates';
 import { getFeed } from '../activity-with-state-updates/get-feed';
+import {
+  isOwnFollowsEqual,
+  isOwnMembershipEqual,
+} from '../utils/check-own-fields-equality';
 
 export type FeedsClientState = {
   connected_user: ConnectedUser | undefined;
@@ -175,11 +179,11 @@ export class FeedsClient extends FeedsApi {
         case 'feeds.feed.created': {
           if (this.activeFeeds[event.feed.id]) break;
 
-          this.getOrCreateActiveFeed(
-            event.feed.group_id,
-            event.feed.id,
-            event.feed,
-          );
+          this.getOrCreateActiveFeed({
+            group: event.feed.group_id,
+            id: event.feed.id,
+            data: event.feed,
+          });
 
           break;
         }
@@ -674,13 +678,11 @@ export class FeedsClient extends FeedsApi {
       activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
     },
   ) => {
-    return this.getOrCreateActiveFeed(
-      groupId,
+    return this.getOrCreateActiveFeed({
+      group: groupId,
       id,
-      undefined,
-      undefined,
       options,
-    );
+    });
   };
 
   /**
@@ -706,12 +708,12 @@ export class FeedsClient extends FeedsApi {
     const feedResponses = response.feeds;
 
     const feeds = feedResponses.map((feedResponse) =>
-      this.getOrCreateActiveFeed(
-        feedResponse.group_id,
-        feedResponse.id,
-        feedResponse,
-        request?.watch,
-      ),
+      this.getOrCreateActiveFeed({
+        group: feedResponse.group_id,
+        id: feedResponse.id,
+        data: feedResponse,
+        watch: request?.watch,
+      }),
     );
 
     this.hydrateCapabilitiesCache(feedResponses);
@@ -844,27 +846,35 @@ export class FeedsClient extends FeedsApi {
     const response = await super.getFollowSuggestions(...params);
 
     response.suggestions.forEach((suggestion) => {
-      this.getOrCreateActiveFeed(
-        suggestion.group_id,
-        suggestion.id,
-        suggestion,
-      );
+      this.getOrCreateActiveFeed({
+        group: suggestion.group_id,
+        id: suggestion.id,
+        data: suggestion,
+      });
     });
 
     // TODO: return feed instance here https://linear.app/stream/issue/REACT-669/return-feed-instance-from-followsuggestions-breaking
     return response;
   }
 
-  protected readonly getOrCreateActiveFeed = (
-    group: string,
-    id: string,
-    data?: FeedResponse,
-    watch?: boolean,
+  protected readonly getOrCreateActiveFeed = ({
+    group,
+    id,
+    data,
+    watch,
+    options,
+    fromWebSocket = false,
+  }: {
+    group: string;
+    id: string;
+    data?: FeedResponse;
+    watch?: boolean;
     options?: {
       addNewActivitiesTo?: 'start' | 'end';
       activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
-    },
-  ) => {
+    };
+    fromWebSocket?: boolean;
+  }) => {
     const fid = `${group}:${id}`;
     let isCreated = false;
 
@@ -893,8 +903,37 @@ export class FeedsClient extends FeedsApi {
     }
 
     if (!feed.currentState.watch) {
-      // feed isn't watched and may be stale, update it
-      if (data) handleFeedUpdated.call(feed, { feed: data });
+      if (!isCreated && data) {
+        if (
+          (feed.currentState.updated_at?.getTime() ?? 0) <
+          data.updated_at.getTime()
+        ) {
+          handleFeedUpdated.call(feed, { feed: data });
+        } else if (
+          (feed.currentState.updated_at?.getTime() ?? 0) ===
+            data.updated_at.getTime() &&
+          !fromWebSocket
+        ) {
+          const fieldsToUpdate: Array<keyof FeedResponse> = [];
+          if (!isOwnFollowsEqual(feed.currentState, data)) {
+            fieldsToUpdate.push('own_follows');
+          }
+          if (!isOwnMembershipEqual(feed.currentState, data)) {
+            fieldsToUpdate.push('own_membership');
+          }
+          if (fieldsToUpdate.length > 0) {
+            const fieldsToUpdateData = fieldsToUpdate.reduce(
+              (acc: Partial<FeedResponse>, field) => {
+                // @ts-expect-error TODO: fix this
+                acc[field] = data[field];
+                return acc;
+              },
+              {},
+            );
+            feed.state.partialNext(fieldsToUpdateData);
+          }
+        }
+      }
       if (watch) handleWatchStarted.call(feed);
     }
 

@@ -1,12 +1,8 @@
-import type { FeedResponse } from '../gen/models';
 import type { FeedsClient } from './feeds-client';
 
 export function getOrCreateActiveFeed(
   this: FeedsClient,
-  group: string,
-  id: string,
-  data?: FeedResponse,
-  watch?: boolean,
+  ...args: Parameters<FeedsClient['getOrCreateActiveFeed']>
 ) {
-  return this.getOrCreateActiveFeed(group, id, data, watch);
+  return this.getOrCreateActiveFeed(...args);
 }
