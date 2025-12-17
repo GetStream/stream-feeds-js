@@ -235,11 +235,11 @@ describe('Feeds page', () => {
       ],
     });
 
-    const feed = johnClient.feed(invitingFeed.group, invitingFeed.id);
+    const feedWithInvite = johnClient.feed(invitingFeed.group, invitingFeed.id);
     // Then John can accept or reject
-    await feed.rejectFeedMemberInvite();
+    await feedWithInvite.rejectFeedMemberInvite();
 
-    // await feed.acceptFeedMemberInvite();
+    // await feedWithInvite.acceptFeedMemberInvite();
   });
 
   it(`Query Feed Members`, async () => {
