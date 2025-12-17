@@ -2,7 +2,7 @@
 
 Bring users together through personalized feeds, threaded discussions, and real-time updates that make every interaction feel meaningful.
 
-Supported React versions: >=17.0.0
+Supported React versions: ^17 || ^18 || ^19
 
 ## **Quick Links**
 

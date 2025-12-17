@@ -4,6 +4,7 @@
   "packageManager": "yarn@3.2.4",
   "main": "./dist/cjs/index.js",
   "module": "./dist/es/index.mjs",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -13,7 +14,7 @@
       },
       "import": "./dist/es/index.mjs",
       "require": "./dist/cjs/index.js",
-      "default": "./dist/es/index.mjs"
+      "default": "./dist/cjs/index.js"
     },
     "./react-bindings": {
       "types": "./dist/types/bindings/react/index.d.ts",
@@ -23,15 +24,14 @@
       },
       "import": "./dist/es/react-bindings.mjs",
       "require": "./dist/cjs/react-bindings.js",
-      "default": "./dist/es/react-bindings.mjs"
+      "default": "./dist/cjs/react-bindings.js"
     }
   },
-  "types": "./dist/types/index.d.ts",
   "license": "See license in LICENSE",
   "scripts": {
     "clean": "rimraf dist",
-    "start": "vite build --watch",
-    "build": "vite build",
+    "start": "yarn clean; concurrently 'vite build --watch' 'tsc -p tsconfig.lib.json --watch'",
+    "build": "yarn clean; concurrently 'vite build' 'tsc -p tsconfig.lib.json'",
     "test": "vitest",
     "test:unit": "vitest --exclude '__integration-tests__/**'",
     "test-ci": "vitest --exclude '__integration-tests__/docs-snippets/**' --coverage",
@@ -56,19 +56,18 @@
   },
   "devDependencies": {
     "@stream-io/node-sdk": "0.6.0",
-    "@types/react": "^19.1.8",
+    "@types/react": "catalog:",
     "@vitest/coverage-v8": "3.2.4",
+    "concurrently": "^9.2.1",
     "dotenv": "^16.4.5",
     "human-id": "^4.1.1",
-    "react": "19.0.0",
     "rimraf": "^6.0.1",
-    "typescript": "^5.8.3",
-    "vite": "^7.1.11",
-    "vite-plugin-dts": "^4.5.4",
+    "typescript": "^5.9.3",
+    "vite": "^7",
     "vitest": "^3.2.4"
   },
   "peerDependencies": {
-    "react": "^18 || ^19"
+    "react": "^17 || ^18 || ^19"
   },
   "peerDependenciesMeta": {
     "react": {

@@ -1,8 +1,10 @@
-import type { SearchSource, SearchSourceState } from '@self';
 import { useMemo } from 'react';
-import { useSearchResultsContext } from '../../contexts/StreamSearchResultsContext';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
+
+import { useSearchResultsContext } from '../../contexts/StreamSearchResultsContext';
 import { useStableCallback } from '../internal';
+import type { SearchSourceState } from '../../../../common/types';
+import type { SearchSource } from '../../../../common/search';
 
 export const useSearchResult = (sourceFromProps?: SearchSource) => {
   const sourceFromContext = useSearchResultsContext();

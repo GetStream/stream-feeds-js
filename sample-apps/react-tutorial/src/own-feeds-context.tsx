@@ -1,10 +1,15 @@
-import type { Feed } from '@stream-io/feeds-react-sdk';
 import {
+  type PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import {
+  type Feed,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
-import type { PropsWithChildren } from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
 
 type OwnFeedsContextValue = {
   ownFeed: Feed | undefined;

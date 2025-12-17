@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
+
 import { useFeedContext } from '../../contexts/StreamFeedContext';
 import { useNotificationStatus } from './useNotificationStatus';
-import { useMemo } from 'react';
-import type { AggregatedActivityResponse, Feed } from '@self';
+import type { Feed } from '../../../../feed';
+import type { AggregatedActivityResponse } from '../../../../gen/models';
 
 export const useIsAggregatedActivitySeen = ({
   feed: feedFromProps,
