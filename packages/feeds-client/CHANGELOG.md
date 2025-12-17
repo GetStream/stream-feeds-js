@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.25](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.24...@stream-io/feeds-client-0.3.25) (2025-12-17)
+
+
+### Features
+
+* optimize when we update feed state in getOrCreateActiveFeed [REACT-701] ([#195](https://github.com/GetStream/stream-feeds-js/issues/195)) ([42b0ba9](https://github.com/GetStream/stream-feeds-js/commit/42b0ba9a92e2fa7e01b6d5385d9ba88dff441998))
+
 ## [0.3.24](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.23...@stream-io/feeds-client-0.3.24) (2025-12-17)
 
 
