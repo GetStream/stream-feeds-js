@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.26](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.25...@stream-io/feeds-client-0.3.26) (2025-12-17)
+
+
+### Bug Fixes
+
+* React Native doesn't know mapiterator ([#197](https://github.com/GetStream/stream-feeds-js/issues/197)) ([2226a1e](https://github.com/GetStream/stream-feeds-js/commit/2226a1e539235cbfc1ed5dda99e07756e0552d5e))
+
 ## [0.3.25](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.24...@stream-io/feeds-client-0.3.25) (2025-12-17)
 
 
