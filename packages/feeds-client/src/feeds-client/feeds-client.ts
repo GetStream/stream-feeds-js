@@ -356,11 +356,9 @@ export class FeedsClient extends FeedsApi {
       const pollResponse = activity.poll;
       const pollFromCache = this.pollFromState(pollResponse.id);
       if (!pollFromCache) {
-        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         const poll = new StreamPoll({ client: this, poll: pollResponse });
         this.polls_by_id.set(poll.id, poll);
       } else {
-        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         pollFromCache.reinitializeState(pollResponse);
       }
     }
