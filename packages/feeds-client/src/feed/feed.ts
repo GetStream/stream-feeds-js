@@ -1010,7 +1010,7 @@ export class Feed extends FeedApi {
           );
         }
       });
-      feedsToGetOrCreate.values().forEach((feed) => {
+      Array.from(feedsToGetOrCreate.values()).forEach((feed) => {
         getOrCreateActiveFeed.bind(this.client)({
           group: feed.group_id,
           id: feed.id,
