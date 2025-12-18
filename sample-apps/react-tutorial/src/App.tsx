@@ -26,8 +26,9 @@ if (!userIdFromUrl) {
 const CURRENT_USER = {
   id: USER_ID,
   name: import.meta.env.VITE_USER_NAME ?? USER_ID,
-  token:
-    (import.meta.env.VITE_USER_TOKEN ?? import.meta.env.VITE_TOKEN_URL)
+  token: import.meta.env.VITE_USER_TOKEN
+    ? import.meta.env.VITE_USER_TOKEN
+    : import.meta.env.VITE_TOKEN_URL
       ? () =>
           fetch(`${import.meta.env.VITE_TOKEN_URL}&user_id=${USER_ID}`)
             .then((res) => res.json())

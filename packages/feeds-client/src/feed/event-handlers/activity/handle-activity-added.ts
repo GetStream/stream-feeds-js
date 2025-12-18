@@ -7,6 +7,7 @@ export function addActivitiesToState(
   newActivities: ActivityResponse[],
   activities: ActivityResponse[] | undefined,
   position: 'start' | 'end',
+  { fromWebSocket }: { fromWebSocket: boolean } = { fromWebSocket: false },
 ) {
   if (activities === undefined) {
     return {
@@ -33,7 +34,7 @@ export function addActivitiesToState(
       ...activities,
       ...(position === 'end' ? newActivitiesDeduplicated : []),
     ];
-    this.newActivitiesAdded(newActivitiesDeduplicated);
+    this.newActivitiesAdded(newActivitiesDeduplicated, { fromWebSocket });
 
     result = { changed: true, activities: updatedActivities };
   }
@@ -55,6 +56,7 @@ export function handleActivityAdded(
     [event.activity],
     currentActivities,
     this.currentState.addNewActivitiesTo,
+    { fromWebSocket: true },
   );
   if (result.changed) {
     const activity = event.activity;

@@ -2,6 +2,51 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.27](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.26...@stream-io/feeds-client-0.3.27) (2025-12-17)
+
+
+### Bug Fixes
+
+* stream-feeds-react-tutorial-related adjustments ([#191](https://github.com/GetStream/stream-feeds-js/issues/191)) ([83abe04](https://github.com/GetStream/stream-feeds-js/commit/83abe04b8c213ca97283348a3471eeb2937594c7))
+
+## [0.3.26](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.25...@stream-io/feeds-client-0.3.26) (2025-12-17)
+
+
+### Bug Fixes
+
+* React Native doesn't know mapiterator ([#197](https://github.com/GetStream/stream-feeds-js/issues/197)) ([2226a1e](https://github.com/GetStream/stream-feeds-js/commit/2226a1e539235cbfc1ed5dda99e07756e0552d5e))
+
+## [0.3.25](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.24...@stream-io/feeds-client-0.3.25) (2025-12-17)
+
+
+### Features
+
+* optimize when we update feed state in getOrCreateActiveFeed [REACT-701] ([#195](https://github.com/GetStream/stream-feeds-js/issues/195)) ([42b0ba9](https://github.com/GetStream/stream-feeds-js/commit/42b0ba9a92e2fa7e01b6d5385d9ba88dff441998))
+
+## [0.3.24](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.23...@stream-io/feeds-client-0.3.24) (2025-12-17)
+
+
+### Bug Fixes
+
+* proper poll typing with user response ([#196](https://github.com/GetStream/stream-feeds-js/issues/196)) ([6d83e88](https://github.com/GetStream/stream-feeds-js/commit/6d83e88d75f8810129f607ec61c1e0ac30b4074c)), closes [#171](https://github.com/GetStream/stream-feeds-js/issues/171)
+
+## [0.3.23](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.22...@stream-io/feeds-client-0.3.23) (2025-12-16)
+
+
+* add mentioned user id to updateActivity [FEEDS-748] ([#194](https://github.com/GetStream/stream-feeds-js/issues/194)) ([8351abe](https://github.com/GetStream/stream-feeds-js/commit/8351abe275c915900e40b5ef5a8ed252b428e0aa))
+
+## [0.3.22](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.21...@stream-io/feeds-client-0.3.22) (2025-12-16)
+
+
+### Features
+
+* add new field own_followings ([#193](https://github.com/GetStream/stream-feeds-js/issues/193)) ([b3012a0](https://github.com/GetStream/stream-feeds-js/commit/b3012a01cdc56fa61f9803dd6cf6a91743287fe7))
+
+## [0.3.21](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.20...@stream-io/feeds-client-0.3.21) (2025-12-16)
+
+
+* add mentioned user id to updateActivity [FEEDS-748] ([#192](https://github.com/GetStream/stream-feeds-js/issues/192)) ([72e9b94](https://github.com/GetStream/stream-feeds-js/commit/72e9b947d9c4a2e6472832c8c09fd1811ae67244))
+
 ## [0.3.20](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.19...@stream-io/feeds-client-0.3.20) (2025-12-15)
 
 

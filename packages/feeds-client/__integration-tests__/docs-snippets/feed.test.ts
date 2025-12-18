@@ -13,11 +13,17 @@ describe('Feeds page', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
   let feed: Feed;
-
+  let invitingFeed: Feed;
+  let johnClient: FeedsClient;
+  let john: { id: string };
   beforeAll(async () => {
     client = createTestClient();
     await client.connectUser(user, createTestTokenGenerator(user));
     feed = client.feed('user', crypto.randomUUID());
+    invitingFeed = feed;
+    johnClient = createTestClient();
+    john = getTestUser('john');
+    await johnClient.connectUser(john, createTestTokenGenerator(john));
   });
 
   it(`Creating Feed`, async () => {
@@ -213,6 +219,35 @@ describe('Feeds page', () => {
     });
 
     await serverClient.deleteUsers({ user_ids: [userId], user: 'hard' });
+  });
+
+  it('Member invites', async () => {
+    await invitingFeed.updateFeedMembers({
+      operation: 'upsert',
+      members: [
+        {
+          user_id: john.id,
+          invite: true,
+          custom: {
+            reason: 'community builder',
+          },
+        },
+      ],
+    });
+
+    const feedWithInvite = johnClient.feed(invitingFeed.group, invitingFeed.id);
+    // Then John can accept or reject
+    await feedWithInvite.rejectFeedMemberInvite();
+
+    // await feedWithInvite.acceptFeedMemberInvite();
+  });
+
+  it(`Query Feed Members`, async () => {
+    await feed.queryFeedMembers({
+      filter: {
+        role: 'moderator',
+      },
+    });
   });
 
   it(`Query feeeds`, async () => {

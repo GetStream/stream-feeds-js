@@ -128,14 +128,6 @@ describe(`getOrCreate`, () => {
           user_score: 0.8,
         },
         watch: true,
-        activity_selector_options: {
-          sort: [
-            {
-              field: 'created_at',
-              direction: 'desc',
-            },
-          ],
-        },
         interest_weights: {
           technology: 0.8,
           travel: -1,
@@ -217,5 +209,107 @@ describe(`getOrCreate`, () => {
     expect(
       feed.getOrCreate({ filter: { filter_tags: ['green'] } }),
     ).rejects.toThrow('Only one getOrCreate call is allowed at a time');
+  });
+});
+
+describe(`newActivitiesAdded`, () => {
+  let feed: Feed;
+  let client: Record<keyof FeedsClient | 'getOrCreateActiveFeed', Mock>;
+
+  beforeEach(() => {
+    client = {
+      getOrCreateActiveFeed: vi.fn(),
+      hydrateCapabilitiesCache: vi.fn(),
+      hydratePollCache: vi.fn(),
+    } as unknown as Record<keyof FeedsClient | 'getOrCreateActiveFeed', Mock>;
+    const feedResponse = generateFeedResponse({
+      id: 'user-123',
+      group_id: 'user',
+    });
+    feed = new Feed(
+      client as unknown as FeedsClient,
+      feedResponse.group_id,
+      feedResponse.id,
+      feedResponse,
+    );
+  });
+
+  it('should not create feeds if enrichment options are set to skip_all', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_all: true,
+        },
+      },
+    });
+
+    feed['newActivitiesAdded']([generateActivityResponse()]);
+
+    expect(client['getOrCreateActiveFeed']).not.toHaveBeenCalled();
+  });
+
+  it('should not create feeds if enrichment options are set to skip_activity_current_feed', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_activity_current_feed: true,
+        },
+      },
+    });
+
+    feed['newActivitiesAdded']([generateActivityResponse()]);
+
+    expect(client['getOrCreateActiveFeed']).not.toHaveBeenCalled();
+  });
+
+  it('should deduplicate feeds from acitivties', () => {
+    const feed1 = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    const feed2 = generateFeedResponse({
+      group_id: 'user',
+      id: '456',
+      feed: 'user:456',
+    });
+    const activity1 = generateActivityResponse({ current_feed: feed1 });
+    const activity2 = generateActivityResponse({ current_feed: feed2 });
+    const activity3 = generateActivityResponse({ current_feed: feed1 });
+
+    feed['newActivitiesAdded']([activity1, activity2, activity3]);
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledTimes(2);
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: feed1.group_id,
+      id: feed1.id,
+      data: feed1,
+      fromWebSocket: false,
+    });
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: feed2.group_id,
+      id: feed2.id,
+      data: feed2,
+      fromWebSocket: false,
+    });
+  });
+
+  it(`should set fromWebSocket flag to true if activities are added from a WebSocket event`, () => {
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: true },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fromWebSocket: true,
+    });
   });
 });

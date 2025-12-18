@@ -1,7 +1,9 @@
 import { useCallback, useMemo } from 'react';
-import { type Feed, type FeedState, checkHasAnotherPage } from '@self';
 import { useStateStore } from '@stream-io/state-store/react-bindings';
+
 import { useFeedContext } from '../../contexts/StreamFeedContext';
+import { checkHasAnotherPage } from '../../../../utils';
+import type { Feed, FeedState } from '../../../../feed';
 
 const selector = ({
   following_count,

@@ -2,6 +2,46 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.42](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.41...@stream-io/feeds-react-native-sdk-0.1.42) (2025-12-17)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.27`
+
+### Bug Fixes
+
+* stream-feeds-react-tutorial-related adjustments ([#191](https://github.com/GetStream/stream-feeds-js/issues/191)) ([83abe04](https://github.com/GetStream/stream-feeds-js/commit/83abe04b8c213ca97283348a3471eeb2937594c7))
+
+## [0.1.41](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.40...@stream-io/feeds-react-native-sdk-0.1.41) (2025-12-17)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.26`
+## [0.1.40](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.39...@stream-io/feeds-react-native-sdk-0.1.40) (2025-12-17)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.25`
+## [0.1.39](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.38...@stream-io/feeds-react-native-sdk-0.1.39) (2025-12-17)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.24`
+## [0.1.38](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.37...@stream-io/feeds-react-native-sdk-0.1.38) (2025-12-16)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.23`
+## [0.1.37](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.36...@stream-io/feeds-react-native-sdk-0.1.37) (2025-12-16)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.22`
+## [0.1.36](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.35...@stream-io/feeds-react-native-sdk-0.1.36) (2025-12-16)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `0.3.21`
 ## [0.1.35](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.34...@stream-io/feeds-react-native-sdk-0.1.35) (2025-12-15)
 
 ### Dependency Updates

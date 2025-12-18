@@ -17,6 +17,7 @@ import type {
   FollowResponse,
   GetFollowSuggestionsResponse,
   GetOrCreateFeedRequest,
+  ImageSize,
   ImageUploadRequest,
   OwnBatchRequest,
   PollResponse,
@@ -93,6 +94,10 @@ import {
 } from '../utils/throttling';
 import { ActivityWithStateUpdates } from '../activity-with-state-updates/activity-with-state-updates';
 import { getFeed } from '../activity-with-state-updates/get-feed';
+import {
+  isOwnFollowsEqual,
+  isOwnMembershipEqual,
+} from '../utils/check-own-fields-equality';
 
 export type FeedsClientState = {
   connected_user: ConnectedUser | undefined;
@@ -175,11 +180,11 @@ export class FeedsClient extends FeedsApi {
         case 'feeds.feed.created': {
           if (this.activeFeeds[event.feed.id]) break;
 
-          this.getOrCreateActiveFeed(
-            event.feed.group_id,
-            event.feed.id,
-            event.feed,
-          );
+          this.getOrCreateActiveFeed({
+            group: event.feed.group_id,
+            id: event.feed.id,
+            data: event.feed,
+          });
 
           break;
         }
@@ -209,7 +214,7 @@ export class FeedsClient extends FeedsApi {
             for (const activeFeed of this.allActiveFeeds) {
               const currentActivities = activeFeed.currentState.activities;
               if (currentActivities) {
-                const newActivities = [];
+                const newActivities: ActivityResponse[] = [];
                 let changed = false;
                 for (const activity of currentActivities) {
                   if (activity.poll?.id === event.poll.id) {
@@ -343,7 +348,7 @@ export class FeedsClient extends FeedsApi {
       ...Object.values(this.activeActivities)
         .filter((a) => !!getFeed.call(a))
         .map((a) => getFeed.call(a)!),
-    ];
+    ] as Feed[];
   }
 
   public pollFromState = (id: string) => this.polls_by_id.get(id);
@@ -356,11 +361,9 @@ export class FeedsClient extends FeedsApi {
       const pollResponse = activity.poll;
       const pollFromCache = this.pollFromState(pollResponse.id);
       if (!pollFromCache) {
-        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         const poll = new StreamPoll({ client: this, poll: pollResponse });
         this.polls_by_id.set(poll.id, poll);
       } else {
-        // @ts-expect-error Incompatibility between PollResponseData and Poll due to teams_role, remove when OpenAPI spec is fixed
         pollFromCache.reinitializeState(pollResponse);
       }
     }
@@ -448,25 +451,22 @@ export class FeedsClient extends FeedsApi {
     });
   };
 
-  // @ts-expect-error API spec says file should be a string
   uploadFile = (
-    request: Omit<FileUploadRequest, 'file'> & { file: StreamFile },
+    request?: Omit<FileUploadRequest, 'file'> & { file?: StreamFile | string },
   ) => {
     return super.uploadFile({
-      // @ts-expect-error API spec says file should be a string
-      file: request.file,
+      file: request?.file as string,
     });
   };
 
-  // @ts-expect-error API spec says file should be a string
   uploadImage = (
-    request: Omit<ImageUploadRequest, 'file'> & { file: StreamFile },
+    request?: Omit<ImageUploadRequest, 'file'> & { file?: StreamFile | string },
   ) => {
     return super.uploadImage({
-      // @ts-expect-error API spec says file should be a string
-      file: request.file,
-      // @ts-expect-error form data will only work if this is a string
-      upload_sizes: JSON.stringify(request.upload_sizes),
+      file: request?.file as string,
+      upload_sizes: JSON.stringify(
+        request?.upload_sizes,
+      ) as unknown as ImageSize[],
     });
   };
 
@@ -676,13 +676,11 @@ export class FeedsClient extends FeedsApi {
       activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
     },
   ) => {
-    return this.getOrCreateActiveFeed(
-      groupId,
+    return this.getOrCreateActiveFeed({
+      group: groupId,
       id,
-      undefined,
-      undefined,
       options,
-    );
+    });
   };
 
   /**
@@ -708,12 +706,12 @@ export class FeedsClient extends FeedsApi {
     const feedResponses = response.feeds;
 
     const feeds = feedResponses.map((feedResponse) =>
-      this.getOrCreateActiveFeed(
-        feedResponse.group_id,
-        feedResponse.id,
-        feedResponse,
-        request?.watch,
-      ),
+      this.getOrCreateActiveFeed({
+        group: feedResponse.group_id,
+        id: feedResponse.id,
+        data: feedResponse,
+        watch: request?.watch,
+      }),
     );
 
     this.hydrateCapabilitiesCache(feedResponses);
@@ -846,27 +844,35 @@ export class FeedsClient extends FeedsApi {
     const response = await super.getFollowSuggestions(...params);
 
     response.suggestions.forEach((suggestion) => {
-      this.getOrCreateActiveFeed(
-        suggestion.group_id,
-        suggestion.id,
-        suggestion,
-      );
+      this.getOrCreateActiveFeed({
+        group: suggestion.group_id,
+        id: suggestion.id,
+        data: suggestion,
+      });
     });
 
     // TODO: return feed instance here https://linear.app/stream/issue/REACT-669/return-feed-instance-from-followsuggestions-breaking
     return response;
   }
 
-  protected readonly getOrCreateActiveFeed = (
-    group: string,
-    id: string,
-    data?: FeedResponse,
-    watch?: boolean,
+  protected readonly getOrCreateActiveFeed = ({
+    group,
+    id,
+    data,
+    watch,
+    options,
+    fromWebSocket = false,
+  }: {
+    group: string;
+    id: string;
+    data?: FeedResponse;
+    watch?: boolean;
     options?: {
       addNewActivitiesTo?: 'start' | 'end';
       activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
-    },
-  ) => {
+    };
+    fromWebSocket?: boolean;
+  }) => {
     const fid = `${group}:${id}`;
     let isCreated = false;
 
@@ -895,8 +901,37 @@ export class FeedsClient extends FeedsApi {
     }
 
     if (!feed.currentState.watch) {
-      // feed isn't watched and may be stale, update it
-      if (data) handleFeedUpdated.call(feed, { feed: data });
+      if (!isCreated && data) {
+        if (
+          (feed.currentState.updated_at?.getTime() ?? 0) <
+          data.updated_at.getTime()
+        ) {
+          handleFeedUpdated.call(feed, { feed: data });
+        } else if (
+          (feed.currentState.updated_at?.getTime() ?? 0) ===
+            data.updated_at.getTime() &&
+          !fromWebSocket
+        ) {
+          const fieldsToUpdate: Array<keyof FeedResponse> = [];
+          if (!isOwnFollowsEqual(feed.currentState, data)) {
+            fieldsToUpdate.push('own_follows');
+          }
+          if (!isOwnMembershipEqual(feed.currentState, data)) {
+            fieldsToUpdate.push('own_membership');
+          }
+          if (fieldsToUpdate.length > 0) {
+            const fieldsToUpdateData = fieldsToUpdate.reduce(
+              (acc: Partial<FeedResponse>, field) => {
+                // @ts-expect-error TODO: fix this
+                acc[field] = data[field];
+                return acc;
+              },
+              {},
+            );
+            feed.state.partialNext(fieldsToUpdateData);
+          }
+        }
+      }
       if (watch) handleWatchStarted.call(feed);
     }
 

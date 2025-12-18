@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-react-sdk",
-  "version": "0.1.35",
+  "version": "0.1.42",
   "description": "Feeds SDK for React",
   "type": "module",
   "exports": {
@@ -10,17 +10,16 @@
     }
   },
   "scripts": {
-    "build": "rimraf ./dist && rimraf ./.ts && tsc",
-    "prepare": "yarn run build",
-    "prepack": "cp ../../LICENSE ./LICENSE",
-    "postpack": "rimraf ./LICENSE",
-    "version": "echo \"export default /$npm_package_version';\" > src/version.ts"
+    "clean": "rimraf ./dist",
+    "build": "yarn clean; tsc && echo 'React SDK build complete!'",
+    "prepublishOnly": "yarn run build"
   },
   "peerDependencies": {
-    "react": "^18 || ^19"
+    "react": "^17 || ^18 || ^19"
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/.tsbuildinfo"
   ],
   "keywords": [
     "react",
