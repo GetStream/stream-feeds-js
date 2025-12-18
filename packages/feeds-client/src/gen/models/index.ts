@@ -2415,6 +2415,8 @@ export interface EnrichedReaction {
 }
 
 export interface EnrichmentOptions {
+  enrich_own_followings?: boolean;
+
   skip_activity?: boolean;
 
   skip_activity_collections?: boolean;
@@ -2444,8 +2446,6 @@ export interface EnrichmentOptions {
   skip_following?: boolean;
 
   skip_own_capabilities?: boolean;
-
-  skip_own_followings?: boolean;
 
   skip_own_follows?: boolean;
 
