@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.28](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.27...@stream-io/feeds-client-0.3.28) (2025-12-18)
+
+
+### Features
+
+* Feeds 999 add support for own followings ([#200](https://github.com/GetStream/stream-feeds-js/issues/200)) ([8f69b26](https://github.com/GetStream/stream-feeds-js/commit/8f69b2656f8f0f4003d65c5659a10b8fb94da332))
+
 ## [0.3.27](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.26...@stream-io/feeds-client-0.3.27) (2025-12-17)
 
 
