@@ -54,7 +54,7 @@
     "@rnx-kit/metro-config": "^2.1.0",
     "@rnx-kit/metro-resolver-symlinks": "^0.2.5",
     "@stream-io/node-sdk": "^0.6.2",
-    "@types/react": "catalog:",
+    "@types/react": "catalog:example-react-types",
     "dotenv": "^17.2.2",
     "jest": "^29.7.0",
     "jest-expo": "~54.0.11",
