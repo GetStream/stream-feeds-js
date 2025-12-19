@@ -167,6 +167,10 @@ export const ActivityComposer = () => {
         await client?.updateActivity({
           ...activityData,
           id: editingActivity.id,
+          feeds: [
+            feed.feed,
+            ...createdHashtagFeeds.map((hashtagFeed) => hashtagFeed.feed),
+          ],
         });
       } else if (hasHashtags) {
         await client?.addActivity({
