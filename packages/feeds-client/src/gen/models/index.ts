@@ -2790,21 +2790,21 @@ export interface FeedResponse {
 
   updated_at: Date;
 
+  filter_tags: string[];
+
   created_by: UserResponse;
+
+  custom: Record<string, any>;
 
   deleted_at?: Date;
 
   visibility?: string;
-
-  filter_tags?: string[];
 
   own_capabilities?: FeedOwnCapability[];
 
   own_followings?: FollowResponse[];
 
   own_follows?: FollowResponse[];
-
-  custom?: Record<string, any>;
 
   own_membership?: FeedMemberResponse;
 }
@@ -2834,7 +2834,11 @@ export interface FeedSuggestionResponse {
 
   updated_at: Date;
 
+  filter_tags: string[];
+
   created_by: UserResponse;
+
+  custom: Record<string, any>;
 
   deleted_at?: Date;
 
@@ -2844,8 +2848,6 @@ export interface FeedSuggestionResponse {
 
   visibility?: string;
 
-  filter_tags?: string[];
-
   own_capabilities?: FeedOwnCapability[];
 
   own_followings?: FollowResponse[];
@@ -2853,8 +2855,6 @@ export interface FeedSuggestionResponse {
   own_follows?: FollowResponse[];
 
   algorithm_scores?: Record<string, number>;
-
-  custom?: Record<string, any>;
 
   own_membership?: FeedMemberResponse;
 }
