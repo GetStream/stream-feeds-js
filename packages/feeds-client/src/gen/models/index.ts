@@ -5710,6 +5710,12 @@ export interface UpdateFeedMembersResponse {
 }
 
 export interface UpdateFeedRequest {
+  description?: string;
+
+  name?: string;
+
+  filter_tags?: string[];
+
   custom?: Record<string, any>;
 }
 

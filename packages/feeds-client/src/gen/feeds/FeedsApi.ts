@@ -1324,6 +1324,9 @@ export class FeedsApi {
       feed_id: request?.feed_id,
     };
     const body = {
+      description: request?.description,
+      name: request?.name,
+      filter_tags: request?.filter_tags,
       custom: request?.custom,
     };
 
