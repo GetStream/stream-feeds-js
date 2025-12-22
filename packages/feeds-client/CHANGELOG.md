@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.29](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.28...@stream-io/feeds-client-0.3.29) (2025-12-22)
+
+
+### Features
+
+* add new udpateable fields: custom and filter_tags always in updateFee… ([#202](https://github.com/GetStream/stream-feeds-js/issues/202)) ([21ffea2](https://github.com/GetStream/stream-feeds-js/commit/21ffea2245bf51af21a59bbaf6b07971583148fb))
+
 ## [0.3.28](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.27...@stream-io/feeds-client-0.3.28) (2025-12-18)
 
 
