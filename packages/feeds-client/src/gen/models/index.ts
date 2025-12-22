@@ -3447,14 +3447,6 @@ export interface Images {
   original: ImageData;
 }
 
-export interface IndividualRecordingResponse {
-  status: string;
-}
-
-export interface IndividualRecordingSettingsResponse {
-  mode: 'available' | 'disabled' | 'auto-on';
-}
-
 export interface IngressAudioEncodingResponse {
   bitrate: number;
 
