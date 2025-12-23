@@ -1571,6 +1571,8 @@ decoders.PollVoteRemovedFeedEvent = (input?: Record<string, any>) => {
 
 decoders.PollVoteResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    poll: { type: 'PollResponseData', isSingle: true },
+
     vote: { type: 'PollVoteResponseData', isSingle: true },
   };
   return decode(typeMappings, input);
