@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.30](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.29...@stream-io/feeds-client-0.3.30) (2025-12-23)
+
+
+### Features
+
+* Feeds 1024 return the updated poll when castingremoving vote ([#203](https://github.com/GetStream/stream-feeds-js/issues/203)) ([6f7269c](https://github.com/GetStream/stream-feeds-js/commit/6f7269ca487f0d2947be34f82de42e483aead056))
+
 ## [0.3.29](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.28...@stream-io/feeds-client-0.3.29) (2025-12-22)
 
 
