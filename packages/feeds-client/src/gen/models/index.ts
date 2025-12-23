@@ -4433,6 +4433,8 @@ export interface PollVoteRemovedFeedEvent {
 export interface PollVoteResponse {
   duration: string;
 
+  poll?: PollResponseData;
+
   vote?: PollVoteResponseData;
 }
 
