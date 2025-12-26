@@ -5680,6 +5680,8 @@ export interface UpdateCommentRequest {
 
   skip_push?: boolean;
 
+  attachments?: Attachment[];
+
   custom?: Record<string, any>;
 }
 
