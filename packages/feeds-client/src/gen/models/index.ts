@@ -614,6 +614,8 @@ export interface AddCommentReactionResponse {
   comment: CommentResponse;
 
   reaction: FeedsReactionResponse;
+
+  notification_created?: boolean;
 }
 
 export interface AddCommentRequest {
@@ -644,6 +646,8 @@ export interface AddCommentResponse {
   duration: string;
 
   comment: CommentResponse;
+
+  notification_created?: boolean;
 }
 
 export interface AddCommentsBatchRequest {
@@ -680,6 +684,8 @@ export interface AddReactionResponse {
   activity: ActivityResponse;
 
   reaction: FeedsReactionResponse;
+
+  notification_created?: boolean;
 }
 
 export interface AggregatedActivityResponse {
@@ -5258,6 +5264,8 @@ export interface SingleFollowResponse {
   duration: string;
 
   follow: FollowResponse;
+
+  notification_created?: boolean;
 }
 
 export interface SortParam {
