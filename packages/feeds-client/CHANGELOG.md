@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.31](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.30...@stream-io/feeds-client-0.3.31) (2025-12-26)
+
+
+### Features
+
+* Add attachments to update comment request ([#204](https://github.com/GetStream/stream-feeds-js/issues/204)) ([e30a146](https://github.com/GetStream/stream-feeds-js/commit/e30a146534c8c86698849994fa1ce4737d98b05c))
+
 ## [0.3.30](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.29...@stream-io/feeds-client-0.3.30) (2025-12-23)
 
 
