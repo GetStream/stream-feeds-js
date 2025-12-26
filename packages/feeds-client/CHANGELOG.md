@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.32](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.31...@stream-io/feeds-client-0.3.32) (2025-12-26)
+
+
+### Features
+
+* Add notification_created when create_notification_activity is sent ([#205](https://github.com/GetStream/stream-feeds-js/issues/205)) ([a1cfd63](https://github.com/GetStream/stream-feeds-js/commit/a1cfd636688090373d96179a5ced11baa7d1a388))
+
 ## [0.3.31](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.30...@stream-io/feeds-client-0.3.31) (2025-12-26)
 
 
