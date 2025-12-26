@@ -1110,6 +1110,7 @@ export class FeedsApi {
       comment: request?.comment,
       skip_enrich_url: request?.skip_enrich_url,
       skip_push: request?.skip_push,
+      attachments: request?.attachments,
       custom: request?.custom,
     };
 
