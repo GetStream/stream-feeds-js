@@ -1,11 +1,5 @@
-import type {
-  ReactNode,
-  Ref} from 'react';
-import {
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from 'react';
+import type { ReactNode, Ref } from 'react';
+import { useEffect, useImperativeHandle, useState } from 'react';
 
 export const Dialog = ({
   children,
@@ -38,7 +32,11 @@ export const Dialog = ({
     };
   }, [dialogElement]);
 
-  useImperativeHandle(ref, () => dialogElement, [dialogElement]);
+  useImperativeHandle<HTMLDialogElement | null, HTMLDialogElement | null>(
+    ref,
+    () => dialogElement,
+    [dialogElement],
+  );
 
   return (
     <dialog
