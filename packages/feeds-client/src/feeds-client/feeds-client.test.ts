@@ -7,6 +7,7 @@ import {
   generateFollowResponse,
 } from '../test-utils';
 import { FeedOwnCapability } from '..';
+import { sleep } from '../common/utils';
 
 describe('Feeds client tests', () => {
   let client: FeedsClient;
@@ -140,7 +141,6 @@ describe('Feeds client tests', () => {
         client['activeFeeds']['user:123']?.currentState.own_membership,
       ).toEqual(ownMembership);
       expect(
-        // @ts-expect-error - own_capabilities is currently excluded from type
         client['activeFeeds']['user:123']?.currentState.own_capabilities,
       ).toEqual(ownCapabilities);
     });
@@ -223,5 +223,28 @@ describe('Feeds client tests', () => {
     expect(spy.mock.lastCall?.[0]).toMatchObject({
       own_membership: newData.own_membership,
     });
+  });
+
+  it(`should throttle calls to ownBatch endpoint`, async () => {
+    vi.spyOn(client, 'ownBatch').mockResolvedValue({ data: {} } as any);
+    const throttleTime = 100;
+    client['setGetBatchOwnCapabilitiesThrottlingInterval'](throttleTime);
+
+    client['throttledGetBatchOwnFields'](
+      [`feed:1`, `feed:2`, `feed:3`],
+      () => {},
+    );
+    expect(client['ownBatch']).toHaveBeenCalledTimes(1);
+
+    client['throttledGetBatchOwnFields']([`feed:4`, `feed:5`, `feed:6`], () => {
+      return Promise.resolve();
+    });
+    expect(client['ownBatch']).toHaveBeenCalledTimes(1);
+
+    await sleep(throttleTime / 2);
+    expect(client['ownBatch']).toHaveBeenCalledTimes(1);
+
+    await sleep(throttleTime / 2);
+    expect(client['ownBatch']).toHaveBeenCalledTimes(2);
   });
 });

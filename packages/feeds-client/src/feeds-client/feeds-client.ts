@@ -86,11 +86,10 @@ import { feedsLoggerSystem } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 import {
   throttle,
-  DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
-  type GetBatchedOwnCapabilitiesThrottledCallback,
-  queueBatchedOwnCapabilities,
-  type ThrottledGetBatchedOwnCapabilities,
   clearQueuedFeeds,
+  type ThrottledGetBatchedOwnFields,
+  type GetBatchedOwnFieldsThrottledCallback,
+  DEFAULT_BATCH_OWN_FIELDS_THROTTLING_INTERVAL,
 } from '../utils/throttling';
 import { ActivityWithStateUpdates } from '../activity-with-state-updates/activity-with-state-updates';
 import { getFeed } from '../activity-with-state-updates/get-feed';
@@ -102,7 +101,6 @@ import {
 export type FeedsClientState = {
   connected_user: ConnectedUser | undefined;
   is_ws_connection_healthy: boolean;
-  own_capabilities_by_fid: Record<string, FeedResponse['own_capabilities']>;
 };
 
 type FID = string;
@@ -128,9 +126,9 @@ export class FeedsClient extends FeedsApi {
 
   private healthyConnectionChangedEventCount = 0;
 
-  protected throttledGetBatchOwnCapabilities!: ThrottledGetBatchedOwnCapabilities;
-  private cancelGetBatchOwnCapabilitiesTimer!: () => void;
-  private query_batch_own_capabilties_throttling_interval!: number;
+  protected throttledGetBatchOwnFields!: ThrottledGetBatchedOwnFields;
+  private cancelGetBatchOwnFieldsTimer!: () => void;
+  private query_batch_own_fields_throttling_interval!: number;
 
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
@@ -145,16 +143,15 @@ export class FeedsClient extends FeedsApi {
     this.state = new StateStore<FeedsClientState>({
       connected_user: undefined,
       is_ws_connection_healthy: false,
-      own_capabilities_by_fid: {},
     });
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
 
-    this.query_batch_own_capabilties_throttling_interval =
-      options?.query_batch_own_capabilties_throttling_interval ??
-      DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL;
+    this.query_batch_own_fields_throttling_interval =
+      options?.query_batch_own_fields_throttling_interval ??
+      DEFAULT_BATCH_OWN_FIELDS_THROTTLING_INTERVAL;
 
     feedsLoggerSystem.configureLoggers(options?.configure_loggers_options);
 
@@ -287,27 +284,26 @@ export class FeedsClient extends FeedsApi {
   private setGetBatchOwnCapabilitiesThrottlingInterval = (
     throttlingMs: number,
   ) => {
-    const {
-      throttledFn: throttledGetBatchOwnCapabilities,
-      cancelTimer: cancel,
-    } = throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
-      (feeds, callback) => {
-        this.ownBatch({
-          feeds,
-        }).catch((error) => {
-          this.eventDispatcher.dispatch({
-            type: 'errors.unhandled',
-            error_type: UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
-            error,
+    const { throttledFn: throttledGetBatchOwnFields, cancelTimer: cancel } =
+      throttle<GetBatchedOwnFieldsThrottledCallback>(
+        (feeds, callback) => {
+          this.ownBatch({
+            feeds,
+          }).catch((error) => {
+            this.eventDispatcher.dispatch({
+              type: 'errors.unhandled',
+              error_type:
+                UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+              error,
+            });
           });
-        });
-        callback(feeds);
-      },
-      throttlingMs,
-      { trailing: true },
-    );
-    this.throttledGetBatchOwnCapabilities = throttledGetBatchOwnCapabilities;
-    this.cancelGetBatchOwnCapabilitiesTimer = cancel;
+          callback(feeds);
+        },
+        throttlingMs,
+        { trailing: true },
+      );
+    this.throttledGetBatchOwnFields = throttledGetBatchOwnFields;
+    this.cancelGetBatchOwnFieldsTimer = cancel;
   };
 
   private recoverOnReconnect = async () => {
@@ -369,34 +365,6 @@ export class FeedsClient extends FeedsApi {
     }
   }
 
-  public hydrateCapabilitiesCache(
-    feedResponses: Array<Pick<FeedResponse, 'feed' | 'own_capabilities'>>,
-  ) {
-    let ownCapabilitiesCache =
-      this.state.getLatestValue().own_capabilities_by_fid;
-
-    const capabilitiesToFetchQueue: string[] = [];
-
-    for (const feedResponse of feedResponses) {
-      const { feed, own_capabilities } = feedResponse;
-
-      if (!Object.prototype.hasOwnProperty.call(ownCapabilitiesCache, feed)) {
-        if (own_capabilities) {
-          ownCapabilitiesCache = {
-            ...ownCapabilitiesCache,
-            [feed]: own_capabilities,
-          };
-        } else {
-          capabilitiesToFetchQueue.push(feed);
-        }
-      }
-    }
-
-    queueBatchedOwnCapabilities.bind(this)({ feeds: capabilitiesToFetchQueue });
-
-    this.state.partialNext({ own_capabilities_by_fid: ownCapabilitiesCache });
-  }
-
   connectUser = async (user: UserRequest, tokenProvider?: TokenOrProvider) => {
     if (
       this.state.getLatestValue().connected_user !== undefined ||
@@ -408,7 +376,7 @@ export class FeedsClient extends FeedsApi {
     this.tokenManager.setTokenOrProvider(tokenProvider);
 
     this.setGetBatchOwnCapabilitiesThrottlingInterval(
-      this.query_batch_own_capabilties_throttling_interval,
+      this.query_batch_own_fields_throttling_interval,
     );
 
     try {
@@ -649,10 +617,9 @@ export class FeedsClient extends FeedsApi {
     this.state.partialNext({
       connected_user: undefined,
       is_ws_connection_healthy: false,
-      own_capabilities_by_fid: {},
     });
 
-    this.cancelGetBatchOwnCapabilitiesTimer();
+    this.cancelGetBatchOwnFieldsTimer();
     clearQueuedFeeds();
   };
 
@@ -714,8 +681,6 @@ export class FeedsClient extends FeedsApi {
       }),
     );
 
-    this.hydrateCapabilitiesCache(feedResponses);
-
     return {
       feeds,
       next: response.next,
@@ -727,13 +692,12 @@ export class FeedsClient extends FeedsApi {
 
   async ownBatch(request: OwnBatchRequest) {
     const response = await super.ownBatch(request);
-    const feedResponses = Object.entries(response.data).map(
-      ([feed, ownFields]) => ({
-        feed,
-        own_capabilities: ownFields.own_capabilities,
-      }),
-    );
-    this.hydrateCapabilitiesCache(feedResponses);
+    Object.entries(response.data).forEach(([fid, ownFields]) => {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        feed.state.partialNext(ownFields);
+      }
+    });
     return response;
   }
 
@@ -826,7 +790,6 @@ export class FeedsClient extends FeedsApi {
     },
   ) {
     const response = await super.getOrCreateFeed(request);
-    this.hydrateCapabilitiesCache([response.feed]);
 
     if (request.watch) {
       const feeds = this.findAllActiveFeedsByFid(

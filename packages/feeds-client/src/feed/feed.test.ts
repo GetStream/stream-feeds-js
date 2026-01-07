@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type Mock } from 'vitest';
 import { FeedsClient } from '../feeds-client';
 import { Feed } from './feed';
 import type { ActivityResponse } from '../gen/models';
 import { generateActivityResponse, generateFeedResponse } from '../test-utils';
+import { clearQueuedFeeds } from '../utils/throttling';
 
 describe('Feed derived state updates', () => {
   let feed: Feed;
@@ -105,7 +106,6 @@ describe(`getOrCreate`, () => {
         limit: 10,
         feed: generateFeedResponse({}),
       }),
-      hydrateCapabilitiesCache: vi.fn(),
       hydratePollCache: vi.fn(),
     } as unknown as { [key in keyof FeedsClient]: Mock };
     const feedResponse = generateFeedResponse({ id: 'main', group_id: 'user' });
@@ -214,14 +214,22 @@ describe(`getOrCreate`, () => {
 
 describe(`newActivitiesAdded`, () => {
   let feed: Feed;
-  let client: Record<keyof FeedsClient | 'getOrCreateActiveFeed', Mock>;
+  let client: Record<
+    keyof FeedsClient | 'getOrCreateActiveFeed' | 'throttledGetBatchOwnFields',
+    Mock
+  >;
 
   beforeEach(() => {
     client = {
       getOrCreateActiveFeed: vi.fn(),
-      hydrateCapabilitiesCache: vi.fn(),
       hydratePollCache: vi.fn(),
-    } as unknown as Record<keyof FeedsClient | 'getOrCreateActiveFeed', Mock>;
+      throttledGetBatchOwnFields: vi.fn(),
+    } as unknown as Record<
+      | keyof FeedsClient
+      | 'getOrCreateActiveFeed'
+      | 'throttledGetBatchOwnFields',
+      Mock
+    >;
     const feedResponse = generateFeedResponse({
       id: 'user-123',
       group_id: 'user',
@@ -311,5 +319,48 @@ describe(`newActivitiesAdded`, () => {
       data: currentFeed,
       fromWebSocket: true,
     });
+  });
+
+  it(`should fetch own_ fields for new feeds received from a WebSocket event, but only once per feed`, () => {
+    const feed1 = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    const feed2 = generateFeedResponse({
+      group_id: 'user',
+      id: '456',
+      feed: 'user:456',
+    });
+    const activity1 = generateActivityResponse({ current_feed: feed1 });
+    const activity2 = generateActivityResponse({ current_feed: feed2 });
+
+    feed['newActivitiesAdded']([activity1, activity2]);
+
+    // Don't call when not from WebSocket
+    expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(0);
+
+    const activity3 = generateActivityResponse({ current_feed: feed1 });
+    feed['newActivitiesAdded']([activity3], { fromWebSocket: true });
+
+    // Don't call when feed already seen
+    expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(0);
+
+    const feed3 = generateFeedResponse({
+      group_id: 'user',
+      id: '789',
+      feed: 'user:789',
+    });
+    const activity4 = generateActivityResponse({ current_feed: feed3 });
+    feed['newActivitiesAdded']([activity4], { fromWebSocket: true });
+
+    // Call when feed not seen
+    expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(1);
+    const lastCall = client['throttledGetBatchOwnFields'].mock.lastCall;
+    expect(lastCall?.[0]).toEqual([feed3.feed]);
+  });
+
+  afterEach(() => {
+    clearQueuedFeeds();
   });
 });

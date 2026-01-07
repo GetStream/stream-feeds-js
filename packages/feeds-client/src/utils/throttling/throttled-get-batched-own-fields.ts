@@ -1,35 +1,35 @@
 import type { FeedsClient } from '../../feeds-client';
 import type { ThrottledFunction } from './throttle';
 
-const BATCH_OWN_CAPABILITIES_API_LIMIT = 100;
+const BATCH_OWN_FIELDS_API_LIMIT = 100;
 
-export type GetBatchedOwnCapabilities = {
+export type GetBatchedOwnFields = {
   feeds: string[];
 };
 
-export type GetBatchedOwnCapabilitiesThrottledCallback = [
+export type GetBatchedOwnFieldsThrottledCallback = [
   feeds: string[],
   callback: (feedsToClear: string[]) => void | Promise<void>,
 ];
 
-export type ThrottledGetBatchedOwnCapabilities =
-  ThrottledFunction<GetBatchedOwnCapabilitiesThrottledCallback>;
+export type ThrottledGetBatchedOwnFields =
+  ThrottledFunction<GetBatchedOwnFieldsThrottledCallback>;
 
-export const DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL = 2000;
+export const DEFAULT_BATCH_OWN_FIELDS_THROTTLING_INTERVAL = 2000;
 
 const queuedFeeds: Set<string> = new Set();
 
-export function queueBatchedOwnCapabilities(
+export function queueBatchedOwnFields(
   this: FeedsClient,
-  { feeds }: GetBatchedOwnCapabilities,
+  { feeds }: GetBatchedOwnFields,
 ) {
   for (const feed of feeds) {
     queuedFeeds.add(feed);
   }
 
   if (queuedFeeds.size > 0) {
-    this.throttledGetBatchOwnCapabilities(
-      [...queuedFeeds].slice(0, BATCH_OWN_CAPABILITIES_API_LIMIT),
+    this.throttledGetBatchOwnFields(
+      [...queuedFeeds].slice(0, BATCH_OWN_FIELDS_API_LIMIT),
       (feedsToClear: string[]) => {
         for (const feed of feedsToClear) {
           queuedFeeds.delete(feed);

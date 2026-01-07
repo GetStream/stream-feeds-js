@@ -6,7 +6,7 @@ export type FeedsClientOptions = {
   base_url?: string;
   timeout?: number;
   configure_loggers_options?: ConfigureLoggersOptions;
-  query_batch_own_capabilties_throttling_interval?: number;
+  query_batch_own_fields_throttling_interval?: number;
 };
 
 export type RateLimit = {

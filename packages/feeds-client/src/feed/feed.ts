@@ -14,6 +14,7 @@ import type {
   FollowRequest,
   QueryCommentsRequest,
   ActivityAddedEvent,
+  EnrichmentOptions,
 } from '../gen/models';
 import type { StreamResponse } from '../gen-imports';
 import { StateStore } from '@stream-io/state-store';
@@ -63,16 +64,16 @@ import {
   checkHasAnotherPage,
   Constants,
   feedsLoggerSystem,
-  ownFeedFields,
   uniqueArrayMerge,
 } from '../utils';
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
 import { deepEqual } from '../utils/deep-equal';
 import { getOrCreateActiveFeed } from '../feeds-client/get-or-create-active-feed';
+import { queueBatchedOwnFields } from '../utils/throttling';
 
 export type FeedState = Omit<
   Partial<GetOrCreateFeedResponse & FeedResponse>,
-  'feed' | 'own_capabilities' | 'duration'
+  'feed' | 'duration'
 > & {
   /**
    * True when loading state using `getOrCreate`
@@ -162,6 +163,7 @@ export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private static readonly noop = () => {};
   protected indexedActivityIds: Set<string> = new Set();
+  private seenCurrentFeeds: Set<string> = new Set();
   protected readonly stateUpdateQueue: Set<string> = new Set();
 
   private readonly eventHandlers: EventHandlerByEventType = {
@@ -333,11 +335,6 @@ export class Feed extends FeedApi {
         }
       }
 
-      this.client.hydrateCapabilitiesCache([
-        response.feed,
-        ...currentActivityFeeds,
-      ]);
-
       if (request?.next) {
         const { activities: currentActivities = [] } = this.currentState;
 
@@ -389,6 +386,7 @@ export class Feed extends FeedApi {
 
         // recreate the caches so that they are updated on the next state update
         this.indexedActivityIds = new Set();
+        this.seenCurrentFeeds = new Set();
 
         // TODO: lazy-load comments from activities when comment_sort and comment_pagination are supported
 
@@ -919,10 +917,7 @@ export class Feed extends FeedApi {
       ...request,
       feeds: [this.feed],
     });
-    const currentFeed = response.activity.current_feed;
-    if (currentFeed) {
-      this.client.hydrateCapabilitiesCache([currentFeed]);
-    }
+
     return response;
   }
 
@@ -934,33 +929,18 @@ export class Feed extends FeedApi {
 
     // no need to run noop function
     if (eventHandler !== Feed.noop) {
-      if ('activity' in event && this.hasActivity(event.activity.id)) {
+      // Backfill current_feed if activity is posted to multiple feeds
+      if (
+        'activity' in event &&
+        event.activity.feeds.length > 1 &&
+        this.hasActivity(event.activity.id)
+      ) {
         const currentActivity = this.currentState.activities?.find(
           (a) => a.id === event.activity.id,
         );
 
-        // Backfill current_feed if activity is posted to multiple feeds
-        if (
-          event.activity.feeds.length > 1 &&
-          !event.activity.current_feed &&
-          currentActivity?.current_feed
-        ) {
+        if (!event.activity.current_feed && currentActivity?.current_feed) {
           event.activity.current_feed = currentActivity.current_feed;
-        }
-
-        // Backfill own_ fields if activity is posted to a single feed
-        if (
-          event.activity.feeds.length === 1 &&
-          event.activity.current_feed &&
-          currentActivity?.current_feed
-        ) {
-          ownFeedFields.forEach((field) => {
-            if (field in currentActivity.current_feed!) {
-              // @ts-expect-error TODO: fix this
-              event.activity.current_feed![field] =
-                currentActivity.current_feed![field];
-            }
-          });
         }
       }
       // @ts-expect-error intersection of handler arguments results to never
@@ -994,10 +974,7 @@ export class Feed extends FeedApi {
   ) {
     const enrichmentOptions =
       this.currentState.last_get_or_create_request_config?.enrichment_options;
-    if (
-      !enrichmentOptions?.skip_activity_current_feed &&
-      !enrichmentOptions?.skip_all
-    ) {
+    if (this.shouldAddToActiveFeeds(enrichmentOptions)) {
       const feedsToGetOrCreate = new Map<string, FeedResponse>();
       activities.forEach((activity) => {
         if (
@@ -1010,7 +987,8 @@ export class Feed extends FeedApi {
           );
         }
       });
-      Array.from(feedsToGetOrCreate.values()).forEach((feed) => {
+      const newFeeds = Array.from(feedsToGetOrCreate.values());
+      newFeeds.forEach((feed) => {
         getOrCreateActiveFeed.bind(this.client)({
           group: feed.group_id,
           id: feed.id,
@@ -1018,6 +996,29 @@ export class Feed extends FeedApi {
           fromWebSocket: options.fromWebSocket,
         });
       });
+      if (options.fromWebSocket) {
+        const notSeenFeeds = newFeeds.filter(
+          (feed) => !this.seenCurrentFeeds.has(feed.feed),
+        );
+        if (notSeenFeeds.length > 0) {
+          queueBatchedOwnFields.bind(this.client)({
+            feeds: notSeenFeeds.map((feed) => feed.feed),
+          });
+        }
+      }
+      newFeeds.forEach((feed) => {
+        this.seenCurrentFeeds.add(feed.feed);
+      });
     }
+  }
+
+  private shouldAddToActiveFeeds(enrichmentOptions?: EnrichmentOptions) {
+    if (!enrichmentOptions) {
+      return true;
+    }
+    return (
+      !enrichmentOptions?.skip_activity_current_feed &&
+      !enrichmentOptions?.skip_all
+    );
   }
 }
