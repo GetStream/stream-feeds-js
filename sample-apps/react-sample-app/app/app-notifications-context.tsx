@@ -1,6 +1,5 @@
 'use client';
-import type {
-  PropsWithChildren} from 'react';
+import type { PropsWithChildren } from 'react';
 import {
   createContext,
   useCallback,
@@ -47,7 +46,7 @@ export const AppNotificationsContextProvider = ({
   >([]);
 
   const showNotificationRef =
-    useRef<AppNotificationsContextValue['showNotification']>();
+    useRef<AppNotificationsContextValue['showNotification']>(undefined);
 
   showNotificationRef.current = (notification, options) => {
     const appNotficiation = { ...notification, hide: () => {} };
