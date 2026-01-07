@@ -19,8 +19,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
+    "@types/react": "catalog:example-react-types",
+    "@types/react-dom": "catalog:example-react-types",
     "@vitejs/plugin-react": "^5",
     "eslint": "^9.15.0",
     "eslint-plugin-react-hooks": "^5.0.0",
