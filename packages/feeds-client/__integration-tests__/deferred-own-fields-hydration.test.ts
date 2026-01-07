@@ -17,18 +17,15 @@ import {
 } from './utils';
 import type { FeedsClient } from '../src/feeds-client';
 import type { Feed } from '../src/feed';
-import type { ActivityResponse, StreamClient } from '@stream-io/node-sdk';
+import type { StreamClient } from '@stream-io/node-sdk';
 
 describe('Deferred own_ fields hydration', () => {
-  const feedGroup = 'timeline';
-  const feedId = crypto.randomUUID();
   let clientRef: FeedsClient;
   let serverClient: StreamClient;
   let ownUser: UserRequest = getTestUser();
   let otherUsers: UserRequest[] = [];
   let ownTimeline: Feed;
   let ownFeed: Feed;
-  const initialActivities: ActivityResponse[] = [];
 
   beforeAll(async () => {
     ownUser = getTestUser();
@@ -37,20 +34,13 @@ describe('Deferred own_ fields hydration', () => {
     serverClient = getServerClient();
     await clientRef.connectUser(ownUser, createTestTokenGenerator(ownUser));
     await serverClient.upsertUsers([...otherUsers]);
-    ownTimeline = clientRef.feed(feedGroup, feedId);
+    ownTimeline = clientRef.feed('timeline', ownUser.id);
     ownFeed = clientRef.feed('user', ownUser.id);
     await ownFeed.getOrCreate();
     await ownTimeline.getOrCreate({
       watch: false,
       limit: 25,
     });
-    const ownActivityResponse = await serverClient.feeds.addActivity({
-      user_id: ownUser.id,
-      type: 'post',
-      feeds: [ownTimeline.feed],
-      text: `Initial activity from ${ownTimeline.feed}`,
-    });
-    initialActivities.push(ownActivityResponse.activity);
     for (let i = 0; i < otherUsers.length; i++) {
       const otherUser = otherUsers[i];
       const otherFeed = serverClient.feeds.feed('user', otherUser.id);
@@ -81,29 +71,33 @@ describe('Deferred own_ fields hydration', () => {
       'throttledGetBatchOwnFields',
     );
 
-    await ownTimeline.getOrCreate({
+    const timeline = client.feed('timeline', ownUser.id);
+    await timeline.getOrCreate({
       watch: true,
       limit: 25,
     });
 
     const otherUser = otherUsers[0];
 
-    await serverClient.feeds.addActivity({
+    serverClient.feeds.addActivity({
       user_id: otherUser.id,
       type: 'post',
       feeds: [`user:${otherUser.id}`],
       text: `Initial activity from ${otherUser.id}`,
     });
 
-    await waitForEvent(ownFeed, 'feeds.activity.added', { timeoutMs: 1000 });
+    await waitForEvent(timeline, 'feeds.activity.added', {
+      timeoutMs: 10000,
+      shouldReject: true,
+    });
 
-    const feed = client.feed('user', otherUser.id);
     await vi.waitFor(
       () => {
-        expect(feed.state.getLatestValue().own_capabilities).toBeDefined();
-        expect(feed.state.getLatestValue().own_follows).toBeDefined();
-        expect(feed.state.getLatestValue().own_followings).toBeDefined();
-        expect(feed.state.getLatestValue().own_membership).toBeDefined();
+        const feed = client.feed('user', otherUser.id);
+        expect(feed.currentState.own_capabilities).toBeDefined();
+        expect(feed.currentState.own_follows).toBeDefined();
+        expect(feed.currentState.own_followings).toBeDefined();
+        expect(feed.currentState.own_membership).toBeDefined();
       },
       { timeout: 1000, interval: 50 },
     );

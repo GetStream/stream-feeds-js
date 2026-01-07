@@ -94,6 +94,7 @@ import {
 import { ActivityWithStateUpdates } from '../activity-with-state-updates/activity-with-state-updates';
 import { getFeed } from '../activity-with-state-updates/get-feed';
 import {
+  isOwnCapabilitiesEqual,
   isOwnFollowsEqual,
   isOwnMembershipEqual,
 } from '../utils/check-own-fields-equality';
@@ -281,9 +282,7 @@ export class FeedsClient extends FeedsApi {
     });
   }
 
-  private setGetBatchOwnCapabilitiesThrottlingInterval = (
-    throttlingMs: number,
-  ) => {
+  private setGetBatchOwnFieldsThrottlingInterval = (throttlingMs: number) => {
     const { throttledFn: throttledGetBatchOwnFields, cancelTimer: cancel } =
       throttle<GetBatchedOwnFieldsThrottledCallback>(
         (feeds, callback) => {
@@ -375,7 +374,7 @@ export class FeedsClient extends FeedsApi {
 
     this.tokenManager.setTokenOrProvider(tokenProvider);
 
-    this.setGetBatchOwnCapabilitiesThrottlingInterval(
+    this.setGetBatchOwnFieldsThrottlingInterval(
       this.query_batch_own_fields_throttling_interval,
     );
 
@@ -881,6 +880,9 @@ export class FeedsClient extends FeedsApi {
           }
           if (!isOwnMembershipEqual(feed.currentState, data)) {
             fieldsToUpdate.push('own_membership');
+          }
+          if (!isOwnCapabilitiesEqual(feed.currentState, data)) {
+            fieldsToUpdate.push('own_capabilities');
           }
           if (fieldsToUpdate.length > 0) {
             const fieldsToUpdateData = fieldsToUpdate.reduce(

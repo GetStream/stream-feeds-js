@@ -228,7 +228,7 @@ describe('Feeds client tests', () => {
   it(`should throttle calls to ownBatch endpoint`, async () => {
     vi.spyOn(client, 'ownBatch').mockResolvedValue({ data: {} } as any);
     const throttleTime = 100;
-    client['setGetBatchOwnCapabilitiesThrottlingInterval'](throttleTime);
+    client['setGetBatchOwnFieldsThrottlingInterval'](throttleTime);
 
     client['throttledGetBatchOwnFields'](
       [`feed:1`, `feed:2`, `feed:3`],
@@ -236,9 +236,10 @@ describe('Feeds client tests', () => {
     );
     expect(client['ownBatch']).toHaveBeenCalledTimes(1);
 
-    client['throttledGetBatchOwnFields']([`feed:4`, `feed:5`, `feed:6`], () => {
-      return Promise.resolve();
-    });
+    client['throttledGetBatchOwnFields'](
+      [`feed:4`, `feed:5`, `feed:6`],
+      () => {},
+    );
     expect(client['ownBatch']).toHaveBeenCalledTimes(1);
 
     await sleep(throttleTime / 2);

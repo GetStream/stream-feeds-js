@@ -38,3 +38,13 @@ export const isOwnMembershipEqual = (
     (newState.own_membership?.updated_at.getTime() ?? 0)
   );
 };
+
+export const isOwnCapabilitiesEqual = (
+  currentState: FeedState,
+  newState: FeedResponse,
+) => {
+  return (
+    currentState.own_capabilities?.sort().join(',') ===
+    newState.own_capabilities?.sort().join(',')
+  );
+};

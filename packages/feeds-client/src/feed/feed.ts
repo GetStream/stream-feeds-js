@@ -163,7 +163,6 @@ export class Feed extends FeedApi {
   readonly state: StateStore<FeedState>;
   private static readonly noop = () => {};
   protected indexedActivityIds: Set<string> = new Set();
-  private seenCurrentFeeds: Set<string> = new Set();
   protected readonly stateUpdateQueue: Set<string> = new Set();
 
   private readonly eventHandlers: EventHandlerByEventType = {
@@ -386,7 +385,6 @@ export class Feed extends FeedApi {
 
         // recreate the caches so that they are updated on the next state update
         this.indexedActivityIds = new Set();
-        this.seenCurrentFeeds = new Set();
 
         // TODO: lazy-load comments from activities when comment_sort and comment_pagination are supported
 
@@ -997,18 +995,22 @@ export class Feed extends FeedApi {
         });
       });
       if (options.fromWebSocket) {
-        const notSeenFeeds = newFeeds.filter(
-          (feed) => !this.seenCurrentFeeds.has(feed.feed),
-        );
-        if (notSeenFeeds.length > 0) {
+        const uninitializedFeeds = newFeeds.filter((feedResponse) => {
+          const feed = this.client.feed(feedResponse.group_id, feedResponse.id);
+          console.log('itt', feed.currentState.own_capabilities);
+          // own_capabilities can only be undefined if we haven't fetched it yet
+          return feed.currentState.own_capabilities === undefined;
+        });
+        if (uninitializedFeeds.length > 0) {
+          console.log(
+            'queueing',
+            uninitializedFeeds.map((feed) => feed.feed),
+          );
           queueBatchedOwnFields.bind(this.client)({
-            feeds: notSeenFeeds.map((feed) => feed.feed),
+            feeds: uninitializedFeeds.map((feed) => feed.feed),
           });
         }
       }
-      newFeeds.forEach((feed) => {
-        this.seenCurrentFeeds.add(feed.feed);
-      });
     }
   }
 

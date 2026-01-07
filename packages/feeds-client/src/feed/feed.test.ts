@@ -224,6 +224,11 @@ describe(`newActivitiesAdded`, () => {
       getOrCreateActiveFeed: vi.fn(),
       hydratePollCache: vi.fn(),
       throttledGetBatchOwnFields: vi.fn(),
+      feed: vi.fn().mockReturnValue({
+        currentState: {
+          own_capabilities: undefined,
+        },
+      }),
     } as unknown as Record<
       | keyof FeedsClient
       | 'getOrCreateActiveFeed'
@@ -321,43 +326,31 @@ describe(`newActivitiesAdded`, () => {
     });
   });
 
-  it(`should fetch own_ fields for new feeds received from a WebSocket event, but only once per feed`, () => {
+  it(`should fetch own_ fields if own_capabilities is undefined`, () => {
     const feed1 = generateFeedResponse({
       group_id: 'user',
       id: '123',
       feed: 'user:123',
     });
-    const feed2 = generateFeedResponse({
-      group_id: 'user',
-      id: '456',
-      feed: 'user:456',
-    });
     const activity1 = generateActivityResponse({ current_feed: feed1 });
-    const activity2 = generateActivityResponse({ current_feed: feed2 });
 
-    feed['newActivitiesAdded']([activity1, activity2]);
+    feed['newActivitiesAdded']([activity1]);
 
     // Don't call when not from WebSocket
     expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(0);
 
-    const activity3 = generateActivityResponse({ current_feed: feed1 });
-    feed['newActivitiesAdded']([activity3], { fromWebSocket: true });
-
-    // Don't call when feed already seen
-    expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(0);
-
-    const feed3 = generateFeedResponse({
+    const feed2 = generateFeedResponse({
       group_id: 'user',
       id: '789',
       feed: 'user:789',
     });
-    const activity4 = generateActivityResponse({ current_feed: feed3 });
-    feed['newActivitiesAdded']([activity4], { fromWebSocket: true });
+    const activity2 = generateActivityResponse({ current_feed: feed2 });
+    feed['newActivitiesAdded']([activity2], { fromWebSocket: true });
 
     // Call when feed not seen
     expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(1);
     const lastCall = client['throttledGetBatchOwnFields'].mock.lastCall;
-    expect(lastCall?.[0]).toEqual([feed3.feed]);
+    expect(lastCall?.[0]).toEqual([feed2.feed]);
   });
 
   afterEach(() => {
