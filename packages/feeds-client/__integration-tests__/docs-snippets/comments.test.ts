@@ -166,7 +166,9 @@ describe('Comments page', () => {
     );
     console.log(currentFeed.currentState.own_followings);
 
-    feed.getOrCreate({ enrichment_options: { enrich_own_followings: true } });
+    await feed.getOrCreate({
+      enrichment_options: { enrich_own_followings: true },
+    });
   });
 
   it('Deleting comments', async () => {
