@@ -1027,6 +1027,7 @@ export class Feed extends FeedApi {
       return true;
     }
     return (
+      !enrichmentOptions?.skip_activity &&
       !enrichmentOptions?.skip_activity_current_feed &&
       !enrichmentOptions?.skip_all
     );
