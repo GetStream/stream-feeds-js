@@ -95,6 +95,7 @@ import { ActivityWithStateUpdates } from '../activity-with-state-updates/activit
 import { getFeed } from '../activity-with-state-updates/get-feed';
 import {
   isOwnCapabilitiesEqual,
+  isOwnFollowingsEqual,
   isOwnFollowsEqual,
   isOwnMembershipEqual,
 } from '../utils/check-own-fields-equality';
@@ -877,6 +878,9 @@ export class FeedsClient extends FeedsApi {
           const fieldsToUpdate: Array<keyof FeedResponse> = [];
           if (!isOwnFollowsEqual(feed.currentState, data)) {
             fieldsToUpdate.push('own_follows');
+          }
+          if (!isOwnFollowingsEqual(feed.currentState, data)) {
+            fieldsToUpdate.push('own_followings');
           }
           if (!isOwnMembershipEqual(feed.currentState, data)) {
             fieldsToUpdate.push('own_membership');

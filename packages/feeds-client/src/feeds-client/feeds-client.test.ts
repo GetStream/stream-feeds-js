@@ -109,12 +109,19 @@ describe('Feeds client tests', () => {
           target_feed: generateFeedResponse({ feed: 'user:123' }),
         }),
       ];
+      const ownFollowings = [
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'user:123' }),
+          target_feed: generateFeedResponse({ feed: 'user:456' }),
+        }),
+      ];
       const ownMembership = generateFeedMemberResponse();
       const ownCapabilities = [FeedOwnCapability.ADD_ACTIVITY];
       const data = generateFeedResponse({
         feed: 'user:123',
         follower_count: 5,
         own_follows: ownFollows,
+        own_followings: ownFollowings,
         own_membership: ownMembership,
         own_capabilities: ownCapabilities,
       });
@@ -122,6 +129,7 @@ describe('Feeds client tests', () => {
 
       const dataFromWebSocket = { ...data };
       delete dataFromWebSocket.own_follows;
+      delete dataFromWebSocket.own_followings;
       delete dataFromWebSocket.own_membership;
       delete dataFromWebSocket.own_capabilities;
       client['getOrCreateActiveFeed']({
@@ -138,6 +146,9 @@ describe('Feeds client tests', () => {
         client['activeFeeds']['user:123']?.currentState.own_follows,
       ).toEqual(ownFollows);
       expect(
+        client['activeFeeds']['user:123']?.currentState.own_followings,
+      ).toEqual(ownFollowings);
+      expect(
         client['activeFeeds']['user:123']?.currentState.own_membership,
       ).toEqual(ownMembership);
       expect(
@@ -153,12 +164,19 @@ describe('Feeds client tests', () => {
         target_feed: generateFeedResponse({ feed: 'user:123' }),
       }),
     ];
+    const ownFollowings = [
+      generateFollowResponse({
+        source_feed: generateFeedResponse({ feed: 'user:123' }),
+        target_feed: generateFeedResponse({ feed: 'user:456' }),
+      }),
+    ];
     const ownMembership = generateFeedMemberResponse();
     const ownCapabilities = [FeedOwnCapability.ADD_ACTIVITY];
     const data = generateFeedResponse({
       feed: 'user:123',
       follower_count: 5,
       own_follows: ownFollows,
+      own_followings: ownFollowings,
       own_membership: ownMembership,
       own_capabilities: ownCapabilities,
     });
@@ -222,6 +240,60 @@ describe('Feeds client tests', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.lastCall?.[0]).toMatchObject({
       own_membership: newData.own_membership,
+    });
+
+    spy.mockClear();
+    newData.own_capabilities = [...ownCapabilities];
+    client['getOrCreateActiveFeed']({
+      group: 'user',
+      id: '123',
+      data: newData,
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    newData.own_capabilities = [
+      FeedOwnCapability.ADD_ACTIVITY,
+      FeedOwnCapability.DELETE_OWN_ACTIVITY,
+    ];
+    client['getOrCreateActiveFeed']({
+      group: 'user',
+      id: '123',
+      data: newData,
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.lastCall?.[0]).toMatchObject({
+      own_capabilities: newData.own_capabilities,
+    });
+
+    spy.mockClear();
+    newData.own_followings = [...ownFollowings];
+    client['getOrCreateActiveFeed']({
+      group: 'user',
+      id: '123',
+      data: newData,
+    });
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    const newOwnFollowings = [
+      ...ownFollowings,
+      generateFollowResponse({
+        source_feed: generateFeedResponse({ feed: 'user:123' }),
+        target_feed: generateFeedResponse({ feed: 'user:789' }),
+      }),
+    ];
+    newData.own_followings = newOwnFollowings;
+    client['getOrCreateActiveFeed']({
+      group: 'user',
+      id: '123',
+      data: newData,
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.lastCall?.[0]).toMatchObject({
+      own_followings: newOwnFollowings,
     });
   });
 
