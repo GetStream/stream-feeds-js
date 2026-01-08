@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type Mock } from 'vitest';
 import { FeedsClient } from '../feeds-client';
 import { Feed } from './feed';
 import type { ActivityResponse } from '../gen/models';
 import { generateActivityResponse, generateFeedResponse } from '../test-utils';
+import { clearQueuedFeeds } from '../utils/throttling';
 
 describe('Feed derived state updates', () => {
   let feed: Feed;
@@ -105,7 +106,6 @@ describe(`getOrCreate`, () => {
         limit: 10,
         feed: generateFeedResponse({}),
       }),
-      hydrateCapabilitiesCache: vi.fn(),
       hydratePollCache: vi.fn(),
     } as unknown as { [key in keyof FeedsClient]: Mock };
     const feedResponse = generateFeedResponse({ id: 'main', group_id: 'user' });
@@ -214,14 +214,27 @@ describe(`getOrCreate`, () => {
 
 describe(`newActivitiesAdded`, () => {
   let feed: Feed;
-  let client: Record<keyof FeedsClient | 'getOrCreateActiveFeed', Mock>;
+  let client: Record<
+    keyof FeedsClient | 'getOrCreateActiveFeed' | 'throttledGetBatchOwnFields',
+    Mock
+  >;
 
   beforeEach(() => {
     client = {
       getOrCreateActiveFeed: vi.fn(),
-      hydrateCapabilitiesCache: vi.fn(),
       hydratePollCache: vi.fn(),
-    } as unknown as Record<keyof FeedsClient | 'getOrCreateActiveFeed', Mock>;
+      throttledGetBatchOwnFields: vi.fn(),
+      feed: vi.fn().mockReturnValue({
+        currentState: {
+          own_capabilities: undefined,
+        },
+      }),
+    } as unknown as Record<
+      | keyof FeedsClient
+      | 'getOrCreateActiveFeed'
+      | 'throttledGetBatchOwnFields',
+      Mock
+    >;
     const feedResponse = generateFeedResponse({
       id: 'user-123',
       group_id: 'user',
@@ -284,17 +297,17 @@ describe(`newActivitiesAdded`, () => {
       group: feed1.group_id,
       id: feed1.id,
       data: feed1,
-      fromWebSocket: false,
+      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
     });
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
       group: feed2.group_id,
       id: feed2.id,
       data: feed2,
-      fromWebSocket: false,
+      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
     });
   });
 
-  it(`should set fromWebSocket flag to true if activities are added from a WebSocket event`, () => {
+  it(`should pass empty fieldsToUpdate array when fromWebSocket is true`, () => {
     const currentFeed = generateFeedResponse({
       group_id: 'user',
       id: '123',
@@ -309,7 +322,139 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fromWebSocket: true,
+      fieldsToUpdate: [],
     });
+  });
+
+  it(`should fetch own_ fields if own_capabilities is undefined`, () => {
+    const feed1 = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    const activity1 = generateActivityResponse({ current_feed: feed1 });
+
+    feed['newActivitiesAdded']([activity1]);
+
+    // Don't call when not from WebSocket
+    expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(0);
+
+    const feed2 = generateFeedResponse({
+      group_id: 'user',
+      id: '789',
+      feed: 'user:789',
+    });
+    const activity2 = generateActivityResponse({ current_feed: feed2 });
+    feed['newActivitiesAdded']([activity2], { fromWebSocket: true });
+
+    // Call when feed not seen
+    expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(1);
+    const lastCall = client['throttledGetBatchOwnFields'].mock.lastCall;
+    expect(lastCall?.[0]).toEqual([feed2.feed]);
+  });
+
+  it('should include own_followings in fieldsToUpdate when enrich_own_followings is true and not from WebSocket', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          enrich_own_followings: true,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
+    });
+  });
+
+  it('should not include own_followings in fieldsToUpdate when enrich_own_followings is false and not from WebSocket', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          enrich_own_followings: false,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+    });
+  });
+
+  it('should not include own_followings in fieldsToUpdate when enrich_own_followings is undefined and not from WebSocket', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {},
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+    });
+  });
+
+  it('should always include own_capabilities, own_follows, own_membership when not from WebSocket', () => {
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    const call = client['getOrCreateActiveFeed'].mock.calls[0][0];
+    expect(call.fieldsToUpdate).toContain('own_capabilities');
+    expect(call.fieldsToUpdate).toContain('own_follows');
+    expect(call.fieldsToUpdate).toContain('own_membership');
+  });
+
+  afterEach(() => {
+    clearQueuedFeeds();
   });
 });

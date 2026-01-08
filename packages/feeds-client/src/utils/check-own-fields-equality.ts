@@ -1,25 +1,25 @@
 import type { FeedState } from '../feed';
-import type { FeedResponse } from '../gen/models';
+import type { FeedResponse, FollowResponse } from '../gen/models';
 
-export const isOwnFollowsEqual = (
-  currentState: FeedState,
-  newState: FeedResponse,
-) => {
+const areFollowArraysEqual = (
+  currentFollows: FollowResponse[] | undefined,
+  newFollows: FollowResponse[] | undefined,
+): boolean => {
   const existingFollows = new Set(
-    currentState.own_follows?.map(
+    currentFollows?.map(
       (f) =>
         `${f.source_feed.feed}:${f.target_feed.feed}:${f.updated_at.getTime()}`,
     ),
   );
-  const newFollows = new Set(
-    newState.own_follows?.map(
+  const newFollowsSet = new Set(
+    newFollows?.map(
       (f) =>
         `${f.source_feed.feed}:${f.target_feed.feed}:${f.updated_at.getTime()}`,
     ),
   );
-  if (existingFollows.size === newFollows.size) {
+  if (existingFollows.size === newFollowsSet.size) {
     const areEqual = Array.from(existingFollows).every((f) =>
-      newFollows.has(f),
+      newFollowsSet.has(f),
     );
     if (areEqual) {
       return true;
@@ -29,6 +29,13 @@ export const isOwnFollowsEqual = (
   return false;
 };
 
+export const isOwnFollowsEqual = (
+  currentState: FeedState,
+  newState: FeedResponse,
+) => {
+  return areFollowArraysEqual(currentState.own_follows, newState.own_follows);
+};
+
 export const isOwnMembershipEqual = (
   currentState: FeedState,
   newState: FeedResponse,
@@ -36,5 +43,25 @@ export const isOwnMembershipEqual = (
   return (
     (currentState.own_membership?.updated_at.getTime() ?? 0) ===
     (newState.own_membership?.updated_at.getTime() ?? 0)
+  );
+};
+
+export const isOwnCapabilitiesEqual = (
+  currentState: FeedState,
+  newState: FeedResponse,
+) => {
+  return (
+    [...(currentState.own_capabilities ?? [])].sort().join(',') ===
+    [...(newState.own_capabilities ?? [])].sort().join(',')
+  );
+};
+
+export const isOwnFollowingsEqual = (
+  currentState: FeedState,
+  newState: FeedResponse,
+) => {
+  return areFollowArraysEqual(
+    currentState.own_followings,
+    newState.own_followings,
   );
 };

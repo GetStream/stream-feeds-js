@@ -60,6 +60,7 @@ import { ModerationClient } from '../moderation-client';
 import { StreamPoll } from '../common/Poll';
 import {
   Feed,
+  type FeedState,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
   handleActivityReactionUpdated,
@@ -86,15 +87,16 @@ import { feedsLoggerSystem } from '../utils';
 import { handleCommentReactionUpdated } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 import {
   throttle,
-  DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL,
-  type GetBatchedOwnCapabilitiesThrottledCallback,
-  queueBatchedOwnCapabilities,
-  type ThrottledGetBatchedOwnCapabilities,
   clearQueuedFeeds,
+  type ThrottledGetBatchedOwnFields,
+  type GetBatchedOwnFieldsThrottledCallback,
+  DEFAULT_BATCH_OWN_FIELDS_THROTTLING_INTERVAL,
 } from '../utils/throttling';
 import { ActivityWithStateUpdates } from '../activity-with-state-updates/activity-with-state-updates';
 import { getFeed } from '../activity-with-state-updates/get-feed';
 import {
+  isOwnCapabilitiesEqual,
+  isOwnFollowingsEqual,
   isOwnFollowsEqual,
   isOwnMembershipEqual,
 } from '../utils/check-own-fields-equality';
@@ -102,7 +104,6 @@ import {
 export type FeedsClientState = {
   connected_user: ConnectedUser | undefined;
   is_ws_connection_healthy: boolean;
-  own_capabilities_by_fid: Record<string, FeedResponse['own_capabilities']>;
 };
 
 type FID = string;
@@ -128,9 +129,9 @@ export class FeedsClient extends FeedsApi {
 
   private healthyConnectionChangedEventCount = 0;
 
-  protected throttledGetBatchOwnCapabilities!: ThrottledGetBatchedOwnCapabilities;
-  private cancelGetBatchOwnCapabilitiesTimer!: () => void;
-  private query_batch_own_capabilties_throttling_interval!: number;
+  protected throttledGetBatchOwnFields!: ThrottledGetBatchedOwnFields;
+  private cancelGetBatchOwnFieldsTimer!: () => void;
+  private query_batch_own_fields_throttling_interval!: number;
 
   constructor(apiKey: string, options?: FeedsClientOptions) {
     const tokenManager = new TokenManager();
@@ -145,16 +146,15 @@ export class FeedsClient extends FeedsApi {
     this.state = new StateStore<FeedsClientState>({
       connected_user: undefined,
       is_ws_connection_healthy: false,
-      own_capabilities_by_fid: {},
     });
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
     this.polls_by_id = new Map();
 
-    this.query_batch_own_capabilties_throttling_interval =
-      options?.query_batch_own_capabilties_throttling_interval ??
-      DEFAULT_BATCH_OWN_CAPABILITIES_THROTTLING_INTERVAL;
+    this.query_batch_own_fields_throttling_interval =
+      options?.query_batch_own_fields_throttling_interval ??
+      DEFAULT_BATCH_OWN_FIELDS_THROTTLING_INTERVAL;
 
     feedsLoggerSystem.configureLoggers(options?.configure_loggers_options);
 
@@ -184,6 +184,7 @@ export class FeedsClient extends FeedsApi {
             group: event.feed.group_id,
             id: event.feed.id,
             data: event.feed,
+            fieldsToUpdate: [],
           });
 
           break;
@@ -284,30 +285,27 @@ export class FeedsClient extends FeedsApi {
     });
   }
 
-  private setGetBatchOwnCapabilitiesThrottlingInterval = (
-    throttlingMs: number,
-  ) => {
-    const {
-      throttledFn: throttledGetBatchOwnCapabilities,
-      cancelTimer: cancel,
-    } = throttle<GetBatchedOwnCapabilitiesThrottledCallback>(
-      (feeds, callback) => {
-        this.ownBatch({
-          feeds,
-        }).catch((error) => {
-          this.eventDispatcher.dispatch({
-            type: 'errors.unhandled',
-            error_type: UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
-            error,
+  private setGetBatchOwnFieldsThrottlingInterval = (throttlingMs: number) => {
+    const { throttledFn: throttledGetBatchOwnFields, cancelTimer: cancel } =
+      throttle<GetBatchedOwnFieldsThrottledCallback>(
+        (feeds, callback) => {
+          this.ownBatch({
+            feeds,
+          }).catch((error) => {
+            this.eventDispatcher.dispatch({
+              type: 'errors.unhandled',
+              error_type:
+                UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+              error,
+            });
           });
-        });
-        callback(feeds);
-      },
-      throttlingMs,
-      { trailing: true },
-    );
-    this.throttledGetBatchOwnCapabilities = throttledGetBatchOwnCapabilities;
-    this.cancelGetBatchOwnCapabilitiesTimer = cancel;
+          callback(feeds);
+        },
+        throttlingMs,
+        { trailing: true },
+      );
+    this.throttledGetBatchOwnFields = throttledGetBatchOwnFields;
+    this.cancelGetBatchOwnFieldsTimer = cancel;
   };
 
   private recoverOnReconnect = async () => {
@@ -369,34 +367,6 @@ export class FeedsClient extends FeedsApi {
     }
   }
 
-  public hydrateCapabilitiesCache(
-    feedResponses: Array<Pick<FeedResponse, 'feed' | 'own_capabilities'>>,
-  ) {
-    let ownCapabilitiesCache =
-      this.state.getLatestValue().own_capabilities_by_fid;
-
-    const capabilitiesToFetchQueue: string[] = [];
-
-    for (const feedResponse of feedResponses) {
-      const { feed, own_capabilities } = feedResponse;
-
-      if (!Object.prototype.hasOwnProperty.call(ownCapabilitiesCache, feed)) {
-        if (own_capabilities) {
-          ownCapabilitiesCache = {
-            ...ownCapabilitiesCache,
-            [feed]: own_capabilities,
-          };
-        } else {
-          capabilitiesToFetchQueue.push(feed);
-        }
-      }
-    }
-
-    queueBatchedOwnCapabilities.bind(this)({ feeds: capabilitiesToFetchQueue });
-
-    this.state.partialNext({ own_capabilities_by_fid: ownCapabilitiesCache });
-  }
-
   connectUser = async (user: UserRequest, tokenProvider?: TokenOrProvider) => {
     if (
       this.state.getLatestValue().connected_user !== undefined ||
@@ -407,8 +377,8 @@ export class FeedsClient extends FeedsApi {
 
     this.tokenManager.setTokenOrProvider(tokenProvider);
 
-    this.setGetBatchOwnCapabilitiesThrottlingInterval(
-      this.query_batch_own_capabilties_throttling_interval,
+    this.setGetBatchOwnFieldsThrottlingInterval(
+      this.query_batch_own_fields_throttling_interval,
     );
 
     try {
@@ -649,10 +619,9 @@ export class FeedsClient extends FeedsApi {
     this.state.partialNext({
       connected_user: undefined,
       is_ws_connection_healthy: false,
-      own_capabilities_by_fid: {},
     });
 
-    this.cancelGetBatchOwnCapabilitiesTimer();
+    this.cancelGetBatchOwnFieldsTimer();
     clearQueuedFeeds();
   };
 
@@ -680,6 +649,7 @@ export class FeedsClient extends FeedsApi {
       group: groupId,
       id,
       options,
+      fieldsToUpdate: [],
     });
   };
 
@@ -711,10 +681,14 @@ export class FeedsClient extends FeedsApi {
         id: feedResponse.id,
         data: feedResponse,
         watch: request?.watch,
+        fieldsToUpdate: [
+          'own_capabilities',
+          'own_follows',
+          'own_membership',
+          'own_followings',
+        ],
       }),
     );
-
-    this.hydrateCapabilitiesCache(feedResponses);
 
     return {
       feeds,
@@ -727,13 +701,12 @@ export class FeedsClient extends FeedsApi {
 
   async ownBatch(request: OwnBatchRequest) {
     const response = await super.ownBatch(request);
-    const feedResponses = Object.entries(response.data).map(
-      ([feed, ownFields]) => ({
-        feed,
-        own_capabilities: ownFields.own_capabilities,
-      }),
-    );
-    this.hydrateCapabilitiesCache(feedResponses);
+    Object.entries(response.data).forEach(([fid, ownFields]) => {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        feed.state.partialNext(ownFields);
+      }
+    });
     return response;
   }
 
@@ -826,7 +799,6 @@ export class FeedsClient extends FeedsApi {
     },
   ) {
     const response = await super.getOrCreateFeed(request);
-    this.hydrateCapabilitiesCache([response.feed]);
 
     if (request.watch) {
       const feeds = this.findAllActiveFeedsByFid(
@@ -848,6 +820,12 @@ export class FeedsClient extends FeedsApi {
         group: suggestion.group_id,
         id: suggestion.id,
         data: suggestion,
+        fieldsToUpdate: [
+          'own_capabilities',
+          'own_follows',
+          'own_membership',
+          'own_followings',
+        ],
       });
     });
 
@@ -861,7 +839,7 @@ export class FeedsClient extends FeedsApi {
     data,
     watch,
     options,
-    fromWebSocket = false,
+    fieldsToUpdate,
   }: {
     group: string;
     id: string;
@@ -871,7 +849,9 @@ export class FeedsClient extends FeedsApi {
       addNewActivitiesTo?: 'start' | 'end';
       activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
     };
-    fromWebSocket?: boolean;
+    fieldsToUpdate: Array<
+      'own_capabilities' | 'own_follows' | 'own_followings' | 'own_membership'
+    >;
   }) => {
     const fid = `${group}:${id}`;
     let isCreated = false;
@@ -909,18 +889,35 @@ export class FeedsClient extends FeedsApi {
           handleFeedUpdated.call(feed, { feed: data });
         } else if (
           (feed.currentState.updated_at?.getTime() ?? 0) ===
-            data.updated_at.getTime() &&
-          !fromWebSocket
+          data.updated_at.getTime()
         ) {
-          const fieldsToUpdate: Array<keyof FeedResponse> = [];
-          if (!isOwnFollowsEqual(feed.currentState, data)) {
-            fieldsToUpdate.push('own_follows');
-          }
-          if (!isOwnMembershipEqual(feed.currentState, data)) {
-            fieldsToUpdate.push('own_membership');
-          }
-          if (fieldsToUpdate.length > 0) {
-            const fieldsToUpdateData = fieldsToUpdate.reduce(
+          const fieldsToUpdateData: Array<keyof FeedResponse> = [];
+          const fieldChecks: Array<
+            [
+              (
+                | 'own_capabilities'
+                | 'own_follows'
+                | 'own_membership'
+                | 'own_followings'
+              ),
+              (currentState: FeedState, newState: FeedResponse) => boolean,
+            ]
+          > = [
+            ['own_capabilities', isOwnCapabilitiesEqual],
+            ['own_follows', isOwnFollowsEqual],
+            ['own_membership', isOwnMembershipEqual],
+            ['own_followings', isOwnFollowingsEqual],
+          ];
+          fieldChecks.forEach(([field, isEqual]) => {
+            if (
+              fieldsToUpdate.includes(field) &&
+              !isEqual(feed.currentState, data)
+            ) {
+              fieldsToUpdateData.push(field);
+            }
+          });
+          if (fieldsToUpdateData.length > 0) {
+            const fieldsToUpdatePayload = fieldsToUpdateData.reduce(
               (acc: Partial<FeedResponse>, field) => {
                 // @ts-expect-error TODO: fix this
                 acc[field] = data[field];
@@ -928,7 +925,7 @@ export class FeedsClient extends FeedsApi {
               },
               {},
             );
-            feed.state.partialNext(fieldsToUpdateData);
+            feed.state.partialNext(fieldsToUpdatePayload);
           }
         }
       }

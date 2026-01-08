@@ -32,12 +32,16 @@ describe('Feeds capabilities page', () => {
 
     const activity = feed.state.getLatestValue().activities?.[0]!;
 
+    const activityFeed = client.feed(
+      activity.current_feed!.group_id,
+      activity.current_feed!.id,
+    );
+
     // Make sure to subscribe to changes, it's not guaranteed that own capabilities are ready by the time an activity is being displayed
     // Usually you do this in a lifecycle method that's called when an activity component is being created
-    const unsubscribe = client.state.subscribeWithSelector(
+    const unsubscribe = activityFeed.state.subscribeWithSelector(
       (state) => ({
-        ownCapabilities:
-          state.own_capabilities_by_fid[activity.current_feed?.feed ?? ''],
+        ownCapabilities: state.own_capabilities,
       }),
       (state) => {
         console.log(state.ownCapabilities);
