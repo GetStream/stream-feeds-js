@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.33](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.32...@stream-io/feeds-client-0.3.33) (2026-01-08)
+
+
+### Features
+
+* backfill all own_ fields for current_feed received from WS event ([#207](https://github.com/GetStream/stream-feeds-js/issues/207)) ([4d47e94](https://github.com/GetStream/stream-feeds-js/commit/4d47e94ee2080c16ce3c71b18db68d5436c02e2e))
+* own_followings hook, add restrict_replies to sample app ([#208](https://github.com/GetStream/stream-feeds-js/issues/208)) ([0ac37bf](https://github.com/GetStream/stream-feeds-js/commit/0ac37bf741c453e0dfd0699d1d85b0e00a70cbf2))
+
 ## [0.3.32](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.31...@stream-io/feeds-client-0.3.32) (2025-12-26)
 
 
