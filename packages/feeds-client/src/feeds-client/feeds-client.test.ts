@@ -382,6 +382,7 @@ describe('Feeds client tests', () => {
   });
 
   it(`should throttle calls to ownBatch endpoint`, async () => {
+    vi.useFakeTimers();
     vi.spyOn(client, 'ownBatch').mockResolvedValue({ data: {} } as any);
     const throttleTime = 100;
     client['setGetBatchOwnFieldsThrottlingInterval'](throttleTime);
@@ -398,11 +399,13 @@ describe('Feeds client tests', () => {
     );
     expect(client['ownBatch']).toHaveBeenCalledTimes(1);
 
-    await sleep(throttleTime / 2);
+    await vi.advanceTimersByTimeAsync(throttleTime / 2);
     expect(client['ownBatch']).toHaveBeenCalledTimes(1);
 
-    await sleep(throttleTime / 2 + 50); // +50 to ensure the trailing call is scheduled
+    await vi.advanceTimersByTimeAsync(throttleTime / 2);
     expect(client['ownBatch']).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers();
   });
 
   describe('fieldsToUpdate logic', () => {
