@@ -44,7 +44,7 @@ export const isOwnCapabilitiesEqual = (
   newState: FeedResponse,
 ) => {
   return (
-    currentState.own_capabilities?.sort().join(',') ===
-    newState.own_capabilities?.sort().join(',')
+    currentState.own_capabilities?.toSorted().join(',') ===
+    newState.own_capabilities?.toSorted().join(',')
   );
 };

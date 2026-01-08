@@ -997,15 +997,10 @@ export class Feed extends FeedApi {
       if (options.fromWebSocket) {
         const uninitializedFeeds = newFeeds.filter((feedResponse) => {
           const feed = this.client.feed(feedResponse.group_id, feedResponse.id);
-          console.log('itt', feed.currentState.own_capabilities);
           // own_capabilities can only be undefined if we haven't fetched it yet
           return feed.currentState.own_capabilities === undefined;
         });
         if (uninitializedFeeds.length > 0) {
-          console.log(
-            'queueing',
-            uninitializedFeeds.map((feed) => feed.feed),
-          );
           queueBatchedOwnFields.bind(this.client)({
             feeds: uninitializedFeeds.map((feed) => feed.feed),
           });
