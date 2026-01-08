@@ -245,7 +245,7 @@ describe('Feeds client tests', () => {
     await sleep(throttleTime / 2);
     expect(client['ownBatch']).toHaveBeenCalledTimes(1);
 
-    await sleep(throttleTime / 2);
+    await sleep(throttleTime / 2 + 50); // +50 to ensure the trailing call is scheduled
     expect(client['ownBatch']).toHaveBeenCalledTimes(2);
   });
 });
