@@ -160,11 +160,11 @@ describe('Comments page', () => {
     // Lists follow relationships where
     // - target feed is owned by current user
     // - source feed is owned by activity author
-    const feed = client.feed(
+    const currentFeed = client.feed(
       activity.current_feed?.group_id!,
       activity.current_feed?.id!,
     );
-    console.log(feed.currentState.own_followings);
+    console.log(currentFeed.currentState.own_followings);
 
     feed.getOrCreate({ enrichment_options: { enrich_own_followings: true } });
   });
