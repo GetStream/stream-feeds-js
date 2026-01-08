@@ -19,7 +19,7 @@ export const useOwnCapabilities = (feedFromProps?: Feed | string) => {
   let feed = feedFromProps ?? feedFromContext;
   if (typeof feed === 'string') {
     const [groupId, id] = feed.split(':');
-    feed = client?.feed(groupId, id);
+    feed = groupId && id ? client?.feed(groupId, id) : undefined;
   }
 
   const { feedOwnCapabilities = stableEmptyArray } =
