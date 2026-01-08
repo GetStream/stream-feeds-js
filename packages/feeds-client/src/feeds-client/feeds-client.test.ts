@@ -7,7 +7,6 @@ import {
   generateFollowResponse,
 } from '../test-utils';
 import { FeedOwnCapability } from '..';
-import { sleep } from '../common/utils';
 
 describe('Feeds client tests', () => {
   let client: FeedsClient;
