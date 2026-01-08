@@ -9,6 +9,7 @@ import type {
 } from '@stream-io/feeds-react-sdk';
 import {
   FeedOwnCapability,
+  useClientConnectedUser,
   useFeedsClient,
   useOwnCapabilities,
   useStateStore,
@@ -41,6 +42,7 @@ export default function ActivityPage() {
 function ActivityPageContent() {
   const params = useParams<{ id: string }>();
   const client = useFeedsClient();
+  const user = useClientConnectedUser();
   const { logErrorAndDisplayNotification, logError } = useErrorContext();
   const [editedActivityText, setEditedActivityText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -66,7 +68,7 @@ function ActivityPageContent() {
   }, [client, params?.id]);
 
   useEffect(() => {
-    if (!activityWithStateUpdates) {
+    if (!activityWithStateUpdates || !user?.id) {
       return;
     }
 
@@ -79,7 +81,11 @@ function ActivityPageContent() {
         const [group, id] = fid.split(':');
         _feed = client?.feed(group, id);
         setFeed(_feed);
-        if (!_feed?.currentState.watch && !_feed?.currentState.is_loading) {
+        if (
+          !(_feed?.id === user.id) &&
+          !_feed?.currentState.watch &&
+          !_feed?.currentState.is_loading
+        ) {
           shouldStopWatching = true;
           return _feed
             ?.getOrCreate({
@@ -103,6 +109,7 @@ function ActivityPageContent() {
     logError,
     activityWithStateUpdates,
     client,
+    user?.id,
   ]);
 
   const ownCapabilities = useOwnCapabilities(feed);

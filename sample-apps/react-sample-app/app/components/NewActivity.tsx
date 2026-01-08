@@ -6,7 +6,7 @@ import {
   useOwnCapabilities,
 } from '@stream-io/feeds-react-sdk';
 import { useErrorContext } from '../error-context';
-import type { FormEvent} from 'react';
+import type { FormEvent } from 'react';
 import { useMemo, useState } from 'react';
 import { ActivityComposer } from './activity/ActivityComposer';
 import { LoadingIndicator } from './LoadingIndicator';
@@ -18,6 +18,9 @@ export const NewActivity = () => {
   const [isSending, setIsSending] = useState<boolean>(false);
   const [activityText, setActivityText] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
+  const [restrictReplies, setRestrictReplies] = useState<
+    'everyone' | 'people_i_follow' | 'nobody'
+  >('everyone');
 
   const ownCapabilities = useOwnCapabilities();
   const canPost = useMemo(
@@ -51,6 +54,7 @@ export const NewActivity = () => {
       await feed?.addActivity({
         type: 'post',
         text: activityText,
+        restrict_replies: restrictReplies,
         attachments: fileResponses.map((response, index) => {
           const isImage = isImageFile(files![index]);
           return {
@@ -90,6 +94,25 @@ export const NewActivity = () => {
           }
         }}
       />
+      <div className="w-full flex items-center gap-2">
+        <label htmlFor="restrict-replies" className="text-sm text-gray-700">
+          Who can reply:
+        </label>
+        <select
+          id="restrict-replies"
+          value={restrictReplies}
+          onChange={(e) =>
+            setRestrictReplies(
+              e.target.value as 'everyone' | 'people_i_follow' | 'nobody',
+            )
+          }
+          className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="everyone">Everyone</option>
+          <option value="people_i_follow">People I follow</option>
+          <option value="nobody">Nobody</option>
+        </select>
+      </div>
       <button
         type="submit"
         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"

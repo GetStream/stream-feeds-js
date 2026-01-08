@@ -19,12 +19,14 @@ import { Reactions } from '../reactions/Reactions';
 const levels = ['ml-8', 'ml-16', 'ml-24', 'ml-32', 'ml-40'];
 
 export const Comment = ({
+  canReply,
   comment,
   setParent,
   level,
   feed,
   activityWithStateUpdates,
 }: {
+  canReply: boolean;
   comment: CommentResponse;
   level: number;
   setParent: (c: CommentResponse) => void;
@@ -129,15 +131,17 @@ export const Comment = ({
         </footer>
         <p className="text-gray-500 pl-8">{comment.text}</p>
         <div className="flex items-center mt-4 space-x-4 pl-8">
-          <button
-            type="button"
-            className="flex items-center text-sm text-gray-500 gap-1 font-medium"
-            disabled={level >= 5}
-            onClick={() => setParent(comment)}
-          >
-            <div className="text-sm material-symbols-outlined">comment</div>
-            Reply
-          </button>
+          {canReply && (
+            <button
+              type="button"
+              className="flex items-center text-sm text-gray-500 gap-1 font-medium"
+              disabled={level >= 5}
+              onClick={() => setParent(comment)}
+            >
+              <div className="text-sm material-symbols-outlined">comment</div>
+              Reply
+            </button>
+          )}
           <Reactions
             type="like"
             object={comment}
@@ -168,6 +172,7 @@ export const Comment = ({
         renderItem={(c) => (
           <Comment
             feed={feed}
+            canReply={canReply}
             activityWithStateUpdates={activityWithStateUpdates}
             level={level + 1}
             key={c.id}
