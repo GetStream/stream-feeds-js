@@ -39,7 +39,12 @@ describe('Feeds client tests', () => {
   describe('client.feed', () => {
     it('should initialize feed state with the given data if feed does not exist', async () => {
       const data = generateFeedResponse({ feed: 'timeline:feed' });
-      client['getOrCreateActiveFeed']({ group: 'timeline', id: 'feed', data });
+      client['getOrCreateActiveFeed']({
+        group: 'timeline',
+        id: 'feed',
+        data,
+        fieldsToUpdate: [],
+      });
 
       expect(
         client['activeFeeds']['timeline:feed']?.currentState,
@@ -51,7 +56,12 @@ describe('Feeds client tests', () => {
         feed: 'timeline:feed',
         follower_count: 5,
       });
-      client['getOrCreateActiveFeed']({ group: 'timeline', id: 'feed', data });
+      client['getOrCreateActiveFeed']({
+        group: 'timeline',
+        id: 'feed',
+        data,
+        fieldsToUpdate: [],
+      });
 
       expect(
         client['activeFeeds']['timeline:feed']?.currentState,
@@ -64,6 +74,7 @@ describe('Feeds client tests', () => {
         group: 'timeline',
         id: 'feed',
         data: newData,
+        fieldsToUpdate: [],
       });
 
       expect(
@@ -79,7 +90,12 @@ describe('Feeds client tests', () => {
         feed: 'timeline:feed',
         follower_count: 5,
       });
-      client['getOrCreateActiveFeed']({ group: 'timeline', id: 'feed', data });
+      client['getOrCreateActiveFeed']({
+        group: 'timeline',
+        id: 'feed',
+        data,
+        fieldsToUpdate: [],
+      });
 
       expect(
         client['activeFeeds']['timeline:feed']?.currentState,
@@ -92,6 +108,7 @@ describe('Feeds client tests', () => {
         group: 'timeline',
         id: 'feed',
         data: oldData,
+        fieldsToUpdate: [],
       });
 
       expect(
@@ -102,7 +119,7 @@ describe('Feeds client tests', () => {
       ).toBe(5);
     });
 
-    it(`should not update own_ fields if data is from WebSocket`, async () => {
+    it(`should not update own_ fields if fieldsToUpdate is empty array`, async () => {
       const ownFollows = [
         generateFollowResponse({
           source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
@@ -125,7 +142,17 @@ describe('Feeds client tests', () => {
         own_membership: ownMembership,
         own_capabilities: ownCapabilities,
       });
-      client['getOrCreateActiveFeed']({ group: 'user', id: '123', data });
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data,
+        fieldsToUpdate: [
+          'own_capabilities',
+          'own_follows',
+          'own_membership',
+          'own_followings',
+        ],
+      });
 
       const dataFromWebSocket = { ...data };
       delete dataFromWebSocket.own_follows;
@@ -136,7 +163,7 @@ describe('Feeds client tests', () => {
         group: 'user',
         id: '123',
         data: dataFromWebSocket,
-        fromWebSocket: true,
+        fieldsToUpdate: [],
       });
 
       expect(client['activeFeeds']['user:123']?.currentState).toMatchObject(
@@ -180,7 +207,17 @@ describe('Feeds client tests', () => {
       own_membership: ownMembership,
       own_capabilities: ownCapabilities,
     });
-    client['getOrCreateActiveFeed']({ group: 'user', id: '123', data });
+    client['getOrCreateActiveFeed']({
+      group: 'user',
+      id: '123',
+      data,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
+    });
 
     const spy = vi.fn();
     const feed = client['activeFeeds']['user:123'];
@@ -193,7 +230,12 @@ describe('Feeds client tests', () => {
       group: 'user',
       id: '123',
       data: newData,
-      fromWebSocket: false,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
     });
 
     expect(spy).toHaveBeenCalledTimes(0);
@@ -211,6 +253,12 @@ describe('Feeds client tests', () => {
       group: 'user',
       id: '123',
       data: newData,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
     });
 
     expect(spy).toHaveBeenCalledTimes(1);
@@ -224,6 +272,12 @@ describe('Feeds client tests', () => {
       group: 'user',
       id: '123',
       data: newData,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
     });
 
     expect(spy).toHaveBeenCalledTimes(0);
@@ -235,6 +289,12 @@ describe('Feeds client tests', () => {
       group: 'user',
       id: '123',
       data: newData,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
     });
 
     expect(spy).toHaveBeenCalledTimes(1);
@@ -248,6 +308,12 @@ describe('Feeds client tests', () => {
       group: 'user',
       id: '123',
       data: newData,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
     });
 
     expect(spy).toHaveBeenCalledTimes(0);
@@ -260,6 +326,12 @@ describe('Feeds client tests', () => {
       group: 'user',
       id: '123',
       data: newData,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
     });
 
     expect(spy).toHaveBeenCalledTimes(1);
@@ -273,6 +345,12 @@ describe('Feeds client tests', () => {
       group: 'user',
       id: '123',
       data: newData,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
     });
 
     expect(spy).toHaveBeenCalledTimes(0);
@@ -289,6 +367,12 @@ describe('Feeds client tests', () => {
       group: 'user',
       id: '123',
       data: newData,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
     });
 
     expect(spy).toHaveBeenCalledTimes(1);
@@ -319,5 +403,233 @@ describe('Feeds client tests', () => {
 
     await sleep(throttleTime / 2 + 50); // +50 to ensure the trailing call is scheduled
     expect(client['ownBatch']).toHaveBeenCalledTimes(2);
+  });
+
+  describe('fieldsToUpdate logic', () => {
+    it('should only update fields in fieldsToUpdate array', async () => {
+      const ownFollows = [
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+          target_feed: generateFeedResponse({ feed: 'user:123' }),
+        }),
+      ];
+      const ownCapabilities = [FeedOwnCapability.ADD_ACTIVITY];
+      const data = generateFeedResponse({
+        feed: 'user:123',
+        own_follows: ownFollows,
+        own_capabilities: ownCapabilities,
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data,
+        fieldsToUpdate: ['own_capabilities', 'own_follows'],
+      });
+
+      const spy = vi.fn();
+      const feed = client['activeFeeds']['user:123'];
+      feed.state.subscribe(spy);
+      spy.mockClear();
+
+      const newData = { ...data };
+      newData.own_capabilities = [
+        FeedOwnCapability.ADD_ACTIVITY,
+        FeedOwnCapability.DELETE_OWN_ACTIVITY,
+      ];
+      newData.own_follows = [
+        ...ownFollows,
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+          target_feed: generateFeedResponse({ feed: 'user:456' }),
+        }),
+      ];
+
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data: newData,
+        fieldsToUpdate: ['own_capabilities', 'own_follows'],
+      });
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      const updatedState = spy.mock.lastCall?.[0];
+      expect(updatedState).toHaveProperty('own_capabilities');
+      expect(updatedState).toHaveProperty('own_follows');
+      expect(updatedState).not.toHaveProperty('own_membership');
+      expect(updatedState).not.toHaveProperty('own_followings');
+    });
+
+    it('should not update own_followings when not in fieldsToUpdate array even if changed', async () => {
+      const ownFollowings = [
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'user:123' }),
+          target_feed: generateFeedResponse({ feed: 'user:456' }),
+        }),
+      ];
+      const data = generateFeedResponse({
+        feed: 'user:123',
+        own_followings: ownFollowings,
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data,
+        fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      });
+
+      const spy = vi.fn();
+      const feed = client['activeFeeds']['user:123'];
+      feed.state.subscribe(spy);
+      spy.mockClear();
+
+      const newData = { ...data };
+      newData.own_followings = [
+        ...ownFollowings,
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'user:123' }),
+          target_feed: generateFeedResponse({ feed: 'user:789' }),
+        }),
+      ];
+
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data: newData,
+        fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      });
+
+      expect(spy).toHaveBeenCalledTimes(0);
+      expect(feed.currentState.own_followings).toEqual(ownFollowings);
+    });
+
+    it('should update own_followings when in fieldsToUpdate array and changed', async () => {
+      const ownFollowings = [
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'user:123' }),
+          target_feed: generateFeedResponse({ feed: 'user:456' }),
+        }),
+      ];
+      const data = generateFeedResponse({
+        feed: 'user:123',
+        own_followings: ownFollowings,
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data,
+        fieldsToUpdate: ['own_followings'],
+      });
+
+      const spy = vi.fn();
+      const feed = client['activeFeeds']['user:123'];
+      feed.state.subscribe(spy);
+      spy.mockClear();
+
+      const newOwnFollowings = [
+        ...ownFollowings,
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'user:123' }),
+          target_feed: generateFeedResponse({ feed: 'user:789' }),
+        }),
+      ];
+      const newData = { ...data };
+      newData.own_followings = newOwnFollowings;
+
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data: newData,
+        fieldsToUpdate: ['own_followings'],
+      });
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy.mock.lastCall?.[0]).toMatchObject({
+        own_followings: newOwnFollowings,
+      });
+    });
+
+    it('should not update any fields when fieldsToUpdate is empty array', async () => {
+      const ownFollows = [
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+          target_feed: generateFeedResponse({ feed: 'user:123' }),
+        }),
+      ];
+      const ownCapabilities = [FeedOwnCapability.ADD_ACTIVITY];
+      const data = generateFeedResponse({
+        feed: 'user:123',
+        own_follows: ownFollows,
+        own_capabilities: ownCapabilities,
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data,
+        fieldsToUpdate: ['own_capabilities', 'own_follows'],
+      });
+
+      const spy = vi.fn();
+      const feed = client['activeFeeds']['user:123'];
+      feed.state.subscribe(spy);
+      spy.mockClear();
+
+      const newData = { ...data };
+      newData.own_capabilities = [
+        FeedOwnCapability.ADD_ACTIVITY,
+        FeedOwnCapability.DELETE_OWN_ACTIVITY,
+      ];
+      newData.own_follows = [
+        ...ownFollows,
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+          target_feed: generateFeedResponse({ feed: 'user:456' }),
+        }),
+      ];
+
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data: newData,
+        fieldsToUpdate: [],
+      });
+
+      expect(spy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should only update fields if they actually changed (equality checks still apply)', async () => {
+      const ownFollows = [
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+          target_feed: generateFeedResponse({ feed: 'user:123' }),
+        }),
+      ];
+      const data = generateFeedResponse({
+        feed: 'user:123',
+        own_follows: ownFollows,
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data,
+        fieldsToUpdate: ['own_follows'],
+      });
+
+      const spy = vi.fn();
+      const feed = client['activeFeeds']['user:123'];
+      feed.state.subscribe(spy);
+      spy.mockClear();
+
+      const newData = { ...data };
+      newData.own_follows = [...ownFollows]; // Same content, different array reference
+
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data: newData,
+        fieldsToUpdate: ['own_follows'],
+      });
+
+      expect(spy).toHaveBeenCalledTimes(0);
+    });
   });
 });

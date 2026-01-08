@@ -60,6 +60,7 @@ import { ModerationClient } from '../moderation-client';
 import { StreamPoll } from '../common/Poll';
 import {
   Feed,
+  type FeedState,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
   handleActivityReactionUpdated,
@@ -183,6 +184,7 @@ export class FeedsClient extends FeedsApi {
             group: event.feed.group_id,
             id: event.feed.id,
             data: event.feed,
+            fieldsToUpdate: [],
           });
 
           break;
@@ -647,6 +649,7 @@ export class FeedsClient extends FeedsApi {
       group: groupId,
       id,
       options,
+      fieldsToUpdate: [],
     });
   };
 
@@ -678,6 +681,12 @@ export class FeedsClient extends FeedsApi {
         id: feedResponse.id,
         data: feedResponse,
         watch: request?.watch,
+        fieldsToUpdate: [
+          'own_capabilities',
+          'own_follows',
+          'own_membership',
+          'own_followings',
+        ],
       }),
     );
 
@@ -811,6 +820,12 @@ export class FeedsClient extends FeedsApi {
         group: suggestion.group_id,
         id: suggestion.id,
         data: suggestion,
+        fieldsToUpdate: [
+          'own_capabilities',
+          'own_follows',
+          'own_membership',
+          'own_followings',
+        ],
       });
     });
 
@@ -824,7 +839,7 @@ export class FeedsClient extends FeedsApi {
     data,
     watch,
     options,
-    fromWebSocket = false,
+    fieldsToUpdate,
   }: {
     group: string;
     id: string;
@@ -834,7 +849,9 @@ export class FeedsClient extends FeedsApi {
       addNewActivitiesTo?: 'start' | 'end';
       activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
     };
-    fromWebSocket?: boolean;
+    fieldsToUpdate: Array<
+      'own_capabilities' | 'own_follows' | 'own_followings' | 'own_membership'
+    >;
   }) => {
     const fid = `${group}:${id}`;
     let isCreated = false;
@@ -872,24 +889,35 @@ export class FeedsClient extends FeedsApi {
           handleFeedUpdated.call(feed, { feed: data });
         } else if (
           (feed.currentState.updated_at?.getTime() ?? 0) ===
-            data.updated_at.getTime() &&
-          !fromWebSocket
+          data.updated_at.getTime()
         ) {
-          const fieldsToUpdate: Array<keyof FeedResponse> = [];
-          if (!isOwnFollowsEqual(feed.currentState, data)) {
-            fieldsToUpdate.push('own_follows');
-          }
-          if (!isOwnFollowingsEqual(feed.currentState, data)) {
-            fieldsToUpdate.push('own_followings');
-          }
-          if (!isOwnMembershipEqual(feed.currentState, data)) {
-            fieldsToUpdate.push('own_membership');
-          }
-          if (!isOwnCapabilitiesEqual(feed.currentState, data)) {
-            fieldsToUpdate.push('own_capabilities');
-          }
-          if (fieldsToUpdate.length > 0) {
-            const fieldsToUpdateData = fieldsToUpdate.reduce(
+          const fieldsToUpdateData: Array<keyof FeedResponse> = [];
+          const fieldChecks: Array<
+            [
+              (
+                | 'own_capabilities'
+                | 'own_follows'
+                | 'own_membership'
+                | 'own_followings'
+              ),
+              (currentState: FeedState, newState: FeedResponse) => boolean,
+            ]
+          > = [
+            ['own_capabilities', isOwnCapabilitiesEqual],
+            ['own_follows', isOwnFollowsEqual],
+            ['own_membership', isOwnMembershipEqual],
+            ['own_followings', isOwnFollowingsEqual],
+          ];
+          fieldChecks.forEach(([field, isEqual]) => {
+            if (
+              fieldsToUpdate.includes(field) &&
+              !isEqual(feed.currentState, data)
+            ) {
+              fieldsToUpdateData.push(field);
+            }
+          });
+          if (fieldsToUpdateData.length > 0) {
+            const fieldsToUpdatePayload = fieldsToUpdateData.reduce(
               (acc: Partial<FeedResponse>, field) => {
                 // @ts-expect-error TODO: fix this
                 acc[field] = data[field];
@@ -897,7 +925,7 @@ export class FeedsClient extends FeedsApi {
               },
               {},
             );
-            feed.state.partialNext(fieldsToUpdateData);
+            feed.state.partialNext(fieldsToUpdatePayload);
           }
         }
       }

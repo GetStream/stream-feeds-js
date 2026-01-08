@@ -986,12 +986,25 @@ export class Feed extends FeedApi {
         }
       });
       const newFeeds = Array.from(feedsToGetOrCreate.values());
+      const fieldsToUpdate: Array<
+        'own_capabilities' | 'own_follows' | 'own_followings' | 'own_membership'
+      > = [];
+      if (!options.fromWebSocket) {
+        fieldsToUpdate.push(
+          'own_capabilities',
+          'own_follows',
+          'own_membership',
+        );
+        if (enrichmentOptions?.enrich_own_followings) {
+          fieldsToUpdate.push('own_followings');
+        }
+      }
       newFeeds.forEach((feed) => {
         getOrCreateActiveFeed.bind(this.client)({
           group: feed.group_id,
           id: feed.id,
           data: feed,
-          fromWebSocket: options.fromWebSocket,
+          fieldsToUpdate,
         });
       });
       if (options.fromWebSocket) {
