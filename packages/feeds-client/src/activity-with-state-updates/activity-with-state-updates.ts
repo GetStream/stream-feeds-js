@@ -1,5 +1,5 @@
 import { StateStore } from '@stream-io/state-store';
-import type { Feed, FeedState } from '../feed';
+import { addActivitiesToState, type Feed, type FeedState } from '../feed';
 import type { FeedsClient } from '../feeds-client';
 import type { ActivityResponse } from '../gen/models';
 import {
@@ -164,8 +164,13 @@ export class ActivityWithStateUpdates {
   }) {
     this.feed = connectActivityToFeed.call(this.feedsClient, { fid });
 
+    const { activities } = addActivitiesToState.bind(this.feed)(
+      [initialState],
+      [],
+      'start',
+    );
     this.feed?.state.partialNext({
-      activities: [initialState],
+      activities,
     });
   }
 

@@ -1,13 +1,16 @@
-import type { FormEvent} from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   Feed,
-  ActivityWithStateUpdates} from '@stream-io/feeds-react-sdk';
+  ActivityWithStateUpdates,
+} from '@stream-io/feeds-react-sdk';
 import {
   type ActivityResponse,
   type CommentResponse,
   useActivityComments,
+  useClientConnectedUser,
   useFeedsClient,
+  useOwnFollowings,
 } from '@stream-io/feeds-react-sdk';
 import { PaginatedList } from '../PaginatedList';
 import { Comment } from './Comment';
@@ -24,7 +27,40 @@ export const ActivityCommentSection = ({
   activity: ActivityResponse;
 }) => {
   const client = useFeedsClient();
+  const currentUser = useClientConnectedUser();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const currentFeed = useMemo(() => {
+    if (!activity.current_feed || !client) {
+      return undefined;
+    }
+    return client.feed(
+      activity.current_feed.group_id,
+      activity.current_feed.id,
+    );
+  }, [activity.current_feed, client]);
+
+  const { own_followings: ownFollowings = [] } =
+    useOwnFollowings(currentFeed) ?? {};
+
+  const canComment = useMemo(() => {
+    if (currentUser?.id === activity.user.id) {
+      return true;
+    }
+    switch (activity.restrict_replies) {
+      case 'nobody':
+        return false;
+      case 'people_i_follow':
+        return ownFollowings?.length > 0;
+      default:
+        return true;
+    }
+  }, [
+    activity.restrict_replies,
+    ownFollowings,
+    currentUser?.id,
+    activity.user.id,
+  ]);
 
   const {
     comments = [],
@@ -103,48 +139,52 @@ export const ActivityCommentSection = ({
           </h2>
         </div>
 
-        {parent && (
-          <div className="text-black p-2 flex items-center justify-between bg-gray-100 rounded-lg mb-4">
-            <div className="flex items-center gap-2">
-              <strong>Replying to:</strong>
-              <button
-                className="text-blue-600 hover:underline"
-                onClick={() => scrollToComment(parent)}
-              >
-                {parent.text}
-              </button>
-            </div>
-            <button
-              className="ml-2 text-blue-600 hover:underline"
-              onClick={() => setParent(null)}
-            >
-              Cancel reply
-            </button>
-          </div>
-        )}
+        {canComment && (
+          <>
+            {parent && (
+              <div className="text-black p-2 flex items-center justify-between bg-gray-100 rounded-lg mb-4">
+                <div className="flex items-center gap-2">
+                  <strong>Replying to:</strong>
+                  <button
+                    className="text-blue-600 hover:underline"
+                    onClick={() => scrollToComment(parent)}
+                  >
+                    {parent.text}
+                  </button>
+                </div>
+                <button
+                  className="ml-2 text-blue-600 hover:underline"
+                  onClick={() => setParent(null)}
+                >
+                  Cancel reply
+                </button>
+              </div>
+            )}
 
-        <form className="mb-6" onSubmit={handleSubmit}>
-          <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200">
-            <label htmlFor="comment" className="sr-only">
-              Your comment
-            </label>
-            <textarea
-              ref={textareaRef}
-              id="comment"
-              name="comment-text"
-              rows={6}
-              className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none"
-              placeholder="Write a comment..."
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className=" px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-          >
-            Post comment
-          </button>
-        </form>
+            <form className="mb-6" onSubmit={handleSubmit}>
+              <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200">
+                <label htmlFor="comment" className="sr-only">
+                  Your comment
+                </label>
+                <textarea
+                  ref={textareaRef}
+                  id="comment"
+                  name="comment-text"
+                  rows={6}
+                  className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none"
+                  placeholder="Write a comment..."
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className=" px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+              >
+                Post comment
+              </button>
+            </form>
+          </>
+        )}
 
         <PaginatedList
           items={comments}
@@ -152,6 +192,7 @@ export const ActivityCommentSection = ({
           hasNext={hasNextPage}
           renderItem={(c) => (
             <Comment
+              canReply={canComment}
               feed={feed}
               activityWithStateUpdates={activityWithStateUpdates}
               level={0}

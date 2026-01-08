@@ -156,6 +156,21 @@ describe('Comments page', () => {
     });
   });
 
+  it(`Show/hide comment input`, async () => {
+    // Lists follow relationships where
+    // - target feed is owned by current user
+    // - source feed is owned by activity author
+    const currentFeed = client.feed(
+      activity.current_feed?.group_id!,
+      activity.current_feed?.id!,
+    );
+    console.log(currentFeed.currentState.own_followings);
+
+    await feed.getOrCreate({
+      enrichment_options: { enrich_own_followings: true },
+    });
+  });
+
   it('Deleting comments', async () => {
     await client.deleteComment({
       id: comment.id,

@@ -43,6 +43,9 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       _ownTimeline
         ?.getOrCreate({
           watch: true,
+          enrichment_options: {
+            enrich_own_followings: true,
+          },
           following_pagination: { limit: 30 },
         })
         .catch(throwUnrecoverableError);

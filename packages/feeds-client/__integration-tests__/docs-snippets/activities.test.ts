@@ -68,6 +68,14 @@ describe('Activities page', () => {
     console.log(response.activity?.parent);
   });
 
+  it(`restrict replies`, async () => {
+    await feed.addActivity({
+      type: 'post',
+      text: 'apple stock will go up',
+      restrict_replies: 'people_i_follow', // Options: "everyone", "people_i_follow", "nobody"
+    });
+  });
+
   it('restricted visibility', async () => {
     const response = await feed.addActivity({
       type: 'post',
