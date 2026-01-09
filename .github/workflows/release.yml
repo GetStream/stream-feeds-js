@@ -11,13 +11,17 @@ concurrency:
   group: version-and-release-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  id-token: write # Required for OIDC
+  contents: write # required for committing the version bump
+
 jobs:
   version-and-release:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [24.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +55,5 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
-          npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
           yarn config set npmRegistryServer https://registry.npmjs.org/
-          yarn config set npmAuthToken ${{ secrets.NPM_TOKEN }}
           yarn release
