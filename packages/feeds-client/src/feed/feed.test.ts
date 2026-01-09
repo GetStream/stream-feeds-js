@@ -297,13 +297,13 @@ describe(`newActivitiesAdded`, () => {
       group: feed1.group_id,
       id: feed1.id,
       data: feed1,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
       group: feed2.group_id,
       id: feed2.id,
       data: feed2,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
   });
 
@@ -377,9 +377,9 @@ describe(`newActivitiesAdded`, () => {
       id: currentFeed.id,
       data: currentFeed,
       fieldsToUpdate: [
+        'own_membership',
         'own_capabilities',
         'own_follows',
-        'own_membership',
         'own_followings',
       ],
     });
@@ -408,7 +408,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
   });
 
@@ -433,7 +433,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
   });
 
@@ -452,6 +452,227 @@ describe(`newActivitiesAdded`, () => {
     expect(call.fieldsToUpdate).toContain('own_capabilities');
     expect(call.fieldsToUpdate).toContain('own_follows');
     expect(call.fieldsToUpdate).toContain('own_membership');
+  });
+
+  it('should not include own_capabilities in fieldsToUpdate when skip_own_capabilities is true', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_own_capabilities: true,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_membership', 'own_follows'],
+    });
+  });
+
+  it('should include own_capabilities in fieldsToUpdate when skip_own_capabilities is false', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_own_capabilities: false,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
+    });
+  });
+
+  it('should not include own_follows in fieldsToUpdate when skip_own_follows is true', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_own_follows: true,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_membership', 'own_capabilities'],
+    });
+  });
+
+  it('should include own_follows in fieldsToUpdate when skip_own_follows is false', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_own_follows: false,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
+    });
+  });
+
+  it('should not include own_capabilities or own_follows when both skip options are true', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_own_capabilities: true,
+          skip_own_follows: true,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_membership'],
+    });
+  });
+
+  it('should respect skip_own_capabilities and skip_own_follows when enrich_own_followings is true', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_own_capabilities: true,
+          skip_own_follows: true,
+          enrich_own_followings: true,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_membership', 'own_followings'],
+    });
+  });
+
+  it('should respect skip_own_capabilities when enrich_own_followings is true', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_own_capabilities: true,
+          enrich_own_followings: true,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_membership', 'own_follows', 'own_followings'],
+    });
+  });
+
+  it('should respect skip_own_follows when enrich_own_followings is true', () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: {
+        enrichment_options: {
+          skip_own_follows: true,
+          enrich_own_followings: true,
+        },
+      },
+    });
+
+    const currentFeed = generateFeedResponse({
+      group_id: 'user',
+      id: '123',
+      feed: 'user:123',
+    });
+    feed['newActivitiesAdded'](
+      [generateActivityResponse({ current_feed: currentFeed })],
+      { fromWebSocket: false },
+    );
+
+    expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
+      group: currentFeed.group_id,
+      id: currentFeed.id,
+      data: currentFeed,
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_followings'],
+    });
   });
 
   afterEach(() => {

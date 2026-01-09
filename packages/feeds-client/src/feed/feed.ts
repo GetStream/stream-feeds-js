@@ -990,11 +990,13 @@ export class Feed extends FeedApi {
         'own_capabilities' | 'own_follows' | 'own_followings' | 'own_membership'
       > = [];
       if (!options.fromWebSocket) {
-        fieldsToUpdate.push(
-          'own_capabilities',
-          'own_follows',
-          'own_membership',
-        );
+        fieldsToUpdate.push('own_membership');
+        if (!enrichmentOptions?.skip_own_capabilities) {
+          fieldsToUpdate.push('own_capabilities');
+        }
+        if (!enrichmentOptions?.skip_own_follows) {
+          fieldsToUpdate.push('own_follows');
+        }
         if (enrichmentOptions?.enrich_own_followings) {
           fieldsToUpdate.push('own_followings');
         }
