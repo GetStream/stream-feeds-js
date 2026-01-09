@@ -297,13 +297,13 @@ describe(`newActivitiesAdded`, () => {
       group: feed1.group_id,
       id: feed1.id,
       data: feed1,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
       group: feed2.group_id,
       id: feed2.id,
       data: feed2,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
   });
 
@@ -377,9 +377,9 @@ describe(`newActivitiesAdded`, () => {
       id: currentFeed.id,
       data: currentFeed,
       fieldsToUpdate: [
+        'own_membership',
         'own_capabilities',
         'own_follows',
-        'own_membership',
         'own_followings',
       ],
     });
@@ -408,7 +408,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
   });
 
@@ -433,7 +433,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
   });
 
@@ -477,7 +477,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_follows'],
     });
   });
 
@@ -504,7 +504,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
   });
 
@@ -531,7 +531,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_capabilities', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities'],
     });
   });
 
@@ -558,7 +558,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_capabilities', 'own_follows', 'own_membership'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_follows'],
     });
   });
 
@@ -643,7 +643,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_follows', 'own_membership', 'own_followings'],
+      fieldsToUpdate: ['own_membership', 'own_follows', 'own_followings'],
     });
   });
 
@@ -671,7 +671,7 @@ describe(`newActivitiesAdded`, () => {
       group: currentFeed.group_id,
       id: currentFeed.id,
       data: currentFeed,
-      fieldsToUpdate: ['own_capabilities', 'own_membership', 'own_followings'],
+      fieldsToUpdate: ['own_membership', 'own_capabilities', 'own_followings'],
     });
   });
 
