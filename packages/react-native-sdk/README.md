@@ -16,9 +16,7 @@ Bring users together through personalized feeds, threaded discussions, and real-
 
 Stream allows developers to rapidly deploy scalable feeds, chat messaging and video with an industry leading 99.999% uptime SLA guarantee.
 
-Stream's Activity Feed V3 SDK enables teams of all sizes to build scalable activity feeds. The best place to get started is to follow the tutorial:
-
-TODO
+Stream's Activity Feed V3 SDK enables teams of all sizes to build scalable activity feeds. The best place to get started is to [follow the tutorial](https://getstream.io/activity-feeds/sdk/react-native/).
 
 ## 👩‍💻 Free for Makers 👨‍💻
 
