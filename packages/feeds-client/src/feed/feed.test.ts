@@ -107,6 +107,7 @@ describe(`getOrCreate`, () => {
         feed: generateFeedResponse({}),
       }),
       hydratePollCache: vi.fn(),
+      markFeedAsInitialized: vi.fn(),
     } as unknown as { [key in keyof FeedsClient]: Mock };
     const feedResponse = generateFeedResponse({ id: 'main', group_id: 'user' });
     feed = new Feed(
@@ -677,5 +678,84 @@ describe(`newActivitiesAdded`, () => {
 
   afterEach(() => {
     clearQueuedFeeds();
+  });
+});
+
+describe('Feed initialization tracking', () => {
+  let feed: Feed;
+  let client: FeedsClient;
+
+  beforeEach(() => {
+    client = new FeedsClient('mock-api-key');
+    const feedResponse = generateFeedResponse({
+      id: 'main',
+      group_id: 'user',
+    });
+    feed = new Feed(
+      client,
+      feedResponse.group_id,
+      feedResponse.id,
+      feedResponse,
+    );
+  });
+
+  it('should mark feed as initialized after successful getOrCreate', async () => {
+    vi.spyOn(client, 'getOrCreateFeed').mockResolvedValue({
+      activities: [],
+      aggregated_activities: [],
+      members: [],
+      next: undefined,
+      prev: undefined,
+      feed: generateFeedResponse({ id: 'main', group_id: 'user' }),
+    } as any);
+
+    expect(feed.feed in client['initializedActiveFeeds']).toBe(false);
+
+    await feed.getOrCreate();
+
+    expect(feed.feed in client['initializedActiveFeeds']).toBe(true);
+  });
+
+  it('should not mark feed as initialized when getOrCreate is called with next (pagination)', async () => {
+    vi.spyOn(client, 'getOrCreateFeed').mockResolvedValue({
+      activities: [],
+      aggregated_activities: [],
+      members: [],
+      next: 'next-cursor',
+      prev: undefined,
+      feed: generateFeedResponse({ id: 'main', group_id: 'user' }),
+    } as any);
+
+    feed.state.partialNext({
+      activities: [],
+      next: 'next-cursor',
+    });
+
+    expect(feed.feed in client['initializedActiveFeeds']).toBe(false);
+
+    await feed.getOrCreate({ next: 'next-cursor' });
+
+    expect(feed.feed in client['initializedActiveFeeds']).toBe(false);
+  });
+
+  it('should mark feed as initialized only once even if getOrCreate is called multiple times', async () => {
+    vi.spyOn(client, 'getOrCreateFeed').mockResolvedValue({
+      activities: [],
+      aggregated_activities: [],
+      members: [],
+      next: undefined,
+      prev: undefined,
+      feed: generateFeedResponse({ id: 'main', group_id: 'user' }),
+    } as any);
+
+    expect(feed.feed in client['initializedActiveFeeds']).toBe(false);
+
+    await feed.getOrCreate();
+    expect(feed.feed in client['initializedActiveFeeds']).toBe(true);
+    expect(Object.keys(client['initializedActiveFeeds']).length).toBe(1);
+
+    await feed.getOrCreate();
+    expect(feed.feed in client['initializedActiveFeeds']).toBe(true);
+    expect(Object.keys(client['initializedActiveFeeds']).length).toBe(1);
   });
 });

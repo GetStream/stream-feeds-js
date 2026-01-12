@@ -19,6 +19,9 @@ describe('Feeds client tests', () => {
     const feedA = client.feed('user', 'feedA');
     const feedB = client.feed('user', 'feedB');
     const feedC = client.feed('user', 'feedC');
+    client['markFeedAsInitialized'](feedA);
+    client['markFeedAsInitialized'](feedB);
+    client['markFeedAsInitialized'](feedC);
     const activity1 = generateActivityResponse({ id: 'activity1' });
 
     feedA.state.partialNext({ activities: [activity1] });
@@ -386,13 +389,13 @@ describe('Feeds client tests', () => {
     const throttleTime = 100;
     client['setGetBatchOwnFieldsThrottlingInterval'](throttleTime);
 
-    client['throttledGetBatchOwnFields'](
+    client['throttledGetBatchOwnFields']!(
       [`feed:1`, `feed:2`, `feed:3`],
       () => {},
     );
     expect(client['ownBatch']).toHaveBeenCalledTimes(1);
 
-    client['throttledGetBatchOwnFields'](
+    client['throttledGetBatchOwnFields']!(
       [`feed:4`, `feed:5`, `feed:6`],
       () => {},
     );
@@ -632,6 +635,105 @@ describe('Feeds client tests', () => {
       });
 
       expect(spy).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe('initializedActiveFeeds tracking', () => {
+    it('should only return initialized feeds from findAllActiveFeedsByActivityId', async () => {
+      const feedA = client.feed('user', 'feedA');
+      const feedB = client.feed('user', 'feedB');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
+
+      // Add activity to both feeds
+      feedA.state.partialNext({ activities: [activity1] });
+      feedB.state.partialNext({ activities: [activity1] });
+
+      // Only feedA is initialized
+      vi.spyOn(client, 'getOrCreateFeed').mockResolvedValue({
+        activities: [activity1],
+        aggregated_activities: [],
+        members: [],
+        next: undefined,
+        prev: undefined,
+        feed: generateFeedResponse({ id: 'feedA', group_id: 'user' }),
+      } as any);
+      await feedA.getOrCreate();
+
+      const feeds = client['findAllActiveFeedsByActivityId'](activity1.id);
+      expect(feeds).toHaveLength(1);
+      expect(feeds).toContain(feedA);
+      expect(feeds).not.toContain(feedB);
+    });
+
+    it('should remove feed from initializedActiveFeeds when feed is deleted', async () => {
+      const feed = client.feed('user', 'feed1');
+
+      vi.spyOn(client, 'getOrCreateFeed').mockResolvedValue({
+        activities: [],
+        aggregated_activities: [],
+        members: [],
+        next: undefined,
+        prev: undefined,
+        feed: generateFeedResponse({ id: 'feed1', group_id: 'user' }),
+      } as any);
+      await feed.getOrCreate();
+
+      expect('user:feed1' in client['initializedActiveFeeds']).toBe(true);
+
+      // Simulate feed deletion event - the event handler in constructor will handle it
+      client['eventDispatcher'].dispatch({
+        type: 'feeds.feed.deleted',
+        fid: 'user:feed1',
+      } as any);
+
+      expect('user:feed1' in client['initializedActiveFeeds']).toBe(false);
+    });
+
+    it('should clear initializedActiveFeeds on disconnectUser', async () => {
+      const feed1 = client.feed('user', 'feed1');
+      const feed2 = client.feed('user', 'feed2');
+
+      vi.spyOn(client, 'getOrCreateFeed').mockResolvedValue({
+        activities: [],
+        aggregated_activities: [],
+        members: [],
+        next: undefined,
+        prev: undefined,
+        feed: generateFeedResponse({ id: 'feed1', group_id: 'user' }),
+      } as any);
+      await feed1.getOrCreate();
+
+      vi.spyOn(client, 'getOrCreateFeed').mockResolvedValue({
+        activities: [],
+        aggregated_activities: [],
+        members: [],
+        next: undefined,
+        prev: undefined,
+        feed: generateFeedResponse({ id: 'feed2', group_id: 'user' }),
+      } as any);
+      await feed2.getOrCreate();
+
+      expect(Object.keys(client['initializedActiveFeeds']).length).toBe(2);
+      expect('user:feed1' in client['initializedActiveFeeds']).toBe(true);
+      expect('user:feed2' in client['initializedActiveFeeds']).toBe(true);
+
+      await client.disconnectUser();
+
+      expect(Object.keys(client['initializedActiveFeeds']).length).toBe(0);
+    });
+
+    it('should not include uninitialized feeds in findAllActiveFeedsByActivityId', () => {
+      const feedA = client.feed('user', 'feedA');
+      const feedB = client.feed('user', 'feedB');
+      const activity1 = generateActivityResponse({ id: 'activity1' });
+
+      // Add activity to both feeds
+      feedA.state.partialNext({ activities: [activity1] });
+      feedB.state.partialNext({ activities: [activity1] });
+
+      // Neither feed is initialized
+      const feeds = client['findAllActiveFeedsByActivityId'](activity1.id);
+      expect(feeds).toHaveLength(0);
     });
   });
 });

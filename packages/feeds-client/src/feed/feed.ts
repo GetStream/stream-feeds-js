@@ -69,6 +69,7 @@ import {
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
 import { deepEqual } from '../utils/deep-equal';
 import { getOrCreateActiveFeed } from '../feeds-client/get-or-create-active-feed';
+import { markFeedAsInitialized } from '../feeds-client/mark-feed-as-initialized';
 import { queueBatchedOwnFields } from '../utils/throttling';
 
 export type FeedState = Omit<
@@ -409,6 +410,10 @@ export class Feed extends FeedApi {
 
           return nextState;
         });
+      }
+
+      if (!request?.next) {
+        markFeedAsInitialized.bind(this.client)(this);
       }
 
       this.newActivitiesAdded(response.activities);

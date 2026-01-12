@@ -23,6 +23,11 @@ export function queueBatchedOwnFields(
   this: FeedsClient,
   { feeds }: GetBatchedOwnFields,
 ) {
+  if (!this.throttledGetBatchOwnFields) {
+    throw new Error(
+      'throttledGetBatchOwnFields is not set, call connectUser first',
+    );
+  }
   for (const feed of feeds) {
     queuedFeeds.add(feed);
   }

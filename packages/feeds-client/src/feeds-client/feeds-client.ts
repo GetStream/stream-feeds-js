@@ -126,11 +126,12 @@ export class FeedsClient extends FeedsApi {
 
   protected activeActivities: Record<ActivityId, ActivityWithStateUpdates> = {};
   protected activeFeeds: Record<FID, Feed> = {};
+  protected initializedActiveFeeds: Record<FID, Feed> = {};
 
   private healthyConnectionChangedEventCount = 0;
 
-  protected throttledGetBatchOwnFields!: ThrottledGetBatchedOwnFields;
-  private cancelGetBatchOwnFieldsTimer!: () => void;
+  protected throttledGetBatchOwnFields?: ThrottledGetBatchedOwnFields;
+  private cancelGetBatchOwnFieldsTimer?: () => void;
   private query_batch_own_fields_throttling_interval!: number;
 
   constructor(apiKey: string, options?: FeedsClientOptions) {
@@ -193,6 +194,7 @@ export class FeedsClient extends FeedsApi {
           feeds.forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
           if (typeof fid === 'string') {
             delete this.activeFeeds[fid];
+            delete this.initializedActiveFeeds[fid];
             Object.keys(this.activeActivities).forEach((activityId) => {
               const activity = this.activeActivities[activityId];
               if (getFeed.call(activity)?.feed === fid) {
@@ -349,6 +351,15 @@ export class FeedsClient extends FeedsApi {
     ] as Feed[];
   }
 
+  private get allInitializedActiveFeeds() {
+    return [
+      ...Object.values(this.initializedActiveFeeds),
+      ...Object.values(this.activeActivities)
+        .filter((a) => !!getFeed.call(a))
+        .map((a) => getFeed.call(a)!),
+    ] as Feed[];
+  }
+
   public pollFromState = (id: string) => this.polls_by_id.get(id);
 
   public hydratePollCache(activities: ActivityResponse[]) {
@@ -446,7 +457,9 @@ export class FeedsClient extends FeedsApi {
     },
   ): Promise<StreamResponse<UpdateActivityResponse>> => {
     const response = await super.updateActivity(request);
-    for (const feed of this.allActiveFeeds) {
+    for (const feed of this.findAllActiveFeedsByActivityId(
+      response.activity.id,
+    )) {
       handleActivityUpdated.bind(feed)(response, false);
     }
     return response;
@@ -457,7 +470,9 @@ export class FeedsClient extends FeedsApi {
   ): Promise<StreamResponse<AddCommentResponse>> => {
     const response = await super.addComment(request);
     const { comment } = response;
-    for (const feed of this.allActiveFeeds) {
+    for (const feed of this.findAllActiveFeedsByActivityId(
+      response.comment.object_id,
+    )) {
       handleCommentAdded.bind(feed)(response, false);
       const parentActivityId = comment.object_id;
       if (feed.hasActivity(parentActivityId)) {
@@ -483,7 +498,9 @@ export class FeedsClient extends FeedsApi {
     request: UpdateCommentRequest & { id: string },
   ): Promise<StreamResponse<UpdateCommentResponse>> => {
     const response = await super.updateComment(request);
-    for (const feed of this.allActiveFeeds) {
+    for (const feed of this.findAllActiveFeedsByActivityId(
+      response.comment.object_id,
+    )) {
       handleCommentUpdated.bind(feed)(response, false);
     }
     return response;
@@ -495,7 +512,7 @@ export class FeedsClient extends FeedsApi {
   }): Promise<StreamResponse<DeleteCommentResponse>> => {
     const response = await super.deleteComment(request);
     const { activity, comment } = response;
-    for (const feed of this.allActiveFeeds) {
+    for (const feed of this.findAllActiveFeedsByActivityId(activity.id)) {
       handleCommentDeleted.bind(feed)({ comment }, false);
       updateCommentCount.bind(feed)({
         activity,
@@ -513,7 +530,9 @@ export class FeedsClient extends FeedsApi {
   ) => {
     const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addActivityReaction(request);
-    for (const feed of this.allActiveFeeds) {
+    for (const feed of this.findAllActiveFeedsByActivityId(
+      response.reaction.activity_id,
+    )) {
       if (shouldEnforceUnique) {
         handleActivityReactionUpdated.bind(feed)(response, false);
       } else {
@@ -539,7 +558,9 @@ export class FeedsClient extends FeedsApi {
     type: string;
   }): Promise<StreamResponse<DeleteActivityReactionResponse>> => {
     const response = await super.deleteActivityReaction(request);
-    for (const feed of this.allActiveFeeds) {
+    for (const feed of this.findAllActiveFeedsByActivityId(
+      response.activity.id,
+    )) {
       handleActivityReactionDeleted.bind(feed)(response, false);
     }
     return response;
@@ -550,7 +571,9 @@ export class FeedsClient extends FeedsApi {
   ): Promise<StreamResponse<AddCommentReactionResponse>> => {
     const shouldEnforceUnique = request.enforce_unique;
     const response = await super.addCommentReaction(request);
-    for (const feed of this.allActiveFeeds) {
+    for (const feed of this.findAllActiveFeedsByActivityId(
+      response.comment.object_id,
+    )) {
       if (shouldEnforceUnique) {
         handleCommentReactionUpdated.bind(feed)(response, false);
       } else {
@@ -565,7 +588,9 @@ export class FeedsClient extends FeedsApi {
     type: string;
   }): Promise<StreamResponse<DeleteCommentReactionResponse>> => {
     const response = await super.deleteCommentReaction(request);
-    for (const feed of this.allActiveFeeds) {
+    for (const feed of this.findAllActiveFeedsByActivityId(
+      response.comment.object_id,
+    )) {
       handleCommentReactionDeleted.bind(feed)(response, false);
     }
     return response;
@@ -615,13 +640,14 @@ export class FeedsClient extends FeedsApi {
 
     this.activeActivities = {};
     this.activeFeeds = {};
+    this.initializedActiveFeeds = {};
 
     this.state.partialNext({
       connected_user: undefined,
       is_ws_connection_healthy: false,
     });
 
-    this.cancelGetBatchOwnFieldsTimer();
+    this.cancelGetBatchOwnFieldsTimer?.();
     clearQueuedFeeds();
   };
 
@@ -935,13 +961,12 @@ export class FeedsClient extends FeedsApi {
     return feed;
   };
 
+  protected markFeedAsInitialized = (feed: Feed) => {
+    this.initializedActiveFeeds[feed.feed] = feed;
+  };
+
   private findAllActiveFeedsByActivityId(activityId: string) {
-    return [
-      ...Object.values(this.activeFeeds),
-      ...Object.values(this.activeActivities)
-        .filter((a) => !!getFeed.call(a))
-        .map((a) => getFeed.call(a)!),
-    ].filter(
+    return this.allInitializedActiveFeeds.filter(
       (feed) =>
         feed.hasActivity(activityId) || feed.hasPinnedActivity(activityId),
     );
