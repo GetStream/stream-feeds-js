@@ -35,10 +35,10 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer h-full max-h-full lg:drawer-open">
       <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex flex-col items-center justify-center">
-        <nav className="lg:hidden navbar w-full bg-base-100">
+      <div className="drawer-content max-h-full min-h-0 h-full max-h-full flex flex-col gap-1 items-center justify-center">
+        <nav className="hidden md:flex lg:hidden navbar w-full bg-base-100">
           <div className="flex-none lg:hidden">
             <label
               htmlFor="my-drawer"
@@ -61,11 +61,11 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
             </label>
           </div>
         </nav>
-        <div className="h-full w-full p-10 flex flex-row gap-10 items-start justify-center">
-          <div className="h-full w-[70%] flex flex-col items-center justify-start">
-            <div className="w-full">{children}</div>
+        <div className="h-full max-h-full overflow-y-auto w-full p-10 flex flex-row gap-10 items-start justify-center">
+          <div className="h-full max-h-full lg:w-[70%] w-full flex flex-col items-center justify-start">
+            <div className="w-full max-h-full">{children}</div>
           </div>
-          <div className="w-[30%] flex flex-col items-stretch justify-start gap-4">
+          <div className="lg:flex hidden w-[30%] flex-col items-stretch justify-start gap-4">
             <div className="join w-full">
               <div className="w-full">
                 <label className="input join-item w-full">
@@ -92,6 +92,42 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
             <FollowSuggestions />
           </div>
         </div>
+        <div className="dock md:hidden w-full">
+          <button>
+            <HomeLink
+              href={`/home?user_id=${currentUser.id}`}
+              isActive={isActive('/home')}
+            />
+          </button>
+
+          <button>
+            <ExploreLink
+              href={`/explore?user_id=${currentUser.id}`}
+              isActive={isActive('/explore')}
+            />
+          </button>
+
+          <button className="dock-active">
+            <AddLink
+              href={`/add?user_id=${currentUser.id}`}
+              isActive={isActive('/add')}
+            />
+          </button>
+
+          <button>
+            <NotificationsLink
+              href={`/notifications?user_id=${currentUser.id}`}
+              isActive={isActive('/notifications')}
+            />
+          </button>
+
+          <button>
+            <ProfileLink
+              href={`/profile?user_id=${currentUser.id}`}
+              isActive={isActive('/profile')}
+            />
+          </button>
+        </div>
       </div>
       <div className="drawer-side">
         <label
@@ -101,56 +137,119 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
         ></label>
         <ul className="menu bg-base-200 min-h-full w-60 p-4">
           <li>
-            <Link
+            <HomeLink
               href={`/home?user_id=${currentUser.id}`}
-              className={`flex flex-row items-center gap-2 ${
-                isActive('/home') ? 'active' : ''
-              }`}
-            >
-              <div>🏠</div>
-              <div>Home</div>
-            </Link>
+              isActive={isActive('/home')}
+            />
           </li>
           <li>
-            <Link
+            <ExploreLink
               href={`/explore?user_id=${currentUser.id}`}
-              className={`flex flex-row items-center gap-2 ${
-                isActive('/explore') ? 'active' : ''
-              }`}
-            >
-              <div>🆕</div>
-              <div>Explore</div>
-            </Link>
+              isActive={isActive('/explore')}
+            />
           </li>
           <li>
-            <Link
+            <NotificationsLink
               href={`/notifications?user_id=${currentUser.id}`}
-              className={`flex flex-row items-center gap-2 ${
-                isActive('/notifications') ? 'active' : ''
-              }`}
-            >
-              <div>🔔</div>
-              <div>Notifications</div>
-              {unreadCount > 0 && (
-                <div className="badge badge-primary badge-xs">
-                  {unreadCount}
-                </div>
-              )}
-            </Link>
+              isActive={isActive('/notifications')}
+            />
           </li>
           <li>
-            <Link
+            <ProfileLink
               href={`/profile?user_id=${currentUser.id}`}
-              className={`flex flex-row items-center gap-2 ${
-                isActive('/profile') ? 'active' : ''
-              }`}
-            >
-              <div>👤</div>
-              <div>Profile</div>
-            </Link>
+              isActive={isActive('/profile')}
+            />
           </li>
         </ul>
       </div>
     </div>
+  );
+};
+
+const HomeLink = ({ href, isActive }: { href: string; isActive: boolean }) => {
+  return (
+    <Link
+      href={href}
+      className={`flex flex-row items-center gap-2 ${
+        isActive ? 'text-primary' : ''
+      }`}
+    >
+      <span className="material-symbols-outlined">home</span>
+      <div className="hidden md:block">Home</div>
+    </Link>
+  );
+};
+
+const ExploreLink = ({
+  href,
+  isActive,
+}: {
+  href: string;
+  isActive: boolean;
+}) => {
+  return (
+    <Link
+      href={href}
+      className={`flex flex-row items-center gap-2 ${
+        isActive ? 'text-primary' : ''
+      }`}
+    >
+      <span className="material-symbols-outlined">search</span>
+      <div className="hidden md:block">Explore</div>
+    </Link>
+  );
+};
+
+const NotificationsLink = ({
+  href,
+  isActive,
+}: {
+  href: string;
+  isActive: boolean;
+}) => {
+  return (
+    <Link
+      href={href}
+      className={`flex flex-row items-center gap-2 ${
+        isActive ? 'text-primary' : ''
+      }`}
+    >
+      <span className="material-symbols-outlined">notifications</span>
+      <div className="hidden md:block">Notifications</div>
+    </Link>
+  );
+};
+
+const ProfileLink = ({
+  href,
+  isActive,
+}: {
+  href: string;
+  isActive: boolean;
+}) => {
+  return (
+    <Link
+      href={href}
+      className={`flex flex-row items-center gap-2 ${
+        isActive ? 'text-primary' : ''
+      }`}
+    >
+      <span className="material-symbols-outlined">account_circle</span>
+      <div className="hidden md:block">Profile</div>
+    </Link>
+  );
+};
+
+const AddLink = ({ href, isActive }: { href: string; isActive: boolean }) => {
+  return (
+    <Link
+      href={href}
+      className={`flex flex-row items-center gap-2 ${
+        isActive ? 'text-primary' : ''
+      }`}
+    >
+      <span className="material-symbols-outlined">add</span>
+      <div className="hidden md:block">Add</div>
+    </Link>
   );
 };

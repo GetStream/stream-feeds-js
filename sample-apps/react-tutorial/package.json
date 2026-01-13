@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@stream-io/feeds-react-sdk": "workspace:*",
+    "material-symbols": "^0.40.2",
     "next": "15.0.5",
     "react": "catalog:",
     "react-dom": "catalog:",

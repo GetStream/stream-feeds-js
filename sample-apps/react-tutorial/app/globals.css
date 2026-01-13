@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @plugin "daisyui";
+@import 'material-symbols';
 
 @plugin "daisyui/theme" {
   name: 'corporate';
@@ -69,4 +70,8 @@
   --border: 0.5px;
   --depth: 0;
   --noise: 0;
+}
+
+.dock {
+  position: static;
 }

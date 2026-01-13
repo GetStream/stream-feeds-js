@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="max-h-full h-full">
+      <body className="max-h-full h-full">
         <ErrorBoundary
           fallback={<div>Something went wrong. Try reloading the page.</div>}
         >
