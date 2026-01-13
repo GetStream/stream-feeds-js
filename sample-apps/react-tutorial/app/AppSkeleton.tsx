@@ -11,7 +11,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export const AppSkeleton = ({ children }: PropsWithChildren) => {
-  const pathname = usePathname();
   const router = useRouter();
   const currentUser = useClientConnectedUser();
   const { ownNotifications } = useOwnFeedsContext();
@@ -31,8 +30,6 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
   if (!currentUser || !ownNotifications) {
     return 'Connecting...';
   }
-
-  const isActive = (path: string) => pathname === path;
 
   return (
     <div className="drawer h-full max-h-full lg:drawer-open">
@@ -92,164 +89,110 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
             <FollowSuggestions />
           </div>
         </div>
-        <div className="dock md:hidden w-full">
-          <button>
-            <HomeLink
-              href={`/home?user_id=${currentUser.id}`}
-              isActive={isActive('/home')}
-            />
-          </button>
-
-          <button>
-            <ExploreLink
-              href={`/explore?user_id=${currentUser.id}`}
-              isActive={isActive('/explore')}
-            />
-          </button>
-
-          <button className="dock-active">
-            <AddLink
-              href={`/add?user_id=${currentUser.id}`}
-              isActive={isActive('/add')}
-            />
-          </button>
-
-          <button>
-            <NotificationsLink
-              href={`/notifications?user_id=${currentUser.id}`}
-              isActive={isActive('/notifications')}
-            />
-          </button>
-
-          <button>
-            <ProfileLink
-              href={`/profile?user_id=${currentUser.id}`}
-              isActive={isActive('/profile')}
-            />
-          </button>
-        </div>
+        <Dock></Dock>
       </div>
-      <div className="drawer-side">
-        <label
-          htmlFor="my-drawer"
-          aria-label="close sidebar"
-          className="drawer-overlay"
-        ></label>
-        <ul className="menu bg-base-200 min-h-full w-60 p-4">
-          <li>
-            <HomeLink
-              href={`/home?user_id=${currentUser.id}`}
-              isActive={isActive('/home')}
-            />
-          </li>
-          <li>
-            <ExploreLink
-              href={`/explore?user_id=${currentUser.id}`}
-              isActive={isActive('/explore')}
-            />
-          </li>
-          <li>
-            <NotificationsLink
-              href={`/notifications?user_id=${currentUser.id}`}
-              isActive={isActive('/notifications')}
-            />
-          </li>
-          <li>
-            <ProfileLink
-              href={`/profile?user_id=${currentUser.id}`}
-              isActive={isActive('/profile')}
-            />
-          </li>
-        </ul>
-      </div>
+      <DrawerSide />
     </div>
   );
 };
 
-const HomeLink = ({ href, isActive }: { href: string; isActive: boolean }) => {
+const DrawerSide = () => {
   return (
-    <Link
-      href={href}
-      className={`flex flex-row items-center gap-2 ${
-        isActive ? 'text-primary' : ''
-      }`}
-    >
-      <span className="material-symbols-outlined">home</span>
-      <div className="hidden md:block">Home</div>
-    </Link>
+    <div className="drawer-side">
+      <label
+        htmlFor="my-drawer"
+        aria-label="close sidebar"
+        className="drawer-overlay"
+      ></label>
+      <ul className="menu bg-base-200 min-h-full w-60 p-4">
+        <li>
+          <HomeLink />
+        </li>
+        <li>
+          <ExploreLink />
+        </li>
+        <li>
+          <NotificationsLink />
+        </li>
+        <li>
+          <ProfileLink />
+        </li>
+      </ul>
+    </div>
   );
 };
 
-const ExploreLink = ({
+const Dock = () => {
+  return (
+    <div className="dock md:hidden w-full">
+      <button>
+        <HomeLink />
+      </button>
+
+      <button>
+        <ExploreLink />
+      </button>
+
+      <button>
+        <AddLink />
+      </button>
+
+      <button>
+        <NotificationsLink />
+      </button>
+
+      <button>
+        <ProfileLink />
+      </button>
+    </div>
+  );
+};
+
+const HomeLink = () => {
+  return <NavLink href="/home" icon="home" label="Home" />;
+};
+
+const ExploreLink = () => {
+  return <NavLink href="/explore" icon="search" label="Explore" />;
+};
+
+const NotificationsLink = () => {
+  return (
+    <NavLink href="/notifications" icon="notifications" label="Notifications" />
+  );
+};
+
+const ProfileLink = () => {
+  return <NavLink href="/profile" icon="account_circle" label="Profile" />;
+};
+
+const AddLink = () => {
+  return <NavLink href="/add" icon="add" label="Add" />;
+};
+
+const NavLink = ({
   href,
-  isActive,
+  icon,
+  label,
 }: {
   href: string;
-  isActive: boolean;
+  icon: string;
+  label: string;
 }) => {
-  return (
-    <Link
-      href={href}
-      className={`flex flex-row items-center gap-2 ${
-        isActive ? 'text-primary' : ''
-      }`}
-    >
-      <span className="material-symbols-outlined">search</span>
-      <div className="hidden md:block">Explore</div>
-    </Link>
-  );
-};
+  const currentUser = useClientConnectedUser();
+  const pathname = usePathname();
 
-const NotificationsLink = ({
-  href,
-  isActive,
-}: {
-  href: string;
-  isActive: boolean;
-}) => {
-  return (
-    <Link
-      href={href}
-      className={`flex flex-row items-center gap-2 ${
-        isActive ? 'text-primary' : ''
-      }`}
-    >
-      <span className="material-symbols-outlined">notifications</span>
-      <div className="hidden md:block">Notifications</div>
-    </Link>
-  );
-};
+  const isActive = pathname === href;
 
-const ProfileLink = ({
-  href,
-  isActive,
-}: {
-  href: string;
-  isActive: boolean;
-}) => {
   return (
     <Link
-      href={href}
+      href={`${href}?user_id=${currentUser?.id}`}
       className={`flex flex-row items-center gap-2 ${
         isActive ? 'text-primary' : ''
       }`}
     >
-      <span className="material-symbols-outlined">account_circle</span>
-      <div className="hidden md:block">Profile</div>
-    </Link>
-  );
-};
-
-const AddLink = ({ href, isActive }: { href: string; isActive: boolean }) => {
-  return (
-    <Link
-      href={href}
-      className={`flex flex-row items-center gap-2 ${
-        isActive ? 'text-primary' : ''
-      }`}
-    >
-      <span className="material-symbols-outlined">add</span>
-      <div className="hidden md:block">Add</div>
+      <span className="material-symbols-outlined">{icon}</span>
+      <div className="hidden md:block">{label}</div>
     </Link>
   );
 };
