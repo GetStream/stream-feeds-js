@@ -1,35 +1,38 @@
+'use client';
+
 import {
   useClientConnectedUser,
   useNotificationStatus,
 } from '@stream-io/feeds-react-sdk';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, type PropsWithChildren } from 'react';
 import { FollowSuggestions } from './components/FollowSuggestions';
 import { useOwnFeedsContext } from './own-feeds-context';
-import { Explore } from './pages/Explore';
-import { Profile } from './pages/Profile';
-import { Notifications } from './pages/Notifications';
-import { Home } from './pages/Home';
-import { SearchResults } from './pages/SearchResults';
+import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-export const AppSkeleton = () => {
-  const [activeTab, setActiveTab] = useState<
-    'home' | 'notifications' | 'profile' | 'explore' | 'search'
-  >('home');
+export const AppSkeleton = ({ children }: PropsWithChildren) => {
+  const pathname = usePathname();
+  const router = useRouter();
   const currentUser = useClientConnectedUser();
   const { ownNotifications } = useOwnFeedsContext();
   const notificationStatus = useNotificationStatus(ownNotifications);
   const unreadCount = notificationStatus?.unread ?? 0;
-  const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const searchClicked = useCallback(() => {
-    setSearchQuery(searchInputRef.current?.value ?? '');
-    setActiveTab('search');
-  }, []);
+    const query = searchInputRef.current?.value ?? '';
+    if (query) {
+      router.push(
+        `/search?q=${encodeURIComponent(query)}&user_id=${currentUser?.id}`,
+      );
+    }
+  }, [router, currentUser?.id]);
 
   if (!currentUser || !ownNotifications) {
     return 'Connecting...';
   }
+
+  const isActive = (path: string) => pathname === path;
 
   return (
     <div className="drawer lg:drawer-open">
@@ -60,15 +63,7 @@ export const AppSkeleton = () => {
         </nav>
         <div className="h-full w-full p-10 flex flex-row gap-10 items-start justify-center">
           <div className="h-full w-[70%] flex flex-col items-center justify-start">
-            <div className="w-full">
-              {activeTab === 'home' && <Home />}
-              {activeTab === 'explore' && <Explore />}
-              {activeTab === 'notifications' && <Notifications />}
-              {activeTab === 'profile' && <Profile />}
-              {activeTab === 'search' && (
-                <SearchResults searchQuery={searchQuery} />
-              )}
-            </div>
+            <div className="w-full">{children}</div>
           </div>
           <div className="w-[30%] flex flex-col items-stretch justify-start gap-4">
             <div className="join w-full">
@@ -78,6 +73,11 @@ export const AppSkeleton = () => {
                     className="w-full"
                     ref={searchInputRef}
                     placeholder="🔍 Search..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        searchClicked();
+                      }
+                    }}
                   />{' '}
                 </label>
               </div>
@@ -100,20 +100,35 @@ export const AppSkeleton = () => {
           className="drawer-overlay"
         ></label>
         <ul className="menu bg-base-200 min-h-full w-60 p-4">
-          <li onClick={() => setActiveTab('home')}>
-            <a className="flex flex-row items-center gap-2">
+          <li>
+            <Link
+              href={`/home?user_id=${currentUser.id}`}
+              className={`flex flex-row items-center gap-2 ${
+                isActive('/home') ? 'active' : ''
+              }`}
+            >
               <div>🏠</div>
               <div>Home</div>
-            </a>
+            </Link>
           </li>
-          <li onClick={() => setActiveTab('explore')}>
-            <a className="flex flex-row items-center gap-2">
+          <li>
+            <Link
+              href={`/explore?user_id=${currentUser.id}`}
+              className={`flex flex-row items-center gap-2 ${
+                isActive('/explore') ? 'active' : ''
+              }`}
+            >
               <div>🆕</div>
               <div>Explore</div>
-            </a>
+            </Link>
           </li>
-          <li onClick={() => setActiveTab('notifications')}>
-            <a className="flex flex-row items-center gap-2">
+          <li>
+            <Link
+              href={`/notifications?user_id=${currentUser.id}`}
+              className={`flex flex-row items-center gap-2 ${
+                isActive('/notifications') ? 'active' : ''
+              }`}
+            >
               <div>🔔</div>
               <div>Notifications</div>
               {unreadCount > 0 && (
@@ -121,13 +136,18 @@ export const AppSkeleton = () => {
                   {unreadCount}
                 </div>
               )}
-            </a>
+            </Link>
           </li>
-          <li onClick={() => setActiveTab('profile')}>
-            <a className="flex flex-row items-center gap-2">
+          <li>
+            <Link
+              href={`/profile?user_id=${currentUser.id}`}
+              className={`flex flex-row items-center gap-2 ${
+                isActive('/profile') ? 'active' : ''
+              }`}
+            >
               <div>👤</div>
               <div>Profile</div>
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

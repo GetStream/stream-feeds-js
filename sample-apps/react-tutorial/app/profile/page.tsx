@@ -1,3 +1,5 @@
+'use client';
+
 import type { BookmarkResponse, FeedState } from '@stream-io/feeds-react-sdk';
 import {
   useClientConnectedUser,
@@ -18,7 +20,7 @@ const followingCountSelector = (state: FeedState) => ({
   followingCount: (state.following_count ?? 0) - 1,
 });
 
-export const Profile = () => {
+export default function Profile() {
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
   const { ownFeed, ownTimeline } = useOwnFeedsContext();
@@ -106,4 +108,4 @@ export const Profile = () => {
       )}
     </div>
   );
-};
+}

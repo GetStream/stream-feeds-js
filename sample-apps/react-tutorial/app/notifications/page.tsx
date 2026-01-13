@@ -1,8 +1,10 @@
+'use client';
+
 import { StreamFeed } from '@stream-io/feeds-react-sdk';
 import { useOwnFeedsContext } from '../own-feeds-context';
 import { NotificationList } from '../components/notifications/NotificationList';
 
-export const Notifications = () => {
+export default function Notifications() {
   const { ownNotifications } = useOwnFeedsContext();
 
   if (!ownNotifications) {
@@ -14,4 +16,4 @@ export const Notifications = () => {
       <NotificationList />
     </StreamFeed>
   );
-};
+}

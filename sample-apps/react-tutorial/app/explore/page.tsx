@@ -1,3 +1,5 @@
+'use client';
+
 import {
   useFeedsClient,
   useClientConnectedUser,
@@ -6,7 +8,7 @@ import {
 import { useEffect, useMemo } from 'react';
 import { ActivityList } from '../components/activity/ActivityList';
 
-export const Explore = () => {
+export default function Explore() {
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
   const feed = useMemo(() => {
@@ -31,4 +33,4 @@ export const Explore = () => {
       <ActivityList />
     </StreamFeed>
   );
-};
+}

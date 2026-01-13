@@ -1,3 +1,5 @@
+'use client';
+
 import { StreamFeed } from '@stream-io/feeds-react-sdk';
 import { useOwnFeedsContext } from '../own-feeds-context';
 import { ActivityComposer } from '../components/activity/ActivityComposer';
@@ -5,7 +7,7 @@ import { ActivityList } from '../components/activity/ActivityList';
 import { OwnStories } from '../components/stories/OwnStories';
 import { StoryTimeline } from '../components/stories/StoryTimeline';
 
-export const Home = () => {
+export default function Home() {
   const { ownTimeline, ownFeed, ownStoryTimeline, ownStoryFeed } =
     useOwnFeedsContext();
 
@@ -34,4 +36,4 @@ export const Home = () => {
       </StreamFeed>
     </div>
   );
-};
+}

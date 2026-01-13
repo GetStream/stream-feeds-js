@@ -1,14 +1,14 @@
-import type {
-  ActivityResponse,
-  Feed} from '@stream-io/feeds-react-sdk';
-import {
-  useFeedsClient
-} from '@stream-io/feeds-react-sdk';
+'use client';
+
+import type { ActivityResponse, Feed } from '@stream-io/feeds-react-sdk';
+import { useFeedsClient } from '@stream-io/feeds-react-sdk';
 import { useState, useCallback, useEffect } from 'react';
 import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
 import { FeedSearchResult } from '../components/FeedSearchResult';
+import { useSearchParams } from 'next/navigation';
 
-export const SearchResults = ({ searchQuery }: { searchQuery: string }) => {
+export default function SearchResults() {
+  const searchQuery = useSearchParams().get('q');
   const client = useFeedsClient();
   const [activitySearchResults, setActivitySearchResults] = useState<
     ActivityResponse[]
@@ -116,7 +116,7 @@ export const SearchResults = ({ searchQuery }: { searchQuery: string }) => {
       </div>
     </div>
   );
-};
+}
 
 const NoResults = () => {
   return (
