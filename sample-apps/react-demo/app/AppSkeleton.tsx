@@ -41,20 +41,7 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
               htmlFor="my-drawer"
               className="drawer-button btn btn-square btn-ghost"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="inline-block h-5 w-5 stroke-current"
-              >
-                {' '}
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                ></path>{' '}
-              </svg>
+              <span className="material-symbols-outlined">menu</span>
             </label>
           </div>
         </nav>
