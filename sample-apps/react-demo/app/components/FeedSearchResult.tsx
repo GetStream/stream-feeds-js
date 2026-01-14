@@ -13,7 +13,7 @@ export const FeedSearchResult = ({
           <span>{feed.created_by?.name?.[0]}</span>
         </div>
       </div>
-      <div className="font-semibold flex-grow w-full overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="md:font-semibold flex-grow w-full overflow-hidden text-ellipsis whitespace-nowrap">
         {feed.created_by?.name}
       </div>
       <ToggleFollowButton userId={feed.created_by?.id ?? ''} />

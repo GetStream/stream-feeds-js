@@ -6,6 +6,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
 import { FeedSearchResult } from '../components/FeedSearchResult';
 import { useSearchParams } from 'next/navigation';
+import { NavLink } from '../components/NavLink';
 
 export default function SearchResults() {
   const searchQuery = useSearchParams().get('q');
@@ -61,7 +62,12 @@ export default function SearchResults() {
 
   return (
     <div className="w-full flex flex-col items-center justify-start gap-4">
-      <div className="text-lg font-bold">Search</div>
+      <div className="w-full flex flex-row items-center justify-start gap-4">
+        <button className="block md:hidden">
+          <NavLink href="/explore" icon="arrow_back" label="Back" />
+        </button>
+        <div className="text-lg font-bold">Search</div>
+      </div>
 
       <div className="w-full tabs tabs-border">
         <input

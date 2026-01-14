@@ -1,8 +1,5 @@
-import type {
-  FeedSuggestionResponse} from '@stream-io/feeds-react-sdk';
-import {
-  useFeedsClient
-} from '@stream-io/feeds-react-sdk';
+import type { FeedSuggestionResponse } from '@stream-io/feeds-react-sdk';
+import { useFeedsClient } from '@stream-io/feeds-react-sdk';
 import { useState, useEffect } from 'react';
 import { FeedSearchResult } from './FeedSearchResult';
 
@@ -21,9 +18,9 @@ export const FollowSuggestions = () => {
   }, [client]);
 
   return (
-    <div className="card card-border bg-base-200">
-      <div className="card-body">
-        <h2 className="card-title">Who to follow?</h2>
+    <div className="md:card md:card-border md:bg-base-200">
+      <div className="md:card-body">
+        <h2 className="card-title hidden md:block">Who to follow?</h2>
         <div className="w-full flex flex-col items-center justify-start gap-2">
           {suggestions.length === 0 ? (
             <p>No suggestions</p>
