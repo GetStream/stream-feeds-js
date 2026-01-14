@@ -142,6 +142,16 @@ const eventDecoderMapping: Record<
   'moderation.mark_reviewed': (data: Record<string, any>) =>
     decoders.ModerationMarkReviewedEvent(data),
 
+  'user.banned': (data: Record<string, any>) => decoders.UserBannedEvent(data),
+
+  'user.deactivated': (data: Record<string, any>) =>
+    decoders.UserDeactivatedEvent(data),
+
+  'user.muted': (data: Record<string, any>) => decoders.UserMutedEvent(data),
+
+  'user.reactivated': (data: Record<string, any>) =>
+    decoders.UserReactivatedEvent(data),
+
   'user.updated': (data: Record<string, any>) =>
     decoders.UserUpdatedEvent(data),
 };

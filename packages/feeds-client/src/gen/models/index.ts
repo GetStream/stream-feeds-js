@@ -5506,6 +5506,42 @@ export interface User {
   data?: Record<string, any>;
 }
 
+export interface UserBannedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  user: UserResponseCommonFields;
+
+  type: string;
+
+  channel_id?: string;
+
+  channel_member_count?: number;
+
+  channel_message_count?: number;
+
+  channel_type?: string;
+
+  cid?: string;
+
+  expiration?: Date;
+
+  reason?: string;
+
+  received_at?: Date;
+
+  shadow?: boolean;
+
+  team?: string;
+
+  total_bans?: number;
+
+  channel_custom?: Record<string, any>;
+
+  created_by?: UserResponseCommonFields;
+}
+
 export interface UserCreatedWithinParameters {
   max_age?: string;
 }
@@ -5514,6 +5550,20 @@ export interface UserCustomPropertyParameters {
   operator?: string;
 
   property_key?: string;
+}
+
+export interface UserDeactivatedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  user: UserResponseCommonFields;
+
+  type: string;
+
+  received_at?: Date;
+
+  created_by?: UserResponseCommonFields;
 }
 
 export interface UserIdenticalContentCountParameters {
@@ -5532,6 +5582,36 @@ export interface UserMuteResponse {
   target?: UserResponse;
 
   user?: UserResponse;
+}
+
+export interface UserMutedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  user: UserResponseCommonFields;
+
+  type: string;
+
+  received_at?: Date;
+
+  target_users?: UserResponseCommonFields[];
+
+  target_user?: UserResponseCommonFields;
+}
+
+export interface UserReactivatedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  user: UserResponseCommonFields;
+
+  type: string;
+
+  received_at?: Date;
+
+  created_by?: UserResponseCommonFields;
 }
 
 export interface UserRequest {
@@ -5839,6 +5919,10 @@ export type WSClientEvent =
   | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
   | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
   | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
+  | ({ type: 'user.banned' } & UserBannedEvent)
+  | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
+  | ({ type: 'user.muted' } & UserMutedEvent)
+  | ({ type: 'user.reactivated' } & UserReactivatedEvent)
   | ({ type: 'user.updated' } & UserUpdatedEvent);
 
 export type WSEvent =
@@ -5890,4 +5974,8 @@ export type WSEvent =
   | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
   | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
   | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
+  | ({ type: 'user.banned' } & UserBannedEvent)
+  | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
+  | ({ type: 'user.muted' } & UserMutedEvent)
+  | ({ type: 'user.reactivated' } & UserReactivatedEvent)
   | ({ type: 'user.updated' } & UserUpdatedEvent);
