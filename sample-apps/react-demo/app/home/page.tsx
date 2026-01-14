@@ -25,12 +25,14 @@ export default function Home() {
           <StoryTimeline />
         </StreamFeed>
       </div>
-      <StreamFeed feed={ownFeed}>
-        <ActivityComposer />
-      </StreamFeed>
+      <div className="w-full hidden md:block">
+        <StreamFeed feed={ownFeed}>
+          <ActivityComposer />
+        </StreamFeed>
+      </div>
       <StreamFeed feed={ownTimeline}>
         <div className="w-full flex flex-col items-center justify-start gap-4">
-          <div className="text-lg font-bold">Latest posts</div>
+          <div className="text-lg font-bold hidden md:block">Latest posts</div>
           <ActivityList />
         </div>
       </StreamFeed>

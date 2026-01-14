@@ -183,7 +183,7 @@ const ProfileLink = () => {
 };
 
 const AddLink = () => {
-  return <NavLink href="/add" icon="add" label="Add" />;
+  return <NavLink href="/activity-compose" icon="add" label="Add" />;
 };
 
 const NavLink = ({
