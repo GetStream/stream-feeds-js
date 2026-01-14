@@ -32,7 +32,7 @@ export const ActivityComposer = () => {
     <div className="w-full p-4 bg-base-100 card border border-base-300">
       <div className="w-full flex items-start gap-4">
         <div className="avatar flex-shrink-0">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary  flex items-center justify-center text-white text-lg font-semibold">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary  flex items-center justify-center text-white text-lg font-semibold">
             <span>{createdBy?.name?.[0]}</span>
           </div>
         </div>

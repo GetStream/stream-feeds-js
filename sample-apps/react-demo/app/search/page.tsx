@@ -3,10 +3,10 @@
 import type { ActivityResponse, Feed } from '@stream-io/feeds-react-sdk';
 import { useFeedsClient } from '@stream-io/feeds-react-sdk';
 import { useState, useCallback, useEffect } from 'react';
-import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
 import { FeedSearchResult } from '../components/FeedSearchResult';
 import { useSearchParams } from 'next/navigation';
 import { NavLink } from '../components/NavLink';
+import { Activity } from '../components/activity/Activity';
 
 export default function SearchResults() {
   const searchQuery = useSearchParams().get('q');
@@ -83,7 +83,7 @@ export default function SearchResults() {
             {activitySearchResults.length > 0 && (
               <>
                 {activitySearchResults.map((activity) => (
-                  <ActivitySearchResult activity={activity} key={activity.id} />
+                  <Activity activity={activity} key={activity.id} />
                 ))}
               </>
             )}
