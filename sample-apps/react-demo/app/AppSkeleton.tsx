@@ -1,6 +1,9 @@
 'use client';
 
-import { useClientConnectedUser } from '@stream-io/feeds-react-sdk';
+import {
+  useClientConnectedUser,
+  useNotificationStatus,
+} from '@stream-io/feeds-react-sdk';
 import { useCallback, useRef, type PropsWithChildren } from 'react';
 import { FollowSuggestions } from './components/FollowSuggestions';
 import { useOwnFeedsContext } from './own-feeds-context';
@@ -11,6 +14,8 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
   const router = useRouter();
   const currentUser = useClientConnectedUser();
   const { ownNotifications } = useOwnFeedsContext();
+  const notificationStatus = useNotificationStatus(ownNotifications);
+  const unreadCount = notificationStatus?.unread ?? 0;
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const searchClicked = useCallback(() => {
@@ -84,14 +89,14 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
             <FollowSuggestions />
           </div>
         </div>
-        <Dock></Dock>
+        <Dock hasUnreadNotifications={unreadCount > 0} />
       </div>
-      <DrawerSide />
+      <DrawerSide unreadCount={unreadCount} />
     </div>
   );
 };
 
-const DrawerSide = () => {
+const DrawerSide = ({ unreadCount }: { unreadCount: number }) => {
   return (
     <div className="drawer-side">
       <label
@@ -107,7 +112,13 @@ const DrawerSide = () => {
           <ExploreLink />
         </li>
         <li>
-          <NotificationsLink />
+          <NotificationsLink>
+            {unreadCount > 0 && (
+              <div className="badge badge-primary badge-xs position-absolute left-23">
+                {unreadCount}
+              </div>
+            )}
+          </NotificationsLink>
         </li>
         <li>
           <ProfileLink />
@@ -117,7 +128,11 @@ const DrawerSide = () => {
   );
 };
 
-const Dock = () => {
+const Dock = ({
+  hasUnreadNotifications,
+}: {
+  hasUnreadNotifications: boolean;
+}) => {
   return (
     <div className="dock md:hidden w-full">
       <button>
@@ -133,7 +148,11 @@ const Dock = () => {
       </button>
 
       <button>
-        <NotificationsLink />
+        <NotificationsLink>
+          {hasUnreadNotifications && (
+            <div className="badge badge-primary h-[0.25rem] w-[0.25rem] p-[0.25rem] absolute left-[70%] top-[5%]" />
+          )}
+        </NotificationsLink>
       </button>
 
       <button>
@@ -151,9 +170,11 @@ const ExploreLink = () => {
   return <NavLink href="/explore" icon="search" label="Explore" />;
 };
 
-const NotificationsLink = () => {
+const NotificationsLink = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <NavLink href="/notifications" icon="notifications" label="Notifications" />
+    <NavLink href="/notifications" icon="notifications" label="Notifications">
+      {children}
+    </NavLink>
   );
 };
 
@@ -169,10 +190,12 @@ const NavLink = ({
   href,
   icon,
   label,
+  children,
 }: {
   href: string;
   icon: string;
   label: string;
+  children?: React.ReactNode;
 }) => {
   const currentUser = useClientConnectedUser();
   const pathname = usePathname();
@@ -188,6 +211,7 @@ const NavLink = ({
     >
       <span className="material-symbols-outlined">{icon}</span>
       <div className="hidden md:block">{label}</div>
+      {children}
     </Link>
   );
 };

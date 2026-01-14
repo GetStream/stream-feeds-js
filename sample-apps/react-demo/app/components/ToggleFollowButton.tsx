@@ -20,7 +20,7 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
     }
 
     await ownTimeline?.follow(targetUserFeed, {
-      // create_notification_activity: true,
+      create_notification_activity: true,
     });
     await ownStoryTimeline
       ?.follow(targetStoryFeed)

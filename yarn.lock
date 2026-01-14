@@ -19840,9 +19840,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stream-feeds-react-tutorial@workspace:sample-apps/react-tutorial":
+"stream-feeds-react-demo@workspace:sample-apps/react-demo":
   version: 0.0.0-use.local
-  resolution: "stream-feeds-react-tutorial@workspace:sample-apps/react-tutorial"
+  resolution: "stream-feeds-react-demo@workspace:sample-apps/react-demo"
   dependencies:
     "@eslint/js": "npm:^9.15.0"
     "@stream-io/feeds-react-sdk": "workspace:*"
