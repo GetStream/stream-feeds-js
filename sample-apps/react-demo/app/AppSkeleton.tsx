@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  useClientConnectedUser,
-  useNotificationStatus,
-} from '@stream-io/feeds-react-sdk';
+import { useClientConnectedUser } from '@stream-io/feeds-react-sdk';
 import { useCallback, useRef, type PropsWithChildren } from 'react';
 import { FollowSuggestions } from './components/FollowSuggestions';
 import { useOwnFeedsContext } from './own-feeds-context';
@@ -14,8 +11,6 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
   const router = useRouter();
   const currentUser = useClientConnectedUser();
   const { ownNotifications } = useOwnFeedsContext();
-  const notificationStatus = useNotificationStatus(ownNotifications);
-  const unreadCount = notificationStatus?.unread ?? 0;
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const searchClicked = useCallback(() => {
