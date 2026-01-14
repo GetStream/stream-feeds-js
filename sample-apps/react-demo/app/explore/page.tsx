@@ -11,14 +11,14 @@ export default function Explore() {
 
   return (
     <div className="flex flex-col items-stretch justify-center gap-4">
-      <div className="md:hidden w-full flex flex-col items-stretch justify-center gap-4">
+      <div className="lg:hidden w-full flex flex-col items-stretch justify-center gap-4">
         <SearchInput />
         <div className="text-md font-bold md:hidden">Follow suggestions</div>
         <FollowSuggestions />
       </div>
       {ownForyouFeed && (
         <StreamFeed feed={ownForyouFeed}>
-          <div className="text-md font-bold md:hidden">Popular posts</div>
+          <div className="text-md font-bold lg:hidden">Popular posts</div>
           <ActivityList />
         </StreamFeed>
       )}

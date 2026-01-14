@@ -7,10 +7,12 @@ export const NavLink = ({
   icon,
   label,
   children,
+  hideLabel = false,
 }: {
   href: string;
   icon: string;
   label: string;
+  hideLabel?: boolean;
   children?: React.ReactNode;
 }) => {
   const currentUser = useClientConnectedUser();
@@ -21,12 +23,12 @@ export const NavLink = ({
   return (
     <Link
       href={`${href}?user_id=${currentUser?.id}`}
-      className={`flex flex-row items-center justify-center gap-2 w-full h-full ${
+      className={`flex flex-row items-center justify-center md:justify-stretch gap-2 w-full h-full ${
         isActive ? 'text-primary' : ''
       }`}
     >
       <span className="material-symbols-outlined">{icon}</span>
-      <div className="hidden md:block">{label}</div>
+      {!hideLabel && <div className="hidden md:block">{label}</div>}
       {children}
     </Link>
   );
