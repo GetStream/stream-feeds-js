@@ -1,21 +1,15 @@
-import type { FeedSuggestionResponse } from '@stream-io/feeds-react-sdk';
-import { useFeedsClient } from '@stream-io/feeds-react-sdk';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { FeedSearchResult } from './FeedSearchResult';
+import { useFollowSuggestionsContext } from '../follow-suggestions-context';
 
 export const FollowSuggestions = () => {
-  const client = useFeedsClient();
-  const [suggestions, setSuggestions] = useState<FeedSuggestionResponse[]>([]);
+  const { suggestions, loadSuggestions } = useFollowSuggestionsContext();
 
   useEffect(() => {
-    if (!client) return;
-    client
-      .getFollowSuggestions({
-        feed_group_id: 'user',
-        limit: 3,
-      })
-      .then((response) => setSuggestions(response.suggestions));
-  }, [client]);
+    if (suggestions.length === 0) {
+      loadSuggestions();
+    }
+  }, [suggestions.length, loadSuggestions]);
 
   return (
     <div className="md:card md:card-border md:bg-base-200">

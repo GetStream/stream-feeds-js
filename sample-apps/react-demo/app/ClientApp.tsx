@@ -7,6 +7,7 @@ import {
 } from '@stream-io/feeds-react-sdk';
 import { AppSkeleton } from './AppSkeleton';
 import { OwnFeedsContextProvider } from './own-feeds-context';
+import { FollowSuggestionsContextProvider } from './follow-suggestions-context';
 import { generateUsername } from 'unique-username-generator';
 import { useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -78,7 +79,9 @@ const ClientAppUI = ({ children }: PropsWithChildren) => {
   return (
     <StreamFeeds client={client}>
       <OwnFeedsContextProvider>
-        <AppSkeleton>{children}</AppSkeleton>
+        <FollowSuggestionsContextProvider>
+          <AppSkeleton>{children}</AppSkeleton>
+        </FollowSuggestionsContextProvider>
       </OwnFeedsContextProvider>
     </StreamFeeds>
   );
