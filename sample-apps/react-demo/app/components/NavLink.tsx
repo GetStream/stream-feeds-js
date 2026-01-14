@@ -21,7 +21,7 @@ export const NavLink = ({
   return (
     <Link
       href={`${href}?user_id=${currentUser?.id}`}
-      className={`flex flex-row items-center gap-2 ${
+      className={`flex flex-row items-center justify-center gap-2 w-full h-full ${
         isActive ? 'text-primary' : ''
       }`}
     >

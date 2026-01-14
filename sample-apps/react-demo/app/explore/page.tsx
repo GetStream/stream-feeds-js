@@ -1,34 +1,13 @@
 'use client';
 
-import {
-  useFeedsClient,
-  useClientConnectedUser,
-  StreamFeed,
-} from '@stream-io/feeds-react-sdk';
-import { useEffect, useMemo } from 'react';
+import { StreamFeed } from '@stream-io/feeds-react-sdk';
 import { ActivityList } from '../components/activity/ActivityList';
 import { FollowSuggestions } from '../components/FollowSuggestions';
 import { SearchInput } from '../components/SearchInput';
+import { useOwnFeedsContext } from '../own-feeds-context';
 
 export default function Explore() {
-  const client = useFeedsClient();
-  const currentUser = useClientConnectedUser();
-  const feed = useMemo(() => {
-    if (!currentUser?.id || !client) {
-      return undefined;
-    }
-    return client.feed('foryou', currentUser.id);
-  }, [client, currentUser?.id]);
-
-  useEffect(() => {
-    if (feed) {
-      feed.getOrCreate({ limit: 10 });
-    }
-  }, [feed]);
-
-  if (!feed) {
-    return null;
-  }
+  const { ownForyouFeed } = useOwnFeedsContext();
 
   return (
     <div className="flex flex-col items-stretch justify-center gap-4">
@@ -37,10 +16,12 @@ export default function Explore() {
         <div className="text-md font-bold md:hidden">Follow suggestions</div>
         <FollowSuggestions />
       </div>
-      <StreamFeed feed={feed}>
-        <div className="text-md font-bold md:hidden">Popular posts</div>
-        <ActivityList />
-      </StreamFeed>
+      {ownForyouFeed && (
+        <StreamFeed feed={ownForyouFeed}>
+          <div className="text-md font-bold md:hidden">Popular posts</div>
+          <ActivityList />
+        </StreamFeed>
+      )}
     </div>
   );
 }

@@ -17,6 +17,7 @@ type OwnFeedsContextValue = {
   ownNotifications: Feed | undefined;
   ownStoryTimeline: Feed | undefined;
   ownStoryFeed: Feed | undefined;
+  ownForyouFeed: Feed | undefined;
 };
 
 const OwnFeedsContext = createContext<OwnFeedsContextValue>({
@@ -25,6 +26,7 @@ const OwnFeedsContext = createContext<OwnFeedsContextValue>({
   ownNotifications: undefined,
   ownStoryTimeline: undefined,
   ownStoryFeed: undefined,
+  ownForyouFeed: undefined,
 });
 
 export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
@@ -33,6 +35,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
   const [ownNotifications, setOwnNotifications] = useState<Feed | undefined>();
   const [ownStoryTimeline, setOwnStoryTimeline] = useState<Feed | undefined>();
   const [ownStoryFeed, setOwnStoryFeed] = useState<Feed | undefined>();
+  const [ownForyouFeed, setOwnForyouFeed] = useState<Feed | undefined>();
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
 
@@ -43,6 +46,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       setOwnNotifications(undefined);
       setOwnStoryTimeline(undefined);
       setOwnStoryFeed(undefined);
+      setOwnForyouFeed(undefined);
     } else {
       const _ownFeed = client.feed('user', connectedUser.id);
       setOwnFeed(_ownFeed);
@@ -84,6 +88,9 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       });
       setOwnStoryFeed(_ownStoryFeed);
       _ownStoryFeed?.getOrCreate({ watch: true, limit: 100 });
+      const _ownForyouFeed = client.feed('foryou', connectedUser.id);
+      setOwnForyouFeed(_ownForyouFeed);
+      _ownForyouFeed?.getOrCreate({ limit: 10 });
     }
   }, [connectedUser, client]);
 
@@ -95,6 +102,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
         ownNotifications,
         ownStoryTimeline,
         ownStoryFeed,
+        ownForyouFeed,
       }}
     >
       {children}
