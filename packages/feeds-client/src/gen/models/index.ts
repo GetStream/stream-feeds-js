@@ -5547,6 +5547,8 @@ export interface UnblockUsersResponse {
 
 export interface UnfollowBatchRequest {
   follows: FollowPair[];
+
+  delete_notification_activity?: boolean;
 }
 
 export interface UnfollowBatchResponse {
@@ -5594,7 +5596,9 @@ export interface UpdateActivityRequest {
 
   text?: string;
 
-  visibility?: string;
+  visibility?: 'public' | 'private' | 'tag';
+
+  visibility_tag?: string;
 
   attachments?: Attachment[];
 
