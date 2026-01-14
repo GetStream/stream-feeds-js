@@ -213,10 +213,10 @@ export class Feed extends FeedApi {
     'moderation.mark_reviewed': Feed.noop,
     'health.check': Feed.noop,
     'app.updated': Feed.noop,
-    'user.banned': Feed.noop,
-    'user.deactivated': Feed.noop,
-    'user.muted': Feed.noop,
-    'user.reactivated': Feed.noop,
+    // 'user.banned': Feed.noop,
+    // 'user.deactivated': Feed.noop,
+    //'user.muted': Feed.noop,
+    //'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
     'feeds.activity.feedback': handleActivityFeedback.bind(this),
   };
@@ -493,6 +493,7 @@ export class Feed extends FeedApi {
           traverseArray.push({
             entityId: comment.id,
             entityParentId: entityId,
+            // @ts-expect-error open api refactor issue
             comments: comment.replies,
             next: comment.meta?.next_cursor,
           });
@@ -626,6 +627,7 @@ export class Feed extends FeedApi {
     await this.loadNextPageComments({
       entityId: entityId,
       base: () =>
+        // @ts-expect-error open api refactor issue
         this.client.getComments({
           ...request,
           sort,
@@ -661,6 +663,7 @@ export class Feed extends FeedApi {
     await this.loadNextPageComments({
       entityId: comment.id,
       base: () =>
+        // @ts-expect-error open api refactor issue
         this.client.getCommentReplies({
           ...request,
           id: comment.id,

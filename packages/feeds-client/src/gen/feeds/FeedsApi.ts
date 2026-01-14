@@ -745,6 +745,7 @@ export class FeedsApi {
       skip_enrich_url: request?.skip_enrich_url,
       text: request?.text,
       visibility: request?.visibility,
+      visibility_tag: request?.visibility_tag,
       attachments: request?.attachments,
       collection_refs: request?.collection_refs,
       feeds: request?.feeds,
