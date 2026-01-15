@@ -812,11 +812,11 @@ export class FeedsClient extends FeedsApi {
 
   async getFollowSuggestions(
     ...params: Parameters<FeedsApi['getFollowSuggestions']>
-  ): Promise<StreamResponse<GetFollowSuggestionsResponse>> {
+  ): Promise<StreamResponse<GetFollowSuggestionsResponse & { feeds: Feed[] }>> {
     const response = await super.getFollowSuggestions(...params);
 
-    response.suggestions.forEach((suggestion) => {
-      this.getOrCreateActiveFeed({
+    const feeds = response.suggestions.map((suggestion) => {
+      return this.getOrCreateActiveFeed({
         group: suggestion.group_id,
         id: suggestion.id,
         data: suggestion,
@@ -829,8 +829,7 @@ export class FeedsClient extends FeedsApi {
       });
     });
 
-    // TODO: return feed instance here https://linear.app/stream/issue/REACT-669/return-feed-instance-from-followsuggestions-breaking
-    return response;
+    return { ...response, feeds };
   }
 
   protected readonly getOrCreateActiveFeed = ({
