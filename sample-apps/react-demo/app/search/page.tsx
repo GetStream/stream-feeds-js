@@ -64,7 +64,7 @@ export default function SearchResults() {
     <div className="w-full flex flex-col items-center justify-start gap-4">
       <div className="w-full flex flex-row items-center justify-start gap-4">
         <button className="block lg:hidden">
-          <NavLink href="/explore" icon="arrow_back" label="Back" hideLabel />
+          <NavLink href="/explore" icon="arrow_back" />
         </button>
         <div className="text-lg font-bold">Search</div>
       </div>

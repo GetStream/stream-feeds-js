@@ -21,7 +21,9 @@ export const ActivityList = () => {
       ) : (
         <>
           {activities?.map((activity) => (
-            <Activity activity={activity} key={activity.id} />
+            <div className="w-full" key={activity.id} id={activity.id}>
+              <Activity activity={activity} />
+            </div>
           ))}
           {has_next_page && (
             <button className="btn btn-soft btn-primary" onClick={loadNextPage}>

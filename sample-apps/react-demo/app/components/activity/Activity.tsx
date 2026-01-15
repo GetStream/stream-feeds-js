@@ -1,28 +1,14 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
-import {
-  useClientConnectedUser,
-  useFeedsClient,
-} from '@stream-io/feeds-react-sdk';
-import { useCallback, useMemo } from 'react';
+import { useClientConnectedUser } from '@stream-io/feeds-react-sdk';
+import { useMemo } from 'react';
 import { ToggleFollowButton } from '../ToggleFollowButton';
 import { ToggleReaction } from './ToggleReaction';
 import { formatDistanceToNow } from 'date-fns';
+import { ToggleBookmark } from './ToggleBookmark';
+import { NavLink } from '../NavLink';
 
 export const Activity = ({ activity }: { activity: ActivityResponse }) => {
-  const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
-
-  const toggleBookmark = useCallback(
-    () =>
-      activity.own_bookmarks?.length > 0
-        ? client?.deleteBookmark({
-            activity_id: activity.id,
-          })
-        : client?.addBookmark({
-            activity_id: activity.id,
-          }),
-    [client, activity.id, activity.own_bookmarks],
-  );
 
   const formattedCreatedAt = useMemo(() => {
     return formatDistanceToNow(activity.created_at, { addSuffix: true });
@@ -62,21 +48,15 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
           )}
           <div className="w-full flex flex-col gap-2">
             <div className="flex flex-row gap-2">
-              <button type="button" className="btn cursor-default">
-                💬&nbsp;
-                {activity.comment_count}
+              <button type="button" className="btn">
+                <NavLink
+                  href={`/activity/${activity.id}`}
+                  icon="chat"
+                  label={activity.comment_count.toString()}
+                />
               </button>
               <ToggleReaction activity={activity} />
-              <button
-                type="button"
-                className={`btn ${
-                  activity.own_bookmarks?.length > 0 ? 'bg-primary' : ''
-                }`}
-                onClick={toggleBookmark}
-              >
-                <span>⭐️&nbsp;</span>
-                {activity.bookmark_count}
-              </button>
+              <ToggleBookmark activity={activity} />
             </div>
           </div>
         </div>
