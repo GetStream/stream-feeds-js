@@ -8,7 +8,7 @@ import {
 } from '@stream-io/feeds-react-sdk';
 import { useOwnFeedsContext } from '../own-feeds-context';
 import { useCallback, useEffect, useState } from 'react';
-import { Activity } from '../components/activity/Activity';
+import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
 
 const followerCountSelector = (state: FeedState) => ({
   // Don't count your own timeline in following feeds
@@ -91,7 +91,10 @@ export default function Profile() {
       ) : (
         <div className="w-full flex flex-col items-center justify-start gap-4">
           {bookmarks.map((bookmark) => (
-            <Activity activity={bookmark.activity} key={bookmark.activity.id} />
+            <ActivitySearchResult
+              activity={bookmark.activity}
+              key={bookmark.activity.id}
+            />
           ))}
           {next && (
             <button

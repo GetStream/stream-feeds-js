@@ -4,10 +4,8 @@ import { useCallback } from 'react';
 
 export const ToggleReaction = ({
   activity,
-  disabled = false,
 }: {
   activity: ActivityResponse;
-  disabled?: boolean;
 }) => {
   const client = useFeedsClient();
 

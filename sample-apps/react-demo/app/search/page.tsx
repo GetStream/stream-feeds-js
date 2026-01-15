@@ -6,7 +6,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { FeedSearchResult } from '../components/FeedSearchResult';
 import { useSearchParams } from 'next/navigation';
 import { NavLink } from '../components/NavLink';
-import { Activity } from '../components/activity/Activity';
+import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
 
 export default function SearchResults() {
   const searchQuery = useSearchParams().get('q');
@@ -83,7 +83,7 @@ export default function SearchResults() {
             {activitySearchResults.length > 0 && (
               <>
                 {activitySearchResults.map((activity) => (
-                  <Activity activity={activity} key={activity.id} />
+                  <ActivitySearchResult activity={activity} key={activity.id} />
                 ))}
               </>
             )}
@@ -105,7 +105,7 @@ export default function SearchResults() {
             {feedSearchResults.length > 0 && (
               <>
                 {feedSearchResults.map((feed) => (
-                  <FeedSearchResult feed={feed.currentState} key={feed.feed} />
+                  <FeedSearchResult feed={feed} key={feed.feed} />
                 ))}
               </>
             )}

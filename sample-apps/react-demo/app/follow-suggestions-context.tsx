@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 import {
-  Feed,
+  type Feed,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';

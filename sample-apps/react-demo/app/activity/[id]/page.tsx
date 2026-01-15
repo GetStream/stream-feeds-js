@@ -3,12 +3,13 @@
 import { Activity } from '@/app/components/activity/Activity';
 import { NavLink } from '@/app/components/NavLink';
 import {
-  ActivityState,
   useFeedsClient,
   useStateStore,
+  type ActivityState,
+  type ActivityWithStateUpdates,
 } from '@stream-io/feeds-react-sdk';
 import { useParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const selector = (state: ActivityState) => ({
   activity: state.activity,
@@ -17,16 +18,22 @@ const selector = (state: ActivityState) => ({
 export default function ActivityPage() {
   const id = useParams<{ id: string }>().id;
   const client = useFeedsClient();
+  const [activityWithStateUpdates, setActivityWithStateUpdates] = useState<
+    ActivityWithStateUpdates | undefined
+  >();
 
-  const activityWithStateUpdates = client?.activityWithStateUpdates(id);
+  useEffect(() => {
+    const _activityWithStateUpdates = client?.activityWithStateUpdates(id);
+    setActivityWithStateUpdates(_activityWithStateUpdates);
+
+    return () => _activityWithStateUpdates?.dispose();
+  }, [client, id]);
 
   useEffect(() => {
     if (!activityWithStateUpdates?.currentState.activity) {
       activityWithStateUpdates?.get();
     }
   }, [activityWithStateUpdates]);
-
-  useEffect(() => () => activityWithStateUpdates?.dispose(), []);
 
   const { activity } = useStateStore(
     activityWithStateUpdates?.state,
