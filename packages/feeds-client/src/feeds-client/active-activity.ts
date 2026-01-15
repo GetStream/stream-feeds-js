@@ -1,3 +1,4 @@
+import type { ActivityWithStateUpdates } from '../activity-with-state-updates/activity-with-state-updates';
 import { Feed } from '../feed';
 import type { FeedsClient } from './feeds-client';
 
@@ -34,9 +35,9 @@ export function isAnyFeedWatched(this: FeedsClient, fids: string[]) {
   return false;
 }
 
-export function disconnectActivityFromFeed(this: FeedsClient, id: string) {
-  const activeFeed = this.activeActivities[id];
-  if (activeFeed) {
-    delete this.activeActivities[id];
-  }
+export function disconnectActivityFromFeed(
+  this: FeedsClient,
+  activity: ActivityWithStateUpdates,
+) {
+  this.activeActivities.splice(this.activeActivities.indexOf(activity), 1);
 }
