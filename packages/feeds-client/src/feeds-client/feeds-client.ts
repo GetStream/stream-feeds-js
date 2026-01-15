@@ -124,7 +124,7 @@ export class FeedsClient extends FeedsApi {
 
   private readonly polls_by_id: Map<string, StreamPoll>;
 
-  protected activeActivities: Record<ActivityId, ActivityWithStateUpdates> = {};
+  protected activeActivities: ActivityWithStateUpdates[] = [];
   protected activeFeeds: Record<FID, Feed> = {};
 
   private healthyConnectionChangedEventCount = 0;
@@ -193,12 +193,9 @@ export class FeedsClient extends FeedsApi {
           feeds.forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
           if (typeof fid === 'string') {
             delete this.activeFeeds[fid];
-            Object.keys(this.activeActivities).forEach((activityId) => {
-              const activity = this.activeActivities[activityId];
-              if (getFeed.call(activity)?.feed === fid) {
-                delete this.activeActivities[activityId];
-              }
-            });
+            this.activeActivities = this.activeActivities.filter(
+              (activity) => getFeed.call(activity)?.feed !== fid,
+            );
           }
           break;
         }
@@ -278,7 +275,9 @@ export class FeedsClient extends FeedsApi {
         default: {
           feeds.forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
           if (event.type === 'feeds.activity.deleted') {
-            delete this.activeActivities[event.activity.id];
+            this.activeActivities = this.activeActivities.filter(
+              (activity) => activity.id !== event.activity.id,
+            );
           }
         }
       }
@@ -314,18 +313,17 @@ export class FeedsClient extends FeedsApi {
     // we skip the first event as we could potentially be querying twice
     if (this.healthyConnectionChangedEventCount > 1) {
       const feedEntries = Object.entries(this.activeFeeds);
-      const activityEntries = Object.entries(this.activeActivities);
 
       const results = await Promise.allSettled([
         ...feedEntries.map(([, feed]) => feed.synchronize()),
-        ...activityEntries.map(([, activity]) => activity.synchronize()),
+        ...this.activeActivities.map((activity) => activity.synchronize()),
       ]);
 
       const failures: SyncFailure[] = results.flatMap((result, index) => {
         if (result.status === 'fulfilled') {
           return [];
         }
-        const activity = activityEntries[index - feedEntries.length]?.[1];
+        const activity = this.activeActivities[index - feedEntries.length];
         const feed =
           feedEntries[index]?.[0] ?? (activity && getFeed.call(activity)?.feed);
 
@@ -613,7 +611,7 @@ export class FeedsClient extends FeedsApi {
     // clear all caches
     this.polls_by_id.clear();
 
-    this.activeActivities = {};
+    this.activeActivities = [];
     this.activeFeeds = {};
 
     this.state.partialNext({
@@ -661,12 +659,14 @@ export class FeedsClient extends FeedsApi {
    * @param id - The id of the activity
    * @returns The activity with state updates
    */
-  activityWithStateUpdates = (id: ActivityId) => {
-    let activity = this.activeActivities[id];
-    if (!activity) {
-      activity = new ActivityWithStateUpdates(id, this);
-      this.activeActivities[id] = activity;
-    }
+  activityWithStateUpdates = (
+    id: ActivityId,
+    { fromResponse }: { fromResponse?: ActivityResponse } = {
+      fromResponse: undefined,
+    },
+  ) => {
+    const activity = new ActivityWithStateUpdates(id, this, { fromResponse });
+    this.activeActivities.push(activity);
     return activity;
   };
 
