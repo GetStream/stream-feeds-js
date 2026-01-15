@@ -5015,7 +5015,7 @@ export interface ThreadedCommentResponse {
 
   score: number;
 
-  status: string;
+  status: 'active' | 'deleted' | 'removed' | 'hidden';
 
   updated_at: Date;
 
