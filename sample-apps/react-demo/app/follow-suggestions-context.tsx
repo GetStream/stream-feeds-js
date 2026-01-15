@@ -6,31 +6,31 @@ import {
   useState,
 } from 'react';
 import {
-  type FeedSuggestionResponse,
+  Feed,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
 
 type FollowSuggestionsContextValue = {
-  suggestions: FeedSuggestionResponse[];
-  loadSuggestions: () => Promise<void>;
+  suggestedFeeds: Feed[];
+  loadFollowSuggestions: () => Promise<void>;
 };
 
 const FollowSuggestionsContext = createContext<FollowSuggestionsContextValue>({
-  suggestions: [],
-  loadSuggestions: async () => {},
+  suggestedFeeds: [],
+  loadFollowSuggestions: async () => {},
 });
 
 export const FollowSuggestionsContextProvider = ({
   children,
 }: PropsWithChildren) => {
-  const [suggestions, setSuggestions] = useState<FeedSuggestionResponse[]>([]);
+  const [suggestedFeeds, setsuggestedFeeds] = useState<Feed[]>([]);
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
 
-  const loadSuggestions = useCallback(async () => {
+  const loadFollowSuggestions = useCallback(async () => {
     if (!client || !connectedUser) {
-      setSuggestions([]);
+      setsuggestedFeeds([]);
       return;
     }
 
@@ -39,18 +39,18 @@ export const FollowSuggestionsContextProvider = ({
         feed_group_id: 'user',
         limit: 3,
       });
-      setSuggestions(response.suggestions);
+      setsuggestedFeeds(response.feeds);
     } catch (error) {
-      console.error('Failed to load follow suggestions:', error);
-      setSuggestions([]);
+      console.error('Failed to load follow suggestedFeeds:', error);
+      setsuggestedFeeds([]);
     }
   }, [client, connectedUser]);
 
   return (
     <FollowSuggestionsContext.Provider
       value={{
-        suggestions,
-        loadSuggestions,
+        suggestedFeeds,
+        loadFollowSuggestions,
       }}
     >
       {children}
