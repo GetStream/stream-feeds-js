@@ -1,0 +1,15 @@
+import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
+import { NavLink } from '../utility/NavLink';
+import { Activity } from './Activity';
+
+export const ActivityPreview = ({
+  activity,
+}: {
+  activity: ActivityResponse;
+}) => {
+  return (
+    <NavLink href={`/activity/${activity.id}`}>
+      <Activity activity={activity} withActions={false} />
+    </NavLink>
+  );
+};

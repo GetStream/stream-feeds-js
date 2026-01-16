@@ -15,7 +15,7 @@
     "build:client": "yarn workspace @stream-io/feeds-client run build",
     "build:react-native-sdk": "yarn workspace @stream-io/feeds-react-native-sdk run build",
     "build:react-sdk": "yarn workspace @stream-io/feeds-react-sdk run build",
-    "build:react-tutorial": "yarn workspaces foreach -Avp --topological-dev --include '{packages/{feeds-client,react-sdk},sample-apps/react-tutorial}' run build",
+    "build:react-demo": "yarn workspaces foreach -Avp --topological-dev --include '{packages/{feeds-client,react-sdk},sample-apps/react-demo}' run build",
     "clean:all": "yarn workspaces foreach -Avp run clean",
     "lint:all": "eslint --max-warnings=0 --cache '**/*.{ts,tsx}'",
     "lint:all:fix": "eslint --max-warnings=0 '**/*.{ts,tsx}' --fix",
