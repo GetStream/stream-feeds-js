@@ -8,7 +8,6 @@ import type {
   FeedResponse,
   FeedsReactionResponse,
   FollowResponse,
-  OwnUser,
   OwnUserResponse,
   PinActivityResponse,
   UserResponse,
@@ -73,7 +72,9 @@ export const generateOwnUserResponse = (
   ...overrides,
 });
 
-export const generateOwnUser = (overrides: Partial<OwnUser> = {}): OwnUser => ({
+export const generateOwnUser = (
+  overrides: Partial<OwnUserResponse> = {},
+): OwnUserResponse => ({
   ...generateOwnUserResponse(),
   devices: [],
   mutes: [],

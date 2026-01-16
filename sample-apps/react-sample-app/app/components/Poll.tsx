@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import type {
   ActivityResponse,
   PollState,
-  PollOption as StreamPollOption,
+  PollOptionResponseData as StreamPollOption,
 } from '@stream-io/feeds-react-sdk';
 import { useFeedsClient, useStateStore } from '@stream-io/feeds-react-sdk';
 import { PollContextProvider, usePollContext } from '@/app/poll-context';

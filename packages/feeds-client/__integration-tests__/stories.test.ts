@@ -54,7 +54,6 @@ describe('Stories Feed', () => {
         {
           type: 'image',
           image_url: 'https://example.com/image.png',
-          custom: {},
         },
       ],
     });
@@ -112,7 +111,6 @@ describe('Stories Feed', () => {
           {
             type: 'video',
             image_url: 'https://example.com/video.mp3',
-            custom: {},
           },
         ],
       }),

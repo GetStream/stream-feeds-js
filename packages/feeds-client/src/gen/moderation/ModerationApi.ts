@@ -1,13 +1,18 @@
 import type { ApiClient, StreamResponse } from '../../gen-imports';
 import type {
+  AppealRequest,
+  AppealResponse,
   BanRequest,
   BanResponse,
   DeleteModerationConfigResponse,
   FlagRequest,
   FlagResponse,
+  GetAppealResponse,
   GetConfigResponse,
   MuteRequest,
   MuteResponse,
+  QueryAppealsRequest,
+  QueryAppealsResponse,
   QueryModerationConfigsRequest,
   QueryModerationConfigsResponse,
   QueryReviewQueueRequest,
@@ -21,6 +26,75 @@ import { decoders } from '../model-decoders/decoders';
 
 export class ModerationApi {
   constructor(public readonly apiClient: ApiClient) {}
+
+  async appeal(
+    request: AppealRequest,
+  ): Promise<StreamResponse<AppealResponse>> {
+    const body = {
+      appeal_reason: request?.appeal_reason,
+      entity_id: request?.entity_id,
+      entity_type: request?.entity_type,
+      attachments: request?.attachments,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<AppealResponse>
+    >(
+      'POST',
+      '/api/v2/moderation/appeal',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.AppealResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getAppeal(request: {
+    id: string;
+  }): Promise<StreamResponse<GetAppealResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetAppealResponse>
+    >('GET', '/api/v2/moderation/appeal/{id}', pathParams, undefined);
+
+    decoders.GetAppealResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryAppeals(
+    request?: QueryAppealsRequest,
+  ): Promise<StreamResponse<QueryAppealsResponse>> {
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryAppealsResponse>
+    >(
+      'POST',
+      '/api/v2/moderation/appeals',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.QueryAppealsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
 
   async ban(request: BanRequest): Promise<StreamResponse<BanResponse>> {
     const body = {
@@ -242,6 +316,7 @@ export class ModerationApi {
   ): Promise<StreamResponse<SubmitActionResponse>> {
     const body = {
       action_type: request?.action_type,
+      appeal_id: request?.appeal_id,
       item_id: request?.item_id,
       ban: request?.ban,
       block: request?.block,
@@ -252,8 +327,11 @@ export class ModerationApi {
       delete_reaction: request?.delete_reaction,
       delete_user: request?.delete_user,
       mark_reviewed: request?.mark_reviewed,
+      reject_appeal: request?.reject_appeal,
+      restore: request?.restore,
       shadow_block: request?.shadow_block,
       unban: request?.unban,
+      unblock: request?.unblock,
     };
 
     const response = await this.apiClient.sendRequest<
