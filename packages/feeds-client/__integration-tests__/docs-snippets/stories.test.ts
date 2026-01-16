@@ -35,7 +35,6 @@ describe('Stories page', () => {
       attachments: [
         {
           image_url: 'https://example.com/image.jpg',
-          custom: {},
         },
       ],
       expires_at: tomorrow.toISOString(),

@@ -78,7 +78,6 @@ describe('File uploads page', () => {
         return {
           type: isImage ? 'image' : 'file',
           [isImage ? 'image_url' : 'asset_url']: response?.file,
-          custom: {},
         };
       }),
     });

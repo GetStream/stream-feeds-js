@@ -795,8 +795,6 @@ export interface AppealResponse {
 }
 
 export interface Attachment {
-  custom: Record<string, any>;
-
   asset_url?: string;
 
   author_icon?: string;
@@ -836,6 +834,8 @@ export interface Attachment {
   actions?: Action[];
 
   fields?: Field[];
+
+  custom?: Record<string, any>;
 
   giphy?: Images;
 }
@@ -3044,8 +3044,6 @@ export interface GetFollowSuggestionsResponse {
 export interface GetOGResponse {
   duration: string;
 
-  custom: Record<string, any>;
-
   asset_url?: string;
 
   author_icon?: string;
@@ -3085,6 +3083,8 @@ export interface GetOGResponse {
   actions?: Action[];
 
   fields?: Field[];
+
+  custom?: Record<string, any>;
 
   giphy?: Images;
 }

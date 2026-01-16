@@ -45,7 +45,6 @@ describe('Activities page', () => {
         {
           type: 'image',
           image_url: 'https://example.com/image.png',
-          custom: {},
         },
       ],
     });
