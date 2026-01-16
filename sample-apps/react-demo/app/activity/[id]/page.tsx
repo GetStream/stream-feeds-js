@@ -1,7 +1,11 @@
 'use client';
 
-import { Activity } from '@/app/components/activity/Activity';
-import { NavLink } from '@/app/components/utility/NavLink';
+import { ActivityActions } from '@/app/components/activity/activity-actions/ActivityActions';
+import { ActivityContent } from '@/app/components/activity/ActivityContent';
+import { ActivityHeader } from '@/app/components/activity/ActivityHeader';
+import { CommentComposer } from '@/app/components/comments/CommentComposer';
+import { CommentList } from '@/app/components/comments/CommentList';
+import { LoadingIndicator } from '@/app/components/utility/LoadingIndicator';
 import {
   useFeedsClient,
   useStateStore,
@@ -40,14 +44,21 @@ export default function ActivityPage() {
     selector,
   ) ?? { activity: undefined };
 
-  if (!activity) {
-    return null;
+  if (!activity || !activityWithStateUpdates) {
+    return (
+      <div className="flex items-center justify-center h-full w-full">
+        <LoadingIndicator />
+      </div>
+    );
   }
 
   return (
-    <>
-      <NavLink href={`/home#${id}`} icon="arrow_back"></NavLink>
-      <Activity activity={activity} />
-    </>
+    <div className="flex flex-col gap-4">
+      <ActivityHeader activity={activity} />
+      <ActivityContent activity={activity} />
+      <ActivityActions activity={activity} />
+      <CommentComposer activity={activity}></CommentComposer>
+      <CommentList activityWithStateUpdates={activityWithStateUpdates} />
+    </div>
   );
 }

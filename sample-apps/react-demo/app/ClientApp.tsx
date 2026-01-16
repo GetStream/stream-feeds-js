@@ -9,10 +9,9 @@ import { AppSkeleton } from './AppSkeleton';
 import { OwnFeedsContextProvider } from './own-feeds-context';
 import { FollowSuggestionsContextProvider } from './follow-suggestions-context';
 import { generateUsername } from 'unique-username-generator';
-import { Suspense, useEffect, useMemo, type PropsWithChildren } from 'react';
+import { useEffect, useMemo, type PropsWithChildren } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { LoadingIndicator } from './components/utility/LoadingIndicator';
-import { ErrorBoundary } from './components/utility/ErrorBoundary';
 
 export const ClientApp = ({ children }: PropsWithChildren) => {
   const searchParams = useSearchParams();
@@ -61,7 +60,11 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
   });
 
   if (!client) {
-    return null;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <LoadingIndicator />
+      </div>
+    );
   }
 
   return (

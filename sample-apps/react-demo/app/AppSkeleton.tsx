@@ -28,7 +28,9 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
         </nav>
         <div className="h-full max-h-full overflow-y-auto w-full md:p-10 p-4 flex flex-row gap-10 items-start justify-center">
           <div className="h-full max-h-full lg:w-[70%] w-full flex flex-col items-center justify-start">
-            <div className="w-full max-h-full">{children}</div>
+            <div className="w-full h-full max-h-full fle flex-col items-center justify-center">
+              {children}
+            </div>
           </div>
           <div className="lg:flex hidden w-[30%] flex-col items-stretch justify-start gap-4">
             <SearchInput />
@@ -55,7 +57,7 @@ const DrawerSide = ({ unreadCount }: { unreadCount: number }) => {
           <HomeLink />
         </li>
         <li>
-          <ExploreLink />
+          <PopularLink />
         </li>
         <li>
           <NotificationsLink>
@@ -65,6 +67,9 @@ const DrawerSide = ({ unreadCount }: { unreadCount: number }) => {
               </div>
             )}
           </NotificationsLink>
+        </li>
+        <li>
+          <BookmarksLink />
         </li>
         <li>
           <ProfileLink />
@@ -112,8 +117,12 @@ const HomeLink = () => {
   return <NavLink href="/home" icon="home" label="Home" />;
 };
 
+const PopularLink = () => {
+  return <NavLink href="/explore" icon="whatshot" label="Popular" />;
+};
+
 const ExploreLink = () => {
-  return <NavLink href="/explore" icon="search" label="Explore" />;
+  return <NavLink href="/explore" icon="search" />;
 };
 
 const NotificationsLink = ({ children }: { children?: React.ReactNode }) => {
@@ -130,4 +139,8 @@ const ProfileLink = () => {
 
 const AddLink = () => {
   return <NavLink href="/activity-compose" icon="add" label="Add" />;
+};
+
+const BookmarksLink = () => {
+  return <NavLink href="/bookmarks" icon="bookmark" label="Bookmarks" />;
 };

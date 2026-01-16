@@ -75,3 +75,7 @@
 .dock {
   position: static;
 }
+
+.fill.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1;
+}

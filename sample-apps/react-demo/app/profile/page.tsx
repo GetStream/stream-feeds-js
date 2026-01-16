@@ -1,73 +1,54 @@
 'use client';
 
-import type { BookmarkResponse, FeedState } from '@stream-io/feeds-react-sdk';
+import type { FeedState } from '@stream-io/feeds-react-sdk';
 import {
   useClientConnectedUser,
-  useFeedsClient,
   useStateStore,
 } from '@stream-io/feeds-react-sdk';
 import { useOwnFeedsContext } from '../own-feeds-context';
-import { useCallback, useEffect, useState } from 'react';
-import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
+import { Avatar } from '../components/utility/Avatar';
 
-const followerCountSelector = (state: FeedState) => ({
+const userFeedSelector = (state: FeedState) => ({
   // Don't count your own timeline in following feeds
   followerCount: (state.follower_count ?? 0) - 1,
+  activityCount: state.activity_count ?? 0,
 });
 
-const followingCountSelector = (state: FeedState) => ({
+const timelineFeedSelector = (state: FeedState) => ({
   // Don't count yourself as a follower
   followingCount: (state.following_count ?? 0) - 1,
 });
 
 export default function Profile() {
-  const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
   const { ownFeed, ownTimeline } = useOwnFeedsContext();
-  const [bookmarks, setBookmarks] = useState<BookmarkResponse[]>([]);
-  const [next, setNext] = useState<string | undefined>(undefined);
 
-  const { followerCount } = useStateStore(
+  const { followerCount, activityCount } = useStateStore(
     ownFeed?.state,
-    followerCountSelector,
+    userFeedSelector,
   ) ?? {
     followerCount: 0,
+    activityCount: 0,
   };
   const { followingCount } = useStateStore(
     ownTimeline?.state,
-    followingCountSelector,
+    timelineFeedSelector,
   ) ?? {
     followingCount: 0,
   };
 
-  const loadBookmarks = useCallback(
-    (nextCursor?: string) => {
-      client
-        ?.queryBookmarks({
-          limit: 2,
-          next: nextCursor,
-        })
-        .then((response) => {
-          setBookmarks((current) => [
-            ...(nextCursor ? current : []),
-            ...response.bookmarks,
-          ]);
-          setNext(response.next);
-        });
-    },
-    [client],
-  );
-
-  useEffect(() => {
-    loadBookmarks();
-  }, [client, loadBookmarks]);
-
   return (
     <div className="w-full flex flex-col items-center justify-start gap-4">
+      <div className="flex flex-row items-center justify-center gap-4">
+        <div className="size-10 md:size-12">
+          <Avatar user={currentUser} />
+        </div>
+        <div className="text-lg font-semibold">{currentUser?.name}</div>
+      </div>
       <div className="stats">
         <div className="stat">
-          <div className="stat-title">Profile</div>
-          <div className="stat-value text-primary">{currentUser?.name}</div>
+          <div className="stat-title">Posts</div>
+          <div className="stat-value text-primary">{activityCount}</div>
         </div>
         <div className="stat">
           <div className="stat-title">Followers</div>
@@ -78,34 +59,6 @@ export default function Profile() {
           <div className="stat-value text-primary">{followingCount}</div>
         </div>
       </div>
-
-      <div className="text-lg font-semibold">Bookmarks</div>
-
-      {bookmarks.length === 0 ? (
-        <div className="card card-border bg-base-100 w-96">
-          <div className="card-body items-center text-center">
-            <h2 className="card-title">No bookmarks yet</h2>
-            <p>Bookmark posts to see them here ⭐</p>
-          </div>
-        </div>
-      ) : (
-        <div className="w-full flex flex-col items-center justify-start gap-4">
-          {bookmarks.map((bookmark) => (
-            <ActivitySearchResult
-              activity={bookmark.activity}
-              key={bookmark.activity.id}
-            />
-          ))}
-          {next && (
-            <button
-              className="btn btn-soft btn-primary"
-              onClick={() => loadBookmarks(next)}
-            >
-              Load more
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }

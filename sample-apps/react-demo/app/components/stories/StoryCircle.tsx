@@ -14,7 +14,7 @@ export const StoryCircle = ({
 }) => {
   return (
     <button
-      className={`w-[4rem] flex flex-col items-stretch justify-stretch gap-0.5`}
+      className={`w-[4.2rem] flex flex-col items-stretch justify-stretch gap-0.5`}
       disabled={disabled}
       onClick={onClick}
     >
@@ -26,7 +26,7 @@ export const StoryCircle = ({
         <div
           className={`rounded-full bg-base-100 p-[0.1rem] flex items-stretch justify-stretch`}
         >
-          <div className="flex size-[3.5rem] items-stretch justify-stretch">
+          <div className="flex size-[3.7rem] items-stretch justify-stretch">
             <Avatar user={user} />
           </div>
         </div>

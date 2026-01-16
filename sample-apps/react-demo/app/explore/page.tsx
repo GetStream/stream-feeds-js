@@ -19,7 +19,7 @@ export default function Explore() {
       {ownForyouFeed && (
         <StreamFeed feed={ownForyouFeed}>
           <div className="text-md font-bold lg:hidden">Popular posts</div>
-          <ActivityList />
+          <ActivityList withFollowButton={true} />
         </StreamFeed>
       )}
     </div>

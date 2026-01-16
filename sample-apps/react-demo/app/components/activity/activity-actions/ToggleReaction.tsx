@@ -1,6 +1,7 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useFeedsClient } from '@stream-io/feeds-react-sdk';
 import { useCallback } from 'react';
+import { ActionButton } from '../../utility/ActionButton';
 
 export const ToggleReaction = ({
   activity,
@@ -25,15 +26,11 @@ export const ToggleReaction = ({
   );
 
   return (
-    <button
-      type="button"
-      className={`btn ${
-        activity.own_reactions?.length > 0 ? 'bg-primary' : ''
-      }`}
+    <ActionButton
       onClick={toggleReaction}
-    >
-      ❤️&nbsp;
-      {activity.reaction_groups.like?.count ?? 0}
-    </button>
+      icon="favorite"
+      label={(activity.reaction_groups.like?.count ?? 0).toString()}
+      isActive={activity.own_reactions?.length > 0}
+    />
   );
 };

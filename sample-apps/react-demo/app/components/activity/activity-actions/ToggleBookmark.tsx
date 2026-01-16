@@ -3,6 +3,7 @@ import {
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
 import { useCallback } from 'react';
+import { ActionButton } from '../../utility/ActionButton';
 
 export const ToggleBookmark = ({
   activity,
@@ -24,15 +25,11 @@ export const ToggleBookmark = ({
   );
 
   return (
-    <button
-      type="button"
-      className={`btn ${
-        activity.own_bookmarks?.length > 0 ? 'bg-primary' : ''
-      }`}
+    <ActionButton
       onClick={toggleBookmark}
-    >
-      <span>⭐️&nbsp;</span>
-      {activity.bookmark_count}
-    </button>
+      icon="bookmark"
+      label={activity.bookmark_count.toString()}
+      isActive={activity.own_bookmarks?.length > 0}
+    />
   );
 };
