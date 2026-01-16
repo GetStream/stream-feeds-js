@@ -12,7 +12,7 @@
     "@stream-io/feeds-react-sdk": "workspace:*",
     "date-fns": "^4.1.0",
     "material-symbols": "^0.40.2",
-    "next": "15.0.5",
+    "next": "16",
     "react": "catalog:",
     "react-dom": "catalog:",
     "unique-username-generator": "^1.5.1"

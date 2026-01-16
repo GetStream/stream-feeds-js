@@ -4,6 +4,7 @@ import {
   type FeedState,
 } from '@stream-io/feeds-react-sdk';
 import { ToggleFollowButton } from './ToggleFollowButton';
+import { Avatar } from './utility/Avatar';
 
 const selector = (state: FeedState) => ({ createdBy: state.created_by });
 
@@ -12,10 +13,8 @@ export const FeedSearchResult = ({ feed }: { feed: Feed }) => {
 
   return (
     <div className="w-full flex flex-row items-center gap-2">
-      <div className="avatar flex-shrink-0">
-        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary  flex items-center justify-center text-white text-md font-semibold">
-          <span>{createdBy?.name?.[0]}</span>
-        </div>
+      <div className="size-8">
+        <Avatar user={createdBy} />
       </div>
       <div className="md:font-semibold flex-grow w-full overflow-hidden text-ellipsis whitespace-nowrap">
         {createdBy?.name}

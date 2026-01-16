@@ -1,4 +1,5 @@
 import type { UserResponse } from '@stream-io/feeds-react-sdk';
+import { Avatar } from '../utility/Avatar';
 
 export const StoryCircle = ({
   isActive,
@@ -13,18 +14,20 @@ export const StoryCircle = ({
 }) => {
   return (
     <button
-      className="w-18 flex flex-col items-center justify-center gap-0.5"
+      className={`w-[4rem] flex flex-col items-stretch justify-stretch gap-0.5`}
       disabled={disabled}
       onClick={onClick}
     >
       <div
-        className={`rounded-full p-[2.5px] ${
+        className={`rounded-full p-[0.15rem] flex items-stretch justify-stretch ${
           isActive ? 'bg-gradient-to-br from-warning to-error' : ''
         }`}
       >
-        <div className="rounded-full bg-base-100 p-0.5">
-          <div className="w-18 h-18 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-lg font-semibold">
-            <span>{user?.name?.[0]}</span>
+        <div
+          className={`rounded-full bg-base-100 p-[0.1rem] flex items-stretch justify-stretch`}
+        >
+          <div className="flex size-[3.5rem] items-stretch justify-stretch">
+            <Avatar user={user} />
           </div>
         </div>
       </div>

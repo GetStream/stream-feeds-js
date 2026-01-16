@@ -1,7 +1,7 @@
 'use client';
 
 import { Activity } from '@/app/components/activity/Activity';
-import { NavLink } from '@/app/components/NavLink';
+import { NavLink } from '@/app/components/utility/NavLink';
 import {
   useFeedsClient,
   useStateStore,

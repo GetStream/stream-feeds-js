@@ -1,12 +1,15 @@
 import { useFeedActivities, useFeedContext } from '@stream-io/feeds-react-sdk';
 import { Activity } from './Activity';
+import { LoadingIndicator } from '../utility/LoadingIndicator';
 
 export const ActivityList = () => {
   const feed = useFeedContext();
-  const { activities, loadNextPage, has_next_page } = useFeedActivities();
+  const { activities, loadNextPage, has_next_page, is_loading } =
+    useFeedActivities();
 
   return (
     <div className="w-full flex flex-col items-center justify-start gap-4">
+      {is_loading && <LoadingIndicator />}
       {activities?.length === 0 ? (
         <div className="card card-border bg-base-100 w-96">
           <div className="card-body items-center text-center">

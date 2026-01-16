@@ -5,7 +5,7 @@ import { useFeedsClient } from '@stream-io/feeds-react-sdk';
 import { useState, useCallback, useEffect } from 'react';
 import { FeedSearchResult } from '../components/FeedSearchResult';
 import { useSearchParams } from 'next/navigation';
-import { NavLink } from '../components/NavLink';
+import { NavLink } from '../components/utility/NavLink';
 import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
 
 export default function SearchResults() {

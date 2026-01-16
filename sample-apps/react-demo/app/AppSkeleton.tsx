@@ -1,24 +1,16 @@
 'use client';
 
-import {
-  useClientConnectedUser,
-  useNotificationStatus,
-} from '@stream-io/feeds-react-sdk';
+import { useNotificationStatus } from '@stream-io/feeds-react-sdk';
 import { type PropsWithChildren } from 'react';
 import { FollowSuggestions } from './components/FollowSuggestions';
 import { useOwnFeedsContext } from './own-feeds-context';
-import { SearchInput } from './components/SearchInput';
-import { NavLink } from './components/NavLink';
+import { SearchInput } from './components/utility/SearchInput';
+import { NavLink } from './components/utility/NavLink';
 
 export const AppSkeleton = ({ children }: PropsWithChildren) => {
-  const currentUser = useClientConnectedUser();
   const { ownNotifications } = useOwnFeedsContext();
   const notificationStatus = useNotificationStatus(ownNotifications);
   const unreadCount = notificationStatus?.unread ?? 0;
-
-  if (!currentUser) {
-    return 'Connecting...';
-  }
 
   return (
     <div className="drawer h-full max-h-full lg:drawer-open">

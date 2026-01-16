@@ -3,7 +3,7 @@
 import { StreamFeed } from '@stream-io/feeds-react-sdk';
 import { ActivityList } from '../components/activity/ActivityList';
 import { FollowSuggestions } from '../components/FollowSuggestions';
-import { SearchInput } from '../components/SearchInput';
+import { SearchInput } from '../components/utility/SearchInput';
 import { useOwnFeedsContext } from '../own-feeds-context';
 
 export default function Explore() {

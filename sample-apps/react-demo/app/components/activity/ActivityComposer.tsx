@@ -2,6 +2,7 @@ import type { FeedState } from '@stream-io/feeds-react-sdk';
 import { useFeedContext, useStateStore } from '@stream-io/feeds-react-sdk';
 import { useCallback, useState } from 'react';
 import { FileUpload } from './FileUpload';
+import { Avatar } from '../utility/Avatar';
 
 const selector = (state: FeedState) => ({
   createdBy: state.created_by,
@@ -31,10 +32,8 @@ export const ActivityComposer = () => {
   return (
     <div className="w-full p-4 bg-base-100 card border border-base-300">
       <div className="w-full flex items-start gap-4">
-        <div className="avatar flex-shrink-0">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary  flex items-center justify-center text-white text-lg font-semibold">
-            <span>{createdBy?.name?.[0]}</span>
-          </div>
+        <div className="size-10 md:size-12">
+          <Avatar user={createdBy} />
         </div>
         <div className="w-full flex flex-col gap-2">
           <textarea

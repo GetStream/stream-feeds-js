@@ -5,7 +5,8 @@ import { ToggleFollowButton } from '../ToggleFollowButton';
 import { ToggleReaction } from './ToggleReaction';
 import { formatDistanceToNow } from 'date-fns';
 import { ToggleBookmark } from './ToggleBookmark';
-import { NavLink } from '../NavLink';
+import { NavLink } from '../utility/NavLink';
+import { Avatar } from '../utility/Avatar';
 
 export const Activity = ({ activity }: { activity: ActivityResponse }) => {
   const currentUser = useClientConnectedUser();
@@ -17,10 +18,8 @@ export const Activity = ({ activity }: { activity: ActivityResponse }) => {
   return (
     <div className="w-full p-2 md:p-4 bg-base-100 md:card md:border border-base-300 border-t-1">
       <div className="w-full flex items-start gap-2 md:gap-4">
-        <div className="avatar flex-shrink-0">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-primary to-secondary  flex items-center justify-center text-white text-lg font-semibold">
-            <span>{activity.user?.name?.[0]}</span>
-          </div>
+        <div className="size-10 md:size-12">
+          <Avatar user={activity.user} />
         </div>
         <div className="w-full flex flex-col items-start gap-2 md:gap-4">
           <div className="flex flex-row items-start w-full justify-between gap-2">

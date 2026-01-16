@@ -9,24 +9,12 @@ import { AppSkeleton } from './AppSkeleton';
 import { OwnFeedsContextProvider } from './own-feeds-context';
 import { FollowSuggestionsContextProvider } from './follow-suggestions-context';
 import { generateUsername } from 'unique-username-generator';
-import { useEffect, useMemo, useState, type PropsWithChildren } from 'react';
+import { Suspense, useEffect, useMemo, type PropsWithChildren } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { LoadingIndicator } from './components/utility/LoadingIndicator';
+import { ErrorBoundary } from './components/utility/ErrorBoundary';
 
 export const ClientApp = ({ children }: PropsWithChildren) => {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return 'Loading...';
-  }
-
-  return <ClientAppUI>{children}</ClientAppUI>;
-};
-
-const ClientAppUI = ({ children }: PropsWithChildren) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 

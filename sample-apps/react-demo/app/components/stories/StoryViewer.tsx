@@ -1,6 +1,7 @@
-import type { ActivityResponse} from '@stream-io/feeds-react-sdk';
+import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useFeedContext } from '@stream-io/feeds-react-sdk';
 import { useState, useEffect, useCallback } from 'react';
+import { Avatar } from '../utility/Avatar';
 
 export const StoryViewer = ({
   activities,
@@ -87,10 +88,8 @@ export const StoryViewer = ({
       </div>
 
       <div className="absolute top-4 left-2 right-2 flex items-center gap-3 z-10 mt-4">
-        <div className="avatar flex-shrink-0">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary  flex items-center justify-center text-white text-lg font-semibold">
-            <span>{currentStory?.user?.name?.[0]}</span>
-          </div>
+        <div className="size-15 md:size-18">
+          <Avatar user={currentStory?.user} />
         </div>
         <div className="flex-1 text-white">
           <div className="font-semibold text-sm drop-shadow-lg">
