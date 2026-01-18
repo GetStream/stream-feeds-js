@@ -482,6 +482,10 @@ export interface ActivityResponse {
   parent?: ActivityResponse;
 
   poll?: PollResponseData;
+
+  friend_reactions?: FeedsReactionResponse[];
+
+  friend_reaction_count?: number;
 }
 
 export interface ActivitySelectorConfig {
@@ -3311,6 +3315,14 @@ export interface GetOrCreateFeedRequest {
   interest_weights?: Record<string, number>;
 
   member_pagination?: PagerRequest;
+
+  friend_reactions_options?: FriendReactionsOptions;
+}
+
+export interface FriendReactionsOptions {
+  enabled?: boolean;
+  type?: 'following' | 'mutual';
+  limit?: number;
 }
 
 export interface GetOrCreateFeedResponse {
