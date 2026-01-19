@@ -30,21 +30,21 @@ const generateColorsFromName = (name: string): [string, string] => {
   return [color1, color2];
 };
 
-export const Avatar = ({ user }: { user?: UserResponse | ConnectedUser }) => {
+export const Avatar = ({ user, className }: { user?: UserResponse | ConnectedUser; className: string }) => {
   const userName = user?.name || '?';
   const [color1, color2] = generateColorsFromName(userName);
 
   return (
     <div
-      className={`avatar w-full h-full flex-shrink-0 flex items-stretch justify-stretch`}
+      className={`avatar flex-shrink-0 flex items-stretch justify-stretch @container ${className}`}
     >
       <div
-        className="rounded-full w-full h-full flex items-center justify-center text-white text-lg font-semibold"
+        className="rounded-full w-[inherit] h-[inherit] flex items-center justify-center text-white text-lg font-semibold"
         style={{
           background: `linear-gradient(to bottom right, ${color1}, ${color2})`,
         }}
       >
-        <span>{userName[0]}</span>
+        <span className="@max-[2rem]:text-xs text-lg">{userName[0]}</span>
       </div>
     </div>
   );

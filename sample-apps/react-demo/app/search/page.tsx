@@ -20,23 +20,23 @@ export default function SearchResults() {
   );
   const [nextFeeds, setNextFeeds] = useState<string | undefined>(undefined);
 
-  const searchActivities = useCallback(async () => {
+  const searchActivities = useCallback(async (next?: string) => {
     if (!client) return;
     const result = await client.queryActivities({
       filter: {
         text: { $q: searchQuery },
       },
       limit: 10,
-      next: nextActivities,
+      next,
     });
     setActivitySearchResults((current) => [
-      ...(nextActivities ? current : []),
+      ...(next ? current : []),
       ...result.activities,
     ]);
     setNextActivities(result.next);
-  }, [client, searchQuery, nextActivities]);
+  }, [client, searchQuery]);
 
-  const searchFeeds = useCallback(async () => {
+  const searchFeeds = useCallback(async (next?: string) => {
     if (!client) return;
     const result = await client.queryFeeds({
       filter: {
@@ -44,14 +44,14 @@ export default function SearchResults() {
         ['created_by.name']: { $q: searchQuery },
       },
       limit: 10,
-      next: nextFeeds,
+      next,
     });
     setFeedSearchResults((current) => [
-      ...(nextFeeds ? current : []),
+      ...(next ? current : []),
       ...result.feeds,
     ]);
     setNextFeeds(result.next);
-  }, [client, searchQuery, nextFeeds]);
+  }, [client, searchQuery]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -64,7 +64,9 @@ export default function SearchResults() {
     <div className="w-full flex flex-col items-center justify-start gap-4">
       <div className="w-full flex flex-row items-center justify-start gap-4">
         <div className="block lg:hidden">
-          <NavLink href="/explore" icon="arrow_back" />
+          <NavLink href="/explore">
+            <span className="material-symbols-outlined">arrow_back</span>
+          </NavLink>
         </div>
         <div className="text-lg font-bold">Search</div>
       </div>
@@ -77,20 +79,20 @@ export default function SearchResults() {
           aria-label="Activities"
           defaultChecked
         />
-        <div className="tab-content border-base-300 bg-base-100 p-10">
+        <div className="tab-content">
           <div className="w-full flex flex-col items-center justify-start gap-4">
             {activitySearchResults.length === 0 && <NoResults />}
             {activitySearchResults.length > 0 && (
-              <>
+              <div className="list w-full">
                 {activitySearchResults.map((activity) => (
-                  <ActivitySearchResult activity={activity} key={activity.id} />
+                  <li className="list-row w-full" key={activity.id}><ActivitySearchResult activity={activity} /></li>
                 ))}
-              </>
+              </div>
             )}
             {nextActivities && (
               <button
                 className="btn btn-soft btn-primary"
-                onClick={searchActivities}
+                onClick={() => searchActivities(nextActivities)}
               >
                 Load more
               </button>
@@ -99,20 +101,20 @@ export default function SearchResults() {
         </div>
 
         <input type="radio" name="my_tabs" className="tab" aria-label="Feeds" />
-        <div className="tab-content border-base-300 bg-base-100 p-10">
+        <div className="tab-content">
           <div className="w-full flex flex-col items-center justify-start gap-4">
             {feedSearchResults.length === 0 && <NoResults />}
             {feedSearchResults.length > 0 && (
-              <>
+              <div className="list w-full">
                 {feedSearchResults.map((feed) => (
-                  <FeedSearchResult feed={feed} key={feed.feed} />
+                  <li className="list-row w-full flex flex-row justify-stretch items-stretch" key={feed.feed}><FeedSearchResult feed={feed} /></li>
                 ))}
-              </>
+              </div>
             )}
             {nextFeeds && (
               <button
                 className="btn btn-soft btn-primary"
-                onClick={searchFeeds}
+                onClick={() => searchFeeds(nextFeeds)}
               >
                 Load more
               </button>

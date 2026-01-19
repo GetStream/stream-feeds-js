@@ -14,14 +14,15 @@ export const ToggleReaction = ({
     () =>
       activity.own_reactions?.length > 0
         ? client?.deleteActivityReaction({
-            activity_id: activity.id,
-            type: 'like',
-          })
+          activity_id: activity.id,
+          type: 'like',
+          delete_notification_activity: true,
+        })
         : client?.addActivityReaction({
-            activity_id: activity.id,
-            type: 'like',
-            create_notification_activity: true,
-          }),
+          activity_id: activity.id,
+          type: 'like',
+          create_notification_activity: true,
+        }),
     [client, activity.id, activity.own_reactions],
   );
 

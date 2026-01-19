@@ -20,7 +20,7 @@ export const NotificationList = () => {
   }, [feed]);
 
   return (
-    <div className="w-full flex flex-col items-center justify-start gap-4">
+    <div className="w-full flex flex-col items-center justify-start max-h-full h-full gap-4">
       <div className="w-full flex flex-row items-center justify-between">
         <div className="text-lg font-semibold">Notifications</div>
         <button
@@ -35,14 +35,14 @@ export const NotificationList = () => {
         <div className="card card-border bg-base-100 w-96">
           <div className="card-body items-center text-center">
             <h2 className="card-title">No notifications yet</h2>
-            <p>When people like or comment, they will show up here..</p>
+            <p>When people like or comment, they will show up here</p>
           </div>
         </div>
       ) : (
         <>
-          <ul className="list bg-base-100 rounded-box">
+          <ul className="list w-full overflow-y-auto">
             {notifications.map((notification) => (
-              <li className="list-row" key={notification.group}>
+              <li className="list-row w-full flex flex-row justify-stretch items-stretch" key={notification.group}>
                 <Notification notification={notification} />
               </li>
             ))}

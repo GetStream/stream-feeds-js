@@ -53,13 +53,17 @@ export default function Bookmarks() {
           </div>
         </div>
       ) : (
-        <div className="w-full flex flex-col items-center justify-stretch gap-4">
-          {bookmarks.map((bookmark) => (
-            <ActivityPreview
-              activity={bookmark.activity}
-              key={bookmark.activity.id}
-            />
-          ))}
+        <>
+          <ul className="w-full list">
+            {bookmarks.map((bookmark) => (
+              <li className="list-row" key={bookmark.activity.id}>
+                <ActivityPreview
+                  activity={bookmark.activity}
+                />
+              </li>
+            ))}
+
+          </ul>
           {next && (
             <button
               className="btn btn-soft btn-primary"
@@ -68,7 +72,7 @@ export default function Bookmarks() {
               Load more
             </button>
           )}
-        </div>
+        </>
       )}
     </div>
   );

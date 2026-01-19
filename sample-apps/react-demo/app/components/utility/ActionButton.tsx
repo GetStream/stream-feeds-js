@@ -27,6 +27,35 @@ export const ActionButton = ({
   </>
 };
 
+export const SecondaryActionButton = ({
+  onClick,
+  href,
+  icon,
+  label,
+  isActive,
+  className,
+}: {
+  onClick?: () => void;
+  href?: string;
+  icon: string;
+  label: string;
+  isActive: boolean;
+  className?: string;
+}) => {
+  const content = <Content icon={icon} label={label} isActive={isActive} />;
+  return <>
+
+    {href ? <div className={`btn btn-md btn-ghost p-2 ${className}`}><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
+      type="button"
+      className={`btn btn-md btn-ghost p-2 ${className}`}
+      onClick={onClick}
+    >
+      {content}
+    </button>
+    }
+  </>
+};
+
 const NavLinkButton = ({
   children,
   href,
@@ -34,7 +63,7 @@ const NavLinkButton = ({
   children: React.ReactNode;
   href: string;
 }) => {
-  return <NavLink href={href}>{children}</NavLink>;
+  return <NavLink className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0" href={href}>{children}</NavLink>;
 };
 
 const Content = ({
@@ -48,7 +77,7 @@ const Content = ({
 }) => (
   <>
     <span
-      className={`material-symbols-outlined text-base-content/80 text-[1.1rem]! ${isActive ? 'fill' : ''}`}
+      className={`material-symbols-outlined text-[1.1rem]! text-base-content/80 ${isActive ? 'fill' : ''}`}
     >
       {icon}
     </span>

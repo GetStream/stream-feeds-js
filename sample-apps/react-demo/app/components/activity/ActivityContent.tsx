@@ -1,20 +1,8 @@
-import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
+import { type ActivityResponse } from "@stream-io/feeds-react-sdk";
+import { Content } from "../common/Content";
 
-export const ActivityContent = ({
-  activity,
-}: {
-  activity: ActivityResponse;
-}) => {
+export const ActivityContent = ({ activity }: { activity: ActivityResponse }) => {
   return (
-    <>
-      <p className="w-full text-md">{activity.text}</p>
-      {activity.attachments.length > 0 && (
-        <img
-          src={activity.attachments[0].image_url}
-          alt="Uploaded image"
-          className="w-50 h-50 object-cover rounded-lg"
-        />
-      )}
-    </>
+    <Content text={activity.text} attachments={activity.attachments} moderation={activity.moderation} location="activity" mentioned_users={activity.mentioned_users} />
   );
 };

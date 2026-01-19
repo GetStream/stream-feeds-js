@@ -40,7 +40,7 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
       return;
     }
 
-    await ownTimeline?.unfollow(targetUserFeed);
+    await ownTimeline?.unfollow(targetUserFeed, { delete_notification_activity: true });
     await ownStoryTimeline?.unfollow(targetStoryFeed).catch((e) => {
       if (e instanceof Error && !e.message.includes(`story:`)) {
         throw e;
@@ -61,9 +61,8 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
 
   return (
     <button
-      className={`btn btn-soft ${
-        isFollowing ? 'btn-error' : 'btn-primary'
-      } btn-sm`}
+      className={`btn btn-soft ${isFollowing ? 'btn-error' : 'btn-primary'
+        } btn-sm`}
       onClick={toggleFollow}
     >
       {isFollowing ? 'Unfollow' : 'Follow'}
