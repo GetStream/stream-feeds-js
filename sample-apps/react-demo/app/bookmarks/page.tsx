@@ -6,14 +6,17 @@ import {
 } from '@stream-io/feeds-react-sdk';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityPreview } from '../components/activity/ActivityPreview';
+import { LoadingIndicator } from '../components/utility/LoadingIndicator';
 
 export default function Bookmarks() {
   const client = useFeedsClient();
   const [bookmarks, setBookmarks] = useState<BookmarkResponse[]>([]);
   const [next, setNext] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadBookmarks = useCallback(
     (nextCursor?: string) => {
+      setIsLoading(true);
       client
         ?.queryBookmarks({
           limit: 20,
@@ -25,6 +28,9 @@ export default function Bookmarks() {
             ...response.bookmarks,
           ]);
           setNext(response.next);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     },
     [client],
@@ -42,8 +48,8 @@ export default function Bookmarks() {
       {bookmarks.length === 0 && !isLoading ? (
         <div className="card card-border bg-base-100 w-96">
           <div className="card-body items-center text-center">
-            <h2 className="card-title">No bookmarks yet</h2>
-            <p>Bookmark posts to see them here ⭐</p>
+            <h2 className="card-title">No bookmarks yet <span className="material-symbols-outlined fill">bookmark</span></h2>
+            <p>Bookmark posts to see them here</p>
           </div>
         </div>
       ) : (

@@ -28,17 +28,17 @@ export const Notification = ({
 
     switch (action) {
       case 'comment': {
-        notificationIcon = '💬';
+        notificationIcon = 'chat_bubble';
         notificationText += ` commented on your post${activityText}`;
         break;
       }
       case 'reaction': {
-        notificationIcon = '❤️';
+        notificationIcon = 'favorite';
         notificationText += ` reacted to your post${activityText}`;
         break;
       }
       case 'follow': {
-        notificationIcon = '👤';
+        notificationIcon = 'person';
         notificationText += ` started following you`;
         break;
       }
@@ -56,7 +56,7 @@ export const Notification = ({
 
   return (
     <div className="flex flex-row items-center gap-2">
-      <div>{icon}</div>
+      <span className="material-symbols-outlined text-primary text-[1rem]!">{icon}</span>
       <div>{text}</div>
       {!isRead && <div className="w-2 h-2 rounded-full bg-primary" />}
     </div>

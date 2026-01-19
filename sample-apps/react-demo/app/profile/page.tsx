@@ -2,11 +2,14 @@
 
 import type { FeedState } from '@stream-io/feeds-react-sdk';
 import {
+  StreamFeed,
   useClientConnectedUser,
   useStateStore,
 } from '@stream-io/feeds-react-sdk';
 import { useOwnFeedsContext } from '../own-feeds-context';
 import { Avatar } from '../components/utility/Avatar';
+import { NavLink } from '../components/utility/NavLink';
+import { ActivityList } from '../components/activity/ActivityList';
 
 const userFeedSelector = (state: FeedState) => ({
   // Don't count your own timeline in following feeds
@@ -59,6 +62,17 @@ export default function Profile() {
           <div className="stat-value text-primary">{followingCount}</div>
         </div>
       </div>
+      <div className="md:hidden">
+        <NavLink href="/bookmarks">
+          <span className="material-symbols-outlined">bookmark</span>
+          <span className="text-sm">Bookmarks</span>
+        </NavLink>
+      </div>
+      {ownFeed && (
+        <StreamFeed feed={ownFeed}>
+          <ActivityList />
+        </StreamFeed>
+      )}
     </div>
   );
 }

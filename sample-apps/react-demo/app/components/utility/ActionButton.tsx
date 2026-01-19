@@ -18,7 +18,7 @@ export const ActionButton = ({
 
     {href ? <div className="btn btn-sm btn-soft"><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
       type="button"
-      className="btn btn-sm btn-soft text-base-content/80"
+      className="btn btn-sm btn-soft"
       onClick={onClick}
     >
       {content}
@@ -48,10 +48,10 @@ const Content = ({
 }) => (
   <>
     <span
-      className={`material-symbols-outlined text-[1.1rem]! ${isActive ? 'fill' : ''}`}
+      className={`material-symbols-outlined text-base-content/80 text-[1.1rem]! ${isActive ? 'fill' : ''}`}
     >
       {icon}
     </span>
-    <span className="text-sm">{label}</span>
+    <span className="text-sm text-base-content/80">{label}</span>
   </>
 );

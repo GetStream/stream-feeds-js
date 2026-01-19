@@ -159,7 +159,7 @@ describe('Activities page', () => {
     ).activity;
 
     // Partially set some fields
-    client.updateActivityPartial({
+    await client.updateActivityPartial({
       id: activity.id,
       set: {
         text: 'Japan has over 6,800 islands.',
@@ -171,7 +171,7 @@ describe('Activities page', () => {
     });
 
     // Partially unset some fields
-    client.updateActivityPartial({
+    await client.updateActivityPartial({
       id: activity.id,
       unset: ['custom.color'],
     });
