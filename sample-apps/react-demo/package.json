@@ -1,0 +1,36 @@
+{
+  "name": "stream-feeds-react-demo",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@stream-io/feeds-react-sdk": "workspace:*",
+    "date-fns": "^4.1.0",
+    "material-symbols": "^0.40.2",
+    "next": "16",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "unique-username-generator": "^1.5.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^20",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "daisyui": "^5.5.5",
+    "eslint": "^9.15.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.12.0",
+    "postcss": "^8",
+    "tailwindcss": "^4.1.17",
+    "typescript": "~5.6.2",
+    "typescript-eslint": "^8.15.0"
+  }
+}

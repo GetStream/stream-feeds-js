@@ -42,39 +42,39 @@ Here are some of the features we support:
 
 ## React sample apps
 
-### Simple React app with stories
+### React demo app with stories
 
-Deployed version: https://feeds-react-tutorial-getstreamio.vercel.app/
+Deployed version: https://feeds-react-demo.vercel.app
 
 Prerequisites:
 
-- Install dependecies: `yarn`
+- Install dependencies: `yarn`
 - Build React SDK: `yarn build:client` and `yarn build:react-sdk`
-- Create a `.env` file in `sample-apps/react-sample-app` with one of the following content:
+- Create a `.env` file in `sample-apps/react-demo` with one of the following content:
 
 Use this if you want to use a single user only:
 
 ```
-VITE_API_KEY=your_api_key_here
-VITE_USER_ID=your_user_id_here
-VITE_USER_NAME=Your Name
-VITE_USER_TOKEN=your_user_token_here
+NEXT_PUBLIC_API_KEY=your_api_key_here
+NEXT_PUBLIC_USER_ID=your_user_id_here
+NEXT_PUBLIC_USER_NAME=Your Name
+NEXT_PUBLIC_USER_TOKEN=your_user_token_here
 ```
 
 If your app [is configured to accept development tokens](https://getstream.io/activity-feeds/docs/javascript/tokens-and-authentication/#developer-tokens), you can use dev tokens to test with muliple users, in this case just provide an API key:
 
 ```
-VITE_API_KEY=your_api_key_here
+NEXT_PUBLIC_API_KEY=your_api_key_here
 ```
 
 If you have a token provider backend, you can also provide a URL that takes `user_id` as a query param:
 
 ```
-VITE_API_KEY=your_api_key_here
-VITE_TOKEN_URL=optional,no need for user info in this case
+NEXT_PUBLIC_API_KEY=your_api_key_here
+NEXT_PUBLIC_TOKEN_URL=optional,no need for user info in this case
 ```
 
-After the above steps run the following command in `sample-apps/react-tutorial`:
+After the above steps run the following command in `sample-apps/react-demo`:
 
 ```
 yarn dev
@@ -84,7 +84,7 @@ yarn dev
 
 Prerequisites:
 
-- Install dependecies: `yarn`
+- Install dependencies: `yarn`
 - Build React SDK: `yarn build:client` and `yarn build:react-sdk`
 - Create a `.env` file in `sample-apps/react-sample-app` with the following content:
 
