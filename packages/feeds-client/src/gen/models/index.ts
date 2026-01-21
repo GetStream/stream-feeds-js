@@ -467,6 +467,8 @@ export interface ActivityResponse {
 
   moderation_action?: string;
 
+  selector_source?: string;
+
   text?: string;
 
   visibility_tag?: string;

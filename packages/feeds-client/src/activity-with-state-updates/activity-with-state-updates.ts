@@ -42,12 +42,21 @@ export class ActivityWithStateUpdates {
   constructor(
     public readonly id: string,
     private readonly feedsClient: FeedsClient,
+    { fromResponse }: { fromResponse?: ActivityResponse } = { fromResponse: undefined },
   ) {
     this.state = new StateStore<ActivityState>({
       activity: undefined,
       comments_by_entity_id: {},
       is_loading: false,
     });
+
+    if (fromResponse) {
+      this.setFeed({
+        fid: fromResponse.feeds[0],
+        initialState: fromResponse,
+      });
+      this.subscribeToFeedState();
+    }
   }
 
   get currentState() {
@@ -140,7 +149,7 @@ export class ActivityWithStateUpdates {
 
   dispose() {
     this.unsubscribeFromFeedState?.();
-    disconnectActivityFromFeed.call(this.feedsClient, this.id);
+    disconnectActivityFromFeed.call(this.feedsClient, this);
   }
 
   /**

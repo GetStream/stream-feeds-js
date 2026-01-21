@@ -19,9 +19,7 @@ export const useCreateFeedsClient = ({
   userData: UserRequest;
   options?: FeedsClientOptions;
 }) => {
-  const [client, setClient] = useState<FeedsClient | null>(
-    () => new FeedsClient(apiKey, options),
-  );
+  const [client, setClient] = useState<FeedsClient | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [cachedUserData, setCachedUserData] = useState(userData);
 

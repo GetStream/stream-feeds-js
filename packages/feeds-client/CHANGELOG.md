@@ -2,6 +2,23 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.35](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.34...@stream-io/feeds-client-0.3.35) (2026-01-21)
+
+
+### Features
+
+* Add selector_source to activity for ranking ([#216](https://github.com/GetStream/stream-feeds-js/issues/216)) ([3336ec3](https://github.com/GetStream/stream-feeds-js/commit/3336ec3f001a370810433543948da16ebae76f3f))
+
+## [0.3.34](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.33...@stream-io/feeds-client-0.3.34) (2026-01-19)
+
+
+* add tutorial link to readme ([280287b](https://github.com/GetStream/stream-feeds-js/commit/280287bc478a25bd4bee84d979be57edef9ffa7c))
+
+
+### Bug Fixes
+
+* respect enrichment settings when update feed state from activity… ([#210](https://github.com/GetStream/stream-feeds-js/issues/210)) ([1091ae9](https://github.com/GetStream/stream-feeds-js/commit/1091ae9d6ede7820b551dfbe24854da4ee53c27b))
+
 ## [0.3.33](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.32...@stream-io/feeds-client-0.3.33) (2026-01-08)
 
 
