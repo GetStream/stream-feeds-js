@@ -365,6 +365,8 @@ export interface ActivityRequest {
 
   feeds: string[];
 
+  create_notification_activity?: boolean;
+
   expires_at?: string;
 
   id?: string;
@@ -376,6 +378,8 @@ export interface ActivityRequest {
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
   skip_enrich_url?: boolean;
+
+  skip_push?: boolean;
 
   text?: string;
 
@@ -467,8 +471,6 @@ export interface ActivityResponse {
 
   moderation_action?: string;
 
-  selector_source?: string;
-
   text?: string;
 
   visibility_tag?: string;
@@ -543,6 +545,8 @@ export interface AddActivityRequest {
 
   feeds: string[];
 
+  create_notification_activity?: boolean;
+
   expires_at?: string;
 
   id?: string;
@@ -554,6 +558,8 @@ export interface AddActivityRequest {
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
   skip_enrich_url?: boolean;
+
+  skip_push?: boolean;
 
   text?: string;
 
@@ -582,6 +588,8 @@ export interface AddActivityResponse {
   duration: string;
 
   activity: ActivityResponse;
+
+  mention_notifications_created?: number;
 }
 
 export interface AddBookmarkRequest {
@@ -648,6 +656,8 @@ export interface AddCommentResponse {
   duration: string;
 
   comment: CommentResponse;
+
+  mention_notifications_created?: number;
 
   notification_created?: boolean;
 }
@@ -754,6 +764,46 @@ export interface AppUpdatedEvent {
   type: string;
 
   received_at?: Date;
+}
+
+export interface AppealItemResponse {
+  appeal_reason: string;
+
+  created_at: Date;
+
+  entity_id: string;
+
+  entity_type: string;
+
+  id: string;
+
+  status: string;
+
+  updated_at: Date;
+
+  decision_reason?: string;
+
+  attachments?: string[];
+
+  entity_content?: ModerationPayload;
+
+  user?: UserResponse;
+}
+
+export interface AppealRequest {
+  appeal_reason: string;
+
+  entity_id: string;
+
+  entity_type: string;
+
+  attachments?: string[];
+}
+
+export interface AppealResponse {
+  appeal_id: string;
+
+  duration: string;
 }
 
 export interface Attachment {
@@ -1208,6 +1258,8 @@ export interface CallResponse {
 
   join_ahead_time_seconds?: number;
 
+  routing_number?: string;
+
   starts_at?: Date;
 
   team?: string;
@@ -1254,7 +1306,11 @@ export interface CallSettingsResponse {
 
   geofencing: GeofenceSettingsResponse;
 
+  individual_recording: IndividualRecordingSettingsResponse;
+
   limits: LimitsSettingsResponse;
+
+  raw_recording: RawRecordingSettingsResponse;
 
   recording: RecordSettingsResponse;
 
@@ -1906,6 +1962,10 @@ export interface CommentUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface CompositeRecordingResponse {
+  status: string;
+}
+
 export interface ConfigOverrides {
   commands: string[];
 
@@ -2347,9 +2407,15 @@ export interface EgressResponse {
 
   rtmps: EgressRTMPResponse[];
 
+  composite_recording?: CompositeRecordingResponse;
+
   frame_recording?: FrameRecordingResponse;
 
   hls?: EgressHLSResponse;
+
+  individual_recording?: IndividualRecordingResponse;
+
+  raw_recording?: RawRecordingResponse;
 }
 
 export interface EnrichedActivity {
@@ -3185,6 +3251,12 @@ export interface GetActivityResponse {
   activity: ActivityResponse;
 }
 
+export interface GetAppealResponse {
+  duration: string;
+
+  item?: AppealItemResponse;
+}
+
 export interface GetApplicationResponse {
   duration: string;
 
@@ -3455,6 +3527,14 @@ export interface Images {
   original: ImageData;
 }
 
+export interface IndividualRecordingResponse {
+  status: string;
+}
+
+export interface IndividualRecordingSettingsResponse {
+  mode: 'available' | 'disabled' | 'auto-on';
+}
+
 export interface IngressAudioEncodingResponse {
   bitrate: number;
 
@@ -3568,6 +3648,8 @@ export interface MarkActivityRequest {
 
 export interface MarkReviewedRequest {
   content_to_mark_as_reviewed_limit?: number;
+
+  decision_reason?: string;
 
   disable_marking_content_as_reviewed?: boolean;
 }
@@ -4584,6 +4666,28 @@ export interface QueryActivityReactionsResponse {
   prev?: string;
 }
 
+export interface QueryAppealsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryAppealsResponse {
+  duration: string;
+
+  items: AppealItemResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
 export interface QueryBookmarkFoldersRequest {
   limit?: number;
 
@@ -4872,6 +4976,14 @@ export interface RankingConfig {
   functions?: Record<string, DecayFunctionConfig>;
 }
 
+export interface RawRecordingResponse {
+  status: string;
+}
+
+export interface RawRecordingSettingsResponse {
+  mode: 'available' | 'disabled' | 'auto-on';
+}
+
 export interface Reaction {
   activity_id: string;
 
@@ -4958,6 +5070,10 @@ export interface RecordSettingsResponse {
   quality: string;
 }
 
+export interface RejectAppealRequest {
+  decision_reason: string;
+}
+
 export interface RejectFeedMemberInviteRequest {}
 
 export interface RejectFeedMemberInviteResponse {
@@ -5012,7 +5128,9 @@ export interface Response {
   duration: string;
 }
 
-export interface RestoreActionRequest {}
+export interface RestoreActionRequest {
+  decision_reason?: string;
+}
 
 export interface ReviewQueueItemResponse {
   ai_text_severity: string;
@@ -5058,6 +5176,8 @@ export interface ReviewQueueItemResponse {
   teams?: string[];
 
   activity?: EnrichedActivity;
+
+  appeal?: AppealItemResponse;
 
   assigned_to?: UserResponse;
 
@@ -5126,6 +5246,10 @@ export interface RuleBuilderCondition {
   user_custom_property_params?: UserCustomPropertyParameters;
 
   user_flag_count_rule_params?: FlagCountRuleParameters;
+
+  user_identical_content_count_params?: UserIdenticalContentCountParameters;
+
+  user_role_params?: UserRoleParameters;
 
   user_rule_params?: UserRuleParameters;
 
@@ -5274,12 +5398,16 @@ export interface SortParam {
   direction: number;
 
   field: string;
+
+  type: string;
 }
 
 export interface SortParamRequest {
   direction?: number;
 
   field?: string;
+
+  type?: '' | 'number' | 'boolean';
 }
 
 export interface SpeechSegmentConfig {
@@ -5331,9 +5459,12 @@ export interface SubmitActionRequest {
     | 'shadow_block'
     | 'unmask'
     | 'kick_user'
-    | 'end_call';
+    | 'end_call'
+    | 'reject_appeal';
 
-  item_id: string;
+  appeal_id?: string;
+
+  item_id?: string;
 
   ban?: BanActionRequest;
 
@@ -5353,13 +5484,21 @@ export interface SubmitActionRequest {
 
   mark_reviewed?: MarkReviewedRequest;
 
+  reject_appeal?: RejectAppealRequest;
+
+  restore?: RestoreActionRequest;
+
   shadow_block?: ShadowBlockActionRequest;
 
   unban?: UnbanActionRequest;
+
+  unblock?: UnblockActionRequest;
 }
 
 export interface SubmitActionResponse {
   duration: string;
+
+  appeal_item?: AppealItemResponse;
 
   item?: ReviewQueueItemResponse;
 }
@@ -5387,6 +5526,8 @@ export interface TextContentParameters {
 export interface TextRuleParameters {
   contains_url?: boolean;
 
+  semantic_filter_min_threshold?: number;
+
   severity?: string;
 
   threshold?: number;
@@ -5396,6 +5537,8 @@ export interface TextRuleParameters {
   blocklist_match?: string[];
 
   harm_labels?: string[];
+
+  semantic_filter_names?: string[];
 
   llm_harm_labels?: Record<string, string>;
 }
@@ -5535,9 +5678,13 @@ export interface TypingIndicatorsResponse {
   enabled: boolean;
 }
 
-export interface UnbanActionRequest {}
+export interface UnbanActionRequest {
+  decision_reason?: string;
+}
 
-export interface UnblockActionRequest {}
+export interface UnblockActionRequest {
+  decision_reason?: string;
+}
 
 export interface UnblockUsersRequest {
   blocked_user_id: string;
@@ -5549,6 +5696,8 @@ export interface UnblockUsersResponse {
 
 export interface UnfollowBatchRequest {
   follows: FollowPair[];
+
+  delete_notification_activity?: boolean;
 }
 
 export interface UnfollowBatchResponse {
@@ -5574,6 +5723,8 @@ export interface UnpinActivityResponse {
 }
 
 export interface UpdateActivityPartialRequest {
+  handle_mention_notifications?: boolean;
+
   unset?: string[];
 
   set?: Record<string, any>;
@@ -5588,6 +5739,8 @@ export interface UpdateActivityPartialResponse {
 export interface UpdateActivityRequest {
   expires_at?: Date;
 
+  handle_mention_notifications?: boolean;
+
   poll_id?: string;
 
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
@@ -5596,7 +5749,9 @@ export interface UpdateActivityRequest {
 
   text?: string;
 
-  visibility?: string;
+  visibility?: 'public' | 'private' | 'tag';
+
+  visibility_tag?: string;
 
   attachments?: Attachment[];
 
@@ -5686,11 +5841,15 @@ export interface UpdateCollectionsResponse {
 export interface UpdateCommentRequest {
   comment?: string;
 
+  handle_mention_notifications?: boolean;
+
   skip_enrich_url?: boolean;
 
   skip_push?: boolean;
 
   attachments?: Attachment[];
+
+  mentioned_user_ids?: string[];
 
   custom?: Record<string, any>;
 }
@@ -5841,6 +6000,8 @@ export interface UpsertActivitiesResponse {
   duration: string;
 
   activities: ActivityResponse[];
+
+  mention_notifications_created?: number;
 }
 
 export interface UpsertConfigRequest {
@@ -5982,6 +6143,12 @@ export interface UserDeactivatedEvent {
   type: string;
 
   user?: User;
+}
+
+export interface UserIdenticalContentCountParameters {
+  threshold?: number;
+
+  time_window?: string;
 }
 
 export interface UserMute {
@@ -6160,6 +6327,12 @@ export interface UserResponsePrivacyFields {
   privacy_settings?: PrivacySettingsResponse;
 
   teams_role?: Record<string, string>;
+}
+
+export interface UserRoleParameters {
+  operator?: string;
+
+  role?: string;
 }
 
 export interface UserRuleParameters {
