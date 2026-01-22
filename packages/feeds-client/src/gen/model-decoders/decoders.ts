@@ -300,6 +300,17 @@ decoders.AppUpdatedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.AppealItemResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.Ban = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -1127,6 +1138,13 @@ decoders.GetActivityResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.GetAppealResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    item: { type: 'AppealItemResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.GetBlockedUsersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     blocks: { type: 'BlockedUserResponse', isSingle: false },
@@ -1617,6 +1635,13 @@ decoders.QueryActivityReactionsResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.QueryAppealsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    items: { type: 'AppealItemResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.QueryBookmarkFoldersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     bookmark_folders: { type: 'BookmarkFolderResponse', isSingle: false },
@@ -1774,6 +1799,8 @@ decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
 
     reviewed_at: { type: 'DatetimeType', isSingle: true },
 
+    appeal: { type: 'AppealItemResponse', isSingle: true },
+
     assigned_to: { type: 'UserResponse', isSingle: true },
 
     call: { type: 'CallResponse', isSingle: true },
@@ -1873,6 +1900,8 @@ decoders.StoriesFeedUpdatedEvent = (input?: Record<string, any>) => {
 
 decoders.SubmitActionResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
+    appeal_item: { type: 'AppealItemResponse', isSingle: true },
+
     item: { type: 'ReviewQueueItemResponse', isSingle: true },
   };
   return decode(typeMappings, input);
