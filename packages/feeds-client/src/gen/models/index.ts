@@ -1931,6 +1931,8 @@ export interface CommentResponse {
 
   deleted_at?: Date;
 
+  edited_at?: Date;
+
   parent_id?: string;
 
   text?: string;
@@ -5581,6 +5583,8 @@ export interface ThreadedCommentResponse {
   controversy_score?: number;
 
   deleted_at?: Date;
+
+  edited_at?: Date;
 
   parent_id?: string;
 
