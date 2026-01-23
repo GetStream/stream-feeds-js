@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.37](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.36...@stream-io/feeds-client-0.3.37) (2026-01-23)
+
+
+### Features
+
+* [FEEDS-1039] handle deletion of mention noti activities when deleting activity ([#219](https://github.com/GetStream/stream-feeds-js/issues/219)) ([6c7a20c](https://github.com/GetStream/stream-feeds-js/commit/6c7a20cba7de2de6ba647fd37034ce875ca75d21))
+* Feeds 1130 add edited at for commentresponse ([#217](https://github.com/GetStream/stream-feeds-js/issues/217)) ([af1fd63](https://github.com/GetStream/stream-feeds-js/commit/af1fd636e878a3d6c4f24545beabb87ec53fb407))
+
 ## [0.3.36](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.35...@stream-io/feeds-client-0.3.36) (2026-01-22)
 
 
