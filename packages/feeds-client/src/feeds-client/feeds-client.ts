@@ -103,6 +103,7 @@ import {
 
 export type FeedsClientState = {
   connected_user: ConnectedUser | undefined;
+  is_anonymous: boolean;
   is_ws_connection_healthy: boolean;
 };
 
@@ -143,10 +144,7 @@ export class FeedsClient extends FeedsApi {
       options,
     );
     super(apiClient);
-    this.state = new StateStore<FeedsClientState>({
-      connected_user: undefined,
-      is_ws_connection_healthy: false,
-    });
+    this.state = new StateStore<FeedsClientState>(this.initialState);
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
@@ -365,13 +363,28 @@ export class FeedsClient extends FeedsApi {
     }
   }
 
-  connectUser = async (user: UserRequest, tokenProvider?: TokenOrProvider) => {
-    if (
-      this.state.getLatestValue().connected_user !== undefined ||
-      this.wsConnection
-    ) {
-      throw new Error(`Can't connect a new user, call "disconnectUser" first`);
-    }
+  connectAnonymous = () => {
+    this.checkIfUserIsConnected();
+
+    this.connectionIdManager.resolveConnectionidPromise();
+    this.tokenManager.setTokenOrProvider(undefined);
+    this.setGetBatchOwnFieldsThrottlingInterval(
+      this.query_batch_own_fields_throttling_interval,
+    );
+    this.state.partialNext({
+      connected_user: undefined,
+      is_anonymous: true,
+      is_ws_connection_healthy: false,
+    });
+
+    return Promise.resolve();
+  };
+
+  connectUser = async (
+    user: UserRequest | { id: '!anon' },
+    tokenProvider?: TokenOrProvider,
+  ) => {
+    this.checkIfUserIsConnected();
 
     this.tokenManager.setTokenOrProvider(tokenProvider);
 
@@ -614,10 +627,7 @@ export class FeedsClient extends FeedsApi {
     this.activeActivities = [];
     this.activeFeeds = {};
 
-    this.state.partialNext({
-      connected_user: undefined,
-      is_ws_connection_healthy: false,
-    });
+    this.state.partialNext(this.initialState);
 
     this.cancelGetBatchOwnFieldsTimer();
     clearQueuedFeeds();
@@ -1009,5 +1019,23 @@ export class FeedsClient extends FeedsApi {
       ];
       feeds.forEach((f) => handleFollowDeleted.bind(f)({ follow }, false));
     });
+  }
+
+  private get initialState() {
+    return {
+      connected_user: undefined,
+      is_anonymous: false,
+      is_ws_connection_healthy: false,
+    };
+  }
+
+  private checkIfUserIsConnected() {
+    if (
+      this.state.getLatestValue().connected_user !== undefined ||
+      this.wsConnection ||
+      this.state.getLatestValue().is_anonymous
+    ) {
+      throw new Error(`Can't connect a new user, call "disconnectUser" first`);
+    }
   }
 }

@@ -24,6 +24,7 @@ describe('WebSocket connection', () => {
       {
         connected_user: undefined,
         is_ws_connection_healthy: false,
+        is_anonymous: false,
       },
       undefined,
     );
