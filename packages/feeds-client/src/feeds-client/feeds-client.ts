@@ -103,6 +103,7 @@ import {
 
 export type FeedsClientState = {
   connected_user: ConnectedUser | undefined;
+  is_anonymous: boolean;
   is_ws_connection_healthy: boolean;
 };
 
@@ -145,6 +146,7 @@ export class FeedsClient extends FeedsApi {
     super(apiClient);
     this.state = new StateStore<FeedsClientState>({
       connected_user: undefined,
+      is_anonymous: false,
       is_ws_connection_healthy: false,
     });
     this.moderation = new ModerationClient(apiClient);
@@ -365,7 +367,25 @@ export class FeedsClient extends FeedsApi {
     }
   }
 
-  connectUser = async (user: UserRequest, tokenProvider?: TokenOrProvider) => {
+  connectAnonymous = () => {
+    this.connectionIdManager.resolveConnectionidPromise();
+    this.tokenManager.setTokenOrProvider(undefined);
+    this.setGetBatchOwnFieldsThrottlingInterval(
+      this.query_batch_own_fields_throttling_interval,
+    );
+    this.state.partialNext({
+      connected_user: undefined,
+      is_anonymous: true,
+      is_ws_connection_healthy: false,
+    });
+
+    return Promise.resolve();
+  };
+
+  connectUser = async (
+    user: UserRequest | { id: '!anon' },
+    tokenProvider?: TokenOrProvider,
+  ) => {
     if (
       this.state.getLatestValue().connected_user !== undefined ||
       this.wsConnection
