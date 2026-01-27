@@ -144,11 +144,7 @@ export class FeedsClient extends FeedsApi {
       options,
     );
     super(apiClient);
-    this.state = new StateStore<FeedsClientState>({
-      connected_user: undefined,
-      is_anonymous: false,
-      is_ws_connection_healthy: false,
-    });
+    this.state = new StateStore<FeedsClientState>(this.initialState);
     this.moderation = new ModerationClient(apiClient);
     this.tokenManager = tokenManager;
     this.connectionIdManager = connectionIdManager;
@@ -368,6 +364,8 @@ export class FeedsClient extends FeedsApi {
   }
 
   connectAnonymous = () => {
+    this.checkIfUserIsConnected();
+
     this.connectionIdManager.resolveConnectionidPromise();
     this.tokenManager.setTokenOrProvider(undefined);
     this.setGetBatchOwnFieldsThrottlingInterval(
@@ -386,12 +384,7 @@ export class FeedsClient extends FeedsApi {
     user: UserRequest | { id: '!anon' },
     tokenProvider?: TokenOrProvider,
   ) => {
-    if (
-      this.state.getLatestValue().connected_user !== undefined ||
-      this.wsConnection
-    ) {
-      throw new Error(`Can't connect a new user, call "disconnectUser" first`);
-    }
+    this.checkIfUserIsConnected();
 
     this.tokenManager.setTokenOrProvider(tokenProvider);
 
@@ -634,10 +627,7 @@ export class FeedsClient extends FeedsApi {
     this.activeActivities = [];
     this.activeFeeds = {};
 
-    this.state.partialNext({
-      connected_user: undefined,
-      is_ws_connection_healthy: false,
-    });
+    this.state.partialNext(this.initialState);
 
     this.cancelGetBatchOwnFieldsTimer();
     clearQueuedFeeds();
@@ -1029,5 +1019,23 @@ export class FeedsClient extends FeedsApi {
       ];
       feeds.forEach((f) => handleFollowDeleted.bind(f)({ follow }, false));
     });
+  }
+
+  private get initialState() {
+    return {
+      connected_user: undefined,
+      is_anonymous: false,
+      is_ws_connection_healthy: false,
+    };
+  }
+
+  private checkIfUserIsConnected() {
+    if (
+      this.state.getLatestValue().connected_user !== undefined ||
+      this.wsConnection ||
+      this.state.getLatestValue().is_anonymous
+    ) {
+      throw new Error(`Can't connect a new user, call "disconnectUser" first`);
+    }
   }
 }

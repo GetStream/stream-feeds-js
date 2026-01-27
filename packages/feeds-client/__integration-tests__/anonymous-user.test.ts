@@ -7,16 +7,14 @@ import {
 import type { FeedsClient } from '../src/feeds-client';
 import type { Feed } from '../src/feed';
 
-describe.skip('Connecting anonymous user', () => {
+describe('Connecting anonymous user', () => {
   let client: FeedsClient;
   let feed: Feed;
 
   beforeAll(async () => {
     client = createTestClient();
-    await client.connectUser(
-      getTestUser(),
-      createTestTokenGenerator(getTestUser()),
-    );
+    const user = getTestUser();
+    await client.connectUser(user, createTestTokenGenerator(user));
     feed = client.feed('user', crypto.randomUUID());
     await feed.getOrCreate({
       data: {

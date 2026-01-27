@@ -22,9 +22,9 @@ export const useCreateFeedsClient = ({
   const userData =
     userDataOrAnonymous === 'anonymous' ? undefined : userDataOrAnonymous;
 
-  if (userDataOrAnonymous === 'anonymous' && !tokenOrProvider) {
+  if (userDataOrAnonymous !== 'anonymous' && !tokenOrProvider) {
     throw new Error(
-      'Token provider can only be emitted when connecting anonymous user',
+      'Token provider can only be omitted when connecting anonymous user',
     );
   }
 
