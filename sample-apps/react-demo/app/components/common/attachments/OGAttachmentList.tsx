@@ -4,11 +4,13 @@ import { OGAttachment } from './OGAttachment';
 export type OGAttachmentListProps = {
   attachments: AttachmentType[];
   size?: 'small' | 'medium' | 'large';
+  withoutLinks?: boolean;
 };
 
 export const OGAttachmentList = ({
   attachments,
   size = 'medium',
+  withoutLinks = false,
 }: OGAttachmentListProps) => {
   if (attachments.length === 0) return null;
 
@@ -19,6 +21,7 @@ export const OGAttachmentList = ({
           key={attachment.og_scrape_url || attachment.title_link || index}
           attachment={attachment}
           size={size}
+          withoutLinks={withoutLinks}
         />
       ))}
     </div>

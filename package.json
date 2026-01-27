@@ -7,7 +7,8 @@
   "license": "See license in LICENSE",
   "workspaces": [
     "packages/*",
-    "sample-apps/**"
+    "sample-apps/**",
+    "test-data-generator"
   ],
   "scripts": {
     "build:all": "yarn workspaces foreach -Avp --topological-dev run build",

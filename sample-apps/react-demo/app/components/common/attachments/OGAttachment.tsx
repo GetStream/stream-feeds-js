@@ -4,11 +4,13 @@ import { useMemo } from 'react';
 export type OGAttachmentProps = {
   attachment: AttachmentType;
   size?: 'small' | 'medium' | 'large';
+  withoutLinks?: boolean;
 };
 
 export const OGAttachment = ({
   attachment,
   size = 'medium',
+  withoutLinks = false,
 }: OGAttachmentProps) => {
   const { title, text, image_url, thumb_url, og_scrape_url, title_link } =
     attachment;
@@ -53,14 +55,8 @@ export const OGAttachment = ({
 
   const classes = sizeClasses[size];
 
-  return (
-    <a
-      href={linkUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`w-full h-full block ${classes.container} rounded-lg border border-base-300 overflow-hidden hover:border-primary/50 hover:shadow-md transition-all bg-base-100`}
-      aria-label={title ? `Link to ${title}` : `Link to ${domain}`}
-    >
+  const content = (
+    <>
       {imageUrl && (
         <div className={`${classes.image} w-full overflow-hidden bg-base-200`}>
           <img
@@ -92,6 +88,28 @@ export const OGAttachment = ({
           <p className={`${classes.text} text-base-content/70`}>{text}</p>
         )}
       </div>
+    </>
+  );
+
+  if (withoutLinks) {
+    return (
+      <div
+        className={`w-full h-full block ${classes.container} rounded-lg border border-base-300 overflow-hidden bg-base-100`}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={linkUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`w-full h-full block ${classes.container} rounded-lg border border-base-300 overflow-hidden hover:border-primary/50 hover:shadow-md transition-all bg-base-100`}
+      aria-label={title ? `Link to ${title}` : `Link to ${domain}`}
+    >
+      {content}
     </a>
   );
 };

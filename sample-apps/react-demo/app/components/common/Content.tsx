@@ -12,9 +12,10 @@ type ContentProps = {
   moderation?: ModerationV2Response;
   location: 'comment' | 'activity';
   mentioned_users?: UserResponse[];
+  withoutLinks?: boolean;
 };
 
-export const Content = ({ text, attachments, moderation, location, mentioned_users = [] }: ContentProps) => {
+export const Content = ({ text, attachments, moderation, location, mentioned_users = [], withoutLinks = false }: ContentProps) => {
   const { mediaAttachments, ogAttachments } = useMemo(() => {
     if (!attachments) {
       return { mediaAttachments: [], ogAttachments: [] };
@@ -119,38 +120,60 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
         const user = userMap.get(username.toLowerCase());
 
         if (user) {
-          // Create a link for the mentioned user
-          parts.push(
-            <NavLink
-              key={`mention-${partIndex}-${m.index}`}
-              href={`/profile/${user.id}`}
-              className="text-primary font-semibold hover:underline"
-            >
-              @{username}
-            </NavLink>
-          );
+          if (withoutLinks) {
+            parts.push(
+              <span
+                key={`mention-${partIndex}-${m.index}`}
+                className="text-primary"
+              >
+                @{username}
+              </span>
+            );
+          } else {
+            // Create a link for the mentioned user
+            parts.push(
+              <NavLink
+                key={`mention-${partIndex}-${m.index}`}
+                href={`/profile/${user.id}`}
+                className="text-primary font-semibold hover:underline"
+              >
+                @{username}
+              </NavLink>
+            );
+          }
         } else {
           // If user not found in mentioned_users, just show the text without link
           parts.push(`@${username}`);
         }
       } else if (m.type === 'url') {
-        // Normalize URL (add https:// if it starts with www.)
-        let url = m.content;
-        if (url.startsWith('www.')) {
-          url = `https://${url}`;
-        }
+        if (withoutLinks) {
+          parts.push(
+            <span
+              key={`url-${partIndex}-${m.index}`}
+              className="text-primary break-all"
+            >
+              {m.content}
+            </span>
+          );
+        } else {
+          // Normalize URL (add https:// if it starts with www.)
+          let url = m.content;
+          if (url.startsWith('www.')) {
+            url = `https://${url}`;
+          }
 
-        parts.push(
-          <a
-            key={`url-${partIndex}-${m.index}`}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline break-all"
-          >
-            {m.content}
-          </a>
-        );
+          parts.push(
+            <a
+              key={`url-${partIndex}-${m.index}`}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline break-all"
+            >
+              {m.content}
+            </a>
+          );
+        }
       }
 
       lastIndex = m.index + m.length;
@@ -166,7 +189,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
     }
 
     return parts;
-  }, [text, mentioned_users]);
+  }, [text, mentioned_users, withoutLinks]);
 
   if (moderation?.action === 'remove') {
     return (
@@ -188,7 +211,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
         </div>
       )}
       {ogAttachments.length > 0 && (
-        <OGAttachmentList attachments={ogAttachments} size={ogAttachmentSize} />
+        <OGAttachmentList attachments={ogAttachments} size={ogAttachmentSize} withoutLinks={withoutLinks} />
       )}
     </>
   );

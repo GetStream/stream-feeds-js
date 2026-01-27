@@ -37,6 +37,7 @@ export const Composer = ({
   const [caretPosition, setCaretPosition] = useState<CaretPosition | null>(null);
   const attachmentListRef = useRef<AttachmentPreviewListHandle>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
   const { getCaretPosition } = useCaretPosition();
   const {
@@ -71,12 +72,16 @@ export const Composer = ({
 
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
+    setError(undefined);
     try {
       await onSubmit(text, completedAttachments, mentionedUsers.map((u) => u.id));
       setText('');
       setCompletedAttachments([]);
       resetMentionedUsers();
       attachmentListRef.current?.reset();
+    } catch (e) {
+      setError(e as Error);
+      throw e;
     } finally {
       setIsSubmitting(false);
     }
@@ -168,6 +173,7 @@ export const Composer = ({
         onHasInFlightUploadsChange={handleHasInFlightUploadsChange}
         size="small"
       />
+      {error && <div className="text-error"> Failed to save: {error.message} </div>}
       <div className="w-full flex justify-end items-center gap-2">
         <FileUpload
           onFileSelected={handleFileSelected}

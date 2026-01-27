@@ -1,3 +1,5 @@
+import { useCallback, useState } from 'react';
+import { ErrorToast } from './ErrorToast';
 import { NavLink } from './NavLink';
 
 export const ActionButton = ({
@@ -7,23 +9,35 @@ export const ActionButton = ({
   label,
   isActive,
 }: {
-  onClick?: () => void;
+  onClick?: () => Promise<any> | undefined;
   href?: string;
   icon: string;
   label: string;
   isActive: boolean;
 }) => {
   const content = <Content icon={icon} label={label} isActive={isActive} />;
-  return <>
+  const [error, setError] = useState<Error | undefined>(undefined);
 
+  const handleClick = useCallback(async () => {
+    try {
+      setError(undefined);
+      await onClick?.();
+    } catch (e) {
+      setError(e as Error);
+      throw e;
+    }
+  }, [onClick]);
+
+  return <>
     {href ? <div className="btn btn-sm btn-soft"><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
       type="button"
       className="btn btn-sm btn-soft"
-      onClick={onClick}
+      onClick={handleClick}
     >
       {content}
     </button>
     }
+    <ErrorToast error={error} />
   </>
 };
 
@@ -35,24 +49,37 @@ export const SecondaryActionButton = ({
   isActive,
   className,
 }: {
-  onClick?: () => void;
+  onClick?: () => Promise<any> | undefined;
   href?: string;
   icon: string;
   label: string;
   isActive: boolean;
   className?: string;
 }) => {
+  const [error, setError] = useState<Error | undefined>(undefined);
+
+  const handleClick = useCallback(async () => {
+    try {
+      setError(undefined);
+      await onClick?.();
+    } catch (e) {
+      setError(e as Error);
+      throw e;
+    }
+  }, [onClick]);
+
   const content = <Content icon={icon} label={label} isActive={isActive} />;
   return <>
 
     {href ? <div className={`btn btn-md btn-ghost p-2 ${className}`}><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
       type="button"
       className={`btn btn-md btn-ghost p-2 ${className}`}
-      onClick={onClick}
+      onClick={handleClick}
     >
       {content}
     </button>
     }
+    <ErrorToast error={error} />
   </>
 };
 

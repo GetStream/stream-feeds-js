@@ -3,8 +3,10 @@
 import { ActivityInteractions } from '@/app/components/activity/activity-interactions/ActivityInteractions';
 import { ActivityContent } from '@/app/components/activity/ActivityContent';
 import { ActivityHeader } from '@/app/components/activity/ActivityHeader';
+import { ActivityParent } from '@/app/components/activity/ActivityParent';
 import { CommentComposer } from '@/app/components/comments/CommentComposer';
 import { CommentList } from '@/app/components/comments/CommentList';
+import { ErrorCard } from '@/app/components/utility/ErrorCard';
 import { LoadingIndicator } from '@/app/components/utility/LoadingIndicator';
 import {
   StreamActivityWithStateUpdates,
@@ -26,6 +28,7 @@ export default function ActivityPage() {
   const [activityWithStateUpdates, setActivityWithStateUpdates] = useState<
     ActivityWithStateUpdates | undefined
   >();
+  const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const _activityWithStateUpdates = client?.activityWithStateUpdates(id);
@@ -36,7 +39,10 @@ export default function ActivityPage() {
 
   useEffect(() => {
     if (!activityWithStateUpdates?.currentState.activity) {
-      activityWithStateUpdates?.get();
+      activityWithStateUpdates?.get().catch((e) => {
+        setError(e.message);
+        throw e;
+      });
     }
   }, [activityWithStateUpdates]);
 
@@ -44,6 +50,10 @@ export default function ActivityPage() {
     activityWithStateUpdates?.state,
     selector,
   ) ?? { activity: undefined };
+
+  if (error) {
+    return <ErrorCard message="Failed to load activity" error={`${error}. This can happen if the activity was deleted.`} />;
+  }
 
   if (!activity || !activityWithStateUpdates) {
     return (
@@ -58,6 +68,7 @@ export default function ActivityPage() {
       <div className="flex-shrink-0 flex flex-col gap-4">
         <ActivityHeader activity={activity} withActions={true} />
         <ActivityContent activity={activity} />
+        <ActivityParent activity={activity} />
         <ActivityInteractions activity={activity} />
         <div className="text-lg font-semibold">Comments</div>
         <CommentComposer activity={activity} />

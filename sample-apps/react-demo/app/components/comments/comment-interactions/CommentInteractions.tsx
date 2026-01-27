@@ -12,7 +12,7 @@ export const CommentInteractions = ({
   onToggleReplying: () => void;
 }) => {
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center gap-2 flex-wrap">
       <ToggleCommentReaction className="-ml-2" comment={comment} />
       <ReplyToComment
         comment={comment}

@@ -3,17 +3,26 @@ import {
   useAggregatedActivities,
   useNotificationStatus,
 } from '@stream-io/feeds-react-sdk';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Notification } from './Notification';
+import { LoadingIndicator } from '../utility/LoadingIndicator';
 
 export const NotificationList = () => {
   const feed = useFeedContext();
+  const [isLoading, setIsLoading] = useState(false);
   const {
     aggregated_activities: notifications,
     loadNextPage,
     has_next_page,
   } = useAggregatedActivities() ?? { aggregated_activities: [] };
   const { unread } = useNotificationStatus() ?? { unread: 0 };
+
+  const loadNext = useCallback(() => {
+    setIsLoading(true);
+    void loadNextPage?.().finally(() => {
+      setIsLoading(false);
+    });
+  }, [loadNextPage]);
 
   const markAllAsRead = useCallback(() => {
     void feed?.markActivity({ mark_all_read: true });
@@ -48,8 +57,8 @@ export const NotificationList = () => {
             ))}
           </ul>
           {has_next_page && (
-            <button className="btn btn-soft btn-primary" onClick={loadNextPage}>
-              Load more
+            <button className="btn btn-soft btn-primary" onClick={loadNext}>
+              {isLoading ? <LoadingIndicator /> : 'Load more'}
             </button>
           )}
         </>

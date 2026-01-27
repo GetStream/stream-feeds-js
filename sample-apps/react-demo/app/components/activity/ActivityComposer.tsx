@@ -58,8 +58,6 @@ export const ActivityComposer = ({
     [feed, client, activity?.id, parent?.id, onSave],
   );
 
-  const isReply = !!parent;
-
   return (
     <div className="w-full flex flex-col gap-3">
       {parent && (
@@ -77,8 +75,6 @@ export const ActivityComposer = ({
         initialAttachments={initialAttachments}
         initialMentionedUsers={initialMentionedUsers}
         onSubmit={handleSubmit}
-        submitLabel={activity?.id ? 'Save' : isReply ? 'Repost' : 'Post'}
-        placeholder={isReply ? 'Add a comment...' : undefined}
         textareaBorder={textareaBorder}
       />
     </div>

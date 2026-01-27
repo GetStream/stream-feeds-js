@@ -6,6 +6,7 @@ import {
 } from '@stream-io/feeds-react-sdk';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityPreview } from '../components/activity/ActivityPreview';
+import { ErrorCard } from '../components/utility/ErrorCard';
 import { LoadingIndicator } from '../components/utility/LoadingIndicator';
 
 export default function Bookmarks() {
@@ -13,11 +14,12 @@ export default function Bookmarks() {
   const [bookmarks, setBookmarks] = useState<BookmarkResponse[]>([]);
   const [next, setNext] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const loadBookmarks = useCallback(
     (nextCursor?: string) => {
       setIsLoading(true);
-      client
+      return client
         ?.queryBookmarks({
           limit: 20,
           next: nextCursor,
@@ -29,6 +31,10 @@ export default function Bookmarks() {
           ]);
           setNext(response.next);
         })
+        .catch((e) => {
+          setError(e.message);
+          throw e;
+        })
         .finally(() => {
           setIsLoading(false);
         });
@@ -39,6 +45,10 @@ export default function Bookmarks() {
   useEffect(() => {
     loadBookmarks();
   }, [client, loadBookmarks]);
+
+  if (error) {
+    return <ErrorCard message="Failed to load bookmarks" error={error} />;
+  }
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4">

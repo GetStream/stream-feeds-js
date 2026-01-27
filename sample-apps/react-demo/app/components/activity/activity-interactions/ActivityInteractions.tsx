@@ -10,8 +10,8 @@ export const ActivityInteractions = ({
   activity: ActivityResponse;
 }) => {
   return (
-    <div className="w-full flex flex-col gap-2">
-      <div className="flex flex-row gap-2">
+    <div className="w-full min-w-0 max-w-full">
+      <div className="flex flex-row flex-wrap gap-2">
         <OpenComments activity={activity} />
         <ToggleReaction activity={activity} />
         <ReplyToActivity activity={activity} />

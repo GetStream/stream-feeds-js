@@ -35,13 +35,7 @@ export const CommentActions = ({ comment }: { comment: CommentResponse }) => {
 
   const isModerated = comment.moderation?.action === 'remove';
 
-  const deleteComment = async () => {
-    try {
-      await client?.deleteComment({ id: comment.id, delete_notification_activity: true });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const deleteComment = () => client?.deleteComment({ id: comment.id, delete_notification_activity: true });
 
   return (
     <ContentActions canEdit={canEdit} canDelete={canDelete} isModerated={isModerated} onDelete={deleteComment}>

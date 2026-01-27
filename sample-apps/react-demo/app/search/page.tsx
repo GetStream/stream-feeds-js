@@ -7,6 +7,8 @@ import { FeedSearchResult } from '../components/FeedSearchResult';
 import { useSearchParams } from 'next/navigation';
 import { NavLink } from '../components/utility/NavLink';
 import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
+import { LoadingIndicator } from '../components/utility/LoadingIndicator';
+import { ErrorCard } from '../components/utility/ErrorCard';
 
 export default function SearchResults() {
   const searchQuery = useSearchParams().get('q');
@@ -19,38 +21,61 @@ export default function SearchResults() {
     undefined,
   );
   const [nextFeeds, setNextFeeds] = useState<string | undefined>(undefined);
+  const [activityError, setActivityError] = useState<Error | undefined>(undefined);
+  const [feedError, setFeedError] = useState<Error | undefined>(undefined);
+  const [isActivitiesLoading, setIsActivitiesLoading] = useState(false);
+  const [isFeedsLoading, setIsFeedsLoading] = useState(false);
 
   const searchActivities = useCallback(async (next?: string) => {
     if (!client) return;
-    const result = await client.queryActivities({
-      filter: {
-        text: { $q: searchQuery },
-      },
-      limit: 10,
-      next,
-    });
-    setActivitySearchResults((current) => [
-      ...(next ? current : []),
-      ...result.activities,
-    ]);
-    setNextActivities(result.next);
+    try {
+      setIsActivitiesLoading(true);
+      const result = await client.queryActivities({
+        filter: {
+          text: { $q: searchQuery },
+        },
+        limit: 10,
+        next,
+      });
+      setActivitySearchResults((current) => [
+        ...(next ? current : []),
+        ...result.activities,
+      ]);
+      setNextActivities(result.next);
+    } catch (error) {
+      setActivitySearchResults([]);
+      setNextActivities(undefined);
+      setActivityError(error as Error);
+      throw error;
+    } finally {
+      setIsActivitiesLoading(false);
+    }
   }, [client, searchQuery]);
 
   const searchFeeds = useCallback(async (next?: string) => {
     if (!client) return;
-    const result = await client.queryFeeds({
-      filter: {
-        group_id: 'user',
-        ['created_by.name']: { $q: searchQuery },
-      },
-      limit: 10,
-      next,
-    });
-    setFeedSearchResults((current) => [
-      ...(next ? current : []),
-      ...result.feeds,
-    ]);
-    setNextFeeds(result.next);
+    try {
+      const result = await client.queryFeeds({
+        filter: {
+          group_id: 'user',
+          ['created_by.name']: { $q: searchQuery },
+        },
+        limit: 10,
+        next,
+      });
+      setFeedSearchResults((current) => [
+        ...(next ? current : []),
+        ...result.feeds,
+      ]);
+      setNextFeeds(result.next);
+    } catch (error) {
+      setFeedSearchResults([]);
+      setNextFeeds(undefined);
+      setFeedError(error as Error);
+      throw error;
+    } finally {
+      setIsFeedsLoading(false);
+    }
   }, [client, searchQuery]);
 
   useEffect(() => {
@@ -81,7 +106,9 @@ export default function SearchResults() {
         />
         <div className="tab-content">
           <div className="w-full flex flex-col items-center justify-start gap-4">
-            {activitySearchResults.length === 0 && <NoResults />}
+            {isActivitiesLoading && <LoadingIndicator />}
+            {!isActivitiesLoading && activitySearchResults.length === 0 && !activityError && <NoResults />}
+            {!isActivitiesLoading && activityError && <ErrorCard message="Failed to load activities" error={activityError} />}
             {activitySearchResults.length > 0 && (
               <div className="list w-full">
                 {activitySearchResults.map((activity) => (
@@ -103,7 +130,9 @@ export default function SearchResults() {
         <input type="radio" name="my_tabs" className="tab" aria-label="Feeds" />
         <div className="tab-content">
           <div className="w-full flex flex-col items-center justify-start gap-4">
-            {feedSearchResults.length === 0 && <NoResults />}
+            {isFeedsLoading && <LoadingIndicator />}
+            {!isFeedsLoading && feedSearchResults.length === 0 && !feedError && <NoResults />}
+            {!isFeedsLoading && feedError && <ErrorCard message="Failed to load feeds" error={feedError} />}
             {feedSearchResults.length > 0 && (
               <div className="list w-full">
                 {feedSearchResults.map((feed) => (

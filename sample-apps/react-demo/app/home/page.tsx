@@ -22,7 +22,7 @@ const HomeActivityComposer = () => {
 };
 
 export default function Home() {
-  const { ownTimeline, ownFeed, ownStoryTimeline, ownStoryFeed } =
+  const { ownTimeline, ownFeed, ownStoryTimeline, ownStoryFeed, errors } =
     useOwnFeedsContext();
 
   if (!ownTimeline || !ownFeed || !ownStoryTimeline || !ownStoryFeed) {
@@ -47,7 +47,7 @@ export default function Home() {
       <StreamFeed feed={ownTimeline}>
         <div className="w-full flex flex-col items-center justify-start gap-4">
           <div className="text-lg font-bold hidden md:block">Latest posts</div>
-          <ActivityList location="timeline" />
+          <ActivityList location="timeline" error={errors.ownTimeline} />
         </div>
       </StreamFeed>
     </div>

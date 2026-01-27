@@ -5,9 +5,11 @@ import {
   StreamFeeds,
   FeedsClient,
 } from '@stream-io/feeds-react-sdk';
+import * as Sentry from '@sentry/nextjs';
 import { AppSkeleton } from './AppSkeleton';
 import { OwnFeedsContextProvider } from './own-feeds-context';
 import { FollowSuggestionsContextProvider } from './follow-suggestions-context';
+import { ConnectionAlert } from './components/utility/ConnectionAlert';
 import { generateUsername } from 'unique-username-generator';
 import { useEffect, useMemo, type PropsWithChildren } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -60,6 +62,15 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
     },
     options: {
       base_url: process.env.NEXT_PUBLIC_API_URL,
+      timeout: 10000,
+      configure_loggers_options: {
+        default: {
+          level: 'error',
+          sink: (...args: any[]) => {
+            Sentry.captureException(new Error(args.join(' ')));
+          },
+        },
+      },
     },
   });
 
@@ -73,6 +84,7 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
 
   return (
     <StreamFeeds client={client}>
+      <ConnectionAlert />
       <OwnFeedsContextProvider>
         <FollowSuggestionsContextProvider>
           <AppSkeleton>{children}</AppSkeleton>

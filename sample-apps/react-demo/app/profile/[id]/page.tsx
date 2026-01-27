@@ -30,28 +30,34 @@ export default function Profile() {
   const userId = useParams<{ id: string }>().id;
   const currentUser = useClientConnectedUser();
   const client = useFeedsClient();
-  const { ownFeed, ownTimeline } = useOwnFeedsContext();
+  const { ownFeed, ownTimeline, errors } = useOwnFeedsContext();
   const [feed, setFeed] = useState<Feed | undefined>();
   const [timeline, setTimeline] = useState<Feed | undefined>();
+  const [error, setError] = useState<Error | undefined>(undefined);
 
   useEffect(() => {
     if (!userId || !client || !currentUser?.id) {
       setFeed(undefined);
       setTimeline(undefined);
+      setError(undefined);
       return;
     }
     if (userId === currentUser?.id) {
       setFeed(ownFeed);
+      setError(errors?.ownFeed);
       setTimeline(ownTimeline);
     } else {
       const _feed = client.feed('user', userId);
       const _timeline = client.feed('timeline', userId);
-      _feed.getOrCreate();
+      _feed.getOrCreate().catch((e) => {
+        setError(e);
+        throw e;
+      });
       _timeline.getOrCreate();
       setFeed(_feed);
       setTimeline(_timeline);
     }
-  }, [userId, currentUser?.id, client, ownFeed, ownTimeline]);
+  }, [userId, currentUser?.id, client, ownFeed, ownTimeline, errors.ownFeed]);
 
   const { followerCount, activityCount, user } = useStateStore(
     feed?.state,
@@ -95,7 +101,7 @@ export default function Profile() {
       </div>
       {feed && (
         <StreamFeed feed={feed}>
-          <ActivityList location="profile" />
+          <ActivityList location="profile" error={error} />
         </StreamFeed>
       )}
     </div>

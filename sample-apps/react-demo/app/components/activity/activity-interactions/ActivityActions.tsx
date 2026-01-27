@@ -26,13 +26,7 @@ export const ActivityActions = ({
 
   const isModerated = activity.moderation_action === 'remove';
 
-  const deleteActivity = async () => {
-    try {
-      await client?.deleteActivity({ id: activity.id, delete_notification_activity: true });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const deleteActivity = () => client?.deleteActivity({ id: activity.id, delete_notification_activity: true });
 
   return (
     <ContentActions canEdit={canEdit} canDelete={canDelete} isModerated={isModerated} onDelete={deleteActivity}>

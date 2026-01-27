@@ -1,15 +1,22 @@
 import { useFeedActivities, useFeedContext } from '@stream-io/feeds-react-sdk';
 import { Activity } from './Activity';
+import { ErrorCard } from '../utility/ErrorCard';
 import { LoadingIndicator } from '../utility/LoadingIndicator';
 
 export const ActivityList = ({
   location,
+  error,
 }: {
   location: 'timeline' | 'profile' | 'foryou';
+  error?: Error;
 }) => {
   const feed = useFeedContext();
   const { activities, loadNextPage, has_next_page, is_loading } =
     useFeedActivities();
+
+  if (error) {
+    return <ErrorCard message="Failed to load feed" error={error} />;
+  }
 
   return (
     <div className="w-full flex flex-col items-center justify-start gap-4">
@@ -40,7 +47,7 @@ export const ActivityList = ({
           </ul>
           {has_next_page && (
             <button className="btn btn-soft btn-primary" onClick={loadNextPage}>
-              Load more
+              {is_loading ? <LoadingIndicator /> : 'Load more'}
             </button>
           )}
         </>
