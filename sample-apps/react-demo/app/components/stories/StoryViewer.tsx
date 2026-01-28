@@ -1,7 +1,10 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useFeedContext } from '@stream-io/feeds-react-sdk';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Avatar } from '../utility/Avatar';
+import { formatDistanceToNow } from 'date-fns';
+
+const IMAGE_DURATION = 5000; // 5 seconds per image story
 
 export const StoryViewer = ({
   activities,
@@ -17,10 +20,16 @@ export const StoryViewer = ({
       0,
     ),
   );
-  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(IMAGE_DURATION);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const currentStory = activities[currentIndex];
   const totalStories = activities.length;
+
+  const isVideo = currentStory?.attachments?.[0]?.type === 'video';
+  const mediaUrl = isVideo
+    ? currentStory?.attachments?.[0]?.asset_url
+    : currentStory?.attachments?.[0]?.image_url;
 
   useEffect(() => {
     const activity = activities[currentIndex];
@@ -28,8 +37,6 @@ export const StoryViewer = ({
       void feed?.markActivity({ mark_watched: [activity.id] });
     }
   }, [currentIndex, feed, activities]);
-
-  const STORY_DURATION = 5000; // 5 seconds per story
 
   const goToNext = useCallback(() => {
     if (currentIndex < totalStories - 1) {
@@ -45,24 +52,22 @@ export const StoryViewer = ({
     }
   }, [currentIndex]);
 
-  // Auto-advance to next story
+  const handleVideoLoaded = useCallback(() => {
+    setDuration((videoRef.current?.duration ?? 0) * 1000);
+    videoRef.current?.play();
+  }, []);
+
+  // Auto-advance to next story (only for images)
   useEffect(() => {
-    setProgress(0);
-    const startTime = Date.now();
+    if (isVideo) return;
 
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const newProgress = Math.min((elapsed / STORY_DURATION) * 100, 100);
-      setProgress(newProgress);
+    setDuration(IMAGE_DURATION);
+    const timeout = setTimeout(() => {
+      goToNext();
+    }, IMAGE_DURATION);
 
-      if (elapsed >= STORY_DURATION) {
-        clearInterval(interval);
-        goToNext();
-      }
-    }, 50);
-
-    return () => clearInterval(interval);
-  }, [currentIndex, goToNext]);
+    return () => clearTimeout(timeout);
+  }, [currentIndex, isVideo, goToNext]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
@@ -72,40 +77,42 @@ export const StoryViewer = ({
             className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden"
             key={index}
           >
-            <div
-              className="h-full bg-white transition-all duration-100"
-              style={{
-                width:
-                  index === currentIndex
-                    ? `${progress}%`
-                    : index < currentIndex
-                      ? '100%'
-                      : '0%',
-              }}
-            />
+            {index === currentIndex ? (
+              <div key={currentIndex}
+                className="h-full bg-white animate-progress"
+                style={
+                  {
+                    '--progress-duration': `${duration}ms`,
+                  } as React.CSSProperties
+                }
+              />
+            ) : (
+              <div
+                className="h-full bg-white"
+                style={{ width: index < currentIndex ? '100%' : '0%' }}
+              />
+            )}
           </div>
         ))}
       </div>
 
       <div className="absolute top-4 left-2 right-2 flex items-center gap-3 z-10 mt-4">
-        <div className="size-15 md:size-18">
-          <Avatar user={currentStory?.user} />
-        </div>
+        <Avatar user={currentStory?.user} className="size-15 md:size-18" />
         <div className="flex-1 text-white">
           <div className="font-semibold text-sm drop-shadow-lg">
             {currentStory?.user?.name}
           </div>
           <div className="text-xs opacity-80 drop-shadow-lg">
-            {currentStory?.created_at?.toLocaleString()}
+            {formatDistanceToNow(currentStory?.created_at, { addSuffix: true })}
           </div>
         </div>
       </div>
 
       <button
-        className="absolute top-4 right-2 z-10 w-10 h-10 flex items-center justify-center text-white text-3xl font-light hover:bg-white/10 rounded-full transition-colors mt-4"
+        className="absolute cursor-pointer top-4 right-2 z-10 w-10 h-10 flex items-center justify-center text-white text-3xl font-light hover:bg-white/10 rounded-full transition-colors mt-4"
         onClick={onClose}
       >
-        ×
+        <span className="material-symbols-outlined">close</span>
       </button>
 
       <div className="relative w-full h-full max-w-md mx-auto">
@@ -119,10 +126,23 @@ export const StoryViewer = ({
         />
 
         <div className="w-full h-full flex items-center justify-center p-2">
-          <img
-            src={currentStory?.attachments?.[0]?.image_url}
-            className="max-w-full max-h-full object-contain rounded-lg"
-          />
+          {isVideo ? (
+            <video
+              ref={videoRef}
+              src={mediaUrl}
+              className="max-w-full max-h-full object-contain rounded-lg"
+              autoPlay
+              playsInline
+              muted
+              onEnded={goToNext}
+              onLoadedMetadata={handleVideoLoaded}
+            />
+          ) : (
+            <img
+              src={mediaUrl}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+          )}
         </div>
       </div>
     </div>

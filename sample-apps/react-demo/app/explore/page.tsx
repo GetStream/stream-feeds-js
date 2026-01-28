@@ -7,7 +7,7 @@ import { SearchInput } from '../components/utility/SearchInput';
 import { useOwnFeedsContext } from '../own-feeds-context';
 
 export default function Explore() {
-  const { ownForyouFeed } = useOwnFeedsContext();
+  const { ownForyouFeed, errors } = useOwnFeedsContext();
 
   return (
     <div className="flex flex-col items-stretch justify-center gap-4">
@@ -18,8 +18,8 @@ export default function Explore() {
       </div>
       {ownForyouFeed && (
         <StreamFeed feed={ownForyouFeed}>
-          <div className="text-md font-bold lg:hidden">Popular posts</div>
-          <ActivityList withFollowButton={true} />
+          <div className="text-md font-bold lg:hidden -mb-4">Popular posts</div>
+          <ActivityList location="foryou" error={errors.ownForyouFeed} />
         </StreamFeed>
       )}
     </div>

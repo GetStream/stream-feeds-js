@@ -31,11 +31,12 @@ export const OwnStories = () => {
         return;
       }
       setIsLoading(true);
-      const { file: image_url } = await client.uploadImage({ file });
+      const type = file.type.startsWith('video/') ? 'video' : 'image';
+      const uploadResponse = await (type === 'video' ? client.uploadFile({ file }) : client.uploadImage({ file }));
       try {
         await ownStoryFeed?.addActivity({
           type: 'post',
-          attachments: [{ type: 'image', image_url, custom: {} }],
+          attachments: [{ type, [type === 'image' ? 'image_url' : 'asset_url']: uploadResponse?.file, custom: {} }],
           // Expires after 24h
           expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
         });
@@ -70,7 +71,7 @@ export const OwnStories = () => {
           </div>
           <input
             type="file"
-            accept="image/*"
+            accept="image/*,video/*"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];

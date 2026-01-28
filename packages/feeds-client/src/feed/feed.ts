@@ -872,12 +872,13 @@ export class Feed extends FeedApi {
     return response;
   }
 
-  async unfollow(feedOrFid: Feed | string) {
+  async unfollow(feedOrFid: Feed | string, options?: Omit<Parameters<typeof this.client.unfollow>[0], 'source' | 'target'>) {
     const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.feed;
 
     const response = await this.client.unfollow({
       source: this.feed,
       target: fid,
+      ...options,
     });
 
     return response;
