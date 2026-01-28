@@ -1,68 +1,82 @@
-import type { FeedState } from '@stream-io/feeds-react-sdk';
-import { useFeedContext, useStateStore } from '@stream-io/feeds-react-sdk';
-import { useCallback, useState } from 'react';
-import { FileUpload } from './FileUpload';
-import { Avatar } from '../utility/Avatar';
+import type { ActivityResponse, Attachment } from '@stream-io/feeds-react-sdk';
+import { useFeedContext, useFeedsClient } from '@stream-io/feeds-react-sdk';
+import { useCallback, useEffect, useState } from 'react';
+import { Composer } from '../common/composer/Composer';
+import { isOGAttachment } from '../common/attachments/is-og-attachment';
+import { Activity } from './Activity';
 
-const selector = (state: FeedState) => ({
-  createdBy: state.created_by,
-});
-
-export const ActivityComposer = () => {
+export const ActivityComposer = ({
+  activity,
+  parent,
+  onSave,
+  textareaBorder = true,
+}: {
+  activity?: ActivityResponse;
+  parent?: ActivityResponse;
+  onSave?: () => void;
+  textareaBorder?: boolean;
+}) => {
+  const client = useFeedsClient();
   const feed = useFeedContext();
-  const [newText, setNewText] = useState('');
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [initialText, setInitialText] = useState('');
+  const [initialAttachments, setInitialAttachments] = useState<Attachment[]>([]);
+  const [initialMentionedUsers, setInitialMentionedUsers] = useState<Array<{ id: string; name: string }>>([]);
 
-  const { createdBy } = useStateStore(feed?.state, selector) ?? {
-    createdBy: undefined,
-  };
+  useEffect(() => {
+    if (activity) {
+      setInitialText(activity.text ?? '');
+      setInitialAttachments(activity.attachments.filter((a) => !isOGAttachment(a)) ?? []);
+      setInitialMentionedUsers(activity.mentioned_users?.map((u) => ({ id: u.id, name: u.name || u.id })) ?? []);
+    }
+  }, [activity]);
 
-  const sendActivity = useCallback(async () => {
-    await feed?.addActivity({
-      text: newText,
-      type: 'post',
-      attachments: imageUrl
-        ? [{ type: 'image', image_url: imageUrl, custom: {} }]
-        : [],
-    });
-    setNewText('');
-    setImageUrl(undefined);
-  }, [feed, newText, imageUrl]);
+  const handleSubmit = useCallback(
+    async (text: string, attachments: Attachment[], mentionedUserIds: string[]) => {
+      if (activity?.id) {
+        await client?.updateActivityPartial({
+          id: activity.id,
+          set: {
+            text,
+            attachments,
+            mentioned_user_ids: mentionedUserIds,
+            parent_id: parent?.id,
+          },
+          handle_mention_notifications: true,
+        });
+      } else {
+        await feed?.addActivity({
+          text,
+          type: 'post',
+          attachments,
+          create_notification_activity: true,
+          mentioned_user_ids: mentionedUserIds,
+          parent_id: parent?.id,
+        });
+      }
+      onSave?.();
+    },
+    [feed, client, activity?.id, parent?.id, onSave],
+  );
 
   return (
-    <div className="w-full p-4 bg-base-100 card border border-base-300">
-      <div className="w-full flex items-start gap-4">
-        <div className="size-10 md:size-12">
-          <Avatar user={createdBy} />
-        </div>
-        <div className="w-full flex flex-col gap-2">
-          <textarea
-            className="w-full textarea textarea-ghost flex-1 min-h-[60px] text-base"
-            rows={3}
-            placeholder="What is happening?"
-            value={newText}
-            onChange={(e) => setNewText(e.target.value)}
-            style={{ resize: 'none' }}
-          />
-          {imageUrl && (
-            <img
-              src={imageUrl}
-              alt="Uploaded image"
-              className="w-50 h-50 object-cover rounded-lg"
-            />
-          )}
-          <div className="w-full flex justify-end items-center gap-2">
-            <FileUpload onImageUploaded={setImageUrl} />
-            <button
-              className="btn btn-primary flex-shrink-0"
-              onClick={sendActivity}
-              disabled={!newText}
-            >
-              Post
-            </button>
+    <div className="w-full flex flex-col gap-3">
+      {parent && (
+        <div className="relative">
+          <div className="border border-base-300 rounded-lg p-4 bg-base-200/50">
+            <div className="text-xs text-base-content/60 mb-2 font-medium">Reposting</div>
+            <Activity activity={parent} location="preview" />
           </div>
+          <div className="absolute left-6 -bottom-3 w-0.5 h-3 bg-base-300" />
         </div>
-      </div>
+      )}
+      <Composer
+        variant="activity"
+        initialText={initialText}
+        initialAttachments={initialAttachments}
+        initialMentionedUsers={initialMentionedUsers}
+        onSubmit={handleSubmit}
+        textareaBorder={textareaBorder}
+      />
     </div>
   );
 };

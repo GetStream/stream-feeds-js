@@ -380,10 +380,7 @@ export class FeedsClient extends FeedsApi {
     return Promise.resolve();
   };
 
-  connectUser = async (
-    user: UserRequest | { id: '!anon' },
-    tokenProvider?: TokenOrProvider,
-  ) => {
+  connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
     this.checkIfUserIsConnected();
 
     this.tokenManager.setTokenOrProvider(tokenProvider);
@@ -500,11 +497,10 @@ export class FeedsClient extends FeedsApi {
     return response;
   };
 
-  deleteComment = async (request: {
-    id: string;
-    hard_delete?: boolean;
-  }): Promise<StreamResponse<DeleteCommentResponse>> => {
-    const response = await super.deleteComment(request);
+  deleteComment = async (
+    ...args: Parameters<FeedsApi['deleteComment']>
+  ): Promise<StreamResponse<DeleteCommentResponse>> => {
+    const response = await super.deleteComment(...args);
     const { activity, comment } = response;
     for (const feed of this.allActiveFeeds) {
       handleCommentDeleted.bind(feed)({ comment }, false);
@@ -545,11 +541,10 @@ export class FeedsClient extends FeedsApi {
     return this.addActivityReaction(request);
   };
 
-  deleteActivityReaction = async (request: {
-    activity_id: string;
-    type: string;
-  }): Promise<StreamResponse<DeleteActivityReactionResponse>> => {
-    const response = await super.deleteActivityReaction(request);
+  deleteActivityReaction = async (
+    ...args: Parameters<FeedsApi['deleteActivityReaction']>
+  ): Promise<StreamResponse<DeleteActivityReactionResponse>> => {
+    const response = await super.deleteActivityReaction(...args);
     for (const feed of this.allActiveFeeds) {
       handleActivityReactionDeleted.bind(feed)(response, false);
     }
@@ -571,11 +566,10 @@ export class FeedsClient extends FeedsApi {
     return response;
   };
 
-  deleteCommentReaction = async (request: {
-    id: string;
-    type: string;
-  }): Promise<StreamResponse<DeleteCommentReactionResponse>> => {
-    const response = await super.deleteCommentReaction(request);
+  deleteCommentReaction = async (
+    ...args: Parameters<FeedsApi['deleteCommentReaction']>
+  ): Promise<StreamResponse<DeleteCommentReactionResponse>> => {
+    const response = await super.deleteCommentReaction(...args);
     for (const feed of this.allActiveFeeds) {
       handleCommentReactionDeleted.bind(feed)(response, false);
     }

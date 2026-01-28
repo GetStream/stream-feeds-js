@@ -40,9 +40,7 @@ Here are some of the features we support:
 - **Search & queries**: Activity search, **query activities**, and **query feeds** endpoints.
 - **Modern essentials**: Permissions • OpenAPI spec • GDPR endpoints • realtime WebSocket events • push notifications • “own capabilities” API.
 
-## React sample apps
-
-### React demo app with stories
+## React demo app
 
 Deployed version: https://feeds-react-demo.vercel.app
 
@@ -80,27 +78,80 @@ After the above steps run the following command in `sample-apps/react-demo`:
 yarn dev
 ```
 
-### Advanced React app
+## Test Data Generator
 
-Prerequisites:
+The `test-data-generator` directory contains scripts to populate your Stream Feeds app with sample data for testing and development purposes.
 
-- Install dependencies: `yarn`
-- Build React SDK: `yarn build:client` and `yarn build:react-sdk`
-- Create a `.env` file in `sample-apps/react-sample-app` with the following content:
+### Setup
 
-```
-NEXT_PUBLIC_STREAM_API_KEY=<Your API key>
-NEXT_API_SECRET=<Your API secret>
-NEXT_PUBLIC_API_URL=<Optionally provide an API URL>
-```
-
-- Run the `node setup-env.js` script in `sample-apps/react-sample-app`
-- If you want to have some pre-made posts in your app, optinally run the `node create-posts.js` script as well
-
-After the above steps run the following command in `sample-apps/react-sample-app`:
+1. Create a `.env` file in `test-data-generator/` with your credentials:
 
 ```
-yarn dev
+STREAM_API_KEY=<Stream API key>
+API_SECRET=<Stream API secret>
+API_URL=<Optional, Stream API URL>
+```
+
+2. Install dependencies: `yarn` (from the repository root)
+
+### Available Scripts
+
+Run these commands from the `test-data-generator/` directory:
+
+| Script          | Command                | Description                                |
+| --------------- | ---------------------- | ------------------------------------------ |
+| Create Users    | `yarn create-users`    | Creates users and their feeds              |
+| Create Follows  | `yarn create-follows`  | Sets up follow relationships between users |
+| Create Posts    | `yarn create-posts`    | Generates sample activities/posts          |
+| Create Stories  | `yarn create-stories`  | Creates sample stories                     |
+| Download Images | `yarn download-images` | Downloads sample images for posts          |
+
+### Create Posts Feature Flags
+
+The `create-posts` script supports a `--features` flag to control which features are included in the generated posts:
+
+```bash
+yarn create-posts --features <feature1,feature2,...>
+```
+
+**Available features:**
+
+| Feature      | Description                              |
+| ------------ | ---------------------------------------- |
+| `link`       | Adds random URLs to posts                |
+| `attachment` | Uploads and attaches 1-3 images to posts |
+| `mention`    | Adds @mentions to other users            |
+| `poll`       | Creates and attaches polls to posts      |
+| `reaction`   | Adds 1-5 reactions from random users     |
+| `comment`    | Adds 1-5 comments from random users      |
+| `bookmark`   | Bookmarks posts by random users          |
+| `repost`     | Creates reposts of existing activities   |
+
+**Examples:**
+
+```bash
+# Create basic posts without any features
+yarn create-posts
+
+# Create posts with polls and reactions
+yarn create-posts --features poll,reaction
+
+# Create posts with all content features
+yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
+```
+
+> Note: Each feature has a probability of being included (not every post will have every enabled feature). Link and attachment are mutually exclusive per post.
+
+### Usage
+
+Typical order of operations:
+
+```bash
+cd test-data-generator
+yarn create-users
+yarn create-follows
+yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
+yarn create-stories
 ```
 
 ## Local Setup
