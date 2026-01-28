@@ -1,5 +1,5 @@
-export const LoadingIndicator = ({ className = 'loading-sm' }: { className?: string }) => {
+export const LoadingIndicator = () => {
   return (
-    <span className={`loading loading-spinner ${className}`}></span>
+    <span className="loading loading-spinner loading-xs text-primary"></span>
   );
 };

@@ -1,0 +1,31 @@
+{
+  "name": "facebook-clone",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "create-posts": "node ./setup-env.js && node ./create-posts.js",
+    "build": "next build"
+  },
+  "dependencies": {
+    "@stream-io/feeds-react-sdk": "workspace:*",
+    "@stream-io/node-sdk": "0.6.0",
+    "clsx": "^2.1.1",
+    "lodash.uniqby": "^4.7.0",
+    "material-symbols": "^0.27.1",
+    "next": "15.0.5",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "@types/lodash.uniqby": "^4",
+    "@types/node": "^20",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "dotenv": "^16.4.5",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}

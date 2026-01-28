@@ -16,7 +16,7 @@ export const FollowSuggestions = () => {
     <div className="md:card md:card-border md:bg-base-200">
       <div className="md:card-body">
         <h2 className="card-title hidden md:block">Who to follow?</h2>
-        <div className="w-full flex flex-col items-center justify-stretch gap-2 overflow-hidden">
+        <div className="w-full flex flex-col items-center justify-start gap-2">
           {suggestedFeeds.length === 0 ? (
             <p>No suggestions</p>
           ) : (

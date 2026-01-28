@@ -6,7 +6,6 @@ import {
 } from '@stream-io/feeds-react-sdk';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityPreview } from '../components/activity/ActivityPreview';
-import { ErrorCard } from '../components/utility/ErrorCard';
 import { LoadingIndicator } from '../components/utility/LoadingIndicator';
 
 export default function Bookmarks() {
@@ -14,12 +13,11 @@ export default function Bookmarks() {
   const [bookmarks, setBookmarks] = useState<BookmarkResponse[]>([]);
   const [next, setNext] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
 
   const loadBookmarks = useCallback(
     (nextCursor?: string) => {
       setIsLoading(true);
-      return client
+      client
         ?.queryBookmarks({
           limit: 20,
           next: nextCursor,
@@ -31,10 +29,6 @@ export default function Bookmarks() {
           ]);
           setNext(response.next);
         })
-        .catch((e) => {
-          setError(e.message);
-          throw e;
-        })
         .finally(() => {
           setIsLoading(false);
         });
@@ -45,10 +39,6 @@ export default function Bookmarks() {
   useEffect(() => {
     loadBookmarks();
   }, [client, loadBookmarks]);
-
-  if (error) {
-    return <ErrorCard message="Failed to load bookmarks" error={error} />;
-  }
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4">
@@ -63,17 +53,13 @@ export default function Bookmarks() {
           </div>
         </div>
       ) : (
-        <>
-          <ul className="w-full list">
-            {bookmarks.map((bookmark) => (
-              <li className="list-row" key={bookmark.activity.id}>
-                <ActivityPreview
-                  activity={bookmark.activity}
-                />
-              </li>
-            ))}
-
-          </ul>
+        <div className="w-full flex flex-col items-center justify-stretch gap-4">
+          {bookmarks.map((bookmark) => (
+            <ActivityPreview
+              activity={bookmark.activity}
+              key={bookmark.activity.id}
+            />
+          ))}
           {next && (
             <button
               className="btn btn-soft btn-primary"
@@ -82,7 +68,7 @@ export default function Bookmarks() {
               Load more
             </button>
           )}
-        </>
+        </div>
       )}
     </div>
   );

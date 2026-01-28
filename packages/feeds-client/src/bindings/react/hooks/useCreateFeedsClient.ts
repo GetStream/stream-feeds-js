@@ -47,7 +47,7 @@ export const useCreateFeedsClient = ({
 
     const connectionPromise = cachedUserData
       ? _client
-          .connectUser(cachedUserData, tokenOrProvider!)
+          .connectUser(cachedUserData, tokenOrProvider)
           .then(() => {
             setError(null);
           })

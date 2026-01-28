@@ -164,7 +164,7 @@ describe('Activity state updates via WebSocket events', () => {
       text: 'Test activity',
     });
 
-    await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 10000 });
+    await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 1000 });
 
     expect(
       feed.state

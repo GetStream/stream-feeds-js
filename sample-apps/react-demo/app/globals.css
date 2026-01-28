@@ -79,24 +79,3 @@
 .fill.material-symbols-outlined {
   font-variation-settings: 'FILL' 1;
 }
-
-.list {
-  font-size: 1rem;
-}
-
-@keyframes progress-fill {
-  0% {
-    transform: scaleX(0);
-  }
-  100% {
-    transform: scaleX(1);
-  }
-}
-
-.animate-progress {
-  width: 100%;
-  transform-origin: left;
-  animation: progress-fill var(--progress-duration) linear forwards;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}

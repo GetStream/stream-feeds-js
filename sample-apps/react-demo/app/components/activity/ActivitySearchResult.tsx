@@ -45,5 +45,5 @@ export const ActivitySearchResult = ({
     return null;
   }
 
-  return <Activity activity={activity} location="search" />;
+  return <Activity activity={activity} withFollowButton={true} />;
 };

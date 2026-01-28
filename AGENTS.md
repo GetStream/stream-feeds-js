@@ -21,21 +21,20 @@ Agents should prioritize backwards compatibility, API stability, and high test c
 ### Project layout (monorepo)
 
 packages/
-  feeds-client/                # Core Feeds API client
-    src/
-      activity-with-state-updates/  # Activity state management
-      bindings/                # Framework bindings
-      common/                  # Common utilities (API client, state management, real-time)
-      feed/                    # Feed management and event handlers
-      feeds-client/            # Main FeedsClient class
-      gen/                     # Generated API clients and models
-      utils/                   # Utility functions
-  react-sdk/                   # React SDK wrapper with hooks and contexts
-  react-native-sdk/            # React Native SDK wrapper
+feeds-client/ # Core Feeds API client
+src/
+common/ # Common utilities (API client, state management, real-time)
+feed/ # Feed management and event handlers
+feeds-client/ # Main FeedsClient class
+gen/ # Generated API clients and models
+utils/ # Utility functions
+types.ts # Type definitions
+@react-bindings/ # React hooks and contexts
+react-sdk/ # React SDK wrapper
+react-native-sdk/ # React Native SDK wrapper
 sample-apps/
-  react-demo/                  # Next.js demo application (stream-feeds-react-demo)
-  react-sample-app/            # Next.js sample application (facebook-clone)
-  react-native/                # React Native sample application (ExpoTikTokApp)
+react-sample-app/ # Next.js sample application for React
+react-native/ # React Native sample application
 
 Use the closest folder's patterns and conventions when editing.
 
@@ -149,11 +148,11 @@ Commit / PR conventions
 Testing policy
 • Add/extend tests in each package's test directories with .test.ts suffix.
 • Cover:
-  • Core FeedsClient and Feed classes
-  • Event handlers and state management - see ai-docs/ai-state-management for details
-  • React hooks and contexts (react-sdk, react-native-sdk)
-  • Utility functions (token creation, rate limiting, search)
-  • Generated API clients and their interactions
+• Core FeedsClient and Feed classes
+• Event handlers and state management - see ai-docs/ai-state-management for details
+• React hooks and contexts (@react-bindings)
+• Utility functions (token creation, rate limiting, search)
+• Generated API clients and their interactions
 • Integration tests are in `__integration-tests__/` directories
 
 Security & credentials
@@ -185,32 +184,3 @@ Quick agent checklist (per commit)
 • Test affected packages individually if needed
 
 End of machine guidance. Edit this file to refine agent behavior over time; keep human-facing details in README.md and docs.
-
-## React Demo app
-
-### Purpose
-
-This is a React demo application showcasing the Stream Feeds SDK. Both source code quality and visual design should be excellent—this app serves as a reference implementation.
-
-### UI Framework
-
-This project uses **Tailwind CSS** with **daisyUI** for styling.
-
-#### daisyUI Setup for Cursor
-
-To get accurate daisyUI code generation, use one of these methods:
-
-**Quick use in chat:**
-```
-@web https://daisyui.com/llms.txt
-```
-
-### Stream Feeds SDK Documentation
-
-If something is not clear, ask for a documentation link
-
-### Quality Standards
-
-- **Source code**: Clean, well-structured, following React best practices
-- **Design**: Modern, polished UI using daisyUI components effectively
-- **Both must be excellent**—this is a showcase application

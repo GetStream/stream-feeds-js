@@ -64,7 +64,7 @@ export const waitForEvent = (
   client: FeedsClient | Feed,
   type: FeedsEvent['type'] | WSEvent['type'],
   {
-    timeoutMs = 10000,
+    timeoutMs = 3000,
     shouldReject = false,
   }: {
     timeoutMs?: number;

@@ -9,7 +9,7 @@ export const ActivityPreview = ({
 }) => {
   return (
     <NavLink href={`/activity/${activity.id}`}>
-      <Activity activity={activity} location="preview" />
+      <Activity activity={activity} withActions={false} />
     </NavLink>
   );
 };

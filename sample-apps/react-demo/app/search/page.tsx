@@ -7,8 +7,6 @@ import { FeedSearchResult } from '../components/FeedSearchResult';
 import { useSearchParams } from 'next/navigation';
 import { NavLink } from '../components/utility/NavLink';
 import { ActivitySearchResult } from '../components/activity/ActivitySearchResult';
-import { LoadingIndicator } from '../components/utility/LoadingIndicator';
-import { ErrorCard } from '../components/utility/ErrorCard';
 
 export default function SearchResults() {
   const searchQuery = useSearchParams().get('q');
@@ -21,62 +19,39 @@ export default function SearchResults() {
     undefined,
   );
   const [nextFeeds, setNextFeeds] = useState<string | undefined>(undefined);
-  const [activityError, setActivityError] = useState<Error | undefined>(undefined);
-  const [feedError, setFeedError] = useState<Error | undefined>(undefined);
-  const [isActivitiesLoading, setIsActivitiesLoading] = useState(false);
-  const [isFeedsLoading, setIsFeedsLoading] = useState(false);
 
-  const searchActivities = useCallback(async (next?: string) => {
+  const searchActivities = useCallback(async () => {
     if (!client) return;
-    try {
-      setIsActivitiesLoading(true);
-      const result = await client.queryActivities({
-        filter: {
-          text: { $q: searchQuery },
-        },
-        limit: 10,
-        next,
-      });
-      setActivitySearchResults((current) => [
-        ...(next ? current : []),
-        ...result.activities,
-      ]);
-      setNextActivities(result.next);
-    } catch (error) {
-      setActivitySearchResults([]);
-      setNextActivities(undefined);
-      setActivityError(error as Error);
-      throw error;
-    } finally {
-      setIsActivitiesLoading(false);
-    }
-  }, [client, searchQuery]);
+    const result = await client.queryActivities({
+      filter: {
+        text: { $q: searchQuery },
+      },
+      limit: 10,
+      next: nextActivities,
+    });
+    setActivitySearchResults((current) => [
+      ...(nextActivities ? current : []),
+      ...result.activities,
+    ]);
+    setNextActivities(result.next);
+  }, [client, searchQuery, nextActivities]);
 
-  const searchFeeds = useCallback(async (next?: string) => {
+  const searchFeeds = useCallback(async () => {
     if (!client) return;
-    try {
-      const result = await client.queryFeeds({
-        filter: {
-          group_id: 'user',
-          ['created_by.name']: { $q: searchQuery },
-        },
-        limit: 10,
-        next,
-      });
-      setFeedSearchResults((current) => [
-        ...(next ? current : []),
-        ...result.feeds,
-      ]);
-      setNextFeeds(result.next);
-    } catch (error) {
-      setFeedSearchResults([]);
-      setNextFeeds(undefined);
-      setFeedError(error as Error);
-      throw error;
-    } finally {
-      setIsFeedsLoading(false);
-    }
-  }, [client, searchQuery]);
+    const result = await client.queryFeeds({
+      filter: {
+        group_id: 'user',
+        ['created_by.name']: { $q: searchQuery },
+      },
+      limit: 10,
+      next: nextFeeds,
+    });
+    setFeedSearchResults((current) => [
+      ...(nextFeeds ? current : []),
+      ...result.feeds,
+    ]);
+    setNextFeeds(result.next);
+  }, [client, searchQuery, nextFeeds]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -89,9 +64,7 @@ export default function SearchResults() {
     <div className="w-full flex flex-col items-center justify-start gap-4">
       <div className="w-full flex flex-row items-center justify-start gap-4">
         <div className="block lg:hidden">
-          <NavLink href="/explore">
-            <span className="material-symbols-outlined">arrow_back</span>
-          </NavLink>
+          <NavLink href="/explore" icon="arrow_back" />
         </div>
         <div className="text-lg font-bold">Search</div>
       </div>
@@ -104,22 +77,20 @@ export default function SearchResults() {
           aria-label="Activities"
           defaultChecked
         />
-        <div className="tab-content">
+        <div className="tab-content border-base-300 bg-base-100 p-10">
           <div className="w-full flex flex-col items-center justify-start gap-4">
-            {isActivitiesLoading && <LoadingIndicator />}
-            {!isActivitiesLoading && activitySearchResults.length === 0 && !activityError && <NoResults />}
-            {!isActivitiesLoading && activityError && <ErrorCard message="Failed to load activities" error={activityError} />}
+            {activitySearchResults.length === 0 && <NoResults />}
             {activitySearchResults.length > 0 && (
-              <div className="list w-full">
+              <>
                 {activitySearchResults.map((activity) => (
-                  <li className="list-row w-full" key={activity.id}><ActivitySearchResult activity={activity} /></li>
+                  <ActivitySearchResult activity={activity} key={activity.id} />
                 ))}
-              </div>
+              </>
             )}
             {nextActivities && (
               <button
                 className="btn btn-soft btn-primary"
-                onClick={() => searchActivities(nextActivities)}
+                onClick={searchActivities}
               >
                 Load more
               </button>
@@ -128,22 +99,20 @@ export default function SearchResults() {
         </div>
 
         <input type="radio" name="my_tabs" className="tab" aria-label="Feeds" />
-        <div className="tab-content">
+        <div className="tab-content border-base-300 bg-base-100 p-10">
           <div className="w-full flex flex-col items-center justify-start gap-4">
-            {isFeedsLoading && <LoadingIndicator />}
-            {!isFeedsLoading && feedSearchResults.length === 0 && !feedError && <NoResults />}
-            {!isFeedsLoading && feedError && <ErrorCard message="Failed to load feeds" error={feedError} />}
+            {feedSearchResults.length === 0 && <NoResults />}
             {feedSearchResults.length > 0 && (
-              <div className="list w-full">
+              <>
                 {feedSearchResults.map((feed) => (
-                  <li className="list-row w-full flex flex-row justify-stretch items-stretch" key={feed.feed}><FeedSearchResult feed={feed} /></li>
+                  <FeedSearchResult feed={feed} key={feed.feed} />
                 ))}
-              </div>
+              </>
             )}
             {nextFeeds && (
               <button
                 className="btn btn-soft btn-primary"
-                onClick={() => searchFeeds(nextFeeds)}
+                onClick={searchFeeds}
               >
                 Load more
               </button>

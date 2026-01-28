@@ -20,7 +20,7 @@ type FollowSuggestionsContextValue = {
 
 const FollowSuggestionsContext = createContext<FollowSuggestionsContextValue>({
   suggestedFeeds: [],
-  loadFollowSuggestions: async () => { },
+  loadFollowSuggestions: async () => {},
 });
 
 export const FollowSuggestionsContextProvider = ({
@@ -43,8 +43,8 @@ export const FollowSuggestionsContextProvider = ({
       });
       setsuggestedFeeds(response.feeds);
     } catch (error) {
+      console.error('Failed to load follow suggestedFeeds:', error);
       setsuggestedFeeds([]);
-      throw error;
     }
   }, [client, connectedUser]);
 

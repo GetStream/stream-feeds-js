@@ -1,11 +1,11 @@
 'use client';
 
-import { useClientConnectedUser, useNotificationStatus } from '@stream-io/feeds-react-sdk';
+import { useNotificationStatus } from '@stream-io/feeds-react-sdk';
 import { type PropsWithChildren } from 'react';
 import { FollowSuggestions } from './components/FollowSuggestions';
 import { useOwnFeedsContext } from './own-feeds-context';
 import { SearchInput } from './components/utility/SearchInput';
-import { MenuNavLink } from './components/utility/NavLink';
+import { NavLink } from './components/utility/NavLink';
 
 export const AppSkeleton = ({ children }: PropsWithChildren) => {
   const { ownNotifications } = useOwnFeedsContext();
@@ -101,7 +101,7 @@ const Dock = ({
       <button>
         <NotificationsLink>
           {hasUnreadNotifications && (
-            <div className="badge badge-primary h-[0.25rem] w-[0.25rem] p-[0.25rem] absolute left-[60%] top-[15%]" />
+            <div className="badge badge-primary h-[0.25rem] w-[0.25rem] p-[0.25rem] absolute left-[70%] top-[5%]" />
           )}
         </NotificationsLink>
       </button>
@@ -114,35 +114,33 @@ const Dock = ({
 };
 
 const HomeLink = () => {
-  return <MenuNavLink href="/home" icon="home" label="Home" />;
+  return <NavLink href="/home" icon="home" label="Home" />;
 };
 
 const PopularLink = () => {
-  return <MenuNavLink href="/explore" icon="whatshot" label="Popular" />;
+  return <NavLink href="/explore" icon="whatshot" label="Popular" />;
 };
 
 const ExploreLink = () => {
-  return <MenuNavLink href="/explore" icon="search" />;
+  return <NavLink href="/explore" icon="search" />;
 };
 
 const NotificationsLink = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <MenuNavLink href="/notifications" icon="notifications" label="Notifications">
+    <NavLink href="/notifications" icon="notifications" label="Notifications">
       {children}
-    </MenuNavLink>
+    </NavLink>
   );
 };
 
 const ProfileLink = () => {
-  const currentUser = useClientConnectedUser();
-
-  return <MenuNavLink href={`/profile/${currentUser?.id}`} icon="account_circle" label="Profile" />;
+  return <NavLink href="/profile" icon="account_circle" label="Profile" />;
 };
 
 const AddLink = () => {
-  return <MenuNavLink href="/activity-compose" icon="add" label="Add" />;
+  return <NavLink href="/activity-compose" icon="add" label="Add" />;
 };
 
 const BookmarksLink = () => {
-  return <MenuNavLink href="/bookmarks" icon="bookmark" label="Bookmarks" />;
+  return <NavLink href="/bookmarks" icon="bookmark" label="Bookmarks" />;
 };
