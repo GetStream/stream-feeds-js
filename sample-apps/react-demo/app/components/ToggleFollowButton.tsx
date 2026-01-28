@@ -4,7 +4,7 @@ import { useFeedsClient, useOwnFollows } from '@stream-io/feeds-react-sdk';
 
 export const ToggleFollowButton = ({ userId }: { userId: string }) => {
   const client = useFeedsClient();
-  const { ownTimeline, ownStoryTimeline } = useOwnFeedsContext();
+  const { ownTimeline, ownStoryTimeline, reloadTimelines } = useOwnFeedsContext();
 
   const targetUserFeed = client?.feed('user', userId);
 
@@ -31,25 +31,23 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
         }
       });
     // Reload timelines to see new activities
-    await ownTimeline?.getOrCreate({ watch: true, limit: 10 });
-    await ownStoryTimeline?.getOrCreate({ watch: true });
-  }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline]);
+    await reloadTimelines();
+  }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline, reloadTimelines]);
 
   const unfollow = useCallback(async () => {
     if (!targetUserFeed || !targetStoryFeed) {
       return;
     }
 
-    await ownTimeline?.unfollow(targetUserFeed);
+    await ownTimeline?.unfollow(targetUserFeed, { delete_notification_activity: true });
     await ownStoryTimeline?.unfollow(targetStoryFeed).catch((e) => {
       if (e instanceof Error && !e.message.includes(`story:`)) {
         throw e;
       }
     });
     // Reload timelines to remove activities
-    await ownTimeline?.getOrCreate({ watch: true });
-    await ownStoryTimeline?.getOrCreate({ watch: true });
-  }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline]);
+    await reloadTimelines();
+  }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline, reloadTimelines]);
 
   const toggleFollow = useCallback(() => {
     if (isFollowing) {
@@ -61,9 +59,8 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
 
   return (
     <button
-      className={`btn btn-soft ${
-        isFollowing ? 'btn-error' : 'btn-primary'
-      } btn-sm`}
+      className={`btn btn-soft ${isFollowing ? 'btn-error' : 'btn-primary'
+        } btn-sm`}
       onClick={toggleFollow}
     >
       {isFollowing ? 'Unfollow' : 'Follow'}
