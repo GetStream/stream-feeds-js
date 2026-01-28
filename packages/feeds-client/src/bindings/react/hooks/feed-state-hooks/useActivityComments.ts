@@ -7,6 +7,7 @@ import { checkHasAnotherPage } from '../../../../utils';
 import type { Feed, FeedState } from '../../../../feed';
 import type { ActivityState, ActivityWithStateUpdates } from '../../../../activity-with-state-updates/activity-with-state-updates';
 import type { ActivityResponse, CommentResponse } from '../../../../gen/models';
+import { useActivityWithStateUpdatesContext } from '../../contexts/StreamActivityWithStateUpdatesContext';
 
 const canLoadComments = (
   feedOrActivity: Feed | ActivityResponse | ActivityWithStateUpdates,
@@ -36,15 +37,17 @@ type UseCommentsReturnType<T extends ActivityResponse | CommentResponse> = {
 export function useActivityComments({
   feed: feedFromProps,
   parentComment,
-  activity,
+  activity: activityFromProps,
 }: {
   feed?: Feed;
   parentComment?: CommentResponse;
   activity?: ActivityResponse | ActivityWithStateUpdates;
-}) {
+} = {}) {
   const feedFromContext = useFeedContext();
   const feed = feedFromProps ?? feedFromContext;
-  const feedOrActivity = feed ?? activity;
+  const activityFromContext = useActivityWithStateUpdatesContext();
+  const activity = activityFromProps ?? activityFromContext;
+  const feedOrActivity = (activity && canLoadComments(activity)) ? activity : feed;
 
   if (!feedOrActivity) {
     throw new Error('Feed or activity is required');

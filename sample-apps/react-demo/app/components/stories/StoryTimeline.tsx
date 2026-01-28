@@ -1,5 +1,6 @@
 import type {
-  AggregatedActivityResponse} from '@stream-io/feeds-react-sdk';
+  AggregatedActivityResponse
+} from '@stream-io/feeds-react-sdk';
 import {
   useAggregatedActivities,
 } from '@stream-io/feeds-react-sdk';
@@ -23,7 +24,7 @@ export const StoryTimeline = () => {
   }, []);
 
   return (
-    <>
+    <div className="flex flex-row w-full max-w-full overflow-x-auto min-w-0">
       {stories.map((storyGroup) => {
         return (
           <StoryCircle
@@ -46,6 +47,6 @@ export const StoryTimeline = () => {
           onClose={closeStoryViewer}
         />
       )}
-    </>
+    </div>
   );
 };

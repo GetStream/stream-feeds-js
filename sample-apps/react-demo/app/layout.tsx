@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="max-h-full h-full">
-      <body className="max-h-full h-full">
+      <body className="max-h-full h-full overflow-hidden">
         <ErrorBoundary
           fallback={<div>Something went wrong. Try reloading the page.</div>}
         >

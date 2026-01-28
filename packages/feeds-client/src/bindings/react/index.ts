@@ -11,6 +11,7 @@ export * from './hooks/search-state-hooks';
 
 export * from './contexts/StreamFeedsContext';
 export * from './contexts/StreamFeedContext';
+export * from './contexts/StreamActivityWithStateUpdatesContext';
 export * from './contexts/StreamSearchContext';
 export * from './contexts/StreamSearchResultsContext';
 
@@ -18,5 +19,6 @@ export * from './contexts/StreamSearchResultsContext';
 
 export * from './wrappers/StreamFeeds';
 export * from './wrappers/StreamFeed';
+export * from './wrappers/StreamActivityWithStateUpdates';
 export * from './wrappers/StreamSearch';
 export * from './wrappers/StreamSearchResults';
