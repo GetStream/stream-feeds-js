@@ -2199,6 +2199,8 @@ export interface DecayFunctionConfig {
 export interface DeleteActivitiesRequest {
   ids: string[];
 
+  delete_notification_activity?: boolean;
+
   hard_delete?: boolean;
 }
 
@@ -5728,6 +5730,8 @@ export interface UnblockUsersResponse {
 
 export interface UnfollowBatchRequest {
   follows: FollowPair[];
+
+  delete_notification_activity?: boolean;
 }
 
 export interface UnfollowBatchResponse {
@@ -5753,6 +5757,8 @@ export interface UnpinActivityResponse {
 }
 
 export interface UpdateActivityPartialRequest {
+  handle_mention_notifications?: boolean;
+
   unset?: string[];
 
   set?: Record<string, any>;
@@ -5766,6 +5772,8 @@ export interface UpdateActivityPartialResponse {
 
 export interface UpdateActivityRequest {
   expires_at?: Date;
+
+  handle_mention_notifications?: boolean;
 
   poll_id?: string;
 
@@ -5867,11 +5875,15 @@ export interface UpdateCollectionsResponse {
 export interface UpdateCommentRequest {
   comment?: string;
 
+  handle_mention_notifications?: boolean;
+
   skip_enrich_url?: boolean;
 
   skip_push?: boolean;
 
   attachments?: Attachment[];
+
+  mentioned_user_ids?: string[];
 
   custom?: Record<string, any>;
 }
