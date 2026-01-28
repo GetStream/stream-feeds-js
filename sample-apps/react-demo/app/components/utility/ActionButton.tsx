@@ -9,7 +9,7 @@ export const ActionButton = ({
   label,
   isActive,
 }: {
-  onClick?: () => Promise<any> | undefined;
+  onClick?: () => Promise<any> | undefined | void;
   href?: string;
   icon: string;
   label: string;
@@ -49,7 +49,7 @@ export const SecondaryActionButton = ({
   isActive,
   className,
 }: {
-  onClick?: () => Promise<any> | undefined;
+  onClick?: () => Promise<any> | undefined | void;
   href?: string;
   icon: string;
   label: string;
