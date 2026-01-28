@@ -490,6 +490,24 @@ export interface ActivityResponse {
   poll?: PollResponseData;
 }
 
+export interface ActivityRestoredEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: ActivityResponse;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  feed_visibility?: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface ActivitySelectorConfig {
   cutoff_time: Date;
 
@@ -2180,8 +2198,6 @@ export interface DecayFunctionConfig {
 
 export interface DeleteActivitiesRequest {
   ids: string[];
-
-  delete_notification_activity?: boolean;
 
   hard_delete?: boolean;
 }
@@ -5138,6 +5154,14 @@ export interface RestoreActionRequest {
   decision_reason?: string;
 }
 
+export interface RestoreActivityRequest {}
+
+export interface RestoreActivityResponse {
+  duration: string;
+
+  activity: ActivityResponse;
+}
+
 export interface ReviewQueueItemResponse {
   ai_text_severity: string;
 
@@ -5704,8 +5728,6 @@ export interface UnblockUsersResponse {
 
 export interface UnfollowBatchRequest {
   follows: FollowPair[];
-
-  delete_notification_activity?: boolean;
 }
 
 export interface UnfollowBatchResponse {
@@ -5731,8 +5753,6 @@ export interface UnpinActivityResponse {
 }
 
 export interface UpdateActivityPartialRequest {
-  handle_mention_notifications?: boolean;
-
   unset?: string[];
 
   set?: Record<string, any>;
@@ -5746,8 +5766,6 @@ export interface UpdateActivityPartialResponse {
 
 export interface UpdateActivityRequest {
   expires_at?: Date;
-
-  handle_mention_notifications?: boolean;
 
   poll_id?: string;
 
@@ -5849,15 +5867,11 @@ export interface UpdateCollectionsResponse {
 export interface UpdateCommentRequest {
   comment?: string;
 
-  handle_mention_notifications?: boolean;
-
   skip_enrich_url?: boolean;
 
   skip_push?: boolean;
 
   attachments?: Attachment[];
-
-  mentioned_user_ids?: string[];
 
   custom?: Record<string, any>;
 }
@@ -6472,6 +6486,7 @@ export type WSClientEvent =
   | ({
       type: 'feeds.activity.removed_from_feed';
     } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'feeds.activity.restored' } & ActivityRestoredEvent)
   | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
   | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
   | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
@@ -6522,6 +6537,7 @@ export type WSEvent =
   | ({
       type: 'feeds.activity.removed_from_feed';
     } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'feeds.activity.restored' } & ActivityRestoredEvent)
   | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
   | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
   | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
