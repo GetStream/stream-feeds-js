@@ -34,6 +34,9 @@ const eventDecoderMapping: Record<
   'feeds.activity.removed_from_feed': (data: Record<string, any>) =>
     decoders.ActivityRemovedFromFeedEvent(data),
 
+  'feeds.activity.restored': (data: Record<string, any>) =>
+    decoders.ActivityRestoredEvent(data),
+
   'feeds.activity.unpinned': (data: Record<string, any>) =>
     decoders.ActivityUnpinnedEvent(data),
 

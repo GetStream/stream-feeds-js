@@ -99,6 +99,8 @@ import type {
   RejectFollowRequest,
   RejectFollowResponse,
   Response,
+  RestoreActivityRequest,
+  RestoreActivityResponse,
   SharedLocationResponse,
   SharedLocationsResponse,
   SingleFollowResponse,
@@ -779,6 +781,30 @@ export class FeedsApi {
     );
 
     decoders.UpdateActivityResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async restoreActivity(
+    request: RestoreActivityRequest & { id: string },
+  ): Promise<StreamResponse<RestoreActivityResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {};
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<RestoreActivityResponse>
+    >(
+      'PUT',
+      '/api/v2/feeds/activities/{id}/restore',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.RestoreActivityResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

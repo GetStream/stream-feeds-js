@@ -219,6 +219,7 @@ export class Feed extends FeedApi {
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
     'feeds.activity.feedback': handleActivityFeedback.bind(this),
+    'feeds.activity.restored': Feed.noop,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -872,7 +873,13 @@ export class Feed extends FeedApi {
     return response;
   }
 
-  async unfollow(feedOrFid: Feed | string, options?: Omit<Parameters<typeof this.client.unfollow>[0], 'source' | 'target'>) {
+  async unfollow(
+    feedOrFid: Feed | string,
+    options?: Omit<
+      Parameters<typeof this.client.unfollow>[0],
+      'source' | 'target'
+    >,
+  ) {
     const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.feed;
 
     const response = await this.client.unfollow({
