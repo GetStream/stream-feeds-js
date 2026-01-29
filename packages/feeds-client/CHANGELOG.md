@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.40](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.39...@stream-io/feeds-client-0.3.40) (2026-01-29)
+
+
+### Bug Fixes
+
+* feeds 1117 support restoring soft deleted activities ([#224](https://github.com/GetStream/stream-feeds-js/issues/224)) ([bf86bb4](https://github.com/GetStream/stream-feeds-js/commit/bf86bb475047a034f2a4587a4bd3cea207fc2238))
+
 ## [0.3.39](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.38...@stream-io/feeds-client-0.3.39) (2026-01-29)
 
 
