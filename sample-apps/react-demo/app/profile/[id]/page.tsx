@@ -13,6 +13,7 @@ import { NavLink } from '../../components/utility/NavLink';
 import { ActivityList } from '../../components/activity/ActivityList';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { ToggleFollowButton } from '@/app/components/ToggleFollowButton';
 
 const userFeedSelector = (state: FeedState) => ({
   // Don't count your own timeline in following feeds
@@ -59,6 +60,10 @@ export default function Profile() {
     }
   }, [userId, currentUser?.id, client, ownFeed, ownTimeline, errors.ownFeed]);
 
+  const shouldShowBookmarks = currentUser?.id === userId;
+
+  const shouldShowToggleFollow = currentUser?.id !== userId;
+
   const { followerCount, activityCount, user } = useStateStore(
     feed?.state,
     userFeedSelector,
@@ -94,11 +99,12 @@ export default function Profile() {
         </div>
       </div>
       <div className="md:hidden">
-        <NavLink className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0" href="/bookmarks">
+        {shouldShowBookmarks && <NavLink className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0" href="/bookmarks">
           <span className="material-symbols-outlined">bookmark</span>
           <span className="text-sm">Bookmarks</span>
-        </NavLink>
+        </NavLink>}
       </div>
+      {shouldShowToggleFollow && <ToggleFollowButton userId={userId} />}
       {feed && (
         <StreamFeed feed={feed}>
           <ActivityList location="profile" error={error} />
