@@ -796,7 +796,7 @@ export class FeedsApi {
     const response = await this.apiClient.sendRequest<
       StreamResponse<RestoreActivityResponse>
     >(
-      'PUT',
+      'POST',
       '/api/v2/feeds/activities/{id}/restore',
       pathParams,
       undefined,
