@@ -11,8 +11,9 @@ import { useOwnFeedsContext } from '../../own-feeds-context';
 import { Avatar } from '../../components/utility/Avatar';
 import { NavLink } from '../../components/utility/NavLink';
 import { ActivityList } from '../../components/activity/ActivityList';
+import { PullToRefresh } from '../../components/utility/PullToRefresh';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ToggleFollowButton } from '@/app/components/ToggleFollowButton';
 
 const userFeedSelector = (state: FeedState) => ({
@@ -31,10 +32,11 @@ export default function Profile() {
   const userId = useParams<{ id: string }>().id;
   const currentUser = useClientConnectedUser();
   const client = useFeedsClient();
-  const { ownFeed, ownTimeline, errors } = useOwnFeedsContext();
+  const { ownFeed, ownTimeline, errors, reloadOwnFeed } = useOwnFeedsContext();
   const [feed, setFeed] = useState<Feed | undefined>();
   const [timeline, setTimeline] = useState<Feed | undefined>();
   const [error, setError] = useState<Error | undefined>(undefined);
+  const isOwnProfile = userId === currentUser?.id;
 
   useEffect(() => {
     if (!userId || !client || !currentUser?.id) {
@@ -43,7 +45,7 @@ export default function Profile() {
       setError(undefined);
       return;
     }
-    if (userId === currentUser?.id) {
+    if (isOwnProfile) {
       setFeed(ownFeed);
       setError(errors?.ownFeed);
       setTimeline(ownTimeline);
@@ -58,7 +60,23 @@ export default function Profile() {
       setFeed(_feed);
       setTimeline(_timeline);
     }
-  }, [userId, currentUser?.id, client, ownFeed, ownTimeline, errors.ownFeed]);
+  }, [userId, currentUser?.id, client, ownFeed, ownTimeline, errors.ownFeed, isOwnProfile]);
+
+  const reloadOtherUserFeed = useCallback(async () => {
+    if (!feed) return;
+    setError(undefined);
+    await feed.getOrCreate().catch((e) => {
+      setError(e);
+    });
+  }, [feed]);
+
+  const handleRefresh = useCallback(async () => {
+    if (isOwnProfile) {
+      await reloadOwnFeed();
+    } else {
+      await reloadOtherUserFeed();
+    }
+  }, [isOwnProfile, reloadOwnFeed, reloadOtherUserFeed]);
 
   const shouldShowBookmarks = currentUser?.id === userId;
 
@@ -79,37 +97,44 @@ export default function Profile() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-start gap-4">
-      <div className="flex flex-row items-center justify-center gap-4">
-        <Avatar user={user} className="size-10 md:size-12" />
-        <div className="text-lg font-semibold">{user?.name}</div>
-      </div>
-      <div className="stats">
-        <div className="stat">
-          <div className="stat-title">Posts</div>
-          <div className="stat-value text-primary">{activityCount}</div>
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="w-full flex flex-col items-center justify-start gap-4">
+        <div className="flex flex-row items-center justify-center gap-4">
+          <Avatar user={user} className="size-10 md:size-12" />
+          <div className="text-lg font-semibold">{user?.name}</div>
         </div>
-        <div className="stat">
-          <div className="stat-title">Followers</div>
-          <div className="stat-value text-primary">{followerCount}</div>
+        <div className="stats">
+          <div className="stat">
+            <div className="stat-title">Posts</div>
+            <div className="stat-value text-primary">{activityCount}</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">Followers</div>
+            <div className="stat-value text-primary">{followerCount}</div>
+          </div>
+          <div className="stat">
+            <div className="stat-title">Following</div>
+            <div className="stat-value text-primary">{followingCount}</div>
+          </div>
         </div>
-        <div className="stat">
-          <div className="stat-title">Following</div>
-          <div className="stat-value text-primary">{followingCount}</div>
+        <div className="md:hidden">
+          {shouldShowBookmarks && (
+            <NavLink
+              className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0"
+              href="/bookmarks"
+            >
+              <span className="material-symbols-outlined">bookmark</span>
+              <span className="text-sm">Bookmarks</span>
+            </NavLink>
+          )}
         </div>
+        {shouldShowToggleFollow && <ToggleFollowButton userId={userId} />}
+        {feed && (
+          <StreamFeed feed={feed}>
+            <ActivityList location="profile" error={error} />
+          </StreamFeed>
+        )}
       </div>
-      <div className="md:hidden">
-        {shouldShowBookmarks && <NavLink className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0" href="/bookmarks">
-          <span className="material-symbols-outlined">bookmark</span>
-          <span className="text-sm">Bookmarks</span>
-        </NavLink>}
-      </div>
-      {shouldShowToggleFollow && <ToggleFollowButton userId={userId} />}
-      {feed && (
-        <StreamFeed feed={feed}>
-          <ActivityList location="profile" error={error} />
-        </StreamFeed>
-      )}
-    </div>
+    </PullToRefresh>
   );
 }

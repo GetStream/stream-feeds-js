@@ -4,24 +4,27 @@ import { StreamFeed } from '@stream-io/feeds-react-sdk';
 import { ActivityList } from '../components/activity/ActivityList';
 import { FollowSuggestions } from '../components/FollowSuggestions';
 import { SearchInput } from '../components/utility/SearchInput';
+import { PullToRefresh } from '../components/utility/PullToRefresh';
 import { useOwnFeedsContext } from '../own-feeds-context';
 
 export default function Explore() {
-  const { ownForyouFeed, errors } = useOwnFeedsContext();
+  const { ownForyouFeed, errors, reloadForyouFeed } = useOwnFeedsContext();
 
   return (
-    <div className="flex flex-col items-stretch justify-center gap-4">
-      <div className="lg:hidden w-full flex flex-col items-stretch justify-center gap-4">
-        <SearchInput />
-        <div className="text-md font-bold md:hidden">Follow suggestions</div>
-        <FollowSuggestions />
+    <PullToRefresh onRefresh={reloadForyouFeed}>
+      <div className="flex flex-col items-stretch justify-center gap-4">
+        <div className="lg:hidden w-full flex flex-col items-stretch justify-center gap-4">
+          <SearchInput />
+          <div className="text-md font-bold md:hidden">Follow suggestions</div>
+          <FollowSuggestions />
+        </div>
+        {ownForyouFeed && (
+          <StreamFeed feed={ownForyouFeed}>
+            <div className="text-md font-bold lg:hidden -mb-4">Popular posts</div>
+            <ActivityList location="foryou" error={errors.ownForyouFeed} />
+          </StreamFeed>
+        )}
       </div>
-      {ownForyouFeed && (
-        <StreamFeed feed={ownForyouFeed}>
-          <div className="text-md font-bold lg:hidden -mb-4">Popular posts</div>
-          <ActivityList location="foryou" error={errors.ownForyouFeed} />
-        </StreamFeed>
-      )}
-    </div>
+    </PullToRefresh>
   );
 }
