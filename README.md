@@ -94,6 +94,19 @@ API_URL=<Optional, Stream API URL>
 
 2. Install dependencies: `yarn` (from the repository root)
 
+### Typical use-case
+
+Run these scripts in the following order:
+
+```bash
+yarn create-users
+yarn create-follows
+# Adjust what features you need
+yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
+# Optional, only useful if you have story feeds
+yarn create-stories
+```
+
 ### Available Scripts
 
 Run these commands from the `test-data-generator/` directory:
