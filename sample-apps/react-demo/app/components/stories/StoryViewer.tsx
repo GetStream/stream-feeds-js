@@ -41,10 +41,14 @@ export const StoryViewer = ({
   useEffect(() => {
     if (isOpen) {
       dialogRef.current?.showModal();
+      setCurrentIndex(Math.max(
+        activities.findIndex((a) => !a.is_watched),
+        0,
+      ));
     } else {
       dialogRef.current?.close();
     }
-  }, [isOpen]);
+  }, [isOpen, activities]);
 
   const currentStory = activities[currentIndex];
   const totalStories = activities.length;
