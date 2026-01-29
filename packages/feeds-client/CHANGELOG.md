@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.39](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.38...@stream-io/feeds-client-0.3.39) (2026-01-29)
+
+
+* remove unnecessary type from connectUser ([1563665](https://github.com/GetStream/stream-feeds-js/commit/1563665e0bfc66451b6a203b524704a54b15c0cd))
+
+
+### Features
+
+* allow deleting notifications ([1fead14](https://github.com/GetStream/stream-feeds-js/commit/1fead1410293d8c643a65d86343ad91350caaa0c))
+* create ActivityWithStateUpdatesContext ([e742eaf](https://github.com/GetStream/stream-feeds-js/commit/e742eaf30f2bc71bfde43d4670a395e04303a25f))
+* new endpoint for restoring soft deleted activity ([#221](https://github.com/GetStream/stream-feeds-js/issues/221)) ([d23d1e6](https://github.com/GetStream/stream-feeds-js/commit/d23d1e68e289ccd117a5c8667289bc74822a0422))
+
 ## [0.3.38](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.37...@stream-io/feeds-client-0.3.38) (2026-01-27)
 
 
