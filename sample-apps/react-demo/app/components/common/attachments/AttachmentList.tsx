@@ -42,48 +42,50 @@ export const AttachmentList = ({
   const currentAttachment = attachments[currentIndex];
 
   return (
-    <div className="flex flex-col items-center max-w-full overflow-hidden">
-      <div className="flex items-stretch gap-1">
+    <div className="flex flex-col items-start max-w-full overflow-hidden">
+      <div className="relative inline-block">
         {hasMultiple && (
           <button
-            className="cursor-pointer flex items-center justify-center px-2 hover:bg-base-200/50 rounded-lg transition-colors"
+            className="absolute left-0 top-0 h-full z-10 flex items-center justify-center px-2 cursor-pointer"
             onClick={goToPrevious}
             aria-label="Previous attachment"
           >
-            <span className="material-symbols-outlined">chevron_left</span>
+            <span className="btn btn-circle btn-sm bg-base-100/80 hover:bg-base-100 border-none shadow-md">
+              <span className="material-symbols-outlined">chevron_left</span>
+            </span>
           </button>
         )}
 
-        <div className="flex-shrink min-w-0">
-          <Attachment
-            attachment={currentAttachment}
-            size={size}
-            onClick={currentAttachment.type !== 'video' ? handleImageClick : undefined}
-          />
-        </div>
+        <Attachment
+          attachment={currentAttachment}
+          size={size}
+          onClick={currentAttachment.type !== 'video' ? handleImageClick : undefined}
+        />
 
         {hasMultiple && (
           <button
-            className="cursor-pointer flex items-center justify-center px-2 hover:bg-base-200/50 rounded-lg transition-colors"
+            className="absolute right-0 top-0 h-full z-10 flex items-center justify-center px-2 cursor-pointer"
             onClick={goToNext}
             aria-label="Next attachment"
           >
-            <span className="material-symbols-outlined">chevron_right</span>
+            <span className="btn btn-circle btn-sm bg-base-100/80 hover:bg-base-100 border-none shadow-md">
+              <span className="material-symbols-outlined">chevron_right</span>
+            </span>
           </button>
         )}
-      </div>
 
-      {hasMultiple && (
-        <div className="flex justify-center gap-1 mt-2">
-          {attachments.map((_, i) => (
-            <span
-              key={i}
-              className={`w-2 h-2 rounded-full transition-colors ${i === currentIndex ? 'bg-primary' : 'bg-base-300'
-                }`}
-            />
-          ))}
-        </div>
-      )}
+        {hasMultiple && (
+          <div className="flex justify-center gap-1 mt-2">
+            {attachments.map((_, i) => (
+              <span
+                key={i}
+                className={`w-2 h-2 rounded-full transition-colors ${i === currentIndex ? 'bg-primary' : 'bg-base-300'
+                  }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       <ImageViewer
         attachments={attachments}
