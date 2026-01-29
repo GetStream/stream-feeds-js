@@ -126,19 +126,19 @@ export const StoryViewer = ({
       </div>
 
       <button
-        className="absolute cursor-pointer top-4 right-2 z-10 w-10 h-10 flex items-center justify-center text-white text-3xl font-light hover:bg-white/10 rounded-full transition-colors mt-4"
+        className="absolute cursor-pointer top-4 right-2 z-30 w-10 h-10 flex items-center justify-center text-white text-3xl font-light hover:bg-white/10 rounded-full transition-colors mt-4"
         onClick={onClose}
       >
         <span className="material-symbols-outlined">close</span>
       </button>
 
-      <div className="relative w-full h-full max-w-md mx-auto">
+      <div className="relative w-full h-full max-w-full min-w-0 mx-auto">
         <div
-          className="absolute left-0 top-0 bottom-0 w-1/3 z-20 cursor-pointer active:bg-black/10"
+          className="absolute left-0 top-0 bottom-0 w-1/2 z-20 cursor-pointer"
           onClick={goToPrevious}
         />
         <div
-          className="absolute right-0 top-0 bottom-0 w-2/3 z-20 cursor-pointer active:bg-black/10"
+          className="absolute right-0 top-0 bottom-0 w-1/2 z-20 cursor-pointer"
           onClick={goToNext}
         />
 
