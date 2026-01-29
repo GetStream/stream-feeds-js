@@ -490,6 +490,24 @@ export interface ActivityResponse {
   poll?: PollResponseData;
 }
 
+export interface ActivityRestoredEvent {
+  created_at: Date;
+
+  fid: string;
+
+  activity: ActivityResponse;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  feed_visibility?: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface ActivitySelectorConfig {
   cutoff_time: Date;
 
@@ -5138,6 +5156,14 @@ export interface RestoreActionRequest {
   decision_reason?: string;
 }
 
+export interface RestoreActivityRequest {}
+
+export interface RestoreActivityResponse {
+  duration: string;
+
+  activity: ActivityResponse;
+}
+
 export interface ReviewQueueItemResponse {
   ai_text_severity: string;
 
@@ -6472,6 +6498,7 @@ export type WSClientEvent =
   | ({
       type: 'feeds.activity.removed_from_feed';
     } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'feeds.activity.restored' } & ActivityRestoredEvent)
   | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
   | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
   | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
@@ -6522,6 +6549,7 @@ export type WSEvent =
   | ({
       type: 'feeds.activity.removed_from_feed';
     } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'feeds.activity.restored' } & ActivityRestoredEvent)
   | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
   | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
   | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
