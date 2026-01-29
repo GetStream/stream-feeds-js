@@ -2,7 +2,7 @@ import {
   type ActivityResponse,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
-import { useCallback, useState } from 'react';
+import { startTransition, useCallback, useOptimistic, useState } from 'react';
 import { ActionButton } from '../../utility/ActionButton';
 
 export const ToggleBookmark = ({
@@ -11,46 +11,50 @@ export const ToggleBookmark = ({
   activity: ActivityResponse;
 }) => {
   const client = useFeedsClient();
-  const [optimisticState, setOptimisticState] = useState<boolean | undefined>(undefined);
-  const [optimisticCount, setOptimisticCount] = useState<number | undefined>(undefined);
   const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
-  const toggleBookmark = useCallback(
-    async () => {
-      setInProgress(true);
-      let request: Promise<unknown> | undefined;
+  const isBookmarked = (activity.own_bookmarks?.length ?? 0) > 0;
+  const bookmarkCount = activity.bookmark_count ?? 0;
 
-      if (activity.own_bookmarks?.length > 0) {
-        setOptimisticState(false);
-        setOptimisticCount((activity.bookmark_count ?? 0) - 1);
-        request = client?.deleteBookmark({
-          activity_id: activity.id,
-        });
-      } else {
-        setOptimisticState(true);
-        setOptimisticCount((activity.bookmark_count ?? 0) + 1);
-        request = client?.addBookmark({
-          activity_id: activity.id,
-        });
-      }
+  const [state, setState] = useOptimistic(
+    { isBookmarked, bookmarkCount },
+    (_, newState: { isBookmarked: boolean; bookmarkCount: number }) => newState,
+  );
+
+  const toggleBookmark = useCallback(() => {
+    setInProgress(true);
+    setError(undefined);
+
+    startTransition(async () => {
       try {
-        await request;
+        if (isBookmarked) {
+          setState({ isBookmarked: false, bookmarkCount: bookmarkCount - 1 });
+          await client?.deleteBookmark({
+            activity_id: activity.id,
+          });
+        } else {
+          setState({ isBookmarked: true, bookmarkCount: bookmarkCount + 1 });
+          await client?.addBookmark({
+            activity_id: activity.id,
+          });
+        }
+      } catch (e) {
+        setError(e as Error);
       } finally {
-        setOptimisticState(undefined);
-        setOptimisticCount(undefined);
         setInProgress(false);
       }
-    },
-    [client, activity.id, activity.own_bookmarks, activity.bookmark_count],
-  );
+    });
+  }, [client, activity.id, isBookmarked, bookmarkCount, setState]);
 
   return (
     <ActionButton
       onClick={toggleBookmark}
       icon="bookmark"
       disabled={inProgress}
-      label={(optimisticCount ?? activity.bookmark_count ?? 0).toString()}
-      isActive={optimisticState ?? (activity.own_bookmarks?.length ?? 0) > 0}
+      label={state.bookmarkCount.toString()}
+      isActive={state.isBookmarked}
+      error={error}
     />
   );
 };

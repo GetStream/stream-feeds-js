@@ -1,6 +1,6 @@
 import type { CommentResponse } from '@stream-io/feeds-react-sdk';
 import { useFeedsClient } from '@stream-io/feeds-react-sdk';
-import { useCallback, useState } from 'react';
+import { startTransition, useCallback, useOptimistic, useState } from 'react';
 import { SecondaryActionButton } from '../../utility/ActionButton';
 
 export const ToggleCommentReaction = ({
@@ -11,51 +11,55 @@ export const ToggleCommentReaction = ({
   className?: string;
 }) => {
   const client = useFeedsClient();
-  const [optimisticState, setOptimisticState] = useState<boolean | undefined>(undefined);
-  const [optimisticCount, setOptimisticCount] = useState<number | undefined>(undefined);
   const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
-  const toggleReaction = useCallback(
-    async () => {
-      setInProgress(true);
-      let request: Promise<unknown> | undefined;
+  const isLiked = (comment.own_reactions?.length ?? 0) > 0;
+  const likeCount = comment.reaction_groups?.like?.count ?? 0;
 
-      if (comment.own_reactions?.length > 0) {
-        setOptimisticState(false);
-        setOptimisticCount((comment.reaction_groups?.like?.count ?? 0) - 1);
-        request = client?.deleteCommentReaction({
-          id: comment.id,
-          type: 'like',
-          delete_notification_activity: true,
-        });
-      } else {
-        setOptimisticState(true);
-        setOptimisticCount((comment.reaction_groups?.like?.count ?? 0) + 1);
-        request = client?.addCommentReaction({
-          id: comment.id,
-          type: 'like',
-          create_notification_activity: true,
-        });
-      }
+  const [state, setState] = useOptimistic(
+    { isLiked, likeCount },
+    (_, newState: { isLiked: boolean; likeCount: number }) => newState,
+  );
+
+  const toggleReaction = useCallback(() => {
+    setInProgress(true);
+    setError(undefined);
+
+    startTransition(async () => {
       try {
-        await request;
+        if (isLiked) {
+          setState({ isLiked: false, likeCount: likeCount - 1 });
+          await client?.deleteCommentReaction({
+            id: comment.id,
+            type: 'like',
+            delete_notification_activity: true,
+          });
+        } else {
+          setState({ isLiked: true, likeCount: likeCount + 1 });
+          await client?.addCommentReaction({
+            id: comment.id,
+            type: 'like',
+            create_notification_activity: true,
+          });
+        }
+      } catch (e) {
+        setError(e as Error);
       } finally {
-        setOptimisticState(undefined);
-        setOptimisticCount(undefined);
         setInProgress(false);
       }
-    },
-    [client, comment.id, comment.own_reactions, comment.reaction_groups?.like?.count],
-  );
+    });
+  }, [client, comment.id, isLiked, likeCount, setState]);
 
   return (
     <SecondaryActionButton
       onClick={toggleReaction}
       icon="favorite"
       disabled={inProgress}
-      label={(optimisticCount ?? (comment.reaction_groups?.like?.count ?? 0)).toString()}
-      isActive={optimisticState ?? (comment.own_reactions?.length ?? 0) > 0}
+      label={state.likeCount.toString()}
+      isActive={state.isLiked}
       className={className}
+      error={error}
     />
   );
 };

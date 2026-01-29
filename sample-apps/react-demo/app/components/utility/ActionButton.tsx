@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react';
 import { ErrorToast } from './ErrorToast';
 import { NavLink } from './NavLink';
 
@@ -9,6 +8,7 @@ export const ActionButton = ({
   label,
   isActive,
   disabled,
+  error,
 }: {
   onClick?: () => Promise<any> | undefined | void;
   href?: string;
@@ -16,26 +16,16 @@ export const ActionButton = ({
   label: string;
   isActive: boolean;
   disabled?: boolean;
+  error?: Error;
 }) => {
   const content = <Content icon={icon} label={label} isActive={isActive} />;
-  const [error, setError] = useState<Error | undefined>(undefined);
-
-  const handleClick = useCallback(async () => {
-    try {
-      setError(undefined);
-      await onClick?.();
-    } catch (e) {
-      setError(e as Error);
-      throw e;
-    }
-  }, [onClick]);
 
   return <>
     {href ? <div className="btn btn-sm btn-soft"><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
       type="button"
       className="btn btn-sm btn-soft"
       disabled={disabled}
-      onClick={handleClick}
+      onClick={onClick}
     >
       {content}
     </button>
@@ -52,6 +42,7 @@ export const SecondaryActionButton = ({
   isActive,
   disabled,
   className,
+  error,
 }: {
   onClick?: () => Promise<any> | undefined | void;
   href?: string;
@@ -60,19 +51,8 @@ export const SecondaryActionButton = ({
   isActive: boolean;
   disabled?: boolean;
   className?: string;
+  error?: Error;
 }) => {
-  const [error, setError] = useState<Error | undefined>(undefined);
-
-  const handleClick = useCallback(async () => {
-    try {
-      setError(undefined);
-      await onClick?.();
-    } catch (e) {
-      setError(e as Error);
-      throw e;
-    }
-  }, [onClick]);
-
   const content = <Content icon={icon} label={label} isActive={isActive} />;
   return <>
 
@@ -80,7 +60,7 @@ export const SecondaryActionButton = ({
       type="button"
       className={`btn btn-md btn-ghost p-2 ${className}`}
       disabled={disabled}
-      onClick={handleClick}
+      onClick={onClick}
     >
       {content}
     </button>
