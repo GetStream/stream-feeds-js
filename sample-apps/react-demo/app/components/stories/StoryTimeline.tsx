@@ -44,6 +44,7 @@ export const StoryTimeline = () => {
         <StoryViewer
           key={selectedStoryGroup.group}
           activities={selectedStoryGroup.activities}
+          isOpen={!!selectedStoryGroup}
           onClose={closeStoryViewer}
         />
       )}

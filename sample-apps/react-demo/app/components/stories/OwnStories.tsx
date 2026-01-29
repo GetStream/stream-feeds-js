@@ -84,9 +84,10 @@ export const OwnStories = () => {
         </label>
       </div>
 
-      {isStoryViewerOpen && activities && (
+      {activities && activities.length > 0 && (
         <StoryViewer
           activities={activities}
+          isOpen={isStoryViewerOpen}
           onClose={() => setIsStoryViewerOpen(false)}
         />
       )}
