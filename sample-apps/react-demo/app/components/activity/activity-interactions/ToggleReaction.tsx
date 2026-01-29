@@ -1,6 +1,6 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useFeedsClient } from '@stream-io/feeds-react-sdk';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { ActionButton } from '../../utility/ActionButton';
 
 export const ToggleReaction = ({
@@ -9,29 +9,51 @@ export const ToggleReaction = ({
   activity: ActivityResponse;
 }) => {
   const client = useFeedsClient();
+  const [optimisticState, setOptimisticState] = useState<boolean | undefined>(undefined);
+  const [optimisticCount, setOptimisticCount] = useState<number | undefined>(undefined);
+  const [inProgress, setInProgress] = useState(false);
 
   const toggleReaction = useCallback(
-    () =>
-      activity.own_reactions?.length > 0
-        ? client?.deleteActivityReaction({
+    async () => {
+      setInProgress(true);
+      let request: Promise<any> | undefined;
+
+      if (activity.own_reactions?.length > 0) {
+        setOptimisticState(false);
+        setOptimisticCount((activity.reaction_groups.like?.count ?? 0) - 1);
+        request = client?.deleteActivityReaction({
           activity_id: activity.id,
           type: 'like',
           delete_notification_activity: true,
-        })
-        : client?.addActivityReaction({
+        });
+
+      } else {
+        setOptimisticState(true);
+        setOptimisticCount((activity.reaction_groups.like?.count ?? 0) + 1);
+        request = client?.addActivityReaction({
           activity_id: activity.id,
           type: 'like',
           create_notification_activity: true,
-        }),
-    [client, activity.id, activity.own_reactions],
+        });
+      }
+      try {
+        await request;
+      } finally {
+        setOptimisticState(undefined);
+        setOptimisticCount(undefined);
+        setInProgress(false);
+      }
+    },
+    [client, activity.id, activity.own_reactions, activity.reaction_groups.like?.count],
   );
 
   return (
     <ActionButton
       onClick={toggleReaction}
       icon="favorite"
-      label={(activity.reaction_groups.like?.count ?? 0).toString()}
-      isActive={activity.own_reactions?.length > 0}
+      disabled={inProgress}
+      label={(optimisticCount ?? (activity.reaction_groups.like?.count ?? 0)).toString()}
+      isActive={optimisticState ?? activity.own_reactions?.length > 0}
     />
   );
 };

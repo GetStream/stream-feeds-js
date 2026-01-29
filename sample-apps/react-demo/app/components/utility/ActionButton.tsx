@@ -8,12 +8,14 @@ export const ActionButton = ({
   icon,
   label,
   isActive,
+  disabled,
 }: {
   onClick?: () => Promise<any> | undefined | void;
   href?: string;
   icon: string;
   label: string;
   isActive: boolean;
+  disabled?: boolean;
 }) => {
   const content = <Content icon={icon} label={label} isActive={isActive} />;
   const [error, setError] = useState<Error | undefined>(undefined);
@@ -32,6 +34,7 @@ export const ActionButton = ({
     {href ? <div className="btn btn-sm btn-soft"><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
       type="button"
       className="btn btn-sm btn-soft"
+      disabled={disabled}
       onClick={handleClick}
     >
       {content}
@@ -47,6 +50,7 @@ export const SecondaryActionButton = ({
   icon,
   label,
   isActive,
+  disabled,
   className,
 }: {
   onClick?: () => Promise<any> | undefined | void;
@@ -54,6 +58,7 @@ export const SecondaryActionButton = ({
   icon: string;
   label: string;
   isActive: boolean;
+  disabled?: boolean;
   className?: string;
 }) => {
   const [error, setError] = useState<Error | undefined>(undefined);
@@ -74,6 +79,7 @@ export const SecondaryActionButton = ({
     {href ? <div className={`btn btn-md btn-ghost p-2 ${className}`}><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
       type="button"
       className={`btn btn-md btn-ghost p-2 ${className}`}
+      disabled={disabled}
       onClick={handleClick}
     >
       {content}
