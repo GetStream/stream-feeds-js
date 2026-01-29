@@ -1,7 +1,12 @@
 import type { Attachment as AttachmentType } from '@stream-io/feeds-react-sdk';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Attachment } from './Attachment';
 import { ImageViewer } from './ImageViewer';
+import { SIZE_DIMENSIONS } from './sizes';
+import {
+  buildImageUrl,
+  useImagePreloader,
+} from '../../../utility/useImagePreloader';
 
 export type AttachmentListProps = {
   attachments: AttachmentType[];
@@ -17,6 +22,22 @@ export const AttachmentList = ({
   const [viewerInitialIndex, setViewerInitialIndex] = useState(0);
 
   const hasMultiple = attachments.length > 1;
+
+  const urlsToPreload = useMemo(() => {
+    if (attachments.length <= 1) return [];
+    const prevIdx =
+      currentIndex === 0 ? attachments.length - 1 : currentIndex - 1;
+    const nextIdx =
+      currentIndex === attachments.length - 1 ? 0 : currentIndex + 1;
+
+    const { width, height } = SIZE_DIMENSIONS[size];
+    return [prevIdx, nextIdx]
+      .map((idx) => attachments[idx])
+      .filter((a) => a.type !== 'video' && a.image_url)
+      .map((a) => buildImageUrl(a.image_url, width, height));
+  }, [attachments, currentIndex, size]);
+
+  useImagePreloader(urlsToPreload);
 
   const goToPrevious = useCallback(() => {
     setCurrentIndex((prev) => (prev === 0 ? attachments.length - 1 : prev - 1));

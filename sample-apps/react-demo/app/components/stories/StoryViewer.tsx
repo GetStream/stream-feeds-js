@@ -1,10 +1,20 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useFeedContext } from '@stream-io/feeds-react-sdk';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Avatar } from '../utility/Avatar';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  buildImageUrl,
+  useImagePreloader,
+} from '../../utility/useImagePreloader';
 
 const IMAGE_DURATION = 5000; // 5 seconds per image story
+
+const getStoryImageUrl = (activity: ActivityResponse | undefined) => {
+  const attachment = activity?.attachments?.[0];
+  if (!attachment || attachment.type === 'video') return null;
+  return buildImageUrl(attachment.image_url, screen.width * 2, screen.height * 2);
+};
 
 export const StoryViewer = ({
   activities,
@@ -29,7 +39,14 @@ export const StoryViewer = ({
   const isVideo = currentStory?.attachments?.[0]?.type === 'video';
   const mediaUrl = isVideo
     ? currentStory?.attachments?.[0]?.asset_url
-    : currentStory?.attachments?.[0]?.image_url;
+    : (getStoryImageUrl(currentStory) ?? undefined);
+
+  const nextStoryImageUrl = useMemo(() => {
+    if (currentIndex >= activities.length - 1) return null;
+    return getStoryImageUrl(activities[currentIndex + 1]);
+  }, [activities, currentIndex]);
+
+  useImagePreloader([nextStoryImageUrl]);
 
   useEffect(() => {
     const activity = activities[currentIndex];

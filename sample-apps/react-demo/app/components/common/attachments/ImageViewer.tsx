@@ -1,5 +1,11 @@
 import type { Attachment as AttachmentType } from '@stream-io/feeds-react-sdk';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import {
+  buildImageUrl,
+  useImagePreloader,
+} from '../../../utility/useImagePreloader';
+
+const VIEWER_SIZE = { width: 1200, height: 1200 };
 
 export type ImageViewerProps = {
   attachments: AttachmentType[];
@@ -20,6 +26,20 @@ export const ImageViewer = ({
   const imageAttachments = attachments.filter((a) => a.type !== 'video');
   const hasMultiple = imageAttachments.length > 1;
   const currentAttachment = imageAttachments[currentIndex];
+
+  const urlsToPreload = useMemo(() => {
+    if (imageAttachments.length <= 1) return [];
+    const prevIdx =
+      currentIndex === 0 ? imageAttachments.length - 1 : currentIndex - 1;
+    const nextIdx =
+      currentIndex === imageAttachments.length - 1 ? 0 : currentIndex + 1;
+
+    return [prevIdx, nextIdx]
+      .map((idx) => imageAttachments[idx])
+      .map((a) => buildImageUrl(a.image_url, VIEWER_SIZE.width, VIEWER_SIZE.height));
+  }, [imageAttachments, currentIndex]);
+
+  useImagePreloader(urlsToPreload);
 
   useEffect(() => {
     setCurrentIndex(initialIndex);
@@ -79,7 +99,13 @@ export const ImageViewer = ({
           )}
 
           <img
-            src={currentAttachment?.image_url + '&w=1200&h=1200'}
+            src={
+              buildImageUrl(
+                currentAttachment?.image_url,
+                VIEWER_SIZE.width,
+                VIEWER_SIZE.height,
+              ) ?? ''
+            }
             alt="Attachment"
             className="max-w-full max-h-[80vh] object-contain rounded-lg"
           />
