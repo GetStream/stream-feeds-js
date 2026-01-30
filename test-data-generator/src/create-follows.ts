@@ -1,4 +1,4 @@
-import { FollowRequest, StreamClient } from '@stream-io/node-sdk';
+import { type FollowRequest, StreamClient } from '@stream-io/node-sdk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,7 +63,7 @@ async function main(): Promise<void> {
     const usersToFollow = shuffledUsers.slice(0, followCount);
 
     // Create follows for both user and story feeds
-    const follows: Array<FollowRequest> = [];
+    const follows: FollowRequest[] = [];
 
     for (const target of usersToFollow) {
       // Timeline follows user feed (for posts)
