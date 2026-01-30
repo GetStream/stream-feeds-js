@@ -64,7 +64,7 @@ const DrawerSide = ({ unreadCount }: { unreadCount: number }) => {
         <li>
           <NotificationsLink>
             {unreadCount > 0 && (
-              <div className="badge badge-primary badge-xs position-absolute left-23">
+              <div className="badge badge-primary badge-xs left-23">
                 {unreadCount}
               </div>
             )}
@@ -88,29 +88,16 @@ const Dock = ({
 }) => {
   return (
     <div className="dock md:hidden w-full">
-      <button>
-        <HomeLink />
-      </button>
+      <HomeLink />
+      <ExploreLink />
 
-      <button>
-        <ExploreLink />
-      </button>
-
-      <button>
-        <AddLink />
-      </button>
-
-      <button>
-        <NotificationsLink>
-          {hasUnreadNotifications && (
-            <div className="badge badge-primary h-[0.25rem] w-[0.25rem] p-[0.25rem] absolute left-[60%] top-[15%]" />
-          )}
-        </NotificationsLink>
-      </button>
-
-      <button>
-        <ProfileLink />
-      </button>
+      <AddLink />
+      <NotificationsLink>
+        {hasUnreadNotifications && (
+          <div className="badge badge-primary h-[0.25rem] w-[0.25rem] p-[0.25rem] absolute left-[60%] top-[15%]" />
+        )}
+      </NotificationsLink>
+      <ProfileLink />
     </div>
   );
 };
