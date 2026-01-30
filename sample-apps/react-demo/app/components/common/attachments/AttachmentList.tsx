@@ -23,7 +23,9 @@ export const AttachmentList = ({
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [viewerInitialIndex, setViewerInitialIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
+  const touchEndY = useRef<number | null>(null);
 
   const hasMultiple = attachments.length > 1;
 
@@ -51,11 +53,20 @@ export const AttachmentList = ({
     setCurrentIndex((prev) => (prev === attachments.length - 1 ? 0 : prev + 1));
   }, [attachments.length]);
 
+  const resetTouchState = useCallback(() => {
+    touchStartX.current = null;
+    touchStartY.current = null;
+    touchEndX.current = null;
+    touchEndY.current = null;
+  }, []);
+
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
       if (!hasMultiple) return;
       touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
       touchEndX.current = null;
+      touchEndY.current = null;
     },
     [hasMultiple]
   );
@@ -64,28 +75,38 @@ export const AttachmentList = ({
     (e: React.TouchEvent) => {
       if (!hasMultiple) return;
       touchEndX.current = e.touches[0].clientX;
+      touchEndY.current = e.touches[0].clientY;
     },
     [hasMultiple]
   );
 
   const handleTouchEnd = useCallback(() => {
-    if (!hasMultiple || touchStartX.current === null || touchEndX.current === null) {
+    if (
+      !hasMultiple ||
+      touchStartX.current === null ||
+      touchStartY.current === null ||
+      touchEndX.current === null ||
+      touchEndY.current === null
+    ) {
+      resetTouchState();
       return;
     }
 
-    const diff = touchStartX.current - touchEndX.current;
+    const diffX = touchStartX.current - touchEndX.current;
+    const diffY = touchStartY.current - touchEndY.current;
 
-    if (Math.abs(diff) > SWIPE_THRESHOLD) {
-      if (diff > 0) {
+    // Only register as swipe if horizontal movement exceeds vertical
+    // This prevents scrolling from being interpreted as a swipe
+    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
         goToNext();
       } else {
         goToPrevious();
       }
     }
 
-    touchStartX.current = null;
-    touchEndX.current = null;
-  }, [hasMultiple, goToNext, goToPrevious]);
+    resetTouchState();
+  }, [hasMultiple, goToNext, goToPrevious, resetTouchState]);
 
   const handleImageClick = useCallback(() => {
     const currentAttachment = attachments[currentIndex];
@@ -109,6 +130,7 @@ export const AttachmentList = ({
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onTouchCancel={resetTouchState}
         >
         {hasMultiple && (
           <button

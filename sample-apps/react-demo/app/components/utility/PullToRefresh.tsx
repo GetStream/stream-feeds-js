@@ -90,21 +90,24 @@ export const PullToRefresh = ({
     [disabled, isRefreshing, isAtTop],
   );
 
-  const handleTouchEnd = useCallback(async () => {
-    if (disabled || !isPullingRef.current) {
-      startYRef.current = null;
-      startXRef.current = null;
-      isHorizontalSwipeRef.current = false;
-      setPullDistance(0);
-      return;
-    }
-
+  const resetTouchState = useCallback(() => {
     startYRef.current = null;
     startXRef.current = null;
     isPullingRef.current = false;
     isHorizontalSwipeRef.current = false;
+    setPullDistance(0);
+  }, []);
 
-    if (pullDistance >= PULL_THRESHOLD) {
+  const handleTouchEnd = useCallback(async () => {
+    if (disabled || !isPullingRef.current) {
+      resetTouchState();
+      return;
+    }
+
+    const shouldRefresh = pullDistance >= PULL_THRESHOLD;
+    resetTouchState();
+
+    if (shouldRefresh) {
       setIsRefreshing(true);
       setPullDistance(PULL_THRESHOLD * 0.5); // Show spinner at half threshold
       try {
@@ -113,10 +116,8 @@ export const PullToRefresh = ({
         setIsRefreshing(false);
         setPullDistance(0);
       }
-    } else {
-      setPullDistance(0);
     }
-  }, [disabled, pullDistance, onRefresh]);
+  }, [disabled, pullDistance, onRefresh, resetTouchState]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -125,13 +126,15 @@ export const PullToRefresh = ({
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.addEventListener('touchmove', handleTouchMove, { passive: false });
     container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener('touchcancel', resetTouchState);
 
     return () => {
       container.removeEventListener('touchstart', handleTouchStart);
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
+      container.removeEventListener('touchcancel', resetTouchState);
     };
-  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd, resetTouchState]);
 
   const progress = Math.min(pullDistance / PULL_THRESHOLD, 1);
   const showIndicator = pullDistance > 10 || isRefreshing;
