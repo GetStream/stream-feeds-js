@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`min-h-full ${materialSymbols.variable}`}>
-      <body className="min-h-full overflow-x-hidden">
+    <html lang="en" className={`min-h-dvh ${materialSymbols.variable}`}>
+      <body className="min-h-dvh overflow-x-hidden">
         <ErrorBoundary
           fallback={<div>Something went wrong. Try reloading the page.</div>}
         >
