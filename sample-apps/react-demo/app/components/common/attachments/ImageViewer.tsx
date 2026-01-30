@@ -26,7 +26,7 @@ export const ImageViewer = ({
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
-  const imageAttachments = attachments.filter((a) => a.type !== 'video');
+  const imageAttachments = useMemo(() => attachments.filter((a) => a.type !== 'video'), [attachments]);
   const hasMultiple = imageAttachments.length > 1;
   const currentAttachment = imageAttachments[currentIndex];
 

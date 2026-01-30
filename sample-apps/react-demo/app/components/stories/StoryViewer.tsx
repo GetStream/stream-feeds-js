@@ -39,16 +39,21 @@ export const StoryViewer = ({
   );
   const [duration, setDuration] = useState(IMAGE_DURATION);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     if (isOpen) {
-      dialogRef.current?.showModal();
-      setCurrentIndex(Math.max(
-        activities.findIndex((a) => !a.is_watched),
-        0,
-      ));
+      if (!initializedRef.current) {
+        dialogRef.current?.showModal();
+        setCurrentIndex(Math.max(
+          activities.findIndex((a) => !a.is_watched),
+          0,
+        ));
+        initializedRef.current = true;
+      }
     } else {
       dialogRef.current?.close();
+      initializedRef.current = false;
     }
   }, [isOpen, activities]);
 
@@ -95,7 +100,7 @@ export const StoryViewer = ({
 
   // Auto-advance to next story (only for images)
   useEffect(() => {
-    if (isVideo) return;
+    if (!isOpen || isVideo) return;
 
     setDuration(IMAGE_DURATION);
     const timeout = setTimeout(() => {
@@ -103,7 +108,7 @@ export const StoryViewer = ({
     }, IMAGE_DURATION);
 
     return () => clearTimeout(timeout);
-  }, [currentIndex, isVideo, goToNext]);
+  }, [currentIndex, isVideo, goToNext, isOpen, activities]);
 
   return (
     <dialog ref={dialogRef} className="modal" onClose={onClose}>
