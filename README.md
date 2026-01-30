@@ -96,7 +96,7 @@ API_URL=<Optional, Stream API URL>
 
 ### Typical use-case
 
-Run these scripts in the following order:
+Run these scripts in the following order from `trst-data-generator` folder:
 
 ```bash
 yarn create-users
@@ -154,18 +154,6 @@ yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookm
 ```
 
 > Note: Each feature has a probability of being included (not every post will have every enabled feature). Link and attachment are mutually exclusive per post.
-
-### Usage
-
-Typical order of operations:
-
-```bash
-cd test-data-generator
-yarn create-users
-yarn create-follows
-yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
-yarn create-stories
-```
 
 ## Local Setup
 
