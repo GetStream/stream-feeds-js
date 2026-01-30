@@ -116,7 +116,7 @@ export const ImageViewer = ({
   return (
     <dialog ref={dialogRef} className="modal" onClose={onClose}>
       <button
-        className="btn btn-circle btn-sm fixed right-4 top-4 z-50 bg-base-100/80 hover:bg-base-100"
+        className="btn btn-circle btn-sm fixed right-0 top-0 z-50 bg-base-100/80 hover:bg-base-100"
         onClick={onClose}
         aria-label="Close"
       >

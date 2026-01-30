@@ -25,7 +25,9 @@ export const PullToRefresh = ({
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const startYRef = useRef<number | null>(null);
+  const startXRef = useRef<number | null>(null);
   const isPullingRef = useRef(false);
+  const isHorizontalSwipeRef = useRef(false);
 
   const isAtTop = useCallback(() => {
     const container = containerRef.current;
@@ -48,22 +50,35 @@ export const PullToRefresh = ({
     (e: TouchEvent) => {
       if (disabled || isRefreshing || !isAtTop()) return;
       startYRef.current = e.touches[0].clientY;
+      startXRef.current = e.touches[0].clientX;
       isPullingRef.current = false;
+      isHorizontalSwipeRef.current = false;
     },
     [disabled, isRefreshing, isAtTop],
   );
 
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
-      if (disabled || isRefreshing || startYRef.current === null) return;
+      if (disabled || isRefreshing || startYRef.current === null || startXRef.current === null) return;
+
+      // If we already detected a horizontal swipe, don't interfere
+      if (isHorizontalSwipeRef.current) return;
 
       const currentY = e.touches[0].clientY;
-      const diff = currentY - startYRef.current;
+      const currentX = e.touches[0].clientX;
+      const diffY = currentY - startYRef.current;
+      const diffX = currentX - startXRef.current;
 
-      if (diff > 0 && isAtTop()) {
+      // Detect if this is a horizontal swipe (more horizontal than vertical movement)
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+        isHorizontalSwipeRef.current = true;
+        return;
+      }
+
+      if (diffY > 0 && isAtTop()) {
         isPullingRef.current = true;
         // Apply resistance to make pulling feel natural
-        const distance = Math.min(diff * RESISTANCE_FACTOR, PULL_THRESHOLD * 1.5);
+        const distance = Math.min(diffY * RESISTANCE_FACTOR, PULL_THRESHOLD * 1.5);
         setPullDistance(distance);
 
         // Prevent default scrolling when pulling down at top
@@ -78,12 +93,16 @@ export const PullToRefresh = ({
   const handleTouchEnd = useCallback(async () => {
     if (disabled || !isPullingRef.current) {
       startYRef.current = null;
+      startXRef.current = null;
+      isHorizontalSwipeRef.current = false;
       setPullDistance(0);
       return;
     }
 
     startYRef.current = null;
+    startXRef.current = null;
     isPullingRef.current = false;
+    isHorizontalSwipeRef.current = false;
 
     if (pullDistance >= PULL_THRESHOLD) {
       setIsRefreshing(true);
