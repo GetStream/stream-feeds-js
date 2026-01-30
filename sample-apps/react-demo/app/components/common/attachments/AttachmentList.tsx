@@ -11,6 +11,7 @@ import {
 export type AttachmentListProps = {
   attachments: AttachmentType[];
   size?: 'small' | 'medium' | 'large';
+  disableButtons?: boolean;
 };
 
 const SWIPE_THRESHOLD = 50;
@@ -18,6 +19,7 @@ const SWIPE_THRESHOLD = 50;
 export const AttachmentList = ({
   attachments,
   size = 'medium',
+  disableButtons = false,
 }: AttachmentListProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
@@ -132,7 +134,7 @@ export const AttachmentList = ({
           onTouchEnd={handleTouchEnd}
           onTouchCancel={resetTouchState}
         >
-        {hasMultiple && (
+        {hasMultiple && !disableButtons && (
           <button
             className="absolute left-0 top-0 h-full z-10 flex items-center justify-center px-2 cursor-pointer"
             onClick={goToPrevious}
@@ -147,10 +149,10 @@ export const AttachmentList = ({
         <Attachment
           attachment={currentAttachment}
           size={size}
-          onClick={currentAttachment.type !== 'video' ? handleImageClick : undefined}
+          onClick={!disableButtons && currentAttachment.type !== 'video' ? handleImageClick : undefined}
         />
 
-        {hasMultiple && (
+        {hasMultiple && !disableButtons && (
           <button
             className="absolute right-0 top-0 h-full z-10 flex items-center justify-center px-2 cursor-pointer"
             onClick={goToNext}
