@@ -79,24 +79,24 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       setOwnForyouFeed(undefined);
       setErrors(defaultErrors);
     } else {
-      const _ownFeed = client.feed('user', connectedUser.id);
-      setOwnFeed(_ownFeed);
-      const _ownTimeline = client.feed('timeline', connectedUser.id, {
+      const feed = client.feed('user', connectedUser.id);
+      setOwnFeed(feed);
+      const timeline = client.feed('timeline', connectedUser.id, {
         // Social media apps usually don't add new activities from WebSocket
         // users need to pull to refresh
         activityAddedEventFilter: (event) => {
           return event.activity.user?.id === connectedUser.id;
         },
       });
-      setOwnTimeline(_ownTimeline);
-      const ownFeedRequest = _ownFeed
+      setOwnTimeline(timeline);
+      const feedRequest = feed
         ?.getOrCreate({
           watch: true,
         })
         .catch((error: Error) => {
           setErrors((prev) => ({ ...prev, ownFeed: error }));
         });
-      const ownTimelineRequest = _ownTimeline
+      const timelineRequest = timeline
         ?.getOrCreate({
           watch: true,
           limit: 10,
@@ -105,39 +105,39 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
           setErrors((prev) => ({ ...prev, ownTimeline: error }));
         });
       // You typically create these relationships on your server-side, we do this here for simplicity
-      Promise.all([ownFeedRequest, ownTimelineRequest]).then(() => {
-        const alreadyFollows = _ownFeed.currentState.own_follows?.find(
-          (follow) => follow.source_feed.feed === _ownTimeline.feed,
+      Promise.all([feedRequest, timelineRequest]).then(() => {
+        const alreadyFollows = feed.currentState.own_follows?.find(
+          (follow) => follow.source_feed.feed === timeline.feed,
         );
         if (!alreadyFollows) {
-          _ownTimeline.follow(_ownFeed);
+          timeline.follow(feed);
         }
       });
-      const _ownNotifications = client.feed('notification', connectedUser.id);
-      setOwnNotifications(_ownNotifications);
-      _ownNotifications?.getOrCreate({ watch: true }).catch((error: Error) => {
+      const notifications = client.feed('notification', connectedUser.id);
+      setOwnNotifications(notifications);
+      notifications?.getOrCreate({ watch: true }).catch((error: Error) => {
         setErrors((prev) => ({ ...prev, ownNotifications: error }));
       });
       // For stories feed there is no WebSocket event for new stories, so we don't need activityAddedEventFilter
-      const _ownStoryTimeline = client.feed('stories', connectedUser.id);
-      setOwnStoryTimeline(_ownStoryTimeline);
-      _ownStoryTimeline?.getOrCreate({ watch: true }).catch((error: Error) => {
+      const storyTimeline = client.feed('stories', connectedUser.id);
+      setOwnStoryTimeline(storyTimeline);
+      storyTimeline?.getOrCreate({ watch: true }).catch((error: Error) => {
         setErrors((prev) => ({ ...prev, ownStoryTimeline: error }));
       });
-      const _ownStoryFeed = client.feed('story', connectedUser.id, {
+      const storyFeed = client.feed('story', connectedUser.id, {
         // In a regular feed, latest activites from WebSocket are added to start of the list
         // but we want stories to be ordered chronologically, so we add them to the end of the list
         addNewActivitiesTo: 'end',
       });
-      setOwnStoryFeed(_ownStoryFeed);
-      _ownStoryFeed
+      setOwnStoryFeed(storyFeed);
+      storyFeed
         ?.getOrCreate({ watch: true, limit: 100 })
         .catch((error: Error) => {
           setErrors((prev) => ({ ...prev, ownStoryFeed: error }));
         });
-      const _ownForyouFeed = client.feed('foryou', connectedUser.id);
-      setOwnForyouFeed(_ownForyouFeed);
-      _ownForyouFeed?.getOrCreate({ limit: 10 }).catch((error: Error) => {
+      const forYouFeed = client.feed('foryou', connectedUser.id);
+      setOwnForyouFeed(forYouFeed);
+      forYouFeed?.getOrCreate({ limit: 10 }).catch((error: Error) => {
         setErrors((prev) => ({ ...prev, ownForyouFeed: error }));
       });
     }

@@ -13,10 +13,10 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
   const unreadCount = notificationStatus?.unread ?? 0;
 
   return (
-    <div className="h-full max-h-full w-full max-w-7xl mx-auto">
-      <div className="drawer h-full max-h-full lg:drawer-open">
+    <div className="min-h-full w-full max-w-7xl mx-auto overflow-x-hidden">
+      <div className="drawer min-h-full lg:drawer-open">
         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content max-h-full min-h-0 h-full max-h-full flex flex-col gap-1 items-center justify-center">
+        <div className="drawer-content min-h-full flex flex-col gap-1 items-center">
           <nav className="hidden md:flex lg:hidden navbar w-full bg-base-100">
             <div className="flex-none lg:hidden">
               <label
@@ -27,9 +27,9 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
               </label>
             </div>
           </nav>
-          <div className="h-full max-h-full overflow-y-auto w-full md:p-10 p-4 flex flex-row gap-10 items-start justify-center">
-            <div className="h-full max-h-full lg:w-[70%] w-full flex flex-col items-center justify-start">
-              <div className="w-full h-full max-h-full">
+          <div className="w-full md:p-10 p-4 pb-20 md:pb-10 flex flex-row gap-10 items-start justify-center">
+            <div className="lg:w-[70%] w-full flex flex-col items-center justify-start">
+              <div className="w-full">
                 {children}
               </div>
             </div>

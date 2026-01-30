@@ -31,10 +31,10 @@ export default function ActivityPage() {
   const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    const _activityWithStateUpdates = client?.activityWithStateUpdates(id);
-    setActivityWithStateUpdates(_activityWithStateUpdates);
+    const activityWrapper = client?.activityWithStateUpdates(id);
+    setActivityWithStateUpdates(activityWrapper);
 
-    return () => _activityWithStateUpdates?.dispose();
+    return () => activityWrapper?.dispose();
   }, [client, id]);
 
   useEffect(() => {
