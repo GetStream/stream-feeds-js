@@ -1,3 +1,5 @@
+'use client';
+
 import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useFeedContext } from '@stream-io/feeds-react-sdk';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';

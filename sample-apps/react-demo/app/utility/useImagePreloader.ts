@@ -6,7 +6,8 @@ export const buildImageUrl = (
   height: number,
 ): string | null => {
   if (!baseUrl) return null;
-  return `${baseUrl}&w=${width}&h=${height}`;
+  const separator = baseUrl.includes('?') ? '&' : '?';
+  return `${baseUrl}${separator}w=${width}&h=${height}`;
 };
 
 export const useImagePreloader = (urls: Array<string | undefined | null>) => {

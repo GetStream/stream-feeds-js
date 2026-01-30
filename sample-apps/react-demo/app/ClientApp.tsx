@@ -14,7 +14,7 @@ import { generateUsername } from 'unique-username-generator';
 import { useEffect, useMemo, type PropsWithChildren } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { LoadingIndicator } from './components/utility/LoadingIndicator';
-import { userIdToUserName } from './utility/user-id-to-name';
+import { userIdToName } from './utility/userIdToName';
 
 export const ClientApp = ({ children }: PropsWithChildren) => {
   const searchParams = useSearchParams();
@@ -40,7 +40,7 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
   const CURRENT_USER = useMemo(
     () => ({
       id: USER_ID,
-      name: process.env.NEXT_PUBLIC_USER_NAME ?? userIdToUserName(USER_ID),
+      name: process.env.NEXT_PUBLIC_USER_NAME ?? userIdToName(USER_ID),
       token: process.env.NEXT_PUBLIC_USER_TOKEN
         ? process.env.NEXT_PUBLIC_USER_TOKEN
         : process.env.NEXT_PUBLIC_TOKEN_URL
