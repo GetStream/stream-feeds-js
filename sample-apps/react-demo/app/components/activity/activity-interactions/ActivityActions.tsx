@@ -30,7 +30,7 @@ export const ActivityActions = ({
 
   return (
     <ContentActions canEdit={canEdit} canDelete={canDelete} isModerated={isModerated} onDelete={deleteActivity}>
-      {(onClose) => <ActivityComposer activity={activity} onSave={onClose} />}
+      {(onClose, dialogElement) => <ActivityComposer activity={activity} onSave={onClose} portalContainer={dialogElement} />}
     </ContentActions>
   );
 };

@@ -39,7 +39,7 @@ export const CommentActions = ({ comment }: { comment: CommentResponse }) => {
 
   return (
     <ContentActions canEdit={canEdit} canDelete={canDelete} isModerated={isModerated} onDelete={deleteComment}>
-      {(onClose) => <CommentComposer comment={comment} onSubmitted={onClose} />}
+      {(onClose, dialogElement) => <CommentComposer comment={comment} onSubmitted={onClose} portalContainer={dialogElement} />}
     </ContentActions>
   );
 };

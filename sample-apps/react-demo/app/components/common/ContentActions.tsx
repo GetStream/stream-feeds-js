@@ -6,7 +6,7 @@ type ContentActionsProps = {
   canEdit: boolean;
   canDelete: boolean;
   onDelete: () => Promise<any> | undefined;
-  children: (onClose: () => void) => React.ReactNode;
+  children: (onClose: () => void, dialogElement: HTMLDialogElement | null) => React.ReactNode;
   isModerated: boolean;
 };
 
@@ -85,7 +85,7 @@ export const ContentActions = ({
       </ul>
       <ErrorToast error={error} />
       {<dialog ref={dialogRef} className="modal">
-        <div className="modal-box w-[80%] max-w-none sm:w-[40%]">{isEditing ? children(closeDialog) : null}</div>
+        <div className="modal-box w-[80%] max-w-none sm:w-[40%]">{isEditing ? children(closeDialog, dialogRef.current) : null}</div>
         <form method="dialog" className="modal-backdrop">
           <button>close</button>
         </form>

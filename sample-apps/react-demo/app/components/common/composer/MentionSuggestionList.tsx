@@ -43,6 +43,7 @@ export type MentionSuggestionListProps = {
   caretPosition: CaretPosition | null;
   onSelect: (user: UserResponse) => void;
   onHover: (index: number) => void;
+  portalContainer?: HTMLElement | null;
 };
 
 export const MentionSuggestionList = ({
@@ -52,6 +53,7 @@ export const MentionSuggestionList = ({
   caretPosition,
   onSelect,
   onHover,
+  portalContainer,
 }: MentionSuggestionListProps) => {
   const listRef = useRef<HTMLDivElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition | null>(null);
@@ -123,6 +125,6 @@ export const MentionSuggestionList = ({
         </button>
       ))}
     </div>,
-    document.body,
+    portalContainer ?? document.body,
   );
 };

@@ -19,6 +19,7 @@ export type ComposerProps = {
   onSubmit: (text: string, attachments: Attachment[], mentionedUserIds: string[]) => Promise<void>;
   textareaBorder?: boolean;
   allowEmptyText?: boolean;
+  portalContainer?: HTMLElement | null;
 };
 
 export const Composer = ({
@@ -31,6 +32,7 @@ export const Composer = ({
   onSubmit,
   textareaBorder = true,
   allowEmptyText = false,
+  portalContainer,
 }: ComposerProps) => {
   const [text, setText] = useState(initialText);
   const [completedAttachments, setCompletedAttachments] = useState<Attachment[]>(initialAttachments);
@@ -165,6 +167,7 @@ export const Composer = ({
             caretPosition={caretPosition}
             onSelect={handleSelectUser}
             onHover={setSelectedIndex}
+            portalContainer={portalContainer}
           />
         )}
       </div>

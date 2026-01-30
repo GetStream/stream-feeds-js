@@ -12,10 +12,10 @@ type ContentProps = {
   moderation?: ModerationV2Response;
   location: 'comment' | 'activity';
   mentioned_users?: UserResponse[];
-  withoutLinks?: boolean;
+  withoutInteractions?: boolean;
 };
 
-export const Content = ({ text, attachments, moderation, location, mentioned_users = [], withoutLinks = false }: ContentProps) => {
+export const Content = ({ text, attachments, moderation, location, mentioned_users = [], withoutInteractions = false }: ContentProps) => {
   const { mediaAttachments, ogAttachments } = useMemo(() => {
     if (!attachments) {
       return { mediaAttachments: [], ogAttachments: [] };
@@ -120,7 +120,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
         const user = userMap.get(username.toLowerCase());
 
         if (user) {
-          if (withoutLinks) {
+          if (withoutInteractions) {
             parts.push(
               <span
                 key={`mention-${partIndex}-${m.index}`}
@@ -146,7 +146,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
           parts.push(`@${username}`);
         }
       } else if (m.type === 'url') {
-        if (withoutLinks) {
+        if (withoutInteractions) {
           parts.push(
             <span
               key={`url-${partIndex}-${m.index}`}
@@ -189,7 +189,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
     }
 
     return parts;
-  }, [text, mentioned_users, withoutLinks]);
+  }, [text, mentioned_users, withoutInteractions]);
 
   if (moderation?.action === 'remove') {
     return (
@@ -207,11 +207,11 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
       {renderedText && <p className="w-full text-md">{renderedText}</p>}
       {mediaAttachments.length > 0 && (
         <div className="w-full">
-          <AttachmentList attachments={mediaAttachments} size={mediaAttachmentSize} />
+          <AttachmentList attachments={mediaAttachments} size={mediaAttachmentSize} disableButtons={withoutInteractions} />
         </div>
       )}
       {ogAttachments.length > 0 && (
-        <OGAttachmentList attachments={ogAttachments} size={ogAttachmentSize} withoutLinks={withoutLinks} />
+        <OGAttachmentList attachments={ogAttachments} size={ogAttachmentSize} withoutLinks={withoutInteractions} />
       )}
     </>
   );

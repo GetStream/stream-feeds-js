@@ -13,10 +13,10 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
   const unreadCount = notificationStatus?.unread ?? 0;
 
   return (
-    <div className="min-h-full w-full max-w-7xl mx-auto overflow-x-hidden">
-      <div className="drawer min-h-full lg:drawer-open">
+    <div className="min-h-dvh w-full max-w-7xl mx-auto overflow-x-hidden">
+      <div className="drawer min-h-dvh lg:drawer-open">
         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content min-h-full flex flex-col gap-1 items-center">
+        <div className="drawer-content min-h-dvh flex flex-col gap-1 items-center">
           <nav className="hidden md:flex lg:hidden navbar w-full bg-base-100">
             <div className="flex-none lg:hidden">
               <label
@@ -54,7 +54,7 @@ const DrawerSide = ({ unreadCount }: { unreadCount: number }) => {
         aria-label="close sidebar"
         className="drawer-overlay"
       ></label>
-      <ul className="menu min-h-full w-60 p-4">
+      <ul className="menu min-h-dvh w-60 p-4">
         <li>
           <HomeLink />
         </li>

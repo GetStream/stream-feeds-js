@@ -21,7 +21,7 @@ export const Activity = ({
         withLink={location === 'timeline' || location === 'profile' || location === 'search' || location === 'foryou'}
         withActions={location === 'timeline' || location === 'profile'}
       />
-      <ActivityContent activity={activity} withoutLinks={location === 'preview'} />
+      <ActivityContent activity={activity} withoutInteractions={location === 'preview'} />
       {activity?.parent ? (location === 'preview' ? <ActivityParent activity={activity} /> : <NavLink className="w-full min-w-0 max-w-full" href={`/activity/${activity.parent?.id}`}><ActivityParent activity={activity} /></NavLink>) : null}
       {location !== 'preview' && <ActivityInteractions activity={activity} />}
     </div>
