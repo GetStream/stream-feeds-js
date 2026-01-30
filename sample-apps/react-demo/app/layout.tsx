@@ -3,6 +3,13 @@ import './globals.css';
 import { ErrorBoundary } from './components/utility/ErrorBoundary';
 import { ClientApp } from './ClientApp';
 import { Suspense } from 'react';
+import localFont from 'next/font/local';
+
+const materialSymbols = localFont({
+  src: '../../../node_modules/material-symbols/material-symbols-outlined.woff2',
+  variable: '--font-material-symbols',
+  display: 'block',
+});
 
 export const metadata: Metadata = {
   title: 'Stream Feeds React Demo',
@@ -15,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="max-h-full h-full">
+    <html lang="en" className={`max-h-full h-full ${materialSymbols.variable}`}>
       <body className="max-h-full h-full overflow-hidden">
         <ErrorBoundary
           fallback={<div>Something went wrong. Try reloading the page.</div>}

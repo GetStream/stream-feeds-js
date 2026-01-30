@@ -1,8 +1,10 @@
-import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
+import { StreamFeed, type ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useCallback, useRef, useState } from 'react';
 import { ActivityComposer } from '../ActivityComposer';
+import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
 export const ReplyToActivity = ({ activity }: { activity: ActivityResponse }) => {
+  const { ownFeed } = useOwnFeedsContext();
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -41,7 +43,9 @@ export const ReplyToActivity = ({ activity }: { activity: ActivityResponse }) =>
               <span className="material-symbols-outlined">close</span>
             </button>
           </div>
-          {isOpen && <ActivityComposer parent={activity} onSave={closeDialog} />}
+          {isOpen && ownFeed && <StreamFeed feed={ownFeed}>
+            <ActivityComposer parent={activity} onSave={closeDialog} />
+          </StreamFeed>}
         </div>
         <form method="dialog" className="modal-backdrop">
           <button>close</button>

@@ -18,6 +18,7 @@ export type ComposerProps = {
   initialMentionedUsers?: Array<{ id: string; name: string }>;
   onSubmit: (text: string, attachments: Attachment[], mentionedUserIds: string[]) => Promise<void>;
   textareaBorder?: boolean;
+  allowEmptyText?: boolean;
 };
 
 export const Composer = ({
@@ -29,6 +30,7 @@ export const Composer = ({
   initialMentionedUsers = [],
   onSubmit,
   textareaBorder = true,
+  allowEmptyText = false,
 }: ComposerProps) => {
   const [text, setText] = useState(initialText);
   const [completedAttachments, setCompletedAttachments] = useState<Attachment[]>(initialAttachments);
@@ -183,7 +185,7 @@ export const Composer = ({
         <button
           className={`btn btn-primary flex-shrink-0 ${buttonSize}`}
           onClick={handleSubmit}
-          disabled={!text.trim() || isSubmitting || hasInFlightUploads}
+          disabled={(!allowEmptyText && !text.trim()) || isSubmitting || hasInFlightUploads}
         >
           {isSubmitting ? <LoadingIndicator /> : submitLabel}
         </button>

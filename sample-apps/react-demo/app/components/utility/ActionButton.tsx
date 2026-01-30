@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react';
 import { ErrorToast } from './ErrorToast';
 import { NavLink } from './NavLink';
 
@@ -8,31 +7,25 @@ export const ActionButton = ({
   icon,
   label,
   isActive,
+  disabled,
+  error,
 }: {
   onClick?: () => Promise<any> | undefined | void;
   href?: string;
   icon: string;
   label: string;
   isActive: boolean;
+  disabled?: boolean;
+  error?: Error;
 }) => {
   const content = <Content icon={icon} label={label} isActive={isActive} />;
-  const [error, setError] = useState<Error | undefined>(undefined);
-
-  const handleClick = useCallback(async () => {
-    try {
-      setError(undefined);
-      await onClick?.();
-    } catch (e) {
-      setError(e as Error);
-      throw e;
-    }
-  }, [onClick]);
 
   return <>
     {href ? <div className="btn btn-sm btn-soft"><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
       type="button"
       className="btn btn-sm btn-soft"
-      onClick={handleClick}
+      disabled={disabled}
+      onClick={onClick}
     >
       {content}
     </button>
@@ -47,34 +40,27 @@ export const SecondaryActionButton = ({
   icon,
   label,
   isActive,
+  disabled,
   className,
+  error,
 }: {
   onClick?: () => Promise<any> | undefined | void;
   href?: string;
   icon: string;
   label: string;
   isActive: boolean;
+  disabled?: boolean;
   className?: string;
+  error?: Error;
 }) => {
-  const [error, setError] = useState<Error | undefined>(undefined);
-
-  const handleClick = useCallback(async () => {
-    try {
-      setError(undefined);
-      await onClick?.();
-    } catch (e) {
-      setError(e as Error);
-      throw e;
-    }
-  }, [onClick]);
-
   const content = <Content icon={icon} label={label} isActive={isActive} />;
   return <>
 
     {href ? <div className={`btn btn-md btn-ghost p-2 ${className}`}><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
       type="button"
       className={`btn btn-md btn-ghost p-2 ${className}`}
-      onClick={handleClick}
+      disabled={disabled}
+      onClick={onClick}
     >
       {content}
     </button>
@@ -103,8 +89,9 @@ const Content = ({
   isActive: boolean | undefined;
 }) => (
   <>
+    { /* Manually adjust the chat_bubble icon, the shape causes a visual illusion of misalgment  */}
     <span
-      className={`material-symbols-outlined text-[1.1rem]! text-base-content/80 ${isActive ? 'fill' : ''}`}
+      className={`material-symbols-outlined text-[1.1rem]! text-base-content/80 ${isActive ? 'fill' : ''} ${icon === 'chat_bubble' ? 'translate-y-[2px]' : ''}`}
     >
       {icon}
     </span>

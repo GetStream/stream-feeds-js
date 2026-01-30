@@ -1,6 +1,7 @@
 import type { Attachment as AttachmentType } from '@stream-io/feeds-react-sdk';
 import { useMemo } from 'react';
 import { SIZE_CLASSES, SIZE_DIMENSIONS } from './sizes';
+import { buildImageUrl } from '@/app/utility/useImagePreloader';
 
 export type AttachmentProps = {
   attachment: AttachmentType;
@@ -21,7 +22,7 @@ export const Attachment = ({
       return attachment.asset_url;
     }
 
-    return attachment.image_url + `&w=${SIZE_DIMENSIONS[size].width}&h=${SIZE_DIMENSIONS[size].height}`;
+    return buildImageUrl(attachment.image_url, SIZE_DIMENSIONS[size].width, SIZE_DIMENSIONS[size].height);
   }, [attachment?.image_url, attachment?.asset_url, isVideo, size]);
 
   if (!url) {

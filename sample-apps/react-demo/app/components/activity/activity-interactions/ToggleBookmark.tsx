@@ -2,7 +2,7 @@ import {
   type ActivityResponse,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
-import { useCallback } from 'react';
+import { startTransition, useCallback, useOptimistic, useState } from 'react';
 import { ActionButton } from '../../utility/ActionButton';
 
 export const ToggleBookmark = ({
@@ -11,25 +11,50 @@ export const ToggleBookmark = ({
   activity: ActivityResponse;
 }) => {
   const client = useFeedsClient();
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
-  const toggleBookmark = useCallback(
-    () =>
-      activity.own_bookmarks?.length > 0
-        ? client?.deleteBookmark({
-            activity_id: activity.id,
-          })
-        : client?.addBookmark({
-            activity_id: activity.id,
-          }),
-    [client, activity.id, activity.own_bookmarks],
+  const isBookmarked = (activity.own_bookmarks?.length ?? 0) > 0;
+  const bookmarkCount = activity.bookmark_count ?? 0;
+
+  const [state, setState] = useOptimistic(
+    { isBookmarked, bookmarkCount },
+    (_, newState: { isBookmarked: boolean; bookmarkCount: number }) => newState,
   );
+
+  const toggleBookmark = useCallback(() => {
+    setInProgress(true);
+    setError(undefined);
+
+    startTransition(async () => {
+      try {
+        if (isBookmarked) {
+          setState({ isBookmarked: false, bookmarkCount: bookmarkCount - 1 });
+          await client?.deleteBookmark({
+            activity_id: activity.id,
+          });
+        } else {
+          setState({ isBookmarked: true, bookmarkCount: bookmarkCount + 1 });
+          await client?.addBookmark({
+            activity_id: activity.id,
+          });
+        }
+      } catch (e) {
+        setError(e as Error);
+      } finally {
+        setInProgress(false);
+      }
+    });
+  }, [client, activity.id, isBookmarked, bookmarkCount, setState]);
 
   return (
     <ActionButton
       onClick={toggleBookmark}
       icon="bookmark"
-      label={activity.bookmark_count.toString()}
-      isActive={activity.own_bookmarks?.length > 0}
+      disabled={inProgress}
+      label={state.bookmarkCount.toString()}
+      isActive={state.isBookmarked}
+      error={error}
     />
   );
 };

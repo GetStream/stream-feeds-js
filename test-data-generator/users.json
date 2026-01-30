@@ -58,5 +58,17 @@
     "name": "David",
     "image": "https://randomuser.me/api/portraits/men/62.jpg",
     "visibility_level": "visible"
+  },
+  {
+    "id": "nina",
+    "name": "Nina",
+    "image": "https://randomuser.me/api/portraits/women/33.jpg",
+    "visibility_level": "visible"
+  },
+  {
+    "id": "james",
+    "name": "James",
+    "image": "https://randomuser.me/api/portraits/men/32.jpg",
+    "visibility_level": "visible"
   }
 ]

@@ -1,5 +1,12 @@
 import type { Attachment as AttachmentType } from '@stream-io/feeds-react-sdk';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo, type TouchEvent } from 'react';
+import {
+  buildImageUrl,
+  useImagePreloader,
+} from '../../../utility/useImagePreloader';
+
+const VIEWER_SIZE = { width: 1200, height: 1200 };
+const SWIPE_THRESHOLD = 50;
 
 export type ImageViewerProps = {
   attachments: AttachmentType[];
@@ -16,10 +23,26 @@ export const ImageViewer = ({
 }: ImageViewerProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
 
-  const imageAttachments = attachments.filter((a) => a.type !== 'video');
+  const imageAttachments = useMemo(() => attachments.filter((a) => a.type !== 'video'), [attachments]);
   const hasMultiple = imageAttachments.length > 1;
   const currentAttachment = imageAttachments[currentIndex];
+
+  const urlsToPreload = useMemo(() => {
+    if (imageAttachments.length <= 1) return [];
+    const prevIdx =
+      currentIndex === 0 ? imageAttachments.length - 1 : currentIndex - 1;
+    const nextIdx =
+      currentIndex === imageAttachments.length - 1 ? 0 : currentIndex + 1;
+
+    return [prevIdx, nextIdx]
+      .map((idx) => imageAttachments[idx])
+      .map((a) => buildImageUrl(a.image_url, VIEWER_SIZE.width, VIEWER_SIZE.height));
+  }, [imageAttachments, currentIndex]);
+
+  useImagePreloader(urlsToPreload);
 
   useEffect(() => {
     setCurrentIndex(initialIndex);
@@ -41,6 +64,42 @@ export const ImageViewer = ({
     setCurrentIndex((prev) => (prev === imageAttachments.length - 1 ? 0 : prev + 1));
   }, [imageAttachments.length]);
 
+  const handleTouchStart = useCallback(
+    (e: TouchEvent<HTMLDivElement>) => {
+      if (!hasMultiple) return;
+      touchStartX.current = e.touches[0].clientX;
+      touchEndX.current = null;
+    },
+    [hasMultiple]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent<HTMLDivElement>) => {
+      if (!hasMultiple) return;
+      touchEndX.current = e.touches[0].clientX;
+    },
+    [hasMultiple]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    if (!hasMultiple || touchStartX.current === null || touchEndX.current === null) {
+      return;
+    }
+
+    const diff = touchStartX.current - touchEndX.current;
+
+    if (Math.abs(diff) > SWIPE_THRESHOLD) {
+      if (diff > 0) {
+        goToNext();
+      } else {
+        goToPrevious();
+      }
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  }, [hasMultiple, goToNext, goToPrevious]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
@@ -57,7 +116,7 @@ export const ImageViewer = ({
   return (
     <dialog ref={dialogRef} className="modal" onClose={onClose}>
       <button
-        className="btn btn-circle btn-sm fixed right-4 top-4 z-50 bg-base-100/80 hover:bg-base-100"
+        className="btn btn-circle btn-sm fixed right-0 top-0 z-50 bg-base-100/80 hover:bg-base-100"
         onClick={onClose}
         aria-label="Close"
       >
@@ -65,7 +124,12 @@ export const ImageViewer = ({
       </button>
 
       <div className="modal-box w-full max-w-full p-4 overflow-hidden">
-        <div className="relative flex items-center justify-center max-h-[80vh]">
+        <div
+          className="relative flex items-center justify-center max-h-[80vh] touch-pan-y"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {hasMultiple && (
             <button
               className="absolute left-0 top-0 h-full z-10 flex items-center justify-center px-2"
@@ -79,7 +143,13 @@ export const ImageViewer = ({
           )}
 
           <img
-            src={currentAttachment?.image_url + '&w=1200&h=1200'}
+            src={
+              buildImageUrl(
+                currentAttachment?.image_url,
+                VIEWER_SIZE.width,
+                VIEWER_SIZE.height,
+              ) ?? ''
+            }
             alt="Attachment"
             className="max-w-full max-h-[80vh] object-contain rounded-lg"
           />

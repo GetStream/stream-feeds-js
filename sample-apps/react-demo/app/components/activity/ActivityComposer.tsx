@@ -76,6 +76,7 @@ export const ActivityComposer = ({
         initialMentionedUsers={initialMentionedUsers}
         onSubmit={handleSubmit}
         textareaBorder={textareaBorder}
+        allowEmptyText={!!parent}
       />
     </div>
   );

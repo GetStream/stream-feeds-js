@@ -66,7 +66,7 @@ export default function Bookmarks() {
         <>
           <ul className="w-full list">
             {bookmarks.map((bookmark) => (
-              <li className="list-row" key={bookmark.activity.id}>
+              <li className="list-row w-full flex flex-row justify-stretch items-stretch" key={bookmark.activity.id}>
                 <ActivityPreview
                   activity={bookmark.activity}
                 />

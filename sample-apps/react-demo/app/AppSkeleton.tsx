@@ -13,33 +13,35 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
   const unreadCount = notificationStatus?.unread ?? 0;
 
   return (
-    <div className="drawer h-full max-h-full lg:drawer-open">
-      <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content max-h-full min-h-0 h-full max-h-full flex flex-col gap-1 items-center justify-center">
-        <nav className="hidden md:flex lg:hidden navbar w-full bg-base-100">
-          <div className="flex-none lg:hidden">
-            <label
-              htmlFor="my-drawer"
-              className="drawer-button btn btn-square btn-ghost"
-            >
-              <span className="material-symbols-outlined">menu</span>
-            </label>
-          </div>
-        </nav>
-        <div className="h-full max-h-full overflow-y-auto w-full md:p-10 p-4 flex flex-row gap-10 items-start justify-center">
-          <div className="h-full max-h-full lg:w-[70%] w-full flex flex-col items-center justify-start">
-            <div className="w-full h-full max-h-full">
-              {children}
+    <div className="h-full max-h-full w-full max-w-7xl mx-auto">
+      <div className="drawer h-full max-h-full lg:drawer-open">
+        <input id="my-drawer" type="checkbox" className="drawer-toggle" />
+        <div className="drawer-content max-h-full min-h-0 h-full max-h-full flex flex-col gap-1 items-center justify-center">
+          <nav className="hidden md:flex lg:hidden navbar w-full bg-base-100">
+            <div className="flex-none lg:hidden">
+              <label
+                htmlFor="my-drawer"
+                className="drawer-button btn btn-square btn-ghost"
+              >
+                <span className="material-symbols-outlined">menu</span>
+              </label>
+            </div>
+          </nav>
+          <div className="h-full max-h-full overflow-y-auto w-full md:p-10 p-4 flex flex-row gap-10 items-start justify-center">
+            <div className="h-full max-h-full lg:w-[70%] w-full flex flex-col items-center justify-start">
+              <div className="w-full h-full max-h-full">
+                {children}
+              </div>
+            </div>
+            <div className="lg:flex hidden w-[30%] flex-col items-stretch justify-start gap-4">
+              <SearchInput />
+              <FollowSuggestions />
             </div>
           </div>
-          <div className="lg:flex hidden w-[30%] flex-col items-stretch justify-start gap-4">
-            <SearchInput />
-            <FollowSuggestions />
-          </div>
+          <Dock hasUnreadNotifications={unreadCount > 0} />
         </div>
-        <Dock hasUnreadNotifications={unreadCount > 0} />
+        <DrawerSide unreadCount={unreadCount} />
       </div>
-      <DrawerSide unreadCount={unreadCount} />
     </div>
   );
 };
@@ -52,7 +54,7 @@ const DrawerSide = ({ unreadCount }: { unreadCount: number }) => {
         aria-label="close sidebar"
         className="drawer-overlay"
       ></label>
-      <ul className="menu bg-base-200 min-h-full w-60 p-4">
+      <ul className="menu min-h-full w-60 p-4">
         <li>
           <HomeLink />
         </li>
@@ -62,7 +64,7 @@ const DrawerSide = ({ unreadCount }: { unreadCount: number }) => {
         <li>
           <NotificationsLink>
             {unreadCount > 0 && (
-              <div className="badge badge-primary badge-xs position-absolute left-23">
+              <div className="badge badge-primary badge-xs left-23">
                 {unreadCount}
               </div>
             )}
@@ -86,29 +88,16 @@ const Dock = ({
 }) => {
   return (
     <div className="dock md:hidden w-full">
-      <button>
-        <HomeLink />
-      </button>
+      <HomeLink />
+      <ExploreLink />
 
-      <button>
-        <ExploreLink />
-      </button>
-
-      <button>
-        <AddLink />
-      </button>
-
-      <button>
-        <NotificationsLink>
-          {hasUnreadNotifications && (
-            <div className="badge badge-primary h-[0.25rem] w-[0.25rem] p-[0.25rem] absolute left-[60%] top-[15%]" />
-          )}
-        </NotificationsLink>
-      </button>
-
-      <button>
-        <ProfileLink />
-      </button>
+      <AddLink />
+      <NotificationsLink>
+        {hasUnreadNotifications && (
+          <div className="badge badge-primary h-[0.25rem] w-[0.25rem] p-[0.25rem] absolute left-[60%] top-[15%]" />
+        )}
+      </NotificationsLink>
+      <ProfileLink />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import type { ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useFeedsClient } from '@stream-io/feeds-react-sdk';
-import { useCallback } from 'react';
+import { startTransition, useCallback, useOptimistic, useState } from 'react';
 import { ActionButton } from '../../utility/ActionButton';
 
 export const ToggleReaction = ({
@@ -9,29 +9,54 @@ export const ToggleReaction = ({
   activity: ActivityResponse;
 }) => {
   const client = useFeedsClient();
+  const [inProgress, setInProgress] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
-  const toggleReaction = useCallback(
-    () =>
-      activity.own_reactions?.length > 0
-        ? client?.deleteActivityReaction({
-          activity_id: activity.id,
-          type: 'like',
-          delete_notification_activity: true,
-        })
-        : client?.addActivityReaction({
-          activity_id: activity.id,
-          type: 'like',
-          create_notification_activity: true,
-        }),
-    [client, activity.id, activity.own_reactions],
+  const isLiked = activity.own_reactions?.length > 0;
+  const likeCount = activity.reaction_groups.like?.count ?? 0;
+
+  const [state, setState] = useOptimistic(
+    { isLiked, likeCount },
+    (_, newState: { isLiked: boolean; likeCount: number }) => newState,
   );
+
+  const toggleReaction = useCallback(() => {
+    setInProgress(true);
+    setError(undefined);
+
+    startTransition(async () => {
+      try {
+        if (isLiked) {
+          setState({ isLiked: false, likeCount: likeCount - 1 });
+          await client?.deleteActivityReaction({
+            activity_id: activity.id,
+            type: 'like',
+            delete_notification_activity: true,
+          });
+        } else {
+          setState({ isLiked: true, likeCount: likeCount + 1 });
+          await client?.addActivityReaction({
+            activity_id: activity.id,
+            type: 'like',
+            create_notification_activity: true,
+          });
+        }
+      } catch (e) {
+        setError(e as Error);
+      } finally {
+        setInProgress(false);
+      }
+    });
+  }, [client, activity.id, isLiked, likeCount, setState]);
 
   return (
     <ActionButton
       onClick={toggleReaction}
       icon="favorite"
-      label={(activity.reaction_groups.like?.count ?? 0).toString()}
-      isActive={activity.own_reactions?.length > 0}
+      disabled={inProgress}
+      label={state.likeCount.toString()}
+      isActive={state.isLiked}
+      error={error}
     />
   );
 };
