@@ -10,11 +10,13 @@ export const ActivityComposer = ({
   parent,
   onSave,
   textareaBorder = true,
+  portalContainer,
 }: {
   activity?: ActivityResponse;
   parent?: ActivityResponse;
   onSave?: () => void;
   textareaBorder?: boolean;
+  portalContainer?: HTMLElement | null;
 }) => {
   const client = useFeedsClient();
   const feed = useFeedContext();
@@ -77,6 +79,7 @@ export const ActivityComposer = ({
         onSubmit={handleSubmit}
         textareaBorder={textareaBorder}
         allowEmptyText={!!parent}
+        portalContainer={portalContainer}
       />
     </div>
   );

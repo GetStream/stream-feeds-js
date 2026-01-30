@@ -44,7 +44,7 @@ export const ReplyToActivity = ({ activity }: { activity: ActivityResponse }) =>
             </button>
           </div>
           {isOpen && ownFeed && <StreamFeed feed={ownFeed}>
-            <ActivityComposer parent={activity} onSave={closeDialog} />
+            <ActivityComposer parent={activity} onSave={closeDialog} portalContainer={dialogRef.current} />
           </StreamFeed>}
         </div>
         <form method="dialog" className="modal-backdrop">

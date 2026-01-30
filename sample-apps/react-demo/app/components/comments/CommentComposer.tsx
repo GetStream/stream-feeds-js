@@ -9,11 +9,13 @@ export const CommentComposer = ({
   parentComment,
   comment,
   onSubmitted,
+  portalContainer,
 }: {
   activity?: ActivityResponse;
   parentComment?: CommentResponse;
   comment?: CommentResponse;
   onSubmitted?: () => void;
+  portalContainer?: HTMLElement | null;
 }) => {
   const client = useFeedsClient();
   const [initialText, setInitialText] = useState('');
@@ -64,6 +66,7 @@ export const CommentComposer = ({
       initialMentionedUsers={initialMentionedUsers}
       onSubmit={handleSubmit}
       submitLabel={isEditing ? 'Save' : 'Reply'}
+      portalContainer={portalContainer}
     />
   );
 };
