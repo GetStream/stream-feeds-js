@@ -1,4 +1,4 @@
-import { StreamClient } from '@stream-io/node-sdk';
+import { FollowRequest, StreamClient } from '@stream-io/node-sdk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -44,7 +44,9 @@ async function main(): Promise<void> {
   const client = new StreamClient(key, secret, { basePath: url });
 
   console.log(`Creating follow relationships for ${users.length} users...`);
-  console.log(`Each user will follow ${MIN_FOLLOW_RATIO * 100}-${MAX_FOLLOW_RATIO * 100}% of other users`);
+  console.log(
+    `Each user will follow ${MIN_FOLLOW_RATIO * 100}-${MAX_FOLLOW_RATIO * 100}% of other users`,
+  );
 
   let totalFollows = 0;
 
@@ -61,13 +63,14 @@ async function main(): Promise<void> {
     const usersToFollow = shuffledUsers.slice(0, followCount);
 
     // Create follows for both user and story feeds
-    const follows: Array<{ source: string; target: string }> = [];
+    const follows: Array<FollowRequest> = [];
 
     for (const target of usersToFollow) {
       // Timeline follows user feed (for posts)
       follows.push({
         source: `timeline:${follower.id}`,
         target: `user:${target.id}`,
+        create_notification_activity: true,
       });
 
       // Stories feed follows story feed (for stories)

@@ -1,5 +1,5 @@
 import type { Attachment as AttachmentType } from '@stream-io/feeds-react-sdk';
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo, type TouchEvent } from 'react';
 import {
   buildImageUrl,
   useImagePreloader,
@@ -65,7 +65,7 @@ export const ImageViewer = ({
   }, [imageAttachments.length]);
 
   const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
+    (e: TouchEvent<HTMLDivElement>) => {
       if (!hasMultiple) return;
       touchStartX.current = e.touches[0].clientX;
       touchEndX.current = null;
@@ -74,7 +74,7 @@ export const ImageViewer = ({
   );
 
   const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
+    (e: TouchEvent<HTMLDivElement>) => {
       if (!hasMultiple) return;
       touchEndX.current = e.touches[0].clientX;
     },

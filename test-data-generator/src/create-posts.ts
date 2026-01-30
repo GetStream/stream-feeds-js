@@ -1,4 +1,8 @@
-import { StreamClient, type Attachment, type ActivityRequest } from '@stream-io/node-sdk';
+import {
+  StreamClient,
+  type Attachment,
+  type ActivityRequest,
+} from '@stream-io/node-sdk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -274,6 +278,7 @@ async function main(): Promise<void> {
           type: reactionType,
           activity_id: createdActivity.activity.id,
           user_id: reactingUser.id,
+          create_notification_activity: true,
         });
       }
     }
@@ -290,6 +295,7 @@ async function main(): Promise<void> {
           object_id: createdActivity.activity.id,
           object_type: 'activity',
           user_id: commentingUser.id,
+          create_notification_activity: true,
         });
       }
     }
