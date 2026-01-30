@@ -1,5 +1,5 @@
 import type { Attachment as AttachmentType } from '@stream-io/feeds-react-sdk';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { Attachment } from './Attachment';
 import { ImageViewer } from './ImageViewer';
 import { SIZE_DIMENSIONS } from './sizes';
@@ -13,6 +13,8 @@ export type AttachmentListProps = {
   size?: 'small' | 'medium' | 'large';
 };
 
+const SWIPE_THRESHOLD = 50;
+
 export const AttachmentList = ({
   attachments,
   size = 'medium',
@@ -20,6 +22,8 @@ export const AttachmentList = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [viewerInitialIndex, setViewerInitialIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
 
   const hasMultiple = attachments.length > 1;
 
@@ -47,6 +51,42 @@ export const AttachmentList = ({
     setCurrentIndex((prev) => (prev === attachments.length - 1 ? 0 : prev + 1));
   }, [attachments.length]);
 
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (!hasMultiple) return;
+      touchStartX.current = e.touches[0].clientX;
+      touchEndX.current = null;
+    },
+    [hasMultiple]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (!hasMultiple) return;
+      touchEndX.current = e.touches[0].clientX;
+    },
+    [hasMultiple]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    if (!hasMultiple || touchStartX.current === null || touchEndX.current === null) {
+      return;
+    }
+
+    const diff = touchStartX.current - touchEndX.current;
+
+    if (Math.abs(diff) > SWIPE_THRESHOLD) {
+      if (diff > 0) {
+        goToNext();
+      } else {
+        goToPrevious();
+      }
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  }, [hasMultiple, goToNext, goToPrevious]);
+
   const handleImageClick = useCallback(() => {
     const currentAttachment = attachments[currentIndex];
     if (currentAttachment.type !== 'video') {
@@ -64,7 +104,12 @@ export const AttachmentList = ({
 
   return (
     <div className="flex flex-col items-start max-w-full overflow-hidden">
-      <div className="relative inline-block">
+      <div
+          className="relative inline-block touch-pan-y"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
         {hasMultiple && (
           <button
             className="absolute left-0 top-0 h-full z-10 flex items-center justify-center px-2 cursor-pointer"
