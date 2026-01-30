@@ -89,8 +89,9 @@ const Content = ({
   isActive: boolean | undefined;
 }) => (
   <>
+    { /* Manually adjust the chat_bubble icon, the shape causes a visual illusion of misalgment  */}
     <span
-      className={`material-symbols-outlined text-[1.1rem]! text-base-content/80 ${isActive ? 'fill' : ''}`}
+      className={`material-symbols-outlined text-[1.1rem]! text-base-content/80 ${isActive ? 'fill' : ''} ${icon === 'chat_bubble' ? 'translate-y-[2px]' : ''}`}
     >
       {icon}
     </span>
