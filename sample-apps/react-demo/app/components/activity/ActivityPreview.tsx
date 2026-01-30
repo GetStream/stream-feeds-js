@@ -8,7 +8,7 @@ export const ActivityPreview = ({
   activity: ActivityResponse;
 }) => {
   return (
-    <NavLink href={`/activity/${activity.id}`}>
+    <NavLink className="w-full" href={`/activity/${activity.id}`}>
       <Activity activity={activity} location="preview" />
     </NavLink>
   );
