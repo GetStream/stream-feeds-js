@@ -204,7 +204,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
 
   return (
     <>
-      <p className="w-full text-md">{renderedText}</p>
+      {renderedText && <p className="w-full text-md">{renderedText}</p>}
       {mediaAttachments.length > 0 && (
         <div className="w-full">
           <AttachmentList attachments={mediaAttachments} size={mediaAttachmentSize} />

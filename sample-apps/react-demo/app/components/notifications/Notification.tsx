@@ -4,8 +4,7 @@ import { useMemo } from 'react';
 import { NavLink } from '../utility/NavLink';
 import { Avatar } from '../utility/Avatar';
 
-const truncateText = (text?: string, maxLength = 20) => {
-  if (!text) return undefined;
+const truncateText = (text: string, maxLength = 20) => {
   return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 };
 
@@ -23,7 +22,7 @@ export const Notification = ({
     const targetActivity = notification.group.includes('follow')
       ? undefined
       : notification.activities[0].notification_context?.target;
-    const activityText = targetActivity ? truncateText(targetActivity.text) : '';
+    const activityText = targetActivity ? (targetActivity.text ? `"${truncateText(targetActivity.text)}"` : 'repost') : '';
 
     let notificationContent: React.ReactNode;
     switch (action) {
@@ -129,7 +128,7 @@ const NotificationContent = ({ icon, postLink, notification, activityText, actio
       <div className="flex-1 min-w-0">
         <Actors notification={notification} /> <span>{actionText}</span>
         {activityText && postLink && (
-          <span> <NavLink href={`${postLink}`} className="link">"{activityText}"</NavLink></span>
+          <span> <NavLink href={`${postLink}`} className="link">{activityText}</NavLink></span>
         )}
       </div>
       <ActorAvatars notification={notification} />
