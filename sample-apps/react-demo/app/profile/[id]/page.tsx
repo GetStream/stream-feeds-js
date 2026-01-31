@@ -11,9 +11,8 @@ import { useOwnFeedsContext } from '../../own-feeds-context';
 import { Avatar } from '../../components/utility/Avatar';
 import { NavLink } from '../../components/utility/NavLink';
 import { ActivityList } from '../../components/activity/ActivityList';
-import { PullToRefresh } from '../../components/utility/PullToRefresh';
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ToggleFollowButton } from '@/app/components/ToggleFollowButton';
 
 const userFeedSelector = (state: FeedState) => ({
@@ -32,7 +31,7 @@ export default function Profile() {
   const userId = useParams<{ id: string }>().id;
   const currentUser = useClientConnectedUser();
   const client = useFeedsClient();
-  const { ownFeed, ownTimeline, errors, reloadOwnFeed } = useOwnFeedsContext();
+  const { ownFeed, ownTimeline, errors } = useOwnFeedsContext();
   const [feed, setFeed] = useState<Feed | undefined>();
   const [timeline, setTimeline] = useState<Feed | undefined>();
   const [error, setError] = useState<Error | undefined>(undefined);
@@ -62,22 +61,6 @@ export default function Profile() {
     }
   }, [userId, currentUser?.id, client, ownFeed, ownTimeline, errors.ownFeed, isOwnProfile]);
 
-  const reloadOtherUserFeed = useCallback(async () => {
-    if (!feed) return;
-    setError(undefined);
-    await feed.getOrCreate().catch((e) => {
-      setError(e);
-    });
-  }, [feed]);
-
-  const handleRefresh = useCallback(async () => {
-    if (isOwnProfile) {
-      await reloadOwnFeed();
-    } else {
-      await reloadOtherUserFeed();
-    }
-  }, [isOwnProfile, reloadOwnFeed, reloadOtherUserFeed]);
-
   const shouldShowBookmarks = currentUser?.id === userId;
 
   const shouldShowToggleFollow = currentUser?.id !== userId;
@@ -97,44 +80,42 @@ export default function Profile() {
   };
 
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
-      <div className="w-full flex flex-col items-center justify-start gap-4">
-        <div className="flex flex-row items-center justify-center gap-4">
-          <Avatar user={user} className="size-10 md:size-12" />
-          <div className="text-lg font-semibold">{user?.name}</div>
+    <div className="w-full flex flex-col items-center justify-start gap-4">
+      <div className="flex flex-row items-center justify-center gap-4">
+        <Avatar user={user} className="size-10 md:size-12" />
+        <div className="text-lg font-semibold">{user?.name}</div>
+      </div>
+      <div className="stats">
+        <div className="stat">
+          <div className="stat-title">Posts</div>
+          <div className="stat-value text-primary">{activityCount}</div>
         </div>
-        <div className="stats">
-          <div className="stat">
-            <div className="stat-title">Posts</div>
-            <div className="stat-value text-primary">{activityCount}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-title">Followers</div>
-            <div className="stat-value text-primary">{followerCount}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-title">Following</div>
-            <div className="stat-value text-primary">{followingCount}</div>
-          </div>
+        <div className="stat">
+          <div className="stat-title">Followers</div>
+          <div className="stat-value text-primary">{followerCount}</div>
         </div>
-        <div className="md:hidden">
-          {shouldShowBookmarks && (
-            <NavLink
-              className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0"
-              href="/bookmarks"
-            >
-              <span className="material-symbols-outlined">bookmark</span>
-              <span className="text-sm">Bookmarks</span>
-            </NavLink>
-          )}
+        <div className="stat">
+          <div className="stat-title">Following</div>
+          <div className="stat-value text-primary">{followingCount}</div>
         </div>
-        {shouldShowToggleFollow && <ToggleFollowButton userId={userId} />}
-        {feed && (
-          <StreamFeed feed={feed}>
-            <ActivityList location="profile" error={error} />
-          </StreamFeed>
+      </div>
+      <div className="md:hidden">
+        {shouldShowBookmarks && (
+          <NavLink
+            className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0"
+            href="/bookmarks"
+          >
+            <span className="material-symbols-outlined">bookmark</span>
+            <span className="text-sm">Bookmarks</span>
+          </NavLink>
         )}
       </div>
-    </PullToRefresh>
+      {shouldShowToggleFollow && <ToggleFollowButton userId={userId} />}
+      {feed && (
+        <StreamFeed feed={feed}>
+          <ActivityList location="profile" error={error} />
+        </StreamFeed>
+      )}
+    </div>
   );
 }

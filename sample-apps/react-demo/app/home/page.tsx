@@ -7,7 +7,6 @@ import { ActivityList } from '../components/activity/ActivityList';
 import { OwnStories } from '../components/stories/OwnStories';
 import { StoryTimeline } from '../components/stories/StoryTimeline';
 import { Avatar } from '../components/utility/Avatar';
-import { PullToRefresh } from '../components/utility/PullToRefresh';
 
 const HomeActivityComposer = () => {
   const currentUser = useClientConnectedUser();
@@ -29,7 +28,6 @@ export default function Home() {
     ownStoryTimeline,
     ownStoryFeed,
     errors,
-    reloadTimelines,
   } = useOwnFeedsContext();
 
   if (!ownTimeline || !ownFeed || !ownStoryTimeline || !ownStoryFeed) {
@@ -37,28 +35,26 @@ export default function Home() {
   }
 
   return (
-    <PullToRefresh onRefresh={reloadTimelines}>
-      <div className="w-full flex flex-col items-center justify-start gap-4">
-        <div className="w-full flex flex-row gap-4">
-          <StreamFeed feed={ownStoryFeed}>
-            <OwnStories />
-          </StreamFeed>
-          <StreamFeed feed={ownStoryTimeline}>
-            <StoryTimeline />
-          </StreamFeed>
-        </div>
-        <div className="w-full hidden md:block">
-          <StreamFeed feed={ownFeed}>
-            <HomeActivityComposer />
-          </StreamFeed>
-        </div>
-        <StreamFeed feed={ownTimeline}>
-          <div className="w-full flex flex-col items-center justify-start gap-4">
-            <div className="text-lg font-bold hidden md:block">Latest posts</div>
-            <ActivityList location="timeline" error={errors.ownTimeline} />
-          </div>
+    <div className="w-full flex flex-col items-center justify-start gap-4">
+      <div className="w-full flex flex-row gap-4">
+        <StreamFeed feed={ownStoryFeed}>
+          <OwnStories />
+        </StreamFeed>
+        <StreamFeed feed={ownStoryTimeline}>
+          <StoryTimeline />
         </StreamFeed>
       </div>
-    </PullToRefresh>
+      <div className="w-full hidden md:block">
+        <StreamFeed feed={ownFeed}>
+          <HomeActivityComposer />
+        </StreamFeed>
+      </div>
+      <StreamFeed feed={ownTimeline}>
+        <div className="w-full flex flex-col items-center justify-start gap-4">
+          <div className="text-lg font-bold hidden md:block">Latest posts</div>
+          <ActivityList location="timeline" error={errors.ownTimeline} />
+        </div>
+      </StreamFeed>
+    </div>
   );
 }

@@ -30,7 +30,6 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
           throw e;
         }
       });
-    // Reload timelines to see new activities
     await reloadTimelines();
   }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline, reloadTimelines]);
 
@@ -45,7 +44,6 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
         throw e;
       }
     });
-    // Reload timelines to remove activities
     await reloadTimelines();
   }, [targetUserFeed, targetStoryFeed, ownTimeline, ownStoryTimeline, reloadTimelines]);
 

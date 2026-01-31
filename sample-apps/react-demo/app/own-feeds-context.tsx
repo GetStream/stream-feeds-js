@@ -32,8 +32,6 @@ type OwnFeedsContextValue = {
   ownForyouFeed: Feed | undefined;
   errors: OwnFeedsErrors;
   reloadTimelines: () => Promise<void>;
-  reloadForyouFeed: () => Promise<void>;
-  reloadOwnFeed: () => Promise<void>;
 };
 
 const defaultErrors: OwnFeedsErrors = {
@@ -54,8 +52,6 @@ const OwnFeedsContext = createContext<OwnFeedsContextValue>({
   ownForyouFeed: undefined,
   errors: defaultErrors,
   reloadTimelines: () => Promise.resolve(),
-  reloadForyouFeed: () => Promise.resolve(),
-  reloadOwnFeed: () => Promise.resolve(),
 });
 
 export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
@@ -144,7 +140,6 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
   }, [connectedUser, client]);
 
   const reloadTimelines = useCallback(async () => {
-    // Reset errors before reloading
     setErrors((prev) => ({
       ...prev,
       ownTimeline: undefined,
@@ -161,30 +156,6 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
     ]);
   }, [ownTimeline, ownStoryTimeline]);
 
-  const reloadForyouFeed = useCallback(async () => {
-    // Reset error before reloading
-    setErrors((prev) => ({
-      ...prev,
-      ownForyouFeed: undefined,
-    }));
-
-    await ownForyouFeed?.getOrCreate({ limit: 10 }).catch((error: Error) => {
-      setErrors((prev) => ({ ...prev, ownForyouFeed: error }));
-    });
-  }, [ownForyouFeed]);
-
-  const reloadOwnFeed = useCallback(async () => {
-    // Reset error before reloading
-    setErrors((prev) => ({
-      ...prev,
-      ownFeed: undefined,
-    }));
-
-    await ownFeed?.getOrCreate({ watch: true }).catch((error: Error) => {
-      setErrors((prev) => ({ ...prev, ownFeed: error }));
-    });
-  }, [ownFeed]);
-
   return (
     <OwnFeedsContext.Provider
       value={{
@@ -196,8 +167,6 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
         ownForyouFeed,
         errors,
         reloadTimelines,
-        reloadForyouFeed,
-        reloadOwnFeed,
       }}
     >
       {children}

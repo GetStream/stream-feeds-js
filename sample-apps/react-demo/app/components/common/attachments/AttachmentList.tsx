@@ -14,7 +14,7 @@ export type AttachmentListProps = {
   disableButtons?: boolean;
 };
 
-const SWIPE_THRESHOLD = 50;
+const SWIPE_THRESHOLD = 10;
 
 export const AttachmentList = ({
   attachments,
@@ -128,12 +128,12 @@ export const AttachmentList = ({
   return (
     <div className="flex flex-col items-start max-w-full overflow-hidden">
       <div
-          className="relative inline-block touch-pan-y"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onTouchCancel={resetTouchState}
-        >
+        className="relative inline-block touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={resetTouchState}
+      >
         {hasMultiple && !disableButtons && (
           <button
             className="absolute left-0 top-0 h-full z-10 flex items-center justify-center px-2 cursor-pointer"
