@@ -1,12 +1,12 @@
 import type { Attachment as AttachmentType } from '@stream-io/feeds-react-sdk';
-import { useEffect, useRef, useState, useCallback, useMemo, type TouchEvent } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
   buildImageUrl,
   useImagePreloader,
 } from '../../../utility/useImagePreloader';
+import { useSwipeNavigation } from '../../../utility/useSwipeNavigation';
 
 const VIEWER_SIZE = { width: 1200, height: 1200 };
-const SWIPE_THRESHOLD = 50;
 
 export type ImageViewerProps = {
   attachments: AttachmentType[];
@@ -23,8 +23,6 @@ export const ImageViewer = ({
 }: ImageViewerProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const touchStartX = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
 
   const imageAttachments = useMemo(() => attachments.filter((a) => a.type !== 'video'), [attachments]);
   const hasMultiple = imageAttachments.length > 1;
@@ -64,41 +62,12 @@ export const ImageViewer = ({
     setCurrentIndex((prev) => (prev === imageAttachments.length - 1 ? 0 : prev + 1));
   }, [imageAttachments.length]);
 
-  const handleTouchStart = useCallback(
-    (e: TouchEvent<HTMLDivElement>) => {
-      if (!hasMultiple) return;
-      touchStartX.current = e.touches[0].clientX;
-      touchEndX.current = null;
-    },
-    [hasMultiple]
-  );
-
-  const handleTouchMove = useCallback(
-    (e: TouchEvent<HTMLDivElement>) => {
-      if (!hasMultiple) return;
-      touchEndX.current = e.touches[0].clientX;
-    },
-    [hasMultiple]
-  );
-
-  const handleTouchEnd = useCallback(() => {
-    if (!hasMultiple || touchStartX.current === null || touchEndX.current === null) {
-      return;
-    }
-
-    const diff = touchStartX.current - touchEndX.current;
-
-    if (Math.abs(diff) > SWIPE_THRESHOLD) {
-      if (diff > 0) {
-        goToNext();
-      } else {
-        goToPrevious();
-      }
-    }
-
-    touchStartX.current = null;
-    touchEndX.current = null;
-  }, [hasMultiple, goToNext, goToPrevious]);
+  const swipeHandlers = useSwipeNavigation<HTMLDivElement>({
+    threshold: 10,
+    enabled: hasMultiple,
+    onSwipeLeft: goToNext,
+    onSwipeRight: goToPrevious,
+  });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -126,9 +95,7 @@ export const ImageViewer = ({
       <div className="modal-box w-full max-w-full p-4 overflow-hidden">
         <div
           className="relative flex items-center justify-center max-h-[80vh] touch-pan-y"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          {...swipeHandlers}
         >
           {hasMultiple && (
             <button

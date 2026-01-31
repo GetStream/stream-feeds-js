@@ -1,5 +1,5 @@
 import type { Attachment as AttachmentType } from '@stream-io/feeds-react-sdk';
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Attachment } from './Attachment';
 import { ImageViewer } from './ImageViewer';
 import { SIZE_DIMENSIONS } from './sizes';
@@ -7,14 +7,13 @@ import {
   buildImageUrl,
   useImagePreloader,
 } from '../../../utility/useImagePreloader';
+import { useSwipeNavigation } from '../../../utility/useSwipeNavigation';
 
 export type AttachmentListProps = {
   attachments: AttachmentType[];
   size?: 'small' | 'medium' | 'large';
   disableButtons?: boolean;
 };
-
-const SWIPE_THRESHOLD = 10;
 
 export const AttachmentList = ({
   attachments,
@@ -24,10 +23,6 @@ export const AttachmentList = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [viewerInitialIndex, setViewerInitialIndex] = useState(0);
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-  const touchEndX = useRef<number | null>(null);
-  const touchEndY = useRef<number | null>(null);
 
   const hasMultiple = attachments.length > 1;
 
@@ -55,60 +50,13 @@ export const AttachmentList = ({
     setCurrentIndex((prev) => (prev === attachments.length - 1 ? 0 : prev + 1));
   }, [attachments.length]);
 
-  const resetTouchState = useCallback(() => {
-    touchStartX.current = null;
-    touchStartY.current = null;
-    touchEndX.current = null;
-    touchEndY.current = null;
-  }, []);
-
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      if (!hasMultiple) return;
-      touchStartX.current = e.touches[0].clientX;
-      touchStartY.current = e.touches[0].clientY;
-      touchEndX.current = null;
-      touchEndY.current = null;
-    },
-    [hasMultiple]
-  );
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!hasMultiple) return;
-      touchEndX.current = e.touches[0].clientX;
-      touchEndY.current = e.touches[0].clientY;
-    },
-    [hasMultiple]
-  );
-
-  const handleTouchEnd = useCallback(() => {
-    if (
-      !hasMultiple ||
-      touchStartX.current === null ||
-      touchStartY.current === null ||
-      touchEndX.current === null ||
-      touchEndY.current === null
-    ) {
-      resetTouchState();
-      return;
-    }
-
-    const diffX = touchStartX.current - touchEndX.current;
-    const diffY = touchStartY.current - touchEndY.current;
-
-    // Only register as swipe if horizontal movement exceeds vertical
-    // This prevents scrolling from being interpreted as a swipe
-    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
-      if (diffX > 0) {
-        goToNext();
-      } else {
-        goToPrevious();
-      }
-    }
-
-    resetTouchState();
-  }, [hasMultiple, goToNext, goToPrevious, resetTouchState]);
+  const swipeHandlers = useSwipeNavigation({
+    threshold: 10,
+    requireHorizontalDominance: true,
+    enabled: hasMultiple,
+    onSwipeLeft: goToNext,
+    onSwipeRight: goToPrevious,
+  });
 
   const handleImageClick = useCallback(() => {
     const currentAttachment = attachments[currentIndex];
@@ -129,10 +77,7 @@ export const AttachmentList = ({
     <div className="flex flex-col items-start max-w-full overflow-hidden">
       <div
         className="relative inline-block touch-pan-y"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={resetTouchState}
+        {...swipeHandlers}
       >
         {hasMultiple && !disableButtons && (
           <button
