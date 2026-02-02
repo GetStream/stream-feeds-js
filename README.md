@@ -8,7 +8,7 @@ Bring users together through personalized feeds, threaded discussions, and real-
 - [React SDK](./packages/react-sdk#official-react-sdk-for-steram-feeds)
 - [React Native SDK](./packages/react-native-sdk#official-react-native-sdk-for-stream-feeds)
 - [JavaScript SDK](./packages/feeds-client#official-plain-js-sdk-and-low-level-client-for-stream-feeds)
-- [React sample apps](#react-demo-apps)
+- [React sample apps](#react-demo-app)
 - [React native sample app](./sample-apps/react-native/ExpoTikTokApp/#expo-tiktok-sample-app)
 - [Docs](https://getstream.io/activity-feeds/docs/)
 
