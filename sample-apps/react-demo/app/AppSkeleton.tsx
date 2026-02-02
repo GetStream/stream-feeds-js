@@ -19,7 +19,7 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
       <div className="drawer min-h-dvh lg:hidden">
         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content h-dvh overflow-hidden flex flex-col lg:hidden">
-          <nav className="hidden md:flex navbar w-full bg-base-100 sticky top-0 z-40 border-b border-base-300 shrink-0">
+          <nav className="hidden md:flex navbar w-full bg-base-100 sticky top-0 z-40 border-b border-base-content/20 shrink-0">
             <div className="flex-none">
               <label
                 htmlFor="my-drawer"
@@ -69,7 +69,7 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
             </ul>
           </nav>
         </aside>
-        <main className="w-1/2 flex flex-col items-stretch justify-start border-r border-l border-base-300 min-h-dvh">
+        <main className="w-1/2 flex flex-col items-stretch justify-start border-r border-l border-base-content/20 min-h-dvh">
           <div className="w-full min-w-0 self-stretch px-4 py-10">
             {children}
           </div>

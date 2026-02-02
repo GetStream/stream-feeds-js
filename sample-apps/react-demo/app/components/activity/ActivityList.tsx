@@ -114,7 +114,7 @@ export const ActivityList = ({
           <ul ref={listRef} className="list w-full">
             {activities?.map((activity) => (
               <li
-                className="w-full py-3 border-b border-base-300 hover:bg-base-200/50 transition-colors cursor-pointer"
+                className="w-full py-3 border-b border-base-content/20 hover:bg-base-200/50 transition-colors cursor-pointer"
                 key={activity.id}
               >
                 <Activity activity={activity} location={location} />

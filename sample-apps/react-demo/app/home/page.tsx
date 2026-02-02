@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <div className="w-full flex flex-col items-center justify-start">
       {/* Stories Section */}
-      <section className="w-full border-b border-base-300 py-3 relative">
+      <section className="w-full border-b border-base-content/20 py-3 relative">
         <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide">
           <StreamFeed feed={ownStoryFeed}>
             <OwnStories />

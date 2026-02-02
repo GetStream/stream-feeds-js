@@ -5,7 +5,7 @@ import { StoryCircleSkeleton } from './StoryCircleSkeleton';
 export const HomePageSkeleton = () => (
   <div className="w-full flex flex-col items-center justify-start">
     {/* Stories Section Skeleton */}
-    <section className="w-full border-b border-base-300 py-3 relative">
+    <section className="w-full border-b border-base-content/20 py-3 relative">
       <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide px-2">
         <StoryCircleSkeleton />
         <StoryCircleSkeleton />

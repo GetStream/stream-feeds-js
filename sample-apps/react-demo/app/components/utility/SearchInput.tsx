@@ -22,7 +22,8 @@ export const SearchInput = () => {
       className={`
         search-input flex items-center gap-3 w-full px-4 py-3
         bg-base-200 rounded-full transition-all duration-200
-        ${isFocused ? 'bg-base-100 ring-2 ring-primary' : ''}
+        border border-transparent dark:border-base-content/20
+        ${isFocused ? 'bg-base-100 ring-2 ring-primary border-primary' : ''}
       `}
     >
       <span className={`material-symbols-outlined text-xl ${isFocused ? 'text-primary' : 'text-base-content/50'}`}>

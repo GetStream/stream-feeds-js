@@ -1,5 +1,5 @@
 export const NotificationSkeleton = () => (
-  <div className="flex flex-row items-center justify-between gap-2 w-full max-w-full p-4 border-b border-base-300 animate-pulse">
+  <div className="flex flex-row items-center justify-between gap-2 w-full max-w-full p-4 border-b border-base-content/20 animate-pulse">
     <div className="flex flex-row items-center gap-2 flex-1 min-w-0">
       <div className="size-5 rounded bg-base-300 flex-shrink-0" />
       <div className="flex-1 min-w-0 space-y-2">

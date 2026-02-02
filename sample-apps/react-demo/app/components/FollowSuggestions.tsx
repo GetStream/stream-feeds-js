@@ -14,7 +14,7 @@ export const FollowSuggestions = () => {
   }, [suggestedFeeds.length, loadFollowSuggestions]);
 
   return (
-    <div className="bg-base-200 rounded-2xl overflow-hidden">
+    <div className="bg-base-200 rounded-2xl overflow-hidden border border-transparent dark:border-base-content/20">
       <div className="p-4">
         <h2 className="text-xl font-extrabold mb-4">
           Who to follow

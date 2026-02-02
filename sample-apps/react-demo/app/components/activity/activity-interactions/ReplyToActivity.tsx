@@ -32,7 +32,7 @@ export const ReplyToActivity = ({ activity }: { activity: ActivityResponse }) =>
       </button>
       <dialog ref={dialogRef} className="modal">
         <div className="modal-box w-[90%] max-w-xl bg-base-100 rounded-2xl p-0">
-          <div className="flex items-center p-4 border-b border-base-300">
+          <div className="flex items-center p-4 border-b border-base-content/20">
             <button
               className="w-9 h-9 rounded-full hover:bg-base-200 flex items-center justify-center transition-colors"
               onClick={closeDialog}

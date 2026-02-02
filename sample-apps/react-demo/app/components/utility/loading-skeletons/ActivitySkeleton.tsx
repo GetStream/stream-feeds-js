@@ -1,5 +1,5 @@
 export const ActivitySkeleton = () => (
-  <div className="w-full p-4 border-b border-base-300 animate-pulse">
+  <div className="w-full p-4 border-b border-base-content/20 animate-pulse">
     <div className="flex items-start gap-3">
       <div className="size-10 md:size-12 rounded-full bg-base-300 shrink-0" />
       <div className="flex-1 space-y-3">

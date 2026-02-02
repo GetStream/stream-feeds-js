@@ -144,7 +144,7 @@ export const Composer = ({
   const isComment = variant === 'comment';
 
   return (
-    <div className="composer w-full flex flex-col gap-1 rounded-xl border border-base-300 p-4 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+    <div className="composer w-full flex flex-col gap-1 rounded-xl border border-base-content/20 p-4 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
       <div className="relative">
         <textarea
           ref={textareaRef}
