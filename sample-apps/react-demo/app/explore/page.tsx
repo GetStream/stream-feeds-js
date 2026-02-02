@@ -19,7 +19,7 @@ export default function Explore() {
         <SearchInput />
         <FollowSuggestions />
       </div>
-      <div className="text-xl font-extrabold lg:hidden -mb-4 px-4 lg:px-0">Popular posts</div>
+      <div className="text-xl font-extrabold lg:hidden lg:px-0">Popular posts</div>
       {showActivityListSkeleton ? (
         <div className="w-full flex flex-col">
           <ActivitySkeleton />
