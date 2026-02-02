@@ -7,7 +7,7 @@ Supported React versions: ^17 || ^18 || ^19
 ## **Quick Links**
 
 - [Register](https://getstream.io/chat/trial/) to get an API key for Stream Feeds
-- [Sample apps](../../#react-sample-apps)
+- [Sample apps](../../#react-demo-app)
 - [Docs](https://getstream.io/activity-feeds/docs/)
 
 ## What is Stream?

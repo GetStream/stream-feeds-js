@@ -5,7 +5,7 @@ Bring users together through personalized feeds, threaded discussions, and real-
 ## **Quick Links**
 
 - [Register](https://getstream.io/chat/trial/) to get an API key for Stream Feeds
-- [React Sample apps](../../#react-sample-apps)
+- [React Sample apps](../../#react-demo-app)
 - [Docs](https://getstream.io/activity-feeds/docs/)
 
 ## What is Stream?
