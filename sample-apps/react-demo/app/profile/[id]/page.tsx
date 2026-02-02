@@ -11,6 +11,7 @@ import { useOwnFeedsContext } from '../../own-feeds-context';
 import { Avatar } from '../../components/utility/Avatar';
 import { NavLink } from '../../components/utility/NavLink';
 import { ActivityList } from '../../components/activity/ActivityList';
+import { ProfilePageSkeleton } from '../../components/utility/loading-skeletons/ProfilePageSkeleton';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ToggleFollowButton } from '@/app/components/ToggleFollowButton';
@@ -78,6 +79,12 @@ export default function Profile() {
   ) ?? {
     followingCount: 0,
   };
+
+  const isProfileLoading = userId && !feed;
+
+  if (isProfileLoading) {
+    return <ProfilePageSkeleton />;
+  }
 
   return (
     <div className="w-full flex flex-col items-center justify-start gap-4">

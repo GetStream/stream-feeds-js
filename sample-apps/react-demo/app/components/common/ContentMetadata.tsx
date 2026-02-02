@@ -23,32 +23,48 @@ export const ContentMetadata = ({
     return formatDistanceToNow(created_at, { addSuffix: true });
   }, [created_at]);
 
-  const formattedEditedAt = useMemo(() => {
-    return edited_at ? formatDistanceToNow(edited_at, { addSuffix: true }) : null;
-  }, [edited_at]);
-  const content = <>
+
+  const avatarContent = (
     <Avatar
       user={user}
       className={location === 'activity' ? 'size-10 md:size-12' : 'size-8 md:size-10'}
     />
-    <div
-      className={`flex ${location === 'activity' ? 'flex-col flex-1 items-start' : 'w-full flex-row gap-1 items-center'}`}
-    >
-      <div className={`font-semibold text-md`}>{user.name}</div>
-      {location === 'comment' && (
-        <div className="text-sm text-base-content/80">-</div>
-      )}
-      <div className="text-sm text-base-content/80 flex-1 w-full min-w-0">
+  );
+
+  const metaContent = (
+    <div className="flex flex-row items-center gap-1 min-w-0">
+      <span className="font-bold text-[15px] hover:underline truncate shrink min-w-[40px]">
+        {user.name}
+      </span>
+      <span className="text-base-content/50 flex-shrink-0">·</span>
+      <span className="text-base-content/50 text-[15px] flex-shrink-0">
         {formattedCreatedAt}
-        {edited_at ? <span className="text-sm text-base-content/80"> (edited {formattedEditedAt})</span> : null}
-      </div>
+      </span>
+      {edited_at && (
+        <span className="text-base-content/40 text-[15px] flex-shrink-0">(edited)</span>
+      )}
     </div>
-  </>
+  );
 
   return (
-    <div className="flex flex-row items-center w-full gap-2">
-      {withLink ? <NavLink className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0" href={`/profile/${user.id}`}>{content}</NavLink> : content}
-      {children}
+    <div className="flex flex-row items-center w-full gap-3">
+      {withLink ? (
+        <NavLink href={`/profile/${user.id}`} className="flex-shrink-0">
+          {avatarContent}
+        </NavLink>
+      ) : (
+        <div className="flex-shrink-0">{avatarContent}</div>
+      )}
+      <div className="flex-1 min-w-0 flex flex-row items-center justify-between gap-2">
+        {withLink ? (
+          <NavLink href={`/profile/${user.id}`} className="min-w-0">
+            {metaContent}
+          </NavLink>
+        ) : (
+          metaContent
+        )}
+        {children}
+      </div>
     </div>
   );
 };

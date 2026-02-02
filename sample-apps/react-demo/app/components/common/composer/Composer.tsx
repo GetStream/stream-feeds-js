@@ -17,9 +17,9 @@ export type ComposerProps = {
   initialAttachments?: Attachment[];
   initialMentionedUsers?: Array<{ id: string; name: string }>;
   onSubmit: (text: string, attachments: Attachment[], mentionedUserIds: string[]) => Promise<void>;
-  textareaBorder?: boolean;
   allowEmptyText?: boolean;
   portalContainer?: HTMLElement | null;
+  rows?: number;
 };
 
 export const Composer = ({
@@ -30,9 +30,9 @@ export const Composer = ({
   initialAttachments = [],
   initialMentionedUsers = [],
   onSubmit,
-  textareaBorder = true,
   allowEmptyText = false,
   portalContainer,
+  rows,
 }: ComposerProps) => {
   const [text, setText] = useState(initialText);
   const [completedAttachments, setCompletedAttachments] = useState<Attachment[]>(initialAttachments);
@@ -142,22 +142,24 @@ export const Composer = ({
   );
 
   const isComment = variant === 'comment';
-  const buttonSize = isComment ? 'btn-sm' : '';
 
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className="composer w-full flex flex-col gap-1 rounded-xl border border-base-300 p-4 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
       <div className="relative">
         <textarea
           ref={textareaRef}
-          className={`w-full textarea flex-1 text-base ${isComment ? 'min-h-[40px]' : 'min-h-[60px]'} ${textareaBorder ? 'textarea-bordered' : 'textarea-ghost'}`}
-          rows={isComment ? 1 : 3}
+          className={`
+            w-full flex-1 text-xl leading-relaxed bg-transparent
+            placeholder:text-base-content/50 resize-none outline-none
+            ${isComment ? 'min-h-[40px] text-[15px]' : 'min-h-[80px]'}
+          `}
+          rows={rows ?? (isComment ? 1 : 2)}
           placeholder={placeholder}
           value={text}
           onChange={handleTextareaChange}
           onKeyDown={handleTextareaKeyDown}
           onClick={handleTextareaClick}
           onKeyUp={handleTextareaKeyUp}
-          style={{ resize: 'none' }}
         />
         {mentionSession.active && (
           <MentionSuggestionList
@@ -178,15 +180,25 @@ export const Composer = ({
         onHasInFlightUploadsChange={handleHasInFlightUploadsChange}
         size="small"
       />
-      {error && <div className="text-error"> Failed to save: {error.message} </div>}
-      <div className="w-full flex justify-end items-center gap-2">
+      {error && (
+        <div className="text-sm text-error">
+          Failed to save: {error.message}
+        </div>
+      )}
+      <div className="w-full flex justify-between items-center">
         <FileUpload
           onFileSelected={handleFileSelected}
           multiple={true}
-          className={isComment ? 'btn btn-secondary btn-sm' : undefined}
+          className="w-9 h-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-primary transition-colors"
         />
         <button
-          className={`btn btn-primary flex-shrink-0 ${buttonSize}`}
+          className={`
+            px-4 py-1.5 rounded-full font-bold text-[15px]
+            bg-primary text-primary-content
+            hover:bg-primary/90
+            disabled:opacity-50 disabled:cursor-not-allowed
+            transition-colors
+          `}
           onClick={handleSubmit}
           disabled={(!allowEmptyText && !text.trim()) || isSubmitting || hasInFlightUploads}
         >

@@ -1,6 +1,6 @@
 import type { ActivityState } from '@stream-io/feeds-react-sdk';
 import { useActivityComments, useActivityWithStateUpdatesContext, useStateStore } from '@stream-io/feeds-react-sdk';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Comment } from './Comment';
 import { ErrorCard } from '../utility/ErrorCard';
 import { LoadingIndicator } from '../utility/LoadingIndicator';
@@ -25,18 +25,15 @@ export const CommentList = () => {
     selector,
   ) ?? { commentCount: 0 };
 
-  // Load initial comments
-  useEffect(() => {
-    if (comments.length === 0 && commentCount > 0) {
-      setIsLoading(true);
-      void loadNextPage({ limit: 5, sort: 'best' }).catch((e) => {
-        setError(e.message);
-        throw e;
-      }).finally(() => {
-        setIsLoading(false);
-      });
-    }
-  }, [loadNextPage, comments.length, commentCount]);
+  const loadNext = useCallback(() => {
+    setIsLoading(true);
+    void loadNextPage().catch(e => {
+      setError(e.message);
+      throw e;
+    }).finally(() => {
+      setIsLoading(false);
+    });
+  }, [loadNextPage]);
 
   if (error) {
     return <ErrorCard message="Failed to load comments" error={error} />;
@@ -50,23 +47,26 @@ export const CommentList = () => {
         <>
           <ul className="list pt-0">
             {comments.map((comment) => (
-              <li className="list-row w-full flex flex-row justify-stretch items-stretch" key={comment.id}>
-                <Comment
-                  comment={comment}
-                />
+              <li className="list-row w-full" key={comment.id}>
+                <div className="list-col-grow w-full min-w-0">
+                  <Comment
+                    comment={comment}
+                  />
+                </div>
               </li>
             ))}
           </ul>
           {commentCount > 0 && has_next_page && comments.length > 0 && (
             <button
               className="btn btn-soft btn-primary"
-              onClick={() => loadNextPage()}
+              onClick={loadNext}
             >
-              Load more comments
+              {isLoading ? <LoadingIndicator /> : 'Load more comments'}
             </button>
           )}
         </>
-      )}
+      )
+      }
     </>
   );
 };

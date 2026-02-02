@@ -16,17 +16,20 @@ import {
 type FollowSuggestionsContextValue = {
   suggestedFeeds: Feed[];
   loadFollowSuggestions: () => Promise<void>;
+  isLoading: boolean;
 };
 
 const FollowSuggestionsContext = createContext<FollowSuggestionsContextValue>({
   suggestedFeeds: [],
   loadFollowSuggestions: async () => { },
+  isLoading: true,
 });
 
 export const FollowSuggestionsContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const [suggestedFeeds, setsuggestedFeeds] = useState<Feed[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const client = useFeedsClient();
   const connectedUser = useClientConnectedUser();
 
@@ -37,6 +40,7 @@ export const FollowSuggestionsContextProvider = ({
     }
 
     try {
+      setIsLoading(true);
       const response = await client.getFollowSuggestions({
         feed_group_id: 'user',
         limit: 3,
@@ -45,6 +49,8 @@ export const FollowSuggestionsContextProvider = ({
     } catch (error) {
       setsuggestedFeeds([]);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   }, [client, connectedUser]);
 
@@ -53,6 +59,7 @@ export const FollowSuggestionsContextProvider = ({
       value={{
         suggestedFeeds,
         loadFollowSuggestions,
+        isLoading,
       }}
     >
       {children}

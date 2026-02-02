@@ -17,77 +17,129 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-feature-settings: "liga";
+  font-feature-settings: 'liga';
 }
 
 @plugin "daisyui/theme" {
-  name: 'corporate';
+  name: 'stream-twitter';
   default: true;
   prefersdark: false;
   color-scheme: 'light';
+  /* Pure white backgrounds */
   --color-base-100: oklch(100% 0 0);
-  --color-base-200: oklch(93% 0 0);
-  --color-base-300: oklch(86% 0 0);
-  --color-base-content: oklch(22.389% 0.031 278.072);
-  --color-primary: oklch(58% 0.158 241.966);
+  --color-base-200: oklch(97% 0 0);
+  --color-base-300: oklch(92% 0 0);
+  /* Dark text */
+  --color-base-content: oklch(15% 0 0);
+  /* Twitter blue primary */
+  --color-primary: oklch(62% 0.19 245);
   --color-primary-content: oklch(100% 0 0);
-  --color-secondary: oklch(84% 0.143 164.978);
+  /* Gray secondary */
+  --color-secondary: oklch(55% 0.02 250);
   --color-secondary-content: oklch(100% 0 0);
-  --color-accent: oklch(60% 0.118 184.704);
+  /* Blue accent */
+  --color-accent: oklch(62% 0.19 245);
   --color-accent-content: oklch(100% 0 0);
-  --color-neutral: oklch(0% 0 0);
-  --color-neutral-content: oklch(100% 0 0);
-  --color-info: oklch(60% 0.126 221.723);
+  /* Dark neutral */
+  --color-neutral: oklch(20% 0 0);
+  --color-neutral-content: oklch(98% 0 0);
+  /* Blue info */
+  --color-info: oklch(62% 0.19 245);
   --color-info-content: oklch(100% 0 0);
-  --color-success: oklch(62% 0.194 149.214);
+  /* Green success */
+  --color-success: oklch(60% 0.16 145);
   --color-success-content: oklch(100% 0 0);
-  --color-warning: oklch(85% 0.199 91.936);
-  --color-warning-content: oklch(0% 0 0);
-  --color-error: oklch(70% 0.191 22.216);
-  --color-error-content: oklch(0% 0 0);
-  --radius-selector: 1rem;
-  --radius-field: 1rem;
+  /* Orange warning */
+  --color-warning: oklch(75% 0.15 65);
+  --color-warning-content: oklch(15% 0 0);
+  /* Red error */
+  --color-error: oklch(60% 0.2 25);
+  --color-error-content: oklch(100% 0 0);
+  --radius-selector: 9999px;
+  --radius-field: 0.5rem;
   --radius-box: 1rem;
   --size-selector: 0.25rem;
   --size-field: 0.25rem;
-  --border: 0.5px;
+  --border: 1px;
   --depth: 0;
   --noise: 0;
 }
 
 @plugin "daisyui/theme" {
-  name: 'business';
+  name: 'stream-twitter-dark';
   default: false;
   prefersdark: true;
   color-scheme: 'dark';
-  --color-base-100: oklch(24.353% 0 0);
-  --color-base-200: oklch(22.648% 0 0);
-  --color-base-300: oklch(20.944% 0 0);
-  --color-base-content: oklch(84.87% 0 0);
-  --color-primary: oklch(60% 0.126 221.723);
-  --color-primary-content: oklch(88.34% 0.019 251.473);
-  --color-secondary: oklch(69% 0.17 162.48);
-  --color-secondary-content: oklch(12.818% 0.005 229.389);
-  --color-accent: oklch(67.271% 0.167 35.791);
-  --color-accent-content: oklch(13.454% 0.033 35.791);
-  --color-neutral: oklch(27.441% 0.013 253.041);
-  --color-neutral-content: oklch(85.488% 0.002 253.041);
-  --color-info: oklch(62.616% 0.143 240.033);
-  --color-info-content: oklch(12.523% 0.028 240.033);
-  --color-success: oklch(70.226% 0.094 156.596);
-  --color-success-content: oklch(14.045% 0.018 156.596);
-  --color-warning: oklch(77.482% 0.115 81.519);
-  --color-warning-content: oklch(15.496% 0.023 81.519);
-  --color-error: oklch(51.61% 0.146 29.674);
-  --color-error-content: oklch(90.322% 0.029 29.674);
-  --radius-selector: 1rem;
-  --radius-field: 1rem;
+  /* Pure black backgrounds */
+  --color-base-100: oklch(0% 0 0);
+  --color-base-200: oklch(12% 0 0);
+  --color-base-300: oklch(18% 0 0);
+  /* White text */
+  --color-base-content: oklch(95% 0 0);
+  /* Twitter blue primary */
+  --color-primary: oklch(65% 0.19 245);
+  --color-primary-content: oklch(100% 0 0);
+  /* Gray secondary */
+  --color-secondary: oklch(60% 0.02 250);
+  --color-secondary-content: oklch(100% 0 0);
+  /* Blue accent */
+  --color-accent: oklch(65% 0.19 245);
+  --color-accent-content: oklch(100% 0 0);
+  /* Dark neutral */
+  --color-neutral: oklch(25% 0 0);
+  --color-neutral-content: oklch(90% 0 0);
+  /* Blue info */
+  --color-info: oklch(65% 0.19 245);
+  --color-info-content: oklch(100% 0 0);
+  /* Green success */
+  --color-success: oklch(65% 0.14 145);
+  --color-success-content: oklch(100% 0 0);
+  /* Orange warning */
+  --color-warning: oklch(70% 0.12 65);
+  --color-warning-content: oklch(15% 0 0);
+  /* Red error */
+  --color-error: oklch(65% 0.18 25);
+  --color-error-content: oklch(100% 0 0);
+  --radius-selector: 9999px;
+  --radius-field: 0.5rem;
   --radius-box: 1rem;
   --size-selector: 0.25rem;
   --size-field: 0.25rem;
-  --border: 0.5px;
+  --border: 1px;
   --depth: 0;
   --noise: 0;
+}
+
+/* Typography - system fonts like Twitter */
+html {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+.font-display {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  font-weight: 700;
+}
+
+/* Refined focus states */
+*:focus-visible {
+  outline: 2px solid oklch(62% 0.19 245);
+  outline-offset: 2px;
+}
+
+/* SearchInput: no inner focus outline (wrapper shows focus ring) */
+.search-input input:focus-visible {
+  outline: none;
+  outline-offset: 0;
+}
+
+/* Composer textarea: no rectangular outline (use component rounded border/ring) */
+.composer textarea:focus-visible {
+  outline: none;
+  outline-offset: 0;
 }
 
 .dock {
@@ -95,6 +147,16 @@
   bottom: 0;
   left: 0;
   right: 0;
+  background: oklch(100% 0 0);
+  border-top: 1px solid oklch(90% 0 0);
+  padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  .dock {
+    background: oklch(0% 0 0);
+    border-top-color: oklch(20% 0 0);
+  }
 }
 
 .fill.material-symbols-outlined {
@@ -120,4 +182,35 @@
   animation: progress-fill var(--progress-duration) linear forwards;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+}
+
+/* Refined button transitions */
+.btn {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Hide scrollbar while keeping scroll (Chrome/Safari + Firefox) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure all interactive elements have pointer cursor */
+button:not(:disabled),
+[role='button']:not(:disabled),
+input[type='submit']:not(:disabled),
+input[type='button']:not(:disabled),
+input[type='reset']:not(:disabled),
+select:not(:disabled),
+label[for],
+.cursor-pointer {
+  cursor: pointer;
 }

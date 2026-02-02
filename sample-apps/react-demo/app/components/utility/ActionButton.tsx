@@ -20,18 +20,31 @@ export const ActionButton = ({
 }) => {
   const content = <Content icon={icon} label={label} isActive={isActive} />;
 
-  return <>
-    {href ? <div className="btn btn-sm btn-soft"><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
-      type="button"
-      className="btn btn-sm btn-soft"
-      disabled={disabled}
-      onClick={onClick}
-    >
-      {content}
-    </button>
-    }
-    <ErrorToast error={error} />
-  </>
+  const buttonClasses = `
+    group inline-flex items-center gap-1 text-base-content/60
+    hover:text-primary transition-colors
+    ${isActive ? 'text-primary' : ''}
+  `;
+
+  return (
+    <>
+      {href ? (
+        <NavLink href={href} className={buttonClasses}>
+          {content}
+        </NavLink>
+      ) : (
+        <button
+          type="button"
+          className={buttonClasses}
+          disabled={disabled}
+          onClick={onClick}
+        >
+          {content}
+        </button>
+      )}
+      <ErrorToast error={error} />
+    </>
+  );
 };
 
 export const SecondaryActionButton = ({
@@ -54,29 +67,34 @@ export const SecondaryActionButton = ({
   error?: Error;
 }) => {
   const content = <Content icon={icon} label={label} isActive={isActive} />;
-  return <>
 
-    {href ? <div className={`btn btn-md btn-ghost p-2 ${className}`}><NavLinkButton href={href}>{content}</NavLinkButton></div> : <button
-      type="button"
-      className={`btn btn-md btn-ghost p-2 ${className}`}
-      disabled={disabled}
-      onClick={onClick}
-    >
-      {content}
-    </button>
-    }
-    <ErrorToast error={error} />
-  </>
-};
+  const buttonClasses = `
+    inline-flex items-center gap-2 p-2 rounded-lg
+    text-base-content/60 hover:text-base-content
+    hover:bg-base-200/50
+    transition-all duration-200
+    ${className ?? ''}
+  `;
 
-const NavLinkButton = ({
-  children,
-  href,
-}: {
-  children: React.ReactNode;
-  href: string;
-}) => {
-  return <NavLink className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0" href={href}>{children}</NavLink>;
+  return (
+    <>
+      {href ? (
+        <NavLink href={href} className={buttonClasses}>
+          {content}
+        </NavLink>
+      ) : (
+        <button
+          type="button"
+          className={buttonClasses}
+          disabled={disabled}
+          onClick={onClick}
+        >
+          {content}
+        </button>
+      )}
+      <ErrorToast error={error} />
+    </>
+  );
 };
 
 const Content = ({
@@ -89,12 +107,22 @@ const Content = ({
   isActive: boolean | undefined;
 }) => (
   <>
-    { /* Manually adjust the chat_bubble icon, the shape causes a visual illusion of misalgment  */}
     <span
-      className={`material-symbols-outlined text-[1.1rem]! text-base-content/80 ${isActive ? 'fill' : ''} ${icon === 'chat_bubble' ? 'translate-y-[2px]' : ''}`}
+      className={`
+        w-9 h-9 rounded-full flex items-center justify-center
+        group-hover:bg-primary/10 transition-colors
+      `}
     >
-      {icon}
+      <span
+        className={`
+          material-symbols-outlined text-[18px]
+          ${isActive ? 'fill' : ''}
+          ${icon === 'chat_bubble' ? 'translate-y-[1px]' : ''}
+        `}
+      >
+        {icon}
+      </span>
     </span>
-    <span className="text-sm text-base-content/80">{label}</span>
+    <span className="text-[13px] tabular-nums">{label}</span>
   </>
 );

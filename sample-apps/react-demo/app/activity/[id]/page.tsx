@@ -7,7 +7,7 @@ import { ActivityParent } from '@/app/components/activity/ActivityParent';
 import { CommentComposer } from '@/app/components/comments/CommentComposer';
 import { CommentList } from '@/app/components/comments/CommentList';
 import { ErrorCard } from '@/app/components/utility/ErrorCard';
-import { LoadingIndicator } from '@/app/components/utility/LoadingIndicator';
+import { ActivityDetailsPageSkeleton } from '@/app/components/utility/loading-skeletons/ActivityDetailsPageSkeleton';
 import {
   StreamActivityWithStateUpdates,
   useFeedsClient,
@@ -25,6 +25,7 @@ const selector = (state: ActivityState) => ({
 export default function ActivityPage() {
   const id = useParams<{ id: string }>().id;
   const client = useFeedsClient();
+  const [isLoading, setIsLoading] = useState(true);
   const [activityWithStateUpdates, setActivityWithStateUpdates] = useState<
     ActivityWithStateUpdates | undefined
   >();
@@ -38,10 +39,18 @@ export default function ActivityPage() {
   }, [client, id]);
 
   useEffect(() => {
+    setIsLoading(true);
     if (!activityWithStateUpdates?.currentState.activity) {
-      activityWithStateUpdates?.get().catch((e) => {
+      activityWithStateUpdates?.get({
+        comments: {
+          limit: 5,
+          sort: 'best',
+        }
+      }).catch((e) => {
         setError(e.message);
         throw e;
+      }).finally(() => {
+        setIsLoading(false);
       });
     }
   }, [activityWithStateUpdates]);
@@ -55,12 +64,8 @@ export default function ActivityPage() {
     return <ErrorCard message="Failed to load activity" error={`${error}. This can happen if the activity was deleted.`} />;
   }
 
-  if (!activity || !activityWithStateUpdates) {
-    return (
-      <div className="flex items-center justify-center h-full w-full">
-        <LoadingIndicator />
-      </div>
-    );
+  if (!activity || !activityWithStateUpdates || isLoading) {
+    return <ActivityDetailsPageSkeleton />;
   }
 
   return (

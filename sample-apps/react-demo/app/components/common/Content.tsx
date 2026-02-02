@@ -135,7 +135,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
               <NavLink
                 key={`mention-${partIndex}-${m.index}`}
                 href={`/profile/${user.id}`}
-                className="text-primary font-semibold hover:underline"
+                className="text-primary font-medium hover:underline underline-offset-2"
               >
                 @{username}
               </NavLink>
@@ -168,7 +168,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline break-all"
+              className="text-primary hover:underline underline-offset-2 break-all"
             >
               {m.content}
             </a>
@@ -193,7 +193,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
 
   if (moderation?.action === 'remove') {
     return (
-      <div role="alert" className="alert alert-error alert-soft w-full">
+      <div role="alert" className="w-full px-4 py-3 rounded-lg bg-error/10 border border-error/20 text-error text-sm">
         This post was removed because it violated our community guidelines.
       </div>
     );
@@ -203,16 +203,20 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
   const ogAttachmentSize = location === 'comment' ? 'small' : (mediaAttachments.length > 0 ? 'medium' : 'small');
 
   return (
-    <>
-      {renderedText && <p className="w-full text-md">{renderedText}</p>}
+    <div className="space-y-3">
+      {renderedText && (
+        <p className="w-full text-[15px] leading-relaxed text-base-content whitespace-pre-wrap">
+          {renderedText}
+        </p>
+      )}
       {mediaAttachments.length > 0 && (
-        <div className="w-full">
+        <div className="w-full rounded-xl overflow-hidden">
           <AttachmentList attachments={mediaAttachments} size={mediaAttachmentSize} disableButtons={withoutInteractions} />
         </div>
       )}
       {ogAttachments.length > 0 && (
         <OGAttachmentList attachments={ogAttachments} size={ogAttachmentSize} withoutLinks={withoutInteractions} />
       )}
-    </>
+    </div>
   );
 };

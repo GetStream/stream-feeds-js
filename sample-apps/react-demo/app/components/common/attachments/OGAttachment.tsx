@@ -34,22 +34,22 @@ export const OGAttachment = ({
 
   const sizeClasses = {
     small: {
-      container: 'max-w-xs',
-      image: 'h-24',
+      container: 'max-w-sm',
+      image: 'h-28',
       title: 'text-sm',
       text: 'text-xs line-clamp-2',
     },
     medium: {
-      container: 'max-w-sm',
-      image: 'h-32',
-      title: 'text-base',
+      container: 'max-w-md',
+      image: 'h-36',
+      title: 'text-[15px]',
       text: 'text-sm line-clamp-3',
     },
     large: {
-      container: 'max-w-md',
-      image: 'h-40',
-      title: 'text-lg',
-      text: 'text-base line-clamp-4',
+      container: 'max-w-lg',
+      image: 'h-44',
+      title: 'text-base',
+      text: 'text-sm line-clamp-4',
     },
   };
 
@@ -62,15 +62,15 @@ export const OGAttachment = ({
           <img
             src={imageUrl}
             alt={title || 'Link preview'}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         </div>
       )}
 
-      <div className="p-3 flex flex-col gap-1">
+      <div className="p-4 flex flex-col gap-1.5">
         {domain && (
-          <div className="flex items-center gap-1.5 text-xs text-base-content/60">
+          <div className="flex items-center gap-1.5 text-xs text-base-content/50 font-medium uppercase tracking-wide">
             <span className="material-symbols-outlined text-sm">link</span>
             <span className="truncate">{domain}</span>
           </div>
@@ -78,14 +78,14 @@ export const OGAttachment = ({
 
         {title && (
           <h4
-            className={`${classes.title} font-semibold text-base-content line-clamp-2`}
+            className={`${classes.title} font-semibold text-base-content line-clamp-2 leading-snug`}
           >
             {title}
           </h4>
         )}
 
         {text && (
-          <p className={`${classes.text} text-base-content/70`}>{text}</p>
+          <p className={`${classes.text} text-base-content/60 leading-relaxed`}>{text}</p>
         )}
       </div>
     </>
@@ -94,7 +94,7 @@ export const OGAttachment = ({
   if (withoutLinks) {
     return (
       <div
-        className={`w-full h-full block ${classes.container} rounded-lg border border-base-300 overflow-hidden bg-base-100`}
+        className={`w-full h-full block ${classes.container} rounded-xl border border-base-200 overflow-hidden bg-base-100`}
       >
         {content}
       </div>
@@ -106,7 +106,7 @@ export const OGAttachment = ({
       href={linkUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`w-full h-full block ${classes.container} rounded-lg border border-base-300 overflow-hidden hover:border-primary/50 hover:shadow-md transition-all bg-base-100`}
+      className={`group w-full h-full block ${classes.container} rounded-xl border border-base-200 overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all duration-200 bg-base-100`}
       aria-label={title ? `Link to ${title}` : `Link to ${domain}`}
     >
       {content}

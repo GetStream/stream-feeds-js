@@ -14,23 +14,24 @@ export const StoryCircle = ({
 }) => {
   return (
     <button
-      className={`w-[4.2rem] flex flex-col items-stretch justify-stretch cursor-pointer gap-0.5`}
+      className="w-[4.5rem] flex flex-col items-center cursor-pointer gap-1 group"
       disabled={disabled}
       onClick={onClick}
     >
       <div
-        className={`rounded-full p-[0.15rem] flex items-stretch justify-stretch ${isActive ? 'bg-gradient-to-br from-warning to-error' : ''
-          }`}
+        className={`rounded-full p-[2px] ${
+          isActive
+            ? 'bg-gradient-to-br from-primary to-blue-400'
+            : 'bg-base-300'
+        }`}
       >
-        <div
-          className={`rounded-full bg-base-100 p-[0.1rem] flex items-stretch justify-stretch`}
-        >
-          <Avatar user={user} className="flex size-[3.7rem] items-stretch justify-stretch" />
+        <div className="rounded-full bg-base-100 p-[2px]">
+          <Avatar user={user} className="size-14" />
         </div>
       </div>
-      <div className="w-full overflow-hidden text-ellipsis whitespace-nowrap">
+      <span className="w-full text-center text-xs text-base-content/70 truncate">
         {user?.name}
-      </div>
+      </span>
     </button>
   );
 };

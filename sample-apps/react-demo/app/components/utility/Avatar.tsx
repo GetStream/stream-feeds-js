@@ -15,19 +15,14 @@ const hashString = (str: string): number => {
 const generateColorsFromName = (name: string): [string, string] => {
   const hash = hashString(name);
 
-  // Generate first color (hue based on hash, high saturation, medium lightness)
+  // Generate hue-based colors
   const hue1 = hash % 360;
-  const saturation1 = 60 + (hash % 25); // 60-85%
-  const lightness1 = 40 + (hash % 20); // 40-60%
-  const color1 = `hsl(${hue1}, ${saturation1}%, ${lightness1}%)`;
+  const hue2 = (hue1 + 40) % 360;
 
-  // Generate second color (complementary hue offset, different saturation/lightness)
-  const hue2 = (hue1 + 120 + (hash % 60)) % 360; // Offset by 120-180 degrees (complementary colors)
-  const saturation2 = 50 + ((hash >> 8) % 30); // 50-80%
-  const lightness2 = 35 + ((hash >> 8) % 25); // 35-60%
-  const color2 = `hsl(${hue2}, ${saturation2}%, ${lightness2}%)`;
-
-  return [color1, color2];
+  return [
+    `oklch(55% 0.15 ${hue1})`,
+    `oklch(45% 0.12 ${hue2})`,
+  ];
 };
 
 export const Avatar = ({ user, className }: { user?: UserResponse | ConnectedUser; className: string }) => {
@@ -37,19 +32,26 @@ export const Avatar = ({ user, className }: { user?: UserResponse | ConnectedUse
 
   return (
     <div
-      className={`avatar flex-shrink-0 flex items-stretch justify-stretch @container ${className}`}
+      className={`avatar flex-shrink-0 flex items-center justify-center @container ${className}`}
     >
-      {userImage ?
-        <img src={userImage} alt={userName} className="w-[inherit] h-[inherit] rounded-full object-cover" /> :
-        (<div
-          className="rounded-full w-[inherit] h-[inherit] flex items-center justify-center text-white text-lg font-semibold"
+      {userImage ? (
+        <img
+          src={userImage}
+          alt={userName}
+          className="w-full h-full rounded-full object-cover"
+        />
+      ) : (
+        <div
+          className="rounded-full w-full h-full flex items-center justify-center text-white font-semibold shadow-inner"
           style={{
-            background: `linear-gradient(to bottom right, ${color1}, ${color2})`,
+            background: `linear-gradient(135deg, ${color1}, ${color2})`,
           }}
         >
-          <span className="@max-[2rem]:text-xs text-lg">{userName[0]}</span>
-        </div>)
-      }
+          <span className="@max-[2rem]:text-xs text-base uppercase tracking-wide">
+            {userName[0]}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

@@ -45,6 +45,7 @@ export const StoryViewer = ({
     if (isOpen) {
       if (!initializedRef.current) {
         dialogRef.current?.showModal();
+        dialogRef.current?.focus();
         setCurrentIndex(Math.max(
           activities.findIndex((a) => !a.is_watched),
           0,

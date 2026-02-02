@@ -7,7 +7,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityPreview } from '../components/activity/ActivityPreview';
 import { ErrorCard } from '../components/utility/ErrorCard';
-import { LoadingIndicator } from '../components/utility/LoadingIndicator';
+import { BookmarksPageSkeleton } from '../components/utility/loading-skeletons/BookmarksPageSkeleton';
 
 export default function Bookmarks() {
   const client = useFeedsClient();
@@ -50,11 +50,13 @@ export default function Bookmarks() {
     return <ErrorCard message="Failed to load bookmarks" error={error} />;
   }
 
+  if (bookmarks.length === 0 && isLoading) {
+    return <BookmarksPageSkeleton />;
+  }
+
   return (
     <div className="w-full flex flex-col items-center justify-center gap-4">
-      <div className="text-lg font-semibold w-full">Bookmarks</div>
-
-      {bookmarks.length === 0 && isLoading && <LoadingIndicator />}
+      <div className="text-lg font-semibold w-full px-4 lg:px-0">Bookmarks</div>
       {bookmarks.length === 0 && !isLoading ? (
         <div className="card card-border bg-base-100 w-96">
           <div className="card-body items-center text-center">
@@ -66,10 +68,12 @@ export default function Bookmarks() {
         <>
           <ul className="w-full list">
             {bookmarks.map((bookmark) => (
-              <li className="list-row w-full flex flex-row justify-stretch items-stretch" key={bookmark.activity.id}>
-                <ActivityPreview
-                  activity={bookmark.activity}
-                />
+              <li className="list-row w-full" key={bookmark.activity.id}>
+                <div className="list-col-grow w-full min-w-0">
+                  <ActivityPreview
+                    activity={bookmark.activity}
+                  />
+                </div>
               </li>
             ))}
 

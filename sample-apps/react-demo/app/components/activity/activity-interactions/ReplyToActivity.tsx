@@ -22,32 +22,33 @@ export const ReplyToActivity = ({ activity }: { activity: ActivityResponse }) =>
     <>
       <button
         type="button"
-        className="btn btn-sm btn-soft"
+        className="group inline-flex items-center gap-1 text-base-content/60 hover:text-primary transition-colors"
         onClick={openDialog}
       >
-        <span className="material-symbols-outlined text-[1.1rem]! text-base-content/80">
-          repeat
+        <span className="w-9 h-9 rounded-full flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+          <span className="material-symbols-outlined text-[18px]">repeat</span>
         </span>
-        <span className="text-sm text-base-content/80">
-          {activity.share_count}
-        </span>
+        <span className="text-[13px] tabular-nums">{activity.share_count}</span>
       </button>
       <dialog ref={dialogRef} className="modal">
-        <div className="modal-box w-[90%] max-w-2xl">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-lg">Repost</h3>
+        <div className="modal-box w-[90%] max-w-xl bg-base-100 rounded-2xl p-0">
+          <div className="flex items-center p-4 border-b border-base-300">
             <button
-              className="btn btn-sm btn-circle btn-ghost"
+              className="w-9 h-9 rounded-full hover:bg-base-200 flex items-center justify-center transition-colors"
               onClick={closeDialog}
             >
               <span className="material-symbols-outlined">close</span>
             </button>
           </div>
-          {isOpen && ownFeed && <StreamFeed feed={ownFeed}>
-            <ActivityComposer parent={activity} onSave={closeDialog} portalContainer={dialogRef.current} />
-          </StreamFeed>}
+          <div className="p-4">
+            {isOpen && ownFeed && (
+              <StreamFeed feed={ownFeed}>
+                <ActivityComposer parent={activity} onSave={closeDialog} portalContainer={dialogRef.current} />
+              </StreamFeed>
+            )}
+          </div>
         </div>
-        <form method="dialog" className="modal-backdrop">
+        <form method="dialog" className="modal-backdrop bg-black/40">
           <button>close</button>
         </form>
       </dialog>

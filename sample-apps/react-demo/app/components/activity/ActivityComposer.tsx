@@ -9,14 +9,14 @@ export const ActivityComposer = ({
   activity,
   parent,
   onSave,
-  textareaBorder = true,
   portalContainer,
+  rows,
 }: {
   activity?: ActivityResponse;
   parent?: ActivityResponse;
   onSave?: () => void;
-  textareaBorder?: boolean;
   portalContainer?: HTMLElement | null;
+  rows?: number;
 }) => {
   const client = useFeedsClient();
   const feed = useFeedContext();
@@ -77,9 +77,9 @@ export const ActivityComposer = ({
         initialAttachments={initialAttachments}
         initialMentionedUsers={initialMentionedUsers}
         onSubmit={handleSubmit}
-        textareaBorder={textareaBorder}
         allowEmptyText={!!parent}
         portalContainer={portalContainer}
+        rows={rows}
       />
     </div>
   );

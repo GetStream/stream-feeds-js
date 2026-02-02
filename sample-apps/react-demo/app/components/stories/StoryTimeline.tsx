@@ -24,7 +24,7 @@ export const StoryTimeline = () => {
   }, []);
 
   return (
-    <div className="flex flex-row w-full max-w-full overflow-x-auto min-w-0 gap-1">
+    <div className="flex flex-row w-full max-w-full overflow-x-auto scrollbar-hide min-w-0 gap-1">
       {stories.map((storyGroup) => {
         return (
           <StoryCircle

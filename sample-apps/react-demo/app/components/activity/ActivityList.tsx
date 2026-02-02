@@ -98,39 +98,39 @@ export const ActivityList = ({
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-start gap-4">
-      {is_loading && <LoadingIndicator />}
-      {!is_loading && activities?.length === 0 ? (
-        <div className="card card-border bg-base-100 w-96">
-          <div className="card-body items-center text-center">
-            <h2 className="card-title">No posts yet</h2>
-            <p>
-              {feed?.group === 'foryou'
-                ? 'Popular activities will show up here once your application has more content'
-                : 'Write something to start your feed ✨'
-              }
-            </p>
-          </div>
+    <div className="w-full flex flex-col items-center justify-start">
+      {activities?.length === 0 ? (
+        <div className="w-full max-w-sm mx-auto py-12 px-4 text-center">
+          <h2 className="text-2xl font-bold mb-2">Welcome to Stream</h2>
+          <p className="text-base-content/60">
+            {feed?.group === 'foryou'
+              ? 'Popular posts will appear here.'
+              : "When you follow people, you'll see their posts here."
+            }
+          </p>
         </div>
       ) : (
         <>
           <ul ref={listRef} className="list w-full">
             {activities?.map((activity) => (
-              <li className="list-row w-full px-0 flex flex-row justify-stretch items-stretch" key={activity.id}>
-                <Activity
-                  activity={activity}
-                  location={location}
-                />
+              <li
+                className="w-full py-3 border-b border-base-300 hover:bg-base-200/50 transition-colors cursor-pointer"
+                key={activity.id}
+              >
+                <Activity activity={activity} location={location} />
               </li>
             ))}
           </ul>
           {has_next_page && !canScroll && (
-            <button className="btn btn-soft btn-primary" onClick={loadNextPage}>
-              {is_loading ? <LoadingIndicator /> : 'Load more'}
+            <button
+              className="my-4 px-5 py-2 text-sm font-bold text-primary hover:bg-primary/10 rounded-full transition-colors"
+              onClick={loadNextPage}
+            >
+              {is_loading ? <LoadingIndicator /> : 'Show more'}
             </button>
           )}
           {has_next_page && canScroll && <div ref={sentinelRef} className="h-1" />}
-          {is_loading && canScroll && <LoadingIndicator />}
+          {is_loading && activities && activities.length > 0 && <LoadingIndicator />}
         </>
       )}
     </div>

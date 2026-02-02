@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { FeedSearchResult } from './FeedSearchResult';
 import { useFollowSuggestionsContext } from '../follow-suggestions-context';
+import { FollowSuggestionSkeleton } from './utility/loading-skeletons/FollowSuggestionSkeleton';
 
 export const FollowSuggestions = () => {
-  const { suggestedFeeds, loadFollowSuggestions } =
+  const { suggestedFeeds, loadFollowSuggestions, isLoading } =
     useFollowSuggestionsContext();
 
   useEffect(() => {
@@ -13,12 +14,22 @@ export const FollowSuggestions = () => {
   }, [suggestedFeeds.length, loadFollowSuggestions]);
 
   return (
-    <div className="md:card md:card-border md:bg-base-200">
-      <div className="md:card-body">
-        <h2 className="card-title hidden md:block">Who to follow?</h2>
-        <div className="w-full flex flex-col items-center justify-stretch gap-2 overflow-hidden">
-          {suggestedFeeds.length === 0 ? (
-            <p>No suggestions</p>
+    <div className="bg-base-200 rounded-2xl overflow-hidden">
+      <div className="p-4">
+        <h2 className="text-xl font-extrabold mb-4">
+          Who to follow
+        </h2>
+        <div className="w-full flex flex-col">
+          {isLoading ? (
+            <>
+              <FollowSuggestionSkeleton />
+              <FollowSuggestionSkeleton />
+              <FollowSuggestionSkeleton />
+            </>
+          ) : suggestedFeeds.length === 0 ? (
+            <p className="text-base-content/60 py-4">
+              No suggestions available
+            </p>
           ) : (
             suggestedFeeds.map((feed) => (
               <FeedSearchResult feed={feed} key={feed.feed} />

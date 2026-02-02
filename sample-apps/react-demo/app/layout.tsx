@@ -12,8 +12,8 @@ const materialSymbols = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Stream Feeds React Demo',
-  description: 'Stream Feeds React Demo App',
+  title: 'Stream Feeds',
+  description: 'Stream Feeds - A modern social feed experience',
 };
 
 export default function RootLayout({
@@ -23,9 +23,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`min-h-dvh ${materialSymbols.variable}`}>
-      <body className="min-h-dvh overflow-x-hidden">
+      <body className="min-h-dvh overflow-x-hidden bg-base-100 text-base-content antialiased">
         <ErrorBoundary
-          fallback={<div>Something went wrong. Try reloading the page.</div>}
+          fallback={
+            <div className="min-h-dvh flex items-center justify-center p-8">
+              <div className="text-center space-y-4">
+                <h1 className="font-display text-2xl font-semibold text-error">Something went wrong</h1>
+                <p className="text-base-content/70">Please try reloading the page.</p>
+              </div>
+            </div>
+          }
         >
           <Suspense>
             <ClientApp>{children}</ClientApp>
