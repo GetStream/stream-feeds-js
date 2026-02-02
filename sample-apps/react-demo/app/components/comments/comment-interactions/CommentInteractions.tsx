@@ -11,6 +11,10 @@ export const CommentInteractions = ({
   isReplying: boolean;
   onToggleReplying: () => void;
 }) => {
+  if (comment.moderation?.action === 'remove') {
+    return null;
+  }
+
   return (
     <div className="flex flex-row items-center gap-2 flex-wrap">
       <ToggleCommentReaction className="-ml-2" comment={comment} />

@@ -9,6 +9,11 @@ export const ActivityInteractions = ({
 }: {
   activity: ActivityResponse;
 }) => {
+
+  if (activity.moderation?.action === 'remove') {
+    return null;
+  }
+
   return (
     <div className="w-full max-w-md">
       <div className="flex flex-row items-center justify-between">
