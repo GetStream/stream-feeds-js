@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.41](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.40...@stream-io/feeds-client-0.3.41) (2026-02-03)
+
+
+### Features
+
+* add request field `run_activity_processors` to enable customer setting this when changing activity text/images ([#228](https://github.com/GetStream/stream-feeds-js/issues/228)) ([690976f](https://github.com/GetStream/stream-feeds-js/commit/690976f039c44390ee3ef5bc7c75b09c2938b993))
+
 ## [0.3.40](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.39...@stream-io/feeds-client-0.3.40) (2026-01-29)
 
 
