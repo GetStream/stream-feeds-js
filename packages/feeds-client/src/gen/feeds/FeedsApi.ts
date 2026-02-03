@@ -724,6 +724,7 @@ export class FeedsApi {
     };
     const body = {
       handle_mention_notifications: request?.handle_mention_notifications,
+      run_activity_processors: request?.run_activity_processors,
       unset: request?.unset,
       set: request?.set,
     };
@@ -755,6 +756,7 @@ export class FeedsApi {
       handle_mention_notifications: request?.handle_mention_notifications,
       poll_id: request?.poll_id,
       restrict_replies: request?.restrict_replies,
+      run_activity_processors: request?.run_activity_processors,
       skip_enrich_url: request?.skip_enrich_url,
       text: request?.text,
       visibility: request?.visibility,
