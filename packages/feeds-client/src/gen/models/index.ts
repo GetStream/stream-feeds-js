@@ -4078,6 +4078,18 @@ export interface NotificationFeedUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface NotificationParentActivity {
+  id: string;
+
+  text?: string;
+
+  type?: string;
+
+  user_id?: string;
+
+  attachments?: Attachment[];
+}
+
 export interface NotificationStatusResponse {
   unread: number;
 
@@ -4106,6 +4118,8 @@ export interface NotificationTarget {
   attachments?: Attachment[];
 
   comment?: NotificationComment;
+
+  parent_activity?: NotificationParentActivity;
 }
 
 export interface NotificationTrigger {
