@@ -5773,6 +5773,8 @@ export interface UnpinActivityResponse {
 export interface UpdateActivityPartialRequest {
   handle_mention_notifications?: boolean;
 
+  run_activity_processors?: boolean;
+
   unset?: string[];
 
   set?: Record<string, any>;
@@ -5792,6 +5794,8 @@ export interface UpdateActivityRequest {
   poll_id?: string;
 
   restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
+
+  run_activity_processors?: boolean;
 
   skip_enrich_url?: boolean;
 
