@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.42](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.41...@stream-io/feeds-client-0.3.42) (2026-02-03)
+
+
+### Features
+
+* Add parent_activity to activity for NotificationTarget ([#227](https://github.com/GetStream/stream-feeds-js/issues/227)) ([ade2792](https://github.com/GetStream/stream-feeds-js/commit/ade2792843b81d8da24f8defc603df56f2d39662))
+
 ## [0.3.41](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.40...@stream-io/feeds-client-0.3.41) (2026-02-03)
 
 
