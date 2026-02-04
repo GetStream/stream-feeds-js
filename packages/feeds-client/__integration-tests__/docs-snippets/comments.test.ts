@@ -55,13 +55,12 @@ describe('Comments page', () => {
 
   it('Updating comments', async () => {
     // Update a comment
-    await client.updateComment({
+    const response = await client.updateComment({
       id: comment.id,
       comment: 'Updated comment',
-      custom: {
-        edited: true,
-      },
     });
+
+    console.log(response.comment.edited_at);
   });
 
   it(`Reading comments`, async () => {

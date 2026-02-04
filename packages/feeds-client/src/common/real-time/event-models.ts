@@ -40,7 +40,7 @@ export interface ConnectedEvent {
 
 export enum UnhandledErrorType {
   ReconnectionReconciliation = 'reconnection-reconciliation',
-  FetchingOwnCapabilitiesOnNewActivity = 'fetching-own-capabilities-on-new-activity',
+  FetchingOwnFieldsOnNewActivity = 'fetching-own-fields-on-new-activity',
 }
 
 export type SyncFailure = {
@@ -58,7 +58,7 @@ export type UnhandledErrorEvent = {
       failures: SyncFailure[];
     }
   | {
-      error_type: UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity;
+      error_type: UnhandledErrorType.FetchingOwnFieldsOnNewActivity;
       error: StreamApiError;
     }
 );

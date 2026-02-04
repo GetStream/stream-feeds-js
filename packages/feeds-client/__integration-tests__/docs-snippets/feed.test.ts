@@ -109,6 +109,8 @@ describe('Feeds page', () => {
     // Second page
     await feed.getNextPage();
 
+    console.log(feed.state.getLatestValue().is_loading_activities);
+    console.log(feed.state.getLatestValue().next);
     expect(feed.state.getLatestValue().activities).toBeDefined();
   });
 

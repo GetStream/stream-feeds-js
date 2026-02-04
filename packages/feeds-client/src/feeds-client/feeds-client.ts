@@ -291,8 +291,7 @@ export class FeedsClient extends FeedsApi {
           }).catch((error) => {
             this.eventDispatcher.dispatch({
               type: 'errors.unhandled',
-              error_type:
-                UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+              error_type: UnhandledErrorType.FetchingOwnFieldsOnNewActivity,
               error,
             });
           });
