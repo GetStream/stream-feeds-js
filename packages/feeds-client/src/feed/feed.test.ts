@@ -2,9 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type Mock } from 'vitest';
 import { FeedsClient } from '../feeds-client';
 import { Feed } from './feed';
-import type { ActivityResponse } from '../gen/models';
+import type { ActivityResponse, GetOrCreateFeedResponse } from '../gen/models';
 import { generateActivityResponse, generateFeedResponse } from '../test-utils';
 import { clearQueuedFeeds } from '../utils/throttling';
+import { StreamApiError, type StreamResponse } from '../common/types';
 
 describe('Feed derived state updates', () => {
   let feed: Feed;
@@ -196,17 +197,17 @@ describe(`getOrCreate`, () => {
     expect(client.getOrCreateFeed).toHaveBeenCalledTimes(2);
   });
 
-  it(`should still throw error if we send two requests at the same time with different config (we will fix this later)`, () => {
+  it(`should still throw error if we send two requests at the same time with different config (we will fix this later)`, async () => {
     feed.getOrCreate({ filter: { filter_tags: ['green'] } });
-    expect(
+    await expect(
       feed.getOrCreate({ filter: { filter_tags: ['blue'] } }),
     ).rejects.toThrow('Only one getOrCreate call is allowed at a time');
   });
 
-  it(`should still throw error if we send getOrCreate and getNextPage at the same time`, () => {
+  it(`should still throw error if we send getOrCreate and getNextPage at the same time`, async () => {
     feed.state.partialNext({ next: 'next' });
     feed.getNextPage();
-    expect(
+    await expect(
       feed.getOrCreate({ filter: { filter_tags: ['green'] } }),
     ).rejects.toThrow('Only one getOrCreate call is allowed at a time');
   });
@@ -677,5 +678,205 @@ describe(`newActivitiesAdded`, () => {
 
   afterEach(() => {
     clearQueuedFeeds();
+  });
+});
+
+describe('synchronize retry', () => {
+  let feed: Feed;
+  let client: { [key in keyof FeedsClient]: Mock };
+  let getOrCreateSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    client = {
+      getOrCreateFeed: vi.fn().mockResolvedValue({
+        activities: [],
+        aggregated_activities: [],
+        members: [],
+        next: 'next',
+        prev: undefined,
+        limit: 10,
+        feed: generateFeedResponse({}),
+      }),
+      hydratePollCache: vi.fn(),
+    } as unknown as { [key in keyof FeedsClient]: Mock };
+    const feedResponse = generateFeedResponse({ id: 'main', group_id: 'user' });
+    feed = new Feed(
+      client as unknown as FeedsClient,
+      feedResponse.group_id,
+      feedResponse.id,
+      feedResponse,
+    );
+    getOrCreateSpy = vi.spyOn(feed, 'getOrCreate');
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    getOrCreateSpy.mockRestore();
+  });
+
+  it('should not synchronize if watch is false', async () => {
+    feed.state.partialNext({
+      last_get_or_create_request_config: { watch: false },
+    });
+
+    await feed.synchronize();
+
+    expect(getOrCreateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should synchronize and retry on failure', async () => {
+    const mockResponse: StreamResponse<GetOrCreateFeedResponse> = {
+      activities: [],
+      aggregated_activities: [],
+      members: [],
+      next: undefined,
+      prev: undefined,
+      duration: '10ms',
+      feed: generateFeedResponse({}),
+    };
+
+    getOrCreateSpy
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValue(mockResponse);
+
+    feed.state.partialNext({
+      last_get_or_create_request_config: { watch: true },
+    });
+
+    const synchronizePromise = feed.synchronize();
+    await vi.runAllTimersAsync();
+    await synchronizePromise;
+
+    expect(getOrCreateSpy).toHaveBeenCalledTimes(3);
+  });
+
+  it('should throw after max retries exceeded during synchronize', async () => {
+    getOrCreateSpy.mockRejectedValue(new Error('Persistent error'));
+
+    feed.state.partialNext({
+      last_get_or_create_request_config: { watch: true },
+    });
+
+    const synchronizePromise = feed.synchronize();
+    // Set up expectation before running timers to avoid unhandled rejection
+    const expectPromise = expect(synchronizePromise).rejects.toThrow('Persistent error');
+    await vi.runAllTimersAsync();
+    await expectPromise;
+
+    expect(getOrCreateSpy).toHaveBeenCalledTimes(4); // initial + 3 retries
+  });
+
+  it('should pass the same request config on retry', async () => {
+    const requestConfig = {
+      watch: true,
+      limit: 20,
+      filter: { filter_tags: ['important'] },
+    };
+    const mockResponse: StreamResponse<GetOrCreateFeedResponse> = {
+      activities: [],
+      aggregated_activities: [],
+      members: [],
+      next: undefined,
+      prev: undefined,
+      duration: '10ms',
+      feed: generateFeedResponse({}),
+    };
+
+    getOrCreateSpy
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValue(mockResponse);
+
+    feed.state.partialNext({
+      last_get_or_create_request_config: requestConfig,
+    });
+
+    const synchronizePromise = feed.synchronize();
+    await vi.runAllTimersAsync();
+    await synchronizePromise;
+
+    expect(getOrCreateSpy).toHaveBeenCalledTimes(2);
+    expect(getOrCreateSpy).toHaveBeenNthCalledWith(1, requestConfig);
+    expect(getOrCreateSpy).toHaveBeenNthCalledWith(2, requestConfig);
+  });
+
+  it('should reset inProgressGetOrCreate before retrying', async () => {
+    const mockResponse: StreamResponse<GetOrCreateFeedResponse> = {
+      activities: [],
+      aggregated_activities: [],
+      members: [],
+      next: undefined,
+      prev: undefined,
+      duration: '10ms',
+      feed: generateFeedResponse({}),
+    };
+
+    getOrCreateSpy
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValue(mockResponse);
+
+    feed.state.partialNext({
+      last_get_or_create_request_config: { watch: true },
+    });
+
+    // Set up an in-progress request
+    feed['inProgressGetOrCreate'] = {
+      request: { watch: true },
+      promise: Promise.resolve(mockResponse),
+    };
+
+    const synchronizePromise = feed.synchronize();
+
+    // inProgressGetOrCreate should be reset before calling getOrCreate
+    expect(feed['inProgressGetOrCreate']).toBeUndefined();
+
+    await vi.runAllTimersAsync();
+    await synchronizePromise;
+  });
+
+  it('should not retry on 4xx client errors during synchronize', async () => {
+    const clientError = new StreamApiError('Bad Request', { response_code: 400 }, 4);
+    getOrCreateSpy.mockRejectedValue(clientError);
+
+    feed.state.partialNext({
+      last_get_or_create_request_config: { watch: true },
+    });
+
+    const synchronizePromise = feed.synchronize();
+    // Set up expectation before running timers to avoid unhandled rejection
+    const expectPromise = expect(synchronizePromise).rejects.toThrow('Bad Request');
+    await vi.runAllTimersAsync();
+    await expectPromise;
+
+    expect(getOrCreateSpy).toHaveBeenCalledTimes(1); // No retries for client errors
+  });
+
+  it('should retry on 5xx server errors during synchronize', async () => {
+    const serverError = new StreamApiError('Internal Server Error', { response_code: 500 }, 16);
+    const mockResponse: StreamResponse<GetOrCreateFeedResponse> = {
+      activities: [],
+      aggregated_activities: [],
+      members: [],
+      next: undefined,
+      prev: undefined,
+      duration: '10ms',
+      feed: generateFeedResponse({}),
+    };
+
+    getOrCreateSpy
+      .mockRejectedValueOnce(serverError)
+      .mockRejectedValueOnce(serverError)
+      .mockResolvedValue(mockResponse);
+
+    feed.state.partialNext({
+      last_get_or_create_request_config: { watch: true },
+    });
+
+    const synchronizePromise = feed.synchronize();
+    await vi.runAllTimersAsync();
+    await synchronizePromise;
+
+    expect(getOrCreateSpy).toHaveBeenCalledTimes(3);
   });
 });
