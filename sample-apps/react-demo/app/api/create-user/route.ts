@@ -2,20 +2,7 @@ import { type FollowRequest, StreamClient } from '@stream-io/node-sdk';
 import { generateUsername } from 'unique-username-generator';
 import { NextResponse } from 'next/server';
 
-const DEMO_USER_IDS = [
-  'susan',
-  'adam',
-  'thomas',
-  'sloan',
-  'tiffany',
-  'jack',
-  'emma',
-  'michael',
-  'olivia',
-  'david',
-  'nina',
-  'james',
-];
+const DEMO_USER_IDS = process.env.DEMO_USER_IDS?.split(',') ?? [];
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -33,7 +20,7 @@ function pickRandom<T>(array: T[], n: number): T[] {
 export async function POST(request: Request) {
   const key = process.env.STREAM_API_KEY ?? process.env.NEXT_PUBLIC_API_KEY;
   const secret = process.env.API_SECRET;
-  const url = process.env.API_URL;
+  const url = process.env.NEXT_PUBLIC_API_URL;
 
   if (!key || !secret) {
     return NextResponse.json(
@@ -86,7 +73,9 @@ export async function POST(request: Request) {
       target: `user:${userId}`,
     });
 
-    const sixToFollow = pickRandom(DEMO_USER_IDS, 6);
+    const sixToFollow = pickRandom(DEMO_USER_IDS, 6).filter(
+      (id) => id && id !== userId,
+    );
     for (const targetId of sixToFollow) {
       follows.push({
         source: `timeline:${userId}`,
@@ -98,7 +87,9 @@ export async function POST(request: Request) {
       });
     }
 
-    const twoToFollowNewUser = pickRandom(DEMO_USER_IDS, 2);
+    const twoToFollowNewUser = pickRandom(DEMO_USER_IDS, 2).filter(
+      (id) => id && id !== userId,
+    );
     for (const followerId of twoToFollowNewUser) {
       follows.push({
         source: `timeline:${followerId}`,

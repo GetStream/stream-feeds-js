@@ -47,6 +47,8 @@ jobs:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
           NEXT_PUBLIC_API_KEY: ${{ vars.REACT_TUTORIAL_API_KEY }}
           NEXT_PUBLIC_TOKEN_URL: ${{ vars.REACT_TUTORIAL_TOKEN_URL }}
+          API_SECRET: ${{ secrets.REACT_TUTORIAL_API_SECRET }}
+          DEMO_USER_IDS: susan,adam,thomas,sloan,tiffany,jack,emma,michael,olivia,david,nina,james
         run: >
           yarn vercel pull --yes --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }} &&
           yarn vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }} &&

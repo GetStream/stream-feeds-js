@@ -48,28 +48,11 @@ Prerequisites:
 
 - Install dependencies: `yarn`
 - Build React SDK: `yarn build:client` and `yarn build:react-sdk`
-- Create a `.env` file in `sample-apps/react-demo` with one of the following content:
-
-Use this if you want to use a single user only:
+- Create a `.env` file in `sample-apps/react-demo`:
 
 ```
 NEXT_PUBLIC_API_KEY=your_api_key_here
-NEXT_PUBLIC_USER_ID=your_user_id_here
-NEXT_PUBLIC_USER_NAME=Your Name
-NEXT_PUBLIC_USER_TOKEN=your_user_token_here
-```
-
-If your app [is configured to accept development tokens](https://getstream.io/activity-feeds/docs/javascript/tokens-and-authentication/#developer-tokens), you can use dev tokens to test with muliple users, in this case just provide an API key:
-
-```
-NEXT_PUBLIC_API_KEY=your_api_key_here
-```
-
-If you have a token provider backend, you can also provide a URL that takes `user_id` as a query param:
-
-```
-NEXT_PUBLIC_API_KEY=your_api_key_here
-NEXT_PUBLIC_TOKEN_URL=optional,no need for user info in this case
+API_SECRET=your_API_secret
 ```
 
 After the above steps run the following command in `sample-apps/react-demo`:
@@ -96,7 +79,7 @@ API_URL=<Optional, Stream API URL>
 
 ### Typical use-case
 
-Run these scripts in the following order from `trst-data-generator` folder:
+Run these scripts in the following order from `test-data-generator` folder:
 
 ```bash
 yarn create-users

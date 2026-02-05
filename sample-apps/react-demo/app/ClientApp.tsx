@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  useCreateFeedsClient,
-  StreamFeeds,
-  FeedsClient,
-} from '@stream-io/feeds-react-sdk';
+import { useCreateFeedsClient, StreamFeeds } from '@stream-io/feeds-react-sdk';
 import * as Sentry from '@sentry/nextjs';
 import { AppSkeleton } from './AppSkeleton';
 import { OwnFeedsContextProvider } from './own-feeds-context';
@@ -32,9 +28,9 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
         setTestDataGeneration('not-started');
         return generateUsername('-');
       }
-    },
-    [],
-  );
+      // Only want to set user on mount
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
   // Set user_id as URL parameter if not already present
   useEffect(() => {
@@ -71,16 +67,18 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
     () => ({
       id: USER_ID,
       name: process.env.NEXT_PUBLIC_USER_NAME ?? userIdToName(USER_ID),
-      token: process.env.NEXT_PUBLIC_USER_TOKEN
-        ? process.env.NEXT_PUBLIC_USER_TOKEN
-        : process.env.NEXT_PUBLIC_TOKEN_URL
-          ? () =>
-            fetch(
-              `${process.env.NEXT_PUBLIC_TOKEN_URL}&user_id=${USER_ID}`,
-            ).then((res) => res.json().then((data) => data.token))
-          : new FeedsClient(API_KEY!).devToken(USER_ID),
+      token:
+        typeof process.env.NEXT_PUBLIC_USER_TOKEN === 'string'
+          ? process.env.NEXT_PUBLIC_USER_TOKEN
+          : () =>
+            fetch(`/api/token?user_id=${encodeURIComponent(USER_ID)}`)
+              .then((res) => {
+                if (!res.ok) throw new Error('Token request failed');
+                return res.json();
+              })
+              .then((data: { token: string }) => data.token),
     }),
-    [USER_ID, API_KEY],
+    [USER_ID],
   );
 
   const client = useCreateFeedsClient({
