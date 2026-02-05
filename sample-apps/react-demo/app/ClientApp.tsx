@@ -76,7 +76,6 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     const off = client?.on('errors.unhandled', async (_) => {
-      console.error('errors.unhandled', _);
       await client?.disconnectUser();
       await client?.connectUser(CURRENT_USER, CURRENT_USER.token);
     });
