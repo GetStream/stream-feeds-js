@@ -15,7 +15,7 @@ export const ActivityInteractions = ({
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w">
       <div className="flex flex-row items-center justify-between">
         <OpenComments activity={activity} />
         <ReplyToActivity activity={activity} />

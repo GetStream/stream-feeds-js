@@ -123,6 +123,6 @@ const Content = ({
         {icon}
       </span>
     </span>
-    <span className="text-[13px] tabular-nums">{label}</span>
+    <span className="text-[13px] tabular-nums pr-2">{label}</span>
   </>
 );

@@ -32,7 +32,7 @@ export const Activity = ({
         )
       ) : null}
       {location !== 'preview' && (
-        <div className="mt-3 md:pl-[52px]">
+        <div className="mt-3">
           <ActivityInteractions activity={activity} />
         </div>
       )}
