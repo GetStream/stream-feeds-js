@@ -313,6 +313,7 @@ export class FeedsApi {
     const body = {
       type: request?.type,
       feeds: request?.feeds,
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       create_notification_activity: request?.create_notification_activity,
       expires_at: request?.expires_at,
       id: request?.id,
@@ -724,6 +725,7 @@ export class FeedsApi {
       id: request?.id,
     };
     const body = {
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       handle_mention_notifications: request?.handle_mention_notifications,
       run_activity_processors: request?.run_activity_processors,
       unset: request?.unset,
@@ -753,6 +755,7 @@ export class FeedsApi {
       id: request?.id,
     };
     const body = {
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       expires_at: request?.expires_at,
       handle_mention_notifications: request?.handle_mention_notifications,
       poll_id: request?.poll_id,
@@ -1152,6 +1155,7 @@ export class FeedsApi {
     };
     const body = {
       comment: request?.comment,
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       handle_mention_notifications: request?.handle_mention_notifications,
       skip_enrich_url: request?.skip_enrich_url,
       skip_push: request?.skip_push,
@@ -1743,6 +1747,7 @@ export class FeedsApi {
     const body = {
       source: request?.source,
       target: request?.target,
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       create_notification_activity: request?.create_notification_activity,
       follower_role: request?.follower_role,
       push_preference: request?.push_preference,
@@ -1772,6 +1777,7 @@ export class FeedsApi {
     const body = {
       source: request?.source,
       target: request?.target,
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       create_notification_activity: request?.create_notification_activity,
       push_preference: request?.push_preference,
       skip_push: request?.skip_push,

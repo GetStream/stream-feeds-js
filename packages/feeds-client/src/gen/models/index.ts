@@ -365,6 +365,8 @@ export interface ActivityRequest {
 
   feeds: string[];
 
+  copy_custom_to_notification?: boolean;
+
   create_notification_activity?: boolean;
 
   expires_at?: string;
@@ -564,6 +566,8 @@ export interface AddActivityRequest {
   type: string;
 
   feeds: string[];
+
+  copy_custom_to_notification?: boolean;
 
   create_notification_activity?: boolean;
 
@@ -3149,6 +3153,8 @@ export interface FollowRequest {
   source: string;
 
   target: string;
+
+  copy_custom_to_notification?: boolean;
 
   create_notification_activity?: boolean;
 
@@ -5777,6 +5783,8 @@ export interface UnpinActivityResponse {
 }
 
 export interface UpdateActivityPartialRequest {
+  copy_custom_to_notification?: boolean;
+
   handle_mention_notifications?: boolean;
 
   run_activity_processors?: boolean;
@@ -5793,6 +5801,8 @@ export interface UpdateActivityPartialResponse {
 }
 
 export interface UpdateActivityRequest {
+  copy_custom_to_notification?: boolean;
+
   expires_at?: Date;
 
   handle_mention_notifications?: boolean;
@@ -5899,6 +5909,8 @@ export interface UpdateCollectionsResponse {
 export interface UpdateCommentRequest {
   comment?: string;
 
+  copy_custom_to_notification?: boolean;
+
   handle_mention_notifications?: boolean;
 
   skip_enrich_url?: boolean;
@@ -5960,6 +5972,8 @@ export interface UpdateFollowRequest {
   source: string;
 
   target: string;
+
+  copy_custom_to_notification?: boolean;
 
   create_notification_activity?: boolean;
 
