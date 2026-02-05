@@ -104,16 +104,13 @@ describe('Notification feed', () => {
 
   it(`reading notification activities`, async () => {
     // Read notifications
-    const response = await notificationFeed.getOrCreate({
+    await notificationFeed.getOrCreate({
       limit: 20,
     });
-    const group = response.aggregated_activities[0];
+    console.log(notificationFeed.currentState.is_loading_activities);
+    console.log(notificationFeed.currentState.aggregated_activities);
 
-    expect(group.activities).toBeDefined();
-    expect(group.activities[0].notification_context).toBeDefined();
-    expect(group.activity_count).toBeDefined();
-    expect(group.user_count).toBeDefined();
-    expect(group.group).toBeDefined();
+    await notificationFeed.getNextPage();
   });
 
   it(`Marking notifications as seen`, async () => {

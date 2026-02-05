@@ -156,8 +156,9 @@ describe('Connection status change', () => {
       online: true,
     });
 
+    // Timeout increased to account for retry logic in synchronize (up to 3 retries with delays)
     await expect
-      .poll(() => eventCollector.length, { interval: 50, timeout: 2000 })
+      .poll(() => eventCollector.length, { interval: 50, timeout: 20000 })
       .toBe(1);
 
     const event = eventCollector[0];

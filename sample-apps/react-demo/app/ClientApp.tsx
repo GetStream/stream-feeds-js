@@ -74,6 +74,15 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
     },
   });
 
+  useEffect(() => {
+    const off = client?.on('errors.unhandled', async (_) => {
+      await client?.disconnectUser();
+      await client?.connectUser(CURRENT_USER, CURRENT_USER.token);
+    });
+
+    return () => off?.();
+  }, [client, CURRENT_USER]);
+
   if (!client) {
     return (
       <div className="flex items-center justify-center h-screen">

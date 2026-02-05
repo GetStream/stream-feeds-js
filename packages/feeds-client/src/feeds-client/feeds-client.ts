@@ -92,6 +92,7 @@ import {
   type GetBatchedOwnFieldsThrottledCallback,
   DEFAULT_BATCH_OWN_FIELDS_THROTTLING_INTERVAL,
 } from '../utils/throttling';
+import { withRetry } from '../utils/retry';
 import { ActivityWithStateUpdates } from '../activity-with-state-updates/activity-with-state-updates';
 import { getFeed } from '../activity-with-state-updates/get-feed';
 import {
@@ -291,8 +292,7 @@ export class FeedsClient extends FeedsApi {
           }).catch((error) => {
             this.eventDispatcher.dispatch({
               type: 'errors.unhandled',
-              error_type:
-                UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity,
+              error_type: UnhandledErrorType.FetchingOwnFieldsOnNewActivity,
               error,
             });
           });
@@ -328,11 +328,13 @@ export class FeedsClient extends FeedsApi {
         return [{ feed, reason: result.reason, activity_id: activity?.id }];
       });
 
-      this.eventDispatcher.dispatch({
-        type: 'errors.unhandled',
-        error_type: UnhandledErrorType.ReconnectionReconciliation,
-        failures,
-      });
+      if (failures.length > 0) {
+        this.eventDispatcher.dispatch({
+          type: 'errors.unhandled',
+          error_type: UnhandledErrorType.ReconnectionReconciliation,
+          failures,
+        });
+      }
     }
   };
 
@@ -620,6 +622,7 @@ export class FeedsClient extends FeedsApi {
 
     this.activeActivities = [];
     this.activeFeeds = {};
+    this.healthyConnectionChangedEventCount = 0;
 
     this.state.partialNext(this.initialState);
 
@@ -704,7 +707,7 @@ export class FeedsClient extends FeedsApi {
   }
 
   async ownBatch(request: OwnBatchRequest) {
-    const response = await super.ownBatch(request);
+    const response = await withRetry(() => super.ownBatch(request));
     Object.entries(response.data).forEach(([fid, ownFields]) => {
       const feed = this.activeFeeds[fid];
       if (feed) {

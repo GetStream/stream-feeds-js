@@ -66,6 +66,7 @@ import {
   feedsLoggerSystem,
   uniqueArrayMerge,
 } from '../utils';
+import { withRetry } from '../utils/retry';
 import { handleActivityFeedback } from './event-handlers/activity/handle-activity-feedback';
 import { deepEqual } from '../utils/deep-equal';
 import { getOrCreateActiveFeed } from '../feeds-client/get-or-create-active-feed';
@@ -294,7 +295,7 @@ export class Feed extends FeedApi {
     const { last_get_or_create_request_config } = this.state.getLatestValue();
     if (last_get_or_create_request_config?.watch) {
       this.inProgressGetOrCreate = undefined;
-      await this.getOrCreate(last_get_or_create_request_config);
+      await withRetry(() => this.getOrCreate(last_get_or_create_request_config));
     }
   }
 

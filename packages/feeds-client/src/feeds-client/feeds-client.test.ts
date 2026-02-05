@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FeedsClient } from './feeds-client';
 import {
   generateActivityResponse,
@@ -7,6 +7,7 @@ import {
   generateFollowResponse,
 } from '../test-utils';
 import { FeedOwnCapability } from '..';
+import { StreamApiError } from '../common/types';
 
 describe('Feeds client tests', () => {
   let client: FeedsClient;
@@ -632,6 +633,116 @@ describe('Feeds client tests', () => {
       });
 
       expect(spy).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe('ownBatch retry', () => {
+    let retryClient: FeedsClient;
+    let superOwnBatchSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      retryClient = new FeedsClient('mock-api-key');
+      // Access the parent class method through prototype chain
+      superOwnBatchSpy = vi.spyOn(
+        Object.getPrototypeOf(Object.getPrototypeOf(retryClient)),
+        'ownBatch',
+      );
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      superOwnBatchSpy.mockRestore();
+    });
+
+    it('should retry ownBatch on failure and succeed', async () => {
+      const mockResponse = {
+        data: { 'user:123': { own_capabilities: ['add_activity'] } },
+      };
+      superOwnBatchSpy
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValue(mockResponse);
+
+      retryClient.feed('user', '123');
+      const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
+
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(superOwnBatchSpy).toHaveBeenCalledTimes(3);
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('should update feed state after successful retry', async () => {
+      const mockResponse = {
+        data: {
+          'user:123': {
+            own_capabilities: ['add_activity'],
+            own_follows: [],
+          },
+        },
+      };
+      superOwnBatchSpy
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValue(mockResponse);
+
+      const feed = retryClient.feed('user', '123');
+      const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
+
+      await vi.runAllTimersAsync();
+      await resultPromise;
+
+      expect(feed.currentState.own_capabilities).toEqual(['add_activity']);
+    });
+
+    it('should throw after max retries exceeded', async () => {
+      superOwnBatchSpy.mockRejectedValue(new Error('Persistent error'));
+
+      retryClient.feed('user', '123');
+      const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
+
+      // Set up expectation before running timers to avoid unhandled rejection
+      const expectPromise = expect(resultPromise).rejects.toThrow('Persistent error');
+      await vi.runAllTimersAsync();
+      await expectPromise;
+
+      expect(superOwnBatchSpy).toHaveBeenCalledTimes(4); // initial + 3 retries
+    });
+
+    it('should not retry on 4xx client errors', async () => {
+      const clientError = new StreamApiError('Bad Request', { response_code: 400 }, 4);
+      superOwnBatchSpy.mockRejectedValue(clientError);
+
+      retryClient.feed('user', '123');
+      const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
+
+      // Set up expectation before running timers to avoid unhandled rejection
+      const expectPromise = expect(resultPromise).rejects.toThrow('Bad Request');
+      await vi.runAllTimersAsync();
+      await expectPromise;
+
+      expect(superOwnBatchSpy).toHaveBeenCalledTimes(1); // No retries for client errors
+    });
+
+    it('should retry on 5xx server errors', async () => {
+      const serverError = new StreamApiError('Internal Server Error', { response_code: 500 }, 16);
+      const mockResponse = {
+        data: { 'user:123': { own_capabilities: ['add_activity'] } },
+      };
+      superOwnBatchSpy
+        .mockRejectedValueOnce(serverError)
+        .mockRejectedValueOnce(serverError)
+        .mockResolvedValue(mockResponse);
+
+      retryClient.feed('user', '123');
+      const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
+
+      await vi.runAllTimersAsync();
+      const result = await resultPromise;
+
+      expect(superOwnBatchSpy).toHaveBeenCalledTimes(3);
+      expect(result).toEqual(mockResponse);
     });
   });
 });
