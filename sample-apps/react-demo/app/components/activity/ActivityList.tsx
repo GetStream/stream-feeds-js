@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useFeedActivities, useFeedContext } from '@stream-io/feeds-react-sdk';
+import { useClientConnectedUser, useFeedActivities, useFeedContext } from '@stream-io/feeds-react-sdk';
 import { Activity } from './Activity';
 import { ErrorCard } from '../utility/ErrorCard';
 import { LoadingIndicator } from '../utility/LoadingIndicator';
@@ -86,6 +86,9 @@ export const ActivityList = ({
   const feed = useFeedContext();
   const { activities, loadNextPage, has_next_page, is_loading } =
     useFeedActivities();
+  const currentUser = useClientConnectedUser();
+
+  const isOwnFeed = feed?.id === currentUser?.id;
 
   const { sentinelRef, listRef, canScroll } = useInfiniteScroll({
     loadNextPage,
@@ -101,11 +104,11 @@ export const ActivityList = ({
     <div className="w-full flex flex-col items-center justify-start">
       {activities?.length === 0 ? (
         <div className="w-full max-w-sm mx-auto py-12 px-4 text-center">
-          <h2 className="text-2xl font-bold mb-2">Welcome to Stream</h2>
+          <h2 className="text-2xl font-bold mb-2">No posts yet</h2>
           <p className="text-base-content/60">
             {feed?.group === 'foryou'
               ? 'Popular posts will appear here.'
-              : "Post something to your feed to see it here."
+              : isOwnFeed ? "Post something to your feed to see it here." : "This user hasn't posted anything yet."
             }
           </p>
         </div>

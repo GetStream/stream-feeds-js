@@ -11,7 +11,7 @@ import { OwnFeedsContextProvider } from './own-feeds-context';
 import { FollowSuggestionsContextProvider } from './follow-suggestions-context';
 import { ConnectionAlert } from './components/utility/ConnectionAlert';
 import { generateUsername } from 'unique-username-generator';
-import { useEffect, useMemo, type PropsWithChildren } from 'react';
+import { useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { LoadingIndicator } from './components/utility/LoadingIndicator';
 import { userIdToName } from './utility/userIdToName';
@@ -22,10 +22,18 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const userIdFromUrl = searchParams.get('user_id');
+  const [testDataGeneration, setTestDataGeneration] = useState<'not-started' | 'in-progress' | 'completed' | 'error'>('completed');
   const USER_ID = useMemo(
-    () =>
-      process.env.NEXT_PUBLIC_USER_ID ?? userIdFromUrl ?? generateUsername('-'),
-    [userIdFromUrl],
+    () => {
+      if (process.env.NEXT_PUBLIC_USER_ID || userIdFromUrl) {
+        setTestDataGeneration('completed');
+        return (process.env.NEXT_PUBLIC_USER_ID ?? userIdFromUrl)!;
+      } else {
+        setTestDataGeneration('not-started');
+        return generateUsername('-');
+      }
+    },
+    [],
   );
 
   // Set user_id as URL parameter if not already present
@@ -36,6 +44,28 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
       router.replace(`?${urlParams.toString()}`);
     }
   }, [userIdFromUrl, USER_ID, searchParams, router]);
+
+  useEffect(() => {
+    console.log('testDataGeneration', testDataGeneration);
+    if (testDataGeneration !== 'not-started') return;
+
+    setTestDataGeneration('in-progress');
+
+    fetch('/api/create-user', {
+      method: 'POST',
+      body: JSON.stringify({ userId: USER_ID }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          setTestDataGeneration('completed');
+        } else {
+          setTestDataGeneration('error');
+        }
+      })
+      .catch(() => {
+        setTestDataGeneration('error');
+      });
+  }, [testDataGeneration, USER_ID]);
 
   const CURRENT_USER = useMemo(
     () => ({
@@ -83,10 +113,22 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
     return () => off?.();
   }, [client, CURRENT_USER]);
 
-  if (!client) {
+  if (testDataGeneration === 'error') {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex flex-col gap-2 items-center justify-center h-screen">
+        <div>Data generation failed</div>
+        <a href="/" className="btn btn-primary">
+          Retry
+        </a>
+      </div>
+    );
+  }
+
+  if (!client || testDataGeneration !== 'completed') {
+    return (
+      <div className="flex flex-col gap-2 items-center justify-center h-screen">
         <LoadingIndicator />
+        <div>Generating data...</div>
       </div>
     );
   }

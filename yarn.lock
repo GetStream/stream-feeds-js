@@ -7395,6 +7395,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stream-io/node-sdk@npm:0.7.40":
+  version: 0.7.40
+  resolution: "@stream-io/node-sdk@npm:0.7.40"
+  dependencies:
+    "@types/jsonwebtoken": "npm:^9.0.3"
+    "@types/node": "npm:^18.3.0"
+    jsonwebtoken: "npm:^9.0.3"
+    uuid: "npm:^9.0.1"
+  peerDependencies:
+    "@stream-io/openai-realtime-api": ~0.1.3 || ~0.2.0 || ~0.3.0
+  peerDependenciesMeta:
+    "@stream-io/openai-realtime-api":
+      optional: true
+  checksum: 10/f6614a9cf9d3fff859c018a0fa3da7242b07e67b1991736c01fd96cff5cbef764420af9aba9546a8b8ec480dc368b442fd0e06a1546fd2f0c0d28d739b02506a
+  languageName: node
+  linkType: hard
+
 "@stream-io/node-sdk@npm:^0.6.2":
   version: 0.6.7
   resolution: "@stream-io/node-sdk@npm:0.6.7"
@@ -21437,6 +21454,7 @@ __metadata:
     "@eslint/js": "npm:^9.15.0"
     "@sentry/nextjs": "npm:^10"
     "@stream-io/feeds-react-sdk": "workspace:*"
+    "@stream-io/node-sdk": "npm:0.7.40"
     "@tailwindcss/postcss": "npm:^4.1.18"
     "@types/node": "npm:^20"
     "@types/react": "catalog:"

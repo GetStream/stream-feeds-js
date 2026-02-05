@@ -1,4 +1,8 @@
-import { StreamClient, type Attachment, type ActivityRequest } from '@stream-io/node-sdk';
+import {
+  StreamClient,
+  type Attachment,
+  type ActivityRequest,
+} from '@stream-io/node-sdk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,7 +16,7 @@ const __dirname = path.dirname(__filename);
 const dataDir = path.resolve(__dirname, '..');
 
 // Story expiration time in days
-const STORY_EXPIRATION_DAYS = 5;
+const STORY_EXPIRATION_DAYS = 12;
 
 function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -109,7 +113,9 @@ async function main(): Promise<void> {
     }
   }
 
-  console.log(`Finished creating ${totalStories} stories for ${users.length} users`);
+  console.log(
+    `Finished creating ${totalStories} stories for ${users.length} users`,
+  );
 }
 
 main().catch(console.error);
