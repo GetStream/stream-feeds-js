@@ -46,7 +46,6 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
           NEXT_PUBLIC_API_KEY: ${{ vars.REACT_TUTORIAL_API_KEY }}
-          NEXT_PUBLIC_TOKEN_URL: ${{ vars.REACT_TUTORIAL_TOKEN_URL }}
           API_SECRET: ${{ secrets.REACT_TUTORIAL_API_SECRET }}
           DEMO_USER_IDS: susan,adam,thomas,sloan,tiffany,jack,emma,michael,olivia,david,nina,james
         run: >

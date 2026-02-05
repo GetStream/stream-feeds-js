@@ -2,7 +2,7 @@ import { StreamClient } from '@stream-io/node-sdk';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
-  const key = process.env.STREAM_API_KEY ?? process.env.NEXT_PUBLIC_API_KEY;
+  const key = process.env.NEXT_PUBLIC_API_KEY;
   const secret = process.env.API_SECRET;
   const url = process.env.NEXT_PUBLIC_API_URL;
 
