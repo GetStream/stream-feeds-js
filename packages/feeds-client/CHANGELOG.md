@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.44](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.43...@stream-io/feeds-client-0.3.44) (2026-02-05)
+
+
+### Features
+
+* Add copy_custom_to_notification ([#230](https://github.com/GetStream/stream-feeds-js/issues/230)) ([a2be104](https://github.com/GetStream/stream-feeds-js/commit/a2be104b952a9a03ab8dd29f78c9728f7356e285))
+
 ## [0.3.43](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.42...@stream-io/feeds-client-0.3.43) (2026-02-05)
 
 
