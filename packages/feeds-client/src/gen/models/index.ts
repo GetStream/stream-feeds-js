@@ -629,6 +629,8 @@ export interface AddBookmarkResponse {
 export interface AddCommentReactionRequest {
   type: string;
 
+  copy_custom_to_notification?: boolean;
+
   create_notification_activity?: boolean;
 
   enforce_unique?: boolean;
@@ -650,6 +652,8 @@ export interface AddCommentReactionResponse {
 
 export interface AddCommentRequest {
   comment?: string;
+
+  copy_custom_to_notification?: boolean;
 
   create_notification_activity?: boolean;
 
@@ -700,6 +704,8 @@ export interface AddFolderRequest {
 
 export interface AddReactionRequest {
   type: string;
+
+  copy_custom_to_notification?: boolean;
 
   create_notification_activity?: boolean;
 

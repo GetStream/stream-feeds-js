@@ -599,6 +599,7 @@ export class FeedsApi {
     };
     const body = {
       type: request?.type,
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       create_notification_activity: request?.create_notification_activity,
       enforce_unique: request?.enforce_unique,
       skip_push: request?.skip_push,
@@ -1026,6 +1027,7 @@ export class FeedsApi {
   ): Promise<StreamResponse<AddCommentResponse>> {
     const body = {
       comment: request?.comment,
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       create_notification_activity: request?.create_notification_activity,
       id: request?.id,
       object_id: request?.object_id,
@@ -1182,6 +1184,7 @@ export class FeedsApi {
     };
     const body = {
       type: request?.type,
+      copy_custom_to_notification: request?.copy_custom_to_notification,
       create_notification_activity: request?.create_notification_activity,
       enforce_unique: request?.enforce_unique,
       skip_push: request?.skip_push,
