@@ -82,7 +82,7 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
     });
 
     return () => off?.();
-  }, [client]);
+  }, [client, CURRENT_USER]);
 
   if (!client) {
     return (
