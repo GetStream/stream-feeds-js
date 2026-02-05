@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.43](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.42...@stream-io/feeds-client-0.3.43) (2026-02-05)
+
+
+### Bug Fixes
+
+* rename UnhandledErrorType.FetchingOwnCapabilitiesOnNewActivity t… ([#229](https://github.com/GetStream/stream-feeds-js/issues/229)) ([4f7e0d1](https://github.com/GetStream/stream-feeds-js/commit/4f7e0d17eecd6455966d97629559a83138087381))
+
 ## [0.3.42](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.41...@stream-io/feeds-client-0.3.42) (2026-02-03)
 
 
