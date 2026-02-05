@@ -105,7 +105,7 @@ export const ActivityList = ({
           <p className="text-base-content/60">
             {feed?.group === 'foryou'
               ? 'Popular posts will appear here.'
-              : "When you follow people, you'll see their posts here."
+              : "Post something to your feed to see it here."
             }
           </p>
         </div>
