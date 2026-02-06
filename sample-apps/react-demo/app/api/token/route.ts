@@ -8,7 +8,7 @@ export async function GET(request: Request) {
 
   if (!key || !secret) {
     return NextResponse.json(
-      { error: 'Missing STREAM_API_KEY or API_SECRET' },
+      { error: 'Missing NEXT_PUBLIC_API_KEY or API_SECRET' },
       { status: 500 },
     );
   }
