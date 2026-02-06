@@ -1,0 +1,35 @@
+name: Refresh demo data
+
+on:
+  schedule:
+    - cron: '0 0 */10 * *' # Every 10 days at 00:00 UTC
+  workflow_dispatch:
+
+jobs:
+  refresh-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Create posts
+        working-directory: test-data-generator
+        env:
+          STREAM_API_KEY: ${{ secrets.REACT_TUTORIAL_API_KEY }}
+          API_SECRET: ${{ secrets.REACT_TUTORIAL_API_SECRET }}
+        run: yarn create-posts --features link,attachment,mention,reaction,comment,bookmark,repost
+
+      - name: Create stories
+        working-directory: test-data-generator
+        env:
+          STREAM_API_KEY: ${{ secrets.REACT_TUTORIAL_API_KEY }}
+          API_SECRET: ${{ secrets.REACT_TUTORIAL_API_SECRET }}
+        run: yarn create-stories

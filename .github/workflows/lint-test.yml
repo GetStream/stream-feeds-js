@@ -46,7 +46,6 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
           NEXT_PUBLIC_API_KEY: ${{ vars.REACT_TUTORIAL_API_KEY }}
-          NEXT_PUBLIC_TOKEN_URL: ${{ vars.REACT_TUTORIAL_TOKEN_URL }}
         run: >
           yarn vercel pull --yes --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }} &&
           yarn vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }} &&

@@ -1,17 +1,13 @@
 'use client';
 
-import {
-  useCreateFeedsClient,
-  StreamFeeds,
-  FeedsClient,
-} from '@stream-io/feeds-react-sdk';
+import { useCreateFeedsClient, StreamFeeds } from '@stream-io/feeds-react-sdk';
 import * as Sentry from '@sentry/nextjs';
 import { AppSkeleton } from './AppSkeleton';
 import { OwnFeedsContextProvider } from './own-feeds-context';
 import { FollowSuggestionsContextProvider } from './follow-suggestions-context';
 import { ConnectionAlert } from './components/utility/ConnectionAlert';
 import { generateUsername } from 'unique-username-generator';
-import { useEffect, useMemo, type PropsWithChildren } from 'react';
+import { useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { LoadingIndicator } from './components/utility/LoadingIndicator';
 import { userIdToName } from './utility/userIdToName';
@@ -22,11 +18,9 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const userIdFromUrl = searchParams.get('user_id');
-  const USER_ID = useMemo(
-    () =>
-      process.env.NEXT_PUBLIC_USER_ID ?? userIdFromUrl ?? generateUsername('-'),
-    [userIdFromUrl],
-  );
+  const [USER_ID] = useState(userIdFromUrl ?? generateUsername('-'));
+  // We assume if user_id is set, the user already has some data, no need to generate it
+  const [testDataGeneration, setTestDataGeneration] = useState<'not-started' | 'in-progress' | 'completed' | 'error'>(userIdFromUrl ? 'completed' : 'not-started');
 
   // Set user_id as URL parameter if not already present
   useEffect(() => {
@@ -37,20 +31,43 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
     }
   }, [userIdFromUrl, USER_ID, searchParams, router]);
 
+  useEffect(() => {
+    if (testDataGeneration !== 'not-started') return;
+
+    setTestDataGeneration('in-progress');
+
+    fetch('/api/create-user', {
+      method: 'POST',
+      body: JSON.stringify({ userId: USER_ID }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          setTestDataGeneration('completed');
+        } else {
+          setTestDataGeneration('error');
+        }
+      })
+      .catch(() => {
+        setTestDataGeneration('error');
+      });
+  }, [testDataGeneration, USER_ID]);
+
   const CURRENT_USER = useMemo(
     () => ({
       id: USER_ID,
       name: process.env.NEXT_PUBLIC_USER_NAME ?? userIdToName(USER_ID),
-      token: process.env.NEXT_PUBLIC_USER_TOKEN
-        ? process.env.NEXT_PUBLIC_USER_TOKEN
-        : process.env.NEXT_PUBLIC_TOKEN_URL
-          ? () =>
-            fetch(
-              `${process.env.NEXT_PUBLIC_TOKEN_URL}&user_id=${USER_ID}`,
-            ).then((res) => res.json().then((data) => data.token))
-          : new FeedsClient(API_KEY!).devToken(USER_ID),
+      token:
+        typeof process.env.NEXT_PUBLIC_USER_TOKEN === 'string'
+          ? process.env.NEXT_PUBLIC_USER_TOKEN
+          : () =>
+            fetch(`/api/token?user_id=${encodeURIComponent(USER_ID)}`)
+              .then((res) => {
+                if (!res.ok) throw new Error('Token request failed');
+                return res.json();
+              })
+              .then((data: { token: string }) => data.token),
     }),
-    [USER_ID, API_KEY],
+    [USER_ID],
   );
 
   const client = useCreateFeedsClient({
@@ -83,10 +100,22 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
     return () => off?.();
   }, [client, CURRENT_USER]);
 
-  if (!client) {
+  if (testDataGeneration === 'error') {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex flex-col gap-2 items-center justify-center h-screen">
+        <div>Data generation failed</div>
+        <a href="/" className="btn btn-primary">
+          Retry
+        </a>
+      </div>
+    );
+  }
+
+  if (!client || testDataGeneration !== 'completed') {
+    return (
+      <div className="flex flex-col gap-2 items-center justify-center h-screen">
         <LoadingIndicator />
+        <div>Generating data...</div>
       </div>
     );
   }
