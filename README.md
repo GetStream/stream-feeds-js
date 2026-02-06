@@ -61,6 +61,8 @@ After the above steps run the following command in `sample-apps/react-demo`:
 yarn dev
 ```
 
+You can provide `user_id=<user id>` query param when opening the app, or provide nothing, and let the application generate a user for you.
+
 ## Test Data Generator
 
 The `test-data-generator` directory contains scripts to populate your Stream Feeds app with sample data for testing and development purposes.

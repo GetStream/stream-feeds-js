@@ -18,19 +18,9 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
 
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const userIdFromUrl = searchParams.get('user_id');
-  const [testDataGeneration, setTestDataGeneration] = useState<'not-started' | 'in-progress' | 'completed' | 'error'>('completed');
-  const USER_ID = useMemo(
-    () => {
-      if (process.env.NEXT_PUBLIC_USER_ID || userIdFromUrl) {
-        setTestDataGeneration('completed');
-        return (process.env.NEXT_PUBLIC_USER_ID ?? userIdFromUrl)!;
-      } else {
-        setTestDataGeneration('not-started');
-        return generateUsername('-');
-      }
-      // Only want to set user on mount
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+  const [USER_ID] = useState(userIdFromUrl ?? generateUsername('-'));
+  // We assume if user_id is set, the user already has some data, no need to generate it
+  const [testDataGeneration, setTestDataGeneration] = useState<'not-started' | 'in-progress' | 'completed' | 'error'>(userIdFromUrl ? 'completed' : 'not-started');
 
   // Set user_id as URL parameter if not already present
   useEffect(() => {
@@ -42,7 +32,6 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
   }, [userIdFromUrl, USER_ID, searchParams, router]);
 
   useEffect(() => {
-    console.log('testDataGeneration', testDataGeneration);
     if (testDataGeneration !== 'not-started') return;
 
     setTestDataGeneration('in-progress');
