@@ -81,7 +81,10 @@ export const AttachmentList = ({
       >
         {hasMultiple && !disableButtons && (
           <button
-            className="absolute left-0 top-0 h-full z-10 flex items-center justify-center px-2 cursor-pointer"
+            className={`absolute left-0 z-10 flex items-center justify-center px-2 cursor-pointer ${currentAttachment.type === 'video'
+              ? 'top-24 bottom-24' /* inset so video controls stay clickable */
+              : 'top-0 h-full'
+              }`}
             onClick={goToPrevious}
             aria-label="Previous attachment"
           >
@@ -99,7 +102,10 @@ export const AttachmentList = ({
 
         {hasMultiple && !disableButtons && (
           <button
-            className="absolute right-0 top-0 h-full z-10 flex items-center justify-center px-2 cursor-pointer"
+            className={`absolute right-0 z-10 flex items-center justify-center px-2 cursor-pointer ${currentAttachment.type === 'video'
+              ? 'top-24 bottom-24' /* inset so video controls stay clickable */
+              : 'top-0 h-full'
+              }`}
             onClick={goToNext}
             aria-label="Next attachment"
           >

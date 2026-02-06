@@ -1,4 +1,4 @@
-import { useFeedsClient, type Attachment } from '@stream-io/feeds-react-sdk';
+import { isImageFile, useFeedsClient, type Attachment } from '@stream-io/feeds-react-sdk';
 import { forwardRef, useCallback, useState, useEffect, useMemo, useRef, useImperativeHandle } from 'react';
 import { AttachmentPreview } from './AttachmentPreview';
 import { AttachmentUploadProgress } from './AttachmentUploadProgress';
@@ -83,7 +83,7 @@ export const AttachmentPreviewList = forwardRef<AttachmentPreviewListHandle, Att
         );
 
         try {
-          const fileType = file.type.startsWith('video/') ? 'video' : 'image';
+          const fileType = isImageFile(file) ? 'image' : 'video';
           const uploadResponse = await (fileType === 'video'
             ? client.uploadFile({ file })
             : client.uploadImage({ file }));
