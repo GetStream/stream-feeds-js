@@ -23,13 +23,13 @@ jobs:
       - name: Create posts
         working-directory: test-data-generator
         env:
-          STREAM_API_KEY: ${{ secrets.REACT_TUTORIAL_API_KEY }}
+          STREAM_API_KEY: ${{ vars.REACT_TUTORIAL_API_KEY }}
           API_SECRET: ${{ secrets.REACT_TUTORIAL_API_SECRET }}
         run: yarn create-posts --features link,attachment,mention,reaction,comment,bookmark,repost
 
       - name: Create stories
         working-directory: test-data-generator
         env:
-          STREAM_API_KEY: ${{ secrets.REACT_TUTORIAL_API_KEY }}
+          STREAM_API_KEY: ${{ vars.REACT_TUTORIAL_API_KEY }}
           API_SECRET: ${{ secrets.REACT_TUTORIAL_API_SECRET }}
         run: yarn create-stories
