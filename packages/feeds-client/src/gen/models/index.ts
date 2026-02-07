@@ -423,7 +423,7 @@ export interface ActivityResponse {
 
   reaction_count: number;
 
-  restrict_replies: string;
+  restrict_replies: 'everyone' | 'people_i_follow' | 'nobody';
 
   score: number;
 
@@ -469,6 +469,8 @@ export interface ActivityResponse {
 
   expires_at?: Date;
 
+  friend_reaction_count?: number;
+
   is_watched?: boolean;
 
   moderation_action?: string;
@@ -478,6 +480,8 @@ export interface ActivityResponse {
   text?: string;
 
   visibility_tag?: string;
+
+  friend_reactions?: FeedsReactionResponse[];
 
   current_feed?: FeedResponse;
 
@@ -490,10 +494,6 @@ export interface ActivityResponse {
   parent?: ActivityResponse;
 
   poll?: PollResponseData;
-
-  friend_reactions?: FeedsReactionResponse[];
-
-  friend_reaction_count?: number;
 }
 
 export interface ActivityRestoredEvent {
@@ -1448,6 +1448,8 @@ export interface ChannelConfig {
 
   polls: boolean;
 
+  push_level: string;
+
   push_notifications: boolean;
 
   quotes: boolean;
@@ -1555,6 +1557,8 @@ export interface ChannelConfigWithInfo {
   partition_size?: number;
 
   partition_ttl?: string;
+
+  push_level?: 'all' | 'all_mentions' | 'mentions' | 'direct_mentions' | 'none';
 
   allowed_flag_reasons?: string[];
 
@@ -2014,6 +2018,8 @@ export interface ConfigOverrides {
   count_messages?: boolean;
 
   max_message_length?: number;
+
+  push_level?: 'all' | 'all_mentions' | 'mentions' | 'direct_mentions' | 'none';
 
   quotes?: boolean;
 
@@ -3219,6 +3225,14 @@ export interface FrameRecordingSettingsResponse {
   quality?: string;
 }
 
+export interface FriendReactionsOptions {
+  enabled?: boolean;
+
+  limit?: number;
+
+  type?: 'following' | 'mutual';
+}
+
 export interface FullUserResponse {
   banned: boolean;
 
@@ -3422,17 +3436,11 @@ export interface GetOrCreateFeedRequest {
 
   following_pagination?: PagerRequest;
 
+  friend_reactions_options?: FriendReactionsOptions;
+
   interest_weights?: Record<string, number>;
 
   member_pagination?: PagerRequest;
-
-  friend_reactions_options?: FriendReactionsOptions;
-}
-
-export interface FriendReactionsOptions {
-  enabled?: boolean;
-  type?: 'following' | 'mutual';
-  limit?: number;
 }
 
 export interface GetOrCreateFeedResponse {
@@ -3731,6 +3739,8 @@ export interface Message {
 
   id: string;
 
+  mentioned_channel: boolean;
+
   pinned: boolean;
 
   reply_count: number;
@@ -3842,6 +3852,8 @@ export interface MessageResponse {
   html: string;
 
   id: string;
+
+  mentioned_channel: boolean;
 
   pinned: boolean;
 
@@ -4647,7 +4659,13 @@ export interface PushPreferenceInput {
 
   channel_cid?: string;
 
-  chat_level?: 'all' | 'mentions' | 'none' | 'default';
+  chat_level?:
+    | 'all'
+    | 'mentions'
+    | 'direct_mentions'
+    | 'all_mentions'
+    | 'none'
+    | 'default';
 
   disabled_until?: Date;
 

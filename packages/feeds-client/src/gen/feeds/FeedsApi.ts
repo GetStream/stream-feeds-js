@@ -1352,6 +1352,7 @@ export class FeedsApi {
       filter: request?.filter,
       followers_pagination: request?.followers_pagination,
       following_pagination: request?.following_pagination,
+      friend_reactions_options: request?.friend_reactions_options,
       interest_weights: request?.interest_weights,
       member_pagination: request?.member_pagination,
     };

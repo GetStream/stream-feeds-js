@@ -203,6 +203,8 @@ decoders.ActivityResponse = (input?: Record<string, any>) => {
 
     expires_at: { type: 'DatetimeType', isSingle: true },
 
+    friend_reactions: { type: 'FeedsReactionResponse', isSingle: false },
+
     current_feed: { type: 'FeedResponse', isSingle: true },
 
     parent: { type: 'ActivityResponse', isSingle: true },
