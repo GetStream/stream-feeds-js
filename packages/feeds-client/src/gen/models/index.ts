@@ -469,8 +469,6 @@ export interface ActivityResponse {
 
   expires_at?: Date;
 
-  friend_reaction_count?: number;
-
   is_watched?: boolean;
 
   moderation_action?: string;
@@ -480,8 +478,6 @@ export interface ActivityResponse {
   text?: string;
 
   visibility_tag?: string;
-
-  friend_reactions?: FeedsReactionResponse[];
 
   current_feed?: FeedResponse;
 
@@ -3439,8 +3435,6 @@ export interface GetOrCreateFeedRequest {
   followers_pagination?: PagerRequest;
 
   following_pagination?: PagerRequest;
-
-  friend_reactions_options?: FriendReactionsOptions;
 
   interest_weights?: Record<string, number>;
 
