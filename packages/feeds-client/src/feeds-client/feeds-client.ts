@@ -7,6 +7,7 @@ import type {
   AddCommentRequest,
   AddCommentResponse,
   AddReactionRequest,
+  CreateGuestResponse,
   DeleteActivityReactionResponse,
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
@@ -392,17 +393,23 @@ export class FeedsClient extends FeedsApi {
 
   createGuest = async (...args: Parameters<FeedsApi['createGuest']>) => {
     let shouldDisconnect = false;
-    if (
-      !this.state.getLatestValue().is_anonymous ||
-      !this.state.getLatestValue().connected_user
-    ) {
-      shouldDisconnect = true;
-      await this.connectAnonymous();
+
+    let response: StreamResponse<CreateGuestResponse>;
+    try {
+      if (
+        !this.state.getLatestValue().is_anonymous ||
+        !this.state.getLatestValue().connected_user
+      ) {
+        shouldDisconnect = true;
+        await this.connectAnonymous();
+      }
+      response = await super.createGuest(...args);
+    } finally {
+      if (shouldDisconnect) {
+        await this.disconnectUser();
+      }
     }
-    const response = await super.createGuest(...args);
-    if (shouldDisconnect) {
-      await this.disconnectUser();
-    }
+
     return response;
   };
 
