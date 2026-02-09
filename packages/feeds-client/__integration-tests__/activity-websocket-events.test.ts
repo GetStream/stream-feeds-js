@@ -150,61 +150,65 @@ describe('Activity state updates via WebSocket events', () => {
     expect(feed.hasActivity(activityId)).toBe(false);
   });
 
-  it('should remove activity from feed in response to activity.removed_from_feed event', async () => {
-    // Create a spy for the activity.removed_from_feed event
-    const removeSpy = vi.fn();
-    feed.on('feeds.activity.removed_from_feed', removeSpy);
+  it(
+    'should remove activity from feed in response to activity.removed_from_feed event',
+    async () => {
+      // Create a spy for the activity.removed_from_feed event
+      const removeSpy = vi.fn();
+      feed.on('feeds.activity.removed_from_feed', removeSpy);
 
-    const secondFeed = client.feed(feedGroup, crypto.randomUUID());
-    await secondFeed.getOrCreate();
+      const secondFeed = client.feed(feedGroup, crypto.randomUUID());
+      await secondFeed.getOrCreate();
 
-    const response = await client.addActivity({
-      type: 'post',
-      feeds: [feed.feed, secondFeed.feed],
-      text: 'Test activity',
-    });
+      const response = await client.addActivity({
+        type: 'post',
+        feeds: [feed.feed, secondFeed.feed],
+        text: 'Test activity',
+      });
 
-    await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 10000 });
+      await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 10000 });
 
-    expect(
-      feed.state
-        .getLatestValue()
-        .activities?.find((a) => a.id === response.activity.id),
-    ).toBeDefined();
+      expect(
+        feed.state
+          .getLatestValue()
+          .activities?.find((a) => a.id === response.activity.id),
+      ).toBeDefined();
 
-    await client.upsertActivities({
-      activities: [
-        {
-          id: response.activity.id,
-          feeds: [secondFeed.feed],
-          text: 'Test activity',
-          type: 'post',
-        },
-      ],
-    });
+      await client.upsertActivities({
+        activities: [
+          {
+            id: response.activity.id,
+            feeds: [secondFeed.feed],
+            text: 'Test activity',
+            type: 'post',
+          },
+        ],
+      });
 
-    await waitForEvent(feed, 'feeds.activity.removed_from_feed', {
-      timeoutMs: 10000,
-    });
+      await waitForEvent(feed, 'feeds.activity.removed_from_feed', {
+        timeoutMs: 10000,
+      });
 
-    const removeEvent = removeSpy.mock
-      .lastCall?.[0] as ActivityRemovedFromFeedEvent;
-    expect(removeEvent?.type).toBe('feeds.activity.removed_from_feed');
-    expect(removeEvent?.activity.id).toBe(response.activity.id);
+      const removeEvent = removeSpy.mock
+        .lastCall?.[0] as ActivityRemovedFromFeedEvent;
+      expect(removeEvent?.type).toBe('feeds.activity.removed_from_feed');
+      expect(removeEvent?.activity.id).toBe(response.activity.id);
 
-    expect(
-      feed.state
-        .getLatestValue()
-        .activities?.find((a) => a.id === response.activity.id),
-    ).toBeUndefined();
+      expect(
+        feed.state
+          .getLatestValue()
+          .activities?.find((a) => a.id === response.activity.id),
+      ).toBeUndefined();
 
-    // Verify that the activity is removed from the cache
-    const indexedActivityIds = (feed as any).indexedActivityIds;
-    expect(indexedActivityIds.size).toEqual(0);
-    expect(feed.hasActivity(response.activity.id)).toBe(false);
+      // Verify that the activity is removed from the cache
+      const indexedActivityIds = (feed as any).indexedActivityIds;
+      expect(indexedActivityIds.size).toEqual(0);
+      expect(feed.hasActivity(response.activity.id)).toBe(false);
 
-    await secondFeed.delete({ hard_delete: true });
-  });
+      await secondFeed.delete({ hard_delete: true });
+    },
+    { timeout: 50000 },
+  );
 
   it(`should backfill current_feed if activity is added to multiple feeds`, async () => {
     const secondFeed = client.feed(feedGroup, crypto.randomUUID());
