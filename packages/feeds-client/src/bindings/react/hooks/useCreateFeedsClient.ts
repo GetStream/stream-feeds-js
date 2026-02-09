@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { FeedsClient } from '../../../feeds-client';
 import type { TokenOrProvider } from '../../../types';
-import type { UserRequest } from '../../../gen/models';
+import type { CreateGuestResponse, UserRequest } from '../../../gen/models';
 import type { FeedsClientOptions } from '../../../common/types';
 
 /**
@@ -15,7 +15,7 @@ export const useCreateFeedsClient = ({
   options,
 }: {
   apiKey: string;
-  tokenOrProvider?: TokenOrProvider;
+  tokenOrProvider?: TokenOrProvider | 'guest';
   userData: UserRequest | 'anonymous';
   options?: FeedsClientOptions;
 }) => {
@@ -24,7 +24,7 @@ export const useCreateFeedsClient = ({
 
   if (userDataOrAnonymous !== 'anonymous' && !tokenOrProvider) {
     throw new Error(
-      'Token provider can only be omitted when connecting anonymous user',
+      'Token provider can only be omitted when connecting anonymous user. If you want to connect as a guest, provide "guest" instead of a token provider.',
     );
   }
 
@@ -45,16 +45,24 @@ export const useCreateFeedsClient = ({
   useEffect(() => {
     const _client = new FeedsClient(apiKey, cachedOptions);
 
-    const connectionPromise = cachedUserData
-      ? _client
-          .connectUser(cachedUserData, tokenOrProvider!)
-          .then(() => {
-            setError(null);
-          })
-          .catch((err) => {
-            setError(err);
-          })
-      : _client.connectAnonymous();
+    let connectionPromise: Promise<void | CreateGuestResponse>;
+    if (!cachedUserData) {
+      connectionPromise = _client.connectAnonymous();
+    } else if (tokenOrProvider === 'guest') {
+      connectionPromise = _client.connectGuest({
+        user: cachedUserData,
+      });
+    } else {
+      connectionPromise = _client.connectUser(cachedUserData, tokenOrProvider!);
+    }
+
+    connectionPromise = connectionPromise
+      .then(() => {
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err);
+      });
 
     setClient(_client);
 
