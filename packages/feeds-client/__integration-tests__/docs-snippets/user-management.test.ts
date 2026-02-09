@@ -1,5 +1,6 @@
 import { FeedsClient } from '../../src/feeds-client';
 import { createTestTokenGenerator, getTestUser } from '../utils';
+import { describe, it } from 'vitest';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 
