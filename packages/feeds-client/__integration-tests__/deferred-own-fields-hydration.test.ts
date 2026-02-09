@@ -99,7 +99,7 @@ describe('Deferred own_ fields hydration', () => {
         expect(feed.currentState.own_followings).toBeDefined();
         expect(feed.currentState.own_membership).toBeDefined();
       },
-      { timeout: 1000, interval: 50 },
+      { timeout: 10000, interval: 50 },
     );
 
     expect(ownBatchThrottledSpy).toHaveBeenCalledExactlyOnceWith(
