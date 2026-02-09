@@ -382,6 +382,30 @@ export class FeedsClient extends FeedsApi {
     return Promise.resolve();
   };
 
+  connectGuest = async (...args: Parameters<FeedsApi['createGuest']>) => {
+    this.checkIfUserIsConnected();
+
+    const response = await this.createGuest(...args);
+    await this.connectUser(response.user, response.access_token);
+    return response;
+  };
+
+  createGuest = async (...args: Parameters<FeedsApi['createGuest']>) => {
+    let shouldDisconnect = false;
+    if (
+      !this.state.getLatestValue().is_anonymous ||
+      !this.state.getLatestValue().connected_user
+    ) {
+      shouldDisconnect = true;
+      await this.connectAnonymous();
+    }
+    const response = await super.createGuest(...args);
+    if (shouldDisconnect) {
+      await this.disconnectUser();
+    }
+    return response;
+  };
+
   connectUser = async (user: UserRequest, tokenProvider: TokenOrProvider) => {
     this.checkIfUserIsConnected();
 
