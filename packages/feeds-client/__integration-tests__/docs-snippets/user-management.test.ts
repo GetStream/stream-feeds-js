@@ -1,6 +1,10 @@
 import { FeedsClient } from '../../src/feeds-client';
-import { createTestTokenGenerator, getTestUser } from '../utils';
-import { describe, it } from 'vitest';
+import {
+  createTestClient,
+  createTestTokenGenerator,
+  getTestUser,
+} from '../utils';
+import { afterAll, beforeAll, describe, it } from 'vitest';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -33,5 +37,62 @@ describe('User management', () => {
     await client.connectAnonymous();
 
     await client.disconnectUser();
+  });
+
+  describe('Query users', () => {
+    let client: FeedsClient;
+
+    beforeAll(async () => {
+      client = createTestClient();
+      const user = getTestUser('query-users');
+      await client.connectUser(user, createTestTokenGenerator(user));
+    });
+
+    afterAll(async () => {
+      await client.disconnectUser();
+    });
+
+    it('querying users', async () => {
+      const response = await client.queryUsers({
+        payload: {
+          filter_conditions: {
+            role: 'admin',
+          },
+          sort: [{ field: 'created_at', direction: -1 }],
+          limit: 10,
+          offset: 0,
+        },
+      });
+
+      console.log(response.users);
+    });
+
+    it('filter examples', async () => {
+      // Query users by custom field
+      const response = await client.queryUsers({
+        payload: {
+          filter_conditions: {
+            'custom.color': 'red',
+          },
+        },
+      });
+      // Query users with multiple conditions
+      const response2 = await client.queryUsers({
+        payload: {
+          filter_conditions: {
+            role: { $in: ['admin', 'moderator'] },
+            'custom.age': { $gte: 18 },
+          },
+        },
+      });
+      // Query users by name (text search)
+      const response3 = await client.queryUsers({
+        payload: {
+          filter_conditions: {
+            name: { $autocomplete: 'john' },
+          },
+        },
+      });
+    });
   });
 });
