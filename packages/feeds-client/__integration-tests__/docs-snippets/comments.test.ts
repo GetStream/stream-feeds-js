@@ -51,6 +51,27 @@ describe('Comments page', () => {
       object_type: 'activity',
       parent_id: comment.id,
     });
+
+    // Adding a comment without triggering push notifications
+    await client.addComment({
+      comment: 'Silent comment',
+      object_id: 'activity_123',
+      object_type: 'activity',
+      skip_push: true,
+    });
+    // Adding a comment with attachments
+    await client.addComment({
+      comment: 'Check out this image!',
+      object_id: 'activity_123',
+      object_type: 'activity',
+      attachments: [
+        {
+          type: 'image',
+          image_url: 'https://example.com/image.png',
+          custom: {},
+        },
+      ],
+    });
   });
 
   it('Updating comments', async () => {
