@@ -69,7 +69,7 @@ describe('User management', () => {
 
     it('filter examples', async () => {
       // Query users by custom field
-      const response = await client.queryUsers({
+      await client.queryUsers({
         payload: {
           filter_conditions: {
             'custom.color': 'red',
@@ -77,7 +77,7 @@ describe('User management', () => {
         },
       });
       // Query users with multiple conditions
-      const response2 = await client.queryUsers({
+      await client.queryUsers({
         payload: {
           filter_conditions: {
             role: { $in: ['admin', 'moderator'] },
@@ -86,7 +86,7 @@ describe('User management', () => {
         },
       });
       // Query users by name (text search)
-      const response3 = await client.queryUsers({
+      await client.queryUsers({
         payload: {
           filter_conditions: {
             name: { $autocomplete: 'john' },
