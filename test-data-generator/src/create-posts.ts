@@ -183,72 +183,11 @@ async function main(): Promise<void> {
       console.log(`  -> Repost of activity ${parentId}`);
     } else {
       // Only add content features (link, attachment, poll) for non-reposts
+      // When a poll is added, no other content features are added and text is appended
+      const includePoll = shouldIncludeFeature('poll', features);
 
-      // Feature: mention - add mentioned user to start of text
-      if (shouldIncludeFeature('mention', features)) {
-        const mentionedUser = users[Math.floor(Math.random() * users.length)];
-        activity.text = `@${mentionedUser.name} ${text}`;
-        activity.mentioned_user_ids = [mentionedUser.id];
-      }
-
-      // Feature: link and attachment are mutually exclusive
-      // First determine which features would be included, then pick at most one
-      const wouldIncludeLink = shouldIncludeFeature('link', features);
-      const wouldIncludeAttachment = shouldIncludeFeature(
-        'attachment',
-        features,
-      );
-
-      let includeLink = false;
-      let includeAttachment = false;
-
-      if (wouldIncludeLink && wouldIncludeAttachment) {
-        // Both would be included, randomly pick one
-        if (Math.random() < 0.5) {
-          includeLink = true;
-        } else {
-          includeAttachment = true;
-        }
-      } else {
-        includeLink = wouldIncludeLink;
-        includeAttachment = wouldIncludeAttachment;
-      }
-
-      // Feature: link - add a random link
-      if (includeLink) {
-        const link = links[Math.floor(Math.random() * links.length)];
-        activity.text = `${activity.text}. Check out this link: ${link}`;
-      }
-
-      // Feature: attachment - add 1-3 random photos
-      if (includeAttachment) {
-        const numPhotos = getRandomInt(1, 3);
-        const selectedImages = getRandomItems(imageFiles, numPhotos);
-        const attachments: Attachment[] = [];
-
-        for (const imageFile of selectedImages) {
-          const imagePath = path.join(imagesDir, imageFile);
-          const imageBuffer = await fs.readFile(imagePath);
-          const file = new File([imageBuffer], imageFile, {
-            type: 'image/jpeg',
-          });
-          const uploadResponse = await client.uploadImage({
-            file,
-            user: { id: user.id },
-            upload_sizes: [],
-          });
-          attachments.push({
-            type: 'image',
-            image_url: uploadResponse.file,
-            custom: {},
-          });
-        }
-
-        activity.attachments = attachments;
-      }
-
-      // Feature: poll - create and add a random poll
-      if (shouldIncludeFeature('poll', features)) {
+      if (includePoll) {
+        activity.text = `${text}. Please vote to help me decide.`;
         const pollData = polls[Math.floor(Math.random() * polls.length)];
         const createdPoll = await client.createPoll({
           ...pollData,
@@ -256,6 +195,69 @@ async function main(): Promise<void> {
         });
         if (createdPoll.poll.id) {
           activity.poll_id = createdPoll.poll.id;
+        }
+      } else {
+        // Feature: mention - add mentioned user to start of text
+        if (shouldIncludeFeature('mention', features)) {
+          const mentionedUser = users[Math.floor(Math.random() * users.length)];
+          activity.text = `@${mentionedUser.name} ${text}`;
+          activity.mentioned_user_ids = [mentionedUser.id];
+        }
+
+        // Feature: link and attachment are mutually exclusive
+        // First determine which features would be included, then pick at most one
+        const wouldIncludeLink = shouldIncludeFeature('link', features);
+        const wouldIncludeAttachment = shouldIncludeFeature(
+          'attachment',
+          features,
+        );
+
+        let includeLink = false;
+        let includeAttachment = false;
+
+        if (wouldIncludeLink && wouldIncludeAttachment) {
+          // Both would be included, randomly pick one
+          if (Math.random() < 0.5) {
+            includeLink = true;
+          } else {
+            includeAttachment = true;
+          }
+        } else {
+          includeLink = wouldIncludeLink;
+          includeAttachment = wouldIncludeAttachment;
+        }
+
+        // Feature: link - add a random link
+        if (includeLink) {
+          const link = links[Math.floor(Math.random() * links.length)];
+          activity.text = `${activity.text}. Check out this link: ${link}`;
+        }
+
+        // Feature: attachment - add 1-3 random photos
+        if (includeAttachment) {
+          const numPhotos = getRandomInt(1, 3);
+          const selectedImages = getRandomItems(imageFiles, numPhotos);
+          const attachments: Attachment[] = [];
+
+          for (const imageFile of selectedImages) {
+            const imagePath = path.join(imagesDir, imageFile);
+            const imageBuffer = await fs.readFile(imagePath);
+            const file = new File([imageBuffer], imageFile, {
+              type: 'image/jpeg',
+            });
+            const uploadResponse = await client.uploadImage({
+              file,
+              user: { id: user.id },
+              upload_sizes: [],
+            });
+            attachments.push({
+              type: 'image',
+              image_url: uploadResponse.file,
+              custom: {},
+            });
+          }
+
+          activity.attachments = attachments;
         }
       }
     }
