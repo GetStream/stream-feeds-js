@@ -189,6 +189,15 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
     0
   );
 
+  // Winner = option(s) with highest vote count when poll is closed (only if at least one vote)
+  const winnerOptionIds = useMemo(() => {
+    if (!isClosed || !options?.length || optimisticTotalVotes === 0) return [];
+    const maxCount = Math.max(...options.map((o) => optimisticVoteCounts[o.id] ?? 0));
+    if (maxCount === 0) return [];
+    return options.filter((o) => (optimisticVoteCounts[o.id] ?? 0) === maxCount).map((o) => o.id);
+  }, [isClosed, options, optimisticVoteCounts, optimisticTotalVotes]);
+  const hasWinner = winnerOptionIds.length > 0;
+
   return (
     <div className="w-full mt-3">
       <div
@@ -236,8 +245,8 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
                   {/* Option content */}
                   <div className="relative flex items-center justify-between p-3 gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      {hasVoted && (
-                        <span className="material-symbols-outlined text-primary text-lg shrink-0 fill">
+                      {isClosed && hasWinner && winnerOptionIds.includes(option.id) && (
+                        <span className="material-symbols-outlined text-base-content text-lg shrink-0">
                           check_circle
                         </span>
                       )}
