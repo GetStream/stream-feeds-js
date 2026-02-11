@@ -24,7 +24,11 @@ export const Activity = ({
       />
       <ActivityContent activity={activity} withoutInteractions={location === 'preview'} />
       {activity.poll && (
-        <PollDisplay poll={activity.poll} activity={activity} />
+        <PollDisplay
+          poll={activity.poll}
+          activity={activity}
+          withoutInteractions={location === 'preview'}
+        />
       )}
       {activity?.parent ? (
         location === 'preview' ? (

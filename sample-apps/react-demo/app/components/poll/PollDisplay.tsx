@@ -13,6 +13,8 @@ import { ConfirmDialog, type ConfirmDialogHandle } from '../utility/ConfirmDialo
 type PollDisplayProps = {
   poll: PollResponseData;
   activity: ActivityResponse;
+  /** When true, voting and close poll are disabled (e.g. for repost preview). */
+  withoutInteractions?: boolean;
 };
 
 const pollStateSelector = (state: PollState) => ({
@@ -25,7 +27,7 @@ const pollStateSelector = (state: PollState) => ({
   created_by_id: state.created_by_id,
 });
 
-export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
+export const PollDisplay = ({ poll, activity, withoutInteractions = false }: PollDisplayProps) => {
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
   const [isVoting, setIsVoting] = useState(false);
@@ -96,7 +98,7 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
 
   const handleVote = useCallback(
     async (optionId: string) => {
-      if (!client || isClosed || isVoting) return;
+      if (!client || isClosed || isVoting || withoutInteractions) return;
 
       setIsVoting(true);
       setError(undefined);
@@ -165,11 +167,12 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
       activity.id,
       setOptimisticOwnVotes,
       setOptimisticVoteCounts,
+      withoutInteractions,
     ]
   );
 
   const handleClosePoll = useCallback(async () => {
-    if (!client || !isOwner || isClosed) return;
+    if (!client || !isOwner || isClosed || withoutInteractions) return;
 
     setIsClosing(true);
     setError(undefined);
@@ -181,7 +184,7 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
     } finally {
       setIsClosing(false);
     }
-  }, [client, isOwner, isClosed, poll.id]);
+  }, [client, isOwner, isClosed, poll.id, withoutInteractions]);
 
   const handleClosePollClick = useCallback(() => {
     confirmDialogRef.current?.open();
@@ -232,9 +235,9 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
                 <button
                   key={option.id}
                   type="button"
-                  onClick={() => handleVote(option.id)}
-                  disabled={isClosed || isVoting}
-                  className={`relative w-full text-left rounded-lg border transition-all overflow-hidden ${isClosed
+                  onClick={withoutInteractions ? undefined : () => handleVote(option.id)}
+                  disabled={isClosed || isVoting || withoutInteractions}
+                  className={`relative w-full text-left rounded-lg border transition-all overflow-hidden ${isClosed || withoutInteractions
                     ? 'cursor-default border-base-300'
                     : 'cursor-pointer border-base-300 hover:border-primary'
                     } ${hasVoted ? 'border-primary ring-1 ring-primary' : ''}`}
@@ -278,7 +281,7 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
               {optimisticTotalVotes} {optimisticTotalVotes === 1 ? 'vote' : 'votes'}
             </span>
 
-            {isOwner && !isClosed && (
+            {isOwner && !isClosed && !withoutInteractions && (
               <button
                 type="button"
                 onClick={handleClosePollClick}
