@@ -86,23 +86,36 @@ Run these scripts in the following order from `test-data-generator` folder:
 ```bash
 yarn create-users
 yarn create-follows
+# Optional, for hashtag feeds (run before create-posts when using --features hashtags).
+yarn create-hashtag-group
 # Adjust what features you need
-yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
+yarn create-posts --features link,hashtags,attachment,mention,poll,reaction,comment,bookmark,repost
 # Optional, only useful if you have story feeds
 yarn create-stories
+# Optional, if you want premium posts too
+yarn create-premium-membership
+yarn create-premium-members
+yarn create-premium-posts
+# Optional, adds 4 location-tagged posts (2 Amsterdam, 2 Boulder) with fun facts
+yarn create-location-posts
 ```
 
 ### Available Scripts
 
 Run these commands from the `test-data-generator/` directory:
 
-| Script          | Command                | Description                                |
-| --------------- | ---------------------- | ------------------------------------------ |
-| Create Users    | `yarn create-users`    | Creates users and their feeds              |
-| Create Follows  | `yarn create-follows`  | Sets up follow relationships between users |
-| Create Posts    | `yarn create-posts`    | Generates sample activities/posts          |
-| Create Stories  | `yarn create-stories`  | Creates sample stories                     |
-| Download Images | `yarn download-images` | Downloads sample images for posts          |
+| Script                    | Command                          | Description                                                                                                                                                                                   |
+| ------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create Users              | `yarn create-users`              | Creates users and their feeds                                                                                                                                                                 |
+| Create Follows            | `yarn create-follows`            | Sets up follow relationships between users                                                                                                                                                    |
+| Create Posts              | `yarn create-posts`              | Generates sample activities/posts                                                                                                                                                             |
+| Create Stories            | `yarn create-stories`            | Creates sample stories                                                                                                                                                                        |
+| Create hashtag group      | `yarn create-hashtag-group`      | Creates `hashtag` feed group (current_feed selector, public default visibility) and the `hashtag:getstream_io` feed with public visibility (for use with the `hashtags` create-posts feature) |
+| Download Images           | `yarn download-images`           | Downloads sample images for posts                                                                                                                                                             |
+| Create premium membership | `yarn create-premium-membership` | Creates `premium` membership level                                                                                                                                                            |
+| Create premium members    | `yarn create-premium-members`    | Adds premium members to randomly selected user feeds                                                                                                                                          |
+| Create premium posts      | `yarn create-premium-posts`      | Updates a few posts of user feeds with premium memebrs to `premium` members only                                                                                                              |
+| Create location posts     | `yarn create-location-posts`     | Creates 4 activities (2 for Amsterdam, 2 for Boulder, CO) with location (lat, lng) and fun-fact text, added to randomly selected users' user feeds                                            |
 
 ### Create Posts Feature Flags
 
@@ -114,16 +127,17 @@ yarn create-posts --features <feature1,feature2,...>
 
 **Available features:**
 
-| Feature      | Description                              |
-| ------------ | ---------------------------------------- |
-| `link`       | Adds random URLs to posts                |
-| `attachment` | Uploads and attaches 1-3 images to posts |
-| `mention`    | Adds @mentions to other users            |
-| `poll`       | Creates and attaches polls to posts      |
-| `reaction`   | Adds 1-5 reactions from random users     |
-| `comment`    | Adds 1-5 comments from random users      |
-| `bookmark`   | Bookmarks posts by random users          |
-| `repost`     | Creates reposts of existing activities   |
+| Feature      | Description                                                                                                                |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `link`       | Adds random URLs to posts                                                                                                  |
+| `hashtags`   | When used with `link`: adds `#getstream_io` to text and `hashtag:getstream_io` to feeds (run `create-hashtag-group` first) |
+| `attachment` | Uploads and attaches 1-3 images to posts                                                                                   |
+| `mention`    | Adds @mentions to other users                                                                                              |
+| `poll`       | Creates and attaches polls to posts                                                                                        |
+| `reaction`   | Adds 1-5 reactions from random users                                                                                       |
+| `comment`    | Adds 1-5 comments from random users                                                                                        |
+| `bookmark`   | Bookmarks posts by random users                                                                                            |
+| `repost`     | Creates reposts of existing activities                                                                                     |
 
 **Examples:**
 
@@ -134,11 +148,41 @@ yarn create-posts
 # Create posts with polls and reactions
 yarn create-posts --features poll,reaction
 
+# Create posts with links and hashtags (run create-hashtag-group first)
+yarn create-posts --features link,hashtags
+
 # Create posts with all content features
-yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
+yarn create-posts --features link,hashtags,attachment,mention,poll,reaction,comment,bookmark,repost
 ```
 
-> Note: Each feature has a probability of being included (not every post will have every enabled feature). Link and attachment are mutually exclusive per post.
+> Note: Each feature has a probability of being included (not every post will have every enabled feature). Link and attachment are mutually exclusive per post. The `hashtags` feature only applies when a link is added to a post.
+
+### Create location posts
+
+The `create-location-posts` script creates 4 activities and adds each to a randomly selected user's user feed:
+
+- **2 for Amsterdam** — `location`: lat `52.3676`, lng `4.9041`; text is a fun fact about Amsterdam.
+- **2 for Boulder, Colorado** — `location`: lat `40.015`, lng `-105.2705`; text is a fun fact about Boulder.
+
+Each activity has `location` set (lat, lng) and post text set to a fun fact about the city. If present, one image per post is read from `test-data-generator/images/location/amsterdam/` or `test-data-generator/images/location/boulder/` (`.jpg`, `.jpeg`, or `.png`), uploaded to Stream, and attached to the activity. Run after `create-users` (and optionally after `create-posts`).
+
+### Download Images flags
+
+The `download-images` script downloads 100 sample images (from picsum.photos) into `test-data-generator/images/`. By default it skips images that already exist.
+
+| Flag                           | Description                                                                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `--replace=N` or `--replace N` | Force re-download of specific image(s). `N` can be a single index (1–100) or comma-separated indices (e.g. `--replace=1,5,10`). |
+
+**Examples:**
+
+```bash
+# Re-download only image 42
+yarn download-images --replace=42
+
+# Re-download images 1, 5 and 10
+yarn download-images --replace 1,5,10
+```
 
 ## Local Setup
 

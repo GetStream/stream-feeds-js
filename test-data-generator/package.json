@@ -8,6 +8,11 @@
     "create-follows": "tsx src/create-follows.ts",
     "create-posts": "tsx src/create-posts.ts",
     "create-stories": "tsx src/create-stories.ts",
+    "create-premium-membership": "tsx src/create-premium-membership.ts",
+    "create-premium-members": "tsx src/create-premium-members.ts",
+    "create-premium-posts": "tsx src/create-premium-posts.ts",
+    "create-hashtag-group": "tsx src/create-hashtag-group.ts",
+    "create-location-posts": "tsx src/create-location-posts.ts",
     "download-images": "tsx src/download-images.ts"
   },
   "dependencies": {

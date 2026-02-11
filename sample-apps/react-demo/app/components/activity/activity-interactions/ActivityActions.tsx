@@ -1,6 +1,7 @@
 import {
   type ActivityResponse,
   FeedOwnCapability,
+  StreamFeed,
   useClientConnectedUser,
   useFeedsClient,
 } from '@stream-io/feeds-react-sdk';
@@ -17,6 +18,8 @@ export const ActivityActions = ({
   const client = useFeedsClient();
   const user = useClientConnectedUser();
 
+  const feed = client?.feed('user', activity.user.id);
+
   const canEdit =
     ownCapabilities.includes(FeedOwnCapability.UPDATE_ANY_ACTIVITY) ||
     (ownCapabilities.includes(FeedOwnCapability.UPDATE_OWN_ACTIVITY) && activity.user.id === user?.id);
@@ -30,7 +33,9 @@ export const ActivityActions = ({
 
   return (
     <ContentActions canEdit={canEdit} canDelete={canDelete} isModerated={isModerated} onDelete={deleteActivity}>
-      {(onClose, dialogElement) => <ActivityComposer activity={activity} onSave={onClose} portalContainer={dialogElement} />}
+      {(onClose, dialogElement) => feed && <StreamFeed feed={feed}>
+        <ActivityComposer activity={activity} onSave={onClose} portalContainer={dialogElement} />
+      </StreamFeed>}
     </ContentActions>
   );
 };

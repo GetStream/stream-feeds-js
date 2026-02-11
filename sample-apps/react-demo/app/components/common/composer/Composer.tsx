@@ -1,15 +1,20 @@
-import type { Attachment } from '@stream-io/feeds-react-sdk';
+import type { Attachment, Feed } from '@stream-io/feeds-react-sdk';
 import type { ReactNode } from 'react';
 import { useCallback, useState, useEffect, useRef } from 'react';
 import { LoadingIndicator } from '../../utility/LoadingIndicator';
 import { FileUpload } from './FileUpload';
 import { AttachmentPreviewList, type AttachmentPreviewListHandle } from '../attachments/AttachmentPreviewList';
 import { useMentionSuggestions } from './useMentionSuggestions';
+import { useHashtagSuggestions, type UseHashtagSuggestionsOptions } from './useHashtagSuggestions';
 import { useCaretPosition, type CaretPosition } from './useCaretPosition';
 import { MentionSuggestionList } from './MentionSuggestionList';
+import { HashtagSuggestionList } from './HashtagSuggestionList';
 import type { PollData } from '../../poll/PollComposerModal';
+import type { LocationData } from '../../activity/LocationModal';
 
 type ComposerVariant = 'activity' | 'comment';
+
+const EMPTY_HASHTAGS: Array<{ id: string; name: string }> = [];
 
 export type ComposerProps = {
   variant: ComposerVariant;
@@ -18,13 +23,18 @@ export type ComposerProps = {
   initialText?: string;
   initialAttachments?: Attachment[];
   initialMentionedUsers?: Array<{ id: string; name: string }>;
-  onSubmit: (text: string, attachments: Attachment[], mentionedUserIds: string[]) => Promise<void>;
+  initialSelectedHashtags?: Array<{ id: string; name: string }>;
+  onSubmit: (text: string, attachments: Attachment[], mentionedUserIds: string[], selectedHashtagIds: string[]) => Promise<void>;
   allowEmptyText?: boolean;
   portalContainer?: HTMLElement | null;
   rows?: number;
   children?: ReactNode;
   attachedPoll?: PollData | null;
   onRemovePoll?: () => void;
+  attachedLocation?: LocationData | null;
+  onRemoveLocation?: () => void;
+  enableHashtags?: boolean;
+  onCreateHashtag?: (name: string) => Promise<{ id: string; name: string } | void>;
 };
 
 export const Composer = ({
@@ -34,6 +44,7 @@ export const Composer = ({
   initialText = '',
   initialAttachments = [],
   initialMentionedUsers = [],
+  initialSelectedHashtags = EMPTY_HASHTAGS,
   onSubmit,
   allowEmptyText = false,
   portalContainer,
@@ -41,6 +52,10 @@ export const Composer = ({
   children,
   attachedPoll,
   onRemovePoll,
+  attachedLocation,
+  onRemoveLocation,
+  enableHashtags = false,
+  onCreateHashtag,
 }: ComposerProps) => {
   const [text, setText] = useState(initialText);
   const [completedAttachments, setCompletedAttachments] = useState<Attachment[]>(initialAttachments);
@@ -54,42 +69,65 @@ export const Composer = ({
   const { getCaretPosition } = useCaretPosition();
   const {
     mentionSession,
-    suggestions,
-    selectedIndex,
-    isLoading,
+    suggestions: mentionSuggestions,
+    selectedIndex: mentionSelectedIndex,
+    isLoading: mentionIsLoading,
     mentionedUsers,
-    handleTextChange,
-    handleKeyDown,
+    handleTextChange: handleMentionTextChange,
+    handleKeyDown: handleMentionKeyDown,
     selectUser,
     resetMentionedUsers,
-    setSelectedIndex,
+    setSelectedIndex: setMentionSelectedIndex,
     initializeMentionedUsers,
   } = useMentionSuggestions();
+
+  const hashtagOptions: UseHashtagSuggestionsOptions = { onCreateHashtag };
+  const {
+    hashtagSession,
+    suggestions: hashtagSuggestions,
+    selectedIndex: hashtagSelectedIndex,
+    isLoading: hashtagIsLoading,
+    isCreating: hashtagIsCreating,
+    createError: hashtagCreateError,
+    handleTextChange: handleHashtagTextChange,
+    handleKeyDown: handleHashtagKeyDown,
+    selectHashtag,
+    createHashtag,
+    selectedHashtags,
+    resetSelectedHashtags,
+    initializeSelectedHashtags,
+    setSelectedIndex: setHashtagSelectedIndex,
+  } = useHashtagSuggestions(enableHashtags ? hashtagOptions : {});
 
   useEffect(() => {
     setText(initialText);
     setCompletedAttachments(initialAttachments);
     initializeMentionedUsers(initialMentionedUsers);
-  }, [initialText, initialAttachments, initialMentionedUsers, initializeMentionedUsers]);
+    initializeSelectedHashtags(initialSelectedHashtags);
+  }, [initialText, initialAttachments, initialMentionedUsers, initializeMentionedUsers, initialSelectedHashtags, initializeSelectedHashtags]);
 
-  // Update caret position when mention session is active
+  // Update caret position when mention or hashtag session is active
   useEffect(() => {
     if (mentionSession.active && textareaRef.current) {
       const pos = getCaretPosition(textareaRef.current, mentionSession.triggerIndex);
       setCaretPosition(pos);
+    } else if (enableHashtags && hashtagSession.active && textareaRef.current) {
+      const pos = getCaretPosition(textareaRef.current, hashtagSession.triggerIndex);
+      setCaretPosition(pos);
     } else {
       setCaretPosition(null);
     }
-  }, [mentionSession.active, mentionSession.triggerIndex, getCaretPosition]);
+  }, [mentionSession.active, mentionSession.triggerIndex, hashtagSession.active, hashtagSession.triggerIndex, enableHashtags, getCaretPosition]);
 
   const handleSubmit = useCallback(async () => {
     setIsSubmitting(true);
     setError(undefined);
     try {
-      await onSubmit(text, completedAttachments, mentionedUsers.map((u) => u.id));
+      await onSubmit(text, completedAttachments, mentionedUsers.map((u) => u.id), selectedHashtags.map((h) => h.id));
       setText('');
       setCompletedAttachments([]);
       resetMentionedUsers();
+      resetSelectedHashtags();
       attachmentListRef.current?.reset();
     } catch (e) {
       setError(e as Error);
@@ -97,7 +135,7 @@ export const Composer = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [text, completedAttachments, mentionedUsers, onSubmit, resetMentionedUsers]);
+  }, [text, completedAttachments, mentionedUsers, selectedHashtags, onSubmit, resetMentionedUsers, resetSelectedHashtags]);
 
   const handleFileSelected = useCallback((files: File[]) => {
     attachmentListRef.current?.uploadFiles(files);
@@ -115,30 +153,45 @@ export const Composer = ({
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newText = e.target.value;
       setText(newText);
-      handleTextChange(newText, e.target.selectionStart ?? newText.length);
+      const cursorPos = e.target.selectionStart ?? newText.length;
+      handleMentionTextChange(newText, cursorPos);
+      if (enableHashtags) {
+        handleHashtagTextChange(newText, cursorPos);
+      }
     },
-    [handleTextChange],
+    [handleMentionTextChange, handleHashtagTextChange, enableHashtags],
   );
 
   const handleTextareaKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      handleKeyDown(e, text, setText);
+      if (mentionSession.active) {
+        handleMentionKeyDown(e, text, setText);
+      } else if (enableHashtags && hashtagSession.active) {
+        handleHashtagKeyDown(e, text, setText);
+      }
     },
-    [handleKeyDown, text],
+    [handleMentionKeyDown, handleHashtagKeyDown, text, mentionSession.active, hashtagSession.active, enableHashtags],
   );
 
   const handleTextareaClick = useCallback(() => {
     if (textareaRef.current) {
-      handleTextChange(text, textareaRef.current.selectionStart ?? text.length);
+      const cursorPos = textareaRef.current.selectionStart ?? text.length;
+      handleMentionTextChange(text, cursorPos);
+      if (enableHashtags) {
+        handleHashtagTextChange(text, cursorPos);
+      }
     }
-  }, [handleTextChange, text]);
+  }, [handleMentionTextChange, handleHashtagTextChange, text, enableHashtags]);
 
   const handleTextareaKeyUp = useCallback(() => {
-    // Re-check mention detection on cursor movement
     if (textareaRef.current) {
-      handleTextChange(text, textareaRef.current.selectionStart ?? text.length);
+      const cursorPos = textareaRef.current.selectionStart ?? text.length;
+      handleMentionTextChange(text, cursorPos);
+      if (enableHashtags) {
+        handleHashtagTextChange(text, cursorPos);
+      }
     }
-  }, [handleTextChange, text]);
+  }, [handleMentionTextChange, handleHashtagTextChange, text, enableHashtags]);
 
   const handleSelectUser = useCallback(
     (user: Parameters<typeof selectUser>[0]) => {
@@ -147,6 +200,25 @@ export const Composer = ({
       textareaRef.current?.focus();
     },
     [selectUser, text],
+  );
+
+  const handleSelectHashtag = useCallback(
+    (feed: Feed) => {
+      const newText = selectHashtag(feed, text);
+      setText(newText);
+      textareaRef.current?.focus();
+    },
+    [selectHashtag, text],
+  );
+
+  const handleCreateHashtag = useCallback(
+    (name: string) => {
+      createHashtag(name, text).then((newText) => {
+        setText(newText);
+        textareaRef.current?.focus();
+      });
+    },
+    [createHashtag, text],
   );
 
   const isComment = variant === 'comment';
@@ -171,12 +243,27 @@ export const Composer = ({
         />
         {mentionSession.active && (
           <MentionSuggestionList
-            suggestions={suggestions}
-            selectedIndex={selectedIndex}
-            isLoading={isLoading}
+            suggestions={mentionSuggestions}
+            selectedIndex={mentionSelectedIndex}
+            isLoading={mentionIsLoading}
             caretPosition={caretPosition}
             onSelect={handleSelectUser}
-            onHover={setSelectedIndex}
+            onHover={setMentionSelectedIndex}
+            portalContainer={portalContainer}
+          />
+        )}
+        {enableHashtags && hashtagSession.active && hashtagSession.query.length > 0 && !mentionSession.active && (
+          <HashtagSuggestionList
+            suggestions={hashtagSuggestions}
+            selectedIndex={hashtagSelectedIndex}
+            isLoading={hashtagIsLoading}
+            isCreating={hashtagIsCreating}
+            createError={hashtagCreateError}
+            query={hashtagSession.query}
+            caretPosition={caretPosition}
+            onSelect={handleSelectHashtag}
+            onCreateHashtag={handleCreateHashtag}
+            onHover={setHashtagSelectedIndex}
             portalContainer={portalContainer}
           />
         )}
@@ -190,19 +277,39 @@ export const Composer = ({
       />
       {attachedPoll && (
         <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
-          <span className="material-symbols-outlined text-primary text-xl">ballot</span>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium truncate">{attachedPoll.name}</div>
+          <span className="material-symbols-outlined text-primary text-xl shrink-0">ballot</span>
+          <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="text-sm font-medium break-words">{attachedPoll.name}</div>
+            {attachedPoll.description && (
+              <div className="text-xs text-base-content/70 break-words">{attachedPoll.description}</div>
+            )}
             <div className="text-xs text-base-content/60">
               {attachedPoll.options.length} options
               {!attachedPoll.enforce_unique_vote && ' · Multiple votes allowed'}
+              {attachedPoll.allow_user_suggested_options && ' · Voters can suggest options'}
             </div>
           </div>
           <button
             type="button"
-            className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error"
+            className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error shrink-0"
             onClick={onRemovePoll}
             aria-label="Remove poll"
+          >
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+      )}
+      {attachedLocation && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
+          <span className="material-symbols-outlined text-primary text-xl shrink-0">location_on</span>
+          <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="text-sm font-medium break-words">{attachedLocation.city}</div>
+          </div>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error shrink-0"
+            onClick={onRemoveLocation}
+            aria-label="Remove location"
           >
             <span className="material-symbols-outlined text-xl">close</span>
           </button>

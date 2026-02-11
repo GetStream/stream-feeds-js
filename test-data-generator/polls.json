@@ -5,7 +5,7 @@
     "voting_visibility": "public",
     "enforce_unique_vote": true,
     "max_votes_allowed": 1,
-    "allow_user_suggested_options": false,
+    "allow_user_suggested_options": true,
     "allow_answers": true,
     "options": [
       { "text": "Relaxing at home" },
