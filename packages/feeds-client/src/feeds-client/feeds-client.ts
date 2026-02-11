@@ -352,17 +352,16 @@ export class FeedsClient extends FeedsApi {
 
   public hydratePollCache(activities: ActivityResponse[]) {
     for (const activity of activities) {
-      if (!activity.poll) {
-        continue;
-      }
-      const pollResponse = activity.poll;
-      const pollFromCache = this.pollFromState(pollResponse.id);
-      if (!pollFromCache) {
-        const poll = new StreamPoll({ client: this, poll: pollResponse });
-        this.polls_by_id.set(poll.id, poll);
-      } else {
-        pollFromCache.reinitializeState(pollResponse);
-      }
+      const polls = [activity.poll, activity.parent?.poll].filter((p) => !!p);
+      polls.forEach((pollResponse) => {
+        const pollFromCache = this.pollFromState(pollResponse.id);
+        if (!pollFromCache) {
+          const poll = new StreamPoll({ client: this, poll: pollResponse });
+          this.polls_by_id.set(poll.id, poll);
+        } else {
+          pollFromCache.reinitializeState(pollResponse);
+        }
+      });
     }
   }
 
