@@ -14,8 +14,9 @@ import { NavLink } from '../../components/utility/NavLink';
 import { ActivityList } from '../../components/activity/ActivityList';
 import { ProfilePageSkeleton } from '../../components/utility/loading-skeletons/ProfilePageSkeleton';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ToggleFollowButton } from '@/app/components/ToggleFollowButton';
+import { FollowListModal, type FollowListModalHandle } from '@/app/components/FollowListModal';
 
 const userFeedSelector = (state: FeedState) => ({
   // Don't count your own timeline in following feeds
@@ -83,6 +84,14 @@ export default function Profile() {
 
   const { activities, is_loading: isTimelineLoading } = useFeedActivities(feed);
 
+  const [modalType, setModalType] = useState<'followers' | 'following'>('followers');
+  const modalRef = useRef<FollowListModalHandle>(null);
+
+  const openModal = (type: 'followers' | 'following') => {
+    setModalType(type);
+    modalRef.current?.open();
+  };
+
   const isProfileLoading = userId && !feed || (isTimelineLoading && activities?.length === 0);
 
   if (isProfileLoading) {
@@ -100,11 +109,11 @@ export default function Profile() {
           <div className="stat-title">Posts</div>
           <div className="stat-value text-primary">{activityCount}</div>
         </div>
-        <div className="stat">
+        <div className="stat cursor-pointer hover:bg-base-200" onClick={() => openModal('followers')}>
           <div className="stat-title">Followers</div>
           <div className="stat-value text-primary">{followerCount}</div>
         </div>
-        <div className="stat">
+        <div className="stat cursor-pointer hover:bg-base-200" onClick={() => openModal('following')}>
           <div className="stat-title">Following</div>
           <div className="stat-value text-primary">{followingCount}</div>
         </div>
@@ -125,6 +134,15 @@ export default function Profile() {
         <StreamFeed feed={feed}>
           <ActivityList location="profile" error={error} />
         </StreamFeed>
+      )}
+      {feed && timeline && (
+        <FollowListModal
+          ref={modalRef}
+          type={modalType}
+          feed={modalType === 'followers' ? feed : timeline}
+          currentUserId={currentUser?.id}
+          isOwnProfile={isOwnProfile}
+        />
       )}
     </div>
   );
