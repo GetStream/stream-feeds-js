@@ -6,6 +6,7 @@ import { Composer } from '../common/composer/Composer';
 import { isOGAttachment } from '../common/attachments/is-og-attachment';
 import { Activity } from './Activity';
 import { PollComposerModal, type PollData, type PollComposerModalHandle } from '../poll/PollComposerModal';
+import { ActivitySettingsModal, type RestrictRepliesValue, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
 
 export const ActivityComposer = ({
   activity,
@@ -28,7 +29,9 @@ export const ActivityComposer = ({
   const [initialAttachments, setInitialAttachments] = useState<Attachment[]>([]);
   const [initialMentionedUsers, setInitialMentionedUsers] = useState<Array<{ id: string; name: string }>>([]);
   const [attachedPoll, setAttachedPoll] = useState<PollData | null>(null);
+  const [restrictReplies, setRestrictReplies] = useState<RestrictRepliesValue>('everyone');
   const pollModalRef = useRef<PollComposerModalHandle>(null);
+  const settingsModalRef = useRef<ActivitySettingsModalHandle>(null);
   const existingPollIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -36,6 +39,7 @@ export const ActivityComposer = ({
       setInitialText(activity.text ?? '');
       setInitialAttachments(activity.attachments.filter((a) => !isOGAttachment(a)) ?? []);
       setInitialMentionedUsers(activity.mentioned_users?.map((u) => ({ id: u.id, name: u.name || u.id })) ?? []);
+      setRestrictReplies(activity.restrict_replies ?? 'everyone');
       if (activity.poll) {
         existingPollIdRef.current = activity.poll.id;
         setAttachedPoll({
@@ -70,6 +74,14 @@ export const ActivityComposer = ({
     pollModalRef.current?.open();
   }, []);
 
+  const handleOpenSettingsModal = useCallback(() => {
+    settingsModalRef.current?.open();
+  }, []);
+
+  const handleSettingsSave = useCallback((value: RestrictRepliesValue) => {
+    setRestrictReplies(value);
+  }, []);
+
   const handleSubmit = useCallback(
     async (text: string, attachments: Attachment[], mentionedUserIds: string[]) => {
       let pollId: string | undefined;
@@ -94,6 +106,7 @@ export const ActivityComposer = ({
             attachments,
             mentioned_user_ids: mentionedUserIds,
             parent_id: parent?.id,
+            restrict_replies: restrictReplies,
             ...(pollId && { poll_id: pollId }),
           },
           ...(removedExistingPoll && { unset: ['poll_id'] }),
@@ -108,14 +121,17 @@ export const ActivityComposer = ({
           mentioned_user_ids: mentionedUserIds,
           parent_id: parent?.id,
           poll_id: pollId,
+          restrict_replies: restrictReplies,
         });
+        // Reset restrict_replies to default only for new posts
+        setRestrictReplies('everyone');
       }
 
       // Clear attached poll after successful submission
       setAttachedPoll(null);
       onSave?.();
     },
-    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll],
+    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, restrictReplies],
   );
 
   return (
@@ -151,8 +167,25 @@ export const ActivityComposer = ({
         >
           <span className="material-symbols-outlined text-xl">ballot</span>
         </button>
+        {!parent && (
+          <button
+            type="button"
+            className="w-9 h-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-primary transition-colors"
+            onClick={handleOpenSettingsModal}
+            aria-label="Post settings"
+          >
+            <span className="material-symbols-outlined text-xl">settings</span>
+          </button>
+        )}
       </Composer>
       <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
+      {!parent && (
+        <ActivitySettingsModal
+          ref={settingsModalRef}
+          initialValue={restrictReplies}
+          onSave={handleSettingsSave}
+        />
+      )}
     </div>
   );
 };
