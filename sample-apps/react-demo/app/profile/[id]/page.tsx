@@ -4,6 +4,7 @@ import type { Feed, FeedState } from '@stream-io/feeds-react-sdk';
 import {
   StreamFeed,
   useClientConnectedUser,
+  useFeedActivities,
   useFeedsClient,
   useStateStore,
 } from '@stream-io/feeds-react-sdk';
@@ -80,7 +81,9 @@ export default function Profile() {
     followingCount: 0,
   };
 
-  const isProfileLoading = userId && !feed;
+  const { activities, is_loading: isTimelineLoading } = useFeedActivities(feed);
+
+  const isProfileLoading = userId && !feed || (isTimelineLoading && activities?.length === 0);
 
   if (isProfileLoading) {
     return <ProfilePageSkeleton />;

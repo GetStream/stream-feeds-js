@@ -245,16 +245,16 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
                   {/* Option content */}
                   <div className="relative flex items-center justify-between p-3 gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      {isClosed && hasWinner && winnerOptionIds.includes(option.id) && (
-                        <span className="material-symbols-outlined text-base-content text-lg shrink-0">
-                          check_circle
-                        </span>
-                      )}
                       <span
                         className={`truncate ${hasVoted ? 'font-medium' : ''}`}
                       >
                         {option.text}
                       </span>
+                      {isClosed && hasWinner && winnerOptionIds.includes(option.id) && (
+                        <span className="material-symbols-outlined text-base-content text-[1.2rem]! shrink-0" title="Winner">
+                          trophy
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0 text-sm text-base-content/70">
                       <span className="tabular-nums">{percentage}%</span>
