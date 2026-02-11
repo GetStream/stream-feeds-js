@@ -1,4 +1,5 @@
 import type { Attachment } from '@stream-io/feeds-react-sdk';
+import type { ReactNode } from 'react';
 import { useCallback, useState, useEffect, useRef } from 'react';
 import { LoadingIndicator } from '../../utility/LoadingIndicator';
 import { FileUpload } from './FileUpload';
@@ -6,6 +7,7 @@ import { AttachmentPreviewList, type AttachmentPreviewListHandle } from '../atta
 import { useMentionSuggestions } from './useMentionSuggestions';
 import { useCaretPosition, type CaretPosition } from './useCaretPosition';
 import { MentionSuggestionList } from './MentionSuggestionList';
+import type { PollData } from '../../poll/PollComposerModal';
 
 type ComposerVariant = 'activity' | 'comment';
 
@@ -20,6 +22,9 @@ export type ComposerProps = {
   allowEmptyText?: boolean;
   portalContainer?: HTMLElement | null;
   rows?: number;
+  children?: ReactNode;
+  attachedPoll?: PollData | null;
+  onRemovePoll?: () => void;
 };
 
 export const Composer = ({
@@ -33,6 +38,9 @@ export const Composer = ({
   allowEmptyText = false,
   portalContainer,
   rows,
+  children,
+  attachedPoll,
+  onRemovePoll,
 }: ComposerProps) => {
   const [text, setText] = useState(initialText);
   const [completedAttachments, setCompletedAttachments] = useState<Attachment[]>(initialAttachments);
@@ -180,17 +188,40 @@ export const Composer = ({
         onHasInFlightUploadsChange={handleHasInFlightUploadsChange}
         size="small"
       />
+      {attachedPoll && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
+          <span className="material-symbols-outlined text-primary text-xl">ballot</span>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium truncate">{attachedPoll.name}</div>
+            <div className="text-xs text-base-content/60">
+              {attachedPoll.options.length} options
+              {!attachedPoll.enforce_unique_vote && ' · Multiple votes allowed'}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error"
+            onClick={onRemovePoll}
+            aria-label="Remove poll"
+          >
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+      )}
       {error && (
         <div className="text-sm text-error">
           Failed to save: {error.message}
         </div>
       )}
       <div className="w-full flex justify-between items-center">
-        <FileUpload
-          onFileSelected={handleFileSelected}
-          multiple={true}
-          className="w-9 h-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-primary transition-colors"
-        />
+        <div className="flex items-center gap-1">
+          <FileUpload
+            onFileSelected={handleFileSelected}
+            multiple={true}
+            className="w-9 h-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-primary transition-colors"
+          />
+          {children}
+        </div>
         <button
           className={`
             px-4 py-1.5 rounded-full font-bold text-[15px]

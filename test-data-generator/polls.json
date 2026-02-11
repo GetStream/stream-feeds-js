@@ -1,65 +1,74 @@
 [
   {
-    "name": "XY1",
-    "description": "",
+    "name": "Best weekend plan?",
+    "description": "What are you up to this weekend?",
     "voting_visibility": "public",
-    "enforce_unique_vote": false,
-    "max_votes_allowed": 2,
+    "enforce_unique_vote": true,
+    "max_votes_allowed": 1,
     "allow_user_suggested_options": false,
     "allow_answers": true,
     "options": [
-      {
-        "text": "A"
-      },
-      {
-        "text": "B"
-      },
-      {
-        "text": "C"
-      },
-      {
-        "text": "D"
-      }
+      { "text": "Relaxing at home" },
+      { "text": "Going out with friends" },
+      { "text": "Outdoor adventure" },
+      { "text": "Catching up on work" }
     ]
   },
   {
-    "name": "XY2",
+    "name": "Coffee or tea?",
     "description": "",
     "voting_visibility": "public",
     "enforce_unique_vote": true,
     "max_votes_allowed": 1,
-    "allow_user_suggested_options": true,
+    "allow_user_suggested_options": false,
     "allow_answers": false,
     "options": [
-      {
-        "text": "A"
-      },
-      {
-        "text": "B"
-      },
-      {
-        "text": "C"
-      },
-      {
-        "text": "D"
-      }
+      { "text": "Coffee" },
+      { "text": "Tea" },
+      { "text": "Both, depends on the day" },
+      { "text": "Neither" }
     ]
   },
   {
-    "name": "XY3",
+    "name": "Remote vs office",
+    "description": "What's your ideal setup?",
+    "voting_visibility": "anonymous",
+    "enforce_unique_vote": true,
+    "max_votes_allowed": 1,
+    "allow_user_suggested_options": false,
+    "allow_answers": false,
+    "options": [
+      { "text": "Fully remote" },
+      { "text": "Fully in office" },
+      { "text": "Hybrid" }
+    ]
+  },
+  {
+    "name": "Morning person or night owl?",
     "description": "",
     "voting_visibility": "public",
     "enforce_unique_vote": true,
     "max_votes_allowed": 1,
-    "allow_user_suggested_options": true,
+    "allow_user_suggested_options": false,
     "allow_answers": true,
     "options": [
-      {
-        "text": "A"
-      },
-      {
-        "text": "B"
-      }
+      { "text": "Morning person" },
+      { "text": "Night owl" },
+      { "text": "Somewhere in between" }
+    ]
+  },
+  {
+    "name": "Pineapple on pizza?",
+    "description": "The eternal question",
+    "voting_visibility": "public",
+    "enforce_unique_vote": true,
+    "max_votes_allowed": 1,
+    "allow_user_suggested_options": false,
+    "allow_answers": true,
+    "options": [
+      { "text": "Yes, absolutely" },
+      { "text": "No way" },
+      { "text": "I'll try anything once" }
     ]
   }
 ]

@@ -135,14 +135,17 @@ export class StreamPoll {
       this.client.state.getLatestValue().connected_user?.id;
     let latestAnswers = [...currentState.latest_answers];
     let ownAnswer = currentState.own_answer;
-    const ownVotesByOptionId = currentState.own_votes_by_option_id;
+    let ownVotesByOptionId = currentState.own_votes_by_option_id;
     let maxVotedOptionIds = currentState.max_voted_option_ids;
 
     if (isOwnVote) {
       if (isVoteAnswer(event.poll_vote)) {
         ownAnswer = event.poll_vote;
       } else if (event.poll_vote.option_id) {
-        ownVotesByOptionId[event.poll_vote.option_id] = event.poll_vote;
+        ownVotesByOptionId = {
+          ...ownVotesByOptionId,
+          [event.poll_vote.option_id]: event.poll_vote,
+        };
       }
     }
 

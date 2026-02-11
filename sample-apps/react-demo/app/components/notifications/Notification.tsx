@@ -22,7 +22,8 @@ export const Notification = ({
     const targetActivity = notification.group.includes('follow')
       ? undefined
       : notification.activities[0].notification_context?.target;
-    const activityText = targetActivity ? (targetActivity.text ? `"${truncateText(targetActivity.text)}"` : 'repost') : '';
+    let activityText = targetActivity ? (targetActivity.text ?? targetActivity.parent_activity?.text) : '';
+    activityText = activityText ? `"${truncateText(activityText)}"` : '';
 
     let notificationContent: React.ReactNode;
     switch (action) {
