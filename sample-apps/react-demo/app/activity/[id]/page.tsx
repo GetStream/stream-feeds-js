@@ -8,6 +8,7 @@ import { CommentComposer } from '@/app/components/comments/CommentComposer';
 import { CommentList } from '@/app/components/comments/CommentList';
 import { ErrorCard } from '@/app/components/utility/ErrorCard';
 import { ActivityDetailsPageSkeleton } from '@/app/components/utility/loading-skeletons/ActivityDetailsPageSkeleton';
+import { PollDisplay } from '@/app/components/poll/PollDisplay';
 import {
   StreamActivityWithStateUpdates,
   useFeedsClient,
@@ -73,6 +74,9 @@ export default function ActivityPage() {
       <div className="flex-shrink-0 flex flex-col gap-4">
         <ActivityHeader activity={activity} withActions={true} />
         <ActivityContent activity={activity} />
+        {activity.poll && (
+          <PollDisplay poll={activity.poll} activity={activity} />
+        )}
         <ActivityParent activity={activity} />
         <ActivityInteractions activity={activity} />
         <div className="text-lg font-semibold">Comments</div>

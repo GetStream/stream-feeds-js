@@ -4,6 +4,7 @@ import { ActivityInteractions } from './activity-interactions/ActivityInteractio
 import { ActivityContent } from './ActivityContent';
 import { ActivityParent } from './ActivityParent';
 import { NavLink } from '../utility/NavLink';
+import { PollDisplay } from '../poll/PollDisplay';
 
 export const Activity = ({
   activity,
@@ -22,6 +23,9 @@ export const Activity = ({
         withActions={location === 'timeline' || location === 'profile'}
       />
       <ActivityContent activity={activity} withoutInteractions={location === 'preview'} />
+      {activity.poll && (
+        <PollDisplay poll={activity.poll} activity={activity} />
+      )}
       {activity?.parent ? (
         location === 'preview' ? (
           <ActivityParent activity={activity} />
