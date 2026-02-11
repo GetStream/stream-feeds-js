@@ -15,6 +15,27 @@ const IMAGE_SIZE = 1000;
 const IMAGES_DIR = path.join(dataDir, 'images');
 const CONCURRENCY = 5; // Number of concurrent downloads
 
+// Parse --replace=N or --replace N to force re-download specific image(s)
+function parseReplaceIndices(): Set<number> {
+  const indices = new Set<number>();
+  const args = process.argv.slice(2);
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    const eq = arg.indexOf('=');
+    const value = eq >= 0 ? arg.slice(eq + 1) : args[i + 1];
+    if (arg === '--replace' || (eq >= 0 && arg.slice(0, eq) === '--replace')) {
+      const parsed = value.split(',').map((s) => parseInt(s.trim(), 10));
+      parsed.forEach((n) => {
+        if (!Number.isNaN(n) && n >= 1 && n <= TOTAL_IMAGES) indices.add(n);
+      });
+      if (eq < 0) i++;
+    }
+  }
+  return indices;
+}
+
+const REPLACE_INDICES = parseReplaceIndices();
+
 // Create images directory if it doesn't exist
 if (!fs.existsSync(IMAGES_DIR)) {
   fs.mkdirSync(IMAGES_DIR, { recursive: true });
@@ -28,8 +49,14 @@ function downloadImage(index: number): Promise<string> {
       `image-${String(index).padStart(4, '0')}.jpg`,
     );
 
-    // Skip if file already exists
-    if (fs.existsSync(filename)) {
+    const forceReplace = REPLACE_INDICES.has(index);
+    if (forceReplace && fs.existsSync(filename)) {
+      fs.unlinkSync(filename);
+      console.log(`[${index}/${TOTAL_IMAGES}] Removed (will replace): ${path.basename(filename)}`);
+    }
+
+    // Skip if file already exists (and not forcing replace)
+    if (!forceReplace && fs.existsSync(filename)) {
       console.log(
         `[${index}/${TOTAL_IMAGES}] Skipped (already exists): ${path.basename(filename)}`,
       );
@@ -132,6 +159,11 @@ async function downloadAllImages(): Promise<void> {
   );
   console.log(`Images will be saved to: ${IMAGES_DIR}`);
   console.log(`Concurrency: ${CONCURRENCY}`);
+  if (REPLACE_INDICES.size > 0) {
+    console.log(
+      `Replace mode: will re-download image(s): ${[...REPLACE_INDICES].sort((a, b) => a - b).join(', ')}`,
+    );
+  }
   console.log('---');
 
   const startTime = Date.now();
