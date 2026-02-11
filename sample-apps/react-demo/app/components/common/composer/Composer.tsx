@@ -190,9 +190,9 @@ export const Composer = ({
       />
       {attachedPoll && (
         <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
-          <span className="material-symbols-outlined text-primary text-xl">ballot</span>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium truncate">{attachedPoll.name}</div>
+          <span className="material-symbols-outlined text-primary text-xl shrink-0">ballot</span>
+          <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="text-sm font-medium break-words">{attachedPoll.name}</div>
             <div className="text-xs text-base-content/60">
               {attachedPoll.options.length} options
               {!attachedPoll.enforce_unique_vote && ' · Multiple votes allowed'}
@@ -200,7 +200,7 @@ export const Composer = ({
           </div>
           <button
             type="button"
-            className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error"
+            className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error shrink-0"
             onClick={onRemovePoll}
             aria-label="Remove poll"
           >

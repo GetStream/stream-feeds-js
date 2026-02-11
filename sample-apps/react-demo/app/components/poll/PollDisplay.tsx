@@ -251,9 +251,9 @@ export const PollDisplay = ({ poll, activity, withoutInteractions = false }: Pol
 
                   {/* Option content */}
                   <div className="relative flex items-center justify-between p-3 gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0 overflow-hidden">
                       <span
-                        className={`truncate ${hasVoted ? 'font-medium' : ''}`}
+                        className={`break-words ${hasVoted ? 'font-medium' : ''}`}
                       >
                         {option.text}
                       </span>
