@@ -38,18 +38,22 @@ export const PollDisplay = ({ poll, activity }: PollDisplayProps) => {
 
   const pollState = useStateStore(pollInstance?.state, pollStateSelector);
 
-  const isClosed = pollState?.is_closed ?? false;
-  const enforceUniqueVote = pollState?.enforce_unique_vote ?? true;
-  const isOwner = currentUser?.id === (pollState?.created_by_id);
-  const options = pollState?.options;
-  const pollName = pollState?.name;
+  // Fall back to poll data from props when poll is not in state store (e.g. reposted activity's poll)
+  const isClosed = pollState?.is_closed ?? poll.is_closed ?? false;
+  const enforceUniqueVote = pollState?.enforce_unique_vote ?? poll.enforce_unique_vote ?? true;
+  const isOwner = currentUser?.id === (pollState?.created_by_id ?? poll.created_by_id);
+  const options = pollState?.options ?? poll.options;
+  const pollName = pollState?.name ?? poll.name;
 
   const ownVotes = useMemo(
-    () => Object.keys(pollState?.own_votes_by_option_id ?? {}),
-    [pollState?.own_votes_by_option_id]
+    () =>
+      Object.keys(pollState?.own_votes_by_option_id ?? {}).length > 0
+        ? Object.keys(pollState?.own_votes_by_option_id ?? {})
+        : (poll.own_votes?.map((v) => v.option_id) ?? []),
+    [pollState?.own_votes_by_option_id, poll.own_votes]
   );
 
-  const voteCounts = pollState?.vote_counts_by_option ?? {};
+  const voteCounts = pollState?.vote_counts_by_option ?? poll.vote_counts_by_option ?? {};
 
   type OptimisticUpdate = {
     optionId: string;
