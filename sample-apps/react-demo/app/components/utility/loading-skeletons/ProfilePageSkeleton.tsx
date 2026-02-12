@@ -25,6 +25,12 @@ export const ProfilePageSkeleton = () => (
           <div className="h-8 w-8 bg-base-300 rounded" />
         </div>
       </div>
+      <div className="stat">
+        <div className="stat-title">Members</div>
+        <div className="stat-value">
+          <div className="h-8 w-8 bg-base-300 rounded" />
+        </div>
+      </div>
     </div>
     <div className="w-full">
       <ActivitySkeleton />

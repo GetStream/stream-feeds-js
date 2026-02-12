@@ -13,7 +13,6 @@ export const Activity = ({
   activity: ActivityResponse;
   location: 'timeline' | 'profile' | 'foryou' | 'preview' | 'search';
 }) => {
-
   return (
     <article className="w-full flex flex-col gap-1">
       <ActivityHeader

@@ -6,7 +6,7 @@ import { Composer } from '../common/composer/Composer';
 import { isOGAttachment } from '../common/attachments/is-og-attachment';
 import { Activity } from './Activity';
 import { PollComposerModal, type PollData, type PollComposerModalHandle } from '../poll/PollComposerModal';
-import { ActivitySettingsModal, type RestrictRepliesValue, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
+import { ActivitySettingsModal, type ActivitySettings, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
 
 export const ActivityComposer = ({
   activity,
@@ -29,7 +29,7 @@ export const ActivityComposer = ({
   const [initialAttachments, setInitialAttachments] = useState<Attachment[]>([]);
   const [initialMentionedUsers, setInitialMentionedUsers] = useState<Array<{ id: string; name: string }>>([]);
   const [attachedPoll, setAttachedPoll] = useState<PollData | null>(null);
-  const [restrictReplies, setRestrictReplies] = useState<RestrictRepliesValue>('everyone');
+  const [activitySettings, setActivitySettings] = useState<ActivitySettings>({ restrictReplies: 'everyone', premiumOnly: false });
   const pollModalRef = useRef<PollComposerModalHandle>(null);
   const settingsModalRef = useRef<ActivitySettingsModalHandle>(null);
   const existingPollIdRef = useRef<string | null>(null);
@@ -39,7 +39,10 @@ export const ActivityComposer = ({
       setInitialText(activity.text ?? '');
       setInitialAttachments(activity.attachments.filter((a) => !isOGAttachment(a)) ?? []);
       setInitialMentionedUsers(activity.mentioned_users?.map((u) => ({ id: u.id, name: u.name || u.id })) ?? []);
-      setRestrictReplies(activity.restrict_replies ?? 'everyone');
+      setActivitySettings({
+        restrictReplies: activity.restrict_replies ?? 'everyone',
+        premiumOnly: activity.visibility === 'tag' && activity.visibility_tag === 'activity-visibility',
+      });
       if (activity.poll) {
         existingPollIdRef.current = activity.poll.id;
         setAttachedPoll({
@@ -78,8 +81,8 @@ export const ActivityComposer = ({
     settingsModalRef.current?.open();
   }, []);
 
-  const handleSettingsSave = useCallback((value: RestrictRepliesValue) => {
-    setRestrictReplies(value);
+  const handleSettingsSave = useCallback((value: ActivitySettings) => {
+    setActivitySettings(value);
   }, []);
 
   const handleSubmit = useCallback(
@@ -97,8 +100,16 @@ export const ActivityComposer = ({
         pollId = pollResponse.poll.id;
       }
 
+      const visibilityFields = activitySettings.premiumOnly
+        ? { visibility: 'tag' as const, visibility_tag: 'premium' }
+        : { visibility: 'public' as const };
+
       if (activity?.id) {
         const removedExistingPoll = hadExistingPoll && !attachedPoll;
+        const unsetFields: string[] = [];
+        if (removedExistingPoll) unsetFields.push('poll_id');
+        if (!activitySettings.premiumOnly) unsetFields.push('visibility_tag');
+
         await client?.updateActivityPartial({
           id: activity.id,
           set: {
@@ -106,10 +117,11 @@ export const ActivityComposer = ({
             attachments,
             mentioned_user_ids: mentionedUserIds,
             parent_id: parent?.id,
-            restrict_replies: restrictReplies,
+            restrict_replies: activitySettings.restrictReplies,
+            ...visibilityFields,
             ...(pollId && { poll_id: pollId }),
           },
-          ...(removedExistingPoll && { unset: ['poll_id'] }),
+          ...(unsetFields.length > 0 && { unset: unsetFields }),
           handle_mention_notifications: true,
         });
       } else {
@@ -121,17 +133,18 @@ export const ActivityComposer = ({
           mentioned_user_ids: mentionedUserIds,
           parent_id: parent?.id,
           poll_id: pollId,
-          restrict_replies: restrictReplies,
+          restrict_replies: activitySettings.restrictReplies,
+          ...visibilityFields,
         });
-        // Reset restrict_replies to default only for new posts
-        setRestrictReplies('everyone');
+        // Reset settings to default only for new posts
+        setActivitySettings({ restrictReplies: 'everyone', premiumOnly: false });
       }
 
       // Clear attached poll after successful submission
       setAttachedPoll(null);
       onSave?.();
     },
-    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, restrictReplies],
+    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, activitySettings],
   );
 
   return (
@@ -182,7 +195,7 @@ export const ActivityComposer = ({
       {!parent && (
         <ActivitySettingsModal
           ref={settingsModalRef}
-          initialValue={restrictReplies}
+          initialValue={activitySettings}
           onSave={handleSettingsSave}
         />
       )}

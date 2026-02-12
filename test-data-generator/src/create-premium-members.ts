@@ -51,6 +51,17 @@ async function main(): Promise<void> {
 
   const client = new StreamClient(key, secret, { basePath: url });
 
+  // Workaround for WS fan-out logic: add owner as premium member on every user feed.
+  console.log(`Adding each feed owner as premium member of their own feed (${users.length} users)...`);
+  for (const user of users) {
+    const userFeed = client.feeds.feed('user', user.id);
+    await userFeed.updateFeedMembers({
+      operation: 'upsert',
+      members: [{ user_id: user.id, membership_level: 'premium' }],
+    });
+  }
+  console.log('Done adding owners as premium members.');
+
   const shuffled = shuffleArray(users);
   const targetUsers = shuffled.slice(0, TARGET_USER_COUNT);
 
@@ -66,17 +77,24 @@ async function main(): Promise<void> {
     );
     const membersToAdd = shuffleArray(otherUsers).slice(0, memberCount);
 
+    // Owner already added above; include again in upsert so these feeds have owner + extra members
+    const allMembers = [
+      { user_id: targetUser.id, membership_level: 'premium' as const },
+      ...membersToAdd.map((u) => ({
+        user_id: u.id,
+        membership_level: 'premium' as const,
+      })),
+    ];
+
     const userFeed = client.feeds.feed('user', targetUser.id);
     await userFeed.updateFeedMembers({
       operation: 'upsert',
-      members: membersToAdd.map((u) => ({
-        user_id: u.id,
-        membership_level: 'premium',
-      })),
+      members: allMembers,
     });
 
+    const memberIds = allMembers.map((m) => m.user_id);
     console.log(
-      `  user:${targetUser.id}: added ${memberCount} premium member(s): ${membersToAdd.map((u) => u.id).join(', ')}`,
+      `  user:${targetUser.id}: added ${allMembers.length} premium member(s) (including owner): ${memberIds.join(', ')}`,
     );
   }
 

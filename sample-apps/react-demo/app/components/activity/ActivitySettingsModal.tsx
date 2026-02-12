@@ -2,14 +2,19 @@ import { useCallback, useRef, useState, forwardRef, useImperativeHandle, useEffe
 
 export type RestrictRepliesValue = 'everyone' | 'people_i_follow' | 'nobody';
 
+export type ActivitySettings = {
+  restrictReplies: RestrictRepliesValue;
+  premiumOnly: boolean;
+};
+
 export type ActivitySettingsModalHandle = {
   open: () => void;
   close: () => void;
 };
 
 type ActivitySettingsModalProps = {
-  initialValue?: RestrictRepliesValue;
-  onSave: (value: RestrictRepliesValue) => void;
+  initialValue?: ActivitySettings;
+  onSave: (value: ActivitySettings) => void;
   onCancel?: () => void;
 };
 
@@ -39,17 +44,22 @@ const OPTIONS: Array<{
   },
 ];
 
+const DEFAULT_SETTINGS: ActivitySettings = { restrictReplies: 'everyone', premiumOnly: false };
+
 export const ActivitySettingsModal = forwardRef<ActivitySettingsModalHandle, ActivitySettingsModalProps>(
-  ({ initialValue = 'everyone', onSave, onCancel }, ref) => {
+  ({ initialValue = DEFAULT_SETTINGS, onSave, onCancel }, ref) => {
     const dialogRef = useRef<HTMLDialogElement>(null);
-    const [selectedValue, setSelectedValue] = useState<RestrictRepliesValue>(initialValue);
+    const [selectedValue, setSelectedValue] = useState<RestrictRepliesValue>(initialValue.restrictReplies);
+    const [premiumOnly, setPremiumOnly] = useState(initialValue.premiumOnly);
 
     useEffect(() => {
-      setSelectedValue(initialValue);
+      setSelectedValue(initialValue.restrictReplies);
+      setPremiumOnly(initialValue.premiumOnly);
     }, [initialValue]);
 
     const open = useCallback(() => {
-      setSelectedValue(initialValue);
+      setSelectedValue(initialValue.restrictReplies);
+      setPremiumOnly(initialValue.premiumOnly);
       dialogRef.current?.showModal();
     }, [initialValue]);
 
@@ -63,18 +73,20 @@ export const ActivitySettingsModal = forwardRef<ActivitySettingsModalHandle, Act
     }));
 
     const handleSave = useCallback(() => {
-      onSave(selectedValue);
+      onSave({ restrictReplies: selectedValue, premiumOnly });
       close();
-    }, [selectedValue, onSave, close]);
+    }, [selectedValue, premiumOnly, onSave, close]);
 
     const handleCancel = useCallback(() => {
-      setSelectedValue(initialValue);
+      setSelectedValue(initialValue.restrictReplies);
+      setPremiumOnly(initialValue.premiumOnly);
       close();
       onCancel?.();
     }, [initialValue, close, onCancel]);
 
     const handleClose = useCallback(() => {
-      setSelectedValue(initialValue);
+      setSelectedValue(initialValue.restrictReplies);
+      setPremiumOnly(initialValue.premiumOnly);
       onCancel?.();
     }, [initialValue, onCancel]);
 
@@ -94,6 +106,37 @@ export const ActivitySettingsModal = forwardRef<ActivitySettingsModalHandle, Act
             >
               <span className="material-symbols-outlined text-xl">close</span>
             </button>
+          </div>
+
+          <div className="mb-6">
+            <label
+              className={`
+                flex items-center gap-3 p-4 rounded-xl cursor-pointer
+                border-2 transition-all duration-200
+                ${premiumOnly
+                  ? 'border-primary bg-primary/5'
+                  : 'border-base-300 hover:border-base-content/30 hover:bg-base-200/50'
+                }
+              `}
+            >
+              <input
+                type="checkbox"
+                checked={premiumOnly}
+                onChange={(e) => setPremiumOnly(e.target.checked)}
+                className="checkbox checkbox-primary checkbox-sm"
+              />
+              <span className={`material-symbols-outlined text-xl ${premiumOnly ? 'text-primary' : 'text-base-content/60'}`}>
+                workspace_premium
+              </span>
+              <div className="flex-1">
+                <div className={`font-medium ${premiumOnly ? 'text-primary' : ''}`}>
+                  Premium members only
+                </div>
+                <div className="text-sm text-base-content/60">
+                  Only premium members can see the full post, others see a preview
+                </div>
+              </div>
+            </label>
           </div>
 
           <div className="mb-4">
