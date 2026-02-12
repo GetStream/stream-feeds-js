@@ -90,19 +90,26 @@ yarn create-follows
 yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
 # Optional, only useful if you have story feeds
 yarn create-stories
+# Optional, if you want premium posts too
+yarn create-premium-membership
+yarn create-premium-members
+yarn create-premium-posts
 ```
 
 ### Available Scripts
 
 Run these commands from the `test-data-generator/` directory:
 
-| Script          | Command                | Description                                |
-| --------------- | ---------------------- | ------------------------------------------ |
-| Create Users    | `yarn create-users`    | Creates users and their feeds              |
-| Create Follows  | `yarn create-follows`  | Sets up follow relationships between users |
-| Create Posts    | `yarn create-posts`    | Generates sample activities/posts          |
-| Create Stories  | `yarn create-stories`  | Creates sample stories                     |
-| Download Images | `yarn download-images` | Downloads sample images for posts          |
+| Script                    | Command                          | Description                                                                      |
+| ------------------------- | -------------------------------- | -------------------------------------------------------------------------------- |
+| Create Users              | `yarn create-users`              | Creates users and their feeds                                                    |
+| Create Follows            | `yarn create-follows`            | Sets up follow relationships between users                                       |
+| Create Posts              | `yarn create-posts`              | Generates sample activities/posts                                                |
+| Create Stories            | `yarn create-stories`            | Creates sample stories                                                           |
+| Download Images           | `yarn download-images`           | Downloads sample images for posts                                                |
+| Create premium membership | `yarn create-premium-membership` | Creates `premium` membership level                                               |
+| Create premium members    | `yarn create-premium-members`    | Adds premium members to randomly selected user feeds                             |
+| Create premium posts      | `yarn create-premium-posts`      | Updates a few posts of user feeds with premium memebrs to `premium` members only |
 
 ### Create Posts Feature Flags
 
@@ -139,6 +146,24 @@ yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookm
 ```
 
 > Note: Each feature has a probability of being included (not every post will have every enabled feature). Link and attachment are mutually exclusive per post.
+
+### Download Images flags
+
+The `download-images` script downloads 100 sample images (from picsum.photos) into `test-data-generator/images/`. By default it skips images that already exist.
+
+| Flag                           | Description                                                                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `--replace=N` or `--replace N` | Force re-download of specific image(s). `N` can be a single index (1–100) or comma-separated indices (e.g. `--replace=1,5,10`). |
+
+**Examples:**
+
+```bash
+# Re-download only image 42
+yarn download-images --replace=42
+
+# Re-download images 1, 5 and 10
+yarn download-images --replace 1,5,10
+```
 
 ## Local Setup
 
