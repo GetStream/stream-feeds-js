@@ -51,7 +51,7 @@ export const TogglePremiumMembershipButton = ({
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, currentUser?.id, userId, isPremium, feed]);
+  }, [isLoading, currentUser?.id, userId, isPremium, feed, reloadTimelines]);
 
   const baseStyles =
     'flex items-center gap-1.5 whitespace-nowrap px-4 py-1.5 text-sm font-bold rounded-full transition-all duration-200 select-none';

@@ -29,7 +29,7 @@ export const ActivityComposer = ({
   const [initialAttachments, setInitialAttachments] = useState<Attachment[]>([]);
   const [initialMentionedUsers, setInitialMentionedUsers] = useState<Array<{ id: string; name: string }>>([]);
   const [attachedPoll, setAttachedPoll] = useState<PollData | null>(null);
-  const [activitySettings, setActivitySettings] = useState<ActivitySettings>({ restrictReplies: 'everyone', premiumOnly: false });
+  const [activitySettings, setActivitySettings] = useState<ActivitySettings>({ restrictReplies: 'everyone', activityVisibility: 'public' });
   const pollModalRef = useRef<PollComposerModalHandle>(null);
   const settingsModalRef = useRef<ActivitySettingsModalHandle>(null);
   const existingPollIdRef = useRef<string | null>(null);
@@ -41,7 +41,7 @@ export const ActivityComposer = ({
       setInitialMentionedUsers(activity.mentioned_users?.map((u) => ({ id: u.id, name: u.name || u.id })) ?? []);
       setActivitySettings({
         restrictReplies: activity.restrict_replies ?? 'everyone',
-        premiumOnly: activity.visibility === 'tag' && activity.visibility_tag === 'activity-visibility',
+        activityVisibility: activity.visibility === 'tag' ? 'premium' : activity.visibility === 'private' ? 'private' : 'public',
       });
       if (activity.poll) {
         existingPollIdRef.current = activity.poll.id;
@@ -100,15 +100,18 @@ export const ActivityComposer = ({
         pollId = pollResponse.poll.id;
       }
 
-      const visibilityFields = activitySettings.premiumOnly
-        ? { visibility: 'tag' as const, visibility_tag: 'premium' }
-        : { visibility: 'public' as const };
+      const visibilityFields =
+        activitySettings.activityVisibility === 'premium'
+          ? { visibility: 'tag' as const, visibility_tag: 'premium' }
+          : activitySettings.activityVisibility === 'private'
+            ? { visibility: 'private' as const }
+            : { visibility: 'public' as const };
 
       if (activity?.id) {
         const removedExistingPoll = hadExistingPoll && !attachedPoll;
         const unsetFields: string[] = [];
         if (removedExistingPoll) unsetFields.push('poll_id');
-        if (!activitySettings.premiumOnly) unsetFields.push('visibility_tag');
+        if (activitySettings.activityVisibility !== 'premium') unsetFields.push('visibility_tag');
 
         await client?.updateActivityPartial({
           id: activity.id,
@@ -137,7 +140,7 @@ export const ActivityComposer = ({
           ...visibilityFields,
         });
         // Reset settings to default only for new posts
-        setActivitySettings({ restrictReplies: 'everyone', premiumOnly: false });
+        setActivitySettings({ restrictReplies: 'everyone', activityVisibility: 'public' });
       }
 
       // Clear attached poll after successful submission

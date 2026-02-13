@@ -2,9 +2,11 @@ import { useCallback, useRef, useState, forwardRef, useImperativeHandle, useEffe
 
 export type RestrictRepliesValue = 'everyone' | 'people_i_follow' | 'nobody';
 
+export type ActivityVisibility = 'public' | 'premium' | 'private';
+
 export type ActivitySettings = {
   restrictReplies: RestrictRepliesValue;
-  premiumOnly: boolean;
+  activityVisibility: ActivityVisibility;
 };
 
 export type ActivitySettingsModalHandle = {
@@ -44,22 +46,48 @@ const OPTIONS: Array<{
   },
 ];
 
-const DEFAULT_SETTINGS: ActivitySettings = { restrictReplies: 'everyone', premiumOnly: false };
+const VISIBILITY_OPTIONS: Array<{
+  value: ActivityVisibility;
+  label: string;
+  description: string;
+  icon: string;
+}> = [
+  {
+    value: 'public',
+    label: 'Public',
+    description: 'Anyone can see this post',
+    icon: 'public',
+  },
+  {
+    value: 'premium',
+    label: 'Premium members only',
+    description: 'Only premium members can see the full post, others see a preview',
+    icon: 'workspace_premium',
+  },
+  {
+    value: 'private',
+    label: 'Private',
+    description: 'Only you can see this post',
+    icon: 'lock',
+  },
+];
+
+const DEFAULT_SETTINGS: ActivitySettings = { restrictReplies: 'everyone', activityVisibility: 'public' };
 
 export const ActivitySettingsModal = forwardRef<ActivitySettingsModalHandle, ActivitySettingsModalProps>(
   ({ initialValue = DEFAULT_SETTINGS, onSave, onCancel }, ref) => {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [selectedValue, setSelectedValue] = useState<RestrictRepliesValue>(initialValue.restrictReplies);
-    const [premiumOnly, setPremiumOnly] = useState(initialValue.premiumOnly);
+    const [activityVisibility, setActivityVisibility] = useState<ActivityVisibility>(initialValue.activityVisibility);
 
     useEffect(() => {
       setSelectedValue(initialValue.restrictReplies);
-      setPremiumOnly(initialValue.premiumOnly);
+      setActivityVisibility(initialValue.activityVisibility);
     }, [initialValue]);
 
     const open = useCallback(() => {
       setSelectedValue(initialValue.restrictReplies);
-      setPremiumOnly(initialValue.premiumOnly);
+      setActivityVisibility(initialValue.activityVisibility);
       dialogRef.current?.showModal();
     }, [initialValue]);
 
@@ -73,20 +101,20 @@ export const ActivitySettingsModal = forwardRef<ActivitySettingsModalHandle, Act
     }));
 
     const handleSave = useCallback(() => {
-      onSave({ restrictReplies: selectedValue, premiumOnly });
+      onSave({ restrictReplies: selectedValue, activityVisibility });
       close();
-    }, [selectedValue, premiumOnly, onSave, close]);
+    }, [selectedValue, activityVisibility, onSave, close]);
 
     const handleCancel = useCallback(() => {
       setSelectedValue(initialValue.restrictReplies);
-      setPremiumOnly(initialValue.premiumOnly);
+      setActivityVisibility(initialValue.activityVisibility);
       close();
       onCancel?.();
     }, [initialValue, close, onCancel]);
 
     const handleClose = useCallback(() => {
       setSelectedValue(initialValue.restrictReplies);
-      setPremiumOnly(initialValue.premiumOnly);
+      setActivityVisibility(initialValue.activityVisibility);
       onCancel?.();
     }, [initialValue, onCancel]);
 
@@ -108,35 +136,49 @@ export const ActivitySettingsModal = forwardRef<ActivitySettingsModalHandle, Act
             </button>
           </div>
 
-          <div className="mb-6">
-            <label
-              className={`
-                flex items-center gap-3 p-4 rounded-xl cursor-pointer
-                border-2 transition-all duration-200
-                ${premiumOnly
-                  ? 'border-primary bg-primary/5'
-                  : 'border-base-300 hover:border-base-content/30 hover:bg-base-200/50'
-                }
-              `}
-            >
-              <input
-                type="checkbox"
-                checked={premiumOnly}
-                onChange={(e) => setPremiumOnly(e.target.checked)}
-                className="checkbox checkbox-primary checkbox-sm"
-              />
-              <span className={`material-symbols-outlined text-xl ${premiumOnly ? 'text-primary' : 'text-base-content/60'}`}>
-                workspace_premium
-              </span>
-              <div className="flex-1">
-                <div className={`font-medium ${premiumOnly ? 'text-primary' : ''}`}>
-                  Premium members only
-                </div>
-                <div className="text-sm text-base-content/60">
-                  Only premium members can see the full post, others see a preview
-                </div>
-              </div>
-            </label>
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-base-content/70 uppercase tracking-wide">
+              Who can see this post?
+            </h4>
+          </div>
+
+          <div className="flex flex-col gap-2 mb-6">
+            {VISIBILITY_OPTIONS.map((option) => {
+              const isSelected = activityVisibility === option.value;
+              return (
+                <label
+                  key={option.value}
+                  className={`
+                    flex items-center gap-3 p-4 rounded-xl cursor-pointer
+                    border-2 transition-all duration-200
+                    ${isSelected
+                      ? 'border-primary bg-primary/5'
+                      : 'border-base-300 hover:border-base-content/30 hover:bg-base-200/50'
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    name="activity_visibility"
+                    value={option.value}
+                    checked={isSelected}
+                    onChange={() => setActivityVisibility(option.value)}
+                    className="sr-only"
+                  />
+                  <span className={`material-symbols-outlined text-xl ${isSelected ? 'text-primary' : 'text-base-content/60'}`}>
+                    {option.icon}
+                  </span>
+                  <div className="flex-1">
+                    <div className={`font-medium ${isSelected ? 'text-primary' : ''}`}>
+                      {option.label}
+                    </div>
+                    <div className="text-sm text-base-content/60">
+                      {option.description}
+                    </div>
+                  </div>
+                </label>
+              );
+            })}
           </div>
 
           <div className="mb-4">

@@ -47,8 +47,8 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
 
     // URL regex pattern - matches http(s):// URLs and www. URLs
     const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
-    // Mention regex pattern
-    const mentionRegex = /@(\w+)/g;
+    // Mention regex pattern (allow letters, digits, underscore and hyphen in usernames)
+    const mentionRegex = /@([\w-]+)/g;
 
     // Collect all matches (mentions and URLs) with their positions
     interface Match {
