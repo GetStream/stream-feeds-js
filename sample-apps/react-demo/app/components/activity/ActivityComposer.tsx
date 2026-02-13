@@ -183,25 +183,21 @@ export const ActivityComposer = ({
         >
           <span className="material-symbols-outlined text-xl">ballot</span>
         </button>
-        {!parent && (
-          <button
-            type="button"
-            className="w-9 h-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-primary transition-colors"
-            onClick={handleOpenSettingsModal}
-            aria-label="Post settings"
-          >
-            <span className="material-symbols-outlined text-xl">settings</span>
-          </button>
-        )}
+        <button
+          type="button"
+          className="w-9 h-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-primary transition-colors"
+          onClick={handleOpenSettingsModal}
+          aria-label="Post settings"
+        >
+          <span className="material-symbols-outlined text-xl">settings</span>
+        </button>
       </Composer>
       <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
-      {!parent && (
-        <ActivitySettingsModal
-          ref={settingsModalRef}
-          initialValue={activitySettings}
-          onSave={handleSettingsSave}
-        />
-      )}
+      <ActivitySettingsModal
+        ref={settingsModalRef}
+        initialValue={activitySettings}
+        onSave={handleSettingsSave}
+      />
     </div>
   );
 };

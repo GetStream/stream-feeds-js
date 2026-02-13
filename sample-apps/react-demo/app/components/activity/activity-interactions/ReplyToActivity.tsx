@@ -1,5 +1,6 @@
 import { StreamFeed, type ActivityResponse } from '@stream-io/feeds-react-sdk';
 import { useCallback, useRef, useState } from 'react';
+import { ActionButton } from '@/app/components/utility/ActionButton';
 import { ActivityComposer } from '../ActivityComposer';
 import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
@@ -18,18 +19,17 @@ export const ReplyToActivity = ({ activity }: { activity: ActivityResponse }) =>
     dialogRef.current?.close();
   }, []);
 
+  const disabled = activity.visibility === 'private' || activity.preview;
+
   return (
     <>
-      <button
-        type="button"
-        className="group inline-flex items-center gap-1 text-base-content/60 hover:text-primary transition-colors"
+      <ActionButton
+        icon="repeat"
+        label={String(activity.share_count)}
+        isActive={false}
+        disabled={disabled}
         onClick={openDialog}
-      >
-        <span className="w-9 h-9 rounded-full flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-          <span className="material-symbols-outlined text-[18px]">repeat</span>
-        </span>
-        <span className="text-[13px] tabular-nums">{activity.share_count}</span>
-      </button>
+      />
       <dialog ref={dialogRef} className="modal">
         <div className="modal-box w-[90%] max-w-xl bg-base-100 rounded-2xl p-0">
           <div className="flex items-center p-4 border-b border-base-content/20">
