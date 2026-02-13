@@ -71,7 +71,7 @@ export const NavLink = ({
 
   return (
     <Link
-      href={`${href}?user_id=${currentUser?.id}`}
+      href={`${href}${href?.includes('?') ? '&' : '?'}user_id=${currentUser?.id}`}
       className={className}
     >
       {icon != null && (
