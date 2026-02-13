@@ -114,7 +114,7 @@ export default function Profile() {
         <Avatar user={user} className="size-10 md:size-12" />
         <div className="text-lg font-semibold">{user?.name}</div>
       </div>
-      <div className="stats">
+      <div className="stats w-full overflow-x-auto">
         <div className="stat">
           <div className="stat-title">Posts</div>
           <div className="stat-value text-primary">{activityCount}</div>

@@ -109,8 +109,23 @@ export const ActivityComposer = ({
     setAttachedLocation(null);
   }, []);
 
+  const handleCreateHashtag = useCallback(async (name: string): Promise<{ id: string; name: string }> => {
+    const trimmedName = name.trim();
+    const res = await fetch('/api/create-hashtag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: trimmedName }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error((data as { error?: string }).error ?? 'Failed to create hashtag');
+    }
+    const data = (await res.json()) as { id: string; name: string };
+    return { id: data.id, name: data.name };
+  }, []);
+
   const handleSubmit = useCallback(
-    async (text: string, attachments: Attachment[], mentionedUserIds: string[]) => {
+    async (text: string, attachments: Attachment[], mentionedUserIds: string[], selectedHashtagIds: string[]) => {
       let pollId: string | undefined;
       const hadExistingPoll = !!activity?.poll;
 
@@ -163,7 +178,11 @@ export const ActivityComposer = ({
           handle_mention_notifications: true,
         });
       } else {
-        await feed?.addActivity({
+        if (!feed?.feed) {
+          return;
+        }
+        await client?.addActivity({
+          feeds: [feed.feed, ...selectedHashtagIds.map((id) => `hashtag:${id}`)],
           text,
           type: 'post',
           attachments,
@@ -211,6 +230,8 @@ export const ActivityComposer = ({
         onRemovePoll={handleRemovePoll}
         attachedLocation={attachedLocation}
         onRemoveLocation={handleRemoveLocation}
+        enableHashtags
+        onCreateHashtag={handleCreateHashtag}
       >
         {children}
         <button

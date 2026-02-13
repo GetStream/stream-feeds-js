@@ -11,6 +11,7 @@
     "create-premium-membership": "tsx src/create-premium-membership.ts",
     "create-premium-members": "tsx src/create-premium-members.ts",
     "create-premium-posts": "tsx src/create-premium-posts.ts",
+    "create-hashtag-group": "tsx src/create-hashtag-group.ts",
     "download-images": "tsx src/download-images.ts"
   },
   "dependencies": {

@@ -17,6 +17,7 @@ import {
   type ActivityState,
   type ActivityWithStateUpdates,
   useOwnFollowings,
+  StreamFeed,
 } from '@stream-io/feeds-react-sdk';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -60,6 +61,9 @@ export default function ActivityPage() {
   }, [client, id]);
 
   useEffect(() => {
+    if (!client) {
+      return;
+    }
     setIsLoading(true);
     if (!activityWithStateUpdates?.currentState.activity) {
       activityWithStateUpdates?.get({
@@ -69,12 +73,19 @@ export default function ActivityPage() {
         },
       }).then((activityResponse) => {
         // Get the feed to access own_followings for people_i_follow restriction
-        if (activityResponse.current_feed && client) {
+        // If activity is posted to multiple feeds, current_feed is not set
+        if (activityResponse.current_feed && activityResponse.current_feed.group_id === 'user') {
           const feed = client.feed(
             activityResponse.current_feed.group_id,
             activityResponse.current_feed.id,
           );
           setActivityFeed(feed);
+        } else {
+          const [group, id] = activityResponse.feeds.find(feed => feed.startsWith('user:'))?.split(':') ?? [];
+          const feed = client.feed(group, id);
+          return feed.getOrCreate({ limit: 0 }).then(() => {
+            setActivityFeed(feed);
+          });
         }
       }).catch((e) => {
         setError(e.message);
@@ -137,9 +148,11 @@ export default function ActivityPage() {
           <CommentRestrictionMessage restrictReplies={activity.restrict_replies} />
         )}
       </div>
-      <StreamActivityWithStateUpdates activityWithStateUpdates={activityWithStateUpdates}>
-        <CommentList />
-      </StreamActivityWithStateUpdates>
+      {activityFeed && <StreamFeed feed={activityFeed}>
+        <StreamActivityWithStateUpdates activityWithStateUpdates={activityWithStateUpdates}>
+          <CommentList />
+        </StreamActivityWithStateUpdates>
+      </StreamFeed>}
     </div>
   );
 }

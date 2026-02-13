@@ -36,7 +36,7 @@ export const ActivityContent = ({ activity, withoutInteractions = false }: { act
           </span>
         </div>
       )}
-      <Content text={activity.text} attachments={activity.attachments} moderation={activity.moderation} location="activity" mentioned_users={activity.mentioned_users} withoutInteractions={withoutInteractions} />
+      <Content text={activity.text} attachments={activity.attachments} moderation={activity.moderation} location="activity" mentioned_users={activity.mentioned_users} withoutInteractions={withoutInteractions} linkHashtags />
     </>
   );
 };

@@ -71,14 +71,24 @@ export default function SearchResults() {
     if (!client) return;
     try {
       setIsFeedsLoading(true);
+
       const result = await client.queryFeeds({
         filter: {
-          group_id: 'user',
-          ['created_by.name']: { $q: searchQuery },
+          $or: [
+            {
+              group_id: 'user',
+              ['created_by.name']: { $q: searchQuery },
+            },
+            {
+              group_id: 'hashtag',
+              name: { $q: searchQuery },
+            },
+          ],
         },
         limit: 10,
         next,
       });
+
       setFeedSearchResults((current) => [
         ...(next ? current : []),
         ...result.feeds,

@@ -90,6 +90,8 @@ yarn create-follows
 yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
 # Optional, only useful if you have story feeds
 yarn create-stories
+# Optional, for hashtag feeds (e.g. hashtag suggestions in composer)
+yarn create-hashtag-group
 # Optional, if you want premium posts too
 yarn create-premium-membership
 yarn create-premium-members
@@ -106,6 +108,7 @@ Run these commands from the `test-data-generator/` directory:
 | Create Follows            | `yarn create-follows`            | Sets up follow relationships between users                                       |
 | Create Posts              | `yarn create-posts`              | Generates sample activities/posts                                                |
 | Create Stories            | `yarn create-stories`            | Creates sample stories                                                           |
+| Create hashtag group      | `yarn create-hashtag-group`      | Creates `hashtag` feed group (current_feed selector, public default visibility)  |
 | Download Images           | `yarn download-images`           | Downloads sample images for posts                                                |
 | Create premium membership | `yarn create-premium-membership` | Creates `premium` membership level                                               |
 | Create premium members    | `yarn create-premium-members`    | Adds premium members to randomly selected user feeds                             |
