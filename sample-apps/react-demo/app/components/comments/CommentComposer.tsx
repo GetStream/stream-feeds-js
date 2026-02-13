@@ -33,7 +33,7 @@ export const CommentComposer = ({
   }, [comment]);
 
   const handleSubmit = useCallback(
-    async (text: string, attachments: Attachment[], mentionedUserIds: string[]) => {
+    async (text: string, attachments: Attachment[], mentionedUserIds: string[], _selectedHashtagIds: string[]) => {
       if (isEditing) {
         await client?.updateComment({
           id: comment.id,

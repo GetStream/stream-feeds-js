@@ -102,7 +102,20 @@ export const PollComposerModal = forwardRef<PollComposerModalHandle, PollCompose
     return (
       <dialog ref={dialogRef} className="modal" onClose={handleClose}>
         <div className="modal-box w-full max-w-md">
-          <h3 className="font-bold text-lg mb-4">Create Poll</h3>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-xl text-primary">ballot</span>
+              <h3 className="font-bold text-lg">Create Poll</h3>
+            </div>
+            <button
+              type="button"
+              className="btn btn-sm btn-circle btn-ghost"
+              onClick={handleCancel}
+              aria-label="Close"
+            >
+              <span className="material-symbols-outlined text-xl">close</span>
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="form-control">

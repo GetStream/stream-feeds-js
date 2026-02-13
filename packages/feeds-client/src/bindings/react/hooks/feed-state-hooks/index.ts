@@ -11,3 +11,4 @@ export * from './useIsAggregatedActivityRead';
 export * from './useIsAggregatedActivitySeen';
 export * from './useActivityComments';
 export * from './useOwnFollowings';
+export * from './useMembers';
