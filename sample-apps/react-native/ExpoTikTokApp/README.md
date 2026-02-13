@@ -1,5 +1,7 @@
 # Expo TikTok Sample App
 
+![TikTok Feeds Header](../../img-previews/TikTokFeedsHeader.png)
+
 This is a sample application displaying some of the capabilities of our `feeds-react-native-sdk`, build using `Expo`.
 
 ## Running the app
@@ -82,6 +84,8 @@ STREAM_API_SECRET=<stream-api-secret>
 ```
 
 ### Run
+
+![Android iOS TikTok Preview](../../img-previews/AndroidiOSTikTokPreview.gif)
 
 To run the application for different platforms, use the following commands:
 
