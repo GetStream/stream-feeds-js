@@ -7,6 +7,7 @@ import { isOGAttachment } from '../common/attachments/is-og-attachment';
 import { Activity } from './Activity';
 import { PollComposerModal, type PollData, type PollComposerModalHandle } from '../poll/PollComposerModal';
 import { ActivitySettingsModal, type ActivitySettings, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
+import { LocationModal, type LocationData, type LocationModalHandle } from './LocationModal';
 
 export const ActivityComposer = ({
   activity,
@@ -30,8 +31,10 @@ export const ActivityComposer = ({
   const [initialMentionedUsers, setInitialMentionedUsers] = useState<Array<{ id: string; name: string }>>([]);
   const [attachedPoll, setAttachedPoll] = useState<PollData | null>(null);
   const [activitySettings, setActivitySettings] = useState<ActivitySettings>({ restrictReplies: 'everyone', activityVisibility: 'public' });
+  const [attachedLocation, setAttachedLocation] = useState<LocationData | null>(null);
   const pollModalRef = useRef<PollComposerModalHandle>(null);
   const settingsModalRef = useRef<ActivitySettingsModalHandle>(null);
+  const locationModalRef = useRef<LocationModalHandle>(null);
   const existingPollIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -53,6 +56,15 @@ export const ActivityComposer = ({
       } else {
         existingPollIdRef.current = null;
         setAttachedPoll(null);
+      }
+      if (activity.location) {
+        setAttachedLocation({
+          city: activity.custom?.location_city ?? 'Unknown',
+          lat: activity.location.lat,
+          lng: activity.location.lng,
+        });
+      } else {
+        setAttachedLocation(null);
       }
     }
   }, [activity]);
@@ -85,6 +97,18 @@ export const ActivityComposer = ({
     setActivitySettings(value);
   }, []);
 
+  const handleOpenLocationModal = useCallback(() => {
+    locationModalRef.current?.open();
+  }, []);
+
+  const handleLocationConfirm = useCallback((location: LocationData) => {
+    setAttachedLocation(location);
+  }, []);
+
+  const handleRemoveLocation = useCallback(() => {
+    setAttachedLocation(null);
+  }, []);
+
   const handleSubmit = useCallback(
     async (text: string, attachments: Attachment[], mentionedUserIds: string[]) => {
       let pollId: string | undefined;
@@ -107,11 +131,21 @@ export const ActivityComposer = ({
             ? { visibility: 'private' as const }
             : { visibility: 'public' as const };
 
+      const locationFields = attachedLocation
+        ? { location: { lat: attachedLocation.lat, lng: attachedLocation.lng }, custom: { location_city: attachedLocation.city } }
+        : {};
+
       if (activity?.id) {
         const removedExistingPoll = hadExistingPoll && !attachedPoll;
+        const hadExistingLocation = !!activity.location;
+        const removedLocation = hadExistingLocation && !attachedLocation;
         const unsetFields: string[] = [];
         if (removedExistingPoll) unsetFields.push('poll_id');
         if (activitySettings.activityVisibility !== 'premium') unsetFields.push('visibility_tag');
+        if (removedLocation) {
+          unsetFields.push('location');
+          unsetFields.push('custom.location_city');
+        }
 
         await client?.updateActivityPartial({
           id: activity.id,
@@ -123,6 +157,7 @@ export const ActivityComposer = ({
             restrict_replies: activitySettings.restrictReplies,
             ...visibilityFields,
             ...(pollId && { poll_id: pollId }),
+            ...locationFields,
           },
           ...(unsetFields.length > 0 && { unset: unsetFields }),
           handle_mention_notifications: true,
@@ -138,16 +173,18 @@ export const ActivityComposer = ({
           poll_id: pollId,
           restrict_replies: activitySettings.restrictReplies,
           ...visibilityFields,
+          ...locationFields,
         });
         // Reset settings to default only for new posts
         setActivitySettings({ restrictReplies: 'everyone', activityVisibility: 'public' });
       }
 
-      // Clear attached poll after successful submission
+      // Clear attached poll and location after successful submission
       setAttachedPoll(null);
+      setAttachedLocation(null);
       onSave?.();
     },
-    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, activitySettings],
+    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, activitySettings, attachedLocation, activity?.location],
   );
 
   return (
@@ -172,8 +209,19 @@ export const ActivityComposer = ({
         rows={rows}
         attachedPoll={attachedPoll}
         onRemovePoll={handleRemovePoll}
+        attachedLocation={attachedLocation}
+        onRemoveLocation={handleRemoveLocation}
       >
         {children}
+        <button
+          type="button"
+          className="w-9 h-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-primary transition-colors disabled:opacity-50 disabled:pointer-events-none"
+          onClick={handleOpenLocationModal}
+          aria-label="Add location"
+          disabled={!!attachedLocation}
+        >
+          <span className="material-symbols-outlined text-xl">location_on</span>
+        </button>
         <button
           type="button"
           className="w-9 h-9 rounded-full hover:bg-primary/10 flex items-center justify-center text-primary transition-colors disabled:opacity-50 disabled:pointer-events-none"
@@ -198,6 +246,7 @@ export const ActivityComposer = ({
         initialValue={activitySettings}
         onSave={handleSettingsSave}
       />
+      <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
     </div>
   );
 };

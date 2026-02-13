@@ -28,6 +28,8 @@ export const ActivityHeader = ({
   const feed = client?.feed(group, id);
   const ownCapabilities = useOwnCapabilities(feed);
 
+  const locationCity = activity.location ? (activity.custom?.location_city as string | undefined) ?? null : null;
+
   return (
     <ContentMetadata
       created_at={activity.created_at}
@@ -35,6 +37,7 @@ export const ActivityHeader = ({
       edited_at={activity.edited_at}
       location="activity"
       withLink={withLink}
+      locationCity={locationCity}
     >
       {withFollowButton &&
         activity.current_feed?.feed !== `user:${currentUser?.id}` && (

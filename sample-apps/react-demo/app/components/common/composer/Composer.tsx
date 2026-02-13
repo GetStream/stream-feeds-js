@@ -8,6 +8,7 @@ import { useMentionSuggestions } from './useMentionSuggestions';
 import { useCaretPosition, type CaretPosition } from './useCaretPosition';
 import { MentionSuggestionList } from './MentionSuggestionList';
 import type { PollData } from '../../poll/PollComposerModal';
+import type { LocationData } from '../../activity/LocationModal';
 
 type ComposerVariant = 'activity' | 'comment';
 
@@ -25,6 +26,8 @@ export type ComposerProps = {
   children?: ReactNode;
   attachedPoll?: PollData | null;
   onRemovePoll?: () => void;
+  attachedLocation?: LocationData | null;
+  onRemoveLocation?: () => void;
 };
 
 export const Composer = ({
@@ -41,6 +44,8 @@ export const Composer = ({
   children,
   attachedPoll,
   onRemovePoll,
+  attachedLocation,
+  onRemoveLocation,
 }: ComposerProps) => {
   const [text, setText] = useState(initialText);
   const [completedAttachments, setCompletedAttachments] = useState<Attachment[]>(initialAttachments);
@@ -203,6 +208,22 @@ export const Composer = ({
             className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error shrink-0"
             onClick={onRemovePoll}
             aria-label="Remove poll"
+          >
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+      )}
+      {attachedLocation && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-lg border border-primary/20">
+          <span className="material-symbols-outlined text-primary text-xl shrink-0">location_on</span>
+          <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="text-sm font-medium break-words">{attachedLocation.city}</div>
+          </div>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error shrink-0"
+            onClick={onRemoveLocation}
+            aria-label="Remove location"
           >
             <span className="material-symbols-outlined text-xl">close</span>
           </button>
