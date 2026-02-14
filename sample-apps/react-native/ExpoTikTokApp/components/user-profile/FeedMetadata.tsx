@@ -1,22 +1,15 @@
 import { Dimensions, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/common/Themed';
 import React from 'react';
-import type {
-  Feed,
-  FeedState} from '@stream-io/feeds-react-native-sdk';
+import type { Feed } from '@stream-io/feeds-react-native-sdk';
 import {
   useClientConnectedUser,
   useFeedMetadata,
-  useStateStore,
 } from '@stream-io/feeds-react-native-sdk';
 import { FollowButton } from '@/components/follows/FollowButton';
 import { useRouter } from 'expo-router';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-const selector = (nextState: FeedState) => ({
-  activityCount: nextState.activities?.length ?? 0,
-});
 
 export const FeedMetadata = ({
   userFeed,
@@ -27,13 +20,13 @@ export const FeedMetadata = ({
 }) => {
   const router = useRouter();
   const connectedUser = useClientConnectedUser();
-  const { created_by: createdBy, follower_count: followerCount = 0 } =
-    useFeedMetadata(userFeed) ?? {};
+  const {
+    created_by: createdBy,
+    follower_count: followerCount = 0,
+    activity_count: activityCount,
+  } = useFeedMetadata(userFeed) ?? {};
   const { following_count: followingCount = 0 } =
     useFeedMetadata(timelineFeed) ?? {};
-  // TODO: This is not the correct number of feeds, but it'll be a placeholder until
-  //       this is supported by our backend.
-  const { activityCount = 0 } = useStateStore(userFeed?.state, selector) ?? {};
   return (
     <>
       <Image source={{ uri: createdBy?.image }} style={styles.avatar} />
