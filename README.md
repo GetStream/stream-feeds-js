@@ -114,7 +114,7 @@ Run these commands from the `test-data-generator/` directory:
 | Download Images           | `yarn download-images`           | Downloads sample images for posts                                                                                                                                                             |
 | Create premium membership | `yarn create-premium-membership` | Creates `premium` membership level                                                                                                                                                            |
 | Create premium members    | `yarn create-premium-members`    | Adds premium members to randomly selected user feeds                                                                                                                                          |
-| Create premium posts      | `yarn create-premium-posts`      | Updates a few posts of user feeds with premium memebrs to `premium` members only                                                                                                              |
+| Create premium posts      | `yarn create-premium-posts`      | Updates a few posts of user feeds with premium members to `premium` members only                                                                                                              |
 | Create location posts     | `yarn create-location-posts`     | Creates 4 activities (2 for Amsterdam, 2 for Boulder, CO) with location (lat, lng) and fun-fact text, added to randomly selected users' user feeds                                            |
 
 ### Create Posts Feature Flags

@@ -42,6 +42,7 @@ export default function SearchResults() {
   const [isFeedsLoading, setIsFeedsLoading] = useState(true);
   const [isPlacesLoading, setIsPlacesLoading] = useState(false);
   const placesSearchedForQuery = useRef<string | null>(null);
+  const placesCoordsRef = useRef<{ lat: number; lon: number } | null>(null);
 
   const searchActivities = useCallback(async (next?: string) => {
     if (!client) return;
@@ -107,11 +108,17 @@ export default function SearchResults() {
     try {
       setIsPlacesLoading(true);
       setPlacesError(undefined);
-      const coords = await getCoordsFromCity(searchQuery);
+      // Only geocode when starting a new search (no pagination); use cached coords for "Load more"
+      let coords: { lat: number; lon: number } | null = next ? placesCoordsRef.current : null;
       if (!coords) {
-        setPlacesSearchResults(next ? (current) => current : []);
-        setNextPlaces(undefined);
-        return;
+        coords = await getCoordsFromCity(searchQuery);
+        if (!coords) {
+          setPlacesSearchResults(next ? (current) => current : []);
+          setNextPlaces(undefined);
+          return;
+        }
+        placesCoordsRef.current = coords;
+        placesSearchedForQuery.current = searchQuery;
       }
       const result = await client.queryActivities({
         filter: {
@@ -125,7 +132,6 @@ export default function SearchResults() {
         ...result.activities,
       ]);
       setNextPlaces(result.next);
-      placesSearchedForQuery.current = searchQuery;
     } catch (error) {
       setPlacesError(error as Error);
     } finally {
@@ -142,6 +148,7 @@ export default function SearchResults() {
       setPlacesSearchResults([]);
       setNextPlaces(undefined);
       placesSearchedForQuery.current = null;
+      placesCoordsRef.current = null;
       searchActivities();
       searchFeeds();
     } else {
