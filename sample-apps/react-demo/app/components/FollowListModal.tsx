@@ -142,7 +142,7 @@ export const FollowListModal = forwardRef<FollowListModalHandle, FollowListModal
                   onClick={close}
                 >
                   <Avatar user={user} className="size-10" />
-                  <span className="font-medium">{user.name}</span>
+                  <span className="font-medium">{user.name ?? user.id}</span>
                 </div>
               </NavLink>
             ))}
