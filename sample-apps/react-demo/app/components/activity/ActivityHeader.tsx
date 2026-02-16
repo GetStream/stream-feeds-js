@@ -24,9 +24,12 @@ export const ActivityHeader = ({
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
 
-  const [group, id] = activity.current_feed?.feed?.split(':') ?? [];
-  const feed = client?.feed(group, id);
+  const [group, id] = activity.current_feed?.feed.split(':') ?? [];
+  const feed = group && id ? client?.feed(group, id) : undefined;
   const ownCapabilities = useOwnCapabilities(feed);
+  const shouldShowFollowButton = activity.user.id === currentUser?.id ? undefined : activity.current_feed?.group_id === 'user' ? client?.feed('user', activity.current_feed.id) : undefined;
+
+  const locationCity = activity.location ? (activity.custom?.location_city as string | undefined) ?? null : null;
 
   return (
     <ContentMetadata
@@ -35,10 +38,11 @@ export const ActivityHeader = ({
       edited_at={activity.edited_at}
       location="activity"
       withLink={withLink}
+      locationCity={locationCity}
     >
       {withFollowButton &&
-        activity.current_feed?.feed !== `user:${currentUser?.id}` && (
-          <ToggleFollowButton userId={activity.current_feed!.created_by.id} />
+        shouldShowFollowButton && (
+          <ToggleFollowButton userId={activity.user.id} />
         )}
       {withActions && <ActivityActions activity={activity} ownCapabilities={ownCapabilities} />}
     </ContentMetadata>

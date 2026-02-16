@@ -25,6 +25,7 @@ const AVAILABLE_FEATURES: Feature[] = [
   'comment',
   'bookmark',
   'repost',
+  'hashtags',
 ];
 
 // Feature probabilities
@@ -37,6 +38,7 @@ const FEATURE_PROBABILITIES: FeatureProbabilities = {
   comment: 0.7,
   bookmark: 0.2,
   repost: 0.05,
+  hashtags: 0.7,
 };
 
 function parseFeatures(featuresArg: string | null): Feature[] {
@@ -76,7 +78,7 @@ function printUsage(): void {
   console.log('  yarn create-posts');
   console.log('  yarn create-posts --features poll,reaction');
   console.log(
-    '  yarn create-posts --features link,attachment,mention,poll,reaction,comment',
+    '  yarn create-posts --features link,hashtags,attachment,mention,poll,reaction,comment',
   );
 }
 
@@ -162,6 +164,10 @@ async function main(): Promise<void> {
     const user = users[Math.floor(Math.random() * users.length)];
     const userFeed = client.feeds.feed('user', user.id);
 
+    let createdPollForVotes: Awaited<
+      ReturnType<StreamClient['createPoll']>
+    > | null = null;
+
     // Feature: repost - check if this should be a repost (only if we have existing activities)
     const isRepost =
       createdActivityIds.length > 0 && shouldIncludeFeature('repost', features);
@@ -193,6 +199,7 @@ async function main(): Promise<void> {
           ...pollData,
           user_id: user.id,
         });
+        createdPollForVotes = createdPoll;
         if (createdPoll.poll.id) {
           activity.poll_id = createdPoll.poll.id;
         }
@@ -231,6 +238,11 @@ async function main(): Promise<void> {
         if (includeLink) {
           const link = links[Math.floor(Math.random() * links.length)];
           activity.text = `${activity.text}. Check out this link: ${link}`;
+          // Feature: hashtags - when adding a link, optionally add #getstream_io and hashtag feed
+          if (shouldIncludeFeature('hashtags', features)) {
+            activity.text = `${activity.text} #getstream_io`;
+            activity.feeds = [...activity.feeds, 'hashtag:getstream_io'];
+          }
         }
 
         // Feature: attachment - add 1-3 random photos
@@ -267,6 +279,27 @@ async function main(): Promise<void> {
 
     // Track the activity ID for potential reposts
     createdActivityIds.push(createdActivity.activity.id);
+
+    // When a poll was added, cast 2 votes from random users
+    if (createdPollForVotes?.poll?.id && createdPollForVotes.poll.options?.length) {
+      const optionIds = createdPollForVotes.poll.options
+        .map((o) => o.id)
+        .filter(Boolean);
+      if (optionIds.length > 0) {
+        const votingUsers = getRandomItems(users, 2);
+        for (const votingUser of votingUsers) {
+          const optionId =
+            optionIds[Math.floor(Math.random() * optionIds.length)];
+          await client.feeds.castPollVote({
+            activity_id: createdActivity.activity.id,
+            poll_id: createdPollForVotes.poll.id,
+            user_id: votingUser.id,
+            vote: { option_id: optionId },
+          });
+        }
+        console.log(`  -> 2 votes cast on poll`);
+      }
+    }
 
     // Feature: reaction - add 1-5 reactions after activity is created
     if (shouldIncludeFeature('reaction', features)) {

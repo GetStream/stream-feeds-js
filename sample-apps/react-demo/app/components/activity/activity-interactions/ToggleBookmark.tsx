@@ -51,7 +51,7 @@ export const ToggleBookmark = ({
     <ActionButton
       onClick={toggleBookmark}
       icon="bookmark"
-      disabled={inProgress}
+      disabled={inProgress || activity.preview}
       label={state.bookmarkCount.toString()}
       isActive={state.isBookmarked}
       error={error}

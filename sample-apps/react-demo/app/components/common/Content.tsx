@@ -13,9 +13,10 @@ type ContentProps = {
   location: 'comment' | 'activity';
   mentioned_users?: UserResponse[];
   withoutInteractions?: boolean;
+  linkHashtags?: boolean;
 };
 
-export const Content = ({ text, attachments, moderation, location, mentioned_users = [], withoutInteractions = false }: ContentProps) => {
+export const Content = ({ text, attachments, moderation, location, mentioned_users = [], withoutInteractions = false, linkHashtags = false }: ContentProps) => {
   const { mediaAttachments, ogAttachments } = useMemo(() => {
     if (!attachments) {
       return { mediaAttachments: [], ogAttachments: [] };
@@ -47,16 +48,20 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
 
     // URL regex pattern - matches http(s):// URLs and www. URLs
     const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
-    // Mention regex pattern
-    const mentionRegex = /@(\w+)/g;
+    // Mention regex pattern (allow letters, digits, underscore and hyphen in usernames)
+    const mentionRegex = /@([\w-]+)/g;
 
-    // Collect all matches (mentions and URLs) with their positions
+    // Hashtag regex pattern
+    const hashtagRegex = /#([\w-]+)/g;
+
+    // Collect all matches (mentions, URLs, and hashtags) with their positions
     interface Match {
       index: number;
       length: number;
-      type: 'mention' | 'url';
+      type: 'mention' | 'url' | 'hashtag';
       content: string;
       username?: string;
+      hashtag?: string;
     }
 
     const matches: Match[] = [];
@@ -81,6 +86,19 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
         type: 'url',
         content: match[0],
       });
+    }
+
+    // Find all hashtag matches
+    if (linkHashtags) {
+      while ((match = hashtagRegex.exec(text)) !== null) {
+        matches.push({
+          index: match.index,
+          length: match[0].length,
+          type: 'hashtag',
+          content: match[0],
+          hashtag: match[1],
+        });
+      }
     }
 
     // Sort matches by index
@@ -174,6 +192,28 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
             </a>
           );
         }
+      } else if (m.type === 'hashtag') {
+        const hashtag = m.hashtag!;
+        if (withoutInteractions) {
+          parts.push(
+            <span
+              key={`hashtag-${partIndex}-${m.index}`}
+              className="text-primary font-medium"
+            >
+              #{hashtag}
+            </span>
+          );
+        } else {
+          parts.push(
+            <NavLink
+              key={`hashtag-${partIndex}-${m.index}`}
+              href={`/hashtag/${hashtag}`}
+              className="text-primary font-medium hover:underline underline-offset-2"
+            >
+              #{hashtag}
+            </NavLink>
+          );
+        }
       }
 
       lastIndex = m.index + m.length;
@@ -189,7 +229,7 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
     }
 
     return parts;
-  }, [text, mentioned_users, withoutInteractions]);
+  }, [text, mentioned_users, withoutInteractions, linkHashtags]);
 
   if (moderation?.action === 'remove') {
     return (

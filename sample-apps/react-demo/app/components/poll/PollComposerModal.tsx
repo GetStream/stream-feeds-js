@@ -4,6 +4,8 @@ export type PollData = {
   name: string;
   options: string[];
   enforce_unique_vote: boolean;
+  description: string;
+  allow_user_suggested_options: boolean;
 };
 
 export type PollComposerModalHandle = {
@@ -23,13 +25,17 @@ export const PollComposerModal = forwardRef<PollComposerModalHandle, PollCompose
   ({ onSubmit, onCancel }, ref) => {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [question, setQuestion] = useState('');
+    const [description, setDescription] = useState('');
     const [options, setOptions] = useState<string[]>(['', '']);
     const [allowMultipleVotes, setAllowMultipleVotes] = useState(false);
+    const [allowUserSuggestedOptions, setAllowUserSuggestedOptions] = useState(false);
 
     const resetForm = useCallback(() => {
       setQuestion('');
+      setDescription('');
       setOptions(['', '']);
       setAllowMultipleVotes(false);
+      setAllowUserSuggestedOptions(false);
     }, []);
 
     const open = useCallback(() => {
@@ -81,12 +87,14 @@ export const PollComposerModal = forwardRef<PollComposerModalHandle, PollCompose
         name: question.trim(),
         options: trimmedOptions,
         enforce_unique_vote: !allowMultipleVotes,
+        description: description.trim(),
+        allow_user_suggested_options: allowUserSuggestedOptions,
       };
 
       onSubmit(pollData);
       resetForm();
       close();
-    }, [question, options, allowMultipleVotes, onSubmit, resetForm, close]);
+    }, [question, description, options, allowMultipleVotes, allowUserSuggestedOptions, onSubmit, resetForm, close]);
 
     const handleCancel = useCallback(() => {
       resetForm();
@@ -102,7 +110,20 @@ export const PollComposerModal = forwardRef<PollComposerModalHandle, PollCompose
     return (
       <dialog ref={dialogRef} className="modal" onClose={handleClose}>
         <div className="modal-box w-full max-w-md">
-          <h3 className="font-bold text-lg mb-4">Create Poll</h3>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-xl text-primary">ballot</span>
+              <h3 className="font-bold text-lg">Create Poll</h3>
+            </div>
+            <button
+              type="button"
+              className="btn btn-sm btn-circle btn-ghost"
+              onClick={handleCancel}
+              aria-label="Close"
+            >
+              <span className="material-symbols-outlined text-xl">close</span>
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="form-control">
@@ -116,6 +137,19 @@ export const PollComposerModal = forwardRef<PollComposerModalHandle, PollCompose
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 autoFocus
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Description <span className="font-normal text-base-content/50">(optional)</span></span>
+              </label>
+              <textarea
+                placeholder="Add a description..."
+                className="textarea textarea-bordered w-full"
+                rows={2}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
 
@@ -170,6 +204,18 @@ export const PollComposerModal = forwardRef<PollComposerModalHandle, PollCompose
                   onChange={(e) => setAllowMultipleVotes(e.target.checked)}
                 />
                 <span className="label-text">Allow multiple votes</span>
+              </label>
+            </div>
+
+            <div className="form-control">
+              <label className="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-primary"
+                  checked={allowUserSuggestedOptions}
+                  onChange={(e) => setAllowUserSuggestedOptions(e.target.checked)}
+                />
+                <span className="label-text">Allow voters to suggest options</span>
               </label>
             </div>
 

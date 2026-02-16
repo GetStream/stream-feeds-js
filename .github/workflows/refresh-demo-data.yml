@@ -25,7 +25,14 @@ jobs:
         env:
           STREAM_API_KEY: ${{ vars.REACT_TUTORIAL_API_KEY }}
           API_SECRET: ${{ secrets.REACT_TUTORIAL_API_SECRET }}
-        run: yarn create-posts --features link,attachment,mention,poll,reaction,comment,bookmark,repost
+        run: yarn create-posts --features link,hashtags,attachment,mention,poll,reaction,comment,bookmark,repost
+
+      - name: Create premium posts
+        working-directory: test-data-generator
+        env:
+          STREAM_API_KEY: ${{ vars.REACT_TUTORIAL_API_KEY }}
+          API_SECRET: ${{ secrets.REACT_TUTORIAL_API_SECRET }}
+        run: yarn create-premium-posts
 
       - name: Create stories
         working-directory: test-data-generator

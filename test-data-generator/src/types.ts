@@ -30,7 +30,8 @@ export type Feature =
   | 'reaction'
   | 'comment'
   | 'bookmark'
-  | 'repost';
+  | 'repost'
+  | 'hashtags';
 
 export interface FeatureProbabilities {
   link: number;
@@ -41,6 +42,7 @@ export interface FeatureProbabilities {
   comment: number;
   bookmark: number;
   repost: number;
+  hashtags: number;
 }
 
 export interface DownloadResult {
