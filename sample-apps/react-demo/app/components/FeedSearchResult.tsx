@@ -20,13 +20,19 @@ const selector = (state: FeedState) => ({
 const feedOwnerFollowsUs = (ownFollowings: FeedState['own_followings']) =>
   Array.isArray(ownFollowings) && ownFollowings.length > 0;
 
-export const FeedSearchResult = ({ feed }: { feed: Feed }) => {
+export const FeedSearchResult = ({
+  feed,
+  showFollowsYouBadge = false,
+}: {
+  feed: Feed;
+  showFollowsYouBadge?: boolean;
+}) => {
   const { createdBy, ownFollowings, groupId, feedId, name, activityCount } = useStateStore(
     feed.state,
     selector,
   );
   const isHashtag = groupId === 'hashtag';
-  const followsUs = feedOwnerFollowsUs(ownFollowings);
+  const followsUs = showFollowsYouBadge && feedOwnerFollowsUs(ownFollowings);
 
   if (isHashtag) {
     return (

@@ -271,7 +271,7 @@ export default function SearchResults() {
                 {feedSearchResults.map((feed) => (
                   <li className="list-row w-full" key={feed.feed}>
                     <div className="list-col-grow w-full min-w-0">
-                      <FeedSearchResult feed={feed} />
+                      <FeedSearchResult feed={feed} showFollowsYouBadge />
                     </div>
                   </li>
                 ))}
