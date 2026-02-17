@@ -16,10 +16,11 @@ Agents should prioritize backwards compatibility, API stability, and high test c
 • Runtime targets: React 18+, React Native 0.73+
 • CI: GitHub Actions (assume PR validation on build + tests + lint)
 • Linters & docs: ESLint + Prettier
-• Build tools: Rollup, Vite, TypeScript
+• Build tools: Vite, TypeScript (feeds-client); react-native-builder-bob for React Native SDK
 
 ### Project layout (monorepo)
 
+```text
 packages/
   feeds-client/                # Core Feeds API client
     src/
@@ -34,8 +35,8 @@ packages/
   react-native-sdk/            # React Native SDK wrapper
 sample-apps/
   react-demo/                  # Next.js demo application (stream-feeds-react-demo)
-  react-sample-app/            # Next.js sample application (facebook-clone)
   react-native/                # React Native sample application (ExpoTikTokApp)
+```
 
 Use the closest folder's patterns and conventions when editing.
 
@@ -149,12 +150,12 @@ Commit / PR conventions
 Testing policy
 • Add/extend tests in each package's test directories with .test.ts suffix.
 • Cover:
-  • Core FeedsClient and Feed classes
-  • Event handlers and state management - see ai-docs/ai-state-management for details
-  • React hooks and contexts (react-sdk, react-native-sdk)
-  • Utility functions (token creation, rate limiting, search)
-  • Generated API clients and their interactions
-• Integration tests are in `__integration-tests__/` directories
+• Core FeedsClient and Feed classes
+• Event handlers and state management - see ai-docs/ai-state-management for details
+• React hooks and contexts (react-sdk, react-native-sdk)
+• Utility functions (token creation, rate limiting, search)
+• Generated API clients and their interactions
+• Integration tests live in `packages/feeds-client/__integration-tests__/`
 
 Security & credentials
 • Never commit API keys or customer data.
@@ -201,6 +202,7 @@ This project uses **Tailwind CSS** with **daisyUI** for styling.
 To get accurate daisyUI code generation, use one of these methods:
 
 **Quick use in chat:**
+
 ```
 @web https://daisyui.com/llms.txt
 ```

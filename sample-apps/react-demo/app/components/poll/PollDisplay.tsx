@@ -6,7 +6,7 @@ import {
   type PollResponseData,
   type PollState,
 } from '@stream-io/feeds-react-sdk';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useOptimistic, useRef, useState, startTransition } from 'react';
 import { ErrorToast } from '../utility/ErrorToast';
 import { ConfirmDialog, type ConfirmDialogHandle } from '../utility/ConfirmDialog';
 
@@ -47,167 +47,103 @@ export const PollDisplay = ({ poll, activity, withoutInteractions = false }: Pol
   const pollState = useStateStore(pollInstance?.state, pollStateSelector);
 
   // Fall back to poll data from props when poll is not in state store (e.g. reposted activity's poll)
-  const isClosed = pollState?.is_closed ?? poll.is_closed ?? false;
-  const enforceUniqueVote = pollState?.enforce_unique_vote ?? poll.enforce_unique_vote ?? true;
-  const allowUserSuggestedOptions = pollState?.allow_user_suggested_options ?? poll.allow_user_suggested_options ?? false;
-  const isOwner = currentUser?.id === (pollState?.created_by_id ?? poll.created_by_id);
-  const options = pollState?.options ?? poll.options;
-  const pollName = pollState?.name ?? poll.name;
-  const pollDescription = pollState?.description ?? poll.description ?? '';
+  const isClosed = pollState?.is_closed ?? false;
+  const enforceUniqueVote = pollState?.enforce_unique_vote ?? true;
+  const allowUserSuggestedOptions = pollState?.allow_user_suggested_options ?? false;
+  const isOwner = currentUser?.id === (pollState?.created_by_id);
+  const options = pollState?.options
+  const pollName = pollState?.name;
+  const pollDescription = pollState?.description ?? '';
 
   const ownVotes = useMemo(
     () =>
-      Object.keys(pollState?.own_votes_by_option_id ?? {}).length > 0
-        ? Object.keys(pollState?.own_votes_by_option_id ?? {})
-        : (poll.own_votes?.map((v) => v.option_id) ?? []),
-    [pollState?.own_votes_by_option_id, poll.own_votes]
+      Object.keys(pollState?.own_votes_by_option_id ?? {}),
+    [pollState?.own_votes_by_option_id]
   );
 
   const voteCounts = useMemo(
-    () => pollState?.vote_counts_by_option ?? poll.vote_counts_by_option ?? {},
-    [pollState?.vote_counts_by_option, poll.vote_counts_by_option]
+    () => pollState?.vote_counts_by_option ?? {},
+    [pollState?.vote_counts_by_option]
   );
 
-  type OptimisticUpdate = {
-    optionId: string;
-    action: 'add' | 'remove' | 'change';
-    previousOptionId?: string; // Used for 'change' action in single-choice mode
-  };
-
-  // Pending optimistic update; we only clear it when base state has caught up (or on error)
-  // to avoid flicker when useOptimistic would revert before the state store updates.
-  const pendingVoteUpdateRef = useRef<OptimisticUpdate | null>(null);
-
-  const applyUpdateToCounts = useCallback(
-    (current: Record<string, number>, update: OptimisticUpdate): Record<string, number> => {
-      const newCounts = { ...current };
-      if (update.action === 'add') {
-        newCounts[update.optionId] = (newCounts[update.optionId] ?? 0) + 1;
-      } else if (update.action === 'remove') {
-        newCounts[update.optionId] = Math.max(0, (newCounts[update.optionId] ?? 0) - 1);
-      } else if (update.action === 'change' && update.previousOptionId) {
-        newCounts[update.previousOptionId] = Math.max(0, (newCounts[update.previousOptionId] ?? 0) - 1);
-        newCounts[update.optionId] = (newCounts[update.optionId] ?? 0) + 1;
-      }
-      return newCounts;
-    },
-    []
+  const [state, setState] = useOptimistic(
+    { ownVotes, voteCounts },
+    (_, newState: { ownVotes: string[]; voteCounts: Record<string, number> }) => newState
   );
-
-  const applyUpdateToOwnVotes = useCallback(
-    (current: string[], update: OptimisticUpdate): string[] => {
-      let votes = [...current];
-      if (update.action === 'add') {
-        votes.push(update.optionId);
-      } else if (update.action === 'remove') {
-        votes = votes.filter((vote) => vote !== update.optionId);
-      } else if (update.action === 'change') {
-        votes = [update.optionId];
-      }
-      return votes;
-    },
-    []
-  );
-
-  const baseStateReflectsUpdate = useCallback(
-    (update: OptimisticUpdate, _baseCounts: Record<string, number>, baseVotes: string[]): boolean => {
-      if (update.action === 'add') {
-        return baseVotes.includes(update.optionId);
-      }
-      if (update.action === 'remove') {
-        return !baseVotes.includes(update.optionId);
-      }
-      if (update.action === 'change') {
-        return baseVotes.length === 1 && baseVotes[0] === update.optionId;
-      }
-      return false;
-    },
-    []
-  );
-
-  // Clear pending ref when base state has caught up (e.g. after server/state store update)
-  useEffect(() => {
-    const pending = pendingVoteUpdateRef.current;
-    if (pending && baseStateReflectsUpdate(pending, voteCounts, ownVotes)) {
-      pendingVoteUpdateRef.current = null;
-    }
-  }, [voteCounts, ownVotes, baseStateReflectsUpdate]);
-
-  // Display state: use pending optimistic overlay until base state has caught up
-  const { displayVoteCounts, displayOwnVotes } = useMemo(() => {
-    const pending = pendingVoteUpdateRef.current;
-    if (!pending) {
-      return { displayVoteCounts: voteCounts, displayOwnVotes: ownVotes };
-    }
-    if (baseStateReflectsUpdate(pending, voteCounts, ownVotes)) {
-      return { displayVoteCounts: voteCounts, displayOwnVotes: ownVotes };
-    }
-    return {
-      displayVoteCounts: applyUpdateToCounts(voteCounts, pending),
-      displayOwnVotes: applyUpdateToOwnVotes(ownVotes, pending),
-    };
-  }, [voteCounts, ownVotes, applyUpdateToCounts, applyUpdateToOwnVotes, baseStateReflectsUpdate]);
 
   const handleVote = useCallback(
-    async (optionId: string) => {
+    (optionId: string) => {
       if (!client || isClosed || isVoting || interactionsDisabled) return;
 
       setIsVoting(true);
       setError(undefined);
 
-      const hasVotedForThisOption = displayOwnVotes.includes(optionId);
-      const hasExistingVote = displayOwnVotes.length > 0;
-      const previousVotedOptionId = hasExistingVote ? displayOwnVotes[0] : undefined;
+      const hasVotedForThisOption = ownVotes.includes(optionId);
+      const hasExistingVote = ownVotes.length > 0;
+      const previousVotedOptionId = hasExistingVote ? ownVotes[0] : undefined;
 
-      try {
-        if (hasVotedForThisOption) {
-          const voteToRemove =
-            pollState?.own_votes_by_option_id?.[optionId] ??
-            poll.own_votes?.find((v) => v.option_id === optionId);
-          if (voteToRemove) {
-            const update = { optionId, action: 'remove' as const };
-            pendingVoteUpdateRef.current = update;
-            await client.deletePollVote({
+      startTransition(async () => {
+        try {
+          if (hasVotedForThisOption) {
+            const voteToRemove =
+              pollState?.own_votes_by_option_id?.[optionId] ??
+              poll.own_votes?.find((v) => v.option_id === optionId);
+            if (voteToRemove) {
+              setState({
+                ownVotes: ownVotes.filter((v) => v !== optionId),
+                voteCounts: { ...voteCounts, [optionId]: (voteCounts[optionId] ?? 0) - 1 },
+              });
+              await client.deletePollVote({
+                activity_id: activity.id,
+                poll_id: poll.id,
+                vote_id: voteToRemove.id,
+              });
+            }
+          } else if (enforceUniqueVote && hasExistingVote && previousVotedOptionId) {
+            setState({
+              ownVotes: [optionId],
+              voteCounts: {
+                ...voteCounts,
+                [previousVotedOptionId]: (voteCounts[previousVotedOptionId] ?? 0) - 1,
+                [optionId]: (voteCounts[optionId] ?? 0) + 1,
+              },
+            });
+            await client.castPollVote({
               activity_id: activity.id,
               poll_id: poll.id,
-              vote_id: voteToRemove.id,
+              vote: { option_id: optionId },
+            });
+          } else {
+            setState({
+              ownVotes: [...ownVotes, optionId],
+              voteCounts: { ...voteCounts, [optionId]: (voteCounts[optionId] ?? 0) + 1 },
+            });
+            await client.castPollVote({
+              activity_id: activity.id,
+              poll_id: poll.id,
+              vote: { option_id: optionId },
             });
           }
-        } else if (enforceUniqueVote && hasExistingVote && previousVotedOptionId) {
-          const update = { optionId, action: 'change' as const, previousOptionId: previousVotedOptionId };
-          pendingVoteUpdateRef.current = update;
-          await client.castPollVote({
-            activity_id: activity.id,
-            poll_id: poll.id,
-            vote: { option_id: optionId },
-          });
-        } else {
-          const update = { optionId, action: 'add' as const };
-          pendingVoteUpdateRef.current = update;
-          await client.castPollVote({
-            activity_id: activity.id,
-            poll_id: poll.id,
-            vote: { option_id: optionId },
-          });
+        } catch (e) {
+          setError(e instanceof Error ? e : new Error('Failed to vote'));
+        } finally {
+          setIsVoting(false);
         }
-      } catch (e) {
-        pendingVoteUpdateRef.current = null;
-        setError(e instanceof Error ? e : new Error('Failed to vote'));
-      } finally {
-        setIsVoting(false);
-      }
+      });
     },
     [
       client,
       isClosed,
       isVoting,
       enforceUniqueVote,
-      displayOwnVotes,
+      ownVotes,
+      voteCounts,
       pollState?.own_votes_by_option_id,
       poll.own_votes,
       poll.id,
       activity.id,
       interactionsDisabled,
+      setState,
     ]
   );
 
@@ -247,8 +183,7 @@ export const PollDisplay = ({ poll, activity, withoutInteractions = false }: Pol
     }
   }, [client, poll.id, suggestedOptionText, isSuggestingOption]);
 
-  // Calculate display total votes (includes pending optimistic update)
-  const displayTotalVotes = Object.values(displayVoteCounts).reduce(
+  const displayTotalVotes = Object.values(state.voteCounts).reduce(
     (sum, count) => sum + count,
     0
   );
@@ -256,10 +191,10 @@ export const PollDisplay = ({ poll, activity, withoutInteractions = false }: Pol
   // Winner = option(s) with highest vote count when poll is closed (only if at least one vote)
   const winnerOptionIds = useMemo(() => {
     if (!isClosed || !options?.length || displayTotalVotes === 0) return [];
-    const maxCount = Math.max(...options.map((o) => displayVoteCounts[o.id] ?? 0));
+    const maxCount = Math.max(...options.map((o) => state.voteCounts[o.id] ?? 0));
     if (maxCount === 0) return [];
-    return options.filter((o) => (displayVoteCounts[o.id] ?? 0) === maxCount).map((o) => o.id);
-  }, [isClosed, options, displayVoteCounts, displayTotalVotes]);
+    return options.filter((o) => (state.voteCounts[o.id] ?? 0) === maxCount).map((o) => o.id);
+  }, [isClosed, options, state.voteCounts, displayTotalVotes]);
   const hasWinner = winnerOptionIds.length > 0;
 
   return (
@@ -286,12 +221,12 @@ export const PollDisplay = ({ poll, activity, withoutInteractions = false }: Pol
           {/* Poll options */}
           <div className="flex flex-col gap-2">
             {options && options.map((option) => {
-              const voteCount = displayVoteCounts[option.id] ?? 0;
+              const voteCount = state.voteCounts[option.id] ?? 0;
               const percentage =
                 displayTotalVotes > 0
                   ? Math.round((voteCount / displayTotalVotes) * 100)
                   : 0;
-              const hasVoted = displayOwnVotes.includes(option.id);
+              const hasVoted = state.ownVotes.includes(option.id);
 
               return (
                 <button

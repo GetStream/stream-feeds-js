@@ -16,8 +16,8 @@ yarn build:client          # Build feeds-client only
 yarn build:react-sdk       # Build React SDK only
 yarn build:react-native-sdk # Build React Native SDK only
 
-# Development mode with watch (in packages/feeds-client)
-yarn start
+# Development mode with watch (feeds-client)
+yarn workspace @stream-io/feeds-client run start
 ```
 
 ## Testing
@@ -38,7 +38,7 @@ yarn test <pattern>        # Run specific test file, e.g., yarn test feed.test
 yarn vitest run path/to/test.test.ts
 
 # Integration tests require environment variables:
-# VITE_STREAM_API_KEY and VITE_STREAM_API_SECRET (see __integration-tests__/utils.ts)
+# VITE_STREAM_API_KEY and VITE_STREAM_API_SECRET (see packages/feeds-client/__integration-tests__/utils.ts)
 ```
 
 ## Linting
@@ -117,5 +117,5 @@ WebSocket events are processed through handlers in `src/feed/event-handlers/`. E
 
 - State management uses `@stream-io/state-store` with React bindings via `useSyncExternalStore`
 - API types are generated from OpenAPI spec - don't manually edit files in `src/gen/`
-- Integration tests in `__integration-tests__/` require Stream API credentials
+- Integration tests in `packages/feeds-client/__integration-tests__/` require Stream API credentials
 - Tests use vitest; configuration is in `vite.config.ts`

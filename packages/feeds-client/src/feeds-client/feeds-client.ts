@@ -7,6 +7,7 @@ import type {
   AddCommentRequest,
   AddCommentResponse,
   AddReactionRequest,
+  CastPollVoteRequest,
   CreateGuestResponse,
   DeleteActivityReactionResponse,
   DeleteCommentReactionResponse,
@@ -22,6 +23,7 @@ import type {
   ImageUploadRequest,
   OwnBatchRequest,
   PollResponse,
+  PollVoteResponse,
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
@@ -459,6 +461,46 @@ export class FeedsClient extends FeedsApi {
         is_closed: true,
       },
     });
+  };
+
+  castPollVote = async (
+    request: CastPollVoteRequest & { activity_id: string; poll_id: string },
+  ): Promise<StreamResponse<PollVoteResponse>> => {
+    const poll = this.pollFromState(request.poll_id);
+    const response = await super.castPollVote(request);
+    if (response.poll && response.vote && poll) {
+      const payload = {
+        poll: response.poll,
+        poll_vote: response.vote,
+        created_at: new Date(),
+      };
+      if (
+        poll.data.enforce_unique_vote &&
+        Object.keys(poll.data.own_votes_by_option_id).length > 0
+      ) {
+        poll.handleVoteChanged(payload);
+      } else {
+        poll.handleVoteCasted(payload);
+      }
+    }
+    return response;
+  };
+
+  deletePollVote = async (request: {
+    activity_id: string;
+    poll_id: string;
+    vote_id: string;
+    user_id?: string;
+  }): Promise<StreamResponse<PollVoteResponse>> => {
+    const response = await super.deletePollVote(request);
+    if (response.poll && response.vote) {
+      this.pollFromState(request.poll_id)?.handleVoteRemoved({
+        poll: response.poll,
+        poll_vote: response.vote,
+        created_at: new Date(),
+      });
+    }
+    return response;
   };
 
   uploadFile = (

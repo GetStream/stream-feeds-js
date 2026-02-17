@@ -6,9 +6,6 @@ import type {
   PollUpdatedFeedEvent,
   WSEvent,
   PollClosedFeedEvent,
-  PollVoteCastedFeedEvent,
-  PollVoteChangedFeedEvent,
-  PollVoteRemovedFeedEvent,
   PollResponseData,
 } from '../gen/models';
 
@@ -20,21 +17,14 @@ const isPollClosedEventEvent = (
   e: WSEvent,
 ): e is { type: 'feeds.poll.closed' } & PollClosedFeedEvent =>
   e.type === 'feeds.poll.closed';
-const isPollVoteCastedEvent = (
-  e: WSEvent,
-): e is { type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent =>
-  e.type === 'feeds.poll.vote_casted';
-const isPollVoteChangedEvent = (
-  e: WSEvent,
-): e is { type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent =>
-  e.type === 'feeds.poll.vote_changed';
-const isPollVoteRemovedEvent = (
-  e: WSEvent,
-): e is { type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent =>
-  e.type === 'feeds.poll.vote_removed';
 
-export const isVoteAnswer = (vote: PollVoteResponseData) =>
-  !!vote?.answer_text;
+export type PollVotePayload = {
+  poll: PollResponseData;
+  poll_vote: PollVoteResponseData;
+  created_at: Date;
+};
+
+export const isVoteAnswer = (vote: PollVoteResponseData) => !!vote?.answer_text;
 
 export type PollAnswersQueryParams = QueryPollVotesRequest & {
   poll_id: string;
@@ -126,13 +116,22 @@ export class StreamPoll {
     });
   };
 
-  public handleVoteCasted = (event: PollVoteCastedFeedEvent) => {
+  public handleVoteCasted = (event: PollVotePayload) => {
     if (event.poll?.id && event.poll.id !== this.id) return;
-    if (!isPollVoteCastedEvent(event as WSEvent)) return;
     const currentState = this.data;
     const isOwnVote =
       event.poll_vote.user_id ===
       this.client.state.getLatestValue().connected_user?.id;
+
+    if (isOwnVote) {
+      const alreadyApplied = isVoteAnswer(event.poll_vote)
+        ? currentState.own_answer?.id === event.poll_vote.id
+        : !!event.poll_vote.option_id &&
+          currentState.own_votes_by_option_id[event.poll_vote.option_id]?.id ===
+            event.poll_vote.id;
+      if (alreadyApplied) return;
+    }
+
     let latestAnswers = [...currentState.latest_answers];
     let ownAnswer = currentState.own_answer;
     let ownVotesByOptionId = currentState.own_votes_by_option_id;
@@ -150,7 +149,10 @@ export class StreamPoll {
     }
 
     if (isVoteAnswer(event.poll_vote)) {
-      latestAnswers = [event.poll_vote, ...latestAnswers];
+      latestAnswers = [
+        event.poll_vote,
+        ...latestAnswers.filter((a) => a.id !== event.poll_vote.id),
+      ];
     } else {
       maxVotedOptionIds = getMaxVotedOptionIds(
         event.poll.vote_counts_by_option,
@@ -176,14 +178,23 @@ export class StreamPoll {
     });
   };
 
-  public handleVoteChanged = (event: PollVoteChangedFeedEvent) => {
+  public handleVoteChanged = (event: PollVotePayload) => {
     // this event is triggered only when event.poll.enforce_unique_vote === true
     if (event.poll?.id && event.poll.id !== this.id) return;
-    if (!isPollVoteChangedEvent(event as WSEvent)) return;
     const currentState = this.data;
     const isOwnVote =
       event.poll_vote.user_id ===
       this.client.state.getLatestValue().connected_user?.id;
+
+    if (isOwnVote) {
+      const alreadyApplied = isVoteAnswer(event.poll_vote)
+        ? currentState.own_answer?.id === event.poll_vote.id
+        : !!event.poll_vote.option_id &&
+          currentState.own_votes_by_option_id[event.poll_vote.option_id]?.id ===
+            event.poll_vote.id;
+      if (alreadyApplied) return;
+    }
+
     let latestAnswers = [...currentState.latest_answers];
     let ownAnswer = currentState.own_answer;
     let ownVotesByOptionId = currentState.own_votes_by_option_id;
@@ -249,13 +260,20 @@ export class StreamPoll {
     });
   };
 
-  public handleVoteRemoved = (event: PollVoteRemovedFeedEvent) => {
+  public handleVoteRemoved = (event: PollVotePayload) => {
     if (event.poll?.id && event.poll.id !== this.id) return;
-    if (!isPollVoteRemovedEvent(event as WSEvent)) return;
     const currentState = this.data;
     const isOwnVote =
       event.poll_vote.user_id ===
       this.client.state.getLatestValue().connected_user?.id;
+
+    if (isOwnVote) {
+      const alreadyApplied = isVoteAnswer(event.poll_vote)
+        ? !currentState.own_answer
+        : !!event.poll_vote.option_id &&
+          !(event.poll_vote.option_id in currentState.own_votes_by_option_id);
+      if (alreadyApplied) return;
+    }
     let latestAnswers = [...currentState.latest_answers];
     let ownAnswer = currentState.own_answer;
     const ownVotesByOptionId = { ...currentState.own_votes_by_option_id };
