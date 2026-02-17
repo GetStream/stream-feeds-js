@@ -1,6 +1,6 @@
 {
   "name": "@stream-io/feeds-react-native-sdk",
-  "version": "0.1.61",
+  "version": "0.1.62",
   "packageManager": "yarn@3.5.0",
   "main": "./dist/commonjs/index.js",
   "types": "./dist/typescript/index.d.ts",
