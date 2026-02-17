@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.47](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.46...@stream-io/feeds-client-0.3.47) (2026-02-17)
+
+
+### Features
+
+* add useMembers hook ([d60d251](https://github.com/GetStream/stream-feeds-js/commit/d60d2513f943f26731673ce714e6dbb4ffca4356))
+
+
+### Bug Fixes
+
+* add poll to poll cache from parent activity too ([2ecbcf5](https://github.com/GetStream/stream-feeds-js/commit/2ecbcf5a2a636acc726c12bccb53babe49ea3db8))
+* prevent WS event handler from wiping friend_reactions and friend… ([#235](https://github.com/GetStream/stream-feeds-js/issues/235)) ([de13b5d](https://github.com/GetStream/stream-feeds-js/commit/de13b5d9d75b3ac32957db392fd9b29e0aeba3ae))
+* updating ownVotesByOptionId change didn't picked up by state store ([cb16ac7](https://github.com/GetStream/stream-feeds-js/commit/cb16ac77b39ebaf10ba370a8b7ae8b6094bcb39f))
+
 ## [0.3.46](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.45...@stream-io/feeds-client-0.3.46) (2026-02-09)
 
 
