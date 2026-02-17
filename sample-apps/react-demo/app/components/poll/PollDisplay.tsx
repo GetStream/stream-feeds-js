@@ -143,6 +143,7 @@ export const PollDisplay = ({ poll, activity, withoutInteractions = false }: Pol
       poll.id,
       activity.id,
       interactionsDisabled,
+      setState,
     ]
   );
 
