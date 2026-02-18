@@ -36,11 +36,23 @@ export function handleCommentAdded(
     }
 
     const newComments = entityState?.comments ? [...entityState.comments] : [];
+    const sort = entityState.pagination?.sort;
+    const hasMorePages = entityState.pagination?.next !== undefined;
+    const isFromCurrentUser = eventTriggeredByConnectedUser.call(this, payload);
 
-    if (entityState.pagination?.sort === 'last') {
+    if (sort === 'last') {
       newComments.unshift(comment);
+    } else if (sort === 'first') {
+      if (isFromCurrentUser) {
+        newComments.push(comment);
+      } else {
+        if (!hasMorePages) {
+          newComments.push(comment);
+        } else {
+          return currentState;
+        }
+      }
     } else {
-      // 'first' and other sort options
       newComments.push(comment);
     }
 

@@ -135,20 +135,28 @@ describe('Activity with state updates', () => {
   });
 
   it(`should load comment replies`, async () => {
-    const comment1 =
+    const activityComments =
       activityWithStateUpdates.currentState.comments_by_entity_id[
         activityWithStateUpdates.id
-      ]?.comments?.[0]!;
+      ]?.comments ?? [];
+    const commentWithReplies = activityComments.find(
+      (c) => (c.reply_count ?? 0) > 0,
+    )!;
 
     expect(
-      activityWithStateUpdates.currentState.comments_by_entity_id[comment1.id],
+      activityWithStateUpdates.currentState.comments_by_entity_id[
+        commentWithReplies.id
+      ],
     ).toBe(undefined);
 
-    await activityWithStateUpdates.loadNextPageCommentReplies(comment1);
+    await activityWithStateUpdates.loadNextPageCommentReplies(
+      commentWithReplies,
+    );
 
     expect(
-      activityWithStateUpdates.currentState.comments_by_entity_id[comment1.id]
-        ?.comments?.length,
+      activityWithStateUpdates.currentState.comments_by_entity_id[
+        commentWithReplies.id
+      ]?.comments?.length,
     ).toBe(1);
   });
 

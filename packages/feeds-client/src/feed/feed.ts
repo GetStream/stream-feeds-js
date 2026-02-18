@@ -509,6 +509,25 @@ export class Feed extends FeedApi {
         );
 
         const existingComments = newCommentsByEntityId[entityId]?.comments;
+        let comments: CommentResponse[] = existingComments
+          ? uniqueArrayMerge(
+              existingComments,
+              newComments,
+              (comment) => comment.id,
+            )
+          : newComments;
+        // Only sort when merging pages (existing + new); initial load order comes from API
+        if (
+          data.sort === 'first' &&
+          existingComments &&
+          existingComments.length > 0
+        ) {
+          comments = [...comments].sort(
+            (a, b) =>
+              new Date(a.created_at).getTime() -
+              new Date(b.created_at).getTime(),
+          );
+        }
 
         newCommentsByEntityId[entityId] = {
           ...newCommentsByEntityId[entityId],
@@ -518,13 +537,7 @@ export class Feed extends FeedApi {
             next: item.next,
             sort: data.sort,
           },
-          comments: existingComments
-            ? uniqueArrayMerge(
-                existingComments,
-                newComments,
-                (comment) => comment.id,
-              )
-            : newComments,
+          comments,
         };
       }
 
