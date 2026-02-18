@@ -33,6 +33,8 @@ import type {
   UpdateCommentRequest,
   UpdateCommentResponse,
   UpdateFollowRequest,
+  UpdatePollPartialRequest,
+  UpdatePollRequest,
   UserRequest,
   WSEvent,
 } from '../gen/models';
@@ -452,15 +454,40 @@ export class FeedsClient extends FeedsApi {
     return streamDevToken(userId);
   };
 
+  updatePoll = async (request: UpdatePollRequest) => {
+    const poll = this.pollFromState(request.id);
+    const response = await super.updatePoll(request);
+    if (response.poll && poll) {
+      poll.handlePollUpdated({ poll: response.poll, created_at: new Date() });
+    }
+    return response;
+  };
+
+  updatePollPartial = async (
+    request: UpdatePollPartialRequest & { poll_id: string },
+  ) => {
+    const poll = this.pollFromState(request.poll_id);
+    const response = await super.updatePollPartial(request);
+    if (response.poll && poll) {
+      poll.handlePollUpdated({ poll: response.poll, created_at: new Date() });
+    }
+    return response;
+  };
+
   closePoll = async (request: {
     poll_id: string;
   }): Promise<StreamResponse<PollResponse>> => {
-    return await this.updatePollPartial({
+    const poll = this.pollFromState(request.poll_id);
+    const response = await super.updatePollPartial({
       poll_id: request.poll_id,
       set: {
         is_closed: true,
       },
     });
+    if (response.poll && poll) {
+      poll.handlePollClosed({ poll: response.poll, created_at: new Date() });
+    }
+    return response;
   };
 
   castPollVote = async (

@@ -85,6 +85,24 @@ describe('Poll state updates from HTTP responses', () => {
     expect(state.own_answer!.answer_text).toBe('My custom answer');
   });
 
+  it('updatePollPartial updates poll state without watch', async () => {
+    await client.updatePollPartial({
+      poll_id: pollId,
+      set: { name: 'Updated poll name' },
+    });
+
+    const poll = client.pollFromState(pollId);
+    expect(poll!.data.name).toBe('Updated poll name');
+  });
+
+  // closePoll must be last since closing prevents further updates
+  it('closePoll updates poll state without watch', async () => {
+    await client.closePoll({ poll_id: pollId });
+
+    const poll = client.pollFromState(pollId);
+    expect(poll!.data.is_closed).toBe(true);
+  });
+
   afterAll(async () => {
     await client.deletePoll({ poll_id: pollId });
     await feed.delete({ hard_delete: true });
@@ -185,6 +203,52 @@ describe('Poll state deduplication with watch', () => {
 
     // Final state should be correct
     expect(poll.data.own_votes_by_option_id[optionIds[0]]).toBeUndefined();
+
+    unsubscribe();
+  });
+
+  it('updatePollPartial state update happens only once when watched', async () => {
+    const poll = client.pollFromState(pollId)!;
+    const spy = vi.fn();
+    const unsubscribe = poll.state.subscribe(spy);
+    spy.mockReset();
+
+    await client.updatePollPartial({
+      poll_id: pollId,
+      set: { name: 'Dedup updated name' },
+    });
+
+    // HTTP update should have been applied
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(poll.data.name).toBe('Dedup updated name');
+
+    // Wait for the WS echo event
+    await waitForEvent(client, 'feeds.poll.updated');
+
+    // Spy should still have been called only once (WS echo was deduplicated)
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+  });
+
+  // closePoll must be last since closing prevents further updates
+  it('closePoll state update happens only once when watched', async () => {
+    const poll = client.pollFromState(pollId)!;
+    const spy = vi.fn();
+    const unsubscribe = poll.state.subscribe(spy);
+    spy.mockReset();
+
+    await client.closePoll({ poll_id: pollId });
+
+    // HTTP update should have been applied
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(poll.data.is_closed).toBe(true);
+
+    // Wait for the WS echo event
+    await waitForEvent(client, 'feeds.poll.closed');
+
+    // Spy should still have been called only once (WS echo was deduplicated)
+    expect(spy).toHaveBeenCalledTimes(1);
 
     unsubscribe();
   });

@@ -3,20 +3,13 @@ import type { FeedsClient } from '../feeds-client';
 import type {
   PollVoteResponseData,
   QueryPollVotesRequest,
-  PollUpdatedFeedEvent,
-  WSEvent,
-  PollClosedFeedEvent,
   PollResponseData,
 } from '../gen/models';
 
-const isPollUpdatedEvent = (
-  e: WSEvent,
-): e is { type: 'feeds.poll.updated' } & PollUpdatedFeedEvent =>
-  e.type === 'feeds.poll.updated';
-const isPollClosedEventEvent = (
-  e: WSEvent,
-): e is { type: 'feeds.poll.closed' } & PollClosedFeedEvent =>
-  e.type === 'feeds.poll.closed';
+export type PollUpdatePayload = {
+  poll: PollResponseData;
+  created_at: Date;
+};
 
 export type PollVotePayload = {
   poll: PollResponseData;
@@ -97,9 +90,16 @@ export class StreamPoll {
     return this.state.getLatestValue();
   }
 
-  public handlePollUpdated = (event: PollUpdatedFeedEvent) => {
+  public handlePollUpdated = (event: PollUpdatePayload) => {
     if (event.poll?.id && event.poll.id !== this.id) return;
-    if (!isPollUpdatedEvent(event as WSEvent)) return;
+    const currentState = this.data;
+    if (
+      currentState.updated_at &&
+      event.poll.updated_at &&
+      event.poll.updated_at <= currentState.updated_at
+    ) {
+      return;
+    }
     const { id, ...pollData } = event.poll;
     this.state.partialNext({
       ...pollData,
@@ -107,9 +107,10 @@ export class StreamPoll {
     });
   };
 
-  public handlePollClosed = (event: PollClosedFeedEvent) => {
+  public handlePollClosed = (event: PollUpdatePayload) => {
     if (event.poll?.id && event.poll.id !== this.id) return;
-    if (!isPollClosedEventEvent(event as WSEvent)) return;
+    const currentState = this.data;
+    if (currentState.is_closed) return;
     this.state.partialNext({
       is_closed: true,
       last_activity_at: new Date(event.created_at),
