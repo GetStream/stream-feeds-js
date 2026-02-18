@@ -46,7 +46,6 @@ export const PollDisplay = ({ poll, activity, withoutInteractions = false }: Pol
 
   const pollState = useStateStore(pollInstance?.state, pollStateSelector);
 
-  // Fall back to poll data from props when poll is not in state store (e.g. reposted activity's poll)
   const isClosed = pollState?.is_closed ?? false;
   const enforceUniqueVote = pollState?.enforce_unique_vote ?? true;
   const allowUserSuggestedOptions = pollState?.allow_user_suggested_options ?? false;
