@@ -73,6 +73,69 @@ describe(handleCommentAdded.name, () => {
     );
   });
 
+  it('for sort "first", does not add comment from other user when next page exists (pagination.next is set)', () => {
+    const existingComment = generateCommentResponse({
+      object_id: activityId,
+    });
+
+    feed.state.partialNext({
+      comments_by_entity_id: {
+        [activityId]: {
+          comments: [existingComment],
+          pagination: { sort: 'first', next: 'cursor-more-comments' },
+        },
+      },
+    });
+
+    const event = generateCommentAddedEvent({
+      comment: { object_id: activityId },
+      user: generateUserResponseCommonFields({ id: getHumanId() }),
+    });
+
+    const stateBefore = feed.currentState;
+    handleCommentAdded.call(feed, event);
+    const stateAfter = feed.currentState;
+
+    expect(stateAfter).toBe(stateBefore);
+    expect(stateAfter.comments_by_entity_id[activityId]!.comments).toHaveLength(
+      1,
+    );
+  });
+
+  it('for sort "first", appends comment from other user when all comments are loaded (next is undefined)', () => {
+    const existingComment = generateCommentResponse({
+      object_id: activityId,
+    });
+
+    feed.state.partialNext({
+      comments_by_entity_id: {
+        [activityId]: {
+          comments: [existingComment],
+          pagination: { sort: 'first' },
+        },
+      },
+    });
+
+    const event = generateCommentAddedEvent({
+      comment: { object_id: activityId },
+      user: generateUserResponseCommonFields({ id: getHumanId() }),
+    });
+
+    const stateBefore = feed.currentState;
+    handleCommentAdded.call(feed, event);
+    const stateAfter = feed.currentState;
+
+    expect(stateAfter.comments_by_entity_id[activityId]!.comments).not.toBe(
+      stateBefore.comments_by_entity_id[activityId]!.comments,
+    );
+    expect(stateAfter.comments_by_entity_id[activityId]!.comments).toHaveLength(
+      2,
+    );
+    expect(stateAfter.comments_by_entity_id[activityId]!.comments!.at(-1)).toBe(
+      event.comment,
+    );
+  });
+
   it('prepends a new comment when pagination.sort is "last"', () => {
     const existingComment = generateCommentResponse({
       object_id: activityId,
