@@ -38,6 +38,7 @@ describe('Feeds page', () => {
         description: 'My personal feed',
         name: 'jack',
         visibility: 'public',
+        filter_tags: ['tech', 'hiking', 'cooking'],
       },
     });
   });
@@ -153,6 +154,16 @@ describe('Feeds page', () => {
     await feed.getOrCreate({
       filter: {
         $and: [{ filter_tags: ['green'] }, { filter_tags: ['orange'] }],
+      },
+    });
+  });
+
+  it(`updating a feed`, async () => {
+    await feed.update({
+      name: 'Updated feed name',
+      filter_tags: ['tech', 'hiking', 'cooking'],
+      custom: {
+        color: 'blue',
       },
     });
   });
@@ -301,8 +312,11 @@ describe('Feeds page', () => {
     });
   });
 
-  afterAll(async () => {
+  it(`deleting a feed`, async () => {
     await feed.delete({ hard_delete: true });
+  });
+
+  afterAll(async () => {
     await client.disconnectUser();
   });
 });
