@@ -4952,6 +4952,28 @@ export interface QueryModerationConfigsResponse {
   prev?: string;
 }
 
+export interface QueryPinnedActivitiesRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryPinnedActivitiesResponse {
+  duration: string;
+
+  pinned_activities: ActivityPinResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
 export interface QueryPollVotesRequest {
   limit?: number;
 

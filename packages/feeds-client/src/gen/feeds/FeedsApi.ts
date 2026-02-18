@@ -88,6 +88,8 @@ import type {
   QueryFeedsResponse,
   QueryFollowsRequest,
   QueryFollowsResponse,
+  QueryPinnedActivitiesRequest,
+  QueryPinnedActivitiesResponse,
   QueryPollVotesRequest,
   QueryPollsRequest,
   QueryPollsResponse,
@@ -1607,6 +1609,40 @@ export class FeedsApi {
     );
 
     decoders.RejectFeedMemberInviteResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async queryPinnedActivities(
+    request: QueryPinnedActivitiesRequest & {
+      feed_group_id: string;
+      feed_id: string;
+    },
+  ): Promise<StreamResponse<QueryPinnedActivitiesResponse>> {
+    const pathParams = {
+      feed_group_id: request?.feed_group_id,
+      feed_id: request?.feed_id,
+    };
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryPinnedActivitiesResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/pinned_activities/query',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.QueryPinnedActivitiesResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

@@ -10,6 +10,8 @@ import type {
   PinActivityResponse,
   QueryFeedMembersRequest,
   QueryFeedMembersResponse,
+  QueryPinnedActivitiesRequest,
+  QueryPinnedActivitiesResponse,
   RejectFeedMemberInviteRequest,
   RejectFeedMemberInviteResponse,
   Response,
@@ -121,6 +123,16 @@ export class FeedApi {
     request?: RejectFeedMemberInviteRequest,
   ): Promise<StreamResponse<RejectFeedMemberInviteResponse>> {
     return this.feedsApi.rejectFeedMemberInvite({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
+
+  queryPinnedActivities(
+    request?: QueryPinnedActivitiesRequest,
+  ): Promise<StreamResponse<QueryPinnedActivitiesResponse>> {
+    return this.feedsApi.queryPinnedActivities({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,

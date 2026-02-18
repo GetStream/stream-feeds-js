@@ -1713,6 +1713,13 @@ decoders.QueryModerationConfigsResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.QueryPinnedActivitiesResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    pinned_activities: { type: 'ActivityPinResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.QueryPollsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     polls: { type: 'PollResponseData', isSingle: false },
