@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.48](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.47...@stream-io/feeds-client-0.3.48) (2026-02-18)
+
+
+### Features
+
+* add state updates from HTTP response to poll vote endpoints ([b7ed748](https://github.com/GetStream/stream-feeds-js/commit/b7ed7484015202d28612a3a7fc436a2797797cd2))
+* New endpoint queryPinnedActivities ([#240](https://github.com/GetStream/stream-feeds-js/issues/240)) ([d458fc5](https://github.com/GetStream/stream-feeds-js/commit/d458fc5a2c5b88d3ca37c0026eb26435f4dd9522))
+
 ## [0.3.47](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.46...@stream-io/feeds-client-0.3.47) (2026-02-17)
 
 
