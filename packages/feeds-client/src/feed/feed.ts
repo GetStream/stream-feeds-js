@@ -13,7 +13,6 @@ import type {
   ThreadedCommentResponse,
   FollowRequest,
   QueryCommentsRequest,
-  ActivityAddedEvent,
   EnrichmentOptions,
 } from '../gen/models';
 import type { StreamResponse } from '../gen-imports';
@@ -55,11 +54,15 @@ import {
 import { capitalize } from '../common/utils';
 import type {
   ActivityIdOrCommentId,
+  ConnectedUser,
   GetCommentsRepliesRequest,
   GetCommentsRequest,
   LoadingStates,
+  OnNewActivityCallback,
+  OnNewActivityResult,
   PagerResponseWithLoadingStates,
 } from '../types';
+import { activityFilter } from './activity-filter';
 import {
   checkHasAnotherPage,
   Constants,
@@ -143,12 +146,6 @@ export type FeedState = Omit<
    * `true` if the feed is receiving real-time updates via WebSocket
    */
   watch: boolean;
-
-  /**
-   * When a new activity is received from a WebSocket event by default it's added to the start of the list. You can change this to `end` to add it to the end of the list.
-   * Useful for story feeds.
-   */
-  addNewActivitiesTo: 'start' | 'end';
 };
 
 type EventHandlerByEventType = {
@@ -236,8 +233,7 @@ export class Feed extends FeedApi {
     id: string,
     data?: FeedResponse,
     watch = false,
-    addNewActivitiesTo: 'start' | 'end' = 'start',
-    public activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean,
+    public onNewActivity?: OnNewActivityCallback,
   ) {
     super(client, groupId, id);
     this.state = new StateStore<FeedState>({
@@ -249,7 +245,6 @@ export class Feed extends FeedApi {
       is_loading_activities: false,
       comments_by_entity_id: {},
       watch,
-      addNewActivitiesTo,
     });
     this.client = client;
 
@@ -277,10 +272,6 @@ export class Feed extends FeedApi {
     return this.state.getLatestValue();
   }
 
-  set addNewActivitiesTo(value: 'start' | 'end') {
-    this.state.partialNext({ addNewActivitiesTo: value });
-  }
-
   hasActivity(activityId: string) {
     return this.indexedActivityIds.has(activityId);
   }
@@ -289,6 +280,31 @@ export class Feed extends FeedApi {
     return this.currentState.pinned_activities?.some(
       (pinnedActivity) => pinnedActivity.activity.id === activityId,
     );
+  }
+
+  /**
+   * Resolves how to handle a new activity (WS or HTTP): ignore, add-to-start, or add-to-end.
+   * Uses onNewActivity if set; else default (current user + filter match) adds to start.
+   */
+  protected resolveNewActivityDecision(
+    activity: ActivityResponse,
+    currentUser: ConnectedUser | undefined,
+    _fromHttp: boolean,
+  ): OnNewActivityResult {
+    if (this.onNewActivity) {
+      return this.onNewActivity({ activity, currentUser });
+    }
+    if (!currentUser) return 'ignore';
+    if (activity.user?.id !== currentUser.id) return 'ignore';
+    if (
+      !activityFilter(
+        activity,
+        this.currentState.last_get_or_create_request_config,
+      )
+    ) {
+      return 'ignore';
+    }
+    return 'add-to-start';
   }
 
   async synchronize() {
@@ -934,11 +950,40 @@ export class Feed extends FeedApi {
     });
   }
 
+  /**
+   * Applies a new activity to this feed's state (decision + add to activities).
+   * Used when the activity was added via this feed's addActivity or via client.addActivity.
+   */
+  protected addActivityFromHTTPResponse(activity: ActivityResponse): void {
+    const currentUser = this.client.state.getLatestValue().connected_user;
+    const decision = this.resolveNewActivityDecision(
+      activity,
+      currentUser,
+      true,
+    );
+    if (decision !== 'ignore') {
+      const position = decision === 'add-to-end' ? 'end' : 'start';
+      const currentActivities = this.currentState.activities;
+      const result = addActivitiesToState.bind(this)(
+        [activity],
+        currentActivities,
+        position,
+        { hasOwnFields: false },
+      );
+      if (result.changed) {
+        this.client.hydratePollCache([activity]);
+        this.state.partialNext({ activities: result.activities });
+      }
+    }
+  }
+
   async addActivity(request: Omit<ActivityRequest, 'feeds'>) {
     const response = await this.client.addActivity({
       ...request,
       feeds: [this.feed],
     });
+
+    this.addActivityFromHTTPResponse(response.activity);
 
     return response;
   }
@@ -981,8 +1026,8 @@ export class Feed extends FeedApi {
   protected newActivitiesAdded(
     activities: ActivityResponse[],
     options: {
-      fromWebSocket: boolean;
-    } = { fromWebSocket: false },
+      hasOwnFields: boolean;
+    } = { hasOwnFields: true },
   ) {
     this.client.hydratePollCache(activities);
     this.getOrCreateFeeds(activities, options);
@@ -991,7 +1036,7 @@ export class Feed extends FeedApi {
   private getOrCreateFeeds(
     activities: ActivityResponse[],
     options: {
-      fromWebSocket: boolean;
+      hasOwnFields: boolean;
     },
   ) {
     const enrichmentOptions =
@@ -1013,7 +1058,7 @@ export class Feed extends FeedApi {
       const fieldsToUpdate: Array<
         'own_capabilities' | 'own_follows' | 'own_followings' | 'own_membership'
       > = [];
-      if (!options.fromWebSocket) {
+      if (options.hasOwnFields) {
         fieldsToUpdate.push('own_membership');
         if (!enrichmentOptions?.skip_own_capabilities) {
           fieldsToUpdate.push('own_capabilities');
@@ -1033,7 +1078,7 @@ export class Feed extends FeedApi {
           fieldsToUpdate,
         });
       });
-      if (options.fromWebSocket) {
+      if (!options.hasOwnFields) {
         const uninitializedFeeds = newFeeds.filter((feedResponse) => {
           const feed = this.client.feed(feedResponse.group_id, feedResponse.id);
           // own_capabilities can only be undefined if we haven't fetched it yet
