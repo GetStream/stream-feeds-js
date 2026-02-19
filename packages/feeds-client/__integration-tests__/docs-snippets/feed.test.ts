@@ -117,8 +117,8 @@ describe('Feeds page', () => {
 
   it(`filtering activities`, async () => {
     feed = client.feed(feed.group, feed.id, {
-      activityAddedEventFilter: (event) =>
-        event.activity.filter_tags.includes('blue'),
+      onNewActivity: ({ activity }) =>
+        activity.filter_tags?.includes('blue') ? 'add-to-start' : 'ignore',
     });
 
     // Add a few activities

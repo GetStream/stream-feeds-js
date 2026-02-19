@@ -50,6 +50,7 @@
     "CHANGELOG.md"
   ],
   "dependencies": {
+    "@stream-io/filter": "file:../../../js-toolkit/packages/filter",
     "@stream-io/logger": "^2.0.0",
     "@stream-io/state-store": "^1.1.6",
     "axios": "^1.7.7"

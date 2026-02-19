@@ -11,7 +11,7 @@ import type { FeedsClient } from '../src/feeds-client';
 import type { Feed } from '../src/feed';
 import { type StreamClient } from '@stream-io/node-sdk';
 
-describe('Feeds - activtyAddedEventFilter filters WS events', () => {
+describe('Feeds - onNewActivity filters WS events', () => {
   let client: FeedsClient;
   const user: UserRequest = getTestUser();
   let feed: Feed;
@@ -23,14 +23,12 @@ describe('Feeds - activtyAddedEventFilter filters WS events', () => {
     await client.connectUser(user, createTestTokenGenerator(user));
   });
 
-  it('create feed and provide activtyAddedEventFilter callback', async () => {
+  it('create feed and provide onNewActivity callback', async () => {
     feed = client.feed('user', crypto.randomUUID(), {
-      activityAddedEventFilter: (event) => {
-        if (event.activity.filter_tags.includes('important')) {
-          return true;
-        }
-        return false;
-      },
+      onNewActivity: ({ activity }) =>
+        activity.filter_tags?.includes('important')
+          ? 'add-to-start'
+          : 'ignore',
     });
     await feed.getOrCreate({
       watch: true,

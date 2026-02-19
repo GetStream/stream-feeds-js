@@ -1,6 +1,7 @@
 export * from '@stream-io/state-store';
 export * from './feeds-client/feeds-client';
 export * from './feed/feed';
+export { activityFilter } from './feed/activity-filter';
 export * from './gen/models';
 export * from './types';
 export * from './common/types';

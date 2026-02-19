@@ -104,7 +104,7 @@ export class ActivityWithStateUpdates {
     });
 
     if (this.feed) {
-      this.feed.activityAddedEventFilter = () => false;
+      this.feed.onNewActivity = () => 'ignore';
     }
 
     if (comments) {

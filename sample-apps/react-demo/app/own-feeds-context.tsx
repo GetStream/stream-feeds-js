@@ -77,13 +77,7 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
     } else {
       const feed = client.feed('user', connectedUser.id);
       setOwnFeed(feed);
-      const timeline = client.feed('timeline', connectedUser.id, {
-        // Social media apps usually don't add new activities from WebSocket
-        // users need to pull to refresh
-        activityAddedEventFilter: (event) => {
-          return event.activity.user?.id === connectedUser.id;
-        },
-      });
+      const timeline = client.feed('timeline', connectedUser.id);
       setOwnTimeline(timeline);
       const feedRequest = feed
         ?.getOrCreate({
@@ -114,16 +108,15 @@ export const OwnFeedsContextProvider = ({ children }: PropsWithChildren) => {
       notifications?.getOrCreate({ watch: true }).catch((error: Error) => {
         setErrors((prev) => ({ ...prev, ownNotifications: error }));
       });
-      // For stories feed there is no WebSocket event for new stories, so we don't need activityAddedEventFilter
       const storyTimeline = client.feed('stories', connectedUser.id);
       setOwnStoryTimeline(storyTimeline);
       storyTimeline?.getOrCreate({ watch: true }).catch((error: Error) => {
         setErrors((prev) => ({ ...prev, ownStoryTimeline: error }));
       });
       const storyFeed = client.feed('story', connectedUser.id, {
-        // In a regular feed, latest activites from WebSocket are added to start of the list
+        // In a regular feed, latest activities from WebSocket are added to start of the list
         // but we want stories to be ordered chronologically, so we add them to the end of the list
-        addNewActivitiesTo: 'end',
+        onNewActivity: () => 'add-to-end',
       });
       setOwnStoryFeed(storyFeed);
       storyFeed
