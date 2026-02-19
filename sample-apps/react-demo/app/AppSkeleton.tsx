@@ -14,12 +14,37 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
   const unreadCount = notificationStatus?.unread ?? 0;
 
   return (
-    <div className="min-h-dvh w-full max-w-7xl mx-auto">
-      {/* Mobile/Tablet drawer */}
-      <div className="drawer min-h-dvh lg:hidden">
+    <div className="min-h-dvh w-full max-w-7xl mx-auto lg:flex">
+      {/* Desktop left sidebar */}
+      <aside className="w-1/4 hidden lg:flex flex-col items-end py-10 sticky top-0 h-dvh px-4">
+        <nav className="flex flex-col gap-1">
+          <ul className="menu gap-0.5">
+            <li>
+              <div className="py-2 mb-2 hover:bg-transparent cursor-default">
+                <StreamLogo />
+              </div>
+            </li>
+            <li><HomeLink /></li>
+            <li><PopularLink /></li>
+            <li>
+              <NotificationsLink>
+                <span className={`bg-primary text-primary-content text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center ${unreadCount > 0 ? 'visible' : 'invisible'}`}>
+                  {unreadCount}
+                </span>
+              </NotificationsLink>
+            </li>
+            <li><BookmarksLink /></li>
+            <li><ProfileLink /></li>
+          </ul>
+        </nav>
+      </aside>
+
+      {/* Center column: mobile drawer wraps the shared main content */}
+      <div className="drawer min-h-dvh lg:w-1/2 lg:border-x lg:border-base-content/20">
         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content h-dvh overflow-hidden flex flex-col lg:hidden">
-          <nav className="hidden md:flex navbar w-full bg-base-100 sticky top-0 z-40 border-b border-base-content/20 shrink-0">
+        <div className="drawer-content h-dvh overflow-hidden flex flex-col lg:h-auto lg:overflow-visible">
+          {/* Mobile/tablet top navbar */}
+          <nav className="hidden md:flex lg:hidden navbar w-full bg-base-100 sticky top-0 z-40 border-b border-base-content/20 shrink-0">
             <div className="flex-none">
               <label
                 htmlFor="my-drawer"
@@ -33,8 +58,8 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
             </div>
             <div className="w-10"></div>
           </nav>
-          <main className="w-full flex flex-col items-stretch justify-start flex-1 min-h-0 overflow-y-auto pb-20 md:pb-10">
-            <div className="w-full min-w-0 self-stretch px-4 pt-4 md:py-8">
+          <main className="w-full flex flex-col items-stretch justify-start flex-1 min-h-0 overflow-y-auto pb-20 md:pb-10 lg:pb-0 lg:overflow-visible lg:min-h-dvh">
+            <div className="w-full min-w-0 self-stretch px-4 pt-4 md:py-8 lg:py-10">
               {children}
             </div>
           </main>
@@ -45,42 +70,13 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
         <DrawerSide unreadCount={unreadCount} />
       </div>
 
-      {/* Desktop three-column layout */}
-      <div className="hidden lg:flex min-h-dvh w-full">
-        <aside className="w-1/4 flex flex-col items-end py-10 sticky top-0 h-dvh px-4">
-          <nav className="flex flex-col gap-1">
-            <ul className="menu gap-0.5">
-              <li>
-                <div className="py-2 mb-2 hover:bg-transparent cursor-default">
-                  <StreamLogo />
-                </div>
-              </li>
-              <li><HomeLink /></li>
-              <li><PopularLink /></li>
-              <li>
-                <NotificationsLink>
-                  <span className={`bg-primary text-primary-content text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center ${unreadCount > 0 ? 'visible' : 'invisible'}`}>
-                    {unreadCount}
-                  </span>
-                </NotificationsLink>
-              </li>
-              <li><BookmarksLink /></li>
-              <li><ProfileLink /></li>
-            </ul>
-          </nav>
-        </aside>
-        <main className="w-1/2 flex flex-col items-stretch justify-start border-r border-l border-base-content/20 min-h-dvh">
-          <div className="w-full min-w-0 self-stretch px-4 py-10">
-            {children}
-          </div>
-        </main>
-        <aside className="w-1/4 flex flex-col items-start py-10 sticky top-0 h-dvh px-4">
-          <div className="w-full flex flex-col gap-4">
-            <SearchInput />
-            <FollowSuggestions />
-          </div>
-        </aside>
-      </div>
+      {/* Desktop right sidebar */}
+      <aside className="w-1/4 hidden lg:flex flex-col items-start py-10 sticky top-0 h-dvh px-4">
+        <div className="w-full flex flex-col gap-4">
+          <SearchInput />
+          <FollowSuggestions />
+        </div>
+      </aside>
     </div>
   );
 };
