@@ -10,8 +10,7 @@ import { useOwnFeedsContext } from '../own-feeds-context';
 import { NotificationList } from '../components/notifications/NotificationList';
 import { ErrorCard } from '../components/utility/ErrorCard';
 import { NotificationsPageSkeleton } from '../components/utility/loading-skeletons/NotificationsPageSkeleton';
-
-const pageHeaderClass = 'w-full flex flex-row items-center justify-between px-4 lg:px-0';
+import { PageHeader } from '../components/utility/PageHeader';
 
 export default function Notifications() {
   const { ownNotifications, errors } = useOwnFeedsContext();
@@ -30,17 +29,16 @@ export default function Notifications() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-start max-h-full h-full gap-4">
-      <div className={pageHeaderClass}>
-        <div className="text-lg font-semibold">Notifications</div>
+    <div className="w-full flex flex-col items-center justify-start max-h-full h-full">
+      <PageHeader title="Notifications">
         <button
           disabled={unread === 0 || showLoadingIndicator}
-          className="btn btn-primary"
+          className="text-sm text-primary font-semibold hover:underline disabled:opacity-40 disabled:no-underline cursor-pointer"
           onClick={markAllAsRead}
         >
           Mark read
         </button>
-      </div>
+      </PageHeader>
       {showLoadingIndicator ? (
         <NotificationsPageSkeleton />
       ) : (

@@ -62,11 +62,11 @@ export const OwnStories = () => {
         />
 
         <label className="absolute bottom-6 right-0 cursor-pointer">
-          <div className="btn btn-xs btn-primary btn-circle">
+          <div className="size-5 rounded-full bg-primary text-primary-content flex items-center justify-center">
             {isLoading ? (
               <span className="loading loading-spinner loading-xs"></span>
             ) : (
-              '+'
+              <span className="material-symbols-outlined text-[14px]!">add</span>
             )}
           </div>
           <input

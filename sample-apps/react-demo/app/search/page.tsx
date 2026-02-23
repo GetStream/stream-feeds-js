@@ -191,153 +191,135 @@ export default function SearchResults() {
   ]);
 
   return (
-    <div className="w-full flex flex-col items-center justify-start gap-4">
-      <div className="w-full flex flex-row items-center justify-start gap-4">
-        <div className="block lg:hidden">
-          <NavLink href="/explore">
-            <span className="material-symbols-outlined">arrow_back</span>
-          </NavLink>
+    <div className="w-full flex flex-col">
+      <div className="w-full flex items-center px-4 py-3 border-b border-base-content/10 sticky top-0 bg-base-100 z-10">
+        <NavLink href="/explore" className="lg:hidden mr-3">
+          <span className="material-symbols-outlined text-[22px]!">arrow_back</span>
+        </NavLink>
+        <div className="text-base font-semibold">Search</div>
+        <div role="tablist" className="flex items-center gap-1 ml-auto">
+          {(['activities', 'feeds', 'places'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              role="tab"
+              className={`px-3 py-1.5 text-[13px] font-semibold rounded-full transition-colors cursor-pointer ${
+                activeTab === tab
+                  ? 'bg-base-content text-base-100'
+                  : 'text-base-content/70 hover:bg-base-200'
+              }`}
+              aria-selected={activeTab === tab}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
-        <div className="text-lg font-bold">Search</div>
       </div>
 
-      <div className="w-full">
-        <div role="tablist" className="tabs tabs-border">
-          <button
-            type="button"
-            role="tab"
-            className={`tab ${activeTab === 'activities' ? 'tab-active' : ''}`}
-            aria-selected={activeTab === 'activities'}
-            onClick={() => setActiveTab('activities')}
-          >
-            Activities
-          </button>
-          <button
-            type="button"
-            role="tab"
-            className={`tab ${activeTab === 'feeds' ? 'tab-active' : ''}`}
-            aria-selected={activeTab === 'feeds'}
-            onClick={() => setActiveTab('feeds')}
-          >
-            Feeds
-          </button>
-          <button
-            type="button"
-            role="tab"
-            className={`tab ${activeTab === 'places' ? 'tab-active' : ''}`}
-            aria-selected={activeTab === 'places'}
-            onClick={() => setActiveTab('places')}
-          >
-            Places
-          </button>
-        </div>
-        {activeTab === 'activities' && (
-          <div className="w-full flex flex-col items-center justify-start gap-4 pt-4">
-            {searchQuery && isActivitiesLoading && activitySearchResults.length === 0 && (
-              <SearchResultsSkeleton tab="activities" />
-            )}
-            {!isActivitiesLoading && activitySearchResults.length === 0 && !activityError && searchQuery && <NoResults />}
-            {!isActivitiesLoading && activityError && <ErrorCard message="Failed to load activities" error={activityError} />}
-            {activitySearchResults.length > 0 && (
-              <ul className="list w-full">
-                {activitySearchResults.map((activity) => (
-                  <li className="list-row w-full" key={activity.id}>
-                    <div className="list-col-grow w-full min-w-0">
-                      <ActivitySearchResult activity={activity} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {nextActivities && (
-              <button
-                className="btn btn-soft btn-primary"
-                onClick={() => searchActivities(nextActivities)}
-              >
-                {isActivitiesLoading ? <LoadingIndicator className="loading-lg" /> : 'Load more'}
-              </button>
-            )}
-          </div>
-        )}
-        {activeTab === 'feeds' && (
-          <div className="w-full flex flex-col items-center justify-start gap-4 pt-4">
-            {searchQuery && isFeedsLoading && feedSearchResults.length === 0 && (
-              <SearchResultsSkeleton tab="feeds" />
-            )}
-            {!isFeedsLoading && feedSearchResults.length === 0 && !feedError && searchQuery && <NoResults />}
-            {!isFeedsLoading && feedError && <ErrorCard message="Failed to load feeds" error={feedError} />}
-            {feedSearchResults.length > 0 && (
-              <ul className="list w-full">
-                {feedSearchResults.map((feed) => (
-                  <li className="list-row w-full" key={feed.feed}>
-                    <div className="list-col-grow w-full min-w-0">
-                      <FeedSearchResult feed={feed} showFollowsYouBadge />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {nextFeeds && (
-              <button
-                className="btn btn-soft btn-primary"
-                onClick={() => searchFeeds(nextFeeds)}
-              >
-                {isFeedsLoading ? <LoadingIndicator className="loading-lg" /> : 'Load more'}
-              </button>
-            )}
-          </div>
-        )}
-        {activeTab === 'places' && (
-          <div className="w-full flex flex-col items-center justify-start gap-4 pt-4">
-            {searchQuery && isPlacesLoading && placesSearchResults.length === 0 && (
-              <SearchResultsSkeleton tab="activities" />
-            )}
-            {!isPlacesLoading && placesSearchResults.length === 0 && !placesError && searchQuery && <NoResultsForPlaces />}
-            {!isPlacesLoading && placesError && <ErrorCard message="Failed to load places" error={placesError} />}
-            {placesSearchResults.length > 0 && (
-              <ul className="list w-full">
-                {placesSearchResults.map((activity) => (
-                  <li className="list-row w-full" key={activity.id}>
-                    <div className="list-col-grow w-full min-w-0">
-                      <ActivitySearchResult activity={activity} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {nextPlaces && (
-              <button
-                className="btn btn-soft btn-primary"
-                onClick={() => searchPlaces(nextPlaces)}
-              >
-                {isPlacesLoading ? <LoadingIndicator className="loading-lg" /> : 'Load more'}
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+      {activeTab === 'activities' && (
+        <SearchTabContent
+          isLoading={isActivitiesLoading}
+          results={activitySearchResults}
+          error={activityError}
+          searchQuery={searchQuery}
+          next={nextActivities}
+          onLoadMore={() => searchActivities(nextActivities)}
+          renderItem={(activity) => (
+            <li className="w-full px-4 py-3 border-b border-base-content/10" key={activity.id}>
+              <ActivitySearchResult activity={activity} />
+            </li>
+          )}
+          skeletonTab="activities"
+          noResultsMessage="Try searching for something else."
+        />
+      )}
+
+      {activeTab === 'feeds' && (
+        <SearchTabContent
+          isLoading={isFeedsLoading}
+          results={feedSearchResults}
+          error={feedError}
+          searchQuery={searchQuery}
+          next={nextFeeds}
+          onLoadMore={() => searchFeeds(nextFeeds)}
+          renderItem={(feed) => (
+            <li key={feed.feed}>
+              <FeedSearchResult feed={feed} showFollowsYouBadge />
+            </li>
+          )}
+          skeletonTab="feeds"
+          noResultsMessage="Try searching for something else."
+        />
+      )}
+
+      {activeTab === 'places' && (
+        <SearchTabContent
+          isLoading={isPlacesLoading}
+          results={placesSearchResults}
+          error={placesError}
+          searchQuery={searchQuery}
+          next={nextPlaces}
+          onLoadMore={() => searchPlaces(nextPlaces)}
+          renderItem={(activity) => (
+            <li className="w-full px-4 py-3 border-b border-base-content/10" key={activity.id}>
+              <ActivitySearchResult activity={activity} />
+            </li>
+          )}
+          skeletonTab="activities"
+          noResultsMessage="Try searching for Amsterdam or Boulder, or add a new activity with location."
+        />
+      )}
     </div>
   );
 }
 
-const NoResults = () => {
+function SearchTabContent<T>({
+  isLoading,
+  results,
+  error,
+  searchQuery,
+  next,
+  onLoadMore,
+  renderItem,
+  skeletonTab,
+  noResultsMessage,
+}: {
+  isLoading: boolean;
+  results: T[];
+  error: Error | undefined;
+  searchQuery: string | null;
+  next: string | undefined;
+  onLoadMore: () => void;
+  renderItem: (item: T) => React.ReactNode;
+  skeletonTab: 'activities' | 'feeds';
+  noResultsMessage: string;
+}) {
   return (
-    <div className="card card-border bg-base-100 w-96">
-      <div className="card-body items-center text-center">
-        <h2 className="card-title">No results found</h2>
-        <p>Try searching for something else.</p>
-      </div>
+    <div className="w-full flex flex-col items-center">
+      {searchQuery && isLoading && results.length === 0 && (
+        <SearchResultsSkeleton tab={skeletonTab} />
+      )}
+      {!isLoading && results.length === 0 && !error && searchQuery && (
+        <div className="w-full max-w-sm mx-auto py-12 px-4 text-center">
+          <h2 className="text-2xl font-semibold mb-2">No results found</h2>
+          <p className="text-base-content/60">{noResultsMessage}</p>
+        </div>
+      )}
+      {!isLoading && error && <ErrorCard message="Failed to load results" error={error} />}
+      {results.length > 0 && (
+        <ul className="w-full">
+          {results.map((item) => renderItem(item))}
+        </ul>
+      )}
+      {next && (
+        <button
+          className="my-4 px-5 py-2 text-sm font-semibold text-primary hover:bg-primary/10 rounded-full transition-colors cursor-pointer"
+          onClick={onLoadMore}
+        >
+          {isLoading ? <LoadingIndicator /> : 'Load more'}
+        </button>
+      )}
     </div>
   );
-};
-
-const NoResultsForPlaces = () => {
-  return (
-    <div className="card card-border bg-base-100 w-96">
-      <div className="card-body items-center text-center">
-        <h2 className="card-title">No results found</h2>
-        <p>Try searching for Amsterdam or Boulder, or add a new activity with location.</p>
-      </div>
-    </div>
-  );
-};
+}

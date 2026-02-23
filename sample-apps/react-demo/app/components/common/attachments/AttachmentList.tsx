@@ -11,7 +11,7 @@ import { useSwipeNavigation } from '../../../utility/useSwipeNavigation';
 
 export type AttachmentListProps = {
   attachments: AttachmentType[];
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'extraLarge';
   disableButtons?: boolean;
 };
 
@@ -74,9 +74,9 @@ export const AttachmentList = ({
   const currentAttachment = attachments[currentIndex];
 
   return (
-    <div className="flex flex-col items-start max-w-full overflow-hidden">
+    <div className="flex flex-col w-full max-w-full overflow-hidden">
       <div
-        className="relative inline-block touch-pan-y"
+        className="relative w-full touch-pan-y"
         {...swipeHandlers}
       >
         {hasMultiple && !disableButtons && (

@@ -261,7 +261,7 @@ export const PollDisplay = ({ poll, activity, withoutInteractions = false }: Pol
                     </div>
                     <div className="flex items-center gap-2 shrink-0 text-sm text-base-content/70">
                       <span className="tabular-nums">{percentage}%</span>
-                      <span className="text-base-content/50">
+                      <span className="text-base-content/70">
                         ({voteCount})
                       </span>
                     </div>

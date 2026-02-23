@@ -104,7 +104,7 @@ export const ActivityList = ({
     <div className="w-full flex flex-col items-center justify-start">
       {activities?.length === 0 ? (
         <div className="w-full max-w-sm mx-auto py-12 px-4 text-center">
-          <h2 className="text-2xl font-bold mb-2">No posts yet</h2>
+          <h2 className="text-2xl font-semibold mb-2">No posts yet</h2>
           <p className="text-base-content/60">
             {feed?.group === 'foryou'
               ? 'Popular posts will appear here.'
@@ -117,7 +117,7 @@ export const ActivityList = ({
           <ul ref={listRef} className="list w-full">
             {activities?.map((activity) => (
               <li
-                className="w-full py-3 border-b border-base-content/20 hover:bg-base-200/50 transition-colors cursor-pointer"
+                className="w-full px-4 py-3 border-b border-base-content/10 hover:bg-base-200/50 transition-colors cursor-pointer"
                 key={activity.id}
               >
                 <Activity activity={activity} location={location} />
@@ -126,7 +126,7 @@ export const ActivityList = ({
           </ul>
           {has_next_page && !canScroll && (
             <button
-              className="my-4 px-5 py-2 text-sm font-bold text-primary hover:bg-primary/10 rounded-full transition-colors"
+              className="my-4 px-5 py-2 text-sm font-semibold text-primary hover:bg-primary/10 rounded-full transition-colors"
               onClick={loadNextPage}
             >
               {is_loading ? <LoadingIndicator /> : 'Show more'}
@@ -134,6 +134,9 @@ export const ActivityList = ({
           )}
           {has_next_page && canScroll && <div ref={sentinelRef} className="h-1" />}
           {is_loading && activities && activities.length > 0 && <LoadingIndicator />}
+          {!has_next_page && !is_loading && activities && activities.length > 0 && (
+            <p className="py-8 text-center text-sm text-base-content/60">You've reached the end</p>
+          )}
         </>
       )}
     </div>

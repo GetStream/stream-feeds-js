@@ -109,46 +109,43 @@ export default function Profile() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-start gap-4">
-      <div className="flex flex-row items-center justify-center gap-4">
-        <Avatar user={user} className="size-10 md:size-12" />
-        <div className="text-lg font-semibold">{user?.name}</div>
-      </div>
-      <div className="stats w-full overflow-x-auto">
-        <div className="stat">
-          <div className="stat-title">Posts</div>
-          <div className="stat-value text-primary">{activityCount}</div>
+    <div className="w-full flex flex-col items-stretch">
+      {/* Profile header */}
+      <div className="flex flex-col items-center gap-3 px-4 py-4 border-b border-base-content/10">
+        <div className="flex flex-row items-center gap-3">
+          <Avatar user={user} className="size-10" />
+          <div className="text-[15px] font-semibold">{user?.name}</div>
         </div>
-        <div className="stat cursor-pointer hover:bg-base-200" onClick={() => openModal('followers')}>
-          <div className="stat-title">Followers</div>
-          <div className="stat-value text-primary">{followerCount}</div>
+        <div className="flex flex-row items-center gap-4 text-sm">
+          <span><span className="font-semibold">{activityCount}</span> <span className="text-base-content/70">Posts</span></span>
+          <button className="hover:underline cursor-pointer" onClick={() => openModal('followers')}>
+            <span className="font-semibold">{followerCount}</span> <span className="text-base-content/70">Followers</span>
+          </button>
+          <button className="hover:underline cursor-pointer" onClick={() => openModal('following')}>
+            <span className="font-semibold">{followingCount}</span> <span className="text-base-content/70">Following</span>
+          </button>
+          <button className="hover:underline cursor-pointer" onClick={openMembersModal}>
+            <span className="font-semibold">{memberCount}</span> <span className="text-base-content/70">Members</span>
+          </button>
         </div>
-        <div className="stat cursor-pointer hover:bg-base-200" onClick={() => openModal('following')}>
-          <div className="stat-title">Following</div>
-          <div className="stat-value text-primary">{followingCount}</div>
-        </div>
-        <div className="stat cursor-pointer hover:bg-base-200" onClick={openMembersModal}>
-          <div className="stat-title">Members</div>
-          <div className="stat-value text-primary">{memberCount}</div>
-        </div>
-      </div>
-      <div className="md:hidden">
+        {shouldShowToggleButtons && (
+          <div className="flex flex-row items-center gap-2">
+            <ToggleFollowButton userId={userId} />
+            {feed && <TogglePremiumMembershipButton feed={feed} userId={userId} />}
+          </div>
+        )}
         {shouldShowBookmarks && (
           <NavLink
-            className="w-full h-full flex flex-row items-center justify-stretch gap-2 min-w-0"
+            className="lg:hidden flex flex-row items-center gap-1.5 text-sm text-base-content/60 hover:text-base-content transition-colors"
             href="/bookmarks"
           >
-            <span className="material-symbols-outlined">bookmark</span>
-            <span className="text-sm">Bookmarks</span>
+            <span className="material-symbols-outlined text-[18px]!">bookmark</span>
+            <span>Bookmarks</span>
           </NavLink>
         )}
       </div>
-      {shouldShowToggleButtons && (
-        <div className="flex flex-row flex-wrap items-center justify-center gap-2">
-          <ToggleFollowButton userId={userId} />
-          {feed && <TogglePremiumMembershipButton feed={feed} userId={userId} />}
-        </div>
-      )}
+
+      {/* Feed */}
       {feed && (
         <StreamFeed feed={feed}>
           <ActivityList location="profile" error={error} />

@@ -15,11 +15,13 @@ export const ActivityHeader = ({
   withFollowButton = false,
   withLink = true,
   withActions = false,
+  withAvatar = true,
 }: {
   activity: ActivityResponse;
   withFollowButton?: boolean;
   withLink?: boolean;
   withActions?: boolean;
+  withAvatar?: boolean;
 }) => {
   const client = useFeedsClient();
   const currentUser = useClientConnectedUser();
@@ -31,6 +33,27 @@ export const ActivityHeader = ({
 
   const locationCity = activity.location ? (activity.custom?.location_city as string | undefined) ?? null : null;
 
+  const isPremium = activity.visibility === 'tag';
+  const isPrivate = activity.visibility === 'private';
+
+  const badge = isPremium ? (
+    <>
+      <span className="text-base-content/70 flex-shrink-0">·</span>
+      <span className="inline-flex items-center gap-0.5 flex-shrink-0 text-primary text-[13px]">
+        <span className="material-symbols-outlined text-[14px]!">workspace_premium</span>
+        Premium
+      </span>
+    </>
+  ) : isPrivate ? (
+    <>
+      <span className="text-base-content/70 flex-shrink-0">·</span>
+      <span className="inline-flex items-center gap-0.5 flex-shrink-0 text-base-content/70 text-[13px]" role="status" aria-label="Private — only visible to you">
+        <span className="material-symbols-outlined text-[14px]!" aria-hidden="true">lock</span>
+        Private
+      </span>
+    </>
+  ) : null;
+
   return (
     <ContentMetadata
       created_at={activity.created_at}
@@ -38,11 +61,13 @@ export const ActivityHeader = ({
       edited_at={activity.edited_at}
       location="activity"
       withLink={withLink}
+      withAvatar={withAvatar}
       locationCity={locationCity}
+      badge={badge}
     >
       {withFollowButton &&
         shouldShowFollowButton && (
-          <ToggleFollowButton userId={activity.user.id} />
+          <ToggleFollowButton userId={activity.user.id} size="small" />
         )}
       {withActions && <ActivityActions activity={activity} ownCapabilities={ownCapabilities} />}
     </ContentMetadata>

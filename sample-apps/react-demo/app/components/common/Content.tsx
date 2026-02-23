@@ -239,11 +239,11 @@ export const Content = ({ text, attachments, moderation, location, mentioned_use
     );
   }
 
-  const mediaAttachmentSize = location === 'comment' ? 'medium' : 'large';
+  const mediaAttachmentSize = location === 'comment' ? 'medium' : 'extraLarge';
   const ogAttachmentSize = location === 'comment' ? 'small' : (mediaAttachments.length > 0 ? 'medium' : 'small');
 
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {renderedText && (
         <p className="w-full text-[15px] leading-relaxed text-base-content whitespace-pre-wrap">
           {renderedText}

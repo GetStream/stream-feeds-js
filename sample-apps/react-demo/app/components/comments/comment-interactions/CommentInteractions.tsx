@@ -16,8 +16,8 @@ export const CommentInteractions = ({
   }
 
   return (
-    <div className="flex flex-row items-center gap-2 flex-wrap">
-      <ToggleCommentReaction className="-ml-2" comment={comment} />
+    <div className="flex flex-row items-center gap-4">
+      <ToggleCommentReaction comment={comment} />
       <ReplyToComment
         comment={comment}
         isReplying={isReplying}

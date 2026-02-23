@@ -45,24 +45,24 @@ export const CommentList = () => {
         <LoadingIndicator />
       ) : (
         <>
-          <ul className="list pt-0">
+          <ul className="list w-full">
             {comments.map((comment) => (
-              <li className="list-row w-full" key={comment.id}>
-                <div className="list-col-grow w-full min-w-0">
-                  <Comment
-                    comment={comment}
-                  />
-                </div>
+              <li className="w-full px-4 py-3 border-b border-base-content/10" key={comment.id}>
+                <Comment comment={comment} />
               </li>
             ))}
           </ul>
           {commentCount > 0 && has_next_page && comments.length > 0 && (
             <button
-              className="btn btn-soft btn-primary"
+              className="my-4 px-5 py-2 text-sm font-semibold text-primary hover:bg-primary/10 rounded-full transition-colors cursor-pointer"
               onClick={loadNext}
             >
               {isLoading ? <LoadingIndicator /> : 'Load more comments'}
             </button>
+          )}
+          {isLoading && comments.length > 0 && <LoadingIndicator />}
+          {!has_next_page && !isLoading && comments.length > 0 && (
+            <p className="py-8 text-center text-sm text-base-content/60">You've reached the end</p>
           )}
         </>
       )

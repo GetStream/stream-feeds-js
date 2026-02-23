@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 @plugin "daisyui";
 
+@theme {
+  --breakpoint-lg: 1176px;
+}
+
 /* Material Symbols - font loaded via next/font in layout.tsx */
 .material-symbols-outlined {
   font-family: var(--font-material-symbols);
@@ -160,24 +164,17 @@ html {
 }
 
 .dock {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: oklch(100% 0 0);
-  border-top: 1px solid oklch(90% 0 0);
-  padding-bottom: env(safe-area-inset-bottom, 0.5rem);
-}
-
-@media (prefers-color-scheme: dark) {
-  .dock {
-    background: oklch(0% 0 0);
-    border-top-color: oklch(20% 0 0);
-  }
+  position: static;
+  background: transparent;
+  border-top: none;
 }
 
 .fill.material-symbols-outlined {
   font-variation-settings: 'FILL' 1;
+}
+
+.menu {
+  padding: 0;
 }
 
 .list {

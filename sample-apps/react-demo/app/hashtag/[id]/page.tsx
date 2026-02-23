@@ -11,6 +11,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ActivityList } from '../../components/activity/ActivityList';
 import { HashtagPageSkeleton } from '../../components/utility/loading-skeletons/HashtagPageSkeleton';
+import { PageHeader } from '../../components/utility/PageHeader';
 
 const hashtagFeedSelector = (state: FeedState) => ({
   activityCount: state.activity_count ?? 0,
@@ -50,14 +51,10 @@ export default function Hashtag() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-start gap-4">
-      <h1 className="text-xl font-bold">#{hashtagId}</h1>
-      <div className="stats">
-        <div className="stat">
-          <div className="stat-title">Posts</div>
-          <div className="stat-value text-primary">{activityCount}</div>
-        </div>
-      </div>
+    <div className="w-full flex flex-col">
+      <PageHeader title={`#${hashtagId}`}>
+        <span className="text-sm text-base-content/70">{activityCount} {activityCount === 1 ? 'post' : 'posts'}</span>
+      </PageHeader>
       {feed && (
         <StreamFeed feed={feed}>
           <ActivityList location="profile" error={error} />

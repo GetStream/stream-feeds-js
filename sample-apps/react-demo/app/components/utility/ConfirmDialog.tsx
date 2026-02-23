@@ -62,7 +62,7 @@ export const ConfirmDialog = forwardRef<ConfirmDialogHandle, ConfirmDialogProps>
     return (
       <dialog ref={dialogRef} className="modal">
         <div className="modal-box w-full max-w-sm">
-          <h3 className="font-bold text-lg">{title}</h3>
+          <h3 className="font-semibold text-lg">{title}</h3>
           <p className="py-4 text-base-content/80">{message}</p>
           <div className="modal-action">
             <button type="button" className="btn btn-ghost" onClick={handleCancel}>

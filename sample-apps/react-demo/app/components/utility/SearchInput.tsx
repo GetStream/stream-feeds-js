@@ -20,20 +20,20 @@ export const SearchInput = () => {
   return (
     <div
       className={`
-        search-input flex items-center gap-3 w-full px-4 py-3
-        bg-base-200 rounded-full transition-all duration-200
-        border border-transparent dark:border-base-content/20
-        ${isFocused ? 'bg-base-100 ring-2 ring-primary border-primary' : ''}
+        search-input flex items-center gap-2.5 w-full px-4 py-2.5
+        bg-base-100 rounded-full transition-all duration-200
+        border border-base-content/10
+        ${isFocused ? 'border-primary ring-1 ring-primary' : ''}
       `}
     >
-      <span className={`material-symbols-outlined text-xl ${isFocused ? 'text-primary' : 'text-base-content/50'}`}>
+      <span className={`material-symbols-outlined text-[18px]! ${isFocused ? 'text-primary' : 'text-base-content/60'}`}>
         search
       </span>
       <input
         ref={searchInputRef}
         type="text"
         placeholder="Search"
-        className="flex-1 bg-transparent text-[15px] placeholder:text-base-content/50"
+        className="flex-1 bg-transparent text-[13px] placeholder:text-base-content/60"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onKeyDown={(e) => {

@@ -85,7 +85,7 @@ export const MembersListModal = forwardRef<MembersListModalHandle, MembersListMo
         <div className="modal-box w-full max-w-md">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-lg">Members</h3>
+            <h3 className="font-semibold text-lg">Members</h3>
             <button
               type="button"
               className="btn btn-sm btn-circle btn-ghost"

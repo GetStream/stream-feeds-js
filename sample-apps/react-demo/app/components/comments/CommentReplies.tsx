@@ -47,9 +47,9 @@ export const CommentReplies = ({
   }
 
   return (
-    <div className="w-full mt-1">
+    <div className="w-full">
       <button
-        className="btn btn-ghost btn-xs text-base-content/70 gap-1 -ml-2"
+        className="text-[13px] text-base-content/70 hover:text-base-content inline-flex items-center gap-1 cursor-pointer transition-colors"
         onClick={handleToggleReplies}
         disabled={isLoading}
       >
@@ -57,7 +57,7 @@ export const CommentReplies = ({
           <LoadingIndicator />
         ) : (
           <>
-            <span className="material-symbols-outlined text-base">
+            <span className="material-symbols-outlined text-[16px]!">
               {isExpanded ? 'expand_less' : 'expand_more'}
             </span>
             {isExpanded
@@ -68,7 +68,7 @@ export const CommentReplies = ({
       </button>
 
       {isExpanded && replies.length > 0 && (
-        <div className="w-full border-l-2 border-base-300 pl-4 mt-2 flex flex-col gap-4">
+        <div className="w-full border-l border-base-content/10 pl-4 mt-3 flex flex-col gap-3">
           {replies.map((reply) => (
             <Comment
               key={reply.id}
@@ -79,7 +79,7 @@ export const CommentReplies = ({
 
           {has_next_page && (
             <button
-              className="btn btn-ghost btn-xs text-primary gap-1"
+              className="text-[13px] text-base-content/70 hover:text-base-content inline-flex items-center gap-1 cursor-pointer transition-colors"
               onClick={handleLoadMore}
               disabled={isLoading}
             >

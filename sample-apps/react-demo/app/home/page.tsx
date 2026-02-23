@@ -13,11 +13,9 @@ const HomeActivityComposer = () => {
   const currentUser = useClientConnectedUser();
 
   return (
-    <div className="w-full rounded-xl">
-      <div className="w-full flex items-start gap-3">
-        <Avatar user={currentUser} className="size-10 md:size-12" />
-        <ActivityComposer />
-      </div>
+    <div className="w-full flex items-start gap-3">
+      <Avatar user={currentUser} className="size-10 shrink-0" />
+      <ActivityComposer />
     </div>
   );
 };
@@ -48,20 +46,24 @@ export default function Home() {
   return (
     <div className="w-full flex flex-col items-center justify-start">
       {/* Stories Section */}
-      <section className="w-full border-b border-base-content/20 py-3 relative">
-        <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide">
-          <StreamFeed feed={ownStoryFeed}>
-            <OwnStories />
-          </StreamFeed>
-          <StreamFeed feed={ownStoryTimeline}>
-            <StoryTimeline />
-          </StreamFeed>
+      <section className="w-full border-b border-base-content/10 py-3 flex flex-row gap-2 px-4">
+        <StreamFeed feed={ownStoryFeed}>
+          <OwnStories />
+        </StreamFeed>
+        <div
+          className="flex-1 min-w-0 overflow-x-auto"
+          style={{ maskImage: 'linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent)' }}
+        >
+          <div className="inline-flex flex-row gap-2 px-3">
+            <StreamFeed feed={ownStoryTimeline}>
+              <StoryTimeline />
+            </StreamFeed>
+          </div>
         </div>
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-base-100 to-transparent pointer-events-none" />
       </section>
 
       {/* Composer Section */}
-      <section className="w-full hidden md:block pt-3">
+      <section className="w-full hidden md:block px-4 py-3 border-b border-base-content/10">
         <StreamFeed feed={ownFeed}>
           <HomeActivityComposer />
         </StreamFeed>

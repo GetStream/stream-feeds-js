@@ -9,6 +9,8 @@ import { CommentList } from '@/app/components/comments/CommentList';
 import { ErrorCard } from '@/app/components/utility/ErrorCard';
 import { ActivityDetailsPageSkeleton } from '@/app/components/utility/loading-skeletons/ActivityDetailsPageSkeleton';
 import { PollDisplay } from '@/app/components/poll/PollDisplay';
+import { Avatar } from '@/app/components/utility/Avatar';
+import { NavLink } from '@/app/components/utility/NavLink';
 import {
   StreamActivityWithStateUpdates,
   useFeedsClient,
@@ -133,15 +135,28 @@ export default function ActivityPage() {
   return (
     <div className="flex flex-col h-full max-h-full">
       {activityFeed && <StreamFeed feed={activityFeed}>
-        <div className="flex-shrink-0 flex flex-col gap-4">
-          <ActivityHeader activity={activity} withActions={true} />
-          <ActivityContent activity={activity} />
-          {activity.poll && (
-            <PollDisplay poll={activity.poll} activity={activity} />
-          )}
-          <ActivityParent activity={activity} />
-          <ActivityInteractions activity={activity} />
-          <div className="text-lg font-semibold">Comments</div>
+        <div className="px-4 py-3 border-b border-base-content/10">
+          <div className="flex gap-3">
+            <div className="flex-shrink-0">
+              <NavLink href={`/profile/${activity.user.id}`}>
+                <Avatar user={activity.user} className="size-10" />
+              </NavLink>
+            </div>
+            <div className="flex-1 min-w-0 flex flex-col gap-2">
+              <ActivityHeader activity={activity} withActions={true} withAvatar={false} />
+              <ActivityContent activity={activity} />
+              {activity.poll && (
+                <PollDisplay poll={activity.poll} activity={activity} />
+              )}
+              <ActivityParent activity={activity} />
+              <ActivityInteractions activity={activity} />
+            </div>
+          </div>
+        </div>
+        <div className="sticky top-0 bg-base-100 z-10 flex items-center justify-between px-4 py-3 border-b border-base-content/10">
+          <div className="text-base font-semibold">Comments</div>
+        </div>
+        <div className="px-4 py-3 border-b border-base-content/10">
           {canComment ? (
             <CommentComposer activity={activity} />
           ) : (

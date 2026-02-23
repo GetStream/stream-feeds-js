@@ -124,7 +124,7 @@ export const ActivitySettingsModal = forwardRef<ActivitySettingsModalHandle, Act
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-xl text-primary">settings</span>
-              <h3 className="font-bold text-lg">Activity Settings</h3>
+              <h3 className="font-semibold text-lg">Activity Settings</h3>
             </div>
             <button
               type="button"
