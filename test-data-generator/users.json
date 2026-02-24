@@ -1,74 +1,38 @@
 [
   {
-    "id": "susan",
-    "name": "Susan",
-    "image": "https://randomuser.me/api/portraits/women/47.jpg",
+    "id": "rachel",
+    "name": "Rachel",
+    "image": "https://randomuser.me/api/portraits/women/5.jpg",
     "visibility_level": "visible"
   },
   {
-    "id": "adam",
-    "name": "Adam",
-    "image": "https://randomuser.me/api/portraits/men/38.jpg",
+    "id": "sophia",
+    "name": "Sophia",
+    "image": "https://randomuser.me/api/portraits/women/26.jpg",
     "visibility_level": "visible"
   },
   {
-    "id": "thomas",
-    "name": "Thomas",
-    "image": "https://randomuser.me/api/portraits/men/42.jpg",
+    "id": "isabella",
+    "name": "Isabella",
+    "image": "https://randomuser.me/api/portraits/women/25.jpg",
     "visibility_level": "visible"
   },
   {
-    "id": "sloan",
-    "name": "Sloan",
-    "image": "https://randomuser.me/api/portraits/women/60.jpg",
+    "id": "daniel",
+    "name": "Daniel",
+    "image": "https://randomuser.me/api/portraits/men/83.jpg",
     "visibility_level": "visible"
   },
   {
-    "id": "tiffany",
-    "name": "Tiffany",
-    "image": "https://randomuser.me/api/portraits/women/40.jpg",
+    "id": "ryan",
+    "name": "Ryan",
+    "image": "https://randomuser.me/api/portraits/men/15.jpg",
     "visibility_level": "visible"
   },
   {
-    "id": "jack",
-    "name": "Jack",
-    "image": "https://randomuser.me/api/portraits/men/54.jpg",
-    "visibility_level": "visible"
-  },
-  {
-    "id": "emma",
-    "name": "Emma",
-    "image": "https://randomuser.me/api/portraits/women/79.jpg",
-    "visibility_level": "visible"
-  },
-  {
-    "id": "michael",
-    "name": "Michael",
-    "image": "https://randomuser.me/api/portraits/men/11.jpg",
-    "visibility_level": "visible"
-  },
-  {
-    "id": "olivia",
-    "name": "Olivia",
-    "image": "https://randomuser.me/api/portraits/women/56.jpg",
-    "visibility_level": "visible"
-  },
-  {
-    "id": "david",
-    "name": "David",
-    "image": "https://randomuser.me/api/portraits/men/62.jpg",
-    "visibility_level": "visible"
-  },
-  {
-    "id": "nina",
-    "name": "Nina",
-    "image": "https://randomuser.me/api/portraits/women/64.jpg",
-    "visibility_level": "visible"
-  },
-  {
-    "id": "james",
-    "name": "James",
-    "image": "https://randomuser.me/api/portraits/men/32.jpg",
+    "id": "christopher",
+    "name": "Christopher",
+    "image": "https://randomuser.me/api/portraits/men/67.jpg",
     "visibility_level": "visible"
   }
 ]
