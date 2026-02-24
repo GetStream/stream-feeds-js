@@ -19,7 +19,8 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const userIdFromUrl = searchParams.get('user_id');
   const [USER_ID] = useState(userIdFromUrl ?? generateUsername('-'));
-  // We assume if user_id is set, the user already has some data, no need to generate it
+  // When user_id is in the URL, middleware already ran create-user server-side, so we
+  // treat data as ready and do not run create-user again on the client.
   const [testDataGeneration, setTestDataGeneration] = useState<'not-started' | 'in-progress' | 'completed' | 'error'>(userIdFromUrl ? 'completed' : 'not-started');
 
   // Set user_id as URL parameter if not already present

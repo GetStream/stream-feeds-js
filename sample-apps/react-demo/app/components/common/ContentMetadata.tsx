@@ -61,10 +61,17 @@ export const ContentMetadata = ({
       {locationCity && (
         <>
           <span className="text-base-content/70 flex-shrink-0">·</span>
-          <NavLink href={`/search?q=${encodeURIComponent(locationCity)}&tab=places`} className="no-underline inline-flex items-center gap-0.5 flex-shrink-0 text-base-content/70 text-[13px]">
-            <span className="material-symbols-outlined text-[14px]!">location_on</span>
-            <span className="hover:underline">{locationCity}</span>
-          </NavLink>
+          {withLink ? (
+            <NavLink href={`/search?q=${encodeURIComponent(locationCity)}&tab=places`} className="no-underline inline-flex items-center gap-0.5 flex-shrink-0 text-base-content/70 text-[13px]">
+              <span className="material-symbols-outlined text-[14px]!">location_on</span>
+              <span className="hover:underline">{locationCity}</span>
+            </NavLink>
+          ) : (
+            <span className="inline-flex items-center gap-0.5 flex-shrink-0 text-base-content/70 text-[13px]">
+              <span className="material-symbols-outlined text-[14px]!">location_on</span>
+              <span>{locationCity}</span>
+            </span>
+          )}
         </>
       )}
       {badge}

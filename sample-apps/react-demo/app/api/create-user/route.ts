@@ -102,6 +102,49 @@ export async function POST(request: Request) {
       await client.feeds.getOrCreateFollows({ follows });
     }
 
+    // Add a welcome activity to the user's feed with "What's new in V3" info
+    const welcomeActivityText =
+      "👋 Welcome! V3 brings For-You feeds, 20–30% faster performance, Reddit-style comments, search, and more. Learn more: https://getstream.io/";
+
+    const welcomeResponse = await client.feeds.addActivity({
+      type: 'post',
+      feeds: [`user:${userId}`],
+      user_id: userId,
+      text: welcomeActivityText,
+      custom: {
+        title: "What's new in V3",
+        link: 'https://getstream.io/',
+        is_welcome_activity: true,
+      },
+    });
+
+    const welcomeActivityId = welcomeResponse.activity?.id;
+    if (welcomeActivityId) {
+      const likerCandidates = DEMO_USER_IDS.filter((id) => id && id !== userId);
+      const likerId =
+        likerCandidates[Math.floor(Math.random() * likerCandidates.length)];
+      if (likerId) {
+        await client.feeds.addActivityReaction({
+          type: 'like',
+          activity_id: welcomeActivityId,
+          user_id: likerId,
+          create_notification_activity: true,
+        });
+      }
+    }
+
+    // Add bookmarks for the new user for two predefined activities
+    const ACTIVITY_IDS_TO_BOOKMARK = [
+      '0069824b-1ee3-4b12-a82d-e2deaf65f7a5',
+      'ae905226-baec-45cb-8711-659e308f0bd8',
+    ];
+    for (const activityId of ACTIVITY_IDS_TO_BOOKMARK) {
+      await client.feeds.addBookmark({
+        activity_id: activityId,
+        user_id: userId,
+      });
+    }
+
     return NextResponse.json({ userId });
   } catch (err) {
     console.error('create-user API error:', err);
