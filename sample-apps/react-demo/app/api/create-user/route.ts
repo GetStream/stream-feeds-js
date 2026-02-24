@@ -3,6 +3,8 @@ import { generateUsername } from 'unique-username-generator';
 import { NextResponse } from 'next/server';
 
 const DEMO_USER_IDS = process.env.DEMO_USER_IDS?.split(',') ?? [];
+const DEMO_BOOKMARK_ACTIVITY_IDS =
+  process.env.DEMO_BOOKMARK_ACTIVITY_IDS?.split(',').filter(Boolean) ?? [];
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -104,7 +106,7 @@ export async function POST(request: Request) {
 
     // Add a welcome activity to the user's feed with "What's new in V3" info
     const welcomeActivityText =
-      "👋 Welcome! V3 brings For-You feeds, 20–30% faster performance, Reddit-style comments, search, and more. Learn more: https://getstream.io/";
+      '👋 Welcome! V3 brings For-You feeds, 20–30% faster performance, Reddit-style comments, search, and more. Learn more: https://getstream.io/';
 
     const welcomeResponse = await client.feeds.addActivity({
       type: 'post',
@@ -133,12 +135,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Add bookmarks for the new user for two predefined activities
-    const ACTIVITY_IDS_TO_BOOKMARK = [
-      '0069824b-1ee3-4b12-a82d-e2deaf65f7a5',
-      'ae905226-baec-45cb-8711-659e308f0bd8',
-    ];
-    for (const activityId of ACTIVITY_IDS_TO_BOOKMARK) {
+    for (const activityId of DEMO_BOOKMARK_ACTIVITY_IDS) {
       await client.feeds.addBookmark({
         activity_id: activityId,
         user_id: userId,
