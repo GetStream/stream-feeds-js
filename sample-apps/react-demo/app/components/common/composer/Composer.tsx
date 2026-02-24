@@ -224,13 +224,13 @@ export const Composer = ({
   const isComment = variant === 'comment';
 
   return (
-    <div className="composer w-full flex flex-col gap-1 rounded-xl border border-base-content/20 p-4 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+    <div className="composer w-full flex flex-col gap-1 rounded-xl border border-base-content/10 p-4 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
       <div className="relative">
         <textarea
           ref={textareaRef}
           className={`
-            w-full flex-1 text-xl leading-relaxed bg-transparent
-            placeholder:text-base-content/50 resize-none outline-none
+            w-full flex-1 text-base leading-relaxed bg-transparent
+            placeholder:text-base-content/70 resize-none outline-none
             ${isComment ? 'min-h-[40px] text-[15px]' : 'min-h-[80px]'}
           `}
           rows={rows ?? (isComment ? 1 : 2)}
@@ -331,7 +331,7 @@ export const Composer = ({
         </div>
         <button
           className={`
-            px-4 py-1.5 rounded-full font-bold text-[15px]
+            px-4 py-1.5 rounded-full font-semibold text-[15px]
             bg-primary text-primary-content
             hover:bg-primary/90
             disabled:opacity-50 disabled:cursor-not-allowed

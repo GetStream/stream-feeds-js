@@ -3,7 +3,7 @@ import { useOwnFeedsContext } from '../own-feeds-context';
 import { useFeedsClient, useOwnFollows } from '@stream-io/feeds-react-sdk';
 import { ErrorToast } from './utility/ErrorToast';
 
-export const ToggleFollowButton = ({ userId }: { userId: string }) => {
+export const ToggleFollowButton = ({ userId, size = 'default' }: { userId: string; size?: 'default' | 'small' }) => {
   const client = useFeedsClient();
   const { ownTimeline, ownStoryTimeline, reloadTimelines } = useOwnFeedsContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -67,12 +67,13 @@ export const ToggleFollowButton = ({ userId }: { userId: string }) => {
     }
   }, [isFollowing, isLoading, follow, unfollow]);
 
-  const baseStyles =
-    'min-w-[5.5rem] px-4 py-1.5 text-sm font-bold rounded-full transition-all duration-200 select-none';
+  const baseStyles = size === 'small'
+    ? 'px-3 py-1 text-xs font-semibold rounded-full transition-all duration-200 select-none'
+    : 'min-w-[5.5rem] px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 select-none';
 
   const followingStyles = isFollowing
-    ? 'bg-transparent text-base-content border-2 border-base-300 hover:border-base-content/50 hover:bg-base-300 active:scale-[0.98] active:bg-base-300'
-    : 'bg-base-content text-base-100 border-2 border-transparent hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] active:brightness-95';
+    ? 'bg-transparent text-base-content border border-base-content/20 hover:border-base-content/40 hover:bg-base-200/50 active:scale-[0.98]'
+    : 'bg-base-content text-base-100 border border-transparent hover:brightness-110 active:scale-[0.98] active:brightness-95';
 
   const loadingStyles = isLoading
     ? 'pointer-events-none opacity-70 cursor-wait'

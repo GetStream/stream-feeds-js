@@ -19,29 +19,31 @@ export const NotificationList = () => {
   }, [loadNextPage]);
 
   return (
-    <div className="w-full flex flex-col items-center justify-start max-h-full h-full gap-4">
+    <div className="w-full flex flex-col items-center justify-start max-h-full h-full">
       {notifications.length === 0 ? (
-        <div className="card card-border bg-base-100 w-96">
-          <div className="card-body items-center text-center">
-            <h2 className="card-title">No notifications yet</h2>
-            <p>When people like or comment, they will show up here</p>
-          </div>
+        <div className="w-full max-w-sm mx-auto py-12 px-4 text-center">
+          <h2 className="text-2xl font-semibold mb-2">No notifications yet</h2>
+          <p className="text-base-content/60">When people like or comment, they will show up here</p>
         </div>
       ) : (
         <>
-          <ul className="list w-full overflow-y-auto">
+          <ul className="w-full overflow-y-auto">
             {notifications.map((notification) => (
-              <li className="list-row w-full" key={notification.group}>
-                <div className="list-col-grow w-full min-w-0">
-                  <Notification notification={notification} />
-                </div>
+              <li
+                className="w-full px-4 py-3 border-b border-base-content/10 hover:bg-base-200/50 transition-colors"
+                key={notification.group}
+              >
+                <Notification notification={notification} />
               </li>
             ))}
           </ul>
           {has_next_page && (
-            <button className="btn btn-soft btn-primary" onClick={loadNext}>
+            <button className="btn btn-soft btn-primary my-4" onClick={loadNext}>
               {isLoading ? <LoadingIndicator /> : 'Load more'}
             </button>
+          )}
+          {!has_next_page && !isLoading && notifications.length > 0 && (
+            <p className="py-8 text-center text-sm text-base-content/60">You've reached the end</p>
           )}
         </>
       )}

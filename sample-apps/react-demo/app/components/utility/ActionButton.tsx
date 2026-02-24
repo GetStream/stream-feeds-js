@@ -9,6 +9,7 @@ export const ActionButton = ({
   isActive,
   disabled,
   error,
+  activeColor,
 }: {
   onClick?: () => Promise<any> | undefined | void;
   href?: string;
@@ -17,13 +18,27 @@ export const ActionButton = ({
   isActive: boolean;
   disabled?: boolean;
   error?: Error;
+  activeColor?: 'primary' | 'green' | 'red';
 }) => {
-  const content = <Content icon={icon} label={label} isActive={isActive} />;
+  const color = activeColor ?? 'primary';
+  const content = <Content icon={icon} label={label} isActive={isActive} color={color} />;
+
+  const hoverColorClass = {
+    primary: 'hover:text-primary',
+    green: 'hover:text-green-500',
+    red: 'hover:text-red-500',
+  }[color];
+
+  const activeColorClass = {
+    primary: 'text-primary',
+    green: 'text-green-500',
+    red: 'text-red-500',
+  }[color];
 
   const buttonClasses = `
     group inline-flex items-center gap-1 text-base-content/60
-    hover:text-primary transition-colors
-    ${isActive ? 'text-primary' : ''}
+    ${hoverColorClass} transition-colors
+    ${isActive ? activeColorClass : ''}
   `;
 
   return (
@@ -66,13 +81,12 @@ export const SecondaryActionButton = ({
   className?: string;
   error?: Error;
 }) => {
-  const content = <Content icon={icon} label={label} isActive={isActive} />;
+  const content = <Content icon={icon} label={label} isActive={isActive} color="primary" />;
 
   const buttonClasses = `
-    inline-flex items-center gap-2 p-2 rounded-lg
-    text-base-content/60 hover:text-base-content
-    hover:bg-base-200/50
-    transition-all duration-200
+    group inline-flex items-center gap-1 text-base-content/60
+    hover:text-primary transition-colors
+    ${isActive ? 'text-primary' : ''}
     ${className ?? ''}
   `;
 
@@ -101,28 +115,38 @@ const Content = ({
   icon,
   label,
   isActive,
+  color,
 }: {
   icon: string;
   label: string;
   isActive: boolean | undefined;
-}) => (
-  <>
-    <span
-      className={`
-        w-9 h-9 rounded-full flex items-center justify-center
-        group-hover:bg-primary/10 transition-colors
-      `}
-    >
+  color: 'primary' | 'green' | 'red';
+}) => {
+  const hoverBgClass = {
+    primary: 'group-hover:bg-primary/10',
+    green: 'group-hover:bg-green-500/10',
+    red: 'group-hover:bg-red-500/10',
+  }[color];
+
+  return (
+    <>
       <span
         className={`
-          material-symbols-outlined text-[18px]
-          ${isActive ? 'fill' : ''}
-          ${icon === 'chat_bubble' ? 'translate-y-[1px]' : ''}
+          w-9 h-9 rounded-full flex items-center justify-center
+          ${hoverBgClass} transition-colors
         `}
       >
-        {icon}
+        <span
+          className={`
+            material-symbols-outlined text-[18px]!
+            ${isActive ? 'fill' : ''}
+            ${icon === 'chat_bubble' ? 'translate-y-[1px]' : ''}
+          `}
+        >
+          {icon}
+        </span>
       </span>
-    </span>
-    <span className="text-[13px] tabular-nums pr-2">{label}</span>
-  </>
-);
+      <span className="text-[13px] tabular-nums pr-2">{label}</span>
+    </>
+  );
+};

@@ -6,12 +6,12 @@ export const ActivityParent = ({ activity }: { activity: ActivityResponse }) => 
     <>
       {
         activity.parent && (
-          <div className="w-full min-w-0 max-w-full">
-            <div className="text-xs text-base-content/60 mb-1 flex items-center gap-1">
-              <span className="material-symbols-outlined text-[0.75rem]">repeat</span>
+          <div className="w-full min-w-0 max-w-full border border-base-content/10 rounded-xl bg-base-200/30 hover:bg-base-200/60 transition-colors cursor-pointer mb-2 overflow-hidden p-4 flex flex-col gap-3">
+            <div className="text-[13px] text-base-content/70 flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[18px]!">repeat</span>
               <span>Reposted</span>
             </div>
-            <div className="border border-base-300 rounded-lg p-3 bg-base-200/50 hover:bg-base-200 transition-colors cursor-pointer mb-2"><Activity activity={activity.parent} location="preview" /></div>
+            <Activity activity={activity.parent} location="preview" />
           </div>
         )
       }

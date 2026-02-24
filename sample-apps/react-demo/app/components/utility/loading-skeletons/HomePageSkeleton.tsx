@@ -5,19 +5,18 @@ import { StoryCircleSkeleton } from './StoryCircleSkeleton';
 export const HomePageSkeleton = () => (
   <div className="w-full flex flex-col items-center justify-start">
     {/* Stories Section Skeleton */}
-    <section className="w-full border-b border-base-content/20 py-3 relative">
-      <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide px-2">
+    <section className="w-full border-b border-base-content/10 py-3 px-4">
+      <div className="flex flex-row gap-2 overflow-x-auto scrollbar-hide">
         <StoryCircleSkeleton />
         <StoryCircleSkeleton />
         <StoryCircleSkeleton />
         <StoryCircleSkeleton />
         <StoryCircleSkeleton />
       </div>
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-base-100 to-transparent pointer-events-none" />
     </section>
 
     {/* Composer Section Skeleton */}
-    <section className="w-full hidden md:block pt-3">
+    <section className="w-full hidden md:block">
       <ComposerSkeleton />
     </section>
 

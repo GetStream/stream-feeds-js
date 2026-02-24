@@ -23,17 +23,17 @@ export const MenuNavLink = ({
   return (
     <NavLink
       className={`
-        relative w-full h-full flex flex-row items-center justify-center md:justify-start gap-4
-        py-3 px-4 rounded-full
+        relative w-full h-full flex flex-row items-center justify-center md:justify-start gap-3
+        py-2 px-3 rounded-full
       `}
       href={href}
     >
       {icon && (
-        <span className={`material-symbols-outlined text-[26px] ${isActive ? 'fill' : ''}`}>
+        <span className={`material-symbols-outlined text-[22px]! ${isActive ? 'fill' : ''}`}>
           {icon}
         </span>
       )}
-      {label && <span className="hidden md:block text-xl">{label}</span>}
+      {label && <span className="hidden md:block text-[18px]">{label}</span>}
       {children}
     </NavLink>
   );
@@ -76,7 +76,7 @@ export const NavLink = ({
     >
       {icon != null && (
         <span
-          className={`material-symbols-outlined text-[26px] ${iconActiveClass}`}
+          className={`material-symbols-outlined text-[22px]! ${iconActiveClass}`}
         >
           {icon}
         </span>

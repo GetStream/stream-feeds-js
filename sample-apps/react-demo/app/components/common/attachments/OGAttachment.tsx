@@ -34,19 +34,19 @@ export const OGAttachment = ({
 
   const sizeClasses = {
     small: {
-      container: 'max-w-sm',
+      container: '',
       image: 'h-28',
       title: 'text-sm',
       text: 'text-xs line-clamp-2',
     },
     medium: {
-      container: 'max-w-md',
+      container: '',
       image: 'h-36',
       title: 'text-[15px]',
       text: 'text-sm line-clamp-3',
     },
     large: {
-      container: 'max-w-lg',
+      container: '',
       image: 'h-44',
       title: 'text-base',
       text: 'text-sm line-clamp-4',
@@ -62,7 +62,7 @@ export const OGAttachment = ({
           <img
             src={imageUrl}
             alt={title || 'Link preview'}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover"
             loading="lazy"
           />
         </div>
@@ -70,7 +70,7 @@ export const OGAttachment = ({
 
       <div className="p-4 flex flex-col gap-1.5">
         {domain && (
-          <div className="flex items-center gap-1.5 text-xs text-base-content/50 font-medium uppercase tracking-wide">
+          <div className="flex items-center gap-1.5 text-xs text-base-content/70 font-medium uppercase tracking-wide">
             <span className="material-symbols-outlined text-sm">link</span>
             <span className="truncate">{domain}</span>
           </div>
@@ -106,7 +106,7 @@ export const OGAttachment = ({
       href={linkUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group w-full h-full block ${classes.container} rounded-xl border border-base-200 overflow-hidden hover:border-primary/30 hover:shadow-lg transition-all duration-200 bg-base-100`}
+      className={`group w-full h-full block ${classes.container} rounded-xl border border-base-200 overflow-hidden hover:border-base-content/20 hover:shadow-sm transition-all duration-200 bg-base-100`}
       aria-label={title ? `Link to ${title}` : `Link to ${domain}`}
     >
       {content}

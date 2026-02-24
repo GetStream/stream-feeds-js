@@ -113,7 +113,7 @@ export const PollComposerModal = forwardRef<PollComposerModalHandle, PollCompose
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-xl text-primary">ballot</span>
-              <h3 className="font-bold text-lg">Create Poll</h3>
+              <h3 className="font-semibold text-lg">Create Poll</h3>
             </div>
             <button
               type="button"
@@ -142,7 +142,7 @@ export const PollComposerModal = forwardRef<PollComposerModalHandle, PollCompose
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Description <span className="font-normal text-base-content/50">(optional)</span></span>
+                <span className="label-text font-medium">Description <span className="font-normal text-base-content/70">(optional)</span></span>
               </label>
               <textarea
                 placeholder="Add a description..."

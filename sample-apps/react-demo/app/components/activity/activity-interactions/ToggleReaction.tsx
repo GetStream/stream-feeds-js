@@ -57,6 +57,7 @@ export const ToggleReaction = ({
       label={state.likeCount.toString()}
       isActive={state.isLiked}
       error={error}
+      activeColor="red"
     />
   );
 };

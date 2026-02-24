@@ -36,21 +36,21 @@ export const FeedSearchResult = ({
 
   if (isHashtag) {
     return (
-      <div className="w-full flex flex-row items-center gap-3 py-3 hover:bg-base-300/30 transition-colors -mx-1 px-1 rounded-lg">
+      <div className="w-full flex flex-row items-center gap-2.5 px-4 py-2.5 hover:bg-base-200/50 transition-colors">
         <NavLink
-          className="flex-1 flex flex-row items-center gap-3 min-w-0"
+          className="flex-1 flex flex-row items-center gap-2.5 min-w-0"
           href={`/hashtag/${feedId}`}
         >
-          <div className="size-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary text-xl">
+          <div className="size-8 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary text-[16px]!">
               tag
             </span>
           </div>
           <div className="min-w-0 flex-1">
-            <span className="font-bold text-[15px] truncate hover:underline">
+            <span className="font-semibold text-[13px] truncate hover:underline">
               #{name || feedId}
             </span>
-            <div className="text-[13px] text-base-content/50">
+            <div className="text-[12px] text-base-content/60">
               {activityCount ?? 0} {activityCount === 1 ? 'post' : 'posts'}
             </div>
           </div>
@@ -60,33 +60,30 @@ export const FeedSearchResult = ({
   }
 
   return (
-    <div className="w-full flex flex-row items-center gap-3 py-3 hover:bg-base-300/30 transition-colors -mx-1 px-1 rounded-lg">
+    <div className="w-full flex flex-row items-center gap-3 px-4 py-2.5 hover:bg-base-200/50 transition-colors">
       <NavLink
-        className="flex-1 flex flex-row items-center gap-3 min-w-0"
+        className="flex-1 flex flex-row items-center gap-2.5 min-w-0"
         href={`/profile/${createdBy?.id}`}
       >
-        <Avatar user={createdBy} className="size-10 shrink-0" />
+        <Avatar user={createdBy} className="size-8 shrink-0" />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-[15px] truncate hover:underline">
+          <div className="flex items-center gap-1.5">
+            <span className="font-semibold text-[13px] truncate hover:underline">
               {createdBy?.name}
             </span>
             {followsUs && (
-              <span
-                className="badge badge-sm badge-ghost text-primary font-medium border border-primary/30 bg-primary/5 gap-1 shrink-0"
-                title="Follows you"
-              >
+              <span className="text-[11px] text-base-content/60 shrink-0">
                 Follows you
               </span>
             )}
           </div>
-          <div className="text-[15px] text-base-content/50 truncate">
+          <div className="text-[12px] text-base-content/60 truncate">
             @{createdBy?.id}
           </div>
         </div>
       </NavLink>
       <div className="shrink-0">
-        <ToggleFollowButton userId={createdBy?.id ?? ''} />
+        <ToggleFollowButton userId={createdBy?.id ?? ''} size="small" />
       </div>
     </div>
   );

@@ -94,7 +94,7 @@ export const LocationModal = forwardRef<LocationModalHandle, LocationModalProps>
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-xl text-primary">location_on</span>
-              <h3 className="font-bold text-lg">Add Location</h3>
+              <h3 className="font-semibold text-lg">Add Location</h3>
             </div>
             <button
               type="button"

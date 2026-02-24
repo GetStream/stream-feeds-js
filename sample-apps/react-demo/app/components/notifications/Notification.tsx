@@ -65,11 +65,9 @@ export const Notification = ({
   }, [notification]);
 
   return (
-    <div className="flex flex-row items-center justify-between gap-2 w-full max-w-full">
-      <div className={`flex flex-row items-center gap-2 flex-1 min-w-0 ${!isRead ? '-ml-2' : ''}`}>
-        {!isRead && <div className="w-2 h-2 -mr-2 rounded-full bg-primary flex-shrink-0" />}
-        <div className="flex-1 min-w-0">{content}</div>
-      </div>
+    <div className="flex flex-row items-start gap-3 w-full min-w-0">
+      {!isRead && <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-2" />}
+      <div className="flex-1 min-w-0">{content}</div>
     </div>
   );
 };
@@ -99,7 +97,7 @@ const Actors = ({ notification }: { notification: AggregatedActivityResponse }) 
       {previewActors.map((actor, index) => (
         <span key={actor.id}>
           {index > 0 ? remainingActors > 0 ? ', ' : ' and ' : ''}
-          <NavLink href={`/profile/${actor.id}`} className="link">
+          <NavLink href={`/profile/${actor.id}`} className="font-semibold underline decoration-base-content/20 hover:decoration-base-content/50 underline-offset-2">
             {actor.name}
           </NavLink>
         </span>
@@ -112,11 +110,9 @@ const Actors = ({ notification }: { notification: AggregatedActivityResponse }) 
 const ActorAvatars = ({ notification }: { notification: AggregatedActivityResponse }) => {
   const previewActors = getPreviewActors(notification);
   return (
-    <div className="flex flex-row">
-      {previewActors.map((actor, index) => (
-        <div key={actor.id} className={index > 0 ? '-ml-1' : ''}>
-          <Avatar user={actor} className="size-5" />
-        </div>
+    <div className="flex flex-row -space-x-1.5">
+      {previewActors.map((actor) => (
+        <Avatar key={actor.id} user={actor} className="size-6 ring-2 ring-base-100" />
       ))}
     </div>
   );
@@ -124,15 +120,17 @@ const ActorAvatars = ({ notification }: { notification: AggregatedActivityRespon
 
 const NotificationContent = ({ icon, postLink, notification, activityText, actionText }: { icon: string, postLink?: string, notification: AggregatedActivityResponse, actionText: string, activityText?: string }) => {
   return (
-    <div className="flex flex-row gap-2 items-center w-full min-w-0">
-      <span className="material-symbols-outlined text-primary text-[1.2rem]! flex-shrink-0 mt-0.5">{icon}</span>
-      <div className="flex-1 min-w-0">
-        <Actors notification={notification} /> <span>{actionText}</span>
-        {activityText && postLink && (
-          <span> <NavLink href={`${postLink}`} className="link">{activityText}</NavLink></span>
-        )}
+    <div className="flex flex-row gap-3 items-start w-full min-w-0">
+      <span className="material-symbols-outlined text-primary text-[18px]! shrink-0 mt-0.5">{icon}</span>
+      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+        <ActorAvatars notification={notification} />
+        <p className="text-[13px] leading-relaxed text-base-content/80">
+          <Actors notification={notification} /> {actionText}
+          {activityText && postLink && (
+            <span> <NavLink href={`${postLink}`} className="text-base-content underline decoration-base-content/20 hover:decoration-base-content/50 underline-offset-2">{activityText}</NavLink></span>
+          )}
+        </p>
       </div>
-      <ActorAvatars notification={notification} />
     </div>
   );
 };

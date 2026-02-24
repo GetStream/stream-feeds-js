@@ -4,6 +4,7 @@ import { ActivityInteractions } from './activity-interactions/ActivityInteractio
 import { ActivityContent } from './ActivityContent';
 import { ActivityParent } from './ActivityParent';
 import { NavLink } from '../utility/NavLink';
+import { Avatar } from '../utility/Avatar';
 import { PollDisplay } from '../poll/PollDisplay';
 
 export const Activity = ({
@@ -15,61 +16,72 @@ export const Activity = ({
 }) => {
   const isHashtagFeed = activity.current_feed?.group_id === 'hashtag';
   const hashtagId = activity.current_feed?.id;
+  const withLink = location === 'timeline' || location === 'profile' || location === 'search' || location === 'foryou';
 
   return (
-    <article className="w-full flex flex-col gap-1">
-      {isHashtagFeed && hashtagId && (
-        location === 'preview' ? (
-          <div className="flex items-center gap-2 mb-1">
-            <div className="size-5 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold">
-              #
-            </div>
-            <span className="text-xs text-base-content/50">
-              #{hashtagId}
-            </span>
-          </div>
-        ) : (
-          <NavLink
-            href={`/hashtag/${hashtagId}`}
-            className="flex items-center gap-2 mb-1 group"
-          >
-            <div className="size-5 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold">
-              #
-            </div>
-            <span className="text-xs text-base-content/50 group-hover:underline">
-              #{hashtagId}
-            </span>
+    <article className="w-full flex gap-3">
+      <div className="flex-shrink-0">
+        {withLink ? (
+          <NavLink href={`/profile/${activity.user.id}`}>
+            <Avatar user={activity.user} className="size-10" />
           </NavLink>
-        )
-      )}
-      <ActivityHeader
-        activity={activity}
-        withFollowButton={location === 'foryou'}
-        withLink={location === 'timeline' || location === 'profile' || location === 'search' || location === 'foryou'}
-        withActions={location === 'timeline' || location === 'profile'}
-      />
-      <ActivityContent activity={activity} withoutInteractions={location === 'preview'} />
-      {activity.poll && (
-        <PollDisplay
-          poll={activity.poll}
+        ) : (
+          <Avatar user={activity.user} className="size-10" />
+        )}
+      </div>
+      <div className="flex-1 min-w-0 flex flex-col gap-2">
+        {isHashtagFeed && hashtagId && (
+          location === 'preview' ? (
+            <div className="flex items-center gap-2">
+              <div className="size-5 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-semibold">
+                #
+              </div>
+              <span className="text-xs text-base-content/70">
+                #{hashtagId}
+              </span>
+            </div>
+          ) : (
+            <NavLink
+              href={`/hashtag/${hashtagId}`}
+              className="flex items-center gap-2 group"
+            >
+              <div className="size-5 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-semibold">
+                #
+              </div>
+              <span className="text-xs text-base-content/70 group-hover:underline">
+                #{hashtagId}
+              </span>
+            </NavLink>
+          )
+        )}
+        <ActivityHeader
           activity={activity}
-          withoutInteractions={location === 'preview'}
+          withFollowButton={location === 'foryou'}
+          withLink={withLink}
+          withActions={location === 'timeline' || location === 'profile'}
+          withAvatar={false}
         />
-      )}
-      {activity?.parent ? (
-        location === 'preview' ? (
-          <ActivityParent activity={activity} />
-        ) : (
-          <NavLink className="w-full min-w-0 max-w-full block mt-2" href={`/activity/${activity.parent?.id}`}>
+        <ActivityContent activity={activity} withoutInteractions={location === 'preview'} />
+        {activity.poll && (
+          <PollDisplay
+            poll={activity.poll}
+            activity={activity}
+            withoutInteractions={location === 'preview'}
+          />
+        )}
+        {activity?.parent ? (
+          location === 'preview' ? (
             <ActivityParent activity={activity} />
-          </NavLink>
-        )
-      ) : null}
-      {location !== 'preview' && (
-        <div className="mt-3">
+          ) : (
+            <NavLink className="w-full min-w-0 max-w-full block" href={`/activity/${activity.parent?.id}`}>
+              <ActivityParent activity={activity} />
+            </NavLink>
+          )
+        ) : null}
+        {location !== 'preview' && (
           <ActivityInteractions activity={activity} />
-        </div>
-      )}
+        )}
+      </div>
     </article>
   );
 };

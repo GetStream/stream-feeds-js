@@ -17,9 +17,9 @@ export default function ActivityComposePage() {
   }
 
   return (
-    <div className="w-full min-h-[calc(100dvh-8rem)] md:min-h-0 flex flex-col">
+    <div className="w-full min-h-[calc(100dvh-8rem)] md:min-h-0 flex flex-col px-4 pt-4">
       <div className="flex items-center justify-between pb-4 mb-4">
-        <span className="font-bold text-lg">New Post</span>
+        <span className="font-semibold text-lg">New Post</span>
       </div>
       <div className="flex-1 flex gap-3">
         <Avatar user={currentUser} className="size-10 shrink-0" />

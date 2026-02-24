@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityPreview } from '../components/activity/ActivityPreview';
 import { ErrorCard } from '../components/utility/ErrorCard';
 import { BookmarksPageSkeleton } from '../components/utility/loading-skeletons/BookmarksPageSkeleton';
+import { PageHeader } from '../components/utility/PageHeader';
 
 export default function Bookmarks() {
   const client = useFeedsClient();
@@ -55,36 +56,35 @@ export default function Bookmarks() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-4">
-      <div className="text-lg font-semibold w-full px-4 lg:px-0">Bookmarks</div>
+    <div className="w-full flex flex-col items-center justify-center">
+      <PageHeader title="Bookmarks" />
       {bookmarks.length === 0 && !isLoading ? (
-        <div className="card card-border bg-base-100 w-96">
-          <div className="card-body items-center text-center">
-            <h2 className="card-title">No bookmarks yet <span className="material-symbols-outlined fill">bookmark</span></h2>
-            <p>Bookmark posts to see them here</p>
-          </div>
+        <div className="w-full max-w-sm mx-auto py-12 px-4 text-center">
+          <h2 className="text-2xl font-semibold mb-2">No bookmarks yet</h2>
+          <p className="text-base-content/60">Bookmark posts to see them here</p>
         </div>
       ) : (
         <>
-          <ul className="w-full list">
+          <ul className="w-full">
             {bookmarks.map((bookmark) => (
-              <li className="list-row w-full" key={bookmark.activity.id}>
-                <div className="list-col-grow w-full min-w-0">
-                  <ActivityPreview
-                    activity={bookmark.activity}
-                  />
-                </div>
+              <li
+                className="w-full px-4 py-3 border-b border-base-content/10 hover:bg-base-200/50 transition-colors cursor-pointer"
+                key={bookmark.activity.id}
+              >
+                <ActivityPreview activity={bookmark.activity} />
               </li>
             ))}
-
           </ul>
           {next && (
             <button
-              className="btn btn-soft btn-primary"
+              className="btn btn-soft btn-primary my-4"
               onClick={() => loadBookmarks(next)}
             >
               Load more
             </button>
+          )}
+          {!next && !isLoading && bookmarks.length > 0 && (
+            <p className="py-8 text-center text-sm text-base-content/60">You've reached the end</p>
           )}
         </>
       )}

@@ -8,7 +8,7 @@ export const SearchResultsSkeleton = ({
 }: {
   tab?: SearchResultsTab;
 }) => (
-  <div className="w-full flex flex-col items-center justify-start gap-4 pt-4">
+  <div className="w-full flex flex-col">
     {tab === 'activities' ? (
       <>
         <ActivitySkeleton />

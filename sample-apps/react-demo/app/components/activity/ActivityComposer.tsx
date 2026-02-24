@@ -259,6 +259,7 @@ export const ActivityComposer = ({
         onRemoveLocation={handleRemoveLocation}
         enableHashtags
         onCreateHashtag={handleCreateHashtag}
+        {...(activity ? { submitLabel: 'Save', placeholder: 'Edit your post...' } : {})}
       >
         {children}
         <button

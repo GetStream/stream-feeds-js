@@ -54,11 +54,11 @@ export const TogglePremiumMembershipButton = ({
   }, [isLoading, currentUser?.id, userId, isPremium, feed, reloadTimelines]);
 
   const baseStyles =
-    'flex items-center gap-1.5 whitespace-nowrap px-4 py-1.5 text-sm font-bold rounded-full transition-all duration-200 select-none';
+    'flex items-center gap-1.5 whitespace-nowrap px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 select-none';
 
   const membershipStyles = isPremium
-    ? 'bg-transparent text-base-content border-2 border-base-300 hover:border-base-content/50 hover:bg-base-300 active:scale-[0.98] active:bg-base-300'
-    : 'bg-base-content text-base-100 border-2 border-transparent hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] active:brightness-95';
+    ? 'bg-transparent text-base-content border border-base-content/20 hover:border-base-content/40 hover:bg-base-200/50 active:scale-[0.98]'
+    : 'bg-base-content text-base-100 border border-transparent hover:brightness-110 active:scale-[0.98] active:brightness-95';
 
   const loadingStyles = isLoading ? 'pointer-events-none opacity-70 cursor-wait' : 'cursor-pointer';
 

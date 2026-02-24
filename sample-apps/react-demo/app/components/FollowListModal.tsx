@@ -102,7 +102,7 @@ export const FollowListModal = forwardRef<FollowListModalHandle, FollowListModal
         <div className="modal-box w-full max-w-md">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-lg">
+            <h3 className="font-semibold text-lg">
               {type === 'followers' ? 'Followers' : 'Following'}
             </h3>
             <button
