@@ -775,6 +775,7 @@ export class FeedsApi {
       mentioned_user_ids: request?.mentioned_user_ids,
       custom: request?.custom,
       location: request?.location,
+      search_data: request?.search_data,
     };
 
     const response = await this.apiClient.sendRequest<

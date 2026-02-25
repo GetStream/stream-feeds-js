@@ -7,7 +7,7 @@ import { Composer } from '../common/composer/Composer';
 import { isOGAttachment } from '../common/attachments/is-og-attachment';
 import { Activity } from './Activity';
 import { PollComposerModal, type PollData, type PollComposerModalHandle } from '../poll/PollComposerModal';
-import { ActivitySettingsModal, type ActivitySettings, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
+import { ActivitySettingsModal, type RestrictRepliesValue, type ActivitySettings, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
 import { LocationModal, type LocationData, type LocationModalHandle } from './LocationModal';
 import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
@@ -54,7 +54,7 @@ export const ActivityComposer = ({
         }),
       );
       setActivitySettings({
-        restrictReplies: activity.restrict_replies ?? 'everyone',
+        restrictReplies: (activity.restrict_replies ?? 'everyone') as RestrictRepliesValue,
         activityVisibility: activity.visibility === 'tag' ? 'premium' : activity.visibility === 'private' ? 'private' : 'public',
       });
       if (activity.poll) {
@@ -291,28 +291,28 @@ export const ActivityComposer = ({
       </Composer>
       {portalContainer
         ? createPortal(
-            <>
-              <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
-              <ActivitySettingsModal
-                ref={settingsModalRef}
-                initialValue={activitySettings}
-                onSave={handleSettingsSave}
-              />
-              <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
-            </>,
-            document.body,
-          )
+          <>
+            <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
+            <ActivitySettingsModal
+              ref={settingsModalRef}
+              initialValue={activitySettings}
+              onSave={handleSettingsSave}
+            />
+            <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
+          </>,
+          document.body,
+        )
         : (
-            <>
-              <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
-              <ActivitySettingsModal
-                ref={settingsModalRef}
-                initialValue={activitySettings}
-                onSave={handleSettingsSave}
-              />
-              <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
-            </>
-          )}
+          <>
+            <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
+            <ActivitySettingsModal
+              ref={settingsModalRef}
+              initialValue={activitySettings}
+              onSave={handleSettingsSave}
+            />
+            <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
+          </>
+        )}
     </div>
   );
 };

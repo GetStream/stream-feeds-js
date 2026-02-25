@@ -150,8 +150,6 @@ const eventDecoderMapping: Record<
   'user.deactivated': (data: Record<string, any>) =>
     decoders.UserDeactivatedEvent(data),
 
-  'user.muted': (data: Record<string, any>) => decoders.UserMutedEvent(data),
-
   'user.reactivated': (data: Record<string, any>) =>
     decoders.UserReactivatedEvent(data),
 
