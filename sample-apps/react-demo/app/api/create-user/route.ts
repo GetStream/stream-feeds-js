@@ -104,20 +104,15 @@ export async function POST(request: Request) {
       await client.feeds.getOrCreateFollows({ follows });
     }
 
-    // Add a welcome activity to the user's feed with "What's new in V3" info
+    // Add a welcome activity to the user's feed with main features overview
     const welcomeActivityText =
-      '👋 Welcome! V3 brings For-You feeds, 20–30% faster performance, Reddit-style comments, search, and more. Learn more: https://getstream.io/';
+      '👋 Welcome to the Stream Feeds demo! This app showcases reactions, threaded comments, images, URL previews, polls, @mentions, notifications, and many more features. Learn more about the powerful architecture: https://getstream.io/activity-feeds/docs/javascript/architecture/';
 
     const welcomeResponse = await client.feeds.addActivity({
       type: 'post',
       feeds: [`user:${userId}`],
       user_id: userId,
       text: welcomeActivityText,
-      custom: {
-        title: "What's new in V3",
-        link: 'https://getstream.io/',
-        is_welcome_activity: true,
-      },
     });
 
     const welcomeActivityId = welcomeResponse.activity?.id;
