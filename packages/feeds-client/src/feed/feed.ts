@@ -216,11 +216,11 @@ export class Feed extends FeedApi {
     'app.updated': Feed.noop,
     'user.banned': Feed.noop,
     'user.deactivated': Feed.noop,
-    'user.muted': Feed.noop,
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
     'feeds.activity.feedback': handleActivityFeedback.bind(this),
     'feeds.activity.restored': Feed.noop,
+    'user.unbanned': Feed.noop,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
@@ -295,7 +295,9 @@ export class Feed extends FeedApi {
     const { last_get_or_create_request_config } = this.state.getLatestValue();
     if (last_get_or_create_request_config?.watch) {
       this.inProgressGetOrCreate = undefined;
-      await withRetry(() => this.getOrCreate(last_get_or_create_request_config));
+      await withRetry(() =>
+        this.getOrCreate(last_get_or_create_request_config),
+      );
     }
   }
 

@@ -291,28 +291,28 @@ export const ActivityComposer = ({
       </Composer>
       {portalContainer
         ? createPortal(
-            <>
-              <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
-              <ActivitySettingsModal
-                ref={settingsModalRef}
-                initialValue={activitySettings}
-                onSave={handleSettingsSave}
-              />
-              <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
-            </>,
-            document.body,
-          )
+          <>
+            <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
+            <ActivitySettingsModal
+              ref={settingsModalRef}
+              initialValue={activitySettings}
+              onSave={handleSettingsSave}
+            />
+            <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
+          </>,
+          document.body,
+        )
         : (
-            <>
-              <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
-              <ActivitySettingsModal
-                ref={settingsModalRef}
-                initialValue={activitySettings}
-                onSave={handleSettingsSave}
-              />
-              <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
-            </>
-          )}
+          <>
+            <PollComposerModal ref={pollModalRef} onSubmit={handlePollSubmit} />
+            <ActivitySettingsModal
+              ref={settingsModalRef}
+              initialValue={activitySettings}
+              onSave={handleSettingsSave}
+            />
+            <LocationModal ref={locationModalRef} onConfirm={handleLocationConfirm} />
+          </>
+        )}
     </div>
   );
 };

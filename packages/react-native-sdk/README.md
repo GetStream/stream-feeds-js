@@ -6,7 +6,7 @@ Bring users together through personalized feeds, threaded discussions, and real-
 - Supported React Native versions: >=0.73.0
 - Supported Expo versions: >=51.0.0
 
-## **Quick Links**
+## **Quick Links 🔗**
 
 - [Register](https://getstream.io/chat/trial/) to get an API key for Stream Feeds
 - [Sample app](../../sample-apps/react-native/ExpoTikTokApp/#expo-tiktok-sample-app)

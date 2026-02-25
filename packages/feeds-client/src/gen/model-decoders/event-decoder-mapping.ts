@@ -150,10 +150,11 @@ const eventDecoderMapping: Record<
   'user.deactivated': (data: Record<string, any>) =>
     decoders.UserDeactivatedEvent(data),
 
-  'user.muted': (data: Record<string, any>) => decoders.UserMutedEvent(data),
-
   'user.reactivated': (data: Record<string, any>) =>
     decoders.UserReactivatedEvent(data),
+
+  'user.unbanned': (data: Record<string, any>) =>
+    decoders.UserUnbannedEvent(data),
 
   'user.updated': (data: Record<string, any>) =>
     decoders.UserUpdatedEvent(data),

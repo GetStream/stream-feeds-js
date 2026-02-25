@@ -26,25 +26,25 @@ const OPTIONS: Array<{
   description: string;
   icon: string;
 }> = [
-  {
-    value: 'everyone',
-    label: 'Everyone',
-    description: 'Anyone can reply to this post',
-    icon: 'public',
-  },
-  {
-    value: 'people_i_follow',
-    label: 'People I follow',
-    description: 'Only people you follow can reply',
-    icon: 'group',
-  },
-  {
-    value: 'nobody',
-    label: 'Nobody',
-    description: 'No one can reply (only you)',
-    icon: 'comments_disabled',
-  },
-];
+    {
+      value: 'everyone',
+      label: 'Everyone',
+      description: 'Anyone can reply to this post',
+      icon: 'public',
+    },
+    {
+      value: 'people_i_follow',
+      label: 'People I follow',
+      description: 'Only people you follow can reply',
+      icon: 'group',
+    },
+    {
+      value: 'nobody',
+      label: 'Nobody',
+      description: 'No one can reply (only you)',
+      icon: 'comments_disabled',
+    },
+  ];
 
 const VISIBILITY_OPTIONS: Array<{
   value: ActivityVisibility;
@@ -52,25 +52,25 @@ const VISIBILITY_OPTIONS: Array<{
   description: string;
   icon: string;
 }> = [
-  {
-    value: 'public',
-    label: 'Public',
-    description: 'Anyone can see this post',
-    icon: 'public',
-  },
-  {
-    value: 'premium',
-    label: 'Premium members only',
-    description: 'Only premium members can see the full post, others see a preview',
-    icon: 'workspace_premium',
-  },
-  {
-    value: 'private',
-    label: 'Private',
-    description: 'Only you can see this post',
-    icon: 'lock',
-  },
-];
+    {
+      value: 'public',
+      label: 'Public',
+      description: 'Anyone can see this post',
+      icon: 'public',
+    },
+    {
+      value: 'premium',
+      label: 'Premium members only',
+      description: 'Only premium members can see the full post, others see a preview',
+      icon: 'workspace_premium',
+    },
+    {
+      value: 'private',
+      label: 'Private',
+      description: 'Only you can see this post',
+      icon: 'lock',
+    },
+  ];
 
 const DEFAULT_SETTINGS: ActivitySettings = { restrictReplies: 'everyone', activityVisibility: 'public' };
 
