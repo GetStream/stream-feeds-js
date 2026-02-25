@@ -216,7 +216,6 @@ export class Feed extends FeedApi {
     'app.updated': Feed.noop,
     'user.banned': Feed.noop,
     'user.deactivated': Feed.noop,
-    // 'user.muted': Feed.noop,
     'user.reactivated': Feed.noop,
     'user.updated': Feed.noop,
     'feeds.activity.feedback': handleActivityFeedback.bind(this),
