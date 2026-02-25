@@ -54,7 +54,7 @@ export const ActivityComposer = ({
         }),
       );
       setActivitySettings({
-        restrictReplies: (activity.restrict_replies ?? 'everyone') as RestrictRepliesValue,
+        restrictReplies: activity.restrict_replies ?? 'everyone',
         activityVisibility: activity.visibility === 'tag' ? 'premium' : activity.visibility === 'private' ? 'private' : 'public',
       });
       if (activity.poll) {
