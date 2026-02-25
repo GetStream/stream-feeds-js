@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState, useEffect } from 'react';
-import type { Feed, FeedState } from '@stream-io/feeds-react-sdk';
+import type { Feed, FeedMemberResponse } from '@stream-io/feeds-react-sdk';
 import { useMembers } from '@stream-io/feeds-react-sdk';
 import { Avatar } from './utility/Avatar';
 import { NavLink } from './utility/NavLink';
@@ -15,9 +15,7 @@ type MembersListModalProps = {
   feed: Feed;
 };
 
-const selector = (state: FeedState) => ({
-  createdBy: state.created_by
-});
+const emptyArray: FeedMemberResponse[] = [];
 
 export const MembersListModal = forwardRef<MembersListModalHandle, MembersListModalProps>(
   ({ feed }, ref) => {
@@ -28,7 +26,8 @@ export const MembersListModal = forwardRef<MembersListModalHandle, MembersListMo
 
     const membersData = useMembers(feed);
 
-    const members = membersData?.members ?? [];
+    const members = membersData?.members ?? emptyArray;
+
     const loadNextPage = membersData?.loadNextPage;
 
     const open = useCallback(() => {
