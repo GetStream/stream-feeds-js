@@ -2,6 +2,19 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.49](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.48...@stream-io/feeds-client-0.3.49) (2026-02-25)
+
+
+### Features
+
+* add state updates from HTTP response to poll update and close endpoints ([3efafb4](https://github.com/GetStream/stream-feeds-js/commit/3efafb46782167cff6bf762273281c303ef58f54))
+* type changes from open api enhancement ([ef8464f](https://github.com/GetStream/stream-feeds-js/commit/ef8464f9bdbfa25683a6b8b04b923fda22e3e716))
+
+
+### Bug Fixes
+
+* comment insertion logic from WS when sort is first; change default comment sort option ([e095afb](https://github.com/GetStream/stream-feeds-js/commit/e095afb982a8935d19c7d47cca4493c0f78a31ee))
+
 ## [0.3.48](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.47...@stream-io/feeds-client-0.3.48) (2026-02-18)
 
 
