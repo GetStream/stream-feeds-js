@@ -3,6 +3,8 @@ import { generateUsername } from 'unique-username-generator';
 import { NextResponse } from 'next/server';
 
 const DEMO_USER_IDS = process.env.DEMO_USER_IDS?.split(',') ?? [];
+const DEMO_BOOKMARK_ACTIVITY_IDS =
+  process.env.DEMO_BOOKMARK_ACTIVITY_IDS?.split(',').filter(Boolean) ?? [];
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -100,6 +102,39 @@ export async function POST(request: Request) {
 
     if (follows.length > 0) {
       await client.feeds.getOrCreateFollows({ follows });
+    }
+
+    // Add a welcome activity to the user's feed with main features overview
+    const welcomeActivityText =
+      '👋 Welcome to the Stream Feeds demo! This app showcases reactions, threaded comments, images, URL previews, polls, @mentions, notifications, and many more features. Learn more about the powerful architecture: https://getstream.io/activity-feeds/docs/javascript/architecture/';
+
+    const welcomeResponse = await client.feeds.addActivity({
+      type: 'post',
+      feeds: [`user:${userId}`],
+      user_id: userId,
+      text: welcomeActivityText,
+    });
+
+    const welcomeActivityId = welcomeResponse.activity?.id;
+    if (welcomeActivityId) {
+      const likerCandidates = DEMO_USER_IDS.filter((id) => id && id !== userId);
+      const likerId =
+        likerCandidates[Math.floor(Math.random() * likerCandidates.length)];
+      if (likerId) {
+        await client.feeds.addActivityReaction({
+          type: 'like',
+          activity_id: welcomeActivityId,
+          user_id: likerId,
+          create_notification_activity: true,
+        });
+      }
+    }
+
+    for (const activityId of DEMO_BOOKMARK_ACTIVITY_IDS) {
+      await client.feeds.addBookmark({
+        activity_id: activityId,
+        user_id: userId,
+      });
     }
 
     return NextResponse.json({ userId });
