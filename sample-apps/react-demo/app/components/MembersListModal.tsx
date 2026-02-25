@@ -1,6 +1,6 @@
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState, useEffect, useMemo } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState, useEffect } from 'react';
 import type { Feed, FeedState } from '@stream-io/feeds-react-sdk';
-import { useMembers, useStateStore } from '@stream-io/feeds-react-sdk';
+import { useMembers } from '@stream-io/feeds-react-sdk';
 import { Avatar } from './utility/Avatar';
 import { NavLink } from './utility/NavLink';
 import { LoadingIndicator } from './utility/LoadingIndicator';
@@ -25,15 +25,10 @@ export const MembersListModal = forwardRef<MembersListModalHandle, MembersListMo
     const [isOpen, setIsOpen] = useState(false);
     const [isInitialLoading, setIsInitialLoading] = useState(false);
     const [error, setError] = useState<Error | undefined>(undefined);
-    const { createdBy } = useStateStore(feed.state, selector);
 
     const membersData = useMembers(feed);
 
-    const members = membersData?.members;
-    const membersExcludingOwner = useMemo(
-      () => members?.filter((m) => m.user.id !== createdBy?.id) ?? [],
-      [members, createdBy?.id],
-    );
+    const members = membersData?.members ?? [];
     const loadNextPage = membersData?.loadNextPage;
 
     const open = useCallback(() => {
@@ -109,14 +104,14 @@ export const MembersListModal = forwardRef<MembersListModalHandle, MembersListMo
             {error && <ErrorCard message="Failed to load" error={error} />}
 
             {/* Empty state */}
-            {!isInitialLoading && !error && membersExcludingOwner.length === 0 && (
+            {!isInitialLoading && !error && members.length === 0 && (
               <p className="text-center text-base-content/60 py-8">
                 No members yet
               </p>
             )}
 
             {/* List items */}
-            {membersExcludingOwner.map((member) => (
+            {members.map((member) => (
               <NavLink key={member.user.id} href={`/profile/${member.user.id}`}>
                 <div
                   className="flex items-center gap-3 p-2 hover:bg-base-200 rounded-lg cursor-pointer"
