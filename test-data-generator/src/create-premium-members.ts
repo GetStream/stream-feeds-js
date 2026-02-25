@@ -51,17 +51,6 @@ async function main(): Promise<void> {
 
   const client = new StreamClient(key, secret, { basePath: url });
 
-  // Workaround for WS fan-out logic: add owner as premium member on every user feed.
-  console.log(`Adding each feed owner as premium member of their own feed (${users.length} users)...`);
-  for (const user of users) {
-    const userFeed = client.feeds.feed('user', user.id);
-    await userFeed.updateFeedMembers({
-      operation: 'upsert',
-      members: [{ user_id: user.id, membership_level: 'premium' }],
-    });
-  }
-  console.log('Done adding owners as premium members.');
-
   const shuffled = shuffleArray(users);
   const targetUsers = shuffled.slice(0, TARGET_USER_COUNT);
 

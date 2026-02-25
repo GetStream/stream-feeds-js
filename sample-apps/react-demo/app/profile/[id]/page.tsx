@@ -24,8 +24,7 @@ const userFeedSelector = (state: FeedState) => ({
   // Don't count your own timeline in following feeds
   followerCount: (state.follower_count ?? 1) - 1,
   activityCount: state.activity_count ?? 0,
-  // Don't count yourself as a member
-  memberCount: Math.max((state.member_count ?? 0) - 1, 0),
+  memberCount: state.member_count,
   user: state.created_by,
 });
 
