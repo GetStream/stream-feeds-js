@@ -7,7 +7,7 @@ import { Composer } from '../common/composer/Composer';
 import { isOGAttachment } from '../common/attachments/is-og-attachment';
 import { Activity } from './Activity';
 import { PollComposerModal, type PollData, type PollComposerModalHandle } from '../poll/PollComposerModal';
-import { ActivitySettingsModal, type RestrictRepliesValue, type ActivitySettings, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
+import { ActivitySettingsModal, type ActivitySettings, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
 import { LocationModal, type LocationData, type LocationModalHandle } from './LocationModal';
 import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
