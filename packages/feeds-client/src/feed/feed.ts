@@ -220,6 +220,7 @@ export class Feed extends FeedApi {
     'user.updated': Feed.noop,
     'feeds.activity.feedback': handleActivityFeedback.bind(this),
     'feeds.activity.restored': Feed.noop,
+    'user.unbanned': Feed.noop,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =

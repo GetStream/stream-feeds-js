@@ -425,7 +425,7 @@ export interface ActivityResponse {
 
   reaction_count: number;
 
-  restrict_replies: string;
+  restrict_replies: 'everyone' | 'people_i_follow' | 'nobody';
 
   score: number;
 
@@ -1807,7 +1807,7 @@ export interface CommentResponse {
 
   score: number;
 
-  status: string;
+  status: 'active' | 'deleted' | 'removed' | 'hidden' | 'shadow_blocked';
 
   updated_at: Date;
 
@@ -2065,6 +2065,10 @@ export interface DeleteActivityReactionResponse {
 }
 
 export interface DeleteActivityRequestPayload {
+  entity_id?: string;
+
+  entity_type?: string;
+
   hard_delete?: boolean;
 
   reason?: string;
@@ -2097,6 +2101,10 @@ export interface DeleteCommentReactionResponse {
 }
 
 export interface DeleteCommentRequestPayload {
+  entity_id?: string;
+
+  entity_type?: string;
+
   hard_delete?: boolean;
 
   reason?: string;
@@ -2117,6 +2125,10 @@ export interface DeleteFeedResponse {
 }
 
 export interface DeleteMessageRequestPayload {
+  entity_id?: string;
+
+  entity_type?: string;
+
   hard_delete?: boolean;
 
   reason?: string;
@@ -2127,6 +2139,10 @@ export interface DeleteModerationConfigResponse {
 }
 
 export interface DeleteReactionRequestPayload {
+  entity_id?: string;
+
+  entity_type?: string;
+
   hard_delete?: boolean;
 
   reason?: string;
@@ -2136,6 +2152,10 @@ export interface DeleteUserRequestPayload {
   delete_conversation_channels?: boolean;
 
   delete_feeds_content?: boolean;
+
+  entity_id?: string;
+
+  entity_type?: string;
 
   hard_delete?: boolean;
 
@@ -2692,7 +2712,7 @@ export interface FeedResponse {
 
   deleted_at?: Date;
 
-  visibility?: string;
+  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
   filter_tags?: string[];
 
@@ -2740,7 +2760,7 @@ export interface FeedSuggestionResponse {
 
   recommendation_score?: number;
 
-  visibility?: string;
+  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
   filter_tags?: string[];
 
@@ -5228,7 +5248,7 @@ export interface ThreadedCommentResponse {
 
   score: number;
 
-  status: string;
+  status: 'active' | 'deleted' | 'removed' | 'hidden' | 'shadow_blocked';
 
   updated_at: Date;
 
@@ -5983,6 +6003,36 @@ export interface UserRuleParameters {
   max_age?: string;
 }
 
+export interface UserUnbannedEvent {
+  created_at: Date;
+
+  custom: Record<string, any>;
+
+  user: UserResponseCommonFields;
+
+  type: string;
+
+  channel_id?: string;
+
+  channel_member_count?: number;
+
+  channel_message_count?: number;
+
+  channel_type?: string;
+
+  cid?: string;
+
+  received_at?: Date;
+
+  shadow?: boolean;
+
+  team?: string;
+
+  channel_custom?: Record<string, any>;
+
+  created_by?: UserResponseCommonFields;
+}
+
 export interface UserUpdatedEvent {
   created_at: Date;
 
@@ -6148,6 +6198,7 @@ export type WSClientEvent =
   | ({ type: 'user.banned' } & UserBannedEvent)
   | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
   | ({ type: 'user.reactivated' } & UserReactivatedEvent)
+  | ({ type: 'user.unbanned' } & UserUnbannedEvent)
   | ({ type: 'user.updated' } & UserUpdatedEvent);
 
 export type WSEvent =
@@ -6203,4 +6254,5 @@ export type WSEvent =
   | ({ type: 'user.banned' } & UserBannedEvent)
   | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
   | ({ type: 'user.reactivated' } & UserReactivatedEvent)
+  | ({ type: 'user.unbanned' } & UserUnbannedEvent)
   | ({ type: 'user.updated' } & UserUpdatedEvent);
