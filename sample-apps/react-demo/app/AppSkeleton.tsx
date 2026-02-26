@@ -21,9 +21,9 @@ export const AppSkeleton = ({ children }: PropsWithChildren) => {
       <div className="min-h-dvh w-full max-w-[1144px] mx-auto lg:flex lg:gap-4">
         {/* Desktop left sidebar */}
         <aside className="w-[256px] shrink-0 hidden lg:flex flex-col gap-4 pt-4 pb-4 sticky top-0 h-dvh">
-          <div className="px-3">
+          <NavLink href="/home" className="px-3">
             <StreamLogo />
-          </div>
+          </NavLink>
           <nav className="w-full flex flex-col gap-1">
             <ul className="menu w-full gap-0.5">
               <li><HomeLink /></li>
@@ -64,13 +64,13 @@ const MobileTopBar = () => {
 
   return (
     <nav className="lg:hidden w-full fixed top-0 left-0 right-0 z-40 bg-base-100/90 backdrop-blur-lg border-b border-base-content/10 grid grid-cols-[auto_1fr_auto] items-center h-14 px-4">
-      <StreamLogo />
+      <NavLink href="/home"><StreamLogo /></NavLink>
       {title ? (
         <>
           <div className="flex justify-center">
             <span className="text-base font-semibold">{title}</span>
           </div>
-          <div className="invisible" aria-hidden="true"><StreamLogo /></div>
+          <div className="invisible" aria-hidden="true"><NavLink href="/home"><StreamLogo /></NavLink></div>
         </>
       ) : (
         <div />
