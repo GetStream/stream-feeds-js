@@ -49,7 +49,7 @@ export const ContentMetadata = ({
   );
 
   const metaContent = (
-    <div className="flex flex-row items-center gap-1 min-w-0">
+    <div className="flex flex-row items-center flex-wrap gap-1 min-w-0">
       {nameElement}
       <span className="text-base-content/70 flex-shrink-0">·</span>
       <span className="text-base-content/70 text-[13px] flex-shrink-0">

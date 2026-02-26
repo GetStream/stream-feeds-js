@@ -71,7 +71,7 @@ export const OGAttachment = ({
       <div className="p-4 flex flex-col gap-1.5">
         {domain && (
           <div className="flex items-center gap-1.5 text-xs text-base-content/70 font-medium uppercase tracking-wide">
-            <span className="material-symbols-outlined text-sm">link</span>
+            <span className="material-symbols-outlined text-[18px]!">link</span>
             <span className="truncate">{domain}</span>
           </div>
         )}

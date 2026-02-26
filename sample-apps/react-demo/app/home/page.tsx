@@ -63,7 +63,7 @@ export default function Home() {
       </section>
 
       {/* Composer Section */}
-      <section className="w-full hidden md:block px-4 py-3 border-b border-base-content/10">
+      <section className="w-full px-4 py-3 border-b border-base-content/10">
         <StreamFeed feed={ownFeed}>
           <HomeActivityComposer />
         </StreamFeed>

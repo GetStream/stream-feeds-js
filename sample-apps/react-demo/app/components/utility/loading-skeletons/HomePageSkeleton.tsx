@@ -16,7 +16,7 @@ export const HomePageSkeleton = () => (
     </section>
 
     {/* Composer Section Skeleton */}
-    <section className="w-full hidden md:block">
+    <section className="w-full">
       <ComposerSkeleton />
     </section>
 
