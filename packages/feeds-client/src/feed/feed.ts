@@ -188,6 +188,7 @@ export class Feed extends FeedApi {
     'feeds.feed.updated': handleFeedUpdated.bind(this),
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
+    'feeds.feed_group.restored': Feed.noop,
     'feeds.follow.created': handleFollowCreated.bind(this),
     'feeds.follow.deleted': handleFollowDeleted.bind(this),
     'feeds.follow.updated': handleFollowUpdated.bind(this),
