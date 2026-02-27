@@ -78,6 +78,9 @@ describe('Stories page', () => {
       onNewActivity: () => 'add-to-end',
     });
 
+    // Alternatively set after feed is created
+    johnFeed.onNewActivity = () => 'add-to-end';
+
     await johnFeed.getOrCreate({
       watch: true,
       limit: 100,

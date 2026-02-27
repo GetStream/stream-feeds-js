@@ -7,6 +7,7 @@ import {
 import type { FeedsClient } from '../../src/feeds-client';
 import type { Feed } from '../../src/feed';
 import type { UserRequest } from '../../src/gen/models';
+import { activityFilter } from '../../src';
 
 describe('Activities page', () => {
   let client: FeedsClient;
@@ -233,6 +234,17 @@ describe('Activities page', () => {
     // If you don't care about state updates
     await client.getActivity({
       id: activityId,
+    });
+  });
+
+  it(`Activity list controls - client-side SDKs`, async () => {
+    const feed = client.feed('user', '123', {
+      onNewActivity: ({ activity, currentUser }) => {
+        const requestConfig =
+          feed.currentState.last_get_or_create_request_config;
+        if (!activityFilter(activity, requestConfig)) return 'ignore';
+        return activity.user.id === currentUser?.id ? 'add-to-start' : 'ignore';
+      },
     });
   });
 
