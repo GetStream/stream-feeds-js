@@ -39,10 +39,7 @@ async function retryOnRateLimit<T>(
           rateLimit.rateLimitReset instanceof Date
             ? rateLimit.rateLimitReset.getTime()
             : new Date(rateLimit.rateLimitReset).getTime();
-        waitMs = Math.min(
-          MAX_WAIT_MS,
-          Math.max(100, resetAt - Date.now()),
-        );
+        waitMs = Math.min(MAX_WAIT_MS, Math.max(100, resetAt - Date.now()));
       }
       console.warn(
         `Rate limited (429). Waiting ${Math.round(waitMs / 1000)}s before retry (attempt ${attempt + 1}/${maxRetries}).`,
@@ -112,7 +109,7 @@ export async function POST() {
     } while (response.users.length > 0 && offset < maxUsers);
 
     const deleted: string[] = [];
-    const errors: { userId: string; error: string }[] = [];
+    const errors: Array<{ userId: string; error: string }> = [];
 
     for (const user of userIdsToDelete) {
       try {
