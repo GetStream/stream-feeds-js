@@ -14,13 +14,25 @@ async function main(): Promise<void> {
   const client = new StreamClient(key, secret, { basePath: url });
 
   console.log('Creating premium membership level...');
-  await client.feeds.createMembershipLevel({
-    id: 'premium',
-    name: 'Premium',
-    tags: ['premium'],
-  });
-
-  console.log('Finished creating premium membership level');
+  try {
+    await client.feeds.createMembershipLevel({
+      id: 'premium',
+      name: 'Premium',
+      tags: ['premium'],
+    });
+    console.log('Finished creating premium membership level');
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const status = (err as { status?: number }).status;
+    const isAlreadyExists =
+      status === 409 ||
+      /already exists|already exist|conflict|duplicate/i.test(message);
+    if (isAlreadyExists) {
+      console.log('Premium membership level already exists, skipping.');
+      return;
+    }
+    throw err;
+  }
 }
 
 main().catch(console.error);

@@ -66,24 +66,21 @@ async function main(): Promise<void> {
     );
     const membersToAdd = shuffleArray(otherUsers).slice(0, memberCount);
 
-    // Owner already added above; include again in upsert so these feeds have owner + extra members
-    const allMembers = [
-      { user_id: targetUser.id, membership_level: 'premium' as const },
-      ...membersToAdd.map((u) => ({
-        user_id: u.id,
-        membership_level: 'premium' as const,
-      })),
-    ];
+    // Never add the feed owner as a premium member; only add other users
+    const premiumMembers = membersToAdd.map((u) => ({
+      user_id: u.id,
+      membership_level: 'premium' as const,
+    }));
 
     const userFeed = client.feeds.feed('user', targetUser.id);
     await userFeed.updateFeedMembers({
       operation: 'upsert',
-      members: allMembers,
+      members: premiumMembers,
     });
 
-    const memberIds = allMembers.map((m) => m.user_id);
+    const memberIds = premiumMembers.map((m) => m.user_id);
     console.log(
-      `  user:${targetUser.id}: added ${allMembers.length} premium member(s) (including owner): ${memberIds.join(', ')}`,
+      `  user:${targetUser.id}: added ${premiumMembers.length} premium member(s) (excluding owner): ${memberIds.join(', ')}`,
     );
   }
 

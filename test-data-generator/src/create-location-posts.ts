@@ -68,11 +68,6 @@ async function getLocationImageFiles(
   }
 }
 
-function pickRandom<T>(array: T[]): T | undefined {
-  if (array.length === 0) return undefined;
-  return array[Math.floor(Math.random() * array.length)];
-}
-
 async function main(): Promise<void> {
   const key = process.env.STREAM_API_KEY;
   const secret = process.env.API_SECRET;
@@ -112,7 +107,8 @@ async function main(): Promise<void> {
     const cityImageFiles = locationImageFiles[location.city] ?? [];
     const cityFolder = LOCATION_IMAGE_FOLDERS[location.city];
 
-    for (const funFact of location.funFacts) {
+    for (let i = 0; i < location.funFacts.length; i++) {
+      const funFact = location.funFacts[i];
       const user = getRandomUser(users);
       const userFeed = client.feeds.feed('user', user.id);
 
@@ -128,8 +124,11 @@ async function main(): Promise<void> {
         custom: { location_city: location.city },
       };
 
-      // Attach one image from this location's folder if available
-      const imageFile = pickRandom(cityImageFiles);
+      // Assign one image per post by index (wraps if fewer images than posts)
+      const imageFile =
+        cityImageFiles.length > 0
+          ? cityImageFiles[i % cityImageFiles.length]
+          : undefined;
       if (imageFile && cityFolder) {
         const imagePath = path.join(locationImagesDir, cityFolder, imageFile);
         const imageBuffer = await fs.readFile(imagePath);

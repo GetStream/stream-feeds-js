@@ -1,0 +1,32 @@
+name: Cleanup old users
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Daily at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call cleanup-old-users endpoint
+        env:
+          DEMO_APP_URL: ${{ vars.DEMO_APP_URL }}
+        run: |
+          if [ -z "$DEMO_APP_URL" ]; then
+            echo "DEMO_APP_URL is not set. Set the vars.DEMO_APP_URL repository variable to the deployed react-demo base URL (e.g. https://your-demo.vercel.app)."
+            exit 1
+          fi
+          url="${DEMO_APP_URL%/}/api/cleanup-old-users"
+          echo "Calling $url ..."
+          response=$(curl -s -w "\n%{http_code}" -X POST "$url")
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          echo "Response body:"
+          echo "$body"
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "Cleanup completed successfully (HTTP $http_code)."
+          else
+            echo "Cleanup request returned HTTP $http_code."
+            exit 1
+          fi
