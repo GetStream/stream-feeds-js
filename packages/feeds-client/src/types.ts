@@ -36,3 +36,20 @@ export type StreamFile = File | { name: string; uri: string; type: string };
 export type CommentParent = ActivityResponse | CommentResponse;
 
 export type ConnectedUser = OwnUserResponse & { name?: string; image?: string };
+
+/**
+ * Result of the onNewActivity callback: whether to add a new activity to the feed and where.
+ * - 'add-to-start': prepend to the activities list (e.g. new posts at top)
+ * - 'add-to-end': append to the activities list (e.g. stories)
+ * - 'ignore': do not add to the feed
+ */
+export type OnNewActivityResult = 'add-to-start' | 'add-to-end' | 'ignore';
+
+/**
+ * Callback invoked when a new activity is received (WebSocket event or addActivity HTTP response).
+ * Return how the feed should handle it.
+ */
+export type OnNewActivityCallback = (params: {
+  activity: ActivityResponse;
+  currentUser: ConnectedUser | undefined;
+}) => OnNewActivityResult;

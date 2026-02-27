@@ -75,11 +75,11 @@ describe('Stories page', () => {
     // Sara reads John's story feed
     const johnFeed = saraClient.feed('story', john.id, {
       // By default new activities are added to the start of the list, but this is not what we want for stories
-      addNewActivitiesTo: 'end',
+      onNewActivity: () => 'add-to-end',
     });
 
     // Alternatively set after feed is created
-    johnFeed.addNewActivitiesTo = 'end';
+    johnFeed.onNewActivity = () => 'add-to-end';
 
     await johnFeed.getOrCreate({
       watch: true,

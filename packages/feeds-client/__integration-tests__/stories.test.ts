@@ -98,7 +98,7 @@ describe('Stories Feed', () => {
 
   it(`user reads user1's story feed directly`, async () => {
     const feed = client2.feed(user1StoryFeed.group, user1StoryFeed.id, {
-      addNewActivitiesTo: 'end',
+      onNewActivity: () => 'add-to-end',
     });
     await feed.getOrCreate({ watch: true });
 

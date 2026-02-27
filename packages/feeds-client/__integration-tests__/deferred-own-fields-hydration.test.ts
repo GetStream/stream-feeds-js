@@ -71,7 +71,9 @@ describe('Deferred own_ fields hydration', () => {
       'throttledGetBatchOwnFields',
     );
 
-    const timeline = client.feed('timeline', ownUser.id);
+    const timeline = client.feed('timeline', ownUser.id, {
+      onNewActivity: () => 'add-to-start',
+    });
     await timeline.getOrCreate({
       watch: true,
       limit: 25,
