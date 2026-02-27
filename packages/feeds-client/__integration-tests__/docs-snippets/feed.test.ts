@@ -116,10 +116,7 @@ describe('Feeds page', () => {
   });
 
   it(`filtering activities`, async () => {
-    feed = client.feed(feed.group, feed.id, {
-      onNewActivity: ({ activity }) =>
-        activity.filter_tags?.includes('blue') ? 'add-to-start' : 'ignore',
-    });
+    feed = client.feed(feed.group, feed.id);
 
     // Add a few activities
     await client.upsertActivities({
