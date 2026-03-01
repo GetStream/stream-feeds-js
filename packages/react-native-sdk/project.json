@@ -15,7 +15,7 @@
           "types": [
             { "type": "feat", "section": "Features" },
             { "type": "fix", "section": "Bug Fixes" },
-            { "type": "chore", "hidden": false },
+            { "type": "chore", "hidden": true },
             { "type": "docs", "hidden": true },
             { "type": "style", "hidden": true },
             { "type": "refactor", "hidden": true },
@@ -25,7 +25,7 @@
         },
         "trackDeps": true,
         "push": true,
-        "skipCommitTypes": ["ci", "refactor", "test", "docs"],
+        "skipCommitTypes": ["ci", "refactor", "test", "docs", "chore"],
         "postTargets": [
           "@stream-io/feeds-react-native-sdk:update-version",
           "@stream-io/feeds-react-native-sdk:github",
