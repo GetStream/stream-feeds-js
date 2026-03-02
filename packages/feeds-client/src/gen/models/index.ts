@@ -473,6 +473,10 @@ export interface ActivityResponse {
 
   friend_reaction_count?: number;
 
+  is_read?: boolean;
+
+  is_seen?: boolean;
+
   is_watched?: boolean;
 
   moderation_action?: string;
@@ -736,6 +740,18 @@ export interface AddReactionResponse {
   notification_created?: boolean;
 }
 
+export interface AddUserGroupMembersRequest {
+  member_ids: string[];
+
+  team_id?: string;
+}
+
+export interface AddUserGroupMembersResponse {
+  duration: string;
+
+  user_group?: UserGroupResponse;
+}
+
 export interface AggregatedActivityResponse {
   activity_count: number;
 
@@ -752,6 +768,10 @@ export interface AggregatedActivityResponse {
   user_count_truncated: boolean;
 
   activities: ActivityResponse[];
+
+  is_read?: boolean;
+
+  is_seen?: boolean;
 
   is_watched?: boolean;
 }
@@ -2018,6 +2038,24 @@ export interface CreatePollRequest {
   custom?: Record<string, any>;
 }
 
+export interface CreateUserGroupRequest {
+  name: string;
+
+  description?: string;
+
+  id?: string;
+
+  team_id?: string;
+
+  member_ids?: string[];
+}
+
+export interface CreateUserGroupResponse {
+  duration: string;
+
+  user_group?: UserGroupResponse;
+}
+
 export interface CustomActionRequestPayload {
   id?: string;
 
@@ -2503,6 +2541,22 @@ export interface FeedGroupChangedEvent {
 }
 
 export interface FeedGroupDeletedEvent {
+  created_at: Date;
+
+  fid: string;
+
+  group_id: string;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  feed_visibility?: string;
+
+  received_at?: Date;
+}
+
+export interface FeedGroupRestoredEvent {
   created_at: Date;
 
   fid: string;
@@ -3289,6 +3343,12 @@ export interface GetOrCreateFeedResponse {
   notification_status?: NotificationStatusResponse;
 }
 
+export interface GetUserGroupResponse {
+  duration: string;
+
+  user_group?: UserGroupResponse;
+}
+
 export interface GoogleVisionConfig {
   enabled?: boolean;
 }
@@ -3512,6 +3572,12 @@ export interface ListDevicesResponse {
   duration: string;
 
   devices: DeviceResponse[];
+}
+
+export interface ListUserGroupsResponse {
+  duration: string;
+
+  user_groups: UserGroupResponse[];
 }
 
 export interface MarkActivityRequest {
@@ -4732,6 +4798,10 @@ export interface ReadCollectionsResponse {
   duration: string;
 
   collections: CollectionResponse[];
+
+  next?: string;
+
+  prev?: string;
 }
 
 export interface ReadReceiptsResponse {
@@ -4788,6 +4858,12 @@ export interface ReminderResponseData {
   message?: MessageResponse;
 
   user?: UserResponse;
+}
+
+export interface RemoveUserGroupMembersResponse {
+  duration: string;
+
+  user_group?: UserGroupResponse;
 }
 
 export interface RepliesMeta {
@@ -5003,6 +5079,12 @@ export interface ScreensharingSettingsResponse {
   enabled: boolean;
 
   target_resolution?: TargetResolution;
+}
+
+export interface SearchUserGroupsResponse {
+  duration: string;
+
+  user_groups: UserGroupResponse[];
 }
 
 export interface SessionSettingsResponse {
@@ -5668,6 +5750,20 @@ export interface UpdatePollRequest {
   custom?: Record<string, any>;
 }
 
+export interface UpdateUserGroupRequest {
+  description?: string;
+
+  name?: string;
+
+  team_id?: string;
+}
+
+export interface UpdateUserGroupResponse {
+  duration: string;
+
+  user_group?: UserGroupResponse;
+}
+
 export interface UpdateUserPartialRequest {
   id: string;
 
@@ -5825,6 +5921,36 @@ export interface UserDeactivatedEvent {
   received_at?: Date;
 
   created_by?: UserResponseCommonFields;
+}
+
+export interface UserGroupMember {
+  app_pk: number;
+
+  created_at: Date;
+
+  group_id: string;
+
+  is_admin: boolean;
+
+  user_id: string;
+}
+
+export interface UserGroupResponse {
+  created_at: Date;
+
+  id: string;
+
+  name: string;
+
+  updated_at: Date;
+
+  created_by?: string;
+
+  description?: string;
+
+  team_id?: string;
+
+  members?: UserGroupMember[];
 }
 
 export interface UserIdenticalContentCountParameters {
@@ -6177,6 +6303,7 @@ export type WSClientEvent =
   | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
   | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
   | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
+  | ({ type: 'feeds.feed_group.restored' } & FeedGroupRestoredEvent)
   | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
   | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
   | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
@@ -6233,6 +6360,7 @@ export type WSEvent =
   | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
   | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
   | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
+  | ({ type: 'feeds.feed_group.restored' } & FeedGroupRestoredEvent)
   | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
   | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
   | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
