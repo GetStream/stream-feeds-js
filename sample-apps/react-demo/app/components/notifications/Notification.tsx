@@ -66,7 +66,9 @@ export const Notification = ({
 
   return (
     <div className="flex flex-row items-start gap-3 w-full min-w-0">
-      {!isRead && <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-2" />}
+      <div className="w-1.5 shrink-0 pt-2">
+        {!isRead && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
+      </div>
       <div className="flex-1 min-w-0">{content}</div>
     </div>
   );
