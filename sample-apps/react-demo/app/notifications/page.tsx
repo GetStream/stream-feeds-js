@@ -28,17 +28,23 @@ export default function Notifications() {
     return <ErrorCard message="Failed to load notifications" error={errors.ownNotifications} />;
   }
 
+  const markReadButton = (
+    <button
+      disabled={unread === 0 || showLoadingIndicator}
+      className="text-sm text-primary font-semibold hover:underline disabled:opacity-40 disabled:no-underline cursor-pointer"
+      onClick={markAllAsRead}
+    >
+      Mark read
+    </button>
+  );
+
   return (
     <div className="w-full flex flex-col items-center justify-start max-h-full h-full">
-      <PageHeader title="Notifications">
-        <button
-          disabled={unread === 0 || showLoadingIndicator}
-          className="text-sm text-primary font-semibold hover:underline disabled:opacity-40 disabled:no-underline cursor-pointer"
-          onClick={markAllAsRead}
-        >
-          Mark read
-        </button>
-      </PageHeader>
+      <PageHeader title="Notifications">{markReadButton}</PageHeader>
+      {/* Mobile: show only the action (title is in MobileTopBar); desktop: action is in PageHeader */}
+      <div className="w-full flex lg:hidden justify-end px-4 py-2 shrink-0">
+        {markReadButton}
+      </div>
       {showLoadingIndicator ? (
         <NotificationsPageSkeleton />
       ) : (
