@@ -70,6 +70,7 @@ async function main(): Promise<void> {
     const premiumMembers = membersToAdd.map((u) => ({
       user_id: u.id,
       membership_level: 'premium' as const,
+      role: 'feed_member_viewer',
     }));
 
     const userFeed = client.feeds.feed('user', targetUser.id);
