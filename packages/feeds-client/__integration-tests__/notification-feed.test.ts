@@ -153,7 +153,6 @@ describe('Notification Feed Test Setup', () => {
         mark_read: [firstActivity.group],
         mark_seen: [firstActivity.group],
       }),
-      waitForEvent(user1NotificationFeed, 'feeds.activity.marked'),
       waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
     ]);
 

@@ -22,6 +22,7 @@ export const replaceUniqueArrayMerge = <T>(
   existingArray: T[],
   arrayToMerge: T[],
   getKey: (v: T) => string,
+  position: 'start' | 'end',
 ) => {
   const existingMap = new Map<string, T>();
   (existingArray ?? []).forEach((item) => {
@@ -41,9 +42,16 @@ export const replaceUniqueArrayMerge = <T>(
     }
   });
 
-  existingMap.forEach((item) => {
-    result.push(item);
-  });
+  // New items (only in arrayToMerge): add in arrayToMerge order
+  const newItemsInOrder = arrayToMerge.filter((item) =>
+    existingMap.has(getKey(item)),
+  );
+
+  if (position === 'end') {
+    newItemsInOrder.forEach((item) => result.push(item));
+  } else {
+    result.unshift(...newItemsInOrder);
+  }
 
   return result;
 };

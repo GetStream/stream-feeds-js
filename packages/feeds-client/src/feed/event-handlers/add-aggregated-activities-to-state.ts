@@ -6,7 +6,7 @@ import { updateActivity } from './activity-updater';
 export const addAggregatedActivitiesToState = (
   newAggregatedActivities: AggregatedActivityResponse[],
   aggregatedActivities: AggregatedActivityResponse[] | undefined,
-  position: 'start' | 'end' | 'replace',
+  position: 'start' | 'end' | 'replace-then-end' | 'replace-then-start',
 ) => {
   let result: UpdateStateResult<{
     aggregated_activities: AggregatedActivityResponse[];
@@ -58,11 +58,20 @@ export const addAggregatedActivitiesToState = (
           (a) => a.group,
         );
         break;
-      case 'replace':
+      case 'replace-then-end':
         result.aggregated_activities = replaceUniqueArrayMerge(
           aggregatedActivities ?? [],
           newAggregatedActivities,
           (a) => a.group,
+          'end',
+        );
+        break;
+      case 'replace-then-start':
+        result.aggregated_activities = replaceUniqueArrayMerge(
+          aggregatedActivities ?? [],
+          newAggregatedActivities,
+          (a) => a.group,
+          'start',
         );
         break;
     }

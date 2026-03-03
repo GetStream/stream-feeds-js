@@ -79,7 +79,7 @@ export function updateStoriesFeedFromEvent(
     const aggregatedActivitiesResult = addAggregatedActivitiesToState(
       event.aggregated_activities,
       aggregatedActivities,
-      'replace',
+      'replace-then-end',
     );
 
     if (aggregatedActivitiesResult.changed) {

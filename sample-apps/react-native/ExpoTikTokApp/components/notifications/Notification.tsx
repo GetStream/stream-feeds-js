@@ -2,7 +2,6 @@ import type { AggregatedActivityResponse } from '@stream-io/feeds-client';
 import { useRouter } from 'expo-router';
 import {
   useFeedContext,
-  useIsAggregatedActivityRead,
 } from '@stream-io/feeds-react-native-sdk';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useMemo } from 'react';
@@ -19,7 +18,7 @@ export const NotificationItem = ({
 }) => {
   const router = useRouter();
   const feed = useFeedContext();
-  const isRead = useIsAggregatedActivityRead({ aggregatedActivity });
+  const isRead = aggregatedActivity.is_read;
   const lastActivity =
     aggregatedActivity.activities[aggregatedActivity.activities.length - 1];
 
