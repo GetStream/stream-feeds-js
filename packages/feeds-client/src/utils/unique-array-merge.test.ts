@@ -1,8 +1,68 @@
 import { describe, it, expect } from 'vitest';
 
-import { uniqueArrayMerge } from './unique-array-merge';
+import {
+  replaceUniqueArrayMerge,
+  uniqueArrayMerge,
+} from './unique-array-merge';
 
 describe('utils', () => {
+  describe(replaceUniqueArrayMerge.name, () => {
+    const getKey = (item: { id: string; name: string }) => item.id;
+
+    it('should add new items at end in arrayToMerge order when position is end', () => {
+      const existingArray = [
+        { id: '1', name: 'Alice' },
+        { id: '2', name: 'Bob' },
+      ];
+      const arrayToMerge = [
+        { id: '2', name: 'Bob Updated' },
+        { id: '3', name: 'Charlie' },
+        { id: '4', name: 'David' },
+      ];
+
+      const result = replaceUniqueArrayMerge(
+        existingArray,
+        arrayToMerge,
+        getKey,
+        'end',
+      );
+
+      expect(result).toEqual([
+        { id: '1', name: 'Alice' },
+        { id: '2', name: 'Bob Updated' },
+        { id: '3', name: 'Charlie' },
+        { id: '4', name: 'David' },
+      ]);
+    });
+
+    it('should add new items at start in arrayToMerge order when position is start', () => {
+      const existingArray = [
+        { id: '1', name: 'Alice' },
+        { id: '2', name: 'Bob' },
+      ];
+      const arrayToMerge = [
+        { id: '4', name: 'David' },
+        { id: '3', name: 'Charlie' },
+        { id: '2', name: 'Bob Updated' },
+      ];
+
+      const result = replaceUniqueArrayMerge(
+        existingArray,
+        arrayToMerge,
+        getKey,
+        'start',
+      );
+
+      // New items (4, 3) must appear at start in arrayToMerge order: David then Charlie
+      expect(result).toEqual([
+        { id: '4', name: 'David' },
+        { id: '3', name: 'Charlie' },
+        { id: '1', name: 'Alice' },
+        { id: '2', name: 'Bob Updated' },
+      ]);
+    });
+  });
+
   describe(uniqueArrayMerge.name, () => {
     it('should merge arrays with unique objects based on key', () => {
       const existingArray = [

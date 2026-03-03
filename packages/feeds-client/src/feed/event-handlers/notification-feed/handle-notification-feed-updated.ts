@@ -62,7 +62,7 @@ export const updateNotificationFeedFromEvent = (
     const aggregatedActivitiesResult = addAggregatedActivitiesToState(
       event.aggregated_activities,
       currentAggregatedActivities,
-      'start',
+      'replace-then-start',
     );
 
     if (aggregatedActivitiesResult.changed) {
