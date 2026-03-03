@@ -144,8 +144,9 @@ describe('Notification feed', () => {
   });
 
   it(`notification status`, async () => {
-    const notificationStatus = (await notificationFeed.getOrCreate())
-      .notification_status;
+    const response = await notificationFeed.getOrCreate();
+    const notificationStatus = response.notification_status;
+    const group = response.aggregated_activities[0];
 
     expect(notificationStatus?.unread).toBeDefined();
     expect(notificationStatus?.unseen).toBeDefined();
@@ -153,6 +154,8 @@ describe('Notification feed', () => {
     expect(notificationStatus?.last_read_at).toBeDefined();
     expect(notificationStatus?.seen_activities).toBeDefined();
     expect(notificationStatus?.read_activities).toBeDefined();
+    expect(group.is_read).toBeDefined();
+    expect(group.is_seen).toBeDefined();
   });
 
   afterAll(async () => {
