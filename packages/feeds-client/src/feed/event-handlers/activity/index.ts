@@ -5,4 +5,3 @@ export * from './handle-activity-updated';
 export * from './handle-activity-reaction-added';
 export * from './handle-activity-reaction-deleted';
 export * from './handle-activity-reaction-updated';
-export * from './handle-activity-marked';
