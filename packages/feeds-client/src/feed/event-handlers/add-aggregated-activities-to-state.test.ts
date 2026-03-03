@@ -246,7 +246,7 @@ describe('addAggregatedActivitiesToState', () => {
       const result = addAggregatedActivitiesToState(
         newActivities,
         existingActivities,
-        'replace',
+        'replace-then-end',
       );
 
       expect(result.changed).toBe(true);
@@ -291,7 +291,7 @@ describe('addAggregatedActivitiesToState', () => {
       const result = addAggregatedActivitiesToState(
         newActivities,
         existingActivities,
-        'replace',
+        'replace-then-end',
       );
 
       expect(result.changed).toBe(true);
@@ -320,7 +320,7 @@ describe('addAggregatedActivitiesToState', () => {
       const result = addAggregatedActivitiesToState(
         newActivities,
         existingActivities,
-        'replace',
+        'replace-then-end',
       );
 
       expect(result.changed).toBe(true);
@@ -348,7 +348,7 @@ describe('addAggregatedActivitiesToState', () => {
       const result = addAggregatedActivitiesToState(
         [],
         existingActivities,
-        'replace',
+        'replace-then-end',
       );
 
       expect(result.changed).toBe(false);
@@ -356,7 +356,7 @@ describe('addAggregatedActivitiesToState', () => {
     });
 
     it('should handle both arrays being empty', () => {
-      const result = addAggregatedActivitiesToState([], [], 'replace');
+      const result = addAggregatedActivitiesToState([], [], 'replace-then-end');
 
       expect(result.changed).toBe(false);
       expect(result.aggregated_activities).toStrictEqual([]);
@@ -401,7 +401,7 @@ describe('addAggregatedActivitiesToState', () => {
       const result = addAggregatedActivitiesToState(
         newActivities,
         existingActivities,
-        'replace',
+        'replace-then-end',
       );
 
       expect(result.changed).toBe(true);
@@ -484,7 +484,7 @@ describe('addAggregatedActivitiesToState', () => {
     const result = addAggregatedActivitiesToState(
       newActivities,
       existingActivities,
-      'replace',
+      'replace-then-end',
     );
 
     expect(result.changed).toBe(true);
