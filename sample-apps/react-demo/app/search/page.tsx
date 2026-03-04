@@ -86,6 +86,7 @@ export default function SearchResults() {
             },
           ],
         },
+        enrich_own_fields: true,
         limit: 10,
         next,
       });
@@ -121,6 +122,7 @@ export default function SearchResults() {
         placesSearchedForQuery.current = searchQuery;
       }
       const result = await client.queryActivities({
+        enrich_own_fields: true,
         filter: {
           near: { $eq: { lat: coords.lat, lng: coords.lon, distance: 20 } },
         },
@@ -203,11 +205,10 @@ export default function SearchResults() {
               key={tab}
               type="button"
               role="tab"
-              className={`px-3 py-1.5 text-[13px] font-semibold rounded-full transition-colors cursor-pointer ${
-                activeTab === tab
-                  ? 'bg-base-content text-base-100'
-                  : 'text-base-content/70 hover:bg-base-200'
-              }`}
+              className={`px-3 py-1.5 text-[13px] font-semibold rounded-full transition-colors cursor-pointer ${activeTab === tab
+                ? 'bg-base-content text-base-100'
+                : 'text-base-content/70 hover:bg-base-200'
+                }`}
               aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
             >

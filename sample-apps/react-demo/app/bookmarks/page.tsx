@@ -22,6 +22,7 @@ export default function Bookmarks() {
       setIsLoading(true);
       return client
         ?.queryBookmarks({
+          enrich_own_fields: true,
           limit: 20,
           next: nextCursor,
         })
