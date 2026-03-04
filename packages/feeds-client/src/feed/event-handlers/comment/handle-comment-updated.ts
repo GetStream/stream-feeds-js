@@ -1,10 +1,8 @@
 import type { Feed } from '../../feed';
-import type { EventPayload} from '../../../types-internal';
+import type { EventPayload } from '../../../types-internal';
 import { type PartializeAllBut } from '../../../types-internal';
 import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
-import {
-  eventTriggeredByConnectedUser
-} from '../../../utils/event-triggered-by-connected-user';
+import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
 
 export type CommentUpdatedPayload = PartializeAllBut<
   EventPayload<'feeds.comment.updated'>,
@@ -21,14 +19,14 @@ export function handleCommentUpdated(
 
   if (
     !shouldUpdateState({
-      stateUpdateQueueId: getStateUpdateQueueId(
-        payload,
-        'comment-updated',
-      ),
+      stateUpdateQueueId: getStateUpdateQueueId(payload, 'comment-updated'),
       stateUpdateQueue: this.stateUpdateQueue,
       watch: this.currentState.watch,
       fromWs,
-      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(this, payload),
+      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(
+        this,
+        payload,
+      ),
     })
   ) {
     return;
@@ -45,7 +43,10 @@ export function handleCommentUpdated(
 
     const newComments = [...entityState.comments];
 
-    newComments[index] = comment;
+    newComments[index] = {
+      ...comment,
+      own_reactions: entityState.comments[index].own_reactions,
+    };
 
     return {
       ...currentState,

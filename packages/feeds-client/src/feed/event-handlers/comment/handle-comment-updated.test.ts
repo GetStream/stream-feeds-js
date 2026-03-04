@@ -10,7 +10,10 @@ import {
   generateUserResponseCommonFields,
   getHumanId,
 } from '../../../test-utils';
-import type { CommentResponse, UserResponseCommonFields } from '../../../gen/models';
+import type {
+  CommentResponse,
+  UserResponseCommonFields,
+} from '../../../gen/models';
 import { shouldUpdateState } from '../../../utils';
 import type { EventPayload } from '../../../types-internal';
 
@@ -67,7 +70,7 @@ describe(handleCommentUpdated.name, () => {
     expect(commentsAfter).not.toBe(commentsBefore);
     expect(commentsAfter).toHaveLength(1);
     const [replaced] = commentsAfter!;
-    expect(replaced).toBe(event.comment);
+    expect(replaced).toStrictEqual(event.comment);
   });
 
   it('updates the comment in the correct parent entity (prefers parent_id)', () => {
@@ -101,7 +104,7 @@ describe(handleCommentUpdated.name, () => {
     expect(commentsAfter).not.toBe(commentsBefore);
     expect(commentsAfter).toHaveLength(1);
     const [updatedReply] = commentsAfter!;
-    expect(updatedReply).toBe(event.comment);
+    expect(updatedReply).toStrictEqual(event.comment);
   });
 
   it('does nothing if entity state does not exist', () => {
