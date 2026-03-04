@@ -892,6 +892,7 @@ export class Feed extends FeedApi {
 
   async unfollow(
     feedOrFid: Feed | string,
+    enrichOwnFollows?: boolean,
     options?: Omit<
       Parameters<typeof this.client.unfollow>[0],
       'source' | 'target'
@@ -902,6 +903,7 @@ export class Feed extends FeedApi {
     const response = await this.client.unfollow({
       source: this.feed,
       target: fid,
+      enrich_own_fields: enrichOwnFollows,
       ...options,
     });
 
