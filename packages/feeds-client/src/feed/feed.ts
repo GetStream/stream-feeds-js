@@ -892,11 +892,13 @@ export class Feed extends FeedApi {
 
   async unfollow(
     feedOrFid: Feed | string,
-    enrichOwnFollows?: boolean,
     options?: Omit<
       Parameters<typeof this.client.unfollow>[0],
       'source' | 'target'
-    >,
+    > & {
+      delete_notification_activity?: boolean;
+    },
+    enrichOwnFollows?: boolean,
   ) {
     const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.feed;
 
