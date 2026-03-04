@@ -898,14 +898,14 @@ export class Feed extends FeedApi {
     > & {
       delete_notification_activity?: boolean;
     },
-    enrichOwnFollows?: boolean,
+    enrichOwnFields?: boolean,
   ) {
     const fid = typeof feedOrFid === 'string' ? feedOrFid : feedOrFid.feed;
 
     const response = await this.client.unfollow({
       source: this.feed,
       target: fid,
-      enrich_own_fields: enrichOwnFollows,
+      enrich_own_fields: enrichOwnFields,
       ...options,
     });
 
