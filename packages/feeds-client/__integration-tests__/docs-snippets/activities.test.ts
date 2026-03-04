@@ -238,10 +238,9 @@ describe('Activities page', () => {
   });
 
   it(`Activity list controls - client-side SDKs`, async () => {
-    const feed = client.feed('user', '123', {
+    const f = client.feed('user', '123', {
       onNewActivity: ({ activity, currentUser }) => {
-        const requestConfig =
-          feed.currentState.last_get_or_create_request_config;
+        const requestConfig = f.currentState.last_get_or_create_request_config;
         if (!activityFilter(activity, requestConfig)) return 'ignore';
         return activity.user.id === currentUser?.id ? 'add-to-start' : 'ignore';
       },
