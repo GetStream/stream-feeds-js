@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.51](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.50...@stream-io/feeds-client-0.3.51) (2026-03-04)
+
+
+### Features
+
+* Add optional enrich_own_fields param to endpoints ([#257](https://github.com/GetStream/stream-feeds-js/issues/257)) ([62d4900](https://github.com/GetStream/stream-feeds-js/commit/62d49006093da251d321d7c871a574e8eeeb850c))
+
 ## [0.3.50](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.49...@stream-io/feeds-client-0.3.50) (2026-03-02)
 
 
