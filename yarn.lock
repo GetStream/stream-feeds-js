@@ -7254,7 +7254,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@stream-io/feeds-client@workspace:packages/feeds-client"
   dependencies:
-    "@stream-io/filter": "file:../../../js-toolkit/packages/filter"
+    "@stream-io/filter": "npm:^1.0.0"
     "@stream-io/logger": "npm:^2.0.0"
     "@stream-io/node-sdk": "npm:0.6.0"
     "@stream-io/state-store": "npm:^1.1.6"
@@ -7371,10 +7371,10 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@stream-io/filter@file:../../../js-toolkit/packages/filter::locator=%40stream-io%2Ffeeds-client%40workspace%3Apackages%2Ffeeds-client":
+"@stream-io/filter@npm:^1.0.0":
   version: 1.0.0
-  resolution: "@stream-io/filter@file:../../../js-toolkit/packages/filter#../../../js-toolkit/packages/filter::hash=e22368&locator=%40stream-io%2Ffeeds-client%40workspace%3Apackages%2Ffeeds-client"
-  checksum: 10/f90c5d6f6f025645b92e73c90b847e6a4df722f9d9aad74c5649a90469d5a80fc0bae7c12480e7e7a162bda8b7a9846ec737b59f7e866ab05119a56859c2da72
+  resolution: "@stream-io/filter@npm:1.0.0"
+  checksum: 10/eba5e91f5a4cc1fe4a63b98ad5e68ce7d525fe454554e735bcf1f953228a0ee51d5b65681c15a7303125251a5d0d312b17848069360755c974db954c0f76914e
   languageName: node
   linkType: hard
 
