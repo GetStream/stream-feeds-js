@@ -115,6 +115,34 @@ describe('Bookmarks page', () => {
     });
   });
 
+  it('Managing Bookmark Folders', async () => {
+    const bookmark = (
+      await client.addBookmark({
+        activity_id: activity.id,
+        new_folder: {
+          name: 'Breakfast recipes',
+          custom: {
+            icon: '🍳',
+          },
+        },
+      })
+    ).bookmark;
+
+    const updatedFolder = (
+      await client.updateBookmarkFolder({
+        folder_id: bookmark.folder?.id!,
+        name: 'Sweet Breakfast Recipes',
+        custom: {
+          icon: '🥞',
+        },
+      })
+    ).bookmark_folder;
+
+    await client.deleteBookmarkFolder({
+      folder_id: updatedFolder.id,
+    });
+  });
+
   afterAll(async () => {
     await feed.delete({ hard_delete: true });
     await client.disconnectUser();
