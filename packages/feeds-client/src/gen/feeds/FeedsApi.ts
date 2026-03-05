@@ -84,6 +84,8 @@ import type {
   QueryBookmarkFoldersResponse,
   QueryBookmarksRequest,
   QueryBookmarksResponse,
+  QueryCollectionsRequest,
+  QueryCollectionsResponse,
   QueryCommentReactionsRequest,
   QueryCommentReactionsResponse,
   QueryCommentsRequest,
@@ -106,6 +108,7 @@ import type {
   RejectFeedMemberInviteResponse,
   RejectFollowRequest,
   RejectFollowResponse,
+  RemoveUserGroupMembersRequest,
   RemoveUserGroupMembersResponse,
   Response,
   RestoreActivityRequest,
@@ -114,6 +117,8 @@ import type {
   SharedLocationResponse,
   SharedLocationsResponse,
   SingleFollowResponse,
+  TrackActivityMetricsRequest,
+  TrackActivityMetricsResponse,
   UnblockUsersRequest,
   UnblockUsersResponse,
   UnfollowBatchRequest,
@@ -409,6 +414,29 @@ export class FeedsApi {
     );
 
     decoders.DeleteActivitiesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async trackActivityMetrics(
+    request: TrackActivityMetricsRequest,
+  ): Promise<StreamResponse<TrackActivityMetricsResponse>> {
+    const body = {
+      events: request?.events,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<TrackActivityMetricsResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/activities/metrics/track',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.TrackActivityMetricsResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -1020,6 +1048,33 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async queryCollections(
+    request?: QueryCollectionsRequest,
+  ): Promise<StreamResponse<QueryCollectionsResponse>> {
+    const body = {
+      limit: request?.limit,
+      next: request?.next,
+      prev: request?.prev,
+      sort: request?.sort,
+      filter: request?.filter,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryCollectionsResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/collections/query',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.QueryCollectionsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async getComments(request: {
     object_id: string;
     object_type: string;
@@ -1112,6 +1167,7 @@ export class FeedsApi {
   ): Promise<StreamResponse<QueryCommentsResponse>> {
     const body = {
       filter: request?.filter,
+      id_around: request?.id_around,
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,
@@ -2649,22 +2705,6 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
-  async removeUserGroupMembers(request: {
-    id: string;
-  }): Promise<StreamResponse<RemoveUserGroupMembersResponse>> {
-    const pathParams = {
-      id: request?.id,
-    };
-
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<RemoveUserGroupMembersResponse>
-    >('DELETE', '/api/v2/usergroups/{id}/members', pathParams, undefined);
-
-    decoders.RemoveUserGroupMembersResponse?.(response.body);
-
-    return { ...response.body, metadata: response.metadata };
-  }
-
   async addUserGroupMembers(
     request: AddUserGroupMembersRequest & { id: string },
   ): Promise<StreamResponse<AddUserGroupMembersResponse>> {
@@ -2688,6 +2728,33 @@ export class FeedsApi {
     );
 
     decoders.AddUserGroupMembersResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async removeUserGroupMembers(
+    request: RemoveUserGroupMembersRequest & { id: string },
+  ): Promise<StreamResponse<RemoveUserGroupMembersResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      member_ids: request?.member_ids,
+      team_id: request?.team_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<RemoveUserGroupMembersResponse>
+    >(
+      'POST',
+      '/api/v2/usergroups/{id}/members/delete',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.RemoveUserGroupMembersResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
