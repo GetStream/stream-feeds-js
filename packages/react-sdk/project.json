@@ -8,11 +8,11 @@
     "version": {
       "executor": "@jscutlery/semver:version",
       "options": {
-        "dryRun": false,
+        "dryRun": true,
         "baseBranch": "main",
         "preset": {
           "name": "conventionalcommits",
-          "preMajor": true,
+          "preMajor": false,
           "types": [
             { "type": "feat", "section": "Features" },
             { "type": "fix", "section": "Bug Fixes" },
