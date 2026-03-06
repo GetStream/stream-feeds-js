@@ -2,14 +2,16 @@ import type { Feed } from '../../../feed';
 import type {
   ActivityPinResponse,
   ActivityResponse,
-  BookmarkDeletedEvent,
   BookmarkResponse,
 } from '../../../gen/models';
-import type { EventPayload } from '../../../types-internal';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import { updateEntityInArray } from '../../../utils';
 
-// Helper function to check if two bookmarks are the same
-// A bookmark is identified by activity_id + folder_id + user_id
+export type BookmarkDeletedPayload = PartializeAllBut<
+  EventPayload<'feeds.bookmark.deleted'>,
+  'bookmark'
+>;
+
 export const isSameBookmark = (
   bookmark1: BookmarkResponse,
   bookmark2: BookmarkResponse,
@@ -17,7 +19,8 @@ export const isSameBookmark = (
   return (
     bookmark1.user.id === bookmark2.user.id &&
     bookmark1.activity.id === bookmark2.activity.id &&
-    bookmark1.folder?.id === bookmark2.folder?.id
+    bookmark1.folder?.id === bookmark2.folder?.id &&
+    bookmark1.updated_at.getTime() === bookmark2.updated_at.getTime()
   );
 };
 
@@ -27,7 +30,7 @@ const sharedUpdateActivity = ({
   eventBelongsToCurrentUser,
 }: {
   currentActivity: ActivityResponse;
-  event: BookmarkDeletedEvent;
+  event: BookmarkDeletedPayload;
   eventBelongsToCurrentUser: boolean;
 }): ActivityResponse => {
   let newOwnBookmarks = currentActivity.own_bookmarks;
@@ -46,13 +49,16 @@ const sharedUpdateActivity = ({
 };
 
 export const removeBookmarkFromActivities = (
-  event: BookmarkDeletedEvent,
+  event: BookmarkDeletedPayload,
   activities: ActivityResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
 ) =>
   updateEntityInArray({
     entities: activities,
-    matcher: (activity) => activity.id === event.bookmark.activity.id,
+    matcher: (activity) =>
+      activity.id === event.bookmark.activity.id &&
+      (!eventBelongsToCurrentUser ||
+        activity.own_bookmarks.some((b) => isSameBookmark(b, event.bookmark))),
     updater: (matchedActivity) =>
       sharedUpdateActivity({
         currentActivity: matchedActivity,
@@ -62,14 +68,18 @@ export const removeBookmarkFromActivities = (
   });
 
 export const removeBookmarkFromPinnedActivities = (
-  event: BookmarkDeletedEvent,
+  event: BookmarkDeletedPayload,
   pinnedActivities: ActivityPinResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
 ) =>
   updateEntityInArray({
     entities: pinnedActivities,
     matcher: (pinnedActivity) =>
-      pinnedActivity.activity.id === event.bookmark.activity.id,
+      pinnedActivity.activity.id === event.bookmark.activity.id &&
+      (!eventBelongsToCurrentUser ||
+        pinnedActivity.activity.own_bookmarks.some((b) =>
+          isSameBookmark(b, event.bookmark),
+        )),
     updater: (matchedPinnedActivity) => {
       const newActivity = sharedUpdateActivity({
         currentActivity: matchedPinnedActivity.activity,
@@ -90,7 +100,7 @@ export const removeBookmarkFromPinnedActivities = (
 
 export function handleBookmarkDeleted(
   this: Feed,
-  event: EventPayload<'feeds.bookmark.deleted'>,
+  event: BookmarkDeletedPayload,
 ) {
   const {
     activities: currentActivities,

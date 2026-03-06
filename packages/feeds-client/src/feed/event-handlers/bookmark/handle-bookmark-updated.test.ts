@@ -84,7 +84,9 @@ describe(handleBookmarkUpdated.name, () => {
 
     const stateAfter = feed.currentState;
     expect(stateAfter.activities![0].own_bookmarks).toHaveLength(1);
-    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toHaveLength(1);
+    expect(
+      stateAfter.pinned_activities![0].activity.own_bookmarks,
+    ).toHaveLength(1);
     expect(stateAfter.activities![0].own_bookmarks[0]).toBe(event.bookmark);
     expect(stateAfter.pinned_activities![0].activity.own_bookmarks[0]).toBe(
       event.bookmark,
@@ -136,9 +138,7 @@ describe(handleBookmarkUpdated.name, () => {
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     ).toHaveLength(1);
     expect(stateBefore.activities![0].bookmark_count).toBe(1);
-    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toBe(
-      1,
-    );
+    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toBe(1);
 
     handleBookmarkUpdated.call(feed, event);
 
@@ -157,6 +157,51 @@ describe(handleBookmarkUpdated.name, () => {
     );
     expect(stateAfter.activities![0].bookmark_count).toBe(2);
     expect(stateAfter.pinned_activities![0].activity.bookmark_count).toBe(2);
+  });
+
+  it('does not double-update state when called twice with the same event', () => {
+    const updatedAt = new Date('2025-08-06T12:00:00Z');
+    const event = generateBookmarkUpdatedEvent({
+      bookmark: {
+        activity: {
+          own_reactions: [],
+          bookmark_count: 1,
+        },
+        user: { id: currentUserId },
+        updated_at: updatedAt,
+      },
+    });
+    const activity = generateActivityResponse({
+      id: event.bookmark.activity.id,
+      bookmark_count: 1,
+      own_bookmarks: [
+        generateBookmarkResponse({
+          activity: { id: event.bookmark.activity.id },
+          user: { id: currentUserId },
+          updated_at: new Date('2025-08-05T12:00:00Z'),
+        }),
+      ],
+      own_reactions: [generateFeedReactionResponse()],
+    });
+    const activityPin = generateActivityPinResponse({
+      activity: { ...activity },
+    });
+    feed.state.partialNext({
+      activities: [activity],
+      pinned_activities: [activityPin],
+    });
+
+    // First call (simulating HTTP response)
+    handleBookmarkUpdated.call(feed, event);
+    const stateAfterFirst = feed.currentState;
+    expect(stateAfterFirst.activities![0].own_bookmarks[0]).toBe(
+      event.bookmark,
+    );
+
+    // Second call (simulating WS event) — state reference should not change
+    handleBookmarkUpdated.call(feed, event);
+    const stateAfterSecond = feed.currentState;
+    expect(stateAfterSecond).toBe(stateAfterFirst);
   });
 
   it('does nothing if activity is not found', () => {
