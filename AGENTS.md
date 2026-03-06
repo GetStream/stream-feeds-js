@@ -133,10 +133,12 @@ Linting & formatting
 • ESLint and Prettier are configured for this project. Run before committing:
 
 ```bash
+yarn prettier --write <changed files>   # Format changed files with prettier
 yarn lint:all
 yarn lint:all:fix
 ```
 
+• **Always run `yarn prettier --write` on changed files before considering changes complete.**
 • Respect eslint.config.mjs and .prettierrc configurations. Do not suppress rules broadly; justify and scope exceptions.
 • The project uses lint-staged with Husky for pre-commit hooks.
 • Each package may have its own linting configuration - check individual package.json files.
@@ -177,6 +179,7 @@ When in doubt
 ⸻
 
 Quick agent checklist (per commit)
+• Format changed files: `yarn prettier --write <changed files>`
 • Build all packages: `yarn build:all`
 • Run all tests: `yarn test:ci:all`
 • Run linting: `yarn lint:all`

@@ -1,7 +1,6 @@
+import type { FollowResponse } from '../gen/models';
 import type {
-  FollowResponse,
-} from '../gen/models';
-import type {
+  ActivityDeletedPayload,
   ActivityReactionAddedPayload,
   ActivityReactionDeletedPayload,
   ActivityUpdatedPayload,
@@ -12,14 +11,11 @@ import type {
   CommentUpdatedPayload,
 } from '../feed';
 import { ensureExhausted } from './ensure-exhausted';
-import type {
-  CommentReactionUpdatedPayload
-} from '../feed/event-handlers/comment/handle-comment-reaction-updated';
-import type {
-  ActivityReactionUpdatedPayload
-} from '../feed/event-handlers/activity/handle-activity-reaction-updated';
+import type { CommentReactionUpdatedPayload } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
+import type { ActivityReactionUpdatedPayload } from '../feed/event-handlers/activity/handle-activity-reaction-updated';
 
 export type StateUpdateQueuePrefix =
+  | 'activity-deleted'
   | 'activity-updated'
   | 'activity-reaction-created'
   | 'activity-reaction-deleted'
@@ -35,6 +31,7 @@ export type StateUpdateQueuePrefix =
   | 'comment-updated';
 
 type StateUpdateQueuePayloadByPrefix = {
+  'activity-deleted': ActivityDeletedPayload;
   'activity-updated': ActivityUpdatedPayload;
   'activity-reaction-created': ActivityReactionAddedPayload;
   'activity-reaction-deleted': ActivityReactionDeletedPayload;
@@ -162,40 +159,31 @@ export const shouldUpdateState = ({
   return true;
 };
 
-export function getStateUpdateQueueId(
-  ...args: StateUpdateQueuePairTuples
-) {
+export function getStateUpdateQueueId(...args: StateUpdateQueuePairTuples) {
   const [data, prefix] = args;
   const toJoin = [prefix as string];
 
   switch (prefix) {
+    case 'activity-deleted': {
+      return toJoin.concat([data.activity.id]).join('-');
+    }
     case 'activity-updated': {
-      return toJoin.concat([data.activity.id]).join('-')
+      return toJoin.concat([data.activity.id]).join('-');
     }
     case 'activity-reaction-created':
     case 'activity-reaction-deleted':
     case 'activity-reaction-updated': {
-      return toJoin
-        .concat([
-          data.activity.id,
-          data.reaction.type,
-        ])
-        .join('-');
+      return toJoin.concat([data.activity.id, data.reaction.type]).join('-');
     }
     case 'comment-reaction-created':
     case 'comment-reaction-deleted':
     case 'comment-reaction-updated': {
-      return toJoin
-        .concat([
-          data.comment.id,
-          data.reaction.type,
-        ])
-        .join('-');
+      return toJoin.concat([data.comment.id, data.reaction.type]).join('-');
     }
     case 'comment-created':
     case 'comment-deleted':
     case 'comment-updated': {
-      return toJoin.concat([data.comment.id]).join('-')
+      return toJoin.concat([data.comment.id]).join('-');
     }
     case 'follow-created':
     case 'follow-deleted':
@@ -205,7 +193,7 @@ export function getStateUpdateQueueId(
         .join('-');
     }
     default: {
-      ensureExhausted(data, 'Encountered unknown state update queue prefix.')
+      ensureExhausted(data, 'Encountered unknown state update queue prefix.');
     }
   }
 }

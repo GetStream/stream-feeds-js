@@ -48,11 +48,20 @@ yarn lint:all              # Lint all TypeScript files
 yarn lint:all:fix          # Lint and auto-fix
 ```
 
-## Verification After Changes
-
-**IMPORTANT**: After making code changes, always verify the build and lint status:
+## Formatting
 
 ```bash
+yarn prettier --write <file1> <file2> ...   # Format specific files with prettier
+```
+
+**IMPORTANT**: After making code changes, always run prettier on changed files before considering changes complete.
+
+## Verification After Changes
+
+**IMPORTANT**: After making code changes, always verify the build, lint, and formatting:
+
+```bash
+yarn prettier --write <changed files>  # Format changed files
 yarn build:all             # Ensure all packages build successfully
 yarn lint:all              # Check for linting errors
 ```
