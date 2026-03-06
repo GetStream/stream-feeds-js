@@ -828,11 +828,15 @@ export class FeedsClient extends FeedsApi {
       handleFeedDeleted.call(feed, {
         created_at: new Date(),
       } as Parameters<typeof handleFeedDeleted>[0]);
+      // If the feed is not watched, clean up immediately (no WS event will follow).
+      // If watched, the WS handler will clean up after dispatching the event.
+      if (!feed.currentState.watch) {
+        delete this.activeFeeds[fid];
+        this.activeActivities = this.activeActivities.filter(
+          (activity) => getFeed.call(activity)?.feed !== fid,
+        );
+      }
     }
-    delete this.activeFeeds[fid];
-    this.activeActivities = this.activeActivities.filter(
-      (activity) => getFeed.call(activity)?.feed !== fid,
-    );
     return response;
   };
 
