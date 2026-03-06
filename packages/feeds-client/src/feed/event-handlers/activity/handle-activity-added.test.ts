@@ -73,7 +73,10 @@ describe(handleActivityAdded.name, () => {
   it('does not duplicate if activity already exists', () => {
     const existing = generateActivityResponse();
     feed.state.partialNext({ activities: [existing] });
-    const newActivitiesAddedSpy = vi.spyOn(feed, 'newActivitiesAdded' as any);
+    const activitiesAddedOrUpdatedSpy = vi.spyOn(
+      feed,
+      'activitiesAddedOrUpdated' as any,
+    );
 
     const event = generateActivityAddedEvent({
       activity: { id: existing.id },
@@ -86,7 +89,7 @@ describe(handleActivityAdded.name, () => {
     expect(stateAfter).toBe(stateBefore);
     expect(stateAfter.activities).toHaveLength(1);
     expect(stateAfter.activities?.[0]).toBe(existing);
-    expect(newActivitiesAddedSpy).not.toHaveBeenCalled();
+    expect(activitiesAddedOrUpdatedSpy).not.toHaveBeenCalled();
 
     vi.resetAllMocks();
   });

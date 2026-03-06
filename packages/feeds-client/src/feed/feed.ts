@@ -362,6 +362,7 @@ export class Feed extends FeedApi {
           response.activities,
           currentActivities,
           'end',
+          { hasOwnFields: true, backfillOwnFields: false },
         );
 
         const aggregatedActivitiesResult = addAggregatedActivitiesToState(
@@ -432,7 +433,7 @@ export class Feed extends FeedApi {
         });
       }
 
-      this.newActivitiesAdded(response.activities);
+      this.activitiesAddedOrUpdated(response.activities);
 
       return response;
     } finally {
@@ -973,7 +974,10 @@ export class Feed extends FeedApi {
         [activity],
         currentActivities,
         position,
-        { hasOwnFields: false },
+        {
+          hasOwnFields: activity.current_feed?.own_capabilities !== undefined,
+          backfillOwnFields: false,
+        },
       );
       if (result.changed) {
         this.client.hydratePollCache([activity]);
@@ -1028,11 +1032,12 @@ export class Feed extends FeedApi {
     this.eventDispatcher.dispatch(event);
   }
 
-  protected newActivitiesAdded(
+  protected activitiesAddedOrUpdated(
     activities: ActivityResponse[],
     options: {
       hasOwnFields: boolean;
-    } = { hasOwnFields: true },
+      backfillOwnFields: boolean;
+    } = { hasOwnFields: true, backfillOwnFields: true },
   ) {
     this.client.hydratePollCache(activities);
     this.getOrCreateFeeds(activities, options);
@@ -1042,6 +1047,7 @@ export class Feed extends FeedApi {
     activities: ActivityResponse[],
     options: {
       hasOwnFields: boolean;
+      backfillOwnFields: boolean;
     },
   ) {
     const enrichmentOptions =
@@ -1083,7 +1089,7 @@ export class Feed extends FeedApi {
           fieldsToUpdate,
         });
       });
-      if (!options.hasOwnFields) {
+      if (!options.hasOwnFields && options.backfillOwnFields) {
         const uninitializedFeeds = newFeeds.filter((feedResponse) => {
           const feed = this.client.feed(feedResponse.group_id, feedResponse.id);
           // own_capabilities can only be undefined if we haven't fetched it yet
