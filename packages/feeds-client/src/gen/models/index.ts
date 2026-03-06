@@ -493,6 +493,8 @@ export interface ActivityResponse {
 
   location?: ActivityLocation;
 
+  metrics?: Record<string, number>;
+
   moderation?: ModerationV2Response;
 
   notification_context?: NotificationContext;
@@ -983,6 +985,8 @@ export interface BackstageSettingsResponse {
 export interface BanActionRequestPayload {
   channel_ban_only?: boolean;
 
+  channel_cid?: string;
+
   delete_messages?: 'soft' | 'pruning' | 'hard';
 
   ip_ban?: boolean;
@@ -1056,6 +1060,8 @@ export interface BlockListConfig {
   rules: BlockListRule[];
 
   async?: boolean;
+
+  match_substring?: boolean;
 }
 
 export interface BlockListOptions {
@@ -3695,6 +3701,8 @@ export interface MessageResponse {
 
   show_in_channel?: boolean;
 
+  mentioned_group_ids?: string[];
+
   mentioned_roles?: string[];
 
   thread_participants?: UserResponse[];
@@ -4470,6 +4478,28 @@ export interface QueryBookmarksResponse {
   prev?: string;
 }
 
+export interface QueryCollectionsRequest {
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  filter?: Record<string, any>;
+}
+
+export interface QueryCollectionsResponse {
+  duration: string;
+
+  collections: CollectionResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
 export interface QueryCommentReactionsRequest {
   limit?: number;
 
@@ -4494,6 +4524,8 @@ export interface QueryCommentReactionsResponse {
 
 export interface QueryCommentsRequest {
   filter: Record<string, any>;
+
+  id_around?: string;
 
   limit?: number;
 
@@ -4816,10 +4848,6 @@ export interface ReadCollectionsResponse {
   duration: string;
 
   collections: CollectionResponse[];
-
-  next?: string;
-
-  prev?: string;
 }
 
 export interface ReadReceiptsResponse {
@@ -4876,6 +4904,12 @@ export interface ReminderResponseData {
   message?: MessageResponse;
 
   user?: UserResponse;
+}
+
+export interface RemoveUserGroupMembersRequest {
+  member_ids: string[];
+
+  team_id?: string;
 }
 
 export interface RemoveUserGroupMembersResponse {
@@ -5402,6 +5436,34 @@ export interface ThumbnailsSettingsResponse {
 }
 
 export interface Time {}
+
+export interface TrackActivityMetricsEvent {
+  activity_id: string;
+
+  metric: string;
+
+  delta?: number;
+}
+
+export interface TrackActivityMetricsEventResult {
+  activity_id: string;
+
+  allowed: boolean;
+
+  metric: string;
+
+  error?: string;
+}
+
+export interface TrackActivityMetricsRequest {
+  events: TrackActivityMetricsEvent[];
+}
+
+export interface TrackActivityMetricsResponse {
+  duration: string;
+
+  results: TrackActivityMetricsEventResult[];
+}
 
 export interface TranscriptionSettingsResponse {
   closed_caption_mode: 'available' | 'disabled' | 'auto-on';

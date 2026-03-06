@@ -1554,6 +1554,13 @@ decoders.QueryBookmarksResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.QueryCollectionsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    collections: { type: 'CollectionResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.QueryCommentReactionsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     reactions: { type: 'FeedsReactionResponse', isSingle: false },
