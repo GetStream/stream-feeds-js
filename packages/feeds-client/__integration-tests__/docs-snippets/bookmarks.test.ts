@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   createTestClient,
   createTestTokenGenerator,
@@ -141,6 +141,51 @@ describe('Bookmarks page', () => {
     await client.deleteBookmarkFolder({
       folder_id: updatedFolder.id,
     });
+  });
+
+  it('updates feed state from HTTP response for bookmark operations', async () => {
+    const testActivity = (
+      await feed.addActivity({
+        type: 'post',
+        text: 'Bookmark state test',
+      })
+    ).activity;
+
+    // addBookmark should update state immediately
+    await client.addBookmark({
+      activity_id: testActivity.id,
+    });
+    const activitiesAfterAdd = feed.currentState.activities!;
+    const activityAfterAdd = activitiesAfterAdd.find(
+      (a) => a.id === testActivity.id,
+    )!;
+    expect(activityAfterAdd.own_bookmarks).toHaveLength(1);
+    expect(activityAfterAdd.own_bookmarks[0].activity.id).toBe(testActivity.id);
+
+    // updateBookmark should update state immediately
+    await client.updateBookmark({
+      activity_id: testActivity.id,
+      folder_id: activityAfterAdd.own_bookmarks[0].folder?.id,
+      custom: { color: 'red' },
+    });
+    const activitiesAfterUpdate = feed.currentState.activities!;
+    const activityAfterUpdate = activitiesAfterUpdate.find(
+      (a) => a.id === testActivity.id,
+    )!;
+    expect(activityAfterUpdate.own_bookmarks).toHaveLength(1);
+    expect(activityAfterUpdate.own_bookmarks[0].custom).toEqual({
+      color: 'red',
+    });
+
+    // deleteBookmark should update state immediately
+    await client.deleteBookmark({
+      activity_id: testActivity.id,
+    });
+    const activitiesAfterDelete = feed.currentState.activities!;
+    const activityAfterDelete = activitiesAfterDelete.find(
+      (a) => a.id === testActivity.id,
+    )!;
+    expect(activityAfterDelete.own_bookmarks).toHaveLength(0);
   });
 
   afterAll(async () => {

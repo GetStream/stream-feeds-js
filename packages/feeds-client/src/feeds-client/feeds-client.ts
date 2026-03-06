@@ -3,6 +3,8 @@ import type {
   ActivityResponse,
   AddActivityRequest,
   AddActivityResponse,
+  AddBookmarkRequest,
+  AddBookmarkResponse,
   AddCommentReactionRequest,
   AddCommentReactionResponse,
   AddCommentRequest,
@@ -11,6 +13,7 @@ import type {
   CastPollVoteRequest,
   CreateGuestResponse,
   DeleteActivityReactionResponse,
+  DeleteBookmarkResponse,
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
   FeedResponse,
@@ -32,6 +35,8 @@ import type {
   UpdateActivityPartialResponse,
   UpdateActivityRequest,
   UpdateActivityResponse,
+  UpdateBookmarkRequest,
+  UpdateBookmarkResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
   UpdateFollowRequest,
@@ -73,6 +78,9 @@ import {
   handleActivityReactionDeleted,
   handleActivityReactionUpdated,
   handleActivityUpdated,
+  handleBookmarkAdded,
+  handleBookmarkDeleted,
+  handleBookmarkUpdated,
   handleCommentAdded,
   handleCommentDeleted,
   handleCommentReactionAdded,
@@ -700,6 +708,37 @@ export class FeedsClient extends FeedsApi {
     const response = await super.deleteCommentReaction(...args);
     for (const feed of this.allActiveFeeds) {
       handleCommentReactionDeleted.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  addBookmark = async (
+    request: AddBookmarkRequest & { activity_id: string },
+  ): Promise<StreamResponse<AddBookmarkResponse>> => {
+    const response = await super.addBookmark(request);
+    for (const feed of this.allActiveFeeds) {
+      handleBookmarkAdded.bind(feed)(response);
+    }
+    return response;
+  };
+
+  updateBookmark = async (
+    request: UpdateBookmarkRequest & { activity_id: string },
+  ): Promise<StreamResponse<UpdateBookmarkResponse>> => {
+    const response = await super.updateBookmark(request);
+    for (const feed of this.allActiveFeeds) {
+      handleBookmarkUpdated.bind(feed)(response);
+    }
+    return response;
+  };
+
+  deleteBookmark = async (request: {
+    activity_id: string;
+    folder_id?: string;
+  }): Promise<StreamResponse<DeleteBookmarkResponse>> => {
+    const response = await super.deleteBookmark(request);
+    for (const feed of this.allActiveFeeds) {
+      handleBookmarkDeleted.bind(feed)(response);
     }
     return response;
   };

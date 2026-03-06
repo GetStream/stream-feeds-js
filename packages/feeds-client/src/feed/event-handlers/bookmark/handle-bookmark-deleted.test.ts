@@ -72,9 +72,7 @@ describe(handleBookmarkDeleted.name, () => {
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     ).toHaveLength(1);
     expect(stateBefore.activities![0].bookmark_count).toBe(1);
-    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toBe(
-      1,
-    );
+    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toBe(1);
 
     handleBookmarkDeleted.call(feed, event);
 
@@ -128,9 +126,7 @@ describe(handleBookmarkDeleted.name, () => {
       stateBefore.pinned_activities![0].activity.own_bookmarks,
     ).toHaveLength(1);
     expect(stateBefore.activities![0].bookmark_count).toBe(1);
-    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toBe(
-      1,
-    );
+    expect(stateBefore.pinned_activities![0].activity.bookmark_count).toBe(1);
 
     handleBookmarkDeleted.call(feed, event);
 
@@ -151,6 +147,46 @@ describe(handleBookmarkDeleted.name, () => {
     expect(stateAfter.pinned_activities![0].activity.bookmark_count).toBe(0);
   });
 
+  it('does not double-update state when called twice with the same event', () => {
+    const event = generateBookmarkDeletedEvent({
+      bookmark: {
+        activity: {
+          own_reactions: [],
+          bookmark_count: 0,
+        },
+        user: { id: currentUserId },
+      },
+    });
+    const activity = generateActivityResponse({
+      id: event.bookmark.activity.id,
+      bookmark_count: 1,
+      own_bookmarks: [
+        generateBookmarkResponse({
+          activity: { id: event.bookmark.activity.id },
+          user: { id: currentUserId },
+        }),
+      ],
+      own_reactions: [generateFeedReactionResponse()],
+    });
+    const activityPin = generateActivityPinResponse({
+      activity: { ...activity },
+    });
+    feed.state.partialNext({
+      activities: [activity],
+      pinned_activities: [activityPin],
+    });
+
+    // First call (simulating HTTP response)
+    handleBookmarkDeleted.call(feed, event);
+    const stateAfterFirst = feed.currentState;
+    expect(stateAfterFirst.activities![0].own_bookmarks).toHaveLength(0);
+
+    // Second call (simulating WS event) — state reference should not change
+    handleBookmarkDeleted.call(feed, event);
+    const stateAfterSecond = feed.currentState;
+    expect(stateAfterSecond).toBe(stateAfterFirst);
+  });
+
   it('does nothing if activity is not found', () => {
     const event = generateBookmarkDeletedEvent({
       bookmark: {
@@ -166,7 +202,7 @@ describe(handleBookmarkDeleted.name, () => {
       bookmark_count: 1,
       own_bookmarks: [
         generateBookmarkResponse({
-          activity: { id: 'another-activity-id', },
+          activity: { id: 'another-activity-id' },
           user: { id: currentUserId },
         }),
       ],
