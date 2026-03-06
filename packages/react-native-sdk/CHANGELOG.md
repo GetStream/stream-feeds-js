@@ -2,6 +2,20 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.0.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.66...@stream-io/feeds-react-native-sdk-1.0.0) (2026-03-06)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `1.0.0`
+
+### ⚠ BREAKING CHANGES
+
+* onNewActivity filter (#251)
+
+### Features
+
+* onNewActivity filter ([#251](https://github.com/GetStream/stream-feeds-js/issues/251)) ([cab4a39](https://github.com/GetStream/stream-feeds-js/commit/cab4a3962874b880cef675fc4850b6cbe7a1bf7c))
+
 ## [0.1.66](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-native-sdk-0.1.65...@stream-io/feeds-react-native-sdk-0.1.66) (2026-03-04)
 
 ### Dependency Updates
