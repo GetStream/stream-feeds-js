@@ -17,6 +17,7 @@ import type {
   DeleteBookmarkResponse,
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
+  DeleteFeedResponse,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -42,6 +43,7 @@ import type {
   UpdateBookmarkResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
+  UpdateFeedResponse,
   UpdateFollowRequest,
   UpdatePollPartialRequest,
   UpdatePollRequest,
@@ -92,6 +94,7 @@ import {
   handleCommentReactionAdded,
   handleCommentReactionDeleted,
   handleCommentUpdated,
+  handleFeedDeleted,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
@@ -798,6 +801,38 @@ export class FeedsClient extends FeedsApi {
         false,
       );
     }
+    return response;
+  };
+
+  updateFeed = async (
+    ...args: Parameters<FeedsApi['updateFeed']>
+  ): Promise<StreamResponse<UpdateFeedResponse>> => {
+    const response = await super.updateFeed(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      handleFeedUpdated.call(feed, { feed: response.feed } as Parameters<
+        typeof handleFeedUpdated
+      >[0]);
+    }
+    return response;
+  };
+
+  deleteFeed = async (
+    ...args: Parameters<FeedsApi['deleteFeed']>
+  ): Promise<StreamResponse<DeleteFeedResponse>> => {
+    const response = await super.deleteFeed(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      handleFeedDeleted.call(feed, {
+        created_at: new Date(),
+      } as Parameters<typeof handleFeedDeleted>[0]);
+    }
+    delete this.activeFeeds[fid];
+    this.activeActivities = this.activeActivities.filter(
+      (activity) => getFeed.call(activity)?.feed !== fid,
+    );
     return response;
   };
 
