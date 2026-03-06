@@ -27,12 +27,14 @@ import type {
   ImageSize,
   ImageUploadRequest,
   OwnBatchRequest,
+  PinActivityResponse,
   PollResponse,
   PollVoteResponse,
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
   UnfollowBatchRequest,
+  UnpinActivityResponse,
   UpdateActivityPartialResponse,
   UpdateActivityRequest,
   UpdateActivityResponse,
@@ -80,6 +82,8 @@ import {
   handleActivityReactionDeleted,
   handleActivityReactionUpdated,
   handleActivityUpdated,
+  handleActivityPinned,
+  handleActivityUnpinned,
   handleBookmarkAdded,
   handleBookmarkDeleted,
   handleBookmarkUpdated,
@@ -760,6 +764,39 @@ export class FeedsClient extends FeedsApi {
     const response = await super.deleteBookmark(request);
     for (const feed of this.allActiveFeeds) {
       handleBookmarkDeleted.bind(feed)(response);
+    }
+    return response;
+  };
+
+  pinActivity = async (
+    ...args: Parameters<FeedsApi['pinActivity']>
+  ): Promise<StreamResponse<PinActivityResponse>> => {
+    const response = await super.pinActivity(...args);
+    for (const feed of this.allActiveFeeds) {
+      handleActivityPinned.bind(feed)(
+        { pinned_activity: response } as Parameters<
+          typeof handleActivityPinned
+        >[0],
+        false,
+      );
+    }
+    return response;
+  };
+
+  unpinActivity = async (
+    ...args: Parameters<FeedsApi['unpinActivity']>
+  ): Promise<StreamResponse<UnpinActivityResponse>> => {
+    const response = await super.unpinActivity(...args);
+    for (const feed of this.allActiveFeeds) {
+      handleActivityUnpinned.bind(feed)(
+        {
+          pinned_activity: {
+            ...response,
+            created_at: new Date(),
+          },
+        } as Parameters<typeof handleActivityUnpinned>[0],
+        false,
+      );
     }
     return response;
   };

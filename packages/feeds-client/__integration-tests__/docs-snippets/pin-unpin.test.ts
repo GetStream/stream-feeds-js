@@ -27,7 +27,7 @@ describe('Pin and unpin page', () => {
     ).activity;
   });
 
-  it('Pinning and unpinning activities', async () => {
+  it('Pinning and unpinning activities (with watch)', async () => {
     // Pin an activity
     await client.pinActivity({
       feed_group_id: feed.group,
@@ -35,10 +35,11 @@ describe('Pin and unpin page', () => {
       activity_id: activity.id,
     });
 
-    const response = await feed.getOrCreate();
-
+    // State should be updated without needing getOrCreate
     expect(
-      response.pinned_activities.find((a) => a.activity.id === activity.id),
+      feed.currentState.pinned_activities?.find(
+        (a) => a.activity.id === activity.id,
+      ),
     ).toBeDefined();
 
     // Unpin an activity
@@ -47,6 +48,47 @@ describe('Pin and unpin page', () => {
       feed_id: feed.id,
       activity_id: activity.id,
     });
+
+    // State should be updated without needing getOrCreate
+    expect(
+      feed.currentState.pinned_activities?.find(
+        (a) => a.activity.id === activity.id,
+      ),
+    ).toBeUndefined();
+  });
+
+  it('Pinning and unpinning activities (without watch)', async () => {
+    // Create a second feed without watch
+    const feedWithoutWatch = client.feed('user', feed.id);
+    await feedWithoutWatch.getOrCreate({ watch: false });
+
+    // Pin an activity
+    await client.pinActivity({
+      feed_group_id: feedWithoutWatch.group,
+      feed_id: feedWithoutWatch.id,
+      activity_id: activity.id,
+    });
+
+    // State should be updated from the HTTP response
+    expect(
+      feedWithoutWatch.currentState.pinned_activities?.find(
+        (a) => a.activity.id === activity.id,
+      ),
+    ).toBeDefined();
+
+    // Unpin an activity
+    await client.unpinActivity({
+      feed_group_id: feedWithoutWatch.group,
+      feed_id: feedWithoutWatch.id,
+      activity_id: activity.id,
+    });
+
+    // State should be updated from the HTTP response
+    expect(
+      feedWithoutWatch.currentState.pinned_activities?.find(
+        (a) => a.activity.id === activity.id,
+      ),
+    ).toBeUndefined();
   });
 
   afterAll(async () => {
