@@ -7,7 +7,13 @@ export function addActivitiesToState(
   newActivities: ActivityResponse[],
   activities: ActivityResponse[] | undefined,
   position: 'start' | 'end',
-  { hasOwnFields }: { hasOwnFields: boolean } = { hasOwnFields: true },
+  {
+    hasOwnFields,
+    backfillOwnFields,
+  }: { hasOwnFields: boolean; backfillOwnFields: boolean } = {
+    hasOwnFields: true,
+    backfillOwnFields: true,
+  },
 ) {
   if (activities === undefined) {
     return {
@@ -34,7 +40,10 @@ export function addActivitiesToState(
       ...activities,
       ...(position === 'end' ? newActivitiesDeduplicated : []),
     ];
-    this.newActivitiesAdded(newActivitiesDeduplicated, { hasOwnFields });
+    this.activitiesAddedOrUpdated(newActivitiesDeduplicated, {
+      hasOwnFields,
+      backfillOwnFields,
+    });
 
     result = { changed: true, activities: updatedActivities };
   }
@@ -61,7 +70,7 @@ export function handleActivityAdded(
     [event.activity],
     currentActivities,
     position,
-    { hasOwnFields: false },
+    { hasOwnFields: false, backfillOwnFields: true },
   );
   if (result.changed) {
     const activity = event.activity;

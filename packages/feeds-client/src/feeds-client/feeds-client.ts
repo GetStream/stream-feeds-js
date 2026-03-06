@@ -859,7 +859,7 @@ export class FeedsClient extends FeedsApi {
   // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
   async follow(request: FollowRequest) {
     const response = await super.follow(request);
-    this.updateStateFromFollows([response.follow]);
+    this.updateStateFromFollows([response.follow], !!request.enrich_own_fields);
 
     return response;
   }
@@ -871,7 +871,7 @@ export class FeedsClient extends FeedsApi {
    */
   async followBatch(request: FollowBatchRequest) {
     const response = await super.followBatch(request);
-    this.updateStateFromFollows(response.follows);
+    this.updateStateFromFollows(response.follows, !!request.enrich_own_fields);
 
     return response;
   }
@@ -879,7 +879,7 @@ export class FeedsClient extends FeedsApi {
   async getOrCreateFollows(request: FollowBatchRequest) {
     const response = await super.getOrCreateFollows(request);
 
-    this.updateStateFromFollows(response.created);
+    this.updateStateFromFollows(response.created, !!request.enrich_own_fields);
 
     return response;
   }
@@ -1110,13 +1110,18 @@ export class FeedsClient extends FeedsApi {
     ];
   }
 
-  private updateStateFromFollows(follows: FollowResponse[]) {
+  private updateStateFromFollows(
+    follows: FollowResponse[],
+    hasOwnFields: boolean,
+  ) {
     follows.forEach((follow) => {
       const feeds = [
         ...this.findAllActiveFeedsByFid(follow.source_feed.feed),
         ...this.findAllActiveFeedsByFid(follow.target_feed.feed),
       ];
-      feeds.forEach((f) => handleFollowCreated.bind(f)({ follow }, false));
+      feeds.forEach((f) =>
+        handleFollowCreated.bind(f)({ follow }, false, hasOwnFields),
+      );
     });
   }
 

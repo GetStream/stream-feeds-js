@@ -213,7 +213,7 @@ describe(`getOrCreate`, () => {
   });
 });
 
-describe(`newActivitiesAdded`, () => {
+describe(`activitiesAddedOrUpdated`, () => {
   let feed: Feed;
   let client: Record<
     keyof FeedsClient | 'getOrCreateActiveFeed' | 'throttledGetBatchOwnFields',
@@ -257,7 +257,7 @@ describe(`newActivitiesAdded`, () => {
       },
     });
 
-    feed['newActivitiesAdded']([generateActivityResponse()]);
+    feed['activitiesAddedOrUpdated']([generateActivityResponse()]);
 
     expect(client['getOrCreateActiveFeed']).not.toHaveBeenCalled();
   });
@@ -271,7 +271,7 @@ describe(`newActivitiesAdded`, () => {
       },
     });
 
-    feed['newActivitiesAdded']([generateActivityResponse()]);
+    feed['activitiesAddedOrUpdated']([generateActivityResponse()]);
 
     expect(client['getOrCreateActiveFeed']).not.toHaveBeenCalled();
   });
@@ -291,7 +291,7 @@ describe(`newActivitiesAdded`, () => {
     const activity2 = generateActivityResponse({ current_feed: feed2 });
     const activity3 = generateActivityResponse({ current_feed: feed1 });
 
-    feed['newActivitiesAdded']([activity1, activity2, activity3]);
+    feed['activitiesAddedOrUpdated']([activity1, activity2, activity3]);
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledTimes(2);
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -314,7 +314,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: false },
     );
@@ -335,7 +335,7 @@ describe(`newActivitiesAdded`, () => {
     });
     const activity1 = generateActivityResponse({ current_feed: feed1 });
 
-    feed['newActivitiesAdded']([activity1]);
+    feed['activitiesAddedOrUpdated']([activity1]);
 
     // Don't call when not from WebSocket
     expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(0);
@@ -346,7 +346,10 @@ describe(`newActivitiesAdded`, () => {
       feed: 'user:789',
     });
     const activity2 = generateActivityResponse({ current_feed: feed2 });
-    feed['newActivitiesAdded']([activity2], { hasOwnFields: false });
+    feed['activitiesAddedOrUpdated']([activity2], {
+      hasOwnFields: false,
+      backfillOwnFields: true,
+    });
 
     // Call when feed not seen
     expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(1);
@@ -368,7 +371,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -400,7 +403,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -425,7 +428,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -444,7 +447,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -469,7 +472,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -496,7 +499,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -523,7 +526,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -550,7 +553,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -578,7 +581,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -607,7 +610,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -635,7 +638,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );
@@ -663,7 +666,7 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
       { hasOwnFields: true },
     );

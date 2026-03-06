@@ -12,6 +12,7 @@ export const updateStateFollowCreated = (
   currentState: FeedState,
   currentFeedId: string,
   connectedUserId?: string,
+  hasOwnFields = false,
 ): UpdateStateResult<{ data: FeedState }> => {
   // filter non-accepted follows (the way getOrCreate does by default)
   if (follow.status !== 'accepted') {
@@ -26,6 +27,13 @@ export const updateStateFollowCreated = (
       ...newState,
       // Update FeedResponse fields, that has the new follower/following count
       ...follow.source_feed,
+      ...(hasOwnFields
+        ? {
+            own_capabilities: follow.source_feed.own_capabilities,
+            own_follows: follow.source_feed.own_follows,
+            own_followings: follow.source_feed.own_followings,
+          }
+        : {}),
     };
 
     // Only update if following array already exists
@@ -42,9 +50,16 @@ export const updateStateFollowCreated = (
       ...newState,
       // Update FeedResponse fields, that has the new follower/following count
       ...follow.target_feed,
+      ...(hasOwnFields
+        ? {
+            own_capabilities: follow.target_feed.own_capabilities,
+            own_follows: follow.target_feed.own_follows,
+            own_followings: follow.target_feed.own_followings,
+          }
+        : {}),
     };
 
-    if (source.created_by.id === connectedUserId) {
+    if (source.created_by.id === connectedUserId && !hasOwnFields) {
       newState.own_follows = currentState.own_follows
         ? currentState.own_follows.concat(follow)
         : [follow];
@@ -66,6 +81,7 @@ export function handleFollowCreated(
     'follow'
   >,
   fromWs?: boolean,
+  hasOwnFields = false,
 ) {
   const follow = eventOrResponse.follow;
 
@@ -88,6 +104,7 @@ export function handleFollowCreated(
     this.currentState,
     this.feed,
     connectedUser?.id,
+    hasOwnFields,
   );
   if (result.changed) {
     this.state.next(result.data);
