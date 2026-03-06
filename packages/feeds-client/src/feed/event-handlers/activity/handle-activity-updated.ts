@@ -90,7 +90,11 @@ export function handleActivityUpdated(
   ];
 
   if (result1?.changed || result2.changed) {
-    this.client.hydratePollCache([payload.activity]);
+    this.activitiesAddedOrUpdated([payload.activity], {
+      hasOwnFields:
+        payload.activity.current_feed?.own_capabilities !== undefined,
+      backfillOwnFields: false,
+    });
 
     this.state.partialNext({
       activities: result1?.changed ? result1.entities : currentActivities,

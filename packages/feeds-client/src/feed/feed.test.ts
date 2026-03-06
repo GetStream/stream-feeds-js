@@ -213,7 +213,7 @@ describe(`getOrCreate`, () => {
   });
 });
 
-describe(`newActivitiesAdded`, () => {
+describe(`activitiesAddedOrUpdated`, () => {
   let feed: Feed;
   let client: Record<
     keyof FeedsClient | 'getOrCreateActiveFeed' | 'throttledGetBatchOwnFields',
@@ -257,7 +257,7 @@ describe(`newActivitiesAdded`, () => {
       },
     });
 
-    feed['newActivitiesAdded']([generateActivityResponse()]);
+    feed['activitiesAddedOrUpdated']([generateActivityResponse()]);
 
     expect(client['getOrCreateActiveFeed']).not.toHaveBeenCalled();
   });
@@ -271,7 +271,7 @@ describe(`newActivitiesAdded`, () => {
       },
     });
 
-    feed['newActivitiesAdded']([generateActivityResponse()]);
+    feed['activitiesAddedOrUpdated']([generateActivityResponse()]);
 
     expect(client['getOrCreateActiveFeed']).not.toHaveBeenCalled();
   });
@@ -291,7 +291,7 @@ describe(`newActivitiesAdded`, () => {
     const activity2 = generateActivityResponse({ current_feed: feed2 });
     const activity3 = generateActivityResponse({ current_feed: feed1 });
 
-    feed['newActivitiesAdded']([activity1, activity2, activity3]);
+    feed['activitiesAddedOrUpdated']([activity1, activity2, activity3]);
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledTimes(2);
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -308,15 +308,15 @@ describe(`newActivitiesAdded`, () => {
     });
   });
 
-  it(`should pass empty fieldsToUpdate array when fromWebSocket is true`, () => {
+  it(`should pass empty fieldsToUpdate array when hasOwnFields is false`, () => {
     const currentFeed = generateFeedResponse({
       group_id: 'user',
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: true },
+      { hasOwnFields: false },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -335,7 +335,7 @@ describe(`newActivitiesAdded`, () => {
     });
     const activity1 = generateActivityResponse({ current_feed: feed1 });
 
-    feed['newActivitiesAdded']([activity1]);
+    feed['activitiesAddedOrUpdated']([activity1]);
 
     // Don't call when not from WebSocket
     expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(0);
@@ -346,7 +346,10 @@ describe(`newActivitiesAdded`, () => {
       feed: 'user:789',
     });
     const activity2 = generateActivityResponse({ current_feed: feed2 });
-    feed['newActivitiesAdded']([activity2], { fromWebSocket: true });
+    feed['activitiesAddedOrUpdated']([activity2], {
+      hasOwnFields: false,
+      backfillOwnFields: true,
+    });
 
     // Call when feed not seen
     expect(client['throttledGetBatchOwnFields']).toHaveBeenCalledTimes(1);
@@ -368,9 +371,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -400,9 +403,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -425,9 +428,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -444,9 +447,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     const call = client['getOrCreateActiveFeed'].mock.calls[0][0];
@@ -469,9 +472,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -496,9 +499,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -523,9 +526,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -550,9 +553,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -578,9 +581,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -607,9 +610,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -635,9 +638,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -663,9 +666,9 @@ describe(`newActivitiesAdded`, () => {
       id: '123',
       feed: 'user:123',
     });
-    feed['newActivitiesAdded'](
+    feed['activitiesAddedOrUpdated'](
       [generateActivityResponse({ current_feed: currentFeed })],
-      { fromWebSocket: false },
+      { hasOwnFields: true },
     );
 
     expect(client['getOrCreateActiveFeed']).toHaveBeenCalledWith({
@@ -761,7 +764,8 @@ describe('synchronize retry', () => {
 
     const synchronizePromise = feed.synchronize();
     // Set up expectation before running timers to avoid unhandled rejection
-    const expectPromise = expect(synchronizePromise).rejects.toThrow('Persistent error');
+    const expectPromise =
+      expect(synchronizePromise).rejects.toThrow('Persistent error');
     await vi.runAllTimersAsync();
     await expectPromise;
 
@@ -836,7 +840,11 @@ describe('synchronize retry', () => {
   });
 
   it('should not retry on 4xx client errors during synchronize', async () => {
-    const clientError = new StreamApiError('Bad Request', { response_code: 400 }, 4);
+    const clientError = new StreamApiError(
+      'Bad Request',
+      { response_code: 400 },
+      4,
+    );
     getOrCreateSpy.mockRejectedValue(clientError);
 
     feed.state.partialNext({
@@ -845,7 +853,8 @@ describe('synchronize retry', () => {
 
     const synchronizePromise = feed.synchronize();
     // Set up expectation before running timers to avoid unhandled rejection
-    const expectPromise = expect(synchronizePromise).rejects.toThrow('Bad Request');
+    const expectPromise =
+      expect(synchronizePromise).rejects.toThrow('Bad Request');
     await vi.runAllTimersAsync();
     await expectPromise;
 
@@ -853,7 +862,11 @@ describe('synchronize retry', () => {
   });
 
   it('should retry on 5xx server errors during synchronize', async () => {
-    const serverError = new StreamApiError('Internal Server Error', { response_code: 500 }, 16);
+    const serverError = new StreamApiError(
+      'Internal Server Error',
+      { response_code: 500 },
+      16,
+    );
     const mockResponse: StreamResponse<GetOrCreateFeedResponse> = {
       activities: [],
       aggregated_activities: [],
@@ -878,5 +891,68 @@ describe('synchronize retry', () => {
     await synchronizePromise;
 
     expect(getOrCreateSpy).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('Feed.addActivity', () => {
+  let feed: Feed;
+  let client: FeedsClient;
+  let addActivityMock: Mock;
+
+  beforeEach(() => {
+    client = new FeedsClient('mock-api-key');
+    client.state.partialNext({
+      connected_user: { id: 'current-user-id' },
+    });
+    addActivityMock = vi.fn().mockResolvedValue({
+      activity: generateActivityResponse({
+        id: 'new-activity-id',
+        user: { id: 'current-user-id' } as any,
+      }),
+      duration: '10ms',
+    });
+    (client as any).addActivity = addActivityMock;
+    const feedResponse = generateFeedResponse({ id: 'main', group_id: 'user' });
+    feed = new Feed(
+      client,
+      feedResponse.group_id,
+      feedResponse.id,
+      feedResponse,
+    );
+  });
+
+  it('adds activity to start when onNewActivity returns add-to-start', async () => {
+    feed.state.partialNext({ activities: [] });
+    feed.onNewActivity = () => 'add-to-start';
+    await feed.addActivity({ type: 'post', text: 'hello' });
+    expect(feed.currentState.activities).toHaveLength(1);
+    expect(feed.currentState.activities?.[0].id).toBe('new-activity-id');
+  });
+
+  it('adds activity to end when onNewActivity returns add-to-end', async () => {
+    const existing = generateActivityResponse();
+    feed.state.partialNext({ activities: [existing] });
+    feed.onNewActivity = () => 'add-to-end';
+    await feed.addActivity({ type: 'post', text: 'hello' });
+    expect(feed.currentState.activities).toHaveLength(2);
+    expect(feed.currentState.activities?.[0]).toBe(existing);
+    expect(feed.currentState.activities?.[1].id).toBe('new-activity-id');
+  });
+
+  it('does not add activity when onNewActivity returns ignore', async () => {
+    feed.state.partialNext({ activities: [] });
+    feed.onNewActivity = () => 'ignore';
+    await feed.addActivity({ type: 'post', text: 'hello' });
+    expect(feed.currentState.activities).toHaveLength(0);
+  });
+
+  it('adds current user activity to start by default when no onNewActivity', async () => {
+    feed.state.partialNext({
+      activities: [],
+      last_get_or_create_request_config: {},
+    });
+    await feed.addActivity({ type: 'post', text: 'hello' });
+    expect(feed.currentState.activities).toHaveLength(1);
+    expect(feed.currentState.activities?.[0].id).toBe('new-activity-id');
   });
 });

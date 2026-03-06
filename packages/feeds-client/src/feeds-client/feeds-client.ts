@@ -1,7 +1,8 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import type {
-  ActivityAddedEvent,
   ActivityResponse,
+  AddActivityRequest,
+  AddActivityResponse,
   AddCommentReactionRequest,
   AddCommentReactionResponse,
   AddCommentRequest,
@@ -41,6 +42,7 @@ import type {
 import type {
   ConnectedUser,
   FeedsEvent,
+  OnNewActivityCallback,
   StreamFile,
   TokenOrProvider,
 } from '../types';
@@ -82,6 +84,7 @@ import {
   handleWatchStarted,
   handleWatchStopped,
 } from '../feed';
+import { applyNewActivityToActiveFeeds } from './apply-new-activity-to-active-feeds';
 import { handleUserUpdated } from './event-handlers';
 import {
   type SyncFailure,
@@ -614,6 +617,19 @@ export class FeedsClient extends FeedsApi {
     return response;
   };
 
+  async addActivity(
+    request: AddActivityRequest,
+  ): Promise<StreamResponse<AddActivityResponse>> {
+    const response = await super.addActivity(request);
+    request.feeds.forEach((fid) => {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        applyNewActivityToActiveFeeds.call(feed, response.activity);
+      }
+    });
+    return response;
+  }
+
   addActivityReaction = async (
     request: AddReactionRequest & {
       activity_id: string;
@@ -737,16 +753,14 @@ export class FeedsClient extends FeedsApi {
    * @param groupId for example `user`, `notification` or id of a custom feed group
    * @param id
    * @param options
-   * @param options.addNewActivitiesTo - when a new activity is received from a WebSocket event by default it's added to the start of the list. You can change this to `end` to add it to the end of the list. Useful for story feeds.
-   * @param options.activityAddedEventFilter - a callback that is called when a new activity is received from a WebSocket event. You can use this to prevent the activity from being added to the feed. Useful for feed filtering, or if you don't want new activities to be added to the feed.
+   * @param options.onNewActivity - callback to control how new activities (WS or addActivity response) are added: 'add-to-start', 'add-to-end', or 'ignore'.
    * @returns
    */
   feed = (
     groupId: string,
     id: string,
     options?: {
-      addNewActivitiesTo?: 'start' | 'end';
-      activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
+      onNewActivity?: OnNewActivityCallback;
     },
   ) => {
     return this.getOrCreateActiveFeed({
@@ -845,7 +859,7 @@ export class FeedsClient extends FeedsApi {
   // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
   async follow(request: FollowRequest) {
     const response = await super.follow(request);
-    this.updateStateFromFollows([response.follow]);
+    this.updateStateFromFollows([response.follow], !!request.enrich_own_fields);
 
     return response;
   }
@@ -857,7 +871,7 @@ export class FeedsClient extends FeedsApi {
    */
   async followBatch(request: FollowBatchRequest) {
     const response = await super.followBatch(request);
-    this.updateStateFromFollows(response.follows);
+    this.updateStateFromFollows(response.follows, !!request.enrich_own_fields);
 
     return response;
   }
@@ -865,7 +879,7 @@ export class FeedsClient extends FeedsApi {
   async getOrCreateFollows(request: FollowBatchRequest) {
     const response = await super.getOrCreateFollows(request);
 
-    this.updateStateFromFollows(response.created);
+    this.updateStateFromFollows(response.created, !!request.enrich_own_fields);
 
     return response;
   }
@@ -957,8 +971,7 @@ export class FeedsClient extends FeedsApi {
     data?: FeedResponse;
     watch?: boolean;
     options?: {
-      addNewActivitiesTo?: 'start' | 'end';
-      activityAddedEventFilter?: (event: ActivityAddedEvent) => boolean;
+      onNewActivity?: OnNewActivityCallback;
     };
     fieldsToUpdate: Array<
       'own_capabilities' | 'own_follows' | 'own_followings' | 'own_membership'
@@ -975,20 +988,14 @@ export class FeedsClient extends FeedsApi {
         id,
         data,
         watch,
-        options?.addNewActivitiesTo,
-        options?.activityAddedEventFilter,
+        options?.onNewActivity,
       );
     }
 
     const feed = this.activeFeeds[fid];
 
-    if (!isCreated && options) {
-      if (options?.addNewActivitiesTo) {
-        feed.addNewActivitiesTo = options.addNewActivitiesTo;
-      }
-      if (options?.activityAddedEventFilter) {
-        feed.activityAddedEventFilter = options.activityAddedEventFilter;
-      }
+    if (!isCreated && options?.onNewActivity !== undefined) {
+      feed.onNewActivity = options.onNewActivity;
     }
 
     if (!feed.currentState.watch) {
@@ -1103,13 +1110,18 @@ export class FeedsClient extends FeedsApi {
     ];
   }
 
-  private updateStateFromFollows(follows: FollowResponse[]) {
+  private updateStateFromFollows(
+    follows: FollowResponse[],
+    hasOwnFields: boolean,
+  ) {
     follows.forEach((follow) => {
       const feeds = [
         ...this.findAllActiveFeedsByFid(follow.source_feed.feed),
         ...this.findAllActiveFeedsByFid(follow.target_feed.feed),
       ];
-      feeds.forEach((f) => handleFollowCreated.bind(f)({ follow }, false));
+      feeds.forEach((f) =>
+        handleFollowCreated.bind(f)({ follow }, false, hasOwnFields),
+      );
     });
   }
 

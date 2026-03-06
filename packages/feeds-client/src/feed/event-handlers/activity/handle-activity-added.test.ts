@@ -7,6 +7,7 @@ import {
   generateActivityResponse,
   generateFeedResponse,
   generateOwnUser,
+  generateUserResponse,
   getHumanId,
 } from '../../../test-utils';
 
@@ -51,11 +52,15 @@ describe(handleActivityAdded.name, () => {
     expect(hydrateSpy).not.toHaveBeenCalled();
   });
 
-  it('prepends new activity when activities already exist', () => {
+  it('prepends new activity when activities already exist (default: current user + no filter)', () => {
     const existing = generateActivityResponse();
-    feed.state.partialNext({ activities: [existing] });
-
-    const event = generateActivityAddedEvent();
+    feed.state.partialNext({
+      activities: [existing],
+      last_get_or_create_request_config: {},
+    });
+    const event = generateActivityAddedEvent({
+      activity: { user: generateUserResponse({ id: currentUserId }) },
+    });
 
     handleActivityAdded.call(feed, event);
 
@@ -65,29 +70,13 @@ describe(handleActivityAdded.name, () => {
     expect(stateAfter.activities?.[1]).toBe(existing);
   });
 
-  it('add new activity to the end if addNewActivitiesTo is end', () => {
-    feed.state.partialNext({ addNewActivitiesTo: 'end' });
-    const existing = generateActivityResponse();
-    feed.state.partialNext({ activities: [existing] });
-    const event = generateActivityAddedEvent();
-    const newActivitiesAddedSpy = vi.spyOn(feed, 'newActivitiesAdded' as any);
-    handleActivityAdded.call(feed, event);
-
-    const stateAfter = feed.currentState;
-    expect(stateAfter.activities).toHaveLength(2);
-    expect(stateAfter.activities?.[0]).toBe(existing);
-    expect(stateAfter.activities?.[1]).toBe(event.activity);
-    expect(newActivitiesAddedSpy).toHaveBeenCalledWith([event.activity], {
-      fromWebSocket: true,
-    });
-
-    vi.resetAllMocks();
-  });
-
   it('does not duplicate if activity already exists', () => {
     const existing = generateActivityResponse();
     feed.state.partialNext({ activities: [existing] });
-    const newActivitiesAddedSpy = vi.spyOn(feed, 'newActivitiesAdded' as any);
+    const activitiesAddedOrUpdatedSpy = vi.spyOn(
+      feed,
+      'activitiesAddedOrUpdated' as any,
+    );
 
     const event = generateActivityAddedEvent({
       activity: { id: existing.id },
@@ -100,20 +89,57 @@ describe(handleActivityAdded.name, () => {
     expect(stateAfter).toBe(stateBefore);
     expect(stateAfter.activities).toHaveLength(1);
     expect(stateAfter.activities?.[0]).toBe(existing);
-    expect(newActivitiesAddedSpy).not.toHaveBeenCalled();
+    expect(activitiesAddedOrUpdatedSpy).not.toHaveBeenCalled();
 
     vi.resetAllMocks();
   });
 
-  it(`onActivityAdded filters out activity if it returns false`, () => {
+  it('onNewActivity returning ignore does not add activity', () => {
     feed.state.partialNext({ activities: [] });
-    feed.activityAddedEventFilter = (_) => {
-      return false;
-    };
+    feed.onNewActivity = () => 'ignore';
     const event = generateActivityAddedEvent();
     handleActivityAdded.call(feed, event);
-    const stateAfter = feed.currentState;
+    expect(feed.currentState.activities).toHaveLength(0);
+  });
 
-    expect(stateAfter.activities).toHaveLength(0);
+  it('onNewActivity returning add-to-end adds activity at end', () => {
+    const existing = generateActivityResponse();
+    feed.state.partialNext({ activities: [existing] });
+    feed.onNewActivity = () => 'add-to-end';
+    const event = generateActivityAddedEvent();
+    handleActivityAdded.call(feed, event);
+    expect(feed.currentState.activities).toHaveLength(2);
+    expect(feed.currentState.activities?.[0]).toBe(existing);
+    expect(feed.currentState.activities?.[1]).toBe(event.activity);
+  });
+
+  it('onNewActivity returning add-to-start adds activity at start', () => {
+    const existing = generateActivityResponse();
+    feed.state.partialNext({ activities: [existing] });
+    feed.onNewActivity = () => 'add-to-start';
+    const event = generateActivityAddedEvent();
+    handleActivityAdded.call(feed, event);
+    expect(feed.currentState.activities).toHaveLength(2);
+    expect(feed.currentState.activities?.[0]).toBe(event.activity);
+    expect(feed.currentState.activities?.[1]).toBe(existing);
+  });
+
+  it('default behavior adds current user activity matching feed filter to start', () => {
+    feed.state.partialNext({
+      activities: [],
+      last_get_or_create_request_config: {
+        filter: { filter_tags: ['blue'] },
+      },
+    });
+    const event = generateActivityAddedEvent({
+      activity: {
+        ...generateActivityResponse(),
+        filter_tags: ['blue'],
+        user: generateUserResponse({ id: currentUserId }),
+      },
+    });
+    handleActivityAdded.call(feed, event);
+    expect(feed.currentState.activities).toHaveLength(1);
+    expect(feed.currentState.activities?.[0]).toBe(event.activity);
   });
 });

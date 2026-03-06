@@ -42,7 +42,9 @@ export class ActivityWithStateUpdates {
   constructor(
     public readonly id: string,
     private readonly feedsClient: FeedsClient,
-    { fromResponse }: { fromResponse?: ActivityResponse } = { fromResponse: undefined },
+    { fromResponse }: { fromResponse?: ActivityResponse } = {
+      fromResponse: undefined,
+    },
   ) {
     this.state = new StateStore<ActivityState>({
       activity: undefined,
@@ -104,7 +106,7 @@ export class ActivityWithStateUpdates {
     });
 
     if (this.feed) {
-      this.feed.activityAddedEventFilter = () => false;
+      this.feed.onNewActivity = () => 'ignore';
     }
 
     if (comments) {
@@ -177,6 +179,10 @@ export class ActivityWithStateUpdates {
       [initialState],
       [],
       'start',
+      {
+        hasOwnFields: initialState.current_feed?.own_capabilities !== undefined,
+        backfillOwnFields: false,
+      },
     );
     this.feed?.state.partialNext({
       activities,

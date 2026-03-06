@@ -7,7 +7,13 @@ export function addActivitiesToState(
   newActivities: ActivityResponse[],
   activities: ActivityResponse[] | undefined,
   position: 'start' | 'end',
-  { fromWebSocket }: { fromWebSocket: boolean } = { fromWebSocket: false },
+  {
+    hasOwnFields,
+    backfillOwnFields,
+  }: { hasOwnFields: boolean; backfillOwnFields: boolean } = {
+    hasOwnFields: true,
+    backfillOwnFields: true,
+  },
 ) {
   if (activities === undefined) {
     return {
@@ -34,7 +40,10 @@ export function addActivitiesToState(
       ...activities,
       ...(position === 'end' ? newActivitiesDeduplicated : []),
     ];
-    this.newActivitiesAdded(newActivitiesDeduplicated, { fromWebSocket });
+    this.activitiesAddedOrUpdated(newActivitiesDeduplicated, {
+      hasOwnFields,
+      backfillOwnFields,
+    });
 
     result = { changed: true, activities: updatedActivities };
   }
@@ -46,17 +55,22 @@ export function handleActivityAdded(
   this: Feed,
   event: EventPayload<'feeds.activity.added'>,
 ) {
-  if (this.activityAddedEventFilter) {
-    if (!this.activityAddedEventFilter(event)) {
-      return;
-    }
+  const currentUser = this.client.state.getLatestValue().connected_user;
+  const decision = this.resolveNewActivityDecision(
+    event.activity,
+    currentUser,
+    false,
+  );
+  if (decision === 'ignore') {
+    return;
   }
+  const position = decision === 'add-to-end' ? 'end' : 'start';
   const currentActivities = this.currentState.activities;
   const result = addActivitiesToState.bind(this)(
     [event.activity],
     currentActivities,
-    this.currentState.addNewActivitiesTo,
-    { fromWebSocket: true },
+    position,
+    { hasOwnFields: false, backfillOwnFields: true },
   );
   if (result.changed) {
     const activity = event.activity;
