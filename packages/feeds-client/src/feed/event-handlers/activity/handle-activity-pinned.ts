@@ -1,11 +1,34 @@
 import type { ActivityPinResponse } from '../../../gen/models';
-import type { EventPayload } from '../../../types-internal';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import type { Feed } from '../../feed';
+import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
+import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
+
+export type ActivityPinnedPayload = PartializeAllBut<
+  EventPayload<'feeds.activity.pinned'>,
+  'pinned_activity'
+>;
 
 export function handleActivityPinned(
   this: Feed,
-  event: EventPayload<'feeds.activity.pinned'>,
+  event: ActivityPinnedPayload,
+  fromWs?: boolean,
 ) {
+  if (
+    !shouldUpdateState({
+      stateUpdateQueueId: getStateUpdateQueueId(event, 'activity-pinned'),
+      stateUpdateQueue: this.stateUpdateQueue,
+      watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(
+        this,
+        event,
+      ),
+    })
+  ) {
+    return;
+  }
+
   this.state.next((currentState) => {
     const newState = {
       ...currentState,
@@ -17,7 +40,6 @@ export function handleActivityPinned(
     const pinnedActivity: ActivityPinResponse = {
       ...event.pinned_activity,
       user: event.user!,
-      feed: event.fid,
       updated_at: new Date(),
     };
 

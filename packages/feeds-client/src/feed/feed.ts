@@ -50,6 +50,8 @@ import {
   addAggregatedActivitiesToState,
   updateNotificationStatus,
   handleStoriesFeedUpdated,
+  handleActivityPinned,
+  handleActivityUnpinned,
 } from './event-handlers';
 import { capitalize } from '../common/utils';
 import type {
@@ -204,8 +206,8 @@ export class Feed extends FeedApi {
     'feeds.poll.vote_casted': Feed.noop,
     'feeds.poll.vote_changed': Feed.noop,
     'feeds.poll.vote_removed': Feed.noop,
-    'feeds.activity.pinned': Feed.noop,
-    'feeds.activity.unpinned': Feed.noop,
+    'feeds.activity.pinned': handleActivityPinned.bind(this),
+    'feeds.activity.unpinned': handleActivityUnpinned.bind(this),
     'feeds.activity.marked': handleActivityMarked.bind(this),
     'moderation.custom_action': Feed.noop,
     'moderation.flagged': Feed.noop,

@@ -1,10 +1,33 @@
-import type { EventPayload } from '../../../types-internal';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import type { Feed, FeedState } from '../../feed';
+import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
+import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
+
+export type ActivityUnpinnedPayload = PartializeAllBut<
+  EventPayload<'feeds.activity.unpinned'>,
+  'pinned_activity'
+>;
 
 export function handleActivityUnpinned(
   this: Feed,
-  event: EventPayload<'feeds.activity.unpinned'>,
+  event: ActivityUnpinnedPayload,
+  fromWs?: boolean,
 ) {
+  if (
+    !shouldUpdateState({
+      stateUpdateQueueId: getStateUpdateQueueId(event, 'activity-unpinned'),
+      stateUpdateQueue: this.stateUpdateQueue,
+      watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(
+        this,
+        event,
+      ),
+    })
+  ) {
+    return;
+  }
+
   this.state.next((currentState) => {
     let newState: FeedState | undefined;
 
