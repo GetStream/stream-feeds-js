@@ -29,6 +29,7 @@ import type {
   QueryFeedsRequest,
   QueryPollVotesRequest,
   UnfollowBatchRequest,
+  UpdateActivityPartialResponse,
   UpdateActivityRequest,
   UpdateActivityResponse,
   UpdateCommentRequest,
@@ -558,6 +559,16 @@ export class FeedsClient extends FeedsApi {
     },
   ): Promise<StreamResponse<UpdateActivityResponse>> => {
     const response = await super.updateActivity(request);
+    for (const feed of this.allActiveFeeds) {
+      handleActivityUpdated.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  updateActivityPartial = async (
+    ...args: Parameters<FeedsApi['updateActivityPartial']>
+  ): Promise<StreamResponse<UpdateActivityPartialResponse>> => {
+    const response = await super.updateActivityPartial(...args);
     for (const feed of this.allActiveFeeds) {
       handleActivityUpdated.bind(feed)(response, false);
     }
