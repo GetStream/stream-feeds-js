@@ -13,6 +13,7 @@ import type {
   CastPollVoteRequest,
   CreateGuestResponse,
   DeleteActivityReactionResponse,
+  DeleteActivityResponse,
   DeleteBookmarkResponse,
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
@@ -74,6 +75,7 @@ import { StreamPoll } from '../common/Poll';
 import {
   Feed,
   type FeedState,
+  handleActivityDeleted,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
   handleActivityReactionUpdated,
@@ -580,6 +582,25 @@ export class FeedsClient extends FeedsApi {
     for (const feed of this.allActiveFeeds) {
       handleActivityUpdated.bind(feed)(response, false);
     }
+    return response;
+  };
+
+  deleteActivity = async (
+    ...args: Parameters<FeedsApi['deleteActivity']>
+  ): Promise<StreamResponse<DeleteActivityResponse>> => {
+    const response = await super.deleteActivity(...args);
+    const activityId = args[0].id;
+    for (const feed of this.allActiveFeeds) {
+      handleActivityDeleted.bind(feed)(
+        { activity: { id: activityId } } as Parameters<
+          typeof handleActivityDeleted
+        >[0],
+        false,
+      );
+    }
+    this.activeActivities = this.activeActivities.filter(
+      (activity) => activity.id !== activityId,
+    );
     return response;
   };
 

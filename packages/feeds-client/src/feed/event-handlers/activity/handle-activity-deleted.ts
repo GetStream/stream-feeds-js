@@ -3,7 +3,13 @@ import type {
   ActivityPinResponse,
   ActivityResponse,
 } from '../../../gen/models';
-import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import type {
+  EventPayload,
+  PartializeAllBut,
+  UpdateStateResult,
+} from '../../../types-internal';
+import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
+import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
 
 export function removeActivityFromState(
   this: Feed,
@@ -45,10 +51,30 @@ export const removePinnedActivityFromState = (
   }
 };
 
+export type ActivityDeletedPayload = PartializeAllBut<
+  EventPayload<'feeds.activity.deleted'>,
+  'activity'
+>;
+
 export function handleActivityDeleted(
   this: Feed,
-  event: EventPayload<'feeds.activity.deleted'>,
+  event: ActivityDeletedPayload,
+  fromWs?: boolean,
 ) {
+  if (
+    !shouldUpdateState({
+      stateUpdateQueueId: getStateUpdateQueueId(event, 'activity-deleted'),
+      stateUpdateQueue: this.stateUpdateQueue,
+      watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(
+        this,
+        event,
+      ),
+    })
+  ) {
+    return;
+  }
   const {
     activities: currentActivities,
     pinned_activities: currentPinnedActivities,
