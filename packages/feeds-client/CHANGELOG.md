@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.0.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.51...@stream-io/feeds-client-1.0.0) (2026-03-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* onNewActivity filter (#251)
+
+### Features
+
+* handle enrich_own_fields req option ([#258](https://github.com/GetStream/stream-feeds-js/issues/258)) ([a21e751](https://github.com/GetStream/stream-feeds-js/commit/a21e751c96df3d19b3a161e106730276aad94094))
+* onNewActivity filter ([#251](https://github.com/GetStream/stream-feeds-js/issues/251)) ([cab4a39](https://github.com/GetStream/stream-feeds-js/commit/cab4a3962874b880cef675fc4850b6cbe7a1bf7c))
+
 ## [0.3.51](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.50...@stream-io/feeds-client-0.3.51) (2026-03-04)
 
 
