@@ -8,3 +8,4 @@ export * from './handle-activity-reaction-updated';
 export * from './handle-activity-marked';
 export * from './handle-activity-pinned';
 export * from './handle-activity-unpinned';
+export * from './handle-activity-feedback';

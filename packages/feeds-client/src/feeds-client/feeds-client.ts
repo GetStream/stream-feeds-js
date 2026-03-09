@@ -1,5 +1,7 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import type {
+  ActivityFeedbackRequest,
+  ActivityFeedbackResponse,
   ActivityResponse,
   AddActivityRequest,
   AddActivityResponse,
@@ -101,6 +103,7 @@ import {
   handleFollowUpdated,
   handleWatchStarted,
   handleWatchStopped,
+  updateActivityFromFeedback,
 } from '../feed';
 import { applyNewActivityToActiveFeeds } from './apply-new-activity-to-active-feeds';
 import { handleUserUpdated } from './event-handlers';
@@ -608,6 +611,37 @@ export class FeedsClient extends FeedsApi {
     this.activeActivities = this.activeActivities.filter(
       (activity) => activity.id !== activityId,
     );
+    return response;
+  };
+
+  activityFeedback = async (
+    request: ActivityFeedbackRequest & { activity_id: string },
+  ): Promise<StreamResponse<ActivityFeedbackResponse>> => {
+    const response = await super.activityFeedback(request);
+    if (request.hide !== undefined) {
+      const feedback = {
+        activity_id: request.activity_id,
+        action: 'hide' as const,
+        value: request.hide ? 'true' : 'false',
+      };
+      for (const feed of this.allActiveFeeds) {
+        const {
+          activities: currentActivities,
+          pinned_activities: currentPinnedActivities,
+        } = feed.currentState;
+        const [result1, result2] = [
+          updateActivityFromFeedback(feedback, currentActivities),
+          updateActivityFromFeedback(feedback, currentPinnedActivities),
+        ];
+
+        if (result1.changed || result2.changed) {
+          feed.state.partialNext({
+            activities: result1.entities,
+            pinned_activities: result2.entities,
+          });
+        }
+      }
+    }
     return response;
   };
 
