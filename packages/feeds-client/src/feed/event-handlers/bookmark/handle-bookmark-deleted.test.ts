@@ -38,22 +38,27 @@ describe(handleBookmarkDeleted.name, () => {
   });
 
   it('removes a bookmark for the current user and updates activities', () => {
+    const activityId = crypto.randomUUID();
+    const updatedAt = new Date();
     const event = generateBookmarkDeletedEvent({
       bookmark: {
         activity: {
           own_reactions: [],
           bookmark_count: 0,
+          id: activityId,
         },
         user: { id: currentUserId },
+        updated_at: updatedAt,
       },
     });
     const activity = generateActivityResponse({
-      id: event.bookmark.activity.id,
+      id: activityId,
       bookmark_count: 1,
       own_bookmarks: [
         generateBookmarkResponse({
-          activity: { id: event.bookmark.activity.id },
+          activity: { id: activityId },
           user: { id: currentUserId },
+          updated_at: updatedAt,
         }),
       ],
       own_reactions: [generateFeedReactionResponse()],
@@ -148,22 +153,27 @@ describe(handleBookmarkDeleted.name, () => {
   });
 
   it('does not double-update state when called twice with the same event', () => {
+    const activityId = crypto.randomUUID();
+    const updatedAt = new Date();
     const event = generateBookmarkDeletedEvent({
       bookmark: {
         activity: {
           own_reactions: [],
           bookmark_count: 0,
+          id: activityId,
         },
         user: { id: currentUserId },
+        updated_at: updatedAt,
       },
     });
     const activity = generateActivityResponse({
-      id: event.bookmark.activity.id,
+      id: activityId,
       bookmark_count: 1,
       own_bookmarks: [
         generateBookmarkResponse({
-          activity: { id: event.bookmark.activity.id },
+          activity: { id: activityId },
           user: { id: currentUserId },
+          updated_at: updatedAt,
         }),
       ],
       own_reactions: [generateFeedReactionResponse()],
