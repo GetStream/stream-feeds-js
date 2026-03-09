@@ -1,8 +1,13 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import type {
+  AcceptFeedMemberInviteResponse,
+  ActivityFeedbackRequest,
+  ActivityFeedbackResponse,
   ActivityResponse,
   AddActivityRequest,
   AddActivityResponse,
+  AddBookmarkRequest,
+  AddBookmarkResponse,
   AddCommentReactionRequest,
   AddCommentReactionResponse,
   AddCommentRequest,
@@ -11,8 +16,11 @@ import type {
   CastPollVoteRequest,
   CreateGuestResponse,
   DeleteActivityReactionResponse,
+  DeleteActivityResponse,
+  DeleteBookmarkResponse,
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
+  DeleteFeedResponse,
   FeedResponse,
   FileUploadRequest,
   FollowBatchRequest,
@@ -23,16 +31,24 @@ import type {
   ImageSize,
   ImageUploadRequest,
   OwnBatchRequest,
+  PinActivityResponse,
   PollResponse,
   PollVoteResponse,
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
+  RejectFeedMemberInviteResponse,
   UnfollowBatchRequest,
+  UnpinActivityResponse,
+  UpdateActivityPartialResponse,
   UpdateActivityRequest,
   UpdateActivityResponse,
+  UpdateBookmarkRequest,
+  UpdateBookmarkResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
+  UpdateFeedMembersResponse,
+  UpdateFeedResponse,
   UpdateFollowRequest,
   UpdatePollPartialRequest,
   UpdatePollRequest,
@@ -68,21 +84,32 @@ import { StreamPoll } from '../common/Poll';
 import {
   Feed,
   type FeedState,
+  handleActivityDeleted,
   handleActivityReactionAdded,
   handleActivityReactionDeleted,
   handleActivityReactionUpdated,
   handleActivityUpdated,
+  handleActivityPinned,
+  handleActivityUnpinned,
+  handleBookmarkAdded,
+  handleBookmarkDeleted,
+  handleBookmarkUpdated,
   handleCommentAdded,
   handleCommentDeleted,
   handleCommentReactionAdded,
   handleCommentReactionDeleted,
   handleCommentUpdated,
+  handleFeedDeleted,
+  handleFeedMemberAdded,
+  handleFeedMemberRemoved,
+  handleFeedMemberUpdated,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
   handleFollowUpdated,
   handleWatchStarted,
   handleWatchStopped,
+  updateActivityFromFeedback,
 } from '../feed';
 import { applyNewActivityToActiveFeeds } from './apply-new-activity-to-active-feeds';
 import { handleUserUpdated } from './event-handlers';
@@ -564,6 +591,66 @@ export class FeedsClient extends FeedsApi {
     return response;
   };
 
+  updateActivityPartial = async (
+    ...args: Parameters<FeedsApi['updateActivityPartial']>
+  ): Promise<StreamResponse<UpdateActivityPartialResponse>> => {
+    const response = await super.updateActivityPartial(...args);
+    for (const feed of this.allActiveFeeds) {
+      handleActivityUpdated.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  deleteActivity = async (
+    ...args: Parameters<FeedsApi['deleteActivity']>
+  ): Promise<StreamResponse<DeleteActivityResponse>> => {
+    const response = await super.deleteActivity(...args);
+    const activityId = args[0].id;
+    for (const feed of this.allActiveFeeds) {
+      handleActivityDeleted.bind(feed)(
+        { activity: { id: activityId } } as Parameters<
+          typeof handleActivityDeleted
+        >[0],
+        false,
+      );
+    }
+    this.activeActivities = this.activeActivities.filter(
+      (activity) => activity.id !== activityId,
+    );
+    return response;
+  };
+
+  activityFeedback = async (
+    request: ActivityFeedbackRequest & { activity_id: string },
+  ): Promise<StreamResponse<ActivityFeedbackResponse>> => {
+    const response = await super.activityFeedback(request);
+    if (request.hide !== undefined) {
+      const feedback = {
+        activity_id: request.activity_id,
+        action: 'hide' as const,
+        value: request.hide ? 'true' : 'false',
+      };
+      for (const feed of this.allActiveFeeds) {
+        const {
+          activities: currentActivities,
+          pinned_activities: currentPinnedActivities,
+        } = feed.currentState;
+        const [result1, result2] = [
+          updateActivityFromFeedback(feedback, currentActivities),
+          updateActivityFromFeedback(feedback, currentPinnedActivities),
+        ];
+
+        if (result1.changed || result2.changed) {
+          feed.state.partialNext({
+            activities: result1.entities,
+            pinned_activities: result2.entities,
+          });
+        }
+      }
+    }
+    return response;
+  };
+
   addComment = async (
     request: AddCommentRequest,
   ): Promise<StreamResponse<AddCommentResponse>> => {
@@ -689,6 +776,160 @@ export class FeedsClient extends FeedsApi {
     const response = await super.deleteCommentReaction(...args);
     for (const feed of this.allActiveFeeds) {
       handleCommentReactionDeleted.bind(feed)(response, false);
+    }
+    return response;
+  };
+
+  addBookmark = async (
+    request: AddBookmarkRequest & { activity_id: string },
+  ): Promise<StreamResponse<AddBookmarkResponse>> => {
+    const response = await super.addBookmark(request);
+    for (const feed of this.allActiveFeeds) {
+      handleBookmarkAdded.bind(feed)(response);
+    }
+    return response;
+  };
+
+  updateBookmark = async (
+    request: UpdateBookmarkRequest & { activity_id: string },
+  ): Promise<StreamResponse<UpdateBookmarkResponse>> => {
+    const response = await super.updateBookmark(request);
+    for (const feed of this.allActiveFeeds) {
+      handleBookmarkUpdated.bind(feed)(response);
+    }
+    return response;
+  };
+
+  deleteBookmark = async (request: {
+    activity_id: string;
+    folder_id?: string;
+  }): Promise<StreamResponse<DeleteBookmarkResponse>> => {
+    const response = await super.deleteBookmark(request);
+    for (const feed of this.allActiveFeeds) {
+      handleBookmarkDeleted.bind(feed)(response);
+    }
+    return response;
+  };
+
+  pinActivity = async (
+    ...args: Parameters<FeedsApi['pinActivity']>
+  ): Promise<StreamResponse<PinActivityResponse>> => {
+    const response = await super.pinActivity(...args);
+    const feedIds =
+      response.activity?.feeds ?? (response.feed ? [response.feed] : []);
+    for (const fid of feedIds) {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        handleActivityPinned.bind(feed)(
+          { pinned_activity: response } as Parameters<
+            typeof handleActivityPinned
+          >[0],
+          false,
+        );
+      }
+    }
+    return response;
+  };
+
+  unpinActivity = async (
+    ...args: Parameters<FeedsApi['unpinActivity']>
+  ): Promise<StreamResponse<UnpinActivityResponse>> => {
+    const response = await super.unpinActivity(...args);
+    const feedIds =
+      response.activity?.feeds ?? (response.feed ? [response.feed] : []);
+    for (const fid of feedIds) {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        handleActivityUnpinned.bind(feed)(
+          {
+            pinned_activity: {
+              ...response,
+              created_at: new Date(),
+            },
+          } as Parameters<typeof handleActivityUnpinned>[0],
+          false,
+        );
+      }
+    }
+    return response;
+  };
+
+  updateFeed = async (
+    ...args: Parameters<FeedsApi['updateFeed']>
+  ): Promise<StreamResponse<UpdateFeedResponse>> => {
+    const response = await super.updateFeed(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      handleFeedUpdated.call(feed, { feed: response.feed } as Parameters<
+        typeof handleFeedUpdated
+      >[0]);
+    }
+    return response;
+  };
+
+  deleteFeed = async (
+    ...args: Parameters<FeedsApi['deleteFeed']>
+  ): Promise<StreamResponse<DeleteFeedResponse>> => {
+    const response = await super.deleteFeed(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      handleFeedDeleted.call(feed, {
+        created_at: new Date(),
+      } as Parameters<typeof handleFeedDeleted>[0]);
+      // If the feed is not watched, clean up immediately (no WS event will follow).
+      // If watched, the WS handler will clean up after dispatching the event.
+      if (!feed.currentState.watch) {
+        delete this.activeFeeds[fid];
+        this.activeActivities = this.activeActivities.filter(
+          (activity) => getFeed.call(activity)?.feed !== fid,
+        );
+      }
+    }
+    return response;
+  };
+
+  updateFeedMembers = async (
+    ...args: Parameters<FeedsApi['updateFeedMembers']>
+  ): Promise<StreamResponse<UpdateFeedMembersResponse>> => {
+    const response = await super.updateFeedMembers(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      for (const member of response.added) {
+        handleFeedMemberAdded.call(feed, { member }, false);
+      }
+      for (const member of response.updated) {
+        handleFeedMemberUpdated.call(feed, { member }, false);
+      }
+      for (const memberId of response.removed_ids) {
+        handleFeedMemberRemoved.call(feed, { member_id: memberId }, false);
+      }
+    }
+    return response;
+  };
+
+  acceptFeedMemberInvite = async (
+    ...args: Parameters<FeedsApi['acceptFeedMemberInvite']>
+  ): Promise<StreamResponse<AcceptFeedMemberInviteResponse>> => {
+    const response = await super.acceptFeedMemberInvite(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      handleFeedMemberUpdated.call(feed, { member: response.member }, false);
+    }
+    return response;
+  };
+
+  rejectFeedMemberInvite = async (
+    ...args: Parameters<FeedsApi['rejectFeedMemberInvite']>
+  ): Promise<StreamResponse<RejectFeedMemberInviteResponse>> => {
+    const response = await super.rejectFeedMemberInvite(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      handleFeedMemberUpdated.call(feed, { member: response.member }, false);
     }
     return response;
   };
@@ -844,6 +1085,20 @@ export class FeedsClient extends FeedsApi {
 
   async updateFollow(request: UpdateFollowRequest) {
     const response = await super.updateFollow(request);
+
+    [
+      response.follow.source_feed.feed,
+      response.follow.target_feed.feed,
+    ].forEach((fid) => {
+      const feeds = this.findAllActiveFeedsByFid(fid);
+      feeds.forEach((f) => handleFollowUpdated.bind(f)(response, false));
+    });
+
+    return response;
+  }
+
+  async acceptFollow(...args: Parameters<FeedsApi['acceptFollow']>) {
+    const response = await super.acceptFollow(...args);
 
     [
       response.follow.source_feed.feed,

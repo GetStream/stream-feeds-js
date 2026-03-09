@@ -2,10 +2,15 @@ import type { Feed } from '../../../feed';
 import type {
   ActivityPinResponse,
   ActivityResponse,
-  BookmarkAddedEvent,
 } from '../../../gen/models';
-import type { EventPayload } from '../../../types-internal';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import { updateEntityInArray } from '../../../utils';
+import { isSameBookmark } from './handle-bookmark-deleted';
+
+export type BookmarkAddedPayload = PartializeAllBut<
+  EventPayload<'feeds.bookmark.added'>,
+  'bookmark'
+>;
 
 const sharedUpdateActivity = ({
   currentActivity,
@@ -13,7 +18,7 @@ const sharedUpdateActivity = ({
   eventBelongsToCurrentUser,
 }: {
   currentActivity: ActivityResponse;
-  event: BookmarkAddedEvent;
+  event: BookmarkAddedPayload;
   eventBelongsToCurrentUser: boolean;
 }): ActivityResponse => {
   let newOwnBookmarks = currentActivity.own_bookmarks;
@@ -30,13 +35,16 @@ const sharedUpdateActivity = ({
 };
 
 export const addBookmarkToActivities = (
-  event: BookmarkAddedEvent,
+  event: BookmarkAddedPayload,
   activities: ActivityResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
 ) =>
   updateEntityInArray({
     entities: activities,
-    matcher: (activity) => activity.id === event.bookmark.activity.id,
+    matcher: (activity) =>
+      activity.id === event.bookmark.activity.id &&
+      (!eventBelongsToCurrentUser ||
+        !activity.own_bookmarks.some((b) => isSameBookmark(b, event.bookmark))),
     updater: (matchedActivity) =>
       sharedUpdateActivity({
         currentActivity: matchedActivity,
@@ -46,14 +54,18 @@ export const addBookmarkToActivities = (
   });
 
 export const addBookmarkToPinnedActivities = (
-  event: BookmarkAddedEvent,
+  event: BookmarkAddedPayload,
   pinnedActivities: ActivityPinResponse[] | undefined,
   eventBelongsToCurrentUser: boolean,
 ) =>
   updateEntityInArray({
     entities: pinnedActivities,
     matcher: (pinnedActivity) =>
-      pinnedActivity.activity.id === event.bookmark.activity.id,
+      pinnedActivity.activity.id === event.bookmark.activity.id &&
+      (!eventBelongsToCurrentUser ||
+        !pinnedActivity.activity.own_bookmarks.some((b) =>
+          isSameBookmark(b, event.bookmark),
+        )),
     updater: (matchedPinnedActivity) => {
       const newActivity = sharedUpdateActivity({
         currentActivity: matchedPinnedActivity.activity,
@@ -72,10 +84,7 @@ export const addBookmarkToPinnedActivities = (
     },
   });
 
-export function handleBookmarkAdded(
-  this: Feed,
-  event: EventPayload<'feeds.bookmark.added'>,
-) {
+export function handleBookmarkAdded(this: Feed, event: BookmarkAddedPayload) {
   const {
     activities: currentActivities,
     pinned_activities: currentPinnedActivities,

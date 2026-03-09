@@ -120,8 +120,6 @@ describe('Follows page', () => {
     await client.acceptFollow({
       source: adamTimeline.feed,
       target: saraFeed.feed,
-      // Optionally provide role
-      follower_role: 'feed_member',
     });
 
     await client.rejectFollow({

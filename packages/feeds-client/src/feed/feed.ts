@@ -38,6 +38,7 @@ import {
   handleBookmarkAdded,
   handleActivityDeleted,
   handleActivityRemovedFromFeed,
+  handleFeedDeleted,
   handleFeedUpdated,
   handleNotificationFeedUpdated,
   handleActivityMarked,
@@ -50,6 +51,8 @@ import {
   addAggregatedActivitiesToState,
   updateNotificationStatus,
   handleStoriesFeedUpdated,
+  handleActivityPinned,
+  handleActivityUnpinned,
 } from './event-handlers';
 import { capitalize } from '../common/utils';
 import type {
@@ -181,7 +184,7 @@ export class Feed extends FeedApi {
     'feeds.comment.deleted': handleCommentDeleted.bind(this),
     'feeds.comment.updated': handleCommentUpdated.bind(this),
     'feeds.feed.created': Feed.noop,
-    'feeds.feed.deleted': Feed.noop,
+    'feeds.feed.deleted': handleFeedDeleted.bind(this),
     'feeds.feed.updated': handleFeedUpdated.bind(this),
     'feeds.feed_group.changed': Feed.noop,
     'feeds.feed_group.deleted': Feed.noop,
@@ -204,8 +207,8 @@ export class Feed extends FeedApi {
     'feeds.poll.vote_casted': Feed.noop,
     'feeds.poll.vote_changed': Feed.noop,
     'feeds.poll.vote_removed': Feed.noop,
-    'feeds.activity.pinned': Feed.noop,
-    'feeds.activity.unpinned': Feed.noop,
+    'feeds.activity.pinned': handleActivityPinned.bind(this),
+    'feeds.activity.unpinned': handleActivityUnpinned.bind(this),
     'feeds.activity.marked': handleActivityMarked.bind(this),
     'moderation.custom_action': Feed.noop,
     'moderation.flagged': Feed.noop,

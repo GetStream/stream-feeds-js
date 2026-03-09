@@ -1,10 +1,33 @@
 import type { Feed, FeedState } from '../../../feed';
-import type { EventPayload } from '../../../types-internal';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
+import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
+import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
+
+export type FeedMemberUpdatedPayload = PartializeAllBut<
+  EventPayload<'feeds.feed_member.updated'>,
+  'member'
+>;
 
 export function handleFeedMemberUpdated(
   this: Feed,
-  event: EventPayload<'feeds.feed_member.updated'>,
+  event: FeedMemberUpdatedPayload,
+  fromWs?: boolean,
 ) {
+  if (
+    !shouldUpdateState({
+      stateUpdateQueueId: getStateUpdateQueueId(event, 'feed-member-updated'),
+      stateUpdateQueue: this.stateUpdateQueue,
+      watch: this.currentState.watch,
+      fromWs,
+      isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(
+        this,
+        event,
+      ),
+    })
+  ) {
+    return;
+  }
+
   const { connected_user: connectedUser } = this.client.state.getLatestValue();
 
   this.state.next((currentState) => {

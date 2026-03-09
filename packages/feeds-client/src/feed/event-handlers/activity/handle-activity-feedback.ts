@@ -2,12 +2,16 @@ import { updateEntityInArray } from '../../../utils';
 import { isPin } from '../is-activity-pin';
 import type { Feed } from '../../feed';
 import type { EventPayload } from '../../../types-internal';
-import type { ActivityFeedbackEventPayload, ActivityPinResponse, ActivityResponse } from '../../../gen/models';
+import type {
+  ActivityFeedbackEventPayload,
+  ActivityPinResponse,
+  ActivityResponse,
+} from '../../../gen/models';
 
-const updateActivityFromFeedback = <
+export const updateActivityFromFeedback = <
   T extends ActivityResponse | ActivityPinResponse,
 >(
-  feedback: ActivityFeedbackEventPayload,
+  feedback: Pick<ActivityFeedbackEventPayload, 'activity_id' | 'value'>,
   activities: T[] | undefined,
 ) => {
   if (!activities) {
@@ -18,10 +22,16 @@ const updateActivityFromFeedback = <
   }
   return updateEntityInArray<T>({
     entities: activities,
-    matcher: (e) =>
-      isPin(e)
-        ? e.activity.id === feedback.activity_id
-        : e.id === feedback.activity_id,
+    matcher: (e) => {
+      const newHidden = feedback.value === 'true';
+      if (isPin(e)) {
+        return (
+          e.activity.id === feedback.activity_id &&
+          e.activity.hidden !== newHidden
+        );
+      }
+      return e.id === feedback.activity_id && e.hidden !== newHidden;
+    },
     updater: (e) => {
       if (isPin(e)) {
         return {

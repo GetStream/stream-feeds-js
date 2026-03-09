@@ -8,8 +8,11 @@ import {
   generateActivityResponse,
   generateFeedResponse,
   generateOwnUser,
+  generateUserResponseCommonFields,
   getHumanId,
 } from '../../../test-utils/response-generators';
+import { shouldUpdateState } from '../../../utils';
+import type { ActivityResponse } from '../../../gen/models';
 
 describe(handleActivityDeleted.name, () => {
   let feed: Feed;
@@ -113,5 +116,87 @@ describe(handleActivityDeleted.name, () => {
     const stateAfter = feed.currentState;
 
     expect(stateAfter).toBe(stateBefore);
+  });
+
+  describe(`Activity deleted ${shouldUpdateState.name} integration`, () => {
+    const activityId = 'deleted-activity';
+    let existingActivity: ActivityResponse;
+    let currentUserPayload: ReturnType<typeof generateActivityDeletedEvent>;
+
+    beforeEach(() => {
+      existingActivity = generateActivityResponse({ id: activityId });
+      currentUserPayload = generateActivityDeletedEvent({
+        activity: { id: activityId },
+        user: generateUserResponseCommonFields({ id: currentUserId }),
+      });
+
+      feed.state.partialNext({ activities: [existingActivity] });
+      feed.state.partialNext({ watch: true });
+    });
+
+    it(`skips update if ${shouldUpdateState.name} returns false`, () => {
+      // 1. HTTP then WS
+      handleActivityDeleted.call(feed, currentUserPayload, false);
+
+      let stateBefore = feed.currentState;
+
+      handleActivityDeleted.call(feed, currentUserPayload);
+
+      let stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+
+      // Reset state for reverse order test
+      feed.state.partialNext({ activities: [existingActivity] });
+
+      // 2. WS then HTTP
+      handleActivityDeleted.call(feed, currentUserPayload);
+
+      stateBefore = feed.currentState;
+
+      handleActivityDeleted.call(feed, currentUserPayload, false);
+
+      stateAfter = feed.currentState;
+
+      expect(stateAfter).toBe(stateBefore);
+      // @ts-expect-error Using Feed internals for tests only
+      expect(feed.stateUpdateQueue.size).toEqual(0);
+    });
+
+    it('allows update again after clearing the stateUpdateQueue', () => {
+      handleActivityDeleted.call(feed, currentUserPayload, false);
+
+      expect(feed.currentState.activities).toHaveLength(0);
+
+      // Reset state and clear queue
+      const newActivity = generateActivityResponse({ id: activityId });
+      feed.state.partialNext({ activities: [newActivity] });
+      (feed as any).stateUpdateQueue.clear();
+
+      handleActivityDeleted.call(feed, currentUserPayload);
+
+      expect(feed.currentState.activities).toHaveLength(0);
+    });
+
+    it('should not insert anything into the stateUpdateQueue if the connected_user did not trigger the event', () => {
+      const otherUserPayload = generateActivityDeletedEvent({
+        activity: { id: activityId },
+        user: generateUserResponseCommonFields({ id: getHumanId() }),
+      });
+
+      handleActivityDeleted.call(feed, otherUserPayload);
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+
+      // Reset state so the second call has something to delete
+      feed.state.partialNext({ activities: [existingActivity] });
+
+      handleActivityDeleted.call(feed, otherUserPayload);
+
+      expect((feed as any).stateUpdateQueue).toEqual(new Set());
+      expect(feed.currentState.activities).toHaveLength(0);
+    });
   });
 });

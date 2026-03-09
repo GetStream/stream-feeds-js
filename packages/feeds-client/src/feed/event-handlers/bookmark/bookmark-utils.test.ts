@@ -136,10 +136,28 @@ describe('bookmark-utils', () => {
     it('should handle existing bookmarks correctly', () => {
       const activity = generateActivityResponse({ id: 'activity1' });
       const user = generateUserResponse({ id: 'user1' });
-      const existingBookmark = createMockBookmark(user, activity);
+      const existingBookmark = {
+        ...createMockBookmark(user, activity),
+        folder: {
+          id: 'folder1',
+          name: 'Folder 1',
+          created_at: new Date(),
+          updated_at: new Date(),
+          custom: {},
+        },
+      };
       activity.own_bookmarks = [existingBookmark];
 
-      const newBookmark = createMockBookmark(user, activity);
+      const newBookmark = {
+        ...createMockBookmark(user, activity),
+        folder: {
+          id: 'folder2',
+          name: 'Folder 2',
+          created_at: new Date(),
+          updated_at: new Date(),
+          custom: {},
+        },
+      };
       const event = createMockAddedEvent(newBookmark);
 
       const result = addBookmarkToActivity(event, activity, true);
@@ -265,12 +283,16 @@ describe('bookmark-utils', () => {
     it('should update bookmark in own_bookmarks when from current user', () => {
       const activity = generateActivityResponse({ id: 'activity1' });
       const user = generateUserResponse({ id: 'user1' });
-      const bookmark = createMockBookmark(user, activity);
+      const bookmark = {
+        ...createMockBookmark(user, activity),
+        updated_at: new Date('2025-01-01T00:00:00Z'),
+      };
       activity.own_bookmarks = [bookmark];
 
       const updatedBookmark = {
         ...bookmark,
         custom: { updated: true },
+        updated_at: new Date('2025-01-02T00:00:00Z'),
       };
       const event = createMockUpdatedEvent(updatedBookmark);
       const result = updateBookmarkInActivity(event, activity, true);
@@ -283,12 +305,16 @@ describe('bookmark-utils', () => {
     it('should not update bookmark in own_bookmarks when not from current user', () => {
       const activity = generateActivityResponse({ id: 'activity1' });
       const user = generateUserResponse({ id: 'user1' });
-      const bookmark = createMockBookmark(user, activity);
+      const bookmark = {
+        ...createMockBookmark(user, activity),
+        updated_at: new Date('2025-01-01T00:00:00Z'),
+      };
       activity.own_bookmarks = [bookmark];
 
       const updatedBookmark = {
         ...bookmark,
         custom: { updated: true },
+        updated_at: new Date('2025-01-02T00:00:00Z'),
       };
       const event = createMockUpdatedEvent(updatedBookmark);
       const result = updateBookmarkInActivity(event, activity, false);
@@ -306,6 +332,7 @@ describe('bookmark-utils', () => {
       // Create two bookmarks with same activity and user but different folders
       const bookmark1 = {
         ...createMockBookmark(user, activity),
+        updated_at: new Date('2025-01-01T00:00:00Z'),
         folder: {
           id: 'folder1',
           name: 'Folder 1',
@@ -316,6 +343,7 @@ describe('bookmark-utils', () => {
       };
       const bookmark2 = {
         ...createMockBookmark(user, activity),
+        updated_at: new Date('2025-01-01T00:00:00Z'),
         folder: {
           id: 'folder2',
           name: 'Folder 2',
@@ -331,6 +359,7 @@ describe('bookmark-utils', () => {
       const updatedBookmark1 = {
         ...bookmark1,
         custom: { updated: true },
+        updated_at: new Date('2025-01-02T00:00:00Z'),
       };
       const event = createMockUpdatedEvent(updatedBookmark1);
       const result = updateBookmarkInActivity(event, activity, true);
@@ -348,6 +377,7 @@ describe('bookmark-utils', () => {
       // Create two bookmarks: one with folder, one without
       const bookmarkWithFolder = {
         ...createMockBookmark(user, activity),
+        updated_at: new Date('2025-01-01T00:00:00Z'),
         folder: {
           id: 'folder1',
           name: 'Folder 1',
@@ -356,7 +386,10 @@ describe('bookmark-utils', () => {
           custom: {},
         },
       };
-      const bookmarkWithoutFolder = createMockBookmark(user, activity);
+      const bookmarkWithoutFolder = {
+        ...createMockBookmark(user, activity),
+        updated_at: new Date('2025-01-01T00:00:00Z'),
+      };
 
       activity.own_bookmarks = [bookmarkWithFolder, bookmarkWithoutFolder];
 
@@ -364,6 +397,7 @@ describe('bookmark-utils', () => {
       const updatedBookmarkWithoutFolder = {
         ...bookmarkWithoutFolder,
         custom: { updated: true },
+        updated_at: new Date('2025-01-02T00:00:00Z'),
       };
       const event = createMockUpdatedEvent(updatedBookmarkWithoutFolder);
       const result = updateBookmarkInActivity(event, activity, true);
@@ -473,13 +507,17 @@ describe('bookmark-utils', () => {
       const activity1 = generateActivityResponse({ id: 'activity1' });
       const activity2 = generateActivityResponse({ id: 'activity2' });
       const user = generateUserResponse({ id: 'user1' });
-      const bookmark = createMockBookmark(user, activity1);
+      const bookmark = {
+        ...createMockBookmark(user, activity1),
+        updated_at: new Date('2025-01-01T00:00:00Z'),
+      };
       activity1.own_bookmarks = [bookmark];
       const activities = [activity1, activity2];
 
       const updatedBookmark = {
         ...bookmark,
         custom: { updated: true },
+        updated_at: new Date('2025-01-02T00:00:00Z'),
       };
       const event = createMockUpdatedEvent(updatedBookmark);
       const result = updateBookmarkInActivities(event, activities, true);

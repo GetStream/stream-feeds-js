@@ -37,6 +37,13 @@ export function handleFollowUpdated(
         ...currentState,
         // Update FeedResponse fields, that has the new follower/following count
         ...follow.source_feed,
+        ...(follow.source_feed.own_capabilities !== undefined
+          ? {
+              own_capabilities: follow.source_feed.own_capabilities,
+              own_follows: follow.source_feed.own_follows,
+              own_followings: follow.source_feed.own_followings,
+            }
+          : {}),
       };
 
       const index =
@@ -58,6 +65,13 @@ export function handleFollowUpdated(
         ...currentState,
         // Update FeedResponse fields, that has the new follower/following count
         ...follow.target_feed,
+        ...(follow.target_feed.own_capabilities !== undefined
+          ? {
+              own_capabilities: follow.target_feed.own_capabilities,
+              own_follows: follow.target_feed.own_follows,
+              own_followings: follow.target_feed.own_followings,
+            }
+          : {}),
       };
 
       if (
