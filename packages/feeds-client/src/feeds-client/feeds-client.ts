@@ -815,13 +815,18 @@ export class FeedsClient extends FeedsApi {
     ...args: Parameters<FeedsApi['pinActivity']>
   ): Promise<StreamResponse<PinActivityResponse>> => {
     const response = await super.pinActivity(...args);
-    for (const feed of this.allActiveFeeds) {
-      handleActivityPinned.bind(feed)(
-        { pinned_activity: response } as Parameters<
-          typeof handleActivityPinned
-        >[0],
-        false,
-      );
+    const feedIds =
+      response.activity?.feeds ?? (response.feed ? [response.feed] : []);
+    for (const fid of feedIds) {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        handleActivityPinned.bind(feed)(
+          { pinned_activity: response } as Parameters<
+            typeof handleActivityPinned
+          >[0],
+          false,
+        );
+      }
     }
     return response;
   };
@@ -830,16 +835,21 @@ export class FeedsClient extends FeedsApi {
     ...args: Parameters<FeedsApi['unpinActivity']>
   ): Promise<StreamResponse<UnpinActivityResponse>> => {
     const response = await super.unpinActivity(...args);
-    for (const feed of this.allActiveFeeds) {
-      handleActivityUnpinned.bind(feed)(
-        {
-          pinned_activity: {
-            ...response,
-            created_at: new Date(),
-          },
-        } as Parameters<typeof handleActivityUnpinned>[0],
-        false,
-      );
+    const feedIds =
+      response.activity?.feeds ?? (response.feed ? [response.feed] : []);
+    for (const fid of feedIds) {
+      const feed = this.activeFeeds[fid];
+      if (feed) {
+        handleActivityUnpinned.bind(feed)(
+          {
+            pinned_activity: {
+              ...response,
+              created_at: new Date(),
+            },
+          } as Parameters<typeof handleActivityUnpinned>[0],
+          false,
+        );
+      }
     }
     return response;
   };
