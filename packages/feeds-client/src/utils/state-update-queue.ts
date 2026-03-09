@@ -15,6 +15,9 @@ import type {
 import { ensureExhausted } from './ensure-exhausted';
 import type { CommentReactionUpdatedPayload } from '../feed/event-handlers/comment/handle-comment-reaction-updated';
 import type { ActivityReactionUpdatedPayload } from '../feed/event-handlers/activity/handle-activity-reaction-updated';
+import type { FeedMemberAddedPayload } from '../feed/event-handlers/feed-member/handle-feed-member-added';
+import type { FeedMemberUpdatedPayload } from '../feed/event-handlers/feed-member/handle-feed-member-updated';
+import type { FeedMemberRemovedPayload } from '../feed/event-handlers/feed-member/handle-feed-member-removed';
 
 export type StateUpdateQueuePrefix =
   | 'activity-deleted'
@@ -32,7 +35,10 @@ export type StateUpdateQueuePrefix =
   | 'follow-updated'
   | 'comment-created'
   | 'comment-deleted'
-  | 'comment-updated';
+  | 'comment-updated'
+  | 'feed-member-added'
+  | 'feed-member-updated'
+  | 'feed-member-removed';
 
 type StateUpdateQueuePayloadByPrefix = {
   'activity-deleted': ActivityDeletedPayload;
@@ -51,6 +57,9 @@ type StateUpdateQueuePayloadByPrefix = {
   'comment-created': CommentAddedPayload;
   'comment-deleted': CommentDeletedPayload;
   'comment-updated': CommentUpdatedPayload;
+  'feed-member-added': FeedMemberAddedPayload;
+  'feed-member-updated': FeedMemberUpdatedPayload;
+  'feed-member-removed': FeedMemberRemovedPayload;
 };
 
 // Union of ([payload, prefix]) tuples:
@@ -201,6 +210,13 @@ export function getStateUpdateQueueId(...args: StateUpdateQueuePairTuples) {
       return toJoin
         .concat([data.source_feed.feed, data.target_feed.feed])
         .join('-');
+    }
+    case 'feed-member-added':
+    case 'feed-member-updated': {
+      return toJoin.concat([data.member.user.id]).join('-');
+    }
+    case 'feed-member-removed': {
+      return toJoin.concat([data.member_id]).join('-');
     }
     default: {
       ensureExhausted(data, 'Encountered unknown state update queue prefix.');

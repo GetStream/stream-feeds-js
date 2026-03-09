@@ -1,5 +1,6 @@
 import { FeedsApi } from '../gen/feeds/FeedsApi';
 import type {
+  AcceptFeedMemberInviteResponse,
   ActivityFeedbackRequest,
   ActivityFeedbackResponse,
   ActivityResponse,
@@ -36,6 +37,7 @@ import type {
   PollVotesResponse,
   QueryFeedsRequest,
   QueryPollVotesRequest,
+  RejectFeedMemberInviteResponse,
   UnfollowBatchRequest,
   UnpinActivityResponse,
   UpdateActivityPartialResponse,
@@ -45,6 +47,7 @@ import type {
   UpdateBookmarkResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
+  UpdateFeedMembersResponse,
   UpdateFeedResponse,
   UpdateFollowRequest,
   UpdatePollPartialRequest,
@@ -97,6 +100,9 @@ import {
   handleCommentReactionDeleted,
   handleCommentUpdated,
   handleFeedDeleted,
+  handleFeedMemberAdded,
+  handleFeedMemberRemoved,
+  handleFeedMemberUpdated,
   handleFeedUpdated,
   handleFollowCreated,
   handleFollowDeleted,
@@ -870,6 +876,50 @@ export class FeedsClient extends FeedsApi {
           (activity) => getFeed.call(activity)?.feed !== fid,
         );
       }
+    }
+    return response;
+  };
+
+  updateFeedMembers = async (
+    ...args: Parameters<FeedsApi['updateFeedMembers']>
+  ): Promise<StreamResponse<UpdateFeedMembersResponse>> => {
+    const response = await super.updateFeedMembers(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      for (const member of response.added) {
+        handleFeedMemberAdded.call(feed, { member }, false);
+      }
+      for (const member of response.updated) {
+        handleFeedMemberUpdated.call(feed, { member }, false);
+      }
+      for (const memberId of response.removed_ids) {
+        handleFeedMemberRemoved.call(feed, { member_id: memberId }, false);
+      }
+    }
+    return response;
+  };
+
+  acceptFeedMemberInvite = async (
+    ...args: Parameters<FeedsApi['acceptFeedMemberInvite']>
+  ): Promise<StreamResponse<AcceptFeedMemberInviteResponse>> => {
+    const response = await super.acceptFeedMemberInvite(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      handleFeedMemberUpdated.call(feed, { member: response.member }, false);
+    }
+    return response;
+  };
+
+  rejectFeedMemberInvite = async (
+    ...args: Parameters<FeedsApi['rejectFeedMemberInvite']>
+  ): Promise<StreamResponse<RejectFeedMemberInviteResponse>> => {
+    const response = await super.rejectFeedMemberInvite(...args);
+    const fid = `${args[0].feed_group_id}:${args[0].feed_id}`;
+    const feed = this.activeFeeds[fid];
+    if (feed) {
+      handleFeedMemberUpdated.call(feed, { member: response.member }, false);
     }
     return response;
   };
