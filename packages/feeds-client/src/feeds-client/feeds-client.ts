@@ -1037,6 +1037,20 @@ export class FeedsClient extends FeedsApi {
     return response;
   }
 
+  async acceptFollow(...args: Parameters<FeedsApi['acceptFollow']>) {
+    const response = await super.acceptFollow(...args);
+
+    [
+      response.follow.source_feed.feed,
+      response.follow.target_feed.feed,
+    ].forEach((fid) => {
+      const feeds = this.findAllActiveFeedsByFid(fid);
+      feeds.forEach((f) => handleFollowUpdated.bind(f)(response, false));
+    });
+
+    return response;
+  }
+
   // For follow API endpoints we update the state after HTTP response to allow queryFeeds with watch: false
   async follow(request: FollowRequest) {
     const response = await super.follow(request);

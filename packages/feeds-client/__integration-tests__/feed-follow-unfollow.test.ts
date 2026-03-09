@@ -147,6 +147,68 @@ describe('Feed follow and unfollow', () => {
     });
   });
 
+  describe('acceptFollow state update', () => {
+    let serverClient: StreamClient;
+    let client: FeedsClient;
+    let myFeed: ReturnType<FeedsClient['feed']>;
+    const user: UserRequest = getTestUser('accept-follow');
+    const secondUser: UserRequest = getTestUser('accept-follow-requester');
+
+    let secondUserTimeline: ReturnType<StreamClient['feeds']['feed']>;
+
+    beforeAll(async () => {
+      serverClient = getServerClient();
+      await serverClient.upsertUsers([secondUser]);
+
+      client = createTestClient();
+      await client.connectUser(user, createTestTokenGenerator(user));
+
+      // Create a followers-only feed owned by the current user
+      myFeed = client.feed('user', user.id);
+      await myFeed.getOrCreate({
+        watch: false,
+        data: {
+          visibility: 'followers',
+        },
+      });
+
+      // Create a timeline feed for the second user (the one requesting to follow)
+      secondUserTimeline = serverClient.feeds.feed('timeline', secondUser.id);
+      await secondUserTimeline.getOrCreate({
+        user: { id: secondUser.id },
+      });
+    });
+
+    it('should update state when accepting a follow request', async () => {
+      // Second user follows the current user's followers-only feed (creates a pending follow)
+      await serverClient.feeds.follow({
+        source: secondUserTimeline.feed,
+        target: myFeed.feed,
+      });
+
+      // Current user accepts the follow request
+      await client.acceptFollow({
+        source: secondUserTimeline.feed,
+        target: myFeed.feed,
+      });
+
+      // Verify my feed state (followers)
+      expect(myFeed.currentState.follower_count).toBeGreaterThanOrEqual(1);
+    });
+
+    afterAll(async () => {
+      await myFeed.delete({ hard_delete: true });
+      await secondUserTimeline.delete({ hard_delete: true });
+
+      await client.disconnectUser();
+
+      await serverClient.deleteUsers({
+        user_ids: [secondUser.id],
+        user: 'hard',
+      });
+    });
+  });
+
   describe('state update with watching', () => {
     let serverClient: StreamClient;
     let client: FeedsClient;
