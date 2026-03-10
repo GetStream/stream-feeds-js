@@ -70,6 +70,7 @@ describe('deleteActivity state deduplication with watch', () => {
   });
 
   afterAll(async () => {
+    await feed.delete({ hard_delete: true });
     await client.disconnectUser();
   });
 
@@ -82,30 +83,23 @@ describe('deleteActivity state deduplication with watch', () => {
     });
     const activityId = response.activity.id;
 
-    await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 10000 });
-
     expect(feed.state.getLatestValue().activities?.length).toBe(1);
 
-    // Subscribe spy to track state changes
+    // Subscribe spy to track state changes (exactly one update expected after dedup)
     const stateChangeSpy = vi.fn();
     const unsubscribe = feed.state.subscribe(stateChangeSpy);
     stateChangeSpy.mockClear();
 
-    // Delete the activity — HTTP response triggers state update
-    await client.deleteActivity({ id: activityId });
+    // Wait for both HTTP and WS so we don't depend on arrival order (WS can beat HTTP).
+    const deletePromise = client.deleteActivity({ id: activityId });
+    const wsEventPromise = waitForEvent(feed, 'feeds.activity.deleted', {
+      timeoutMs: 10000,
+    });
+    await Promise.all([deletePromise, wsEventPromise]);
 
+    // State should show 0 activities; dedup ensures only one state update
     expect(feed.state.getLatestValue().activities?.length).toBe(0);
-
-    const stateChangeCountAfterHttp = stateChangeSpy.mock.calls.length;
-    expect(stateChangeCountAfterHttp).toBeGreaterThanOrEqual(1);
-
-    // Wait for the WS event (should be deduplicated, no additional state change)
-    await waitForEvent(feed, 'feeds.activity.deleted', { timeoutMs: 10000 });
-
-    // State should still show 0 activities — WS event was deduplicated
-    expect(feed.state.getLatestValue().activities?.length).toBe(0);
-    // No additional state change from the WS event
-    expect(stateChangeSpy.mock.calls.length).toBe(stateChangeCountAfterHttp);
+    expect(stateChangeSpy.mock.calls.length).toBe(1);
 
     unsubscribe();
   });
