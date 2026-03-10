@@ -1,5 +1,4 @@
 import type { AggregatedActivityResponse, UserResponse } from '@stream-io/feeds-react-sdk';
-import { useIsAggregatedActivityRead } from '@stream-io/feeds-react-sdk';
 import { useMemo } from 'react';
 import { NavLink } from '../utility/NavLink';
 import { Avatar } from '../utility/Avatar';
@@ -13,9 +12,7 @@ export const Notification = ({
 }: {
   notification: AggregatedActivityResponse;
 }) => {
-  const isRead = useIsAggregatedActivityRead({
-    aggregatedActivity: notification,
-  });
+  const isRead = notification.is_read;
   const content = useMemo(() => {
     const action = notification.activities[0].type;
 
