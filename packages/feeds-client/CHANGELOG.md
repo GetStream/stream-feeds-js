@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.1.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.0.0...@stream-io/feeds-client-1.1.0) (2026-03-10)
+
+
+### Features
+
+* ensure correct is_read and is_seen state for older notifications too ([#255](https://github.com/GetStream/stream-feeds-js/issues/255)) ([2eb2fb2](https://github.com/GetStream/stream-feeds-js/commit/2eb2fb250e0589f767c126b568af4e4e3c7ccefc))
+* update sdk, add activity metrics endpoints ([#259](https://github.com/GetStream/stream-feeds-js/issues/259)) ([9b27b59](https://github.com/GetStream/stream-feeds-js/commit/9b27b59ef513448f28211471ebb54ae4710f48ea))
+* update state from HTTP response - implemented for all feeds methods (useful is feed is not watched) ([#261](https://github.com/GetStream/stream-feeds-js/issues/261)) ([5f52a34](https://github.com/GetStream/stream-feeds-js/commit/5f52a346956333a9ce9f8c5aa3dbf2b6cb663702))
+
 ## [1.0.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-0.3.51...@stream-io/feeds-client-1.0.0) (2026-03-06)
 
 
