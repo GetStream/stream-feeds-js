@@ -865,6 +865,7 @@ export class FeedsClient extends FeedsApi {
         typeof handleFeedUpdated
       >[0]);
     }
+    this.checkIfOwnFieldsChanged(response.feed, !!args[0].enrich_own_fields);
     return response;
   };
 
@@ -1094,6 +1095,14 @@ export class FeedsClient extends FeedsApi {
       feeds.forEach((f) => handleFollowUpdated.bind(f)(response, false));
     });
 
+    this.checkIfOwnFieldsChanged(
+      response.follow.source_feed,
+      !!request.enrich_own_fields,
+    );
+    this.checkIfOwnFieldsChanged(
+      response.follow.target_feed,
+      !!request.enrich_own_fields,
+    );
     return response;
   }
 
@@ -1115,7 +1124,14 @@ export class FeedsClient extends FeedsApi {
   async follow(request: FollowRequest) {
     const response = await super.follow(request);
     this.updateStateFromFollows([response.follow], !!request.enrich_own_fields);
-
+    this.checkIfOwnFieldsChanged(
+      response.follow.source_feed,
+      !!request.enrich_own_fields,
+    );
+    this.checkIfOwnFieldsChanged(
+      response.follow.target_feed,
+      !!request.enrich_own_fields,
+    );
     return response;
   }
 
@@ -1127,7 +1143,11 @@ export class FeedsClient extends FeedsApi {
   async followBatch(request: FollowBatchRequest) {
     const response = await super.followBatch(request);
     this.updateStateFromFollows(response.follows, !!request.enrich_own_fields);
-
+    const enrichOwnFields = !!request.enrich_own_fields;
+    for (const follow of response.follows) {
+      this.checkIfOwnFieldsChanged(follow.source_feed, enrichOwnFields);
+      this.checkIfOwnFieldsChanged(follow.target_feed, enrichOwnFields);
+    }
     return response;
   }
 
@@ -1135,7 +1155,12 @@ export class FeedsClient extends FeedsApi {
     const response = await super.getOrCreateFollows(request);
 
     this.updateStateFromFollows(response.created, !!request.enrich_own_fields);
-
+    const enrichOwnFields = !!request.enrich_own_fields;
+    const allFollows = [...response.created, ...response.follows];
+    for (const follow of allFollows) {
+      this.checkIfOwnFieldsChanged(follow.source_feed, enrichOwnFields);
+      this.checkIfOwnFieldsChanged(follow.target_feed, enrichOwnFields);
+    }
     return response;
   }
 
@@ -1146,14 +1171,25 @@ export class FeedsClient extends FeedsApi {
   }) {
     const response = await super.unfollow(request);
     this.updateStateFromUnfollows([response.follow]);
-
+    this.checkIfOwnFieldsChanged(
+      response.follow.source_feed,
+      !!request.enrich_own_fields,
+    );
+    this.checkIfOwnFieldsChanged(
+      response.follow.target_feed,
+      !!request.enrich_own_fields,
+    );
     return response;
   }
 
   async getOrCreateUnfollows(request: UnfollowBatchRequest) {
     const response = await super.getOrCreateUnfollows(request);
     this.updateStateFromUnfollows(response.follows);
-
+    const enrichOwnFields = !!request.enrich_own_fields;
+    for (const follow of response.follows) {
+      this.checkIfOwnFieldsChanged(follow.source_feed, enrichOwnFields);
+      this.checkIfOwnFieldsChanged(follow.target_feed, enrichOwnFields);
+    }
     return response;
   }
 
@@ -1309,6 +1345,25 @@ export class FeedsClient extends FeedsApi {
 
     return feed;
   };
+
+  private checkIfOwnFieldsChanged(
+    feed: FeedResponse,
+    enrichOwnFields: boolean,
+  ) {
+    if (!enrichOwnFields || !this.activeFeeds[feed.feed]) return false;
+
+    this.getOrCreateActiveFeed({
+      group: feed.group_id,
+      id: feed.id,
+      data: feed,
+      fieldsToUpdate: [
+        'own_capabilities',
+        'own_follows',
+        'own_membership',
+        'own_followings',
+      ],
+    });
+  }
 
   private findAllActiveFeedsByActivityId(activityId: string) {
     return [

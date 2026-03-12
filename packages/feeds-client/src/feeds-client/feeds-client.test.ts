@@ -5,9 +5,12 @@ import {
   generateFeedMemberResponse,
   generateFeedResponse,
   generateFollowResponse,
+  generateOwnUser,
+  generateUserResponse,
 } from '../test-utils';
 import { FeedOwnCapability } from '..';
 import { StreamApiError } from '../common/types';
+import { handleFollowCreated } from '../feed';
 
 describe('Feeds client tests', () => {
   let client: FeedsClient;
@@ -793,6 +796,95 @@ describe('Feeds client tests', () => {
 
       expect(superOwnBatchSpy).toHaveBeenCalledTimes(3);
       expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('follow with enrich_own_fields and checkIfOwnFieldsChanged', () => {
+    it('updates own_capabilities when HTTP resolves after WS event (WS has no own_* fields)', async () => {
+      const connectedUserId = 'me-user-id';
+      client.state.partialNext({
+        connected_user: generateOwnUser({ id: connectedUserId }),
+      });
+
+      const initialData = generateFeedResponse({
+        feed: 'timeline:me',
+        id: 'me',
+        group_id: 'timeline',
+        own_capabilities: [],
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'timeline',
+        id: 'me',
+        data: initialData,
+        fieldsToUpdate: [],
+      });
+      const feed = client['activeFeeds']['timeline:me'];
+      feed.state.partialNext({ following: [] });
+      expect(feed.currentState.own_capabilities).toEqual([]);
+
+      let resolveFollow: (value: any) => void;
+      const followPromise = new Promise<any>((resolve) => {
+        resolveFollow = resolve;
+      });
+      const superFollowSpy = vi.spyOn(
+        Object.getPrototypeOf(Object.getPrototypeOf(client)),
+        'follow',
+      );
+      superFollowSpy.mockImplementation(() => followPromise);
+
+      const followRequestPromise = client.follow({
+        source: 'timeline:me',
+        target: 'user:other',
+        enrich_own_fields: true,
+      });
+
+      const wsFollow = generateFollowResponse({
+        source_feed: generateFeedResponse({
+          feed: 'timeline:me',
+          id: 'me',
+          group_id: 'timeline',
+          own_capabilities: [],
+          created_by: generateUserResponse({ id: connectedUserId }),
+        }),
+        target_feed: generateFeedResponse({
+          feed: 'user:other',
+          id: 'other',
+          group_id: 'user',
+        }),
+        status: 'accepted',
+      });
+      handleFollowCreated.call(feed, { follow: wsFollow }, true, false);
+
+      expect(feed.currentState.following).toHaveLength(1);
+      expect(feed.currentState.own_capabilities).toEqual([]);
+
+      const httpFollowResponse = generateFollowResponse({
+        source_feed: generateFeedResponse({
+          feed: 'timeline:me',
+          id: 'me',
+          group_id: 'timeline',
+          own_capabilities: [FeedOwnCapability.ADD_ACTIVITY],
+          created_by: generateUserResponse({ id: connectedUserId }),
+        }),
+        target_feed: generateFeedResponse({
+          feed: 'user:other',
+          id: 'other',
+          group_id: 'user',
+          own_capabilities: [FeedOwnCapability.ADD_ACTIVITY],
+        }),
+        status: 'accepted',
+      });
+      resolveFollow!({
+        follow: httpFollowResponse,
+        metadata: {},
+      });
+
+      await followRequestPromise;
+
+      expect(feed.currentState.own_capabilities).toEqual([
+        FeedOwnCapability.ADD_ACTIVITY,
+      ]);
+      superFollowSpy.mockRestore();
     });
   });
 });
