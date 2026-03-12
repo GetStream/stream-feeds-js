@@ -1346,6 +1346,8 @@ export class FeedsClient extends FeedsApi {
     return feed;
   };
 
+  // Used when updating from HTTP responses to check if own_* fields have changed
+  // It'll do a state update if WS update ran before HTTP, but WS doesn't have own_* fields
   private checkIfOwnFieldsChanged(
     feed: FeedResponse,
     enrichOwnFields: boolean,
