@@ -53,7 +53,7 @@
     "@babel/core": "^7.25.2",
     "@rnx-kit/metro-config": "^2.1.0",
     "@rnx-kit/metro-resolver-symlinks": "^0.2.5",
-    "@stream-io/node-sdk": "^0.6.2",
+    "@stream-io/node-sdk": "catalog:",
     "@types/react": "catalog:",
     "dotenv": "^17.2.2",
     "jest": "^29.7.0",

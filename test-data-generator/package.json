@@ -16,7 +16,7 @@
     "download-images": "tsx src/download-images.ts"
   },
   "dependencies": {
-    "@stream-io/node-sdk": "0.7.36",
+    "@stream-io/node-sdk": "catalog:",
     "dotenv": "^16.4.7"
   },
   "devDependencies": {
