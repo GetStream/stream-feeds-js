@@ -11,7 +11,7 @@ const external = [
 
 export default defineConfig({
   optimizeDeps: {
-    esbuildOptions: {
+    rolldownOptions: {
       tsconfig: resolve(__dirname, 'tsconfig.lib.json'),
     },
   },
