@@ -5,9 +5,12 @@ import {
   generateFeedMemberResponse,
   generateFeedResponse,
   generateFollowResponse,
+  generateOwnUser,
+  generateUserResponse,
 } from '../test-utils';
 import { FeedOwnCapability } from '..';
 import { StreamApiError } from '../common/types';
+import { handleFollowCreated } from '../feed';
 
 describe('Feeds client tests', () => {
   let client: FeedsClient;
@@ -634,6 +637,46 @@ describe('Feeds client tests', () => {
 
       expect(spy).toHaveBeenCalledTimes(0);
     });
+
+    it('should update own fields when feed is already watching and fieldsToUpdate is non-empty', async () => {
+      const ownFollows = [
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+          target_feed: generateFeedResponse({ feed: 'user:123' }),
+        }),
+      ];
+      const data = generateFeedResponse({
+        feed: 'user:123',
+        own_follows: ownFollows,
+        own_capabilities: [FeedOwnCapability.ADD_ACTIVITY],
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data,
+        watch: true,
+        fieldsToUpdate: [],
+      });
+
+      const newFollow = generateFollowResponse({
+        source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+        target_feed: generateFeedResponse({ feed: 'user:456' }),
+      });
+      const newData = { ...data };
+      newData.own_follows = [...ownFollows, newFollow];
+
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data: newData,
+        watch: true,
+        fieldsToUpdate: ['own_follows'],
+      });
+
+      expect(
+        client['activeFeeds']['user:123']?.currentState.own_follows,
+      ).toEqual(newData.own_follows);
+    });
   });
 
   describe('ownBatch retry', () => {
@@ -703,7 +746,8 @@ describe('Feeds client tests', () => {
       const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
 
       // Set up expectation before running timers to avoid unhandled rejection
-      const expectPromise = expect(resultPromise).rejects.toThrow('Persistent error');
+      const expectPromise =
+        expect(resultPromise).rejects.toThrow('Persistent error');
       await vi.runAllTimersAsync();
       await expectPromise;
 
@@ -711,14 +755,19 @@ describe('Feeds client tests', () => {
     });
 
     it('should not retry on 4xx client errors', async () => {
-      const clientError = new StreamApiError('Bad Request', { response_code: 400 }, 4);
+      const clientError = new StreamApiError(
+        'Bad Request',
+        { response_code: 400 },
+        4,
+      );
       superOwnBatchSpy.mockRejectedValue(clientError);
 
       retryClient.feed('user', '123');
       const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
 
       // Set up expectation before running timers to avoid unhandled rejection
-      const expectPromise = expect(resultPromise).rejects.toThrow('Bad Request');
+      const expectPromise =
+        expect(resultPromise).rejects.toThrow('Bad Request');
       await vi.runAllTimersAsync();
       await expectPromise;
 
@@ -726,7 +775,11 @@ describe('Feeds client tests', () => {
     });
 
     it('should retry on 5xx server errors', async () => {
-      const serverError = new StreamApiError('Internal Server Error', { response_code: 500 }, 16);
+      const serverError = new StreamApiError(
+        'Internal Server Error',
+        { response_code: 500 },
+        16,
+      );
       const mockResponse = {
         data: { 'user:123': { own_capabilities: ['add_activity'] } },
       };
@@ -743,6 +796,95 @@ describe('Feeds client tests', () => {
 
       expect(superOwnBatchSpy).toHaveBeenCalledTimes(3);
       expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('follow with enrich_own_fields and checkIfOwnFieldsChanged', () => {
+    it('updates own_capabilities when HTTP resolves after WS event (WS has no own_* fields)', async () => {
+      const connectedUserId = 'me-user-id';
+      client.state.partialNext({
+        connected_user: generateOwnUser({ id: connectedUserId }),
+      });
+
+      const initialData = generateFeedResponse({
+        feed: 'timeline:me',
+        id: 'me',
+        group_id: 'timeline',
+        own_capabilities: [],
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'timeline',
+        id: 'me',
+        data: initialData,
+        fieldsToUpdate: [],
+      });
+      const feed = client['activeFeeds']['timeline:me'];
+      feed.state.partialNext({ following: [], watch: true });
+      expect(feed.currentState.own_capabilities).toEqual([]);
+
+      let resolveFollow: (value: any) => void;
+      const followPromise = new Promise<any>((resolve) => {
+        resolveFollow = resolve;
+      });
+      const superFollowSpy = vi.spyOn(
+        Object.getPrototypeOf(Object.getPrototypeOf(client)),
+        'follow',
+      );
+      superFollowSpy.mockImplementation(() => followPromise);
+
+      const followRequestPromise = client.follow({
+        source: 'timeline:me',
+        target: 'user:other',
+        enrich_own_fields: true,
+      });
+
+      const wsFollow = generateFollowResponse({
+        source_feed: generateFeedResponse({
+          feed: 'timeline:me',
+          id: 'me',
+          group_id: 'timeline',
+          own_capabilities: [],
+          created_by: generateUserResponse({ id: connectedUserId }),
+        }),
+        target_feed: generateFeedResponse({
+          feed: 'user:other',
+          id: 'other',
+          group_id: 'user',
+        }),
+        status: 'accepted',
+      });
+      handleFollowCreated.call(feed, { follow: wsFollow }, true, false);
+
+      expect(feed.currentState.following).toHaveLength(1);
+      expect(feed.currentState.own_capabilities).toEqual([]);
+
+      const httpFollowResponse = generateFollowResponse({
+        source_feed: generateFeedResponse({
+          feed: 'timeline:me',
+          id: 'me',
+          group_id: 'timeline',
+          own_capabilities: [FeedOwnCapability.ADD_ACTIVITY],
+          created_by: generateUserResponse({ id: connectedUserId }),
+        }),
+        target_feed: generateFeedResponse({
+          feed: 'user:other',
+          id: 'other',
+          group_id: 'user',
+          own_capabilities: [FeedOwnCapability.ADD_ACTIVITY],
+        }),
+        status: 'accepted',
+      });
+      resolveFollow!({
+        follow: httpFollowResponse,
+        metadata: {},
+      });
+
+      await followRequestPromise;
+
+      expect(feed.currentState.own_capabilities).toEqual([
+        FeedOwnCapability.ADD_ACTIVITY,
+      ]);
+      superFollowSpy.mockRestore();
     });
   });
 });

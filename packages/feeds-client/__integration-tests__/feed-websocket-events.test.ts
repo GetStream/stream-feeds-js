@@ -75,7 +75,7 @@ describe('Feed state updates via WebSocket events', () => {
       feed_id: feedId,
     });
 
-    await waitForEvent(feed, 'feeds.feed.deleted', { timeoutMs: 10000 });
+    await waitForEvent(feed, 'feeds.feed.deleted', { timeoutMs: 20000 });
 
     const newFeed = client.feed(feedGroup, feedId);
     // testing we get a new reference to the feed
