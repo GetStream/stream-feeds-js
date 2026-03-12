@@ -31,7 +31,7 @@ export default defineConfig({
     minify: false,
     sourcemap: true,
     target: 'es2020',
-    rollupOptions: {
+    rolldownOptions: {
       external,
     },
   },
