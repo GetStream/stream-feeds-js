@@ -819,7 +819,7 @@ describe('Feeds client tests', () => {
         fieldsToUpdate: [],
       });
       const feed = client['activeFeeds']['timeline:me'];
-      feed.state.partialNext({ following: [] });
+      feed.state.partialNext({ following: [], watch: true });
       expect(feed.currentState.own_capabilities).toEqual([]);
 
       let resolveFollow: (value: any) => void;
