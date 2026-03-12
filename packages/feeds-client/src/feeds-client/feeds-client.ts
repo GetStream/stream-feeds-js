@@ -1253,6 +1253,7 @@ export class FeedsClient extends FeedsApi {
       feed.onNewActivity = options.onNewActivity;
     }
 
+    let wasFullUpdate = isCreated;
     if (!feed.currentState.watch) {
       if (!isCreated && data) {
         if (
@@ -1260,49 +1261,50 @@ export class FeedsClient extends FeedsApi {
           data.updated_at.getTime()
         ) {
           handleFeedUpdated.call(feed, { feed: data });
-        } else if (
-          (feed.currentState.updated_at?.getTime() ?? 0) ===
-          data.updated_at.getTime()
-        ) {
-          const fieldsToUpdateData: Array<keyof FeedResponse> = [];
-          const fieldChecks: Array<
-            [
-              (
-                | 'own_capabilities'
-                | 'own_follows'
-                | 'own_membership'
-                | 'own_followings'
-              ),
-              (currentState: FeedState, newState: FeedResponse) => boolean,
-            ]
-          > = [
-            ['own_capabilities', isOwnCapabilitiesEqual],
-            ['own_follows', isOwnFollowsEqual],
-            ['own_membership', isOwnMembershipEqual],
-            ['own_followings', isOwnFollowingsEqual],
-          ];
-          fieldChecks.forEach(([field, isEqual]) => {
-            if (
-              fieldsToUpdate.includes(field) &&
-              !isEqual(feed.currentState, data)
-            ) {
-              fieldsToUpdateData.push(field);
-            }
-          });
-          if (fieldsToUpdateData.length > 0) {
-            const fieldsToUpdatePayload = fieldsToUpdateData.reduce(
-              (acc: Partial<FeedResponse>, field) => {
-                // @ts-expect-error TODO: fix this
-                acc[field] = data[field];
-                return acc;
-              },
-              {},
-            );
-            feed.state.partialNext(fieldsToUpdatePayload);
-          }
+          wasFullUpdate = true;
         }
       }
       if (watch) handleWatchStarted.call(feed);
+    }
+
+    // If we didn't do a full update, check if own_* fields have changed
+    if (!wasFullUpdate && data && fieldsToUpdate.length > 0) {
+      const fieldsToUpdateData: Array<keyof FeedResponse> = [];
+      const fieldChecks: Array<
+        [
+          (
+            | 'own_capabilities'
+            | 'own_follows'
+            | 'own_membership'
+            | 'own_followings'
+          ),
+          (currentState: FeedState, newState: FeedResponse) => boolean,
+        ]
+      > = [
+        ['own_capabilities', isOwnCapabilitiesEqual],
+        ['own_follows', isOwnFollowsEqual],
+        ['own_membership', isOwnMembershipEqual],
+        ['own_followings', isOwnFollowingsEqual],
+      ];
+      fieldChecks.forEach(([field, isEqual]) => {
+        if (
+          fieldsToUpdate.includes(field) &&
+          !isEqual(feed.currentState, data)
+        ) {
+          fieldsToUpdateData.push(field);
+        }
+      });
+      if (fieldsToUpdateData.length > 0) {
+        const fieldsToUpdatePayload = fieldsToUpdateData.reduce(
+          (acc: Partial<FeedResponse>, field) => {
+            // @ts-expect-error TODO: fix this
+            acc[field] = data[field];
+            return acc;
+          },
+          {},
+        );
+        feed.state.partialNext(fieldsToUpdatePayload);
+      }
     }
 
     return feed;

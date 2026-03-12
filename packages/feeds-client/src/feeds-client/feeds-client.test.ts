@@ -634,6 +634,46 @@ describe('Feeds client tests', () => {
 
       expect(spy).toHaveBeenCalledTimes(0);
     });
+
+    it('should update own fields when feed is already watching and fieldsToUpdate is non-empty', async () => {
+      const ownFollows = [
+        generateFollowResponse({
+          source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+          target_feed: generateFeedResponse({ feed: 'user:123' }),
+        }),
+      ];
+      const data = generateFeedResponse({
+        feed: 'user:123',
+        own_follows: ownFollows,
+        own_capabilities: [FeedOwnCapability.ADD_ACTIVITY],
+      });
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data,
+        watch: true,
+        fieldsToUpdate: [],
+      });
+
+      const newFollow = generateFollowResponse({
+        source_feed: generateFeedResponse({ feed: 'timeline:feed' }),
+        target_feed: generateFeedResponse({ feed: 'user:456' }),
+      });
+      const newData = { ...data };
+      newData.own_follows = [...ownFollows, newFollow];
+
+      client['getOrCreateActiveFeed']({
+        group: 'user',
+        id: '123',
+        data: newData,
+        watch: true,
+        fieldsToUpdate: ['own_follows'],
+      });
+
+      expect(
+        client['activeFeeds']['user:123']?.currentState.own_follows,
+      ).toEqual(newData.own_follows);
+    });
   });
 
   describe('ownBatch retry', () => {
@@ -703,7 +743,8 @@ describe('Feeds client tests', () => {
       const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
 
       // Set up expectation before running timers to avoid unhandled rejection
-      const expectPromise = expect(resultPromise).rejects.toThrow('Persistent error');
+      const expectPromise =
+        expect(resultPromise).rejects.toThrow('Persistent error');
       await vi.runAllTimersAsync();
       await expectPromise;
 
@@ -711,14 +752,19 @@ describe('Feeds client tests', () => {
     });
 
     it('should not retry on 4xx client errors', async () => {
-      const clientError = new StreamApiError('Bad Request', { response_code: 400 }, 4);
+      const clientError = new StreamApiError(
+        'Bad Request',
+        { response_code: 400 },
+        4,
+      );
       superOwnBatchSpy.mockRejectedValue(clientError);
 
       retryClient.feed('user', '123');
       const resultPromise = retryClient.ownBatch({ feeds: ['user:123'] });
 
       // Set up expectation before running timers to avoid unhandled rejection
-      const expectPromise = expect(resultPromise).rejects.toThrow('Bad Request');
+      const expectPromise =
+        expect(resultPromise).rejects.toThrow('Bad Request');
       await vi.runAllTimersAsync();
       await expectPromise;
 
@@ -726,7 +772,11 @@ describe('Feeds client tests', () => {
     });
 
     it('should retry on 5xx server errors', async () => {
-      const serverError = new StreamApiError('Internal Server Error', { response_code: 500 }, 16);
+      const serverError = new StreamApiError(
+        'Internal Server Error',
+        { response_code: 500 },
+        16,
+      );
       const mockResponse = {
         data: { 'user:123': { own_capabilities: ['add_activity'] } },
       };
