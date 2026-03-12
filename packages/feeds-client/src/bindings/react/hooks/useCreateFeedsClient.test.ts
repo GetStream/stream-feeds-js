@@ -17,17 +17,16 @@ vi.mock('../../../feeds-client', () => {
     disconnectUser,
   };
   return {
-    FeedsClient: vi.fn().mockImplementation(() => ({
-      connectAnonymous,
-      connectGuest,
-      connectUser,
-      disconnectUser,
-    })),
+    FeedsClient: vi.fn(function () {
+      return { connectAnonymous, connectGuest, connectUser, disconnectUser };
+    }),
   };
 });
 
 function getMocks() {
-  return (globalThis as Record<string, unknown>)['__useCreateFeedsClient_mocks'] as {
+  return (globalThis as Record<string, unknown>)[
+    '__useCreateFeedsClient_mocks'
+  ] as {
     connectAnonymous: ReturnType<typeof vi.fn>;
     connectGuest: ReturnType<typeof vi.fn>;
     connectUser: ReturnType<typeof vi.fn>;
@@ -127,7 +126,10 @@ describe('useCreateFeedsClient', () => {
       });
 
       expect(getMocks().connectUser).toHaveBeenCalledTimes(1);
-      expect(getMocks().connectUser).toHaveBeenCalledWith(userData, tokenProvider);
+      expect(getMocks().connectUser).toHaveBeenCalledWith(
+        userData,
+        tokenProvider,
+      );
       expect(getMocks().connectAnonymous).not.toHaveBeenCalled();
       expect(getMocks().connectGuest).not.toHaveBeenCalled();
     });
@@ -227,14 +229,18 @@ describe('useCreateFeedsClient', () => {
 
       await waitFor(() => {
         expect(getMocks().connectGuest).toHaveBeenCalledTimes(1);
-        expect(getMocks().connectGuest).toHaveBeenCalledWith({ user: { id: 'user-1' } });
+        expect(getMocks().connectGuest).toHaveBeenCalledWith({
+          user: { id: 'user-1' },
+        });
       });
 
       rerender({ userData: { id: 'user-2' } });
 
       await waitFor(() => {
         expect(getMocks().connectGuest).toHaveBeenCalledTimes(2);
-        expect(getMocks().connectGuest).toHaveBeenLastCalledWith({ user: { id: 'user-2' } });
+        expect(getMocks().connectGuest).toHaveBeenLastCalledWith({
+          user: { id: 'user-2' },
+        });
       });
     });
   });

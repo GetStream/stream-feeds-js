@@ -152,6 +152,7 @@ describe('Activity state updates via WebSocket events', () => {
 
   it(
     'should remove activity from feed in response to activity.removed_from_feed event',
+    { timeout: 50000 },
     async () => {
       // Create a spy for the activity.removed_from_feed event
       const removeSpy = vi.fn();
@@ -207,7 +208,6 @@ describe('Activity state updates via WebSocket events', () => {
 
       await secondFeed.delete({ hard_delete: true });
     },
-    { timeout: 50000 },
   );
 
   it(`should backfill current_feed if activity is added to multiple feeds`, async () => {
