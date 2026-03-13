@@ -9,7 +9,6 @@ import { Activity } from './Activity';
 import { PollComposerModal, type PollData, type PollComposerModalHandle } from '../poll/PollComposerModal';
 import { ActivitySettingsModal, type ActivitySettings, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
 import { LocationModal, type LocationData, type LocationModalHandle } from './LocationModal';
-import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
 export const ActivityComposer = ({
   activity,
@@ -39,7 +38,6 @@ export const ActivityComposer = ({
   const settingsModalRef = useRef<ActivitySettingsModalHandle>(null);
   const locationModalRef = useRef<LocationModalHandle>(null);
   const existingPollIdRef = useRef<string | null>(null);
-  const { reloadTimelines } = useOwnFeedsContext();
 
   useEffect(() => {
     if (activity) {
@@ -223,7 +221,7 @@ export const ActivityComposer = ({
       setAttachedLocation(null);
       onSave?.();
     },
-    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, activitySettings, attachedLocation, activity?.location, reloadTimelines],
+    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, activitySettings, attachedLocation, activity?.location],
   );
 
   return (
