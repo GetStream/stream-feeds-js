@@ -172,8 +172,6 @@ export const ActivityComposer = ({
       }
 
       const feeds = [feed.feed, ...selectedHashtagIds.map((id) => `hashtag:${id}`)];
-      // Temporary fix to missing WS fan-out for private activities
-      const shouldReload = visibilityFields.visibility === 'private';
 
       if (activity?.id) {
         const removedExistingPoll = hadExistingPoll && !attachedPoll;
@@ -218,10 +216,6 @@ export const ActivityComposer = ({
         });
         // Reset settings to default only for new posts
         setActivitySettings({ restrictReplies: 'everyone', activityVisibility: 'public' });
-      }
-
-      if (shouldReload) {
-        reloadTimelines();
       }
 
       // Clear attached poll and location after successful submission
