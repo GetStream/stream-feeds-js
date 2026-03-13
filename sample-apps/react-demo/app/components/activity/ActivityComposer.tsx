@@ -9,7 +9,6 @@ import { Activity } from './Activity';
 import { PollComposerModal, type PollData, type PollComposerModalHandle } from '../poll/PollComposerModal';
 import { ActivitySettingsModal, type ActivitySettings, type ActivitySettingsModalHandle } from './ActivitySettingsModal';
 import { LocationModal, type LocationData, type LocationModalHandle } from './LocationModal';
-import { useOwnFeedsContext } from '@/app/own-feeds-context';
 
 export const ActivityComposer = ({
   activity,
@@ -39,7 +38,6 @@ export const ActivityComposer = ({
   const settingsModalRef = useRef<ActivitySettingsModalHandle>(null);
   const locationModalRef = useRef<LocationModalHandle>(null);
   const existingPollIdRef = useRef<string | null>(null);
-  const { reloadTimelines } = useOwnFeedsContext();
 
   useEffect(() => {
     if (activity) {
@@ -172,8 +170,6 @@ export const ActivityComposer = ({
       }
 
       const feeds = [feed.feed, ...selectedHashtagIds.map((id) => `hashtag:${id}`)];
-      // Temporary fix to missing WS fan-out for private activities
-      const shouldReload = visibilityFields.visibility === 'private';
 
       if (activity?.id) {
         const removedExistingPoll = hadExistingPoll && !attachedPoll;
@@ -220,16 +216,12 @@ export const ActivityComposer = ({
         setActivitySettings({ restrictReplies: 'everyone', activityVisibility: 'public' });
       }
 
-      if (shouldReload) {
-        reloadTimelines();
-      }
-
       // Clear attached poll and location after successful submission
       setAttachedPoll(null);
       setAttachedLocation(null);
       onSave?.();
     },
-    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, activitySettings, attachedLocation, activity?.location, reloadTimelines],
+    [feed, client, activity?.id, parent?.id, onSave, activity?.poll, attachedPoll, activitySettings, attachedLocation, activity?.location],
   );
 
   return (
