@@ -1,11066 +1,6554 @@
+export interface AIImageConfig {
+  enabled: boolean;
 
-    export interface AIImageConfig {enabled: boolean;
-    
+  ocr_rules: OCRRule[];
 
-        ocr_rules: Array<OCRRule>;
-    
+  rules: AWSRekognitionRule[];
 
-        rules: Array<AWSRekognitionRule>;
-    
+  async?: boolean;
+}
 
-        async?: boolean;
-    
+export interface AIImageLabelDefinition {
+  description: string;
 
-        }
-    
+  group: string;
 
+  key: string;
 
+  label: string;
+}
 
+export interface AITextConfig {
+  enabled: boolean;
 
-    export interface AIImageLabelDefinition {description: string;
-    
+  profile: string;
 
-        group: string;
-    
+  rules: BodyguardRule[];
 
-        key: string;
-    
+  severity_rules: BodyguardSeverityRule[];
 
-        label: string;
-    
+  async?: boolean;
+}
 
-        }
-    
+export interface AIVideoConfig {
+  enabled: boolean;
 
+  rules: AWSRekognitionRule[];
 
+  async?: boolean;
+}
 
+export interface APIError {
+  code: number;
 
-    export interface AITextConfig {enabled: boolean;
-    
+  duration: string;
 
-        profile: string;
-    
+  message: string;
 
-        rules: Array<BodyguardRule>;
-    
+  more_info: string;
 
-        severity_rules: Array<BodyguardSeverityRule>;
-    
+  status_code: number;
 
-        async?: boolean;
-    
+  details: number[];
 
-        }
-    
+  unrecoverable?: boolean;
 
+  exception_fields?: Record<string, string>;
+}
 
+export interface AWSRekognitionRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
+  label: string;
 
-    export interface AIVideoConfig {enabled: boolean;
-    
+  min_confidence: number;
 
-        rules: Array<AWSRekognitionRule>;
-    
+  subclassifications?: Record<string, any>;
+}
 
-        async?: boolean;
-    
+export interface AcceptFeedMemberInviteRequest {}
 
-        }
-    
+export interface AcceptFeedMemberInviteResponse {
+  duration: string;
 
+  member: FeedMemberResponse;
+}
 
+export interface AcceptFollowRequest {
+  source: string;
 
+  target: string;
 
-    export interface APIError {code: number;
-    
+  follower_role?: string;
+}
 
-        duration: string;
-    
+export interface AcceptFollowResponse {
+  duration: string;
 
-        message: string;
-    
+  follow: FollowResponse;
+}
 
-        more_info: string;
-    
+export interface Action {
+  name: string;
 
-        status_code: number;
-    
+  text: string;
 
-        details: Array<number>;
-    
+  type: string;
 
-        unrecoverable?: boolean;
-    
+  style?: string;
 
-        exception_fields?: Record<string, string>;
-    
+  value?: string;
+}
 
-        }
-    
+export interface ActionLogResponse {
+  created_at: Date;
 
+  id: string;
 
+  reason: string;
 
+  target_user_id: string;
 
-    export interface AWSRekognitionRule {
-        action:| "flag" | "shadow" | "remove" | "bounce" | "bounce_flag" | "bounce_remove" ;
+  type: string;
 
-        label: string;
-    
+  user_id: string;
 
-        min_confidence: number;
-    
+  ai_providers: string[];
 
-        subclassifications?: Record<string, any>;
-    
+  custom: Record<string, any>;
 
-        }
-    
+  review_queue_item?: ReviewQueueItemResponse;
 
+  target_user?: UserResponse;
 
+  user?: UserResponse;
+}
 
+export interface ActionSequence {
+  action: string;
 
-    export interface AcceptFeedMemberInviteRequest {}
-    
+  blur: boolean;
 
+  cooldown_period: number;
 
+  threshold: number;
 
+  time_window: number;
 
-    export interface AcceptFeedMemberInviteResponse {duration: string;
-    
+  warning: boolean;
 
-        member: FeedMemberResponse;
-    
+  warning_text: string;
+}
 
-        }
-    
+export interface ActivityAddedEvent {
+  created_at: Date;
 
+  fid: string;
 
+  activity: ActivityResponse;
 
+  custom: Record<string, any>;
 
-    export interface AcceptFollowRequest {source: string;
-    
+  type: string;
 
-        target: string;
-    
+  feed_visibility?: string;
 
-        follower_role?: string;
-    
+  received_at?: Date;
 
-        }
-    
+  user?: UserResponseCommonFields;
+}
 
+export interface ActivityDeletedEvent {
+  created_at: Date;
 
+  fid: string;
 
+  activity: ActivityResponse;
 
-    export interface AcceptFollowResponse {duration: string;
-    
+  custom: Record<string, any>;
 
-        follow: FollowResponse;
-    
+  type: string;
 
-        }
-    
+  feed_visibility?: string;
 
+  received_at?: Date;
 
+  user?: UserResponseCommonFields;
+}
 
+export interface ActivityFeedbackEvent {
+  created_at: Date;
 
-    export interface Action {name: string;
-    
+  activity_feedback: ActivityFeedbackEventPayload;
 
-        text: string;
-    
+  custom: Record<string, any>;
 
-        type: string;
-    
+  type: string;
 
-        style?: string;
-    
+  received_at?: Date;
 
-        value?: string;
-    
+  user?: UserResponseCommonFields;
+}
 
-        }
-    
+export interface ActivityFeedbackEventPayload {
+  action: 'hide' | 'show_more' | 'show_less';
 
+  activity_id: string;
 
+  created_at: Date;
 
+  updated_at: Date;
 
-    export interface ActionLogResponse {created_at: Date;
-    
+  value: string;
 
-        id: string;
-    
+  user: UserResponse;
+}
 
-        reason: string;
-    
+export interface ActivityFeedbackRequest {
+  hide?: boolean;
 
-        target_user_id: string;
-    
+  show_less?: boolean;
 
-        type: string;
-    
+  show_more?: boolean;
+}
 
-        user_id: string;
-    
+export interface ActivityFeedbackResponse {
+  activity_id: string;
 
-        ai_providers: Array<string>;
-    
+  duration: string;
+}
 
-        custom: Record<string, any>;
-    
+export interface ActivityLocation {
+  lat: number;
 
-        review_queue_item?: ReviewQueueItemResponse;
-    
+  lng: number;
+}
 
-        target_user?: UserResponse;
-    
+export interface ActivityMarkEvent {
+  created_at: Date;
 
-        user?: UserResponse;
-    
+  fid: string;
 
-        }
-    
+  custom: Record<string, any>;
 
+  type: string;
 
+  feed_visibility?: string;
 
+  mark_all_read?: boolean;
 
-    export interface ActionSequence {action: string;
-    
+  mark_all_seen?: boolean;
 
-        blur: boolean;
-    
+  received_at?: Date;
 
-        cooldown_period: number;
-    
+  mark_read?: string[];
 
-        threshold: number;
-    
+  mark_seen?: string[];
 
-        time_window: number;
-    
+  mark_watched?: string[];
 
-        warning: boolean;
-    
+  user?: UserResponseCommonFields;
+}
 
-        warning_text: string;
-    
+export interface ActivityPinResponse {
+  created_at: Date;
 
-        }
-    
+  feed: string;
 
+  updated_at: Date;
 
+  activity: ActivityResponse;
 
+  user: UserResponse;
+}
 
-    export interface ActivityAddedEvent {created_at: Date;
-    
+export interface ActivityPinnedEvent {
+  created_at: Date;
 
-        fid: string;
-    
+  fid: string;
 
-        activity: ActivityResponse;
-    
+  custom: Record<string, any>;
 
-        custom: Record<string, any>;
-    
+  pinned_activity: PinActivityResponse;
 
-        type: string;
-    
+  type: string;
 
-        feed_visibility?: string;
-    
+  feed_visibility?: string;
 
-        received_at?: Date;
-    
+  received_at?: Date;
 
-        user?: UserResponseCommonFields;
-    
+  user?: UserResponseCommonFields;
+}
 
-        }
-    
+export interface ActivityProcessorConfig {
+  type: string;
 
+  openai_key?: string;
 
+  config?: Record<string, any>;
+}
 
+export interface ActivityReactionAddedEvent {
+  created_at: Date;
 
-    export interface ActivityDeletedEvent {created_at: Date;
-    
+  fid: string;
 
-        fid: string;
-    
+  activity: ActivityResponse;
 
-        activity: ActivityResponse;
-    
+  custom: Record<string, any>;
 
-        custom: Record<string, any>;
-    
+  reaction: FeedsReactionResponse;
 
-        type: string;
-    
+  type: string;
 
-        feed_visibility?: string;
-    
+  feed_visibility?: string;
 
-        received_at?: Date;
-    
+  received_at?: Date;
 
-        user?: UserResponseCommonFields;
-    
+  user?: UserResponseCommonFields;
+}
 
-        }
-    
+export interface ActivityReactionDeletedEvent {
+  created_at: Date;
 
+  fid: string;
 
+  activity: ActivityResponse;
 
+  custom: Record<string, any>;
 
-    export interface ActivityFeedbackEvent {created_at: Date;
-    
+  reaction: FeedsReactionResponse;
 
-        activity_feedback: ActivityFeedbackEventPayload;
-    
+  type: string;
 
-        custom: Record<string, any>;
-    
+  feed_visibility?: string;
 
-        type: string;
-    
+  received_at?: Date;
 
-        received_at?: Date;
-    
+  user?: UserResponseCommonFields;
+}
 
-        user?: UserResponseCommonFields;
-    
+export interface ActivityReactionUpdatedEvent {
+  created_at: Date;
 
-        }
-    
+  fid: string;
 
+  activity: ActivityResponse;
 
+  custom: Record<string, any>;
 
+  reaction: FeedsReactionResponse;
 
-    export interface ActivityFeedbackEventPayload {
-        action:| "hide" | "show_more" | "show_less" ;
+  type: string;
 
-        activity_id: string;
-    
+  feed_visibility?: string;
 
-        created_at: Date;
-    
+  received_at?: Date;
 
-        updated_at: Date;
-    
+  user?: UserResponseCommonFields;
+}
 
-        value: string;
-    
+export interface ActivityRemovedFromFeedEvent {
+  created_at: Date;
 
-        user: UserResponse;
-    
+  fid: string;
 
-        }
-    
+  activity: ActivityResponse;
 
+  custom: Record<string, any>;
 
+  type: string;
 
+  feed_visibility?: string;
 
-    export interface ActivityFeedbackRequest {hide?: boolean;
-    
+  received_at?: Date;
 
-        show_less?: boolean;
-    
+  user?: UserResponseCommonFields;
+}
 
-        show_more?: boolean;
-    
+export interface ActivityRequest {
+  type: string;
 
-        }
-    
+  feeds: string[];
 
+  copy_custom_to_notification?: boolean;
 
+  create_notification_activity?: boolean;
 
+  expires_at?: string;
 
-    export interface ActivityFeedbackResponse {activity_id: string;
-    
+  id?: string;
 
-        duration: string;
-    
+  parent_id?: string;
 
-        }
-    
+  poll_id?: string;
 
+  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
+  skip_enrich_url?: boolean;
 
+  skip_push?: boolean;
 
-    export interface ActivityLocation {lat: number;
-    
+  text?: string;
 
-        lng: number;
-    
+  visibility?: 'public' | 'private' | 'tag';
 
-        }
-    
+  visibility_tag?: string;
 
+  attachments?: Attachment[];
 
+  collection_refs?: string[];
 
+  filter_tags?: string[];
 
-    export interface ActivityMarkEvent {created_at: Date;
-    
+  interest_tags?: string[];
 
-        fid: string;
-    
+  mentioned_user_ids?: string[];
 
-        custom: Record<string, any>;
-    
+  custom?: Record<string, any>;
 
-        type: string;
-    
+  location?: ActivityLocation;
 
-        feed_visibility?: string;
-    
+  search_data?: Record<string, any>;
+}
 
-        mark_all_read?: boolean;
-    
+export interface ActivityResponse {
+  bookmark_count: number;
 
-        mark_all_seen?: boolean;
-    
+  comment_count: number;
 
-        received_at?: Date;
-    
+  created_at: Date;
 
-        mark_read?: Array<string>;
-    
+  hidden: boolean;
 
-        mark_seen?: Array<string>;
-    
+  id: string;
 
-        mark_watched?: Array<string>;
-    
+  popularity: number;
 
-        user?: UserResponseCommonFields;
-    
+  preview: boolean;
 
-        }
-    
+  reaction_count: number;
 
+  restrict_replies: 'everyone' | 'people_i_follow' | 'nobody';
 
+  score: number;
 
+  share_count: number;
 
-    export interface ActivityPinResponse {created_at: Date;
-    
+  type: string;
 
-        feed: string;
-    
+  updated_at: Date;
 
-        updated_at: Date;
-    
+  visibility: 'public' | 'private' | 'tag';
 
-        activity: ActivityResponse;
-    
+  attachments: Attachment[];
 
-        user: UserResponse;
-    
+  comments: CommentResponse[];
 
-        }
-    
+  feeds: string[];
 
+  filter_tags: string[];
 
+  interest_tags: string[];
 
+  latest_reactions: FeedsReactionResponse[];
 
-    export interface ActivityPinnedEvent {created_at: Date;
-    
+  mentioned_users: UserResponse[];
 
-        fid: string;
-    
+  own_bookmarks: BookmarkResponse[];
 
-        custom: Record<string, any>;
-    
+  own_reactions: FeedsReactionResponse[];
 
-        pinned_activity: PinActivityResponse;
-    
+  collections: Record<string, EnrichedCollectionResponse>;
 
-        type: string;
-    
+  custom: Record<string, any>;
 
-        feed_visibility?: string;
-    
+  reaction_groups: Record<string, FeedsReactionGroupResponse>;
 
-        received_at?: Date;
-    
+  search_data: Record<string, any>;
 
-        user?: UserResponseCommonFields;
-    
+  user: UserResponse;
 
-        }
-    
+  deleted_at?: Date;
 
+  edited_at?: Date;
 
+  expires_at?: Date;
 
+  friend_reaction_count?: number;
 
-    export interface ActivityProcessorConfig {type: string;
-    
+  is_read?: boolean;
 
-        openai_key?: string;
-    
+  is_seen?: boolean;
 
-        config?: Record<string, any>;
-    
+  is_watched?: boolean;
 
-        }
-    
+  moderation_action?: string;
 
+  selector_source?: string;
 
+  text?: string;
 
+  visibility_tag?: string;
 
-    export interface ActivityReactionAddedEvent {created_at: Date;
-    
+  friend_reactions?: FeedsReactionResponse[];
 
-        fid: string;
-    
+  current_feed?: FeedResponse;
 
-        activity: ActivityResponse;
-    
+  location?: ActivityLocation;
 
-        custom: Record<string, any>;
-    
+  metrics?: Record<string, number>;
 
-        reaction: FeedsReactionResponse;
-    
+  moderation?: ModerationV2Response;
 
-        type: string;
-    
+  notification_context?: NotificationContext;
 
-        feed_visibility?: string;
-    
+  parent?: ActivityResponse;
 
-        received_at?: Date;
-    
+  poll?: PollResponseData;
+}
 
-        user?: UserResponseCommonFields;
-    
+export interface ActivityRestoredEvent {
+  created_at: Date;
 
-        }
-    
+  fid: string;
 
+  activity: ActivityResponse;
 
+  custom: Record<string, any>;
 
+  type: string;
 
-    export interface ActivityReactionDeletedEvent {created_at: Date;
-    
+  feed_visibility?: string;
 
-        fid: string;
-    
+  received_at?: Date;
 
-        activity: ActivityResponse;
-    
+  user?: UserResponseCommonFields;
+}
 
-        custom: Record<string, any>;
-    
+export interface ActivitySelectorConfig {
+  cutoff_time: Date;
 
-        reaction: FeedsReactionResponse;
-    
+  cutoff_window?: string;
 
-        type: string;
-    
+  min_popularity?: number;
 
-        feed_visibility?: string;
-    
+  type?: string;
 
-        received_at?: Date;
-    
+  sort?: SortParam[];
 
-        user?: UserResponseCommonFields;
-    
+  filter?: Record<string, any>;
 
-        }
-    
+  params?: Record<string, any>;
+}
 
+export interface ActivityUnpinnedEvent {
+  created_at: Date;
 
+  fid: string;
 
+  custom: Record<string, any>;
 
-    export interface ActivityReactionUpdatedEvent {created_at: Date;
-    
+  pinned_activity: PinActivityResponse;
 
-        fid: string;
-    
+  type: string;
 
-        activity: ActivityResponse;
-    
+  feed_visibility?: string;
 
-        custom: Record<string, any>;
-    
+  received_at?: Date;
 
-        reaction: FeedsReactionResponse;
-    
+  user?: UserResponseCommonFields;
+}
 
-        type: string;
-    
+export interface ActivityUpdatedEvent {
+  created_at: Date;
 
-        feed_visibility?: string;
-    
+  fid: string;
 
-        received_at?: Date;
-    
+  activity: ActivityResponse;
 
-        user?: UserResponseCommonFields;
-    
+  custom: Record<string, any>;
 
-        }
-    
+  type: string;
 
+  feed_visibility?: string;
 
+  received_at?: Date;
 
+  user?: UserResponseCommonFields;
+}
 
-    export interface ActivityRemovedFromFeedEvent {created_at: Date;
-    
+export interface AddActivityRequest {
+  type: string;
 
-        fid: string;
-    
+  feeds: string[];
 
-        activity: ActivityResponse;
-    
+  copy_custom_to_notification?: boolean;
 
-        custom: Record<string, any>;
-    
+  create_notification_activity?: boolean;
 
-        type: string;
-    
+  enrich_own_fields?: boolean;
 
-        feed_visibility?: string;
-    
+  expires_at?: string;
 
-        received_at?: Date;
-    
+  id?: string;
 
-        user?: UserResponseCommonFields;
-    
+  parent_id?: string;
 
-        }
-    
+  poll_id?: string;
 
+  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
+  skip_enrich_url?: boolean;
 
+  skip_push?: boolean;
 
-    export interface ActivityRequest {type: string;
-    
+  text?: string;
 
-        feeds: Array<string>;
-    
+  visibility?: 'public' | 'private' | 'tag';
 
-        copy_custom_to_notification?: boolean;
-    
+  visibility_tag?: string;
 
-        create_notification_activity?: boolean;
-    
+  attachments?: Attachment[];
 
-        expires_at?: string;
-    
+  collection_refs?: string[];
 
-        id?: string;
-    
+  filter_tags?: string[];
 
-        parent_id?: string;
-    
+  interest_tags?: string[];
 
-        poll_id?: string;
-    
+  mentioned_user_ids?: string[];
 
-        
-        restrict_replies?:| "everyone" | "people_i_follow" | "nobody" ;
+  custom?: Record<string, any>;
 
-        skip_enrich_url?: boolean;
-    
+  location?: ActivityLocation;
 
-        skip_push?: boolean;
-    
+  search_data?: Record<string, any>;
+}
 
-        text?: string;
-    
+export interface AddActivityResponse {
+  duration: string;
 
-        
-        visibility?:| "public" | "private" | "tag" ;
+  activity: ActivityResponse;
 
-        visibility_tag?: string;
-    
+  mention_notifications_created?: number;
+}
 
-        attachments?: Array<Attachment>;
-    
+export interface AddBookmarkRequest {
+  folder_id?: string;
 
-        collection_refs?: Array<string>;
-    
+  custom?: Record<string, any>;
 
-        filter_tags?: Array<string>;
-    
+  new_folder?: AddFolderRequest;
+}
 
-        interest_tags?: Array<string>;
-    
+export interface AddBookmarkResponse {
+  duration: string;
 
-        mentioned_user_ids?: Array<string>;
-    
+  bookmark: BookmarkResponse;
+}
 
-        custom?: Record<string, any>;
-    
+export interface AddCommentReactionRequest {
+  type: string;
 
-        location?: ActivityLocation;
-    
+  copy_custom_to_notification?: boolean;
 
-        search_data?: Record<string, any>;
-    
+  create_notification_activity?: boolean;
 
-        }
-    
+  enforce_unique?: boolean;
 
+  skip_push?: boolean;
 
+  custom?: Record<string, any>;
+}
 
+export interface AddCommentReactionResponse {
+  duration: string;
 
-    export interface ActivityResponse {bookmark_count: number;
-    
+  comment: CommentResponse;
 
-        comment_count: number;
-    
+  reaction: FeedsReactionResponse;
 
-        created_at: Date;
-    
+  notification_created?: boolean;
+}
 
-        hidden: boolean;
-    
+export interface AddCommentRequest {
+  comment?: string;
 
-        id: string;
-    
+  copy_custom_to_notification?: boolean;
 
-        popularity: number;
-    
+  create_notification_activity?: boolean;
 
-        preview: boolean;
-    
+  id?: string;
 
-        reaction_count: number;
-    
+  object_id?: string;
 
-        
-        restrict_replies:| "everyone" | "people_i_follow" | "nobody" ;
+  object_type?: string;
 
-        score: number;
-    
+  parent_id?: string;
 
-        share_count: number;
-    
+  skip_enrich_url?: boolean;
 
-        type: string;
-    
+  skip_push?: boolean;
 
-        updated_at: Date;
-    
+  attachments?: Attachment[];
 
-        
-        visibility:| "public" | "private" | "tag" ;
+  mentioned_user_ids?: string[];
 
-        attachments: Array<Attachment>;
-    
+  custom?: Record<string, any>;
+}
 
-        comments: Array<CommentResponse>;
-    
+export interface AddCommentResponse {
+  duration: string;
 
-        feeds: Array<string>;
-    
+  comment: CommentResponse;
 
-        filter_tags: Array<string>;
-    
+  mention_notifications_created?: number;
 
-        interest_tags: Array<string>;
-    
+  notification_created?: boolean;
+}
 
-        latest_reactions: Array<FeedsReactionResponse>;
-    
+export interface AddCommentsBatchRequest {
+  comments: AddCommentRequest[];
+}
 
-        mentioned_users: Array<UserResponse>;
-    
+export interface AddCommentsBatchResponse {
+  duration: string;
 
-        own_bookmarks: Array<BookmarkResponse>;
-    
+  comments: CommentResponse[];
+}
 
-        own_reactions: Array<FeedsReactionResponse>;
-    
+export interface AddFolderRequest {
+  name: string;
 
-        collections: Record<string, EnrichedCollectionResponse>;
-    
+  custom?: Record<string, any>;
+}
 
-        custom: Record<string, any>;
-    
+export interface AddReactionRequest {
+  type: string;
 
-        reaction_groups: Record<string, FeedsReactionGroupResponse>;
-    
+  copy_custom_to_notification?: boolean;
 
-        search_data: Record<string, any>;
-    
+  create_notification_activity?: boolean;
 
-        user: UserResponse;
-    
+  enforce_unique?: boolean;
 
-        deleted_at?: Date;
-    
+  skip_push?: boolean;
 
-        edited_at?: Date;
-    
+  custom?: Record<string, any>;
+}
 
-        expires_at?: Date;
-    
+export interface AddReactionResponse {
+  duration: string;
 
-        friend_reaction_count?: number;
-    
+  activity: ActivityResponse;
 
-        is_read?: boolean;
-    
+  reaction: FeedsReactionResponse;
 
-        is_seen?: boolean;
-    
+  notification_created?: boolean;
+}
 
-        is_watched?: boolean;
-    
+export interface AddUserGroupMembersRequest {
+  member_ids: string[];
 
-        moderation_action?: string;
-    
+  team_id?: string;
+}
 
-        selector_source?: string;
-    
+export interface AddUserGroupMembersResponse {
+  duration: string;
 
-        text?: string;
-    
+  user_group?: UserGroupResponse;
+}
 
-        visibility_tag?: string;
-    
+export interface AggregatedActivityResponse {
+  activity_count: number;
 
-        friend_reactions?: Array<FeedsReactionResponse>;
-    
+  created_at: Date;
 
-        current_feed?: FeedResponse;
-    
+  group: string;
 
-        location?: ActivityLocation;
-    
+  score: number;
 
-        metrics?: Record<string, number>;
-    
+  updated_at: Date;
 
-        moderation?: ModerationV2Response;
-    
+  user_count: number;
 
-        notification_context?: NotificationContext;
-    
+  user_count_truncated: boolean;
 
-        parent?: ActivityResponse;
-    
+  activities: ActivityResponse[];
 
-        poll?: PollResponseData;
-    
+  is_read?: boolean;
 
-        }
-    
+  is_seen?: boolean;
 
+  is_watched?: boolean;
+}
 
+export interface AggregationConfig {
+  format?: string;
 
+  group_size?: number;
+}
 
-    export interface ActivityRestoredEvent {created_at: Date;
-    
+export interface AppEventResponse {
+  auto_translation_enabled: boolean;
 
-        fid: string;
-    
+  name: string;
 
-        activity: ActivityResponse;
-    
+  async_url_enrich_enabled?: boolean;
 
-        custom: Record<string, any>;
-    
+  file_upload_config?: FileUploadConfig;
 
-        type: string;
-    
+  image_upload_config?: FileUploadConfig;
+}
 
-        feed_visibility?: string;
-    
+export interface AppResponseFields {
+  async_url_enrich_enabled: boolean;
 
-        received_at?: Date;
-    
+  auto_translation_enabled: boolean;
 
-        user?: UserResponseCommonFields;
-    
+  id: number;
 
-        }
-    
+  name: string;
 
+  placement: string;
 
+  file_upload_config: FileUploadConfig;
 
+  image_upload_config: FileUploadConfig;
+}
 
-    export interface ActivitySelectorConfig {cutoff_time: Date;
-    
+export interface AppUpdatedEvent {
+  created_at: Date;
 
-        cutoff_window?: string;
-    
+  app: AppEventResponse;
 
-        min_popularity?: number;
-    
+  custom: Record<string, any>;
 
-        type?: string;
-    
+  type: string;
 
-        sort?: Array<SortParam>;
-    
+  received_at?: Date;
+}
 
-        filter?: Record<string, any>;
-    
+export interface AppealItemResponse {
+  appeal_reason: string;
 
-        params?: Record<string, any>;
-    
+  created_at: Date;
 
-        }
-    
+  entity_id: string;
 
+  entity_type: string;
 
+  id: string;
 
+  status: string;
 
-    export interface ActivityUnpinnedEvent {created_at: Date;
-    
+  updated_at: Date;
 
-        fid: string;
-    
+  decision_reason?: string;
 
-        custom: Record<string, any>;
-    
+  attachments?: string[];
 
-        pinned_activity: PinActivityResponse;
-    
+  entity_content?: ModerationPayload;
 
-        type: string;
-    
+  user?: UserResponse;
+}
 
-        feed_visibility?: string;
-    
+export interface AppealRequest {
+  appeal_reason: string;
 
-        received_at?: Date;
-    
+  entity_id: string;
 
-        user?: UserResponseCommonFields;
-    
+  entity_type: string;
 
-        }
-    
+  attachments?: string[];
+}
 
+export interface AppealResponse {
+  appeal_id: string;
 
+  duration: string;
+}
 
+export interface Attachment {
+  custom: Record<string, any>;
 
-    export interface ActivityUpdatedEvent {created_at: Date;
-    
+  asset_url?: string;
 
-        fid: string;
-    
+  author_icon?: string;
 
-        activity: ActivityResponse;
-    
+  author_link?: string;
 
-        custom: Record<string, any>;
-    
+  author_name?: string;
 
-        type: string;
-    
+  color?: string;
 
-        feed_visibility?: string;
-    
+  fallback?: string;
 
-        received_at?: Date;
-    
+  footer?: string;
 
-        user?: UserResponseCommonFields;
-    
+  footer_icon?: string;
 
-        }
-    
+  image_url?: string;
 
+  og_scrape_url?: string;
 
+  original_height?: number;
 
+  original_width?: number;
 
-    export interface AddActivityRequest {type: string;
-    
+  pretext?: string;
 
-        feeds: Array<string>;
-    
+  text?: string;
 
-        copy_custom_to_notification?: boolean;
-    
+  thumb_url?: string;
 
-        create_notification_activity?: boolean;
-    
+  title?: string;
 
-        enrich_own_fields?: boolean;
-    
+  title_link?: string;
 
-        expires_at?: string;
-    
+  type?: string;
 
-        id?: string;
-    
+  actions?: Action[];
 
-        parent_id?: string;
-    
+  fields?: Field[];
 
-        poll_id?: string;
-    
+  giphy?: Images;
+}
 
-        
-        restrict_replies?:| "everyone" | "people_i_follow" | "nobody" ;
+export interface AudioSettingsResponse {
+  access_request_enabled: boolean;
 
-        skip_enrich_url?: boolean;
-    
+  default_device: 'speaker' | 'earpiece';
 
-        skip_push?: boolean;
-    
+  hifi_audio_enabled: boolean;
 
-        text?: string;
-    
+  mic_default_on: boolean;
 
-        
-        visibility?:| "public" | "private" | "tag" ;
+  opus_dtx_enabled: boolean;
 
-        visibility_tag?: string;
-    
+  redundant_coding_enabled: boolean;
 
-        attachments?: Array<Attachment>;
-    
+  speaker_default_on: boolean;
 
-        collection_refs?: Array<string>;
-    
+  noise_cancellation?: NoiseCancellationSettings;
+}
 
-        filter_tags?: Array<string>;
-    
+export interface AutomodPlatformCircumventionConfig {
+  enabled: boolean;
 
-        interest_tags?: Array<string>;
-    
+  rules: AutomodRule[];
 
-        mentioned_user_ids?: Array<string>;
-    
+  async?: boolean;
+}
 
-        custom?: Record<string, any>;
-    
+export interface AutomodRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
-        location?: ActivityLocation;
-    
+  label: string;
 
-        search_data?: Record<string, any>;
-    
+  threshold: number;
+}
 
-        }
-    
+export interface AutomodSemanticFiltersConfig {
+  enabled: boolean;
 
+  rules: AutomodSemanticFiltersRule[];
 
+  async?: boolean;
+}
 
+export interface AutomodSemanticFiltersRule {
+  action: 'flag' | 'shadow' | 'remove';
 
-    export interface AddActivityResponse {duration: string;
-    
+  name: string;
 
-        activity: ActivityResponse;
-    
+  threshold: number;
+}
 
-        mention_notifications_created?: number;
-    
+export interface AutomodToxicityConfig {
+  enabled: boolean;
 
-        }
-    
+  rules: AutomodRule[];
 
+  async?: boolean;
+}
 
+export interface BackstageSettingsResponse {
+  enabled: boolean;
 
+  join_ahead_time_seconds?: number;
+}
 
-    export interface AddBookmarkRequest {folder_id?: string;
-    
+export interface BanActionRequestPayload {
+  channel_ban_only?: boolean;
 
-        custom?: Record<string, any>;
-    
+  channel_cid?: string;
 
-        new_folder?: AddFolderRequest;
-    
+  delete_messages?: 'soft' | 'pruning' | 'hard';
 
-        }
-    
+  ip_ban?: boolean;
 
+  reason?: string;
 
+  shadow?: boolean;
 
+  target_user_id?: string;
 
-    export interface AddBookmarkResponse {duration: string;
-    
+  timeout?: number;
+}
 
-        bookmark: BookmarkResponse;
-    
+export interface BanInfoResponse {
+  created_at: Date;
 
-        }
-    
+  expires?: Date;
 
+  reason?: string;
 
+  shadow?: boolean;
 
+  created_by?: UserResponse;
 
-    export interface AddCommentReactionRequest {type: string;
-    
+  user?: UserResponse;
+}
 
-        copy_custom_to_notification?: boolean;
-    
+export interface BanOptions {
+  delete_messages?: 'soft' | 'pruning' | 'hard';
 
-        create_notification_activity?: boolean;
-    
+  duration?: number;
 
-        enforce_unique?: boolean;
-    
+  ip_ban?: boolean;
 
-        skip_push?: boolean;
-    
+  reason?: string;
 
-        custom?: Record<string, any>;
-    
+  shadow_ban?: boolean;
+}
 
-        }
-    
+export interface BanRequest {
+  target_user_id: string;
 
+  banned_by_id?: string;
 
+  channel_cid?: string;
 
+  delete_messages?: 'soft' | 'pruning' | 'hard';
 
-    export interface AddCommentReactionResponse {duration: string;
-    
+  ip_ban?: boolean;
 
-        comment: CommentResponse;
-    
+  reason?: string;
 
-        reaction: FeedsReactionResponse;
-    
+  shadow?: boolean;
 
-        notification_created?: boolean;
-    
+  timeout?: number;
 
-        }
-    
+  banned_by?: UserRequest;
+}
 
+export interface BanResponse {
+  duration: string;
+}
 
+export interface BlockActionRequestPayload {
+  reason?: string;
+}
 
+export interface BlockListConfig {
+  enabled: boolean;
 
-    export interface AddCommentRequest {comment?: string;
-    
+  rules: BlockListRule[];
 
-        copy_custom_to_notification?: boolean;
-    
+  async?: boolean;
 
-        create_notification_activity?: boolean;
-    
+  match_substring?: boolean;
+}
 
-        id?: string;
-    
+export interface BlockListOptions {
+  behavior: 'flag' | 'block' | 'shadow_block';
 
-        object_id?: string;
-    
+  blocklist: string;
+}
 
-        object_type?: string;
-    
+export interface BlockListResponse {
+  is_leet_check_enabled: boolean;
 
-        parent_id?: string;
-    
+  is_plural_check_enabled: boolean;
 
-        skip_enrich_url?: boolean;
-    
+  name: string;
 
-        skip_push?: boolean;
-    
+  type: string;
 
-        attachments?: Array<Attachment>;
-    
+  words: string[];
 
-        mentioned_user_ids?: Array<string>;
-    
+  created_at?: Date;
 
-        custom?: Record<string, any>;
-    
+  id?: string;
 
-        }
-    
+  team?: string;
 
+  updated_at?: Date;
+}
 
+export interface BlockListRule {
+  action:
+    | 'flag'
+    | 'mask_flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
+  name: string;
 
-    export interface AddCommentResponse {duration: string;
-    
+  team: string;
+}
 
-        comment: CommentResponse;
-    
+export interface BlockUsersRequest {
+  blocked_user_id: string;
+}
 
-        mention_notifications_created?: number;
-    
+export interface BlockUsersResponse {
+  blocked_by_user_id: string;
 
-        notification_created?: boolean;
-    
+  blocked_user_id: string;
 
-        }
-    
+  created_at: Date;
 
+  duration: string;
+}
 
+export interface BlockedUserResponse {
+  blocked_user_id: string;
 
+  created_at: Date;
 
-    export interface AddCommentsBatchRequest {comments: Array<AddCommentRequest>;
-    
+  user_id: string;
 
-        }
-    
+  blocked_user: UserResponse;
 
+  user: UserResponse;
+}
 
+export interface BodyguardRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
+  label: string;
 
-    export interface AddCommentsBatchResponse {duration: string;
-    
+  severity_rules: BodyguardSeverityRule[];
+}
 
-        comments: Array<CommentResponse>;
-    
+export interface BodyguardSeverityRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
-        }
-    
+  severity: 'low' | 'medium' | 'high' | 'critical';
+}
 
+export interface BookmarkAddedEvent {
+  created_at: Date;
 
+  bookmark: BookmarkResponse;
 
+  custom: Record<string, any>;
 
-    export interface AddFolderRequest {name: string;
-    
+  type: string;
 
-        custom?: Record<string, any>;
-    
+  received_at?: Date;
 
-        }
-    
+  user?: UserResponseCommonFields;
+}
 
+export interface BookmarkDeletedEvent {
+  created_at: Date;
 
+  bookmark: BookmarkResponse;
 
+  custom: Record<string, any>;
 
-    export interface AddReactionRequest {type: string;
-    
+  type: string;
 
-        copy_custom_to_notification?: boolean;
-    
+  received_at?: Date;
 
-        create_notification_activity?: boolean;
-    
+  user?: UserResponseCommonFields;
+}
 
-        enforce_unique?: boolean;
-    
+export interface BookmarkFolderDeletedEvent {
+  created_at: Date;
 
-        skip_push?: boolean;
-    
+  bookmark_folder: BookmarkFolderResponse;
 
-        custom?: Record<string, any>;
-    
+  custom: Record<string, any>;
 
-        }
-    
+  type: string;
 
+  received_at?: Date;
 
+  user?: UserResponseCommonFields;
+}
 
+export interface BookmarkFolderResponse {
+  created_at: Date;
 
-    export interface AddReactionResponse {duration: string;
-    
+  id: string;
 
-        activity: ActivityResponse;
-    
+  name: string;
 
-        reaction: FeedsReactionResponse;
-    
+  updated_at: Date;
 
-        notification_created?: boolean;
-    
+  user: UserResponse;
 
-        }
-    
+  custom?: Record<string, any>;
+}
 
+export interface BookmarkFolderUpdatedEvent {
+  created_at: Date;
 
+  bookmark_folder: BookmarkFolderResponse;
 
+  custom: Record<string, any>;
 
-    export interface AddUserGroupMembersRequest {member_ids: Array<string>;
-    
+  type: string;
 
-        team_id?: string;
-    
+  received_at?: Date;
 
-        }
-    
+  user?: UserResponseCommonFields;
+}
 
+export interface BookmarkResponse {
+  created_at: Date;
 
+  updated_at: Date;
 
+  activity: ActivityResponse;
 
-    export interface AddUserGroupMembersResponse {duration: string;
-    
+  user: UserResponse;
 
-        user_group?: UserGroupResponse;
-    
+  custom?: Record<string, any>;
 
-        }
-    
+  folder?: BookmarkFolderResponse;
+}
 
+export interface BookmarkUpdatedEvent {
+  created_at: Date;
 
+  bookmark: BookmarkResponse;
 
+  custom: Record<string, any>;
 
-    export interface AggregatedActivityResponse {activity_count: number;
-    
+  type: string;
 
-        created_at: Date;
-    
+  received_at?: Date;
 
-        group: string;
-    
+  user?: UserResponseCommonFields;
+}
 
-        score: number;
-    
+export interface BroadcastSettingsResponse {
+  enabled: boolean;
 
-        updated_at: Date;
-    
+  hls: HLSSettingsResponse;
 
-        user_count: number;
-    
+  rtmp: RTMPSettingsResponse;
+}
 
-        user_count_truncated: boolean;
-    
+export interface CallActionOptions {
+  duration?: number;
 
-        activities: Array<ActivityResponse>;
-    
+  flag_reason?: string;
 
-        is_read?: boolean;
-    
+  kick_reason?: string;
 
-        is_seen?: boolean;
-    
+  mute_audio?: boolean;
 
-        is_watched?: boolean;
-    
+  mute_video?: boolean;
 
-        }
-    
+  reason?: string;
 
+  warning_text?: string;
+}
 
+export interface CallCustomPropertyParameters {
+  operator?: string;
 
+  property_key?: string;
+}
 
-    export interface AggregationConfig {format?: string;
-    
+export interface CallIngressResponse {
+  rtmp: RTMPIngress;
 
-        group_size?: number;
-    
+  srt: SRTIngress;
 
-        }
-    
+  whip: WHIPIngress;
+}
 
+export interface CallParticipantResponse {
+  joined_at: Date;
 
+  role: string;
 
+  user_session_id: string;
 
-    export interface AppEventResponse {auto_translation_enabled: boolean;
-    
+  user: UserResponse;
+}
 
-        name: string;
-    
+export interface CallResponse {
+  backstage: boolean;
 
-        async_url_enrich_enabled?: boolean;
-    
+  captioning: boolean;
 
-        file_upload_config?: FileUploadConfig;
-    
+  cid: string;
 
-        image_upload_config?: FileUploadConfig;
-    
+  created_at: Date;
 
-        }
-    
+  current_session_id: string;
 
+  id: string;
 
+  recording: boolean;
 
+  transcribing: boolean;
 
-    export interface AppResponseFields {async_url_enrich_enabled: boolean;
-    
+  translating: boolean;
 
-        auto_translation_enabled: boolean;
-    
+  type: string;
 
-        id: number;
-    
+  updated_at: Date;
 
-        name: string;
-    
+  blocked_user_ids: string[];
 
-        placement: string;
-    
+  created_by: UserResponse;
 
-        file_upload_config: FileUploadConfig;
-    
+  custom: Record<string, any>;
 
-        image_upload_config: FileUploadConfig;
-    
+  egress: EgressResponse;
 
-        }
-    
+  ingress: CallIngressResponse;
 
+  settings: CallSettingsResponse;
 
+  channel_cid?: string;
 
+  ended_at?: Date;
 
-    export interface AppUpdatedEvent {created_at: Date;
-    
+  join_ahead_time_seconds?: number;
 
-        app: AppEventResponse;
-    
+  routing_number?: string;
 
-        custom: Record<string, any>;
-    
+  starts_at?: Date;
 
-        type: string;
-    
+  team?: string;
 
-        received_at?: Date;
-    
+  session?: CallSessionResponse;
 
-        }
-    
+  thumbnails?: ThumbnailResponse;
+}
 
+export interface CallRuleActionSequence {
+  violation_number?: number;
 
+  actions?: string[];
 
+  call_options?: CallActionOptions;
+}
 
-    export interface AppealItemResponse {appeal_reason: string;
-    
+export interface CallSessionResponse {
+  anonymous_participant_count: number;
 
-        created_at: Date;
-    
+  id: string;
 
-        entity_id: string;
-    
+  participants: CallParticipantResponse[];
 
-        entity_type: string;
-    
+  accepted_by: Record<string, Date>;
 
-        id: string;
-    
+  missed_by: Record<string, Date>;
 
-        status: string;
-    
+  participants_count_by_role: Record<string, number>;
 
-        updated_at: Date;
-    
+  rejected_by: Record<string, Date>;
 
-        decision_reason?: string;
-    
+  ended_at?: Date;
 
-        attachments?: Array<string>;
-    
+  live_ended_at?: Date;
 
-        entity_content?: ModerationPayload;
-    
+  live_started_at?: Date;
 
-        user?: UserResponse;
-    
+  started_at?: Date;
 
-        }
-    
+  timer_ends_at?: Date;
+}
 
+export interface CallSettingsResponse {
+  audio: AudioSettingsResponse;
 
+  backstage: BackstageSettingsResponse;
 
+  broadcasting: BroadcastSettingsResponse;
 
-    export interface AppealRequest {appeal_reason: string;
-    
+  frame_recording: FrameRecordingSettingsResponse;
 
-        entity_id: string;
-    
+  geofencing: GeofenceSettingsResponse;
 
-        entity_type: string;
-    
+  individual_recording: IndividualRecordingSettingsResponse;
 
-        attachments?: Array<string>;
-    
+  limits: LimitsSettingsResponse;
 
-        }
-    
+  raw_recording: RawRecordingSettingsResponse;
 
+  recording: RecordSettingsResponse;
 
+  ring: RingSettingsResponse;
 
+  screensharing: ScreensharingSettingsResponse;
 
-    export interface AppealResponse {appeal_id: string;
-    
+  session: SessionSettingsResponse;
 
-        duration: string;
-    
+  thumbnails: ThumbnailsSettingsResponse;
 
-        }
-    
+  transcription: TranscriptionSettingsResponse;
 
+  video: VideoSettingsResponse;
 
+  ingress?: IngressSettingsResponse;
+}
 
+export interface CallTypeRuleParameters {
+  call_type?: string;
+}
 
-    export interface Attachment {custom: Record<string, any>;
-    
+export interface CallViolationCountParameters {
+  threshold?: number;
 
-        asset_url?: string;
-    
+  time_window?: string;
+}
 
-        author_icon?: string;
-    
+export interface CastPollVoteRequest {
+  vote?: VoteData;
+}
 
-        author_link?: string;
-    
+export interface ChannelConfigWithInfo {
+  automod: 'disabled' | 'simple' | 'AI';
 
-        author_name?: string;
-    
+  automod_behavior: 'flag' | 'block' | 'shadow_block';
 
-        color?: string;
-    
+  connect_events: boolean;
 
-        fallback?: string;
-    
+  count_messages: boolean;
 
-        footer?: string;
-    
+  created_at: Date;
 
-        footer_icon?: string;
-    
+  custom_events: boolean;
 
-        image_url?: string;
-    
+  delivery_events: boolean;
 
-        og_scrape_url?: string;
-    
+  mark_messages_pending: boolean;
 
-        original_height?: number;
-    
+  max_message_length: number;
 
-        original_width?: number;
-    
+  mutes: boolean;
 
-        pretext?: string;
-    
+  name: string;
 
-        text?: string;
-    
+  polls: boolean;
 
-        thumb_url?: string;
-    
+  push_notifications: boolean;
 
-        title?: string;
-    
+  quotes: boolean;
 
-        title_link?: string;
-    
+  reactions: boolean;
 
-        type?: string;
-    
+  read_events: boolean;
 
-        actions?: Array<Action>;
-    
+  reminders: boolean;
 
-        fields?: Array<Field>;
-    
+  replies: boolean;
 
-        giphy?: Images;
-    
+  search: boolean;
 
-        }
-    
+  shared_locations: boolean;
 
+  skip_last_msg_update_for_system_msgs: boolean;
 
+  typing_events: boolean;
 
+  updated_at: Date;
 
-    export interface AudioSettingsResponse {access_request_enabled: boolean;
-    
+  uploads: boolean;
 
-        
-        default_device:| "speaker" | "earpiece" ;
+  url_enrichment: boolean;
 
-        hifi_audio_enabled: boolean;
-    
+  user_message_reminders: boolean;
 
-        mic_default_on: boolean;
-    
+  commands: Command[];
 
-        opus_dtx_enabled: boolean;
-    
+  blocklist?: string;
 
-        redundant_coding_enabled: boolean;
-    
+  blocklist_behavior?: 'flag' | 'block' | 'shadow_block';
 
-        speaker_default_on: boolean;
-    
+  partition_size?: number;
 
-        noise_cancellation?: NoiseCancellationSettings;
-    
+  partition_ttl?: string;
 
-        }
-    
+  push_level?: 'all' | 'all_mentions' | 'mentions' | 'direct_mentions' | 'none';
 
+  allowed_flag_reasons?: string[];
 
+  blocklists?: BlockListOptions[];
 
+  automod_thresholds?: Thresholds;
 
-    export interface AutomodPlatformCircumventionConfig {enabled: boolean;
-    
+  chat_preferences?: ChatPreferences;
 
-        rules: Array<AutomodRule>;
-    
+  grants?: Record<string, string[]>;
+}
 
-        async?: boolean;
-    
+export interface ChannelMemberResponse {
+  banned: boolean;
 
-        }
-    
+  channel_role: string;
 
+  created_at: Date;
 
+  notifications_muted: boolean;
 
+  shadow_banned: boolean;
 
-    export interface AutomodRule {
-        action:| "flag" | "shadow" | "remove" | "bounce" | "bounce_flag" | "bounce_remove" ;
+  updated_at: Date;
 
-        label: string;
-    
+  custom: Record<string, any>;
 
-        threshold: number;
-    
+  archived_at?: Date;
 
-        }
-    
+  ban_expires?: Date;
 
+  deleted_at?: Date;
 
+  invite_accepted_at?: Date;
 
+  invite_rejected_at?: Date;
 
-    export interface AutomodSemanticFiltersConfig {enabled: boolean;
-    
+  invited?: boolean;
 
-        rules: Array<AutomodSemanticFiltersRule>;
-    
+  is_moderator?: boolean;
 
-        async?: boolean;
-    
+  pinned_at?: Date;
 
-        }
-    
+  role?: string;
 
+  status?: string;
 
+  user_id?: string;
 
+  deleted_messages?: string[];
 
-    export interface AutomodSemanticFiltersRule {
-        action:| "flag" | "shadow" | "remove" ;
+  user?: UserResponse;
+}
 
-        name: string;
-    
+export interface ChannelMute {
+  created_at: Date;
 
-        threshold: number;
-    
+  updated_at: Date;
 
-        }
-    
+  expires?: Date;
 
+  channel?: ChannelResponse;
 
-
-
-    export interface AutomodToxicityConfig {enabled: boolean;
-    
-
-        rules: Array<AutomodRule>;
-    
-
-        async?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface BackstageSettingsResponse {enabled: boolean;
-    
-
-        join_ahead_time_seconds?: number;
-    
-
-        }
-    
-
-
-
-
-    export interface BanActionRequestPayload {channel_ban_only?: boolean;
-    
-
-        channel_cid?: string;
-    
-
-        
-        delete_messages?:| "soft" | "pruning" | "hard" ;
-
-        ip_ban?: boolean;
-    
-
-        reason?: string;
-    
-
-        shadow?: boolean;
-    
-
-        target_user_id?: string;
-    
-
-        timeout?: number;
-    
-
-        }
-    
-
-
-
-
-    export interface BanInfoResponse {created_at: Date;
-    
-
-        expires?: Date;
-    
-
-        reason?: string;
-    
-
-        shadow?: boolean;
-    
-
-        created_by?: UserResponse;
-    
-
-        user?: UserResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface BanOptions {
-        delete_messages?:| "soft" | "pruning" | "hard" ;
-
-        duration?: number;
-    
-
-        ip_ban?: boolean;
-    
-
-        reason?: string;
-    
-
-        shadow_ban?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface BanRequest {target_user_id: string;
-    
-
-        banned_by_id?: string;
-    
-
-        channel_cid?: string;
-    
-
-        
-        delete_messages?:| "soft" | "pruning" | "hard" ;
-
-        ip_ban?: boolean;
-    
-
-        reason?: string;
-    
-
-        shadow?: boolean;
-    
-
-        timeout?: number;
-    
-
-        banned_by?: UserRequest;
-    
-
-        }
-    
-
-
-
-
-    export interface BanResponse {duration: string;
-    
-
-        }
-    
-
-
-
-
-    export interface BlockActionRequestPayload {reason?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface BlockListConfig {enabled: boolean;
-    
-
-        rules: Array<BlockListRule>;
-    
-
-        async?: boolean;
-    
-
-        match_substring?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface BlockListOptions {
-        behavior:| "flag" | "block" | "shadow_block" ;
-
-        blocklist: string;
-    
-
-        }
-    
-
-
-
-
-    export interface BlockListResponse {is_leet_check_enabled: boolean;
-    
-
-        is_plural_check_enabled: boolean;
-    
-
-        name: string;
-    
-
-        type: string;
-    
-
-        words: Array<string>;
-    
-
-        created_at?: Date;
-    
-
-        id?: string;
-    
-
-        team?: string;
-    
-
-        updated_at?: Date;
-    
-
-        }
-    
-
-
-
-
-    export interface BlockListRule {
-        action:| "flag" | "mask_flag" | "shadow" | "remove" | "bounce" | "bounce_flag" | "bounce_remove" ;
-
-        name: string;
-    
-
-        team: string;
-    
-
-        }
-    
-
-
-
-
-    export interface BlockUsersRequest {blocked_user_id: string;
-    
-
-        }
-    
-
-
-
-
-    export interface BlockUsersResponse {blocked_by_user_id: string;
-    
-
-        blocked_user_id: string;
-    
-
-        created_at: Date;
-    
-
-        duration: string;
-    
-
-        }
-    
-
-
-
-
-    export interface BlockedUserResponse {blocked_user_id: string;
-    
-
-        created_at: Date;
-    
-
-        user_id: string;
-    
-
-        blocked_user: UserResponse;
-    
-
-        user: UserResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface BodyguardRule {
-        action:| "flag" | "shadow" | "remove" | "bounce" | "bounce_flag" | "bounce_remove" ;
-
-        label: string;
-    
-
-        severity_rules: Array<BodyguardSeverityRule>;
-    
-
-        }
-    
-
-
-
-
-    export interface BodyguardSeverityRule {
-        action:| "flag" | "shadow" | "remove" | "bounce" | "bounce_flag" | "bounce_remove" ;
-
-        
-        severity:| "low" | "medium" | "high" | "critical" ;
-
-        }
-    
-
-
-
-
-    export interface BookmarkAddedEvent {created_at: Date;
-    
-
-        bookmark: BookmarkResponse;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface BookmarkDeletedEvent {created_at: Date;
-    
-
-        bookmark: BookmarkResponse;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface BookmarkFolderDeletedEvent {created_at: Date;
-    
-
-        bookmark_folder: BookmarkFolderResponse;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface BookmarkFolderResponse {created_at: Date;
-    
-
-        id: string;
-    
-
-        name: string;
-    
-
-        updated_at: Date;
-    
-
-        user: UserResponse;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface BookmarkFolderUpdatedEvent {created_at: Date;
-    
-
-        bookmark_folder: BookmarkFolderResponse;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface BookmarkResponse {created_at: Date;
-    
-
-        updated_at: Date;
-    
-
-        activity: ActivityResponse;
-    
-
-        user: UserResponse;
-    
-
-        custom?: Record<string, any>;
-    
-
-        folder?: BookmarkFolderResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface BookmarkUpdatedEvent {created_at: Date;
-    
-
-        bookmark: BookmarkResponse;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface BroadcastSettingsResponse {enabled: boolean;
-    
-
-        hls: HLSSettingsResponse;
-    
-
-        rtmp: RTMPSettingsResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface CallActionOptions {duration?: number;
-    
-
-        flag_reason?: string;
-    
-
-        kick_reason?: string;
-    
-
-        mute_audio?: boolean;
-    
-
-        mute_video?: boolean;
-    
-
-        reason?: string;
-    
-
-        warning_text?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface CallCustomPropertyParameters {operator?: string;
-    
-
-        property_key?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface CallIngressResponse {rtmp: RTMPIngress;
-    
-
-        srt: SRTIngress;
-    
-
-        whip: WHIPIngress;
-    
-
-        }
-    
-
-
-
-
-    export interface CallParticipantResponse {joined_at: Date;
-    
-
-        role: string;
-    
-
-        user_session_id: string;
-    
-
-        user: UserResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface CallResponse {backstage: boolean;
-    
-
-        captioning: boolean;
-    
-
-        cid: string;
-    
-
-        created_at: Date;
-    
-
-        current_session_id: string;
-    
-
-        id: string;
-    
-
-        recording: boolean;
-    
-
-        transcribing: boolean;
-    
-
-        translating: boolean;
-    
-
-        type: string;
-    
-
-        updated_at: Date;
-    
-
-        blocked_user_ids: Array<string>;
-    
-
-        created_by: UserResponse;
-    
-
-        custom: Record<string, any>;
-    
-
-        egress: EgressResponse;
-    
-
-        ingress: CallIngressResponse;
-    
-
-        settings: CallSettingsResponse;
-    
-
-        channel_cid?: string;
-    
-
-        ended_at?: Date;
-    
-
-        join_ahead_time_seconds?: number;
-    
-
-        routing_number?: string;
-    
-
-        starts_at?: Date;
-    
-
-        team?: string;
-    
-
-        session?: CallSessionResponse;
-    
-
-        thumbnails?: ThumbnailResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface CallRuleActionSequence {violation_number?: number;
-    
-
-        actions?: Array<string>;
-    
-
-        call_options?: CallActionOptions;
-    
-
-        }
-    
-
-
-
-
-    export interface CallSessionResponse {anonymous_participant_count: number;
-    
-
-        id: string;
-    
-
-        participants: Array<CallParticipantResponse>;
-    
-
-        accepted_by: Record<string, Date>;
-    
-
-        missed_by: Record<string, Date>;
-    
-
-        participants_count_by_role: Record<string, number>;
-    
-
-        rejected_by: Record<string, Date>;
-    
-
-        ended_at?: Date;
-    
-
-        live_ended_at?: Date;
-    
-
-        live_started_at?: Date;
-    
-
-        started_at?: Date;
-    
-
-        timer_ends_at?: Date;
-    
-
-        }
-    
-
-
-
-
-    export interface CallSettingsResponse {audio: AudioSettingsResponse;
-    
-
-        backstage: BackstageSettingsResponse;
-    
-
-        broadcasting: BroadcastSettingsResponse;
-    
-
-        frame_recording: FrameRecordingSettingsResponse;
-    
-
-        geofencing: GeofenceSettingsResponse;
-    
-
-        individual_recording: IndividualRecordingSettingsResponse;
-    
-
-        limits: LimitsSettingsResponse;
-    
-
-        raw_recording: RawRecordingSettingsResponse;
-    
-
-        recording: RecordSettingsResponse;
-    
-
-        ring: RingSettingsResponse;
-    
-
-        screensharing: ScreensharingSettingsResponse;
-    
-
-        session: SessionSettingsResponse;
-    
-
-        thumbnails: ThumbnailsSettingsResponse;
-    
-
-        transcription: TranscriptionSettingsResponse;
-    
-
-        video: VideoSettingsResponse;
-    
-
-        ingress?: IngressSettingsResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface CallTypeRuleParameters {call_type?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface CallViolationCountParameters {threshold?: number;
-    
-
-        time_window?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface CastPollVoteRequest {vote?: VoteData;
-    
-
-        }
-    
-
-
-
-
-    export interface ChannelConfigWithInfo {
-        automod:| "disabled" | "simple" | "AI" ;
-
-        
-        automod_behavior:| "flag" | "block" | "shadow_block" ;
-
-        connect_events: boolean;
-    
-
-        count_messages: boolean;
-    
-
-        created_at: Date;
-    
-
-        custom_events: boolean;
-    
-
-        delivery_events: boolean;
-    
-
-        mark_messages_pending: boolean;
-    
-
-        max_message_length: number;
-    
-
-        mutes: boolean;
-    
-
-        name: string;
-    
-
-        polls: boolean;
-    
-
-        push_notifications: boolean;
-    
-
-        quotes: boolean;
-    
-
-        reactions: boolean;
-    
-
-        read_events: boolean;
-    
-
-        reminders: boolean;
-    
-
-        replies: boolean;
-    
-
-        search: boolean;
-    
-
-        shared_locations: boolean;
-    
-
-        skip_last_msg_update_for_system_msgs: boolean;
-    
-
-        typing_events: boolean;
-    
-
-        updated_at: Date;
-    
-
-        uploads: boolean;
-    
-
-        url_enrichment: boolean;
-    
-
-        user_message_reminders: boolean;
-    
-
-        commands: Array<Command>;
-    
-
-        blocklist?: string;
-    
-
-        
-        blocklist_behavior?:| "flag" | "block" | "shadow_block" ;
-
-        partition_size?: number;
-    
-
-        partition_ttl?: string;
-    
-
-        
-        push_level?:| "all" | "all_mentions" | "mentions" | "direct_mentions" | "none" ;
-
-        allowed_flag_reasons?: Array<string>;
-    
-
-        blocklists?: Array<BlockListOptions>;
-    
-
-        automod_thresholds?: Thresholds;
-    
-
-        chat_preferences?: ChatPreferences;
-    
-
-        grants?: Record<string, Array<string>>;
-    
-
-        }
-    
-
-
-
-
-    export interface ChannelMemberResponse {banned: boolean;
-    
-
-        channel_role: string;
-    
-
-        created_at: Date;
-    
-
-        notifications_muted: boolean;
-    
-
-        shadow_banned: boolean;
-    
-
-        updated_at: Date;
-    
-
-        custom: Record<string, any>;
-    
-
-        archived_at?: Date;
-    
-
-        ban_expires?: Date;
-    
-
-        deleted_at?: Date;
-    
-
-        invite_accepted_at?: Date;
-    
-
-        invite_rejected_at?: Date;
-    
-
-        invited?: boolean;
-    
-
-        is_moderator?: boolean;
-    
-
-        pinned_at?: Date;
-    
-
-        role?: string;
-    
-
-        status?: string;
-    
-
-        user_id?: string;
-    
-
-        deleted_messages?: Array<string>;
-    
-
-        user?: UserResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface ChannelMute {created_at: Date;
-    
-
-        updated_at: Date;
-    
-
-        expires?: Date;
-    
-
-        channel?: ChannelResponse;
-    
-
-        user?: UserResponse;
-    
-
-        }
-    
-
-
+  user?: UserResponse;
+}
 
 export const ChannelOwnCapability = {
-    BAN_CHANNEL_MEMBERS: 'ban-channel-members',
-    CAST_POLL_VOTE: 'cast-poll-vote',
-    CONNECT_EVENTS: 'connect-events',
-    CREATE_ATTACHMENT: 'create-attachment',
-    DELETE_ANY_MESSAGE: 'delete-any-message',
-    DELETE_CHANNEL: 'delete-channel',
-    DELETE_OWN_MESSAGE: 'delete-own-message',
-    DELIVERY_EVENTS: 'delivery-events',
-    FLAG_MESSAGE: 'flag-message',
-    FREEZE_CHANNEL: 'freeze-channel',
-    JOIN_CHANNEL: 'join-channel',
-    LEAVE_CHANNEL: 'leave-channel',
-    MUTE_CHANNEL: 'mute-channel',
-    PIN_MESSAGE: 'pin-message',
-    QUERY_POLL_VOTES: 'query-poll-votes',
-    QUOTE_MESSAGE: 'quote-message',
-    READ_EVENTS: 'read-events',
-    SEARCH_MESSAGES: 'search-messages',
-    SEND_CUSTOM_EVENTS: 'send-custom-events',
-    SEND_LINKS: 'send-links',
-    SEND_MESSAGE: 'send-message',
-    SEND_POLL: 'send-poll',
-    SEND_REACTION: 'send-reaction',
-    SEND_REPLY: 'send-reply',
-    SEND_RESTRICTED_VISIBILITY_MESSAGE: 'send-restricted-visibility-message',
-    SEND_TYPING_EVENTS: 'send-typing-events',
-    SET_CHANNEL_COOLDOWN: 'set-channel-cooldown',
-    SHARE_LOCATION: 'share-location',
-    SKIP_SLOW_MODE: 'skip-slow-mode',
-    SLOW_MODE: 'slow-mode',
-    TYPING_EVENTS: 'typing-events',
-    UPDATE_ANY_MESSAGE: 'update-any-message',
-    UPDATE_CHANNEL: 'update-channel',
-    UPDATE_CHANNEL_MEMBERS: 'update-channel-members',
-    UPDATE_OWN_MESSAGE: 'update-own-message',
-    UPDATE_THREAD: 'update-thread',
-    UPLOAD_FILE: 'upload-file',
+  BAN_CHANNEL_MEMBERS: 'ban-channel-members',
+  CAST_POLL_VOTE: 'cast-poll-vote',
+  CONNECT_EVENTS: 'connect-events',
+  CREATE_ATTACHMENT: 'create-attachment',
+  DELETE_ANY_MESSAGE: 'delete-any-message',
+  DELETE_CHANNEL: 'delete-channel',
+  DELETE_OWN_MESSAGE: 'delete-own-message',
+  DELIVERY_EVENTS: 'delivery-events',
+  FLAG_MESSAGE: 'flag-message',
+  FREEZE_CHANNEL: 'freeze-channel',
+  JOIN_CHANNEL: 'join-channel',
+  LEAVE_CHANNEL: 'leave-channel',
+  MUTE_CHANNEL: 'mute-channel',
+  PIN_MESSAGE: 'pin-message',
+  QUERY_POLL_VOTES: 'query-poll-votes',
+  QUOTE_MESSAGE: 'quote-message',
+  READ_EVENTS: 'read-events',
+  SEARCH_MESSAGES: 'search-messages',
+  SEND_CUSTOM_EVENTS: 'send-custom-events',
+  SEND_LINKS: 'send-links',
+  SEND_MESSAGE: 'send-message',
+  SEND_POLL: 'send-poll',
+  SEND_REACTION: 'send-reaction',
+  SEND_REPLY: 'send-reply',
+  SEND_RESTRICTED_VISIBILITY_MESSAGE: 'send-restricted-visibility-message',
+  SEND_TYPING_EVENTS: 'send-typing-events',
+  SET_CHANNEL_COOLDOWN: 'set-channel-cooldown',
+  SHARE_LOCATION: 'share-location',
+  SKIP_SLOW_MODE: 'skip-slow-mode',
+  SLOW_MODE: 'slow-mode',
+  TYPING_EVENTS: 'typing-events',
+  UPDATE_ANY_MESSAGE: 'update-any-message',
+  UPDATE_CHANNEL: 'update-channel',
+  UPDATE_CHANNEL_MEMBERS: 'update-channel-members',
+  UPDATE_OWN_MESSAGE: 'update-own-message',
+  UPDATE_THREAD: 'update-thread',
+  UPLOAD_FILE: 'upload-file',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export type ChannelOwnCapability = typeof ChannelOwnCapability[keyof typeof ChannelOwnCapability]
+export type ChannelOwnCapability =
+  (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
 
+export interface ChannelPushPreferencesResponse {
+  chat_level?: string;
 
+  disabled_until?: Date;
 
+  chat_preferences?: ChatPreferencesResponse;
+}
 
-    export interface ChannelPushPreferencesResponse {chat_level?: string;
-    
+export interface ChannelResponse {
+  cid: string;
 
-        disabled_until?: Date;
-    
+  created_at: Date;
 
-        chat_preferences?: ChatPreferencesResponse;
-    
+  disabled: boolean;
 
-        }
-    
+  frozen: boolean;
 
+  id: string;
 
+  type: string;
 
+  updated_at: Date;
 
-    export interface ChannelResponse {cid: string;
-    
+  custom: Record<string, any>;
 
-        created_at: Date;
-    
+  auto_translation_enabled?: boolean;
 
-        disabled: boolean;
-    
+  auto_translation_language?: string;
 
-        frozen: boolean;
-    
+  blocked?: boolean;
 
-        id: string;
-    
+  cooldown?: number;
 
-        type: string;
-    
+  deleted_at?: Date;
 
-        updated_at: Date;
-    
+  hidden?: boolean;
 
-        custom: Record<string, any>;
-    
+  hide_messages_before?: Date;
 
-        auto_translation_enabled?: boolean;
-    
+  last_message_at?: Date;
 
-        auto_translation_language?: string;
-    
+  member_count?: number;
 
-        blocked?: boolean;
-    
+  message_count?: number;
 
-        cooldown?: number;
-    
+  mute_expires_at?: Date;
 
-        deleted_at?: Date;
-    
+  muted?: boolean;
 
-        hidden?: boolean;
-    
+  team?: string;
 
-        hide_messages_before?: Date;
-    
+  truncated_at?: Date;
 
-        last_message_at?: Date;
-    
+  filter_tags?: string[];
 
-        member_count?: number;
-    
+  members?: ChannelMemberResponse[];
 
-        message_count?: number;
-    
+  own_capabilities?: ChannelOwnCapability[];
 
-        mute_expires_at?: Date;
-    
+  config?: ChannelConfigWithInfo;
 
-        muted?: boolean;
-    
+  created_by?: UserResponse;
 
-        team?: string;
-    
+  truncated_by?: UserResponse;
+}
 
-        truncated_at?: Date;
-    
+export interface ChatPreferences {
+  channel_mentions?: string;
 
-        filter_tags?: Array<string>;
-    
+  default_preference?: string;
 
-        members?: Array<ChannelMemberResponse>;
-    
+  direct_mentions?: string;
 
-        own_capabilities?: Array<ChannelOwnCapability>;
-    
+  distinct_channel_messages?: string;
 
-        config?: ChannelConfigWithInfo;
-    
+  group_mentions?: string;
 
-        created_by?: UserResponse;
-    
+  here_mentions?: string;
 
-        truncated_by?: UserResponse;
-    
+  role_mentions?: string;
 
-        }
-    
+  thread_replies?: string;
+}
 
+export interface ChatPreferencesInput {
+  channel_mentions?: 'all' | 'none';
 
+  default_preference?: 'all' | 'none';
 
+  direct_mentions?: 'all' | 'none';
 
-    export interface ChatPreferences {channel_mentions?: string;
-    
+  group_mentions?: 'all' | 'none';
 
-        default_preference?: string;
-    
+  here_mentions?: 'all' | 'none';
 
-        direct_mentions?: string;
-    
+  role_mentions?: 'all' | 'none';
 
-        distinct_channel_messages?: string;
-    
+  thread_replies?: 'all' | 'none';
+}
 
-        group_mentions?: string;
-    
+export interface ChatPreferencesResponse {
+  channel_mentions?: string;
 
-        here_mentions?: string;
-    
+  default_preference?: string;
 
-        role_mentions?: string;
-    
+  direct_mentions?: string;
 
-        thread_replies?: string;
-    
+  group_mentions?: string;
 
-        }
-    
+  here_mentions?: string;
 
+  role_mentions?: string;
 
+  thread_replies?: string;
+}
 
+export interface ClosedCaptionRuleParameters {
+  threshold?: number;
 
-    export interface ChatPreferencesInput {
-        channel_mentions?:| "all" | "none" ;
+  harm_labels?: string[];
 
-        
-        default_preference?:| "all" | "none" ;
+  llm_harm_labels?: Record<string, string>;
+}
 
-        
-        direct_mentions?:| "all" | "none" ;
+export interface CollectionRequest {
+  name: string;
 
-        
-        group_mentions?:| "all" | "none" ;
+  custom: Record<string, any>;
 
-        
-        here_mentions?:| "all" | "none" ;
+  id?: string;
+}
 
-        
-        role_mentions?:| "all" | "none" ;
+export interface CollectionResponse {
+  id: string;
 
-        
-        thread_replies?:| "all" | "none" ;
+  name: string;
 
-        }
-    
+  created_at?: Date;
 
+  updated_at?: Date;
 
+  user_id?: string;
 
+  custom?: Record<string, any>;
+}
 
-    export interface ChatPreferencesResponse {channel_mentions?: string;
-    
+export interface Command {
+  args: string;
 
-        default_preference?: string;
-    
+  description: string;
 
-        direct_mentions?: string;
-    
+  name: string;
 
-        group_mentions?: string;
-    
+  set: string;
 
-        here_mentions?: string;
-    
+  created_at?: Date;
 
-        role_mentions?: string;
-    
+  updated_at?: Date;
+}
 
-        thread_replies?: string;
-    
+export interface CommentAddedEvent {
+  created_at: Date;
 
-        }
-    
+  fid: string;
 
+  activity: ActivityResponse;
 
+  comment: CommentResponse;
 
+  custom: Record<string, any>;
 
-    export interface ClosedCaptionRuleParameters {threshold?: number;
-    
+  type: string;
 
-        harm_labels?: Array<string>;
-    
+  feed_visibility?: string;
 
-        llm_harm_labels?: Record<string, string>;
-    
+  received_at?: Date;
 
-        }
-    
+  user?: UserResponseCommonFields;
+}
 
+export interface CommentDeletedEvent {
+  created_at: Date;
 
+  fid: string;
 
+  comment: CommentResponse;
 
-    export interface CollectionRequest {name: string;
-    
+  custom: Record<string, any>;
 
-        custom: Record<string, any>;
-    
+  type: string;
 
-        id?: string;
-    
+  feed_visibility?: string;
 
-        }
-    
+  received_at?: Date;
 
+  user?: UserResponseCommonFields;
+}
 
+export interface CommentReactionAddedEvent {
+  created_at: Date;
 
+  fid: string;
 
-    export interface CollectionResponse {id: string;
-    
+  activity: ActivityResponse;
 
-        name: string;
-    
+  comment: CommentResponse;
 
-        created_at?: Date;
-    
+  custom: Record<string, any>;
 
-        updated_at?: Date;
-    
+  reaction: FeedsReactionResponse;
 
-        user_id?: string;
-    
+  type: string;
 
-        custom?: Record<string, any>;
-    
+  feed_visibility?: string;
 
-        }
-    
+  received_at?: Date;
 
+  user?: UserResponseCommonFields;
+}
 
+export interface CommentReactionDeletedEvent {
+  created_at: Date;
 
+  fid: string;
 
-    export interface Command {args: string;
-    
+  comment: CommentResponse;
 
-        description: string;
-    
+  custom: Record<string, any>;
 
-        name: string;
-    
+  reaction: FeedsReactionResponse;
 
-        set: string;
-    
+  type: string;
 
-        created_at?: Date;
-    
+  feed_visibility?: string;
 
-        updated_at?: Date;
-    
+  received_at?: Date;
+}
 
-        }
-    
+export interface CommentReactionUpdatedEvent {
+  created_at: Date;
 
+  fid: string;
 
+  activity: ActivityResponse;
 
+  comment: CommentResponse;
 
-    export interface CommentAddedEvent {created_at: Date;
-    
+  custom: Record<string, any>;
 
-        fid: string;
-    
+  reaction: FeedsReactionResponse;
 
-        activity: ActivityResponse;
-    
+  type: string;
 
-        comment: CommentResponse;
-    
+  feed_visibility?: string;
 
-        custom: Record<string, any>;
-    
+  received_at?: Date;
 
-        type: string;
-    
+  user?: UserResponseCommonFields;
+}
 
-        feed_visibility?: string;
-    
+export interface CommentResponse {
+  confidence_score: number;
 
-        received_at?: Date;
-    
+  created_at: Date;
 
-        user?: UserResponseCommonFields;
-    
+  downvote_count: number;
 
-        }
-    
+  id: string;
 
+  object_id: string;
 
+  object_type: string;
 
+  reaction_count: number;
 
-    export interface CommentDeletedEvent {created_at: Date;
-    
+  reply_count: number;
 
-        fid: string;
-    
+  score: number;
 
-        comment: CommentResponse;
-    
+  status: 'active' | 'deleted' | 'removed' | 'hidden' | 'shadow_blocked';
 
-        custom: Record<string, any>;
-    
+  updated_at: Date;
 
-        type: string;
-    
+  upvote_count: number;
 
-        feed_visibility?: string;
-    
+  mentioned_users: UserResponse[];
 
-        received_at?: Date;
-    
+  own_reactions: FeedsReactionResponse[];
 
-        user?: UserResponseCommonFields;
-    
+  user: UserResponse;
 
-        }
-    
+  controversy_score?: number;
 
+  deleted_at?: Date;
 
+  edited_at?: Date;
 
+  parent_id?: string;
 
-    export interface CommentReactionAddedEvent {created_at: Date;
-    
+  text?: string;
 
-        fid: string;
-    
+  attachments?: Attachment[];
 
-        activity: ActivityResponse;
-    
+  latest_reactions?: FeedsReactionResponse[];
 
-        comment: CommentResponse;
-    
+  custom?: Record<string, any>;
 
-        custom: Record<string, any>;
-    
+  moderation?: ModerationV2Response;
 
-        reaction: FeedsReactionResponse;
-    
+  reaction_groups?: Record<string, FeedsReactionGroupResponse>;
+}
 
-        type: string;
-    
+export interface CommentUpdatedEvent {
+  created_at: Date;
 
-        feed_visibility?: string;
-    
+  fid: string;
 
-        received_at?: Date;
-    
+  comment: CommentResponse;
 
-        user?: UserResponseCommonFields;
-    
+  custom: Record<string, any>;
 
-        }
-    
+  type: string;
 
+  feed_visibility?: string;
 
+  received_at?: Date;
 
+  user?: UserResponseCommonFields;
+}
 
-    export interface CommentReactionDeletedEvent {created_at: Date;
-    
+export interface CompositeRecordingResponse {
+  status: string;
+}
 
-        fid: string;
-    
+export interface ConfigResponse {
+  async: boolean;
 
-        comment: CommentResponse;
-    
+  created_at: Date;
 
-        custom: Record<string, any>;
-    
+  key: string;
 
-        reaction: FeedsReactionResponse;
-    
+  team: string;
 
-        type: string;
-    
+  updated_at: Date;
 
-        feed_visibility?: string;
-    
+  supported_video_call_harm_types: string[];
 
-        received_at?: Date;
-    
+  ai_image_label_definitions?: AIImageLabelDefinition[];
 
-        }
-    
+  ai_image_config?: AIImageConfig;
 
+  ai_image_subclassifications?: Record<string, string[]>;
 
+  ai_text_config?: AITextConfig;
 
+  ai_video_config?: AIVideoConfig;
 
-    export interface CommentReactionUpdatedEvent {created_at: Date;
-    
+  automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
 
-        fid: string;
-    
+  automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
 
-        activity: ActivityResponse;
-    
+  automod_toxicity_config?: AutomodToxicityConfig;
 
-        comment: CommentResponse;
-    
+  block_list_config?: BlockListConfig;
 
-        custom: Record<string, any>;
-    
+  llm_config?: LLMConfig;
 
-        reaction: FeedsReactionResponse;
-    
+  velocity_filter_config?: VelocityFilterConfig;
 
-        type: string;
-    
+  video_call_rule_config?: VideoCallRuleConfig;
+}
 
-        feed_visibility?: string;
-    
+export interface ConnectUserDetailsRequest {
+  id: string;
 
-        received_at?: Date;
-    
+  image?: string;
 
-        user?: UserResponseCommonFields;
-    
+  invisible?: boolean;
 
-        }
-    
+  language?: string;
 
+  name?: string;
 
+  custom?: Record<string, any>;
 
+  privacy_settings?: PrivacySettingsResponse;
+}
 
-    export interface CommentResponse {confidence_score: number;
-    
+export interface ContentCountRuleParameters {
+  threshold?: number;
 
-        created_at: Date;
-    
+  time_window?: string;
+}
 
-        downvote_count: number;
-    
+export interface CreateBlockListRequest {
+  name: string;
 
-        id: string;
-    
+  words: string[];
 
-        object_id: string;
-    
+  is_leet_check_enabled?: boolean;
 
-        object_type: string;
-    
+  is_plural_check_enabled?: boolean;
 
-        reaction_count: number;
-    
+  team?: string;
 
-        reply_count: number;
-    
+  type?:
+    | 'regex'
+    | 'domain'
+    | 'domain_allowlist'
+    | 'email'
+    | 'email_allowlist'
+    | 'word';
+}
 
-        score: number;
-    
+export interface CreateBlockListResponse {
+  duration: string;
 
-        
-        status:| "active" | "deleted" | "removed" | "hidden" | "shadow_blocked" ;
+  blocklist?: BlockListResponse;
+}
 
-        updated_at: Date;
-    
+export interface CreateCollectionsRequest {
+  collections: CollectionRequest[];
+}
 
-        upvote_count: number;
-    
+export interface CreateCollectionsResponse {
+  duration: string;
 
-        mentioned_users: Array<UserResponse>;
-    
+  collections: CollectionResponse[];
+}
 
-        own_reactions: Array<FeedsReactionResponse>;
-    
+export interface CreateDeviceRequest {
+  id: string;
 
-        user: UserResponse;
-    
+  push_provider: 'firebase' | 'apn' | 'huawei' | 'xiaomi';
 
-        controversy_score?: number;
-    
+  push_provider_name?: string;
 
-        deleted_at?: Date;
-    
+  voip_token?: boolean;
+}
 
-        edited_at?: Date;
-    
+export interface CreateFeedsBatchRequest {
+  feeds: FeedRequest[];
 
-        parent_id?: string;
-    
+  enrich_own_fields?: boolean;
+}
 
-        text?: string;
-    
+export interface CreateFeedsBatchResponse {
+  duration: string;
 
-        attachments?: Array<Attachment>;
-    
+  feeds: FeedResponse[];
+}
 
-        latest_reactions?: Array<FeedsReactionResponse>;
-    
+export interface CreateGuestRequest {
+  user: UserRequest;
+}
 
-        custom?: Record<string, any>;
-    
+export interface CreateGuestResponse {
+  access_token: string;
 
-        moderation?: ModerationV2Response;
-    
+  duration: string;
 
-        reaction_groups?: Record<string, FeedsReactionGroupResponse>;
-    
+  user: UserResponse;
+}
 
-        }
-    
+export interface CreatePollOptionRequest {
+  text: string;
 
+  custom?: Record<string, any>;
+}
 
+export interface CreatePollRequest {
+  name: string;
 
+  allow_answers?: boolean;
 
-    export interface CommentUpdatedEvent {created_at: Date;
-    
+  allow_user_suggested_options?: boolean;
 
-        fid: string;
-    
+  description?: string;
 
-        comment: CommentResponse;
-    
+  enforce_unique_vote?: boolean;
 
-        custom: Record<string, any>;
-    
+  id?: string;
 
-        type: string;
-    
+  is_closed?: boolean;
 
-        feed_visibility?: string;
-    
+  max_votes_allowed?: number;
 
-        received_at?: Date;
-    
+  voting_visibility?: 'anonymous' | 'public';
 
-        user?: UserResponseCommonFields;
-    
+  options?: PollOptionInput[];
 
-        }
-    
+  custom?: Record<string, any>;
+}
 
+export interface CreateUserGroupRequest {
+  name: string;
 
+  description?: string;
 
+  id?: string;
 
-    export interface CompositeRecordingResponse {status: string;
-    
+  team_id?: string;
 
-        }
-    
+  member_ids?: string[];
+}
 
+export interface CreateUserGroupResponse {
+  duration: string;
 
+  user_group?: UserGroupResponse;
+}
 
+export interface CustomActionRequestPayload {
+  id?: string;
 
-    export interface ConfigResponse {async: boolean;
-    
+  options?: Record<string, any>;
+}
 
-        created_at: Date;
-    
+export interface Data {
+  id: string;
+}
 
-        key: string;
-    
+export interface DecayFunctionConfig {
+  base?: string;
 
-        team: string;
-    
+  decay?: string;
 
-        updated_at: Date;
-    
+  direction?: string;
 
-        supported_video_call_harm_types: Array<string>;
-    
+  offset?: string;
 
-        ai_image_label_definitions?: Array<AIImageLabelDefinition>;
-    
+  origin?: string;
 
-        ai_image_config?: AIImageConfig;
-    
+  scale?: string;
+}
 
-        ai_image_subclassifications?: Record<string, Array<string>>;
-    
+export interface DeleteActivitiesRequest {
+  ids: string[];
 
-        ai_text_config?: AITextConfig;
-    
+  delete_notification_activity?: boolean;
 
-        ai_video_config?: AIVideoConfig;
-    
+  hard_delete?: boolean;
+}
 
-        automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
-    
+export interface DeleteActivitiesResponse {
+  duration: string;
 
-        automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
-    
+  deleted_ids: string[];
+}
 
-        automod_toxicity_config?: AutomodToxicityConfig;
-    
+export interface DeleteActivityReactionResponse {
+  duration: string;
 
-        block_list_config?: BlockListConfig;
-    
+  activity: ActivityResponse;
 
-        llm_config?: LLMConfig;
-    
+  reaction: FeedsReactionResponse;
+}
 
-        velocity_filter_config?: VelocityFilterConfig;
-    
+export interface DeleteActivityRequestPayload {
+  entity_id?: string;
 
-        video_call_rule_config?: VideoCallRuleConfig;
-    
+  entity_type?: string;
 
-        }
-    
+  hard_delete?: boolean;
 
+  reason?: string;
+}
 
+export interface DeleteActivityResponse {
+  duration: string;
+}
 
+export interface DeleteBookmarkFolderResponse {
+  duration: string;
+}
 
-    export interface ConnectUserDetailsRequest {id: string;
-    
+export interface DeleteBookmarkResponse {
+  duration: string;
 
-        image?: string;
-    
+  bookmark: BookmarkResponse;
+}
 
-        invisible?: boolean;
-    
+export interface DeleteCollectionsResponse {
+  duration: string;
+}
 
-        language?: string;
-    
+export interface DeleteCommentReactionResponse {
+  duration: string;
 
-        name?: string;
-    
+  comment: CommentResponse;
 
-        custom?: Record<string, any>;
-    
+  reaction: FeedsReactionResponse;
+}
 
-        privacy_settings?: PrivacySettingsResponse;
-    
+export interface DeleteCommentRequestPayload {
+  entity_id?: string;
 
-        }
-    
+  entity_type?: string;
 
+  hard_delete?: boolean;
 
+  reason?: string;
+}
 
+export interface DeleteCommentResponse {
+  duration: string;
 
-    export interface ContentCountRuleParameters {threshold?: number;
-    
+  activity: ActivityResponse;
 
-        time_window?: string;
-    
+  comment: CommentResponse;
+}
 
-        }
-    
+export interface DeleteFeedResponse {
+  duration: string;
 
+  task_id: string;
+}
 
+export interface DeleteMessageRequestPayload {
+  entity_id?: string;
 
+  entity_type?: string;
 
-    export interface CreateBlockListRequest {name: string;
-    
+  hard_delete?: boolean;
 
-        words: Array<string>;
-    
+  reason?: string;
+}
 
-        is_leet_check_enabled?: boolean;
-    
+export interface DeleteModerationConfigResponse {
+  duration: string;
+}
 
-        is_plural_check_enabled?: boolean;
-    
+export interface DeleteReactionRequestPayload {
+  entity_id?: string;
 
-        team?: string;
-    
+  entity_type?: string;
 
-        
-        type?:| "regex" | "domain" | "domain_allowlist" | "email" | "email_allowlist" | "word" ;
+  hard_delete?: boolean;
 
-        }
-    
+  reason?: string;
+}
 
+export interface DeleteUserRequestPayload {
+  delete_conversation_channels?: boolean;
 
+  delete_feeds_content?: boolean;
 
+  entity_id?: string;
 
-    export interface CreateBlockListResponse {duration: string;
-    
+  entity_type?: string;
 
-        blocklist?: BlockListResponse;
-    
+  hard_delete?: boolean;
 
-        }
-    
+  mark_messages_deleted?: boolean;
 
+  reason?: string;
+}
 
+export interface DeliveryReceiptsResponse {
+  enabled: boolean;
+}
 
+export interface DeviceResponse {
+  created_at: Date;
 
-    export interface CreateCollectionsRequest {collections: Array<CollectionRequest>;
-    
+  id: string;
 
-        }
-    
+  push_provider: string;
 
+  user_id: string;
 
+  disabled?: boolean;
 
+  disabled_reason?: string;
 
-    export interface CreateCollectionsResponse {duration: string;
-    
+  push_provider_name?: string;
 
-        collections: Array<CollectionResponse>;
-    
+  voip?: boolean;
+}
 
-        }
-    
+export interface DraftPayloadResponse {
+  id: string;
 
+  text: string;
 
+  custom: Record<string, any>;
 
+  html?: string;
 
-    export interface CreateDeviceRequest {id: string;
-    
+  mml?: string;
 
-        
-        push_provider:| "firebase" | "apn" | "huawei" | "xiaomi" ;
+  parent_id?: string;
 
-        push_provider_name?: string;
-    
+  poll_id?: string;
 
-        voip_token?: boolean;
-    
+  quoted_message_id?: string;
 
-        }
-    
+  show_in_channel?: boolean;
 
+  silent?: boolean;
 
+  type?: string;
 
+  attachments?: Attachment[];
 
-    export interface CreateFeedsBatchRequest {feeds: Array<FeedRequest>;
-    
+  mentioned_users?: UserResponse[];
+}
 
-        enrich_own_fields?: boolean;
-    
+export interface DraftResponse {
+  channel_cid: string;
 
-        }
-    
+  created_at: Date;
 
+  message: DraftPayloadResponse;
 
+  parent_id?: string;
 
+  channel?: ChannelResponse;
 
-    export interface CreateFeedsBatchResponse {duration: string;
-    
+  parent_message?: MessageResponse;
 
-        feeds: Array<FeedResponse>;
-    
+  quoted_message?: MessageResponse;
+}
 
-        }
-    
+export interface EgressHLSResponse {
+  playlist_url: string;
 
+  status: string;
+}
 
+export interface EgressRTMPResponse {
+  name: string;
 
+  started_at: Date;
 
-    export interface CreateGuestRequest {user: UserRequest;
-    
+  stream_key?: string;
 
-        }
-    
+  stream_url?: string;
+}
 
+export interface EgressResponse {
+  broadcasting: boolean;
 
+  rtmps: EgressRTMPResponse[];
 
+  composite_recording?: CompositeRecordingResponse;
 
-    export interface CreateGuestResponse {access_token: string;
-    
+  frame_recording?: FrameRecordingResponse;
 
-        duration: string;
-    
+  hls?: EgressHLSResponse;
 
-        user: UserResponse;
-    
+  individual_recording?: IndividualRecordingResponse;
 
-        }
-    
+  raw_recording?: RawRecordingResponse;
+}
 
+export interface EnrichedActivity {
+  foreign_id?: string;
 
+  id?: string;
 
+  score?: number;
 
-    export interface CreatePollOptionRequest {text: string;
-    
+  verb?: string;
 
-        custom?: Record<string, any>;
-    
+  to?: string[];
 
-        }
-    
+  actor?: Data;
 
+  latest_reactions?: Record<string, EnrichedReaction[]>;
 
+  object?: Data;
 
+  origin?: Data;
 
-    export interface CreatePollRequest {name: string;
-    
+  own_reactions?: Record<string, EnrichedReaction[]>;
 
-        allow_answers?: boolean;
-    
+  reaction_counts?: Record<string, number>;
 
-        allow_user_suggested_options?: boolean;
-    
+  target?: Data;
+}
 
-        description?: string;
-    
+export interface EnrichedCollectionResponse {
+  id: string;
 
-        enforce_unique_vote?: boolean;
-    
+  name: string;
 
-        id?: string;
-    
+  status: 'ok' | 'notfound';
 
-        is_closed?: boolean;
-    
+  created_at?: Date;
 
-        max_votes_allowed?: number;
-    
+  updated_at?: Date;
 
-        
-        voting_visibility?:| "anonymous" | "public" ;
+  user_id?: string;
 
-        options?: Array<PollOptionInput>;
-    
+  custom?: Record<string, any>;
+}
 
-        custom?: Record<string, any>;
-    
+export interface EnrichedReaction {
+  activity_id: string;
 
-        }
-    
+  kind: string;
 
+  user_id: string;
 
+  id?: string;
 
+  parent?: string;
 
-    export interface CreateUserGroupRequest {name: string;
-    
+  target_feeds?: string[];
 
-        description?: string;
-    
+  children_counts?: Record<string, number>;
 
-        id?: string;
-    
+  created_at?: Time;
 
-        team_id?: string;
-    
+  data?: Record<string, any>;
 
-        member_ids?: Array<string>;
-    
+  latest_children?: Record<string, EnrichedReaction[]>;
 
-        }
-    
+  own_children?: Record<string, EnrichedReaction[]>;
 
+  updated_at?: Time;
 
+  user?: Data;
+}
 
+export interface EnrichmentOptions {
+  enrich_own_followings?: boolean;
 
-    export interface CreateUserGroupResponse {duration: string;
-    
+  skip_activity?: boolean;
 
-        user_group?: UserGroupResponse;
-    
+  skip_activity_collections?: boolean;
 
-        }
-    
+  skip_activity_comments?: boolean;
 
+  skip_activity_current_feed?: boolean;
 
+  skip_activity_mentioned_users?: boolean;
 
+  skip_activity_own_bookmarks?: boolean;
 
-    export interface CustomActionRequestPayload {id?: string;
-    
+  skip_activity_parents?: boolean;
 
-        options?: Record<string, any>;
-    
+  skip_activity_poll?: boolean;
 
-        }
-    
+  skip_activity_reactions?: boolean;
 
+  skip_activity_refresh_image_urls?: boolean;
 
+  skip_all?: boolean;
 
+  skip_feed_member_user?: boolean;
 
-    export interface Data {id: string;
-    
+  skip_followers?: boolean;
 
-        }
-    
+  skip_following?: boolean;
 
+  skip_own_capabilities?: boolean;
 
+  skip_own_follows?: boolean;
 
+  skip_pins?: boolean;
+}
 
-    export interface DecayFunctionConfig {base?: string;
-    
+export interface EntityCreatorResponse {
+  ban_count: number;
 
-        decay?: string;
-    
+  banned: boolean;
 
-        direction?: string;
-    
+  created_at: Date;
 
-        offset?: string;
-    
+  deleted_content_count: number;
 
-        origin?: string;
-    
+  flagged_count: number;
 
-        scale?: string;
-    
+  id: string;
 
-        }
-    
+  language: string;
 
+  online: boolean;
 
+  role: string;
 
+  updated_at: Date;
 
-    export interface DeleteActivitiesRequest {ids: Array<string>;
-    
+  blocked_user_ids: string[];
 
-        delete_notification_activity?: boolean;
-    
+  teams: string[];
 
-        hard_delete?: boolean;
-    
+  custom: Record<string, any>;
 
-        }
-    
+  avg_response_time?: number;
 
+  deactivated_at?: Date;
 
+  deleted_at?: Date;
 
+  image?: string;
 
-    export interface DeleteActivitiesResponse {duration: string;
-    
+  last_active?: Date;
 
-        deleted_ids: Array<string>;
-    
+  name?: string;
 
-        }
-    
+  revoke_tokens_issued_before?: Date;
 
+  teams_role?: Record<string, string>;
+}
 
+export interface FeedCreatedEvent {
+  created_at: Date;
 
+  fid: string;
 
-    export interface DeleteActivityReactionResponse {duration: string;
-    
+  members: FeedMemberResponse[];
 
-        activity: ActivityResponse;
-    
+  custom: Record<string, any>;
 
-        reaction: FeedsReactionResponse;
-    
+  feed: FeedResponse;
 
-        }
-    
+  user: UserResponseCommonFields;
 
+  type: string;
 
+  feed_visibility?: string;
 
+  received_at?: Date;
+}
 
-    export interface DeleteActivityRequestPayload {entity_id?: string;
-    
+export interface FeedDeletedEvent {
+  created_at: Date;
 
-        entity_type?: string;
-    
+  fid: string;
 
-        hard_delete?: boolean;
-    
+  custom: Record<string, any>;
 
-        reason?: string;
-    
+  type: string;
 
-        }
-    
+  feed_visibility?: string;
 
+  received_at?: Date;
 
+  user?: UserResponseCommonFields;
+}
 
+export interface FeedGroup {
+  aggregation_version: number;
 
-    export interface DeleteActivityResponse {duration: string;
-    
+  app_pk: number;
 
-        }
-    
+  created_at: Date;
 
+  default_visibility: string;
 
+  group_id: string;
 
+  updated_at: Date;
 
-    export interface DeleteBookmarkFolderResponse {duration: string;
-    
+  activity_processors: ActivityProcessorConfig[];
 
-        }
-    
+  activity_selectors: ActivitySelectorConfig[];
 
+  custom: Record<string, any>;
 
+  deleted_at?: Date;
 
+  last_feed_get_at?: Date;
 
-    export interface DeleteBookmarkResponse {duration: string;
-    
+  aggregation?: AggregationConfig;
 
-        bookmark: BookmarkResponse;
-    
+  notification?: NotificationConfig;
 
-        }
-    
+  push_notification?: PushNotificationConfig;
 
+  ranking?: RankingConfig;
 
+  stories?: StoriesConfig;
+}
 
+export interface FeedGroupChangedEvent {
+  created_at: Date;
 
-    export interface DeleteCollectionsResponse {duration: string;
-    
+  fid: string;
 
-        }
-    
+  custom: Record<string, any>;
 
+  type: string;
 
+  feed_visibility?: string;
 
+  received_at?: Date;
 
-    export interface DeleteCommentReactionResponse {duration: string;
-    
+  feed_group?: FeedGroup;
 
-        comment: CommentResponse;
-    
+  user?: UserResponseCommonFields;
+}
 
-        reaction: FeedsReactionResponse;
-    
+export interface FeedGroupDeletedEvent {
+  created_at: Date;
 
-        }
-    
+  fid: string;
 
+  group_id: string;
 
+  custom: Record<string, any>;
 
+  type: string;
 
-    export interface DeleteCommentRequestPayload {entity_id?: string;
-    
+  feed_visibility?: string;
 
-        entity_type?: string;
-    
+  received_at?: Date;
+}
 
-        hard_delete?: boolean;
-    
+export interface FeedGroupRestoredEvent {
+  created_at: Date;
 
-        reason?: string;
-    
+  fid: string;
 
-        }
-    
+  group_id: string;
 
+  custom: Record<string, any>;
 
+  type: string;
 
+  feed_visibility?: string;
 
-    export interface DeleteCommentResponse {duration: string;
-    
+  received_at?: Date;
+}
 
-        activity: ActivityResponse;
-    
+export interface FeedInput {
+  description?: string;
 
-        comment: CommentResponse;
-    
+  name?: string;
 
-        }
-    
+  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
+  filter_tags?: string[];
 
+  members?: FeedMemberRequest[];
 
+  custom?: Record<string, any>;
+}
 
-    export interface DeleteFeedResponse {duration: string;
-    
+export interface FeedMemberAddedEvent {
+  created_at: Date;
 
-        task_id: string;
-    
+  fid: string;
 
-        }
-    
+  custom: Record<string, any>;
 
+  member: FeedMemberResponse;
 
+  type: string;
 
+  feed_visibility?: string;
 
-    export interface DeleteMessageRequestPayload {entity_id?: string;
-    
+  received_at?: Date;
 
-        entity_type?: string;
-    
+  user?: UserResponseCommonFields;
+}
 
-        hard_delete?: boolean;
-    
+export interface FeedMemberRemovedEvent {
+  created_at: Date;
 
-        reason?: string;
-    
+  fid: string;
 
-        }
-    
+  member_id: string;
 
+  custom: Record<string, any>;
 
+  type: string;
 
+  feed_visibility?: string;
 
-    export interface DeleteModerationConfigResponse {duration: string;
-    
+  received_at?: Date;
 
-        }
-    
+  user?: UserResponseCommonFields;
+}
 
+export interface FeedMemberRequest {
+  user_id: string;
 
+  invite?: boolean;
 
+  membership_level?: string;
 
-    export interface DeleteReactionRequestPayload {entity_id?: string;
-    
+  role?: string;
 
-        entity_type?: string;
-    
+  custom?: Record<string, any>;
+}
 
-        hard_delete?: boolean;
-    
+export interface FeedMemberResponse {
+  created_at: Date;
 
-        reason?: string;
-    
+  role: string;
 
-        }
-    
+  status: 'member' | 'pending' | 'rejected';
 
+  updated_at: Date;
 
+  user: UserResponse;
 
+  invite_accepted_at?: Date;
 
-    export interface DeleteUserRequestPayload {delete_conversation_channels?: boolean;
-    
+  invite_rejected_at?: Date;
 
-        delete_feeds_content?: boolean;
-    
+  custom?: Record<string, any>;
 
-        entity_id?: string;
-    
+  membership_level?: MembershipLevelResponse;
+}
 
-        entity_type?: string;
-    
+export interface FeedMemberUpdatedEvent {
+  created_at: Date;
 
-        hard_delete?: boolean;
-    
+  fid: string;
 
-        mark_messages_deleted?: boolean;
-    
+  custom: Record<string, any>;
 
-        reason?: string;
-    
+  member: FeedMemberResponse;
 
-        }
-    
+  type: string;
 
+  feed_visibility?: string;
 
+  received_at?: Date;
 
-
-    export interface DeliveryReceiptsResponse {enabled: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface DeviceResponse {created_at: Date;
-    
-
-        id: string;
-    
-
-        push_provider: string;
-    
-
-        user_id: string;
-    
-
-        disabled?: boolean;
-    
-
-        disabled_reason?: string;
-    
-
-        push_provider_name?: string;
-    
-
-        voip?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface DraftPayloadResponse {id: string;
-    
-
-        text: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        html?: string;
-    
-
-        mml?: string;
-    
-
-        parent_id?: string;
-    
-
-        poll_id?: string;
-    
-
-        quoted_message_id?: string;
-    
-
-        show_in_channel?: boolean;
-    
-
-        silent?: boolean;
-    
-
-        type?: string;
-    
-
-        attachments?: Array<Attachment>;
-    
-
-        mentioned_users?: Array<UserResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface DraftResponse {channel_cid: string;
-    
-
-        created_at: Date;
-    
-
-        message: DraftPayloadResponse;
-    
-
-        parent_id?: string;
-    
-
-        channel?: ChannelResponse;
-    
-
-        parent_message?: MessageResponse;
-    
-
-        quoted_message?: MessageResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface EgressHLSResponse {playlist_url: string;
-    
-
-        status: string;
-    
-
-        }
-    
-
-
-
-
-    export interface EgressRTMPResponse {name: string;
-    
-
-        started_at: Date;
-    
-
-        stream_key?: string;
-    
-
-        stream_url?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface EgressResponse {broadcasting: boolean;
-    
-
-        rtmps: Array<EgressRTMPResponse>;
-    
-
-        composite_recording?: CompositeRecordingResponse;
-    
-
-        frame_recording?: FrameRecordingResponse;
-    
-
-        hls?: EgressHLSResponse;
-    
-
-        individual_recording?: IndividualRecordingResponse;
-    
-
-        raw_recording?: RawRecordingResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface EnrichedActivity {foreign_id?: string;
-    
-
-        id?: string;
-    
-
-        score?: number;
-    
-
-        verb?: string;
-    
-
-        to?: Array<string>;
-    
-
-        actor?: Data;
-    
-
-        latest_reactions?: Record<string, Array<EnrichedReaction>>;
-    
-
-        object?: Data;
-    
-
-        origin?: Data;
-    
-
-        own_reactions?: Record<string, Array<EnrichedReaction>>;
-    
-
-        reaction_counts?: Record<string, number>;
-    
-
-        target?: Data;
-    
-
-        }
-    
-
-
-
-
-    export interface EnrichedCollectionResponse {id: string;
-    
-
-        name: string;
-    
-
-        
-        status:| "ok" | "notfound" ;
-
-        created_at?: Date;
-    
-
-        updated_at?: Date;
-    
-
-        user_id?: string;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface EnrichedReaction {activity_id: string;
-    
-
-        kind: string;
-    
-
-        user_id: string;
-    
-
-        id?: string;
-    
-
-        parent?: string;
-    
-
-        target_feeds?: Array<string>;
-    
-
-        children_counts?: Record<string, number>;
-    
-
-        created_at?: Time;
-    
-
-        data?: Record<string, any>;
-    
-
-        latest_children?: Record<string, Array<EnrichedReaction>>;
-    
-
-        own_children?: Record<string, Array<EnrichedReaction>>;
-    
-
-        updated_at?: Time;
-    
-
-        user?: Data;
-    
-
-        }
-    
-
-
-
-
-    export interface EnrichmentOptions {enrich_own_followings?: boolean;
-    
-
-        skip_activity?: boolean;
-    
-
-        skip_activity_collections?: boolean;
-    
-
-        skip_activity_comments?: boolean;
-    
-
-        skip_activity_current_feed?: boolean;
-    
-
-        skip_activity_mentioned_users?: boolean;
-    
-
-        skip_activity_own_bookmarks?: boolean;
-    
-
-        skip_activity_parents?: boolean;
-    
-
-        skip_activity_poll?: boolean;
-    
-
-        skip_activity_reactions?: boolean;
-    
-
-        skip_activity_refresh_image_urls?: boolean;
-    
-
-        skip_all?: boolean;
-    
-
-        skip_feed_member_user?: boolean;
-    
-
-        skip_followers?: boolean;
-    
-
-        skip_following?: boolean;
-    
-
-        skip_own_capabilities?: boolean;
-    
-
-        skip_own_follows?: boolean;
-    
-
-        skip_pins?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface EntityCreatorResponse {ban_count: number;
-    
-
-        banned: boolean;
-    
-
-        created_at: Date;
-    
-
-        deleted_content_count: number;
-    
-
-        flagged_count: number;
-    
-
-        id: string;
-    
-
-        language: string;
-    
-
-        online: boolean;
-    
-
-        role: string;
-    
-
-        updated_at: Date;
-    
-
-        blocked_user_ids: Array<string>;
-    
-
-        teams: Array<string>;
-    
-
-        custom: Record<string, any>;
-    
-
-        avg_response_time?: number;
-    
-
-        deactivated_at?: Date;
-    
-
-        deleted_at?: Date;
-    
-
-        image?: string;
-    
-
-        last_active?: Date;
-    
-
-        name?: string;
-    
-
-        revoke_tokens_issued_before?: Date;
-    
-
-        teams_role?: Record<string, string>;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedCreatedEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        members: Array<FeedMemberResponse>;
-    
-
-        custom: Record<string, any>;
-    
-
-        feed: FeedResponse;
-    
-
-        user: UserResponseCommonFields;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedDeletedEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedGroup {aggregation_version: number;
-    
-
-        app_pk: number;
-    
-
-        created_at: Date;
-    
-
-        default_visibility: string;
-    
-
-        group_id: string;
-    
-
-        updated_at: Date;
-    
-
-        activity_processors: Array<ActivityProcessorConfig>;
-    
-
-        activity_selectors: Array<ActivitySelectorConfig>;
-    
-
-        custom: Record<string, any>;
-    
-
-        deleted_at?: Date;
-    
-
-        last_feed_get_at?: Date;
-    
-
-        aggregation?: AggregationConfig;
-    
-
-        notification?: NotificationConfig;
-    
-
-        push_notification?: PushNotificationConfig;
-    
-
-        ranking?: RankingConfig;
-    
-
-        stories?: StoriesConfig;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedGroupChangedEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        feed_group?: FeedGroup;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedGroupDeletedEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        group_id: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedGroupRestoredEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        group_id: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedInput {description?: string;
-    
-
-        name?: string;
-    
-
-        
-        visibility?:| "public" | "visible" | "followers" | "members" | "private" ;
-
-        filter_tags?: Array<string>;
-    
-
-        members?: Array<FeedMemberRequest>;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedMemberAddedEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        member: FeedMemberResponse;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedMemberRemovedEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        member_id: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedMemberRequest {user_id: string;
-    
-
-        invite?: boolean;
-    
-
-        membership_level?: string;
-    
-
-        role?: string;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedMemberResponse {created_at: Date;
-    
-
-        role: string;
-    
-
-        
-        status:| "member" | "pending" | "rejected" ;
-
-        updated_at: Date;
-    
-
-        user: UserResponse;
-    
-
-        invite_accepted_at?: Date;
-    
-
-        invite_rejected_at?: Date;
-    
-
-        custom?: Record<string, any>;
-    
-
-        membership_level?: MembershipLevelResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface FeedMemberUpdatedEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        member: FeedMemberResponse;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
+  user?: UserResponseCommonFields;
+}
 
 export const FeedOwnCapability = {
-    ADD_ACTIVITY: 'add-activity',
-    ADD_ACTIVITY_BOOKMARK: 'add-activity-bookmark',
-    ADD_ACTIVITY_REACTION: 'add-activity-reaction',
-    ADD_COMMENT: 'add-comment',
-    ADD_COMMENT_REACTION: 'add-comment-reaction',
-    CREATE_FEED: 'create-feed',
-    DELETE_ANY_ACTIVITY: 'delete-any-activity',
-    DELETE_ANY_COMMENT: 'delete-any-comment',
-    DELETE_FEED: 'delete-feed',
-    DELETE_OWN_ACTIVITY: 'delete-own-activity',
-    DELETE_OWN_ACTIVITY_BOOKMARK: 'delete-own-activity-bookmark',
-    DELETE_OWN_ACTIVITY_REACTION: 'delete-own-activity-reaction',
-    DELETE_OWN_COMMENT: 'delete-own-comment',
-    DELETE_OWN_COMMENT_REACTION: 'delete-own-comment-reaction',
-    FOLLOW: 'follow',
-    PIN_ACTIVITY: 'pin-activity',
-    QUERY_FEED_MEMBERS: 'query-feed-members',
-    QUERY_FOLLOWS: 'query-follows',
-    READ_ACTIVITIES: 'read-activities',
-    READ_FEED: 'read-feed',
-    UNFOLLOW: 'unfollow',
-    UPDATE_ANY_ACTIVITY: 'update-any-activity',
-    UPDATE_ANY_COMMENT: 'update-any-comment',
-    UPDATE_FEED: 'update-feed',
-    UPDATE_FEED_FOLLOWERS: 'update-feed-followers',
-    UPDATE_FEED_MEMBERS: 'update-feed-members',
-    UPDATE_OWN_ACTIVITY: 'update-own-activity',
-    UPDATE_OWN_ACTIVITY_BOOKMARK: 'update-own-activity-bookmark',
-    UPDATE_OWN_COMMENT: 'update-own-comment',
+  ADD_ACTIVITY: 'add-activity',
+  ADD_ACTIVITY_BOOKMARK: 'add-activity-bookmark',
+  ADD_ACTIVITY_REACTION: 'add-activity-reaction',
+  ADD_COMMENT: 'add-comment',
+  ADD_COMMENT_REACTION: 'add-comment-reaction',
+  CREATE_FEED: 'create-feed',
+  DELETE_ANY_ACTIVITY: 'delete-any-activity',
+  DELETE_ANY_COMMENT: 'delete-any-comment',
+  DELETE_FEED: 'delete-feed',
+  DELETE_OWN_ACTIVITY: 'delete-own-activity',
+  DELETE_OWN_ACTIVITY_BOOKMARK: 'delete-own-activity-bookmark',
+  DELETE_OWN_ACTIVITY_REACTION: 'delete-own-activity-reaction',
+  DELETE_OWN_COMMENT: 'delete-own-comment',
+  DELETE_OWN_COMMENT_REACTION: 'delete-own-comment-reaction',
+  FOLLOW: 'follow',
+  PIN_ACTIVITY: 'pin-activity',
+  QUERY_FEED_MEMBERS: 'query-feed-members',
+  QUERY_FOLLOWS: 'query-follows',
+  READ_ACTIVITIES: 'read-activities',
+  READ_FEED: 'read-feed',
+  UNFOLLOW: 'unfollow',
+  UPDATE_ANY_ACTIVITY: 'update-any-activity',
+  UPDATE_ANY_COMMENT: 'update-any-comment',
+  UPDATE_FEED: 'update-feed',
+  UPDATE_FEED_FOLLOWERS: 'update-feed-followers',
+  UPDATE_FEED_MEMBERS: 'update-feed-members',
+  UPDATE_OWN_ACTIVITY: 'update-own-activity',
+  UPDATE_OWN_ACTIVITY_BOOKMARK: 'update-own-activity-bookmark',
+  UPDATE_OWN_COMMENT: 'update-own-comment',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export type FeedOwnCapability = typeof FeedOwnCapability[keyof typeof FeedOwnCapability]
+export type FeedOwnCapability =
+  (typeof FeedOwnCapability)[keyof typeof FeedOwnCapability];
 
+export interface FeedOwnData {
+  own_capabilities?: FeedOwnCapability[];
 
+  own_followings?: FollowResponse[];
 
+  own_follows?: FollowResponse[];
 
-    export interface FeedOwnData {own_capabilities?: Array<FeedOwnCapability>;
-    
+  own_membership?: FeedMemberResponse;
+}
 
-        own_followings?: Array<FollowResponse>;
-    
+export interface FeedRequest {
+  feed_group_id: string;
 
-        own_follows?: Array<FollowResponse>;
-    
+  feed_id: string;
 
-        own_membership?: FeedMemberResponse;
-    
+  created_by_id?: string;
 
-        }
-    
+  description?: string;
 
+  name?: string;
 
+  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
+  filter_tags?: string[];
 
-    export interface FeedRequest {feed_group_id: string;
-    
+  members?: FeedMemberRequest[];
 
-        feed_id: string;
-    
+  custom?: Record<string, any>;
+}
 
-        created_by_id?: string;
-    
+export interface FeedResponse {
+  activity_count: number;
 
-        description?: string;
-    
+  created_at: Date;
 
-        name?: string;
-    
+  description: string;
 
-        
-        visibility?:| "public" | "visible" | "followers" | "members" | "private" ;
+  feed: string;
 
-        filter_tags?: Array<string>;
-    
+  follower_count: number;
 
-        members?: Array<FeedMemberRequest>;
-    
+  following_count: number;
 
-        custom?: Record<string, any>;
-    
+  group_id: string;
 
-        }
-    
+  id: string;
 
+  member_count: number;
 
+  name: string;
 
+  pin_count: number;
 
-    export interface FeedResponse {activity_count: number;
-    
+  updated_at: Date;
 
-        created_at: Date;
-    
+  created_by: UserResponse;
 
-        description: string;
-    
+  deleted_at?: Date;
 
-        feed: string;
-    
+  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
-        follower_count: number;
-    
+  filter_tags?: string[];
 
-        following_count: number;
-    
+  own_capabilities?: FeedOwnCapability[];
 
-        group_id: string;
-    
+  own_followings?: FollowResponse[];
 
-        id: string;
-    
+  own_follows?: FollowResponse[];
 
-        member_count: number;
-    
+  custom?: Record<string, any>;
 
-        name: string;
-    
+  own_membership?: FeedMemberResponse;
+}
 
-        pin_count: number;
-    
+export interface FeedSuggestionResponse {
+  activity_count: number;
 
-        updated_at: Date;
-    
+  created_at: Date;
 
-        created_by: UserResponse;
-    
+  description: string;
 
-        deleted_at?: Date;
-    
+  feed: string;
 
-        
-        visibility?:| "public" | "visible" | "followers" | "members" | "private" ;
+  follower_count: number;
 
-        filter_tags?: Array<string>;
-    
+  following_count: number;
 
-        own_capabilities?: Array<FeedOwnCapability>;
-    
+  group_id: string;
 
-        own_followings?: Array<FollowResponse>;
-    
+  id: string;
 
-        own_follows?: Array<FollowResponse>;
-    
+  member_count: number;
 
-        custom?: Record<string, any>;
-    
+  name: string;
 
-        own_membership?: FeedMemberResponse;
-    
+  pin_count: number;
 
-        }
-    
+  updated_at: Date;
 
+  created_by: UserResponse;
 
+  deleted_at?: Date;
 
+  reason?: string;
 
-    export interface FeedSuggestionResponse {activity_count: number;
-    
+  recommendation_score?: number;
 
-        created_at: Date;
-    
+  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
 
-        description: string;
-    
+  filter_tags?: string[];
 
-        feed: string;
-    
+  own_capabilities?: FeedOwnCapability[];
 
-        follower_count: number;
-    
+  own_followings?: FollowResponse[];
 
-        following_count: number;
-    
+  own_follows?: FollowResponse[];
 
-        group_id: string;
-    
+  algorithm_scores?: Record<string, number>;
 
-        id: string;
-    
+  custom?: Record<string, any>;
 
-        member_count: number;
-    
+  own_membership?: FeedMemberResponse;
+}
 
-        name: string;
-    
+export interface FeedUpdatedEvent {
+  created_at: Date;
 
-        pin_count: number;
-    
+  fid: string;
 
-        updated_at: Date;
-    
+  custom: Record<string, any>;
 
-        created_by: UserResponse;
-    
+  feed: FeedResponse;
 
-        deleted_at?: Date;
-    
+  type: string;
 
-        reason?: string;
-    
+  feed_visibility?: string;
 
-        recommendation_score?: number;
-    
+  received_at?: Date;
 
-        
-        visibility?:| "public" | "visible" | "followers" | "members" | "private" ;
+  user?: UserResponseCommonFields;
+}
 
-        filter_tags?: Array<string>;
-    
+export interface FeedsPreferences {
+  comment?: 'all' | 'none';
 
-        own_capabilities?: Array<FeedOwnCapability>;
-    
+  comment_reaction?: 'all' | 'none';
 
-        own_followings?: Array<FollowResponse>;
-    
+  comment_reply?: 'all' | 'none';
 
-        own_follows?: Array<FollowResponse>;
-    
+  follow?: 'all' | 'none';
 
-        algorithm_scores?: Record<string, number>;
-    
+  mention?: 'all' | 'none';
 
-        custom?: Record<string, any>;
-    
+  reaction?: 'all' | 'none';
 
-        own_membership?: FeedMemberResponse;
-    
+  custom_activity_types?: Record<string, string>;
+}
 
-        }
-    
+export interface FeedsPreferencesResponse {
+  comment?: string;
 
+  comment_reaction?: string;
 
+  comment_reply?: string;
 
+  follow?: string;
 
-    export interface FeedUpdatedEvent {created_at: Date;
-    
+  mention?: string;
 
-        fid: string;
-    
+  reaction?: string;
 
-        custom: Record<string, any>;
-    
+  custom_activity_types?: Record<string, string>;
+}
 
-        feed: FeedResponse;
-    
+export interface FeedsReactionGroupResponse {
+  count: number;
 
-        type: string;
-    
+  first_reaction_at: Date;
 
-        feed_visibility?: string;
-    
+  last_reaction_at: Date;
+}
 
-        received_at?: Date;
-    
+export interface FeedsReactionResponse {
+  activity_id: string;
 
-        user?: UserResponseCommonFields;
-    
+  created_at: Date;
 
-        }
-    
+  type: string;
 
+  updated_at: Date;
 
+  user: UserResponse;
 
+  comment_id?: string;
 
-    export interface FeedsPreferences {
-        comment?:| "all" | "none" ;
+  custom?: Record<string, any>;
+}
 
-        
-        comment_reaction?:| "all" | "none" ;
+export interface Field {
+  short: boolean;
 
-        
-        comment_reply?:| "all" | "none" ;
+  title: string;
 
-        
-        follow?:| "all" | "none" ;
+  value: string;
+}
 
-        
-        mention?:| "all" | "none" ;
+export interface FileUploadConfig {
+  size_limit: number;
 
-        
-        reaction?:| "all" | "none" ;
+  allowed_file_extensions: string[];
 
-        custom_activity_types?: Record<string, string>;
-    
+  allowed_mime_types: string[];
 
-        }
-    
+  blocked_file_extensions: string[];
 
+  blocked_mime_types: string[];
+}
 
+export interface FileUploadRequest {
+  file?: string;
 
+  user?: OnlyUserID;
+}
 
-    export interface FeedsPreferencesResponse {comment?: string;
-    
+export interface FileUploadResponse {
+  duration: string;
 
-        comment_reaction?: string;
-    
+  file?: string;
 
-        comment_reply?: string;
-    
+  thumb_url?: string;
+}
 
-        follow?: string;
-    
+export interface FilterConfigResponse {
+  llm_labels: string[];
 
-        mention?: string;
-    
+  ai_text_labels?: string[];
 
-        reaction?: string;
-    
+  config_keys?: string[];
+}
 
-        custom_activity_types?: Record<string, string>;
-    
+export interface FlagCountRuleParameters {
+  threshold?: number;
+}
 
-        }
-    
+export interface FlagRequest {
+  entity_id: string;
 
+  entity_type: string;
 
+  entity_creator_id?: string;
 
+  reason?: string;
 
-    export interface FeedsReactionGroupResponse {count: number;
-    
+  custom?: Record<string, any>;
 
-        first_reaction_at: Date;
-    
+  moderation_payload?: ModerationPayload;
+}
 
-        last_reaction_at: Date;
-    
+export interface FlagResponse {
+  duration: string;
 
-        }
-    
+  item_id: string;
+}
 
+export interface FlagUserOptions {
+  reason?: string;
+}
 
+export interface FollowBatchRequest {
+  follows: FollowRequest[];
 
+  enrich_own_fields?: boolean;
+}
 
-    export interface FeedsReactionResponse {activity_id: string;
-    
+export interface FollowBatchResponse {
+  duration: string;
 
-        created_at: Date;
-    
+  created: FollowResponse[];
 
-        type: string;
-    
+  follows: FollowResponse[];
+}
 
-        updated_at: Date;
-    
+export interface FollowCreatedEvent {
+  created_at: Date;
 
-        user: UserResponse;
-    
+  fid: string;
 
-        comment_id?: string;
-    
+  custom: Record<string, any>;
 
-        custom?: Record<string, any>;
-    
+  follow: FollowResponse;
 
-        }
-    
+  type: string;
 
+  feed_visibility?: string;
 
+  received_at?: Date;
+}
 
+export interface FollowDeletedEvent {
+  created_at: Date;
 
-    export interface Field {short: boolean;
-    
+  fid: string;
 
-        title: string;
-    
+  custom: Record<string, any>;
 
-        value: string;
-    
+  follow: FollowResponse;
 
-        }
-    
+  type: string;
 
+  feed_visibility?: string;
 
+  received_at?: Date;
+}
 
+export interface FollowPair {
+  source: string;
 
-    export interface FileUploadConfig {size_limit: number;
-    
+  target: string;
+}
 
-        allowed_file_extensions: Array<string>;
-    
+export interface FollowRequest {
+  source: string;
 
-        allowed_mime_types: Array<string>;
-    
+  target: string;
 
-        blocked_file_extensions: Array<string>;
-    
+  copy_custom_to_notification?: boolean;
 
-        blocked_mime_types: Array<string>;
-    
+  create_notification_activity?: boolean;
 
-        }
-    
+  enrich_own_fields?: boolean;
 
+  push_preference?: 'all' | 'none';
 
+  skip_push?: boolean;
 
+  custom?: Record<string, any>;
+}
 
-    export interface FileUploadRequest {file?: string;
-    
+export interface FollowResponse {
+  created_at: Date;
 
-        user?: OnlyUserID;
-    
+  follower_role: string;
 
-        }
-    
+  push_preference: 'all' | 'none';
 
+  status: 'accepted' | 'pending' | 'rejected';
 
+  updated_at: Date;
 
+  source_feed: FeedResponse;
 
-    export interface FileUploadResponse {duration: string;
-    
+  target_feed: FeedResponse;
 
-        file?: string;
-    
+  request_accepted_at?: Date;
 
-        thumb_url?: string;
-    
+  request_rejected_at?: Date;
 
-        }
-    
+  custom?: Record<string, any>;
+}
 
+export interface FollowUpdatedEvent {
+  created_at: Date;
 
+  fid: string;
 
+  custom: Record<string, any>;
 
-    export interface FilterConfigResponse {llm_labels: Array<string>;
-    
+  follow: FollowResponse;
 
-        ai_text_labels?: Array<string>;
-    
+  type: string;
 
-        config_keys?: Array<string>;
-    
+  feed_visibility?: string;
 
-        }
-    
+  received_at?: Date;
+}
 
+export interface FrameRecordingResponse {
+  status: string;
+}
 
+export interface FrameRecordingSettingsResponse {
+  capture_interval_in_seconds: number;
 
+  mode: 'available' | 'disabled' | 'auto-on';
 
-    export interface FlagCountRuleParameters {threshold?: number;
-    
+  quality?: string;
+}
 
-        }
-    
+export interface FriendReactionsOptions {
+  enabled?: boolean;
 
+  limit?: number;
 
+  type?: 'following' | 'mutual';
+}
 
+export interface FullUserResponse {
+  banned: boolean;
 
-    export interface FlagRequest {entity_id: string;
-    
+  created_at: Date;
 
-        entity_type: string;
-    
+  id: string;
 
-        entity_creator_id?: string;
-    
+  invisible: boolean;
 
-        reason?: string;
-    
+  language: string;
 
-        custom?: Record<string, any>;
-    
+  online: boolean;
 
-        moderation_payload?: ModerationPayload;
-    
+  role: string;
 
-        }
-    
+  shadow_banned: boolean;
 
+  total_unread_count: number;
 
+  unread_channels: number;
 
+  unread_count: number;
 
-    export interface FlagResponse {duration: string;
-    
+  unread_threads: number;
 
-        item_id: string;
-    
+  updated_at: Date;
 
-        }
-    
+  blocked_user_ids: string[];
 
+  channel_mutes: ChannelMute[];
 
+  devices: DeviceResponse[];
 
+  mutes: UserMuteResponse[];
 
-    export interface FlagUserOptions {reason?: string;
-    
+  teams: string[];
 
-        }
-    
+  custom: Record<string, any>;
 
+  avg_response_time?: number;
 
+  ban_expires?: Date;
 
+  deactivated_at?: Date;
 
-    export interface FollowBatchRequest {follows: Array<FollowRequest>;
-    
+  deleted_at?: Date;
 
-        enrich_own_fields?: boolean;
-    
+  image?: string;
 
-        }
-    
+  last_active?: Date;
 
+  name?: string;
 
+  revoke_tokens_issued_before?: Date;
 
+  latest_hidden_channels?: string[];
 
-    export interface FollowBatchResponse {duration: string;
-    
+  privacy_settings?: PrivacySettingsResponse;
 
-        created: Array<FollowResponse>;
-    
+  teams_role?: Record<string, string>;
+}
 
-        follows: Array<FollowResponse>;
-    
+export interface GeofenceSettingsResponse {
+  names: string[];
+}
 
-        }
-    
+export interface GetActivityResponse {
+  duration: string;
 
+  activity: ActivityResponse;
+}
 
+export interface GetAppealResponse {
+  duration: string;
 
+  item?: AppealItemResponse;
+}
 
-    export interface FollowCreatedEvent {created_at: Date;
-    
+export interface GetApplicationResponse {
+  duration: string;
 
-        fid: string;
-    
+  app: AppResponseFields;
+}
 
-        custom: Record<string, any>;
-    
+export interface GetBlockedUsersResponse {
+  duration: string;
 
-        follow: FollowResponse;
-    
+  blocks: BlockedUserResponse[];
+}
 
-        type: string;
-    
+export interface GetCommentRepliesResponse {
+  duration: string;
 
-        feed_visibility?: string;
-    
+  sort: string;
 
-        received_at?: Date;
-    
+  comments: ThreadedCommentResponse[];
 
-        }
-    
+  next?: string;
 
+  prev?: string;
+}
 
+export interface GetCommentResponse {
+  duration: string;
 
+  comment: CommentResponse;
+}
 
-    export interface FollowDeletedEvent {created_at: Date;
-    
+export interface GetCommentsResponse {
+  duration: string;
 
-        fid: string;
-    
+  sort: string;
 
-        custom: Record<string, any>;
-    
+  comments: ThreadedCommentResponse[];
 
-        follow: FollowResponse;
-    
+  next?: string;
 
-        type: string;
-    
+  prev?: string;
+}
 
-        feed_visibility?: string;
-    
+export interface GetConfigResponse {
+  duration: string;
 
-        received_at?: Date;
-    
+  config?: ConfigResponse;
+}
 
-        }
-    
+export interface GetFollowSuggestionsResponse {
+  duration: string;
 
+  suggestions: FeedSuggestionResponse[];
 
+  algorithm_used?: string;
+}
 
+export interface GetOGResponse {
+  duration: string;
 
-    export interface FollowPair {source: string;
-    
+  custom: Record<string, any>;
 
-        target: string;
-    
+  asset_url?: string;
 
-        }
-    
+  author_icon?: string;
 
+  author_link?: string;
 
+  author_name?: string;
 
+  color?: string;
 
-    export interface FollowRequest {source: string;
-    
+  fallback?: string;
 
-        target: string;
-    
+  footer?: string;
 
-        copy_custom_to_notification?: boolean;
-    
+  footer_icon?: string;
 
-        create_notification_activity?: boolean;
-    
+  image_url?: string;
 
-        enrich_own_fields?: boolean;
-    
+  og_scrape_url?: string;
 
-        
-        push_preference?:| "all" | "none" ;
+  original_height?: number;
 
-        skip_push?: boolean;
-    
+  original_width?: number;
 
-        custom?: Record<string, any>;
-    
+  pretext?: string;
 
-        }
-    
+  text?: string;
 
+  thumb_url?: string;
 
+  title?: string;
 
+  title_link?: string;
 
-    export interface FollowResponse {created_at: Date;
-    
+  type?: string;
 
-        follower_role: string;
-    
+  actions?: Action[];
 
-        
-        push_preference:| "all" | "none" ;
+  fields?: Field[];
 
-        
-        status:| "accepted" | "pending" | "rejected" ;
+  giphy?: Images;
+}
 
-        updated_at: Date;
-    
+export interface GetOrCreateFeedRequest {
+  id_around?: string;
 
-        source_feed: FeedResponse;
-    
+  limit?: number;
 
-        target_feed: FeedResponse;
-    
+  next?: string;
 
-        request_accepted_at?: Date;
-    
+  prev?: string;
 
-        request_rejected_at?: Date;
-    
+  view?: string;
 
-        custom?: Record<string, any>;
-    
+  watch?: boolean;
 
-        }
-    
+  data?: FeedInput;
 
+  enrichment_options?: EnrichmentOptions;
 
+  external_ranking?: Record<string, any>;
 
+  filter?: Record<string, any>;
 
-    export interface FollowUpdatedEvent {created_at: Date;
-    
+  followers_pagination?: PagerRequest;
 
-        fid: string;
-    
+  following_pagination?: PagerRequest;
 
-        custom: Record<string, any>;
-    
+  friend_reactions_options?: FriendReactionsOptions;
 
-        follow: FollowResponse;
-    
+  interest_weights?: Record<string, number>;
 
-        type: string;
-    
+  member_pagination?: PagerRequest;
+}
 
-        feed_visibility?: string;
-    
+export interface GetOrCreateFeedResponse {
+  created: boolean;
 
-        received_at?: Date;
-    
+  duration: string;
 
-        }
-    
+  activities: ActivityResponse[];
 
+  aggregated_activities: AggregatedActivityResponse[];
 
+  followers: FollowResponse[];
 
+  following: FollowResponse[];
 
-    export interface FrameRecordingResponse {status: string;
-    
+  members: FeedMemberResponse[];
 
-        }
-    
+  pinned_activities: ActivityPinResponse[];
 
+  feed: FeedResponse;
 
+  next?: string;
 
+  prev?: string;
 
-    export interface FrameRecordingSettingsResponse {capture_interval_in_seconds: number;
-    
+  followers_pagination?: PagerResponse;
 
-        
-        mode:| "available" | "disabled" | "auto-on" ;
+  following_pagination?: PagerResponse;
 
-        quality?: string;
-    
+  member_pagination?: PagerResponse;
 
-        }
-    
+  notification_status?: NotificationStatusResponse;
+}
 
+export interface GetUserGroupResponse {
+  duration: string;
 
+  user_group?: UserGroupResponse;
+}
 
+export interface GoogleVisionConfig {
+  enabled?: boolean;
+}
 
-    export interface FriendReactionsOptions {enabled?: boolean;
-    
+export interface HLSSettingsResponse {
+  auto_on: boolean;
 
-        limit?: number;
-    
+  enabled: boolean;
 
-        
-        type?:| "following" | "mutual" ;
+  quality_tracks: string[];
+}
 
-        }
-    
+export interface HarmConfig {
+  cooldown_period: number;
 
+  severity: number;
 
+  threshold: number;
 
+  action_sequences: ActionSequence[];
 
-    export interface FullUserResponse {banned: boolean;
-    
+  harm_types: string[];
+}
 
-        created_at: Date;
-    
+export interface HealthCheckEvent {
+  connection_id: string;
 
-        id: string;
-    
+  created_at: Date;
 
-        invisible: boolean;
-    
+  custom: Record<string, any>;
 
-        language: string;
-    
+  type: string;
 
-        online: boolean;
-    
+  cid?: string;
 
-        role: string;
-    
+  received_at?: Date;
 
-        shadow_banned: boolean;
-    
+  me?: OwnUserResponse;
+}
 
-        total_unread_count: number;
-    
+export interface ImageContentParameters {
+  harm_labels?: string[];
+}
 
-        unread_channels: number;
-    
+export interface ImageData {
+  frames: string;
 
-        unread_count: number;
-    
+  height: string;
 
-        unread_threads: number;
-    
+  size: string;
 
-        updated_at: Date;
-    
+  url: string;
 
-        blocked_user_ids: Array<string>;
-    
+  width: string;
+}
 
-        channel_mutes: Array<ChannelMute>;
-    
+export interface ImageRuleParameters {
+  threshold?: number;
 
-        devices: Array<DeviceResponse>;
-    
+  time_window?: string;
 
-        mutes: Array<UserMuteResponse>;
-    
+  harm_labels?: string[];
+}
 
-        teams: Array<string>;
-    
+export interface ImageSize {
+  crop?: string;
 
-        custom: Record<string, any>;
-    
+  height?: number;
 
-        avg_response_time?: number;
-    
+  resize?: string;
 
-        ban_expires?: Date;
-    
+  width?: number;
+}
 
-        deactivated_at?: Date;
-    
+export interface ImageUploadRequest {
+  file?: string;
 
-        deleted_at?: Date;
-    
+  upload_sizes?: ImageSize[];
 
-        image?: string;
-    
+  user?: OnlyUserID;
+}
 
-        last_active?: Date;
-    
+export interface ImageUploadResponse {
+  duration: string;
 
-        name?: string;
-    
+  file?: string;
 
-        revoke_tokens_issued_before?: Date;
-    
+  thumb_url?: string;
 
-        latest_hidden_channels?: Array<string>;
-    
+  upload_sizes?: ImageSize[];
+}
 
-        privacy_settings?: PrivacySettingsResponse;
-    
+export interface Images {
+  fixed_height: ImageData;
 
-        teams_role?: Record<string, string>;
-    
+  fixed_height_downsampled: ImageData;
 
-        }
-    
+  fixed_height_still: ImageData;
 
+  fixed_width: ImageData;
 
+  fixed_width_downsampled: ImageData;
 
+  fixed_width_still: ImageData;
 
-    export interface GeofenceSettingsResponse {names: Array<string>;
-    
+  original: ImageData;
+}
 
-        }
-    
+export interface IndividualRecordingResponse {
+  status: string;
+}
 
+export interface IndividualRecordingSettingsResponse {
+  mode: 'available' | 'disabled' | 'auto-on';
 
+  output_types?: string[];
+}
 
+export interface IngressAudioEncodingResponse {
+  bitrate: number;
 
-    export interface GetActivityResponse {duration: string;
-    
+  channels: number;
 
-        activity: ActivityResponse;
-    
+  enable_dtx: boolean;
+}
 
-        }
-    
+export interface IngressSettingsResponse {
+  enabled: boolean;
 
+  audio_encoding_options?: IngressAudioEncodingResponse;
 
+  video_encoding_options?: Record<string, IngressVideoEncodingResponse>;
+}
 
+export interface IngressSourceResponse {
+  fps: number;
 
-    export interface GetAppealResponse {duration: string;
-    
+  height: number;
 
-        item?: AppealItemResponse;
-    
+  width: number;
+}
 
-        }
-    
+export interface IngressVideoEncodingResponse {
+  layers: IngressVideoLayerResponse[];
 
+  source: IngressSourceResponse;
+}
 
+export interface IngressVideoLayerResponse {
+  bitrate: number;
 
+  codec: string;
 
-    export interface GetApplicationResponse {duration: string;
-    
+  frame_rate_limit: number;
 
-        app: AppResponseFields;
-    
+  max_dimension: number;
 
-        }
-    
+  min_dimension: number;
+}
 
+export interface KeyframeRuleParameters {
+  min_confidence?: number;
 
+  threshold?: number;
 
+  harm_labels?: string[];
+}
 
-    export interface GetBlockedUsersResponse {duration: string;
-    
+export interface LLMConfig {
+  enabled: boolean;
 
-        blocks: Array<BlockedUserResponse>;
-    
+  rules: LLMRule[];
 
-        }
-    
+  app_context?: string;
 
+  async?: boolean;
 
+  severity_descriptions?: Record<string, string>;
+}
 
+export interface LLMRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove'
+    | 'keep';
 
-    export interface GetCommentRepliesResponse {duration: string;
-    
+  description: string;
 
-        sort: string;
-    
+  label: string;
 
-        comments: Array<ThreadedCommentResponse>;
-    
+  severity_rules: BodyguardSeverityRule[];
+}
 
-        next?: string;
-    
+export interface LabelThresholds {
+  block?: number;
 
-        prev?: string;
-    
+  flag?: number;
+}
 
-        }
-    
+export interface LimitsSettingsResponse {
+  max_participants_exclude_roles: string[];
 
+  max_duration_seconds?: number;
 
+  max_participants?: number;
 
+  max_participants_exclude_owner?: boolean;
+}
 
-    export interface GetCommentResponse {duration: string;
-    
+export interface ListBlockListResponse {
+  duration: string;
 
-        comment: CommentResponse;
-    
+  blocklists: BlockListResponse[];
+}
 
-        }
-    
+export interface ListDevicesResponse {
+  duration: string;
 
+  devices: DeviceResponse[];
+}
 
+export interface ListUserGroupsResponse {
+  duration: string;
 
+  user_groups: UserGroupResponse[];
+}
 
-    export interface GetCommentsResponse {duration: string;
-    
+export interface MarkActivityRequest {
+  mark_all_read?: boolean;
 
-        sort: string;
-    
+  mark_all_seen?: boolean;
 
-        comments: Array<ThreadedCommentResponse>;
-    
+  mark_read?: string[];
 
-        next?: string;
-    
+  mark_seen?: string[];
 
-        prev?: string;
-    
+  mark_watched?: string[];
+}
 
-        }
-    
+export interface MarkReviewedRequestPayload {
+  content_to_mark_as_reviewed_limit?: number;
 
+  decision_reason?: string;
 
+  disable_marking_content_as_reviewed?: boolean;
+}
 
+export interface MembershipLevelResponse {
+  created_at: Date;
 
-    export interface GetConfigResponse {duration: string;
-    
+  id: string;
 
-        config?: ConfigResponse;
-    
+  name: string;
 
-        }
-    
+  priority: number;
 
+  updated_at: Date;
 
+  tags: string[];
 
+  description?: string;
 
-    export interface GetFollowSuggestionsResponse {duration: string;
-    
+  custom?: Record<string, any>;
+}
 
-        suggestions: Array<FeedSuggestionResponse>;
-    
+export interface MessageResponse {
+  cid: string;
 
-        algorithm_used?: string;
-    
+  created_at: Date;
 
-        }
-    
+  deleted_reply_count: number;
 
+  html: string;
 
+  id: string;
 
+  mentioned_channel: boolean;
 
-    export interface GetOGResponse {duration: string;
-    
+  mentioned_here: boolean;
 
-        custom: Record<string, any>;
-    
+  pinned: boolean;
 
-        asset_url?: string;
-    
+  reply_count: number;
 
-        author_icon?: string;
-    
+  shadowed: boolean;
 
-        author_link?: string;
-    
+  silent: boolean;
 
-        author_name?: string;
-    
+  text: string;
 
-        color?: string;
-    
+  type: string;
 
-        fallback?: string;
-    
+  updated_at: Date;
 
-        footer?: string;
-    
+  attachments: Attachment[];
 
-        footer_icon?: string;
-    
+  latest_reactions: ReactionResponse[];
 
-        image_url?: string;
-    
+  mentioned_users: UserResponse[];
 
-        og_scrape_url?: string;
-    
+  own_reactions: ReactionResponse[];
 
-        original_height?: number;
-    
+  restricted_visibility: string[];
 
-        original_width?: number;
-    
+  custom: Record<string, any>;
 
-        pretext?: string;
-    
+  reaction_counts: Record<string, number>;
 
-        text?: string;
-    
+  reaction_scores: Record<string, number>;
 
-        thumb_url?: string;
-    
+  user: UserResponse;
 
-        title?: string;
-    
+  command?: string;
 
-        title_link?: string;
-    
+  deleted_at?: Date;
 
-        type?: string;
-    
+  deleted_for_me?: boolean;
 
-        actions?: Array<Action>;
-    
+  message_text_updated_at?: Date;
 
-        fields?: Array<Field>;
-    
+  mml?: string;
 
-        giphy?: Images;
-    
+  parent_id?: string;
 
-        }
-    
+  pin_expires?: Date;
 
+  pinned_at?: Date;
 
+  poll_id?: string;
 
+  quoted_message_id?: string;
 
-    export interface GetOrCreateFeedRequest {id_around?: string;
-    
+  show_in_channel?: boolean;
 
-        limit?: number;
-    
+  mentioned_group_ids?: string[];
 
-        next?: string;
-    
+  mentioned_roles?: string[];
 
-        prev?: string;
-    
+  thread_participants?: UserResponse[];
 
-        view?: string;
-    
+  draft?: DraftResponse;
 
-        watch?: boolean;
-    
+  i18n?: Record<string, string>;
 
-        data?: FeedInput;
-    
+  image_labels?: Record<string, string[]>;
 
-        enrichment_options?: EnrichmentOptions;
-    
+  member?: ChannelMemberResponse;
 
-        external_ranking?: Record<string, any>;
-    
+  moderation?: ModerationV2Response;
 
-        filter?: Record<string, any>;
-    
+  pinned_by?: UserResponse;
 
-        followers_pagination?: PagerRequest;
-    
+  poll?: PollResponseData;
 
-        following_pagination?: PagerRequest;
-    
+  quoted_message?: MessageResponse;
 
-        friend_reactions_options?: FriendReactionsOptions;
-    
+  reaction_groups?: Record<string, ReactionGroupResponse>;
 
-        interest_weights?: Record<string, number>;
-    
+  reminder?: ReminderResponseData;
 
-        member_pagination?: PagerRequest;
-    
+  shared_location?: SharedLocationResponseData;
+}
 
-        }
-    
+export interface ModerationActionConfigResponse {
+  action: string;
 
+  description: string;
 
+  entity_type: string;
 
+  icon: string;
 
-    export interface GetOrCreateFeedResponse {created: boolean;
-    
+  order: number;
 
-        duration: string;
-    
+  custom?: Record<string, any>;
+}
 
-        activities: Array<ActivityResponse>;
-    
+export interface ModerationCustomActionEvent {
+  action_id: string;
 
-        aggregated_activities: Array<AggregatedActivityResponse>;
-    
+  created_at: Date;
 
-        followers: Array<FollowResponse>;
-    
+  custom: Record<string, any>;
 
-        following: Array<FollowResponse>;
-    
+  review_queue_item: ReviewQueueItemResponse;
 
-        members: Array<FeedMemberResponse>;
-    
+  type: string;
 
-        pinned_activities: Array<ActivityPinResponse>;
-    
+  received_at?: Date;
 
-        feed: FeedResponse;
-    
+  action_options?: Record<string, any>;
 
-        next?: string;
-    
+  message?: MessageResponse;
+}
 
-        prev?: string;
-    
+export interface ModerationFlagResponse {
+  created_at: Date;
 
-        followers_pagination?: PagerResponse;
-    
+  entity_id: string;
 
-        following_pagination?: PagerResponse;
-    
+  entity_type: string;
 
-        member_pagination?: PagerResponse;
-    
+  type: string;
 
-        notification_status?: NotificationStatusResponse;
-    
+  updated_at: Date;
 
-        }
-    
+  user_id: string;
 
+  result: Array<Record<string, any>>;
 
+  entity_creator_id?: string;
 
+  reason?: string;
 
-    export interface GetUserGroupResponse {duration: string;
-    
+  review_queue_item_id?: string;
 
-        user_group?: UserGroupResponse;
-    
+  labels?: string[];
 
-        }
-    
+  custom?: Record<string, any>;
 
+  moderation_payload?: ModerationPayloadResponse;
 
+  review_queue_item?: ReviewQueueItemResponse;
 
+  user?: UserResponse;
+}
 
-    export interface GoogleVisionConfig {enabled?: boolean;
-    
+export interface ModerationFlaggedEvent {
+  content_type: string;
 
-        }
-    
+  created_at: Date;
 
+  object_id: string;
 
+  custom: Record<string, any>;
 
+  type: string;
 
-    export interface HLSSettingsResponse {auto_on: boolean;
-    
+  received_at?: Date;
+}
 
-        enabled: boolean;
-    
+export interface ModerationMarkReviewedEvent {
+  created_at: Date;
 
-        quality_tracks: Array<string>;
-    
+  custom: Record<string, any>;
 
-        }
-    
+  item: ReviewQueueItemResponse;
 
+  type: string;
 
+  received_at?: Date;
 
+  message?: MessageResponse;
+}
 
-    export interface HarmConfig {cooldown_period: number;
-    
+export interface ModerationPayload {
+  images?: string[];
 
-        severity: number;
-    
+  texts?: string[];
 
-        threshold: number;
-    
+  videos?: string[];
 
-        action_sequences: Array<ActionSequence>;
-    
+  custom?: Record<string, any>;
+}
 
-        harm_types: Array<string>;
-    
+export interface ModerationPayloadResponse {
+  images?: string[];
 
-        }
-    
+  texts?: string[];
 
+  videos?: string[];
 
+  custom?: Record<string, any>;
+}
 
+export interface ModerationV2Response {
+  action: string;
 
-    export interface HealthCheckEvent {connection_id: string;
-    
+  original_text: string;
 
-        created_at: Date;
-    
+  blocklist_matched?: string;
 
-        custom: Record<string, any>;
-    
+  platform_circumvented?: boolean;
 
-        type: string;
-    
+  semantic_filter_matched?: string;
 
-        cid?: string;
-    
+  blocklists_matched?: string[];
 
-        received_at?: Date;
-    
+  image_harms?: string[];
 
-        me?: OwnUserResponse;
-    
+  text_harms?: string[];
+}
 
-        }
-    
+export interface MuteRequest {
+  target_ids: string[];
 
+  timeout?: number;
+}
 
+export interface MuteResponse {
+  duration: string;
 
+  mutes?: UserMuteResponse[];
 
-    export interface ImageContentParameters {harm_labels?: Array<string>;
-    
+  non_existing_users?: string[];
 
-        }
-    
+  own_user?: OwnUserResponse;
+}
 
+export interface NoiseCancellationSettings {
+  mode: 'available' | 'disabled' | 'auto-on';
+}
 
+export interface NotificationComment {
+  comment: string;
 
+  id: string;
 
-    export interface ImageData {frames: string;
-    
+  user_id: string;
 
-        height: string;
-    
+  attachments?: Attachment[];
+}
 
-        size: string;
-    
+export interface NotificationConfig {
+  deduplication_window?: string;
 
-        url: string;
-    
+  track_read?: boolean;
 
-        width: string;
-    
+  track_seen?: boolean;
+}
 
-        }
-    
+export interface NotificationContext {
+  target?: NotificationTarget;
 
+  trigger?: NotificationTrigger;
+}
 
+export interface NotificationFeedUpdatedEvent {
+  created_at: Date;
 
+  fid: string;
 
-    export interface ImageRuleParameters {threshold?: number;
-    
+  custom: Record<string, any>;
 
-        time_window?: string;
-    
+  type: string;
 
-        harm_labels?: Array<string>;
-    
+  feed_visibility?: string;
 
-        }
-    
+  received_at?: Date;
 
+  aggregated_activities?: AggregatedActivityResponse[];
 
+  notification_status?: NotificationStatusResponse;
 
+  user?: UserResponseCommonFields;
+}
 
-    export interface ImageSize {crop?: string;
-    
+export interface NotificationParentActivity {
+  id: string;
 
-        height?: number;
-    
+  text?: string;
 
-        resize?: string;
-    
+  type?: string;
 
-        width?: number;
-    
+  user_id?: string;
 
-        }
-    
+  attachments?: Attachment[];
+}
 
+export interface NotificationStatusResponse {
+  unread: number;
 
+  unseen: number;
 
+  last_read_at?: Date;
 
-    export interface ImageUploadRequest {file?: string;
-    
+  last_seen_at?: Date;
 
-        upload_sizes?: Array<ImageSize>;
-    
+  read_activities?: string[];
 
-        user?: OnlyUserID;
-    
+  seen_activities?: string[];
+}
 
-        }
-    
+export interface NotificationTarget {
+  id: string;
 
+  name?: string;
 
+  text?: string;
 
+  type?: string;
 
-    export interface ImageUploadResponse {duration: string;
-    
+  user_id?: string;
 
-        file?: string;
-    
+  attachments?: Attachment[];
 
-        thumb_url?: string;
-    
+  comment?: NotificationComment;
 
-        upload_sizes?: Array<ImageSize>;
-    
+  parent_activity?: NotificationParentActivity;
+}
 
-        }
-    
+export interface NotificationTrigger {
+  text: string;
 
+  type: string;
 
+  comment?: NotificationComment;
+}
 
+export interface OCRRule {
+  action:
+    | 'flag'
+    | 'shadow'
+    | 'remove'
+    | 'bounce'
+    | 'bounce_flag'
+    | 'bounce_remove';
 
-    export interface Images {fixed_height: ImageData;
-    
+  label: string;
+}
 
-        fixed_height_downsampled: ImageData;
-    
+export interface OnlyUserID {
+  id: string;
+}
 
-        fixed_height_still: ImageData;
-    
+export interface OwnBatchRequest {
+  feeds: string[];
 
-        fixed_width: ImageData;
-    
+  fields?: string[];
+}
 
-        fixed_width_downsampled: ImageData;
-    
+export interface OwnBatchResponse {
+  duration: string;
 
-        fixed_width_still: ImageData;
-    
+  data: Record<string, FeedOwnData>;
+}
 
-        original: ImageData;
-    
+export interface OwnUserResponse {
+  banned: boolean;
 
-        }
-    
+  created_at: Date;
 
+  id: string;
 
+  invisible: boolean;
 
+  language: string;
 
-    export interface IndividualRecordingResponse {status: string;
-    
+  online: boolean;
 
-        }
-    
+  role: string;
 
+  total_unread_count: number;
 
+  unread_channels: number;
 
+  unread_count: number;
 
-    export interface IndividualRecordingSettingsResponse {
-        mode:| "available" | "disabled" | "auto-on" ;
+  unread_threads: number;
 
-        output_types?: Array<string>;
-    
+  updated_at: Date;
 
-        }
-    
+  channel_mutes: ChannelMute[];
 
+  devices: DeviceResponse[];
 
+  mutes: UserMuteResponse[];
 
+  teams: string[];
 
-    export interface IngressAudioEncodingResponse {bitrate: number;
-    
+  custom: Record<string, any>;
 
-        channels: number;
-    
+  avg_response_time?: number;
 
-        enable_dtx: boolean;
-    
+  deactivated_at?: Date;
 
-        }
-    
+  deleted_at?: Date;
 
+  image?: string;
 
+  last_active?: Date;
 
+  name?: string;
 
-    export interface IngressSettingsResponse {enabled: boolean;
-    
+  revoke_tokens_issued_before?: Date;
 
-        audio_encoding_options?: IngressAudioEncodingResponse;
-    
+  blocked_user_ids?: string[];
 
-        video_encoding_options?: Record<string, IngressVideoEncodingResponse>;
-    
+  latest_hidden_channels?: string[];
 
-        }
-    
+  privacy_settings?: PrivacySettingsResponse;
 
+  push_preferences?: PushPreferencesResponse;
 
+  teams_role?: Record<string, string>;
 
+  total_unread_count_by_team?: Record<string, number>;
+}
 
-    export interface IngressSourceResponse {fps: number;
-    
+export interface PagerRequest {
+  limit?: number;
 
-        height: number;
-    
+  next?: string;
 
-        width: number;
-    
+  prev?: string;
+}
 
-        }
-    
+export interface PagerResponse {
+  next?: string;
 
+  prev?: string;
+}
 
+export interface PinActivityRequest {
+  enrich_own_fields?: boolean;
+}
 
+export interface PinActivityResponse {
+  created_at: Date;
 
-    export interface IngressVideoEncodingResponse {layers: Array<IngressVideoLayerResponse>;
-    
+  duration: string;
 
-        source: IngressSourceResponse;
-    
+  feed: string;
 
-        }
-    
+  user_id: string;
 
+  activity: ActivityResponse;
+}
 
+export interface PollClosedFeedEvent {
+  created_at: Date;
 
+  fid: string;
 
-    export interface IngressVideoLayerResponse {bitrate: number;
-    
+  custom: Record<string, any>;
 
-        codec: string;
-    
+  poll: PollResponseData;
 
-        frame_rate_limit: number;
-    
+  type: string;
 
-        max_dimension: number;
-    
+  feed_visibility?: string;
 
-        min_dimension: number;
-    
+  received_at?: Date;
+}
 
-        }
-    
+export interface PollDeletedFeedEvent {
+  created_at: Date;
 
+  fid: string;
 
+  custom: Record<string, any>;
 
+  poll: PollResponseData;
 
-    export interface KeyframeRuleParameters {min_confidence?: number;
-    
+  type: string;
 
-        threshold?: number;
-    
+  feed_visibility?: string;
 
-        harm_labels?: Array<string>;
-    
+  received_at?: Date;
+}
 
-        }
-    
+export interface PollOptionInput {
+  text?: string;
 
+  custom?: Record<string, any>;
+}
 
+export interface PollOptionRequest {
+  id: string;
 
+  text?: string;
 
-    export interface LLMConfig {enabled: boolean;
-    
+  custom?: Record<string, any>;
+}
 
-        rules: Array<LLMRule>;
-    
+export interface PollOptionResponse {
+  duration: string;
 
-        app_context?: string;
-    
+  poll_option: PollOptionResponseData;
+}
 
-        async?: boolean;
-    
+export interface PollOptionResponseData {
+  id: string;
 
-        severity_descriptions?: Record<string, string>;
-    
+  text: string;
 
-        }
-    
+  custom: Record<string, any>;
+}
 
+export interface PollResponse {
+  duration: string;
 
+  poll: PollResponseData;
+}
 
+export interface PollResponseData {
+  allow_answers: boolean;
 
-    export interface LLMRule {
-        action:| "flag" | "shadow" | "remove" | "bounce" | "bounce_flag" | "bounce_remove" | "keep" ;
+  allow_user_suggested_options: boolean;
 
-        description: string;
-    
+  answers_count: number;
 
-        label: string;
-    
+  created_at: Date;
 
-        severity_rules: Array<BodyguardSeverityRule>;
-    
+  created_by_id: string;
 
-        }
-    
+  description: string;
 
+  enforce_unique_vote: boolean;
 
+  id: string;
 
+  name: string;
 
-    export interface LabelThresholds {block?: number;
-    
+  updated_at: Date;
 
-        flag?: number;
-    
+  vote_count: number;
 
-        }
-    
+  voting_visibility: string;
 
+  latest_answers: PollVoteResponseData[];
 
+  options: PollOptionResponseData[];
 
+  own_votes: PollVoteResponseData[];
 
-    export interface LimitsSettingsResponse {max_participants_exclude_roles: Array<string>;
-    
+  custom: Record<string, any>;
 
-        max_duration_seconds?: number;
-    
+  latest_votes_by_option: Record<string, PollVoteResponseData[]>;
 
-        max_participants?: number;
-    
+  vote_counts_by_option: Record<string, number>;
 
-        max_participants_exclude_owner?: boolean;
-    
+  is_closed?: boolean;
 
-        }
-    
+  max_votes_allowed?: number;
 
+  created_by?: UserResponse;
+}
 
+export interface PollUpdatedFeedEvent {
+  created_at: Date;
 
+  fid: string;
 
-    export interface ListBlockListResponse {duration: string;
-    
+  custom: Record<string, any>;
 
-        blocklists: Array<BlockListResponse>;
-    
+  poll: PollResponseData;
 
-        }
-    
+  type: string;
 
+  feed_visibility?: string;
 
+  received_at?: Date;
+}
 
+export interface PollVoteCastedFeedEvent {
+  created_at: Date;
 
-    export interface ListDevicesResponse {duration: string;
-    
+  fid: string;
 
-        devices: Array<DeviceResponse>;
-    
+  custom: Record<string, any>;
 
-        }
-    
+  poll: PollResponseData;
 
+  poll_vote: PollVoteResponseData;
 
+  type: string;
 
+  feed_visibility?: string;
 
-    export interface ListUserGroupsResponse {duration: string;
-    
+  received_at?: Date;
+}
 
-        user_groups: Array<UserGroupResponse>;
-    
+export interface PollVoteChangedFeedEvent {
+  created_at: Date;
 
-        }
-    
+  fid: string;
 
+  custom: Record<string, any>;
 
+  poll: PollResponseData;
 
+  poll_vote: PollVoteResponseData;
 
-    export interface MarkActivityRequest {mark_all_read?: boolean;
-    
+  type: string;
 
-        mark_all_seen?: boolean;
-    
+  feed_visibility?: string;
 
-        mark_read?: Array<string>;
-    
+  received_at?: Date;
+}
 
-        mark_seen?: Array<string>;
-    
+export interface PollVoteRemovedFeedEvent {
+  created_at: Date;
 
-        mark_watched?: Array<string>;
-    
+  fid: string;
 
-        }
-    
+  custom: Record<string, any>;
 
+  poll: PollResponseData;
 
+  poll_vote: PollVoteResponseData;
 
+  type: string;
 
-    export interface MarkReviewedRequestPayload {content_to_mark_as_reviewed_limit?: number;
-    
+  feed_visibility?: string;
 
-        decision_reason?: string;
-    
+  received_at?: Date;
+}
 
-        disable_marking_content_as_reviewed?: boolean;
-    
+export interface PollVoteResponse {
+  duration: string;
 
-        }
-    
+  poll?: PollResponseData;
 
+  vote?: PollVoteResponseData;
+}
 
+export interface PollVoteResponseData {
+  created_at: Date;
 
+  id: string;
 
-    export interface MembershipLevelResponse {created_at: Date;
-    
+  option_id: string;
 
-        id: string;
-    
+  poll_id: string;
 
-        name: string;
-    
+  updated_at: Date;
 
-        priority: number;
-    
+  answer_text?: string;
 
-        updated_at: Date;
-    
+  is_answer?: boolean;
 
-        tags: Array<string>;
-    
+  user_id?: string;
 
-        description?: string;
-    
+  user?: UserResponse;
+}
 
-        custom?: Record<string, any>;
-    
+export interface PollVotesResponse {
+  duration: string;
 
-        }
-    
+  votes: PollVoteResponseData[];
 
+  next?: string;
 
+  prev?: string;
+}
 
+export interface PrivacySettingsResponse {
+  delivery_receipts?: DeliveryReceiptsResponse;
 
-    export interface MessageResponse {cid: string;
-    
+  read_receipts?: ReadReceiptsResponse;
 
-        created_at: Date;
-    
+  typing_indicators?: TypingIndicatorsResponse;
+}
 
-        deleted_reply_count: number;
-    
+export interface PushNotificationConfig {
+  enable_push?: boolean;
 
-        html: string;
-    
+  push_types?: string[];
+}
 
-        id: string;
-    
+export interface PushPreferenceInput {
+  call_level?: 'all' | 'none' | 'default';
 
-        mentioned_channel: boolean;
-    
+  channel_cid?: string;
 
-        mentioned_here: boolean;
-    
+  chat_level?:
+    | 'all'
+    | 'mentions'
+    | 'direct_mentions'
+    | 'all_mentions'
+    | 'none'
+    | 'default';
 
-        pinned: boolean;
-    
+  disabled_until?: Date;
 
-        reply_count: number;
-    
+  feeds_level?: 'all' | 'none' | 'default';
 
-        shadowed: boolean;
-    
+  remove_disable?: boolean;
 
-        silent: boolean;
-    
+  user_id?: string;
 
-        text: string;
-    
+  chat_preferences?: ChatPreferencesInput;
 
-        type: string;
-    
+  feeds_preferences?: FeedsPreferences;
+}
 
-        updated_at: Date;
-    
+export interface PushPreferencesResponse {
+  call_level?: string;
 
-        attachments: Array<Attachment>;
-    
+  chat_level?: string;
 
-        latest_reactions: Array<ReactionResponse>;
-    
+  disabled_until?: Date;
 
-        mentioned_users: Array<UserResponse>;
-    
+  feeds_level?: string;
 
-        own_reactions: Array<ReactionResponse>;
-    
+  chat_preferences?: ChatPreferencesResponse;
 
-        restricted_visibility: Array<string>;
-    
+  feeds_preferences?: FeedsPreferencesResponse;
+}
 
-        custom: Record<string, any>;
-    
+export interface QueryActivitiesRequest {
+  enrich_own_fields?: boolean;
 
-        reaction_counts: Record<string, number>;
-    
+  include_soft_deleted_activities?: boolean;
 
-        reaction_scores: Record<string, number>;
-    
+  limit?: number;
 
-        user: UserResponse;
-    
+  next?: string;
 
-        command?: string;
-    
+  prev?: string;
 
-        deleted_at?: Date;
-    
+  sort?: SortParamRequest[];
 
-        deleted_for_me?: boolean;
-    
+  filter?: Record<string, any>;
+}
 
-        message_text_updated_at?: Date;
-    
+export interface QueryActivitiesResponse {
+  duration: string;
 
-        mml?: string;
-    
+  activities: ActivityResponse[];
 
-        parent_id?: string;
-    
+  next?: string;
 
-        pin_expires?: Date;
-    
+  prev?: string;
+}
 
-        pinned_at?: Date;
-    
+export interface QueryActivityReactionsRequest {
+  limit?: number;
 
-        poll_id?: string;
-    
+  next?: string;
 
-        quoted_message_id?: string;
-    
+  prev?: string;
 
-        show_in_channel?: boolean;
-    
+  sort?: SortParamRequest[];
 
-        mentioned_group_ids?: Array<string>;
-    
+  filter?: Record<string, any>;
+}
 
-        mentioned_roles?: Array<string>;
-    
+export interface QueryActivityReactionsResponse {
+  duration: string;
 
-        thread_participants?: Array<UserResponse>;
-    
+  reactions: FeedsReactionResponse[];
 
-        draft?: DraftResponse;
-    
+  next?: string;
 
-        i18n?: Record<string, string>;
-    
+  prev?: string;
+}
 
-        image_labels?: Record<string, Array<string>>;
-    
+export interface QueryAppealsRequest {
+  limit?: number;
 
-        member?: ChannelMemberResponse;
-    
+  next?: string;
 
-        moderation?: ModerationV2Response;
-    
+  prev?: string;
 
-        pinned_by?: UserResponse;
-    
+  sort?: SortParamRequest[];
 
-        poll?: PollResponseData;
-    
+  filter?: Record<string, any>;
+}
 
-        quoted_message?: MessageResponse;
-    
+export interface QueryAppealsResponse {
+  duration: string;
 
-        reaction_groups?: Record<string, ReactionGroupResponse>;
-    
+  items: AppealItemResponse[];
 
-        reminder?: ReminderResponseData;
-    
+  next?: string;
 
-        shared_location?: SharedLocationResponseData;
-    
+  prev?: string;
+}
 
-        }
-    
+export interface QueryBookmarkFoldersRequest {
+  limit?: number;
 
+  next?: string;
 
+  prev?: string;
 
+  sort?: SortParamRequest[];
 
-    export interface ModerationActionConfigResponse {action: string;
-    
+  filter?: Record<string, any>;
+}
 
-        description: string;
-    
+export interface QueryBookmarkFoldersResponse {
+  duration: string;
 
-        entity_type: string;
-    
+  bookmark_folders: BookmarkFolderResponse[];
 
-        icon: string;
-    
+  next?: string;
 
-        order: number;
-    
+  prev?: string;
+}
 
-        custom?: Record<string, any>;
-    
+export interface QueryBookmarksRequest {
+  enrich_own_fields?: boolean;
 
-        }
-    
+  limit?: number;
 
+  next?: string;
 
+  prev?: string;
 
+  sort?: SortParamRequest[];
 
-    export interface ModerationCustomActionEvent {action_id: string;
-    
+  filter?: Record<string, any>;
+}
 
-        created_at: Date;
-    
+export interface QueryBookmarksResponse {
+  duration: string;
 
-        custom: Record<string, any>;
-    
+  bookmarks: BookmarkResponse[];
 
-        review_queue_item: ReviewQueueItemResponse;
-    
+  next?: string;
 
-        type: string;
-    
+  prev?: string;
+}
 
-        received_at?: Date;
-    
+export interface QueryCollectionsRequest {
+  limit?: number;
 
-        action_options?: Record<string, any>;
-    
+  next?: string;
 
-        message?: MessageResponse;
-    
+  prev?: string;
 
-        }
-    
+  sort?: SortParamRequest[];
 
+  filter?: Record<string, any>;
+}
 
+export interface QueryCollectionsResponse {
+  duration: string;
 
+  collections: CollectionResponse[];
 
-    export interface ModerationFlagResponse {created_at: Date;
-    
+  next?: string;
 
-        entity_id: string;
-    
+  prev?: string;
+}
 
-        entity_type: string;
-    
+export interface QueryCommentReactionsRequest {
+  limit?: number;
 
-        type: string;
-    
+  next?: string;
 
-        updated_at: Date;
-    
+  prev?: string;
 
-        user_id: string;
-    
+  sort?: SortParamRequest[];
 
-        result: Array<Record<string, any>>;
-    
+  filter?: Record<string, any>;
+}
 
-        entity_creator_id?: string;
-    
+export interface QueryCommentReactionsResponse {
+  duration: string;
 
-        reason?: string;
-    
+  reactions: FeedsReactionResponse[];
 
-        review_queue_item_id?: string;
-    
+  next?: string;
 
-        labels?: Array<string>;
-    
+  prev?: string;
+}
 
-        custom?: Record<string, any>;
-    
+export interface QueryCommentsRequest {
+  filter: Record<string, any>;
 
-        moderation_payload?: ModerationPayloadResponse;
-    
+  id_around?: string;
 
-        review_queue_item?: ReviewQueueItemResponse;
-    
+  limit?: number;
 
-        user?: UserResponse;
-    
+  next?: string;
 
-        }
-    
+  prev?: string;
 
+  sort?: 'first' | 'last' | 'top' | 'best' | 'controversial';
+}
 
+export interface QueryCommentsResponse {
+  duration: string;
 
+  comments: CommentResponse[];
 
-    export interface ModerationFlaggedEvent {content_type: string;
-    
+  next?: string;
 
-        created_at: Date;
-    
+  prev?: string;
+}
 
-        object_id: string;
-    
+export interface QueryFeedMembersRequest {
+  limit?: number;
 
-        custom: Record<string, any>;
-    
+  next?: string;
 
-        type: string;
-    
+  prev?: string;
 
-        received_at?: Date;
-    
+  sort?: SortParamRequest[];
 
-        }
-    
+  filter?: Record<string, any>;
+}
 
+export interface QueryFeedMembersResponse {
+  duration: string;
 
+  members: FeedMemberResponse[];
 
+  next?: string;
 
-    export interface ModerationMarkReviewedEvent {created_at: Date;
-    
+  prev?: string;
+}
 
-        custom: Record<string, any>;
-    
+export interface QueryFeedsRequest {
+  enrich_own_fields?: boolean;
 
-        item: ReviewQueueItemResponse;
-    
+  limit?: number;
 
-        type: string;
-    
+  next?: string;
 
-        received_at?: Date;
-    
+  prev?: string;
 
-        message?: MessageResponse;
-    
+  watch?: boolean;
 
-        }
-    
+  sort?: SortParamRequest[];
 
+  filter?: Record<string, any>;
+}
 
+export interface QueryFeedsResponse {
+  duration: string;
 
+  feeds: FeedResponse[];
 
-    export interface ModerationPayload {images?: Array<string>;
-    
+  next?: string;
 
-        texts?: Array<string>;
-    
+  prev?: string;
+}
 
-        videos?: Array<string>;
-    
+export interface QueryFollowsRequest {
+  limit?: number;
 
-        custom?: Record<string, any>;
-    
+  next?: string;
 
-        }
-    
+  prev?: string;
 
+  sort?: SortParamRequest[];
 
+  filter?: Record<string, any>;
+}
 
+export interface QueryFollowsResponse {
+  duration: string;
 
-    export interface ModerationPayloadResponse {images?: Array<string>;
-    
+  follows: FollowResponse[];
 
-        texts?: Array<string>;
-    
+  next?: string;
 
-        videos?: Array<string>;
-    
+  prev?: string;
+}
 
-        custom?: Record<string, any>;
-    
+export interface QueryModerationConfigsRequest {
+  limit?: number;
 
-        }
-    
+  next?: string;
 
+  prev?: string;
 
+  sort?: SortParamRequest[];
 
+  filter?: Record<string, any>;
+}
 
-    export interface ModerationV2Response {action: string;
-    
+export interface QueryModerationConfigsResponse {
+  duration: string;
 
-        original_text: string;
-    
+  configs: ConfigResponse[];
 
-        blocklist_matched?: string;
-    
+  next?: string;
 
-        platform_circumvented?: boolean;
-    
+  prev?: string;
+}
 
-        semantic_filter_matched?: string;
-    
+export interface QueryPinnedActivitiesRequest {
+  enrich_own_fields?: boolean;
 
-        blocklists_matched?: Array<string>;
-    
+  limit?: number;
 
-        image_harms?: Array<string>;
-    
+  next?: string;
 
-        text_harms?: Array<string>;
-    
+  prev?: string;
 
-        }
-    
+  sort?: SortParamRequest[];
 
+  filter?: Record<string, any>;
+}
 
+export interface QueryPinnedActivitiesResponse {
+  duration: string;
 
+  pinned_activities: ActivityPinResponse[];
 
-    export interface MuteRequest {target_ids: Array<string>;
-    
+  next?: string;
 
-        timeout?: number;
-    
+  prev?: string;
+}
 
-        }
-    
+export interface QueryPollVotesRequest {
+  limit?: number;
 
+  next?: string;
 
+  prev?: string;
 
+  sort?: SortParamRequest[];
 
-    export interface MuteResponse {duration: string;
-    
+  filter?: Record<string, any>;
+}
 
-        mutes?: Array<UserMuteResponse>;
-    
+export interface QueryPollsRequest {
+  limit?: number;
 
-        non_existing_users?: Array<string>;
-    
+  next?: string;
 
-        own_user?: OwnUserResponse;
-    
+  prev?: string;
 
-        }
-    
+  sort?: SortParamRequest[];
 
+  filter?: Record<string, any>;
+}
 
+export interface QueryPollsResponse {
+  duration: string;
 
+  polls: PollResponseData[];
 
-    export interface NoiseCancellationSettings {
-        mode:| "available" | "disabled" | "auto-on" ;
+  next?: string;
 
-        }
-    
+  prev?: string;
+}
 
+export interface QueryReviewQueueRequest {
+  limit?: number;
 
+  lock_count?: number;
 
+  lock_duration?: number;
 
-    export interface NotificationComment {comment: string;
-    
+  lock_items?: boolean;
 
-        id: string;
-    
+  next?: string;
 
-        user_id: string;
-    
+  prev?: string;
 
-        attachments?: Array<Attachment>;
-    
+  stats_only?: boolean;
 
-        }
-    
+  sort?: SortParamRequest[];
 
+  filter?: Record<string, any>;
+}
 
+export interface QueryReviewQueueResponse {
+  duration: string;
 
+  items: ReviewQueueItemResponse[];
 
-    export interface NotificationConfig {deduplication_window?: string;
-    
+  action_config: Record<string, ModerationActionConfigResponse[]>;
 
-        track_read?: boolean;
-    
+  stats: Record<string, any>;
 
-        track_seen?: boolean;
-    
+  next?: string;
 
-        }
-    
+  prev?: string;
 
+  filter_config?: FilterConfigResponse;
+}
 
+export interface QueryUsersPayload {
+  filter_conditions: Record<string, any>;
 
+  include_deactivated_users?: boolean;
 
-    export interface NotificationContext {target?: NotificationTarget;
-    
+  limit?: number;
 
-        trigger?: NotificationTrigger;
-    
+  offset?: number;
 
-        }
-    
+  presence?: boolean;
 
+  sort?: SortParamRequest[];
+}
 
+export interface QueryUsersResponse {
+  duration: string;
 
+  users: FullUserResponse[];
+}
 
-    export interface NotificationFeedUpdatedEvent {created_at: Date;
-    
+export interface RTMPIngress {
+  address: string;
+}
 
-        fid: string;
-    
+export interface RTMPSettingsResponse {
+  enabled: boolean;
 
-        custom: Record<string, any>;
-    
+  quality: string;
+}
 
-        type: string;
-    
+export interface RankingConfig {
+  score?: string;
 
-        feed_visibility?: string;
-    
+  type?: string;
 
-        received_at?: Date;
-    
+  defaults?: Record<string, any>;
 
-        aggregated_activities?: Array<AggregatedActivityResponse>;
-    
+  functions?: Record<string, DecayFunctionConfig>;
+}
 
-        notification_status?: NotificationStatusResponse;
-    
+export interface RawRecordingResponse {
+  status: string;
+}
 
-        user?: UserResponseCommonFields;
-    
+export interface RawRecordingSettingsResponse {
+  mode: 'available' | 'disabled' | 'auto-on';
+}
 
-        }
-    
+export interface Reaction {
+  activity_id: string;
 
+  created_at: Date;
 
+  kind: string;
 
+  updated_at: Date;
 
-    export interface NotificationParentActivity {id: string;
-    
+  user_id: string;
 
-        text?: string;
-    
+  deleted_at?: Date;
 
-        type?: string;
-    
+  id?: string;
 
-        user_id?: string;
-    
+  parent?: string;
 
-        attachments?: Array<Attachment>;
-    
+  score?: number;
 
-        }
-    
+  target_feeds?: string[];
 
+  children_counts?: Record<string, any>;
 
+  data?: Record<string, any>;
 
+  latest_children?: Record<string, Reaction[]>;
 
-    export interface NotificationStatusResponse {unread: number;
-    
+  moderation?: Record<string, any>;
 
-        unseen: number;
-    
+  own_children?: Record<string, Reaction[]>;
 
-        last_read_at?: Date;
-    
+  target_feeds_extra_data?: Record<string, any>;
 
-        last_seen_at?: Date;
-    
+  user?: User;
+}
 
-        read_activities?: Array<string>;
-    
+export interface ReactionGroupResponse {
+  count: number;
 
-        seen_activities?: Array<string>;
-    
+  first_reaction_at: Date;
 
-        }
-    
+  last_reaction_at: Date;
 
+  sum_scores: number;
+}
 
+export interface ReactionResponse {
+  created_at: Date;
 
+  message_id: string;
 
-    export interface NotificationTarget {id: string;
-    
+  score: number;
 
-        name?: string;
-    
+  type: string;
 
-        text?: string;
-    
+  updated_at: Date;
 
-        type?: string;
-    
+  user_id: string;
 
-        user_id?: string;
-    
+  custom: Record<string, any>;
 
-        attachments?: Array<Attachment>;
-    
+  user: UserResponse;
+}
 
-        comment?: NotificationComment;
-    
+export interface ReadCollectionsResponse {
+  duration: string;
 
-        parent_activity?: NotificationParentActivity;
-    
+  collections: CollectionResponse[];
+}
 
-        }
-    
+export interface ReadReceiptsResponse {
+  enabled: boolean;
+}
 
+export interface RecordSettingsResponse {
+  audio_only: boolean;
 
+  mode: string;
 
+  quality: string;
+}
 
-    export interface NotificationTrigger {text: string;
-    
+export interface RejectAppealRequestPayload {
+  decision_reason: string;
+}
 
-        type: string;
-    
+export interface RejectFeedMemberInviteRequest {}
 
-        comment?: NotificationComment;
-    
+export interface RejectFeedMemberInviteResponse {
+  duration: string;
 
-        }
-    
+  member: FeedMemberResponse;
+}
 
+export interface RejectFollowRequest {
+  source: string;
 
+  target: string;
+}
 
+export interface RejectFollowResponse {
+  duration: string;
 
-    export interface OCRRule {
-        action:| "flag" | "shadow" | "remove" | "bounce" | "bounce_flag" | "bounce_remove" ;
+  follow: FollowResponse;
+}
 
-        label: string;
-    
+export interface ReminderResponseData {
+  channel_cid: string;
 
-        }
-    
+  created_at: Date;
 
+  message_id: string;
 
+  updated_at: Date;
 
+  user_id: string;
 
-    export interface OnlyUserID {id: string;
-    
+  remind_at?: Date;
 
-        }
-    
+  channel?: ChannelResponse;
 
+  message?: MessageResponse;
 
+  user?: UserResponse;
+}
 
+export interface RemoveUserGroupMembersRequest {
+  member_ids: string[];
 
-    export interface OwnBatchRequest {feeds: Array<string>;
-    
+  team_id?: string;
+}
 
-        fields?: Array<string>;
-    
+export interface RemoveUserGroupMembersResponse {
+  duration: string;
 
-        }
-    
+  user_group?: UserGroupResponse;
+}
 
+export interface RepliesMeta {
+  depth_truncated: boolean;
 
+  has_more: boolean;
 
+  remaining: number;
 
-    export interface OwnBatchResponse {duration: string;
-    
+  next_cursor?: string;
+}
 
-        data: Record<string, FeedOwnData>;
-    
+export interface Response {
+  duration: string;
+}
 
-        }
-    
+export interface RestoreActionRequestPayload {
+  decision_reason?: string;
+}
 
+export interface RestoreActivityRequest {}
 
+export interface RestoreActivityResponse {
+  duration: string;
 
+  activity: ActivityResponse;
+}
 
-    export interface OwnUserResponse {banned: boolean;
-    
+export interface ReviewQueueItemResponse {
+  ai_text_severity: string;
 
-        created_at: Date;
-    
+  created_at: Date;
 
-        id: string;
-    
+  entity_id: string;
 
-        invisible: boolean;
-    
+  entity_type: string;
 
-        language: string;
-    
+  flags_count: number;
 
-        online: boolean;
-    
+  id: string;
 
-        role: string;
-    
+  latest_moderator_action: string;
 
-        total_unread_count: number;
-    
+  recommended_action: string;
 
-        unread_channels: number;
-    
+  reviewed_by: string;
 
-        unread_count: number;
-    
+  severity: number;
 
-        unread_threads: number;
-    
+  status: string;
 
-        updated_at: Date;
-    
+  updated_at: Date;
 
-        channel_mutes: Array<ChannelMute>;
-    
+  actions: ActionLogResponse[];
 
-        devices: Array<DeviceResponse>;
-    
+  bans: BanInfoResponse[];
 
-        mutes: Array<UserMuteResponse>;
-    
+  flags: ModerationFlagResponse[];
 
-        teams: Array<string>;
-    
+  languages: string[];
 
-        custom: Record<string, any>;
-    
+  completed_at?: Date;
 
-        avg_response_time?: number;
-    
+  config_key?: string;
 
-        deactivated_at?: Date;
-    
+  entity_creator_id?: string;
 
-        deleted_at?: Date;
-    
+  reviewed_at?: Date;
 
-        image?: string;
-    
+  teams?: string[];
 
-        last_active?: Date;
-    
+  activity?: EnrichedActivity;
 
-        name?: string;
-    
+  appeal?: AppealItemResponse;
 
-        revoke_tokens_issued_before?: Date;
-    
+  assigned_to?: UserResponse;
 
-        blocked_user_ids?: Array<string>;
-    
+  call?: CallResponse;
 
-        latest_hidden_channels?: Array<string>;
-    
+  entity_creator?: EntityCreatorResponse;
 
-        privacy_settings?: PrivacySettingsResponse;
-    
+  feeds_v2_activity?: EnrichedActivity;
 
-        push_preferences?: PushPreferencesResponse;
-    
+  feeds_v2_reaction?: Reaction;
 
-        teams_role?: Record<string, string>;
-    
+  feeds_v3_activity?: ActivityResponse;
 
-        total_unread_count_by_team?: Record<string, number>;
-    
+  feeds_v3_comment?: CommentResponse;
 
-        }
-    
+  message?: MessageResponse;
 
+  moderation_payload?: ModerationPayloadResponse;
 
+  reaction?: Reaction;
+}
 
+export interface RingSettingsResponse {
+  auto_cancel_timeout_ms: number;
 
-    export interface PagerRequest {limit?: number;
-    
+  incoming_call_timeout_ms: number;
 
-        next?: string;
-    
+  missed_call_timeout_ms: number;
+}
 
-        prev?: string;
-    
+export interface RuleBuilderAction {
+  skip_inbox?: boolean;
 
-        }
-    
+  type?:
+    | 'ban_user'
+    | 'flag_user'
+    | 'flag_content'
+    | 'block_content'
+    | 'shadow_content'
+    | 'bounce_flag_content'
+    | 'bounce_content'
+    | 'bounce_remove_content'
+    | 'mute_video'
+    | 'mute_audio'
+    | 'blur'
+    | 'call_blur'
+    | 'end_call'
+    | 'kick_user'
+    | 'warning'
+    | 'call_warning'
+    | 'webhook_only';
 
+  ban_options?: BanOptions;
 
+  call_options?: CallActionOptions;
 
+  flag_user_options?: FlagUserOptions;
+}
 
-    export interface PagerResponse {next?: string;
-    
+export interface RuleBuilderCondition {
+  confidence?: number;
 
-        prev?: string;
-    
+  type?: string;
 
-        }
-    
+  call_custom_property_params?: CallCustomPropertyParameters;
 
+  call_type_rule_params?: CallTypeRuleParameters;
 
+  call_violation_count_params?: CallViolationCountParameters;
 
+  closed_caption_rule_params?: ClosedCaptionRuleParameters;
 
-    export interface PinActivityRequest {enrich_own_fields?: boolean;
-    
+  content_count_rule_params?: ContentCountRuleParameters;
 
-        }
-    
+  content_flag_count_rule_params?: FlagCountRuleParameters;
 
+  image_content_params?: ImageContentParameters;
 
+  image_rule_params?: ImageRuleParameters;
 
+  keyframe_rule_params?: KeyframeRuleParameters;
 
-    export interface PinActivityResponse {created_at: Date;
-    
+  text_content_params?: TextContentParameters;
 
-        duration: string;
-    
+  text_rule_params?: TextRuleParameters;
 
-        feed: string;
-    
+  user_created_within_params?: UserCreatedWithinParameters;
 
-        user_id: string;
-    
+  user_custom_property_params?: UserCustomPropertyParameters;
 
-        activity: ActivityResponse;
-    
+  user_flag_count_rule_params?: FlagCountRuleParameters;
 
-        }
-    
+  user_identical_content_count_params?: UserIdenticalContentCountParameters;
 
+  user_role_params?: UserRoleParameters;
 
+  user_rule_params?: UserRuleParameters;
 
+  video_content_params?: VideoContentParameters;
 
-    export interface PollClosedFeedEvent {created_at: Date;
-    
+  video_rule_params?: VideoRuleParameters;
+}
 
-        fid: string;
-    
+export interface RuleBuilderConditionGroup {
+  logic?: string;
 
-        custom: Record<string, any>;
-    
+  conditions?: RuleBuilderCondition[];
+}
 
-        poll: PollResponseData;
-    
+export interface RuleBuilderConfig {
+  async?: boolean;
 
-        type: string;
-    
+  rules?: RuleBuilderRule[];
+}
 
-        feed_visibility?: string;
-    
+export interface RuleBuilderRule {
+  rule_type: string;
 
-        received_at?: Date;
-    
+  cooldown_period?: string;
 
-        }
-    
+  id?: string;
 
+  logic?: string;
 
+  action_sequences?: CallRuleActionSequence[];
 
+  conditions?: RuleBuilderCondition[];
 
-    export interface PollDeletedFeedEvent {created_at: Date;
-    
+  groups?: RuleBuilderConditionGroup[];
 
-        fid: string;
-    
+  action?: RuleBuilderAction;
+}
 
-        custom: Record<string, any>;
-    
+export interface SRTIngress {
+  address: string;
+}
 
-        poll: PollResponseData;
-    
+export interface ScreensharingSettingsResponse {
+  access_request_enabled: boolean;
 
-        type: string;
-    
+  enabled: boolean;
 
-        feed_visibility?: string;
-    
+  target_resolution?: TargetResolution;
+}
 
-        received_at?: Date;
-    
+export interface SearchUserGroupsResponse {
+  duration: string;
 
-        }
-    
+  user_groups: UserGroupResponse[];
+}
 
+export interface SessionSettingsResponse {
+  inactivity_timeout_seconds: number;
+}
 
+export interface ShadowBlockActionRequestPayload {
+  reason?: string;
+}
 
+export interface SharedLocationResponse {
+  channel_cid: string;
 
-    export interface PollOptionInput {text?: string;
-    
+  created_at: Date;
 
-        custom?: Record<string, any>;
-    
+  created_by_device_id: string;
 
-        }
-    
+  duration: string;
 
+  latitude: number;
 
+  longitude: number;
 
+  message_id: string;
 
-    export interface PollOptionRequest {id: string;
-    
+  updated_at: Date;
 
-        text?: string;
-    
+  user_id: string;
 
-        custom?: Record<string, any>;
-    
+  end_at?: Date;
 
-        }
-    
+  channel?: ChannelResponse;
 
+  message?: MessageResponse;
+}
 
+export interface SharedLocationResponseData {
+  channel_cid: string;
 
+  created_at: Date;
 
-    export interface PollOptionResponse {duration: string;
-    
+  created_by_device_id: string;
 
-        poll_option: PollOptionResponseData;
-    
+  latitude: number;
 
-        }
-    
+  longitude: number;
 
+  message_id: string;
 
+  updated_at: Date;
 
+  user_id: string;
 
-    export interface PollOptionResponseData {id: string;
-    
+  end_at?: Date;
 
-        text: string;
-    
+  channel?: ChannelResponse;
 
-        custom: Record<string, any>;
-    
+  message?: MessageResponse;
+}
 
-        }
-    
+export interface SharedLocationsResponse {
+  duration: string;
 
+  active_live_locations: SharedLocationResponseData[];
+}
 
+export interface SingleFollowResponse {
+  duration: string;
 
+  follow: FollowResponse;
 
-    export interface PollResponse {duration: string;
-    
+  notification_created?: boolean;
+}
 
-        poll: PollResponseData;
-    
+export interface SortParam {
+  direction: number;
 
-        }
-    
+  field: string;
 
+  type: string;
+}
 
+export interface SortParamRequest {
+  direction?: number;
 
+  field?: string;
 
-    export interface PollResponseData {allow_answers: boolean;
-    
+  type?: string;
+}
 
-        allow_user_suggested_options: boolean;
-    
+export interface SpeechSegmentConfig {
+  max_speech_caption_ms?: number;
 
-        answers_count: number;
-    
+  silence_duration_ms?: number;
+}
 
-        created_at: Date;
-    
+export interface StoriesConfig {
+  skip_watched?: boolean;
 
-        created_by_id: string;
-    
+  track_watched?: boolean;
+}
 
-        description: string;
-    
+export interface StoriesFeedUpdatedEvent {
+  created_at: Date;
 
-        enforce_unique_vote: boolean;
-    
+  fid: string;
 
-        id: string;
-    
+  custom: Record<string, any>;
 
-        name: string;
-    
+  type: string;
 
-        updated_at: Date;
-    
+  feed_visibility?: string;
 
-        vote_count: number;
-    
+  received_at?: Date;
 
-        voting_visibility: string;
-    
+  activities?: ActivityResponse[];
 
-        latest_answers: Array<PollVoteResponseData>;
-    
+  aggregated_activities?: AggregatedActivityResponse[];
 
-        options: Array<PollOptionResponseData>;
-    
+  user?: UserResponseCommonFields;
+}
 
-        own_votes: Array<PollVoteResponseData>;
-    
+export interface SubmitActionRequest {
+  action_type:
+    | 'flag'
+    | 'mark_reviewed'
+    | 'delete_message'
+    | 'delete_activity'
+    | 'delete_comment'
+    | 'delete_reaction'
+    | 'ban'
+    | 'custom'
+    | 'unban'
+    | 'restore'
+    | 'delete_user'
+    | 'unblock'
+    | 'block'
+    | 'shadow_block'
+    | 'unmask'
+    | 'kick_user'
+    | 'end_call'
+    | 'reject_appeal';
 
-        custom: Record<string, any>;
-    
+  appeal_id?: string;
 
-        latest_votes_by_option: Record<string, Array<PollVoteResponseData>>;
-    
+  item_id?: string;
 
-        vote_counts_by_option: Record<string, number>;
-    
+  ban?: BanActionRequestPayload;
 
-        is_closed?: boolean;
-    
+  block?: BlockActionRequestPayload;
 
-        max_votes_allowed?: number;
-    
+  custom?: CustomActionRequestPayload;
 
-        created_by?: UserResponse;
-    
+  delete_activity?: DeleteActivityRequestPayload;
 
-        }
-    
+  delete_comment?: DeleteCommentRequestPayload;
 
+  delete_message?: DeleteMessageRequestPayload;
 
+  delete_reaction?: DeleteReactionRequestPayload;
 
+  delete_user?: DeleteUserRequestPayload;
 
-    export interface PollUpdatedFeedEvent {created_at: Date;
-    
+  flag?: FlagRequest;
 
-        fid: string;
-    
+  mark_reviewed?: MarkReviewedRequestPayload;
 
-        custom: Record<string, any>;
-    
+  reject_appeal?: RejectAppealRequestPayload;
 
-        poll: PollResponseData;
-    
+  restore?: RestoreActionRequestPayload;
 
-        type: string;
-    
+  shadow_block?: ShadowBlockActionRequestPayload;
 
-        feed_visibility?: string;
-    
+  unban?: UnbanActionRequestPayload;
 
-        received_at?: Date;
-    
+  unblock?: UnblockActionRequestPayload;
+}
 
-        }
-    
+export interface SubmitActionResponse {
+  duration: string;
 
+  appeal_item?: AppealItemResponse;
 
+  item?: ReviewQueueItemResponse;
+}
 
+export interface TargetResolution {
+  bitrate: number;
 
-    export interface PollVoteCastedFeedEvent {created_at: Date;
-    
+  height: number;
 
-        fid: string;
-    
+  width: number;
+}
 
-        custom: Record<string, any>;
-    
+export interface TextContentParameters {
+  contains_url?: boolean;
 
-        poll: PollResponseData;
-    
+  severity?: string;
 
-        poll_vote: PollVoteResponseData;
-    
+  blocklist_match?: string[];
 
-        type: string;
-    
+  harm_labels?: string[];
 
-        feed_visibility?: string;
-    
+  llm_harm_labels?: Record<string, string>;
+}
 
-        received_at?: Date;
-    
+export interface TextRuleParameters {
+  contains_url?: boolean;
 
-        }
-    
+  semantic_filter_min_threshold?: number;
 
+  severity?: string;
 
+  threshold?: number;
 
+  time_window?: string;
 
-    export interface PollVoteChangedFeedEvent {created_at: Date;
-    
+  blocklist_match?: string[];
 
-        fid: string;
-    
+  harm_labels?: string[];
 
-        custom: Record<string, any>;
-    
+  semantic_filter_names?: string[];
 
-        poll: PollResponseData;
-    
+  llm_harm_labels?: Record<string, string>;
+}
 
-        poll_vote: PollVoteResponseData;
-    
+export interface ThreadedCommentResponse {
+  confidence_score: number;
 
-        type: string;
-    
+  created_at: Date;
 
-        feed_visibility?: string;
-    
+  downvote_count: number;
 
-        received_at?: Date;
-    
+  id: string;
 
-        }
-    
+  object_id: string;
 
+  object_type: string;
 
+  reaction_count: number;
 
+  reply_count: number;
 
-    export interface PollVoteRemovedFeedEvent {created_at: Date;
-    
+  score: number;
 
-        fid: string;
-    
+  status: 'active' | 'deleted' | 'removed' | 'hidden' | 'shadow_blocked';
 
-        custom: Record<string, any>;
-    
+  updated_at: Date;
 
-        poll: PollResponseData;
-    
+  upvote_count: number;
 
-        poll_vote: PollVoteResponseData;
-    
+  mentioned_users: UserResponse[];
 
-        type: string;
-    
+  own_reactions: FeedsReactionResponse[];
 
-        feed_visibility?: string;
-    
+  user: UserResponse;
 
-        received_at?: Date;
-    
+  controversy_score?: number;
 
-        }
-    
+  deleted_at?: Date;
 
+  edited_at?: Date;
 
+  parent_id?: string;
 
+  text?: string;
 
-    export interface PollVoteResponse {duration: string;
-    
+  attachments?: Attachment[];
 
-        poll?: PollResponseData;
-    
+  latest_reactions?: FeedsReactionResponse[];
 
-        vote?: PollVoteResponseData;
-    
+  replies?: ThreadedCommentResponse[];
 
-        }
-    
+  custom?: Record<string, any>;
 
+  meta?: RepliesMeta;
 
+  moderation?: ModerationV2Response;
 
+  reaction_groups?: Record<string, FeedsReactionGroupResponse>;
+}
 
-    export interface PollVoteResponseData {created_at: Date;
-    
+export interface Thresholds {
+  explicit?: LabelThresholds;
 
-        id: string;
-    
+  spam?: LabelThresholds;
 
-        option_id: string;
-    
+  toxic?: LabelThresholds;
+}
 
-        poll_id: string;
-    
+export interface ThumbnailResponse {
+  image_url: string;
+}
 
-        updated_at: Date;
-    
+export interface ThumbnailsSettingsResponse {
+  enabled: boolean;
+}
 
-        answer_text?: string;
-    
+export interface Time {}
 
-        is_answer?: boolean;
-    
+export interface TrackActivityMetricsEvent {
+  activity_id: string;
 
-        user_id?: string;
-    
+  metric: string;
 
-        user?: UserResponse;
-    
+  delta?: number;
+}
 
-        }
-    
+export interface TrackActivityMetricsEventResult {
+  activity_id: string;
 
+  allowed: boolean;
 
+  metric: string;
 
+  error?: string;
+}
 
-    export interface PollVotesResponse {duration: string;
-    
+export interface TrackActivityMetricsRequest {
+  events: TrackActivityMetricsEvent[];
+}
 
-        votes: Array<PollVoteResponseData>;
-    
+export interface TrackActivityMetricsResponse {
+  duration: string;
 
-        next?: string;
-    
+  results: TrackActivityMetricsEventResult[];
+}
 
-        prev?: string;
-    
+export interface TranscriptionSettingsResponse {
+  closed_caption_mode: 'available' | 'disabled' | 'auto-on';
 
-        }
-    
+  language:
+    | 'auto'
+    | 'en'
+    | 'fr'
+    | 'es'
+    | 'de'
+    | 'it'
+    | 'nl'
+    | 'pt'
+    | 'pl'
+    | 'ca'
+    | 'cs'
+    | 'da'
+    | 'el'
+    | 'fi'
+    | 'id'
+    | 'ja'
+    | 'ru'
+    | 'sv'
+    | 'ta'
+    | 'th'
+    | 'tr'
+    | 'hu'
+    | 'ro'
+    | 'zh'
+    | 'ar'
+    | 'tl'
+    | 'he'
+    | 'hi'
+    | 'hr'
+    | 'ko'
+    | 'ms'
+    | 'no'
+    | 'uk'
+    | 'bg'
+    | 'et'
+    | 'sl'
+    | 'sk';
 
+  mode: 'available' | 'disabled' | 'auto-on';
 
+  speech_segment_config?: SpeechSegmentConfig;
 
+  translation?: TranslationSettings;
+}
 
-    export interface PrivacySettingsResponse {delivery_receipts?: DeliveryReceiptsResponse;
-    
+export interface TranslationSettings {
+  enabled: boolean;
 
-        read_receipts?: ReadReceiptsResponse;
-    
+  languages: string[];
+}
 
-        typing_indicators?: TypingIndicatorsResponse;
-    
+export interface TypingIndicatorsResponse {
+  enabled: boolean;
+}
 
-        }
-    
+export interface UnbanActionRequestPayload {
+  channel_cid?: string;
 
+  decision_reason?: string;
+}
 
+export interface UnblockActionRequestPayload {
+  decision_reason?: string;
+}
 
+export interface UnblockUsersRequest {
+  blocked_user_id: string;
+}
 
-    export interface PushNotificationConfig {enable_push?: boolean;
-    
+export interface UnblockUsersResponse {
+  duration: string;
+}
 
-        push_types?: Array<string>;
-    
+export interface UnfollowBatchRequest {
+  follows: FollowPair[];
 
-        }
-    
+  delete_notification_activity?: boolean;
 
+  enrich_own_fields?: boolean;
+}
 
+export interface UnfollowBatchResponse {
+  duration: string;
 
+  follows: FollowResponse[];
+}
 
-    export interface PushPreferenceInput {
-        call_level?:| "all" | "none" | "default" ;
+export interface UnfollowResponse {
+  duration: string;
 
-        channel_cid?: string;
-    
+  follow: FollowResponse;
+}
 
-        
-        chat_level?:| "all" | "mentions" | "direct_mentions" | "all_mentions" | "none" | "default" ;
+export interface UnpinActivityResponse {
+  duration: string;
 
-        disabled_until?: Date;
-    
+  feed: string;
 
-        
-        feeds_level?:| "all" | "none" | "default" ;
+  user_id: string;
 
-        remove_disable?: boolean;
-    
+  activity: ActivityResponse;
+}
 
-        user_id?: string;
-    
+export interface UpdateActivityPartialRequest {
+  copy_custom_to_notification?: boolean;
 
-        chat_preferences?: ChatPreferencesInput;
-    
+  enrich_own_fields?: boolean;
 
-        feeds_preferences?: FeedsPreferences;
-    
+  handle_mention_notifications?: boolean;
 
-        }
-    
+  run_activity_processors?: boolean;
 
+  unset?: string[];
 
+  set?: Record<string, any>;
+}
 
+export interface UpdateActivityPartialResponse {
+  duration: string;
 
-    export interface PushPreferencesResponse {call_level?: string;
-    
+  activity: ActivityResponse;
+}
 
-        chat_level?: string;
-    
+export interface UpdateActivityRequest {
+  copy_custom_to_notification?: boolean;
 
-        disabled_until?: Date;
-    
+  enrich_own_fields?: boolean;
 
-        feeds_level?: string;
-    
+  expires_at?: Date;
 
-        chat_preferences?: ChatPreferencesResponse;
-    
+  handle_mention_notifications?: boolean;
 
-        feeds_preferences?: FeedsPreferencesResponse;
-    
+  poll_id?: string;
 
-        }
-    
+  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
 
+  run_activity_processors?: boolean;
 
+  skip_enrich_url?: boolean;
 
+  text?: string;
 
-    export interface QueryActivitiesRequest {enrich_own_fields?: boolean;
-    
+  visibility?: 'public' | 'private' | 'tag';
 
-        include_soft_deleted_activities?: boolean;
-    
+  visibility_tag?: string;
 
-        limit?: number;
-    
+  attachments?: Attachment[];
 
-        next?: string;
-    
+  collection_refs?: string[];
 
-        prev?: string;
-    
+  feeds?: string[];
 
-        sort?: Array<SortParamRequest>;
-    
+  filter_tags?: string[];
 
-        filter?: Record<string, any>;
-    
+  interest_tags?: string[];
 
-        }
-    
+  mentioned_user_ids?: string[];
 
+  custom?: Record<string, any>;
 
+  location?: ActivityLocation;
 
+  search_data?: Record<string, any>;
+}
 
-    export interface QueryActivitiesResponse {duration: string;
-    
+export interface UpdateActivityResponse {
+  duration: string;
 
-        activities: Array<ActivityResponse>;
-    
+  activity: ActivityResponse;
+}
 
-        next?: string;
-    
+export interface UpdateBlockListRequest {
+  is_leet_check_enabled?: boolean;
 
-        prev?: string;
-    
+  is_plural_check_enabled?: boolean;
 
-        }
-    
+  team?: string;
 
+  words?: string[];
+}
 
+export interface UpdateBlockListResponse {
+  duration: string;
 
+  blocklist?: BlockListResponse;
+}
 
-    export interface QueryActivityReactionsRequest {limit?: number;
-    
+export interface UpdateBookmarkFolderRequest {
+  name?: string;
 
-        next?: string;
-    
+  custom?: Record<string, any>;
+}
 
-        prev?: string;
-    
+export interface UpdateBookmarkFolderResponse {
+  duration: string;
 
-        sort?: Array<SortParamRequest>;
-    
+  bookmark_folder: BookmarkFolderResponse;
+}
 
-        filter?: Record<string, any>;
-    
+export interface UpdateBookmarkRequest {
+  folder_id?: string;
 
-        }
-    
+  new_folder_id?: string;
 
+  custom?: Record<string, any>;
 
+  new_folder?: AddFolderRequest;
+}
 
+export interface UpdateBookmarkResponse {
+  duration: string;
 
-    export interface QueryActivityReactionsResponse {duration: string;
-    
+  bookmark: BookmarkResponse;
+}
 
-        reactions: Array<FeedsReactionResponse>;
-    
+export interface UpdateCollectionRequest {
+  id: string;
 
-        next?: string;
-    
+  name: string;
 
-        prev?: string;
-    
+  custom: Record<string, any>;
+}
 
-        }
-    
+export interface UpdateCollectionsRequest {
+  collections: UpdateCollectionRequest[];
+}
 
+export interface UpdateCollectionsResponse {
+  duration: string;
 
+  collections: CollectionResponse[];
+}
 
+export interface UpdateCommentRequest {
+  comment?: string;
 
-    export interface QueryAppealsRequest {limit?: number;
-    
+  copy_custom_to_notification?: boolean;
 
-        next?: string;
-    
+  handle_mention_notifications?: boolean;
 
-        prev?: string;
-    
+  skip_enrich_url?: boolean;
 
-        sort?: Array<SortParamRequest>;
-    
+  skip_push?: boolean;
 
-        filter?: Record<string, any>;
-    
+  attachments?: Attachment[];
 
-        }
-    
+  mentioned_user_ids?: string[];
 
+  custom?: Record<string, any>;
+}
 
+export interface UpdateCommentResponse {
+  duration: string;
 
+  comment: CommentResponse;
+}
 
-    export interface QueryAppealsResponse {duration: string;
-    
+export interface UpdateFeedMembersRequest {
+  operation: 'upsert' | 'remove' | 'set';
 
-        items: Array<AppealItemResponse>;
-    
+  limit?: number;
 
-        next?: string;
-    
+  next?: string;
 
-        prev?: string;
-    
+  prev?: string;
 
-        }
-    
+  members?: FeedMemberRequest[];
+}
 
+export interface UpdateFeedMembersResponse {
+  duration: string;
 
+  added: FeedMemberResponse[];
 
+  removed_ids: string[];
 
-    export interface QueryBookmarkFoldersRequest {limit?: number;
-    
+  updated: FeedMemberResponse[];
+}
 
-        next?: string;
-    
+export interface UpdateFeedRequest {
+  description?: string;
 
-        prev?: string;
-    
+  enrich_own_fields?: boolean;
 
-        sort?: Array<SortParamRequest>;
-    
+  name?: string;
 
-        filter?: Record<string, any>;
-    
+  filter_tags?: string[];
 
-        }
-    
+  custom?: Record<string, any>;
+}
 
+export interface UpdateFeedResponse {
+  duration: string;
 
+  feed: FeedResponse;
+}
 
+export interface UpdateFollowRequest {
+  source: string;
 
-    export interface QueryBookmarkFoldersResponse {duration: string;
-    
+  target: string;
 
-        bookmark_folders: Array<BookmarkFolderResponse>;
-    
+  copy_custom_to_notification?: boolean;
 
-        next?: string;
-    
+  create_notification_activity?: boolean;
 
-        prev?: string;
-    
+  enrich_own_fields?: boolean;
 
-        }
-    
+  follower_role?: string;
 
+  push_preference?: 'all' | 'none';
 
+  skip_push?: boolean;
 
+  custom?: Record<string, any>;
+}
 
-    export interface QueryBookmarksRequest {enrich_own_fields?: boolean;
-    
+export interface UpdateFollowResponse {
+  duration: string;
 
-        limit?: number;
-    
+  follow: FollowResponse;
+}
 
-        next?: string;
-    
+export interface UpdateLiveLocationRequest {
+  message_id: string;
 
-        prev?: string;
-    
+  end_at?: Date;
 
-        sort?: Array<SortParamRequest>;
-    
+  latitude?: number;
 
-        filter?: Record<string, any>;
-    
+  longitude?: number;
+}
 
-        }
-    
+export interface UpdatePollOptionRequest {
+  id: string;
 
+  text: string;
 
+  custom?: Record<string, any>;
+}
 
+export interface UpdatePollPartialRequest {
+  unset?: string[];
 
-    export interface QueryBookmarksResponse {duration: string;
-    
+  set?: Record<string, any>;
+}
 
-        bookmarks: Array<BookmarkResponse>;
-    
+export interface UpdatePollRequest {
+  id: string;
 
-        next?: string;
-    
+  name: string;
 
-        prev?: string;
-    
+  allow_answers?: boolean;
 
-        }
-    
+  allow_user_suggested_options?: boolean;
 
+  description?: string;
 
+  enforce_unique_vote?: boolean;
 
+  is_closed?: boolean;
 
-    export interface QueryCollectionsRequest {limit?: number;
-    
+  max_votes_allowed?: number;
 
-        next?: string;
-    
+  voting_visibility?: 'anonymous' | 'public';
 
-        prev?: string;
-    
+  options?: PollOptionRequest[];
 
-        sort?: Array<SortParamRequest>;
-    
+  custom?: Record<string, any>;
+}
 
-        filter?: Record<string, any>;
-    
+export interface UpdateUserGroupRequest {
+  description?: string;
 
-        }
-    
+  name?: string;
 
+  team_id?: string;
+}
 
+export interface UpdateUserGroupResponse {
+  duration: string;
 
+  user_group?: UserGroupResponse;
+}
 
-    export interface QueryCollectionsResponse {duration: string;
-    
+export interface UpdateUserPartialRequest {
+  id: string;
 
-        collections: Array<CollectionResponse>;
-    
+  unset?: string[];
 
-        next?: string;
-    
+  set?: Record<string, any>;
+}
 
-        prev?: string;
-    
+export interface UpdateUsersPartialRequest {
+  users: UpdateUserPartialRequest[];
+}
 
-        }
-    
+export interface UpdateUsersRequest {
+  users: Record<string, UserRequest>;
+}
 
+export interface UpdateUsersResponse {
+  duration: string;
 
+  membership_deletion_task_id: string;
 
+  users: Record<string, FullUserResponse>;
+}
 
-    export interface QueryCommentReactionsRequest {limit?: number;
-    
+export interface UpsertActivitiesRequest {
+  activities: ActivityRequest[];
 
-        next?: string;
-    
+  enrich_own_fields?: boolean;
+}
 
-        prev?: string;
-    
+export interface UpsertActivitiesResponse {
+  duration: string;
 
-        sort?: Array<SortParamRequest>;
-    
+  activities: ActivityResponse[];
 
-        filter?: Record<string, any>;
-    
+  mention_notifications_created?: number;
+}
 
-        }
-    
+export interface UpsertConfigRequest {
+  key: string;
 
+  async?: boolean;
 
+  team?: string;
 
+  ai_image_config?: AIImageConfig;
 
-    export interface QueryCommentReactionsResponse {duration: string;
-    
+  ai_text_config?: AITextConfig;
 
-        reactions: Array<FeedsReactionResponse>;
-    
+  ai_video_config?: AIVideoConfig;
 
-        next?: string;
-    
+  automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
 
-        prev?: string;
-    
+  automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
 
-        }
-    
+  automod_toxicity_config?: AutomodToxicityConfig;
 
+  aws_rekognition_config?: AIImageConfig;
 
+  block_list_config?: BlockListConfig;
 
+  bodyguard_config?: AITextConfig;
 
-    export interface QueryCommentsRequest {filter: Record<string, any>;
-    
+  google_vision_config?: GoogleVisionConfig;
 
-        id_around?: string;
-    
+  llm_config?: LLMConfig;
 
-        limit?: number;
-    
+  rule_builder_config?: RuleBuilderConfig;
 
-        next?: string;
-    
+  velocity_filter_config?: VelocityFilterConfig;
 
-        prev?: string;
-    
+  video_call_rule_config?: VideoCallRuleConfig;
+}
 
-        
-        sort?:| "first" | "last" | "top" | "best" | "controversial" ;
+export interface UpsertConfigResponse {
+  duration: string;
 
-        }
-    
+  config?: ConfigResponse;
+}
 
+export interface UpsertPushPreferencesRequest {
+  preferences: PushPreferenceInput[];
+}
 
+export interface UpsertPushPreferencesResponse {
+  duration: string;
 
+  user_channel_preferences: Record<
+    string,
+    Record<string, ChannelPushPreferencesResponse | null>
+  >;
 
-    export interface QueryCommentsResponse {duration: string;
-    
+  user_preferences: Record<string, PushPreferencesResponse>;
+}
 
-        comments: Array<CommentResponse>;
-    
+export interface User {
+  id: string;
 
-        next?: string;
-    
+  data?: Record<string, any>;
+}
 
-        prev?: string;
-    
+export interface UserBannedEvent {
+  created_at: Date;
 
-        }
-    
+  custom: Record<string, any>;
 
+  user: UserResponseCommonFields;
 
+  type: string;
 
+  channel_id?: string;
 
-    export interface QueryFeedMembersRequest {limit?: number;
-    
+  channel_member_count?: number;
 
-        next?: string;
-    
+  channel_message_count?: number;
 
-        prev?: string;
-    
+  channel_type?: string;
 
-        sort?: Array<SortParamRequest>;
-    
+  cid?: string;
 
-        filter?: Record<string, any>;
-    
+  expiration?: Date;
 
-        }
-    
+  reason?: string;
 
+  received_at?: Date;
 
+  shadow?: boolean;
 
+  team?: string;
 
-    export interface QueryFeedMembersResponse {duration: string;
-    
+  total_bans?: number;
 
-        members: Array<FeedMemberResponse>;
-    
+  channel_custom?: Record<string, any>;
 
-        next?: string;
-    
+  created_by?: UserResponseCommonFields;
+}
 
-        prev?: string;
-    
+export interface UserCreatedWithinParameters {
+  max_age?: string;
+}
 
-        }
-    
+export interface UserCustomPropertyParameters {
+  operator?: string;
 
+  property_key?: string;
+}
 
+export interface UserDeactivatedEvent {
+  created_at: Date;
 
+  custom: Record<string, any>;
 
-    export interface QueryFeedsRequest {enrich_own_fields?: boolean;
-    
+  user: UserResponseCommonFields;
 
-        limit?: number;
-    
+  type: string;
 
-        next?: string;
-    
+  received_at?: Date;
 
-        prev?: string;
-    
+  created_by?: UserResponseCommonFields;
+}
 
-        watch?: boolean;
-    
+export interface UserGroupMember {
+  app_pk: number;
 
-        sort?: Array<SortParamRequest>;
-    
+  created_at: Date;
 
-        filter?: Record<string, any>;
-    
+  group_id: string;
 
-        }
-    
+  is_admin: boolean;
 
+  user_id: string;
+}
 
+export interface UserGroupResponse {
+  created_at: Date;
 
+  id: string;
 
-    export interface QueryFeedsResponse {duration: string;
-    
+  name: string;
 
-        feeds: Array<FeedResponse>;
-    
+  updated_at: Date;
 
-        next?: string;
-    
+  created_by?: string;
 
-        prev?: string;
-    
+  description?: string;
 
-        }
-    
+  team_id?: string;
 
+  members?: UserGroupMember[];
+}
 
+export interface UserIdenticalContentCountParameters {
+  threshold?: number;
 
+  time_window?: string;
+}
 
-    export interface QueryFollowsRequest {limit?: number;
-    
+export interface UserMuteResponse {
+  created_at: Date;
 
-        next?: string;
-    
+  updated_at: Date;
 
-        prev?: string;
-    
+  expires?: Date;
 
-        sort?: Array<SortParamRequest>;
-    
+  target?: UserResponse;
 
-        filter?: Record<string, any>;
-    
+  user?: UserResponse;
+}
 
-        }
-    
+export interface UserReactivatedEvent {
+  created_at: Date;
 
+  custom: Record<string, any>;
 
+  user: UserResponseCommonFields;
 
+  type: string;
 
-    export interface QueryFollowsResponse {duration: string;
-    
+  received_at?: Date;
 
-        follows: Array<FollowResponse>;
-    
+  created_by?: UserResponseCommonFields;
+}
 
-        next?: string;
-    
+export interface UserRequest {
+  id: string;
 
-        prev?: string;
-    
+  image?: string;
 
-        }
-    
+  invisible?: boolean;
 
+  language?: string;
 
+  name?: string;
 
+  custom?: Record<string, any>;
 
-    export interface QueryModerationConfigsRequest {limit?: number;
-    
+  privacy_settings?: PrivacySettingsResponse;
+}
 
-        next?: string;
-    
+export interface UserResponse {
+  banned: boolean;
 
-        prev?: string;
-    
+  created_at: Date;
 
-        sort?: Array<SortParamRequest>;
-    
+  id: string;
 
-        filter?: Record<string, any>;
-    
+  language: string;
 
-        }
-    
+  online: boolean;
 
+  role: string;
 
+  updated_at: Date;
 
+  blocked_user_ids: string[];
 
-    export interface QueryModerationConfigsResponse {duration: string;
-    
+  teams: string[];
 
-        configs: Array<ConfigResponse>;
-    
+  custom: Record<string, any>;
 
-        next?: string;
-    
+  avg_response_time?: number;
 
-        prev?: string;
-    
+  deactivated_at?: Date;
 
-        }
-    
+  deleted_at?: Date;
 
+  image?: string;
 
+  last_active?: Date;
 
+  name?: string;
 
-    export interface QueryPinnedActivitiesRequest {enrich_own_fields?: boolean;
-    
+  revoke_tokens_issued_before?: Date;
 
-        limit?: number;
-    
+  teams_role?: Record<string, string>;
+}
 
-        next?: string;
-    
+export interface UserResponseCommonFields {
+  banned: boolean;
 
-        prev?: string;
-    
+  created_at: Date;
 
-        sort?: Array<SortParamRequest>;
-    
+  id: string;
 
-        filter?: Record<string, any>;
-    
+  language: string;
 
-        }
-    
+  online: boolean;
 
+  role: string;
 
+  updated_at: Date;
 
+  blocked_user_ids: string[];
 
-    export interface QueryPinnedActivitiesResponse {duration: string;
-    
+  teams: string[];
 
-        pinned_activities: Array<ActivityPinResponse>;
-    
+  custom: Record<string, any>;
 
-        next?: string;
-    
+  avg_response_time?: number;
 
-        prev?: string;
-    
+  deactivated_at?: Date;
 
-        }
-    
+  deleted_at?: Date;
 
+  image?: string;
 
+  last_active?: Date;
 
+  name?: string;
 
-    export interface QueryPollVotesRequest {limit?: number;
-    
+  revoke_tokens_issued_before?: Date;
 
-        next?: string;
-    
+  teams_role?: Record<string, string>;
+}
 
-        prev?: string;
-    
+export interface UserResponsePrivacyFields {
+  banned: boolean;
 
-        sort?: Array<SortParamRequest>;
-    
+  created_at: Date;
 
-        filter?: Record<string, any>;
-    
+  id: string;
 
-        }
-    
+  language: string;
 
+  online: boolean;
 
+  role: string;
 
+  updated_at: Date;
 
-    export interface QueryPollsRequest {limit?: number;
-    
+  blocked_user_ids: string[];
 
-        next?: string;
-    
+  teams: string[];
 
-        prev?: string;
-    
+  custom: Record<string, any>;
 
-        sort?: Array<SortParamRequest>;
-    
+  avg_response_time?: number;
 
-        filter?: Record<string, any>;
-    
+  deactivated_at?: Date;
 
-        }
-    
+  deleted_at?: Date;
 
+  image?: string;
 
+  invisible?: boolean;
 
+  last_active?: Date;
 
-    export interface QueryPollsResponse {duration: string;
-    
+  name?: string;
 
-        polls: Array<PollResponseData>;
-    
+  revoke_tokens_issued_before?: Date;
 
-        next?: string;
-    
+  privacy_settings?: PrivacySettingsResponse;
 
-        prev?: string;
-    
+  teams_role?: Record<string, string>;
+}
 
-        }
-    
+export interface UserRoleParameters {
+  operator?: string;
 
+  role?: string;
+}
 
+export interface UserRuleParameters {
+  max_age?: string;
+}
 
+export interface UserUnbannedEvent {
+  created_at: Date;
 
-    export interface QueryReviewQueueRequest {limit?: number;
-    
+  custom: Record<string, any>;
 
-        lock_count?: number;
-    
+  user: UserResponseCommonFields;
 
-        lock_duration?: number;
-    
+  type: string;
 
-        lock_items?: boolean;
-    
+  channel_id?: string;
 
-        next?: string;
-    
+  channel_member_count?: number;
 
-        prev?: string;
-    
+  channel_message_count?: number;
 
-        stats_only?: boolean;
-    
+  channel_type?: string;
 
-        sort?: Array<SortParamRequest>;
-    
+  cid?: string;
 
-        filter?: Record<string, any>;
-    
+  received_at?: Date;
 
-        }
-    
+  shadow?: boolean;
 
+  team?: string;
 
+  channel_custom?: Record<string, any>;
 
+  created_by?: UserResponseCommonFields;
+}
 
-    export interface QueryReviewQueueResponse {duration: string;
-    
+export interface UserUpdatedEvent {
+  created_at: Date;
 
-        items: Array<ReviewQueueItemResponse>;
-    
+  custom: Record<string, any>;
 
-        action_config: Record<string, Array<ModerationActionConfigResponse>>;
-    
+  user: UserResponsePrivacyFields;
 
-        stats: Record<string, any>;
-    
+  type: string;
 
-        next?: string;
-    
+  received_at?: Date;
+}
 
-        prev?: string;
-    
+export interface VelocityFilterConfig {
+  advanced_filters: boolean;
 
-        filter_config?: FilterConfigResponse;
-    
+  cascading_actions: boolean;
 
-        }
-    
+  cids_per_user: number;
 
+  enabled: boolean;
 
+  first_message_only: boolean;
 
+  rules: VelocityFilterConfigRule[];
 
-    export interface QueryUsersPayload {filter_conditions: Record<string, any>;
-    
+  async?: boolean;
+}
 
-        include_deactivated_users?: boolean;
-    
+export interface VelocityFilterConfigRule {
+  action: 'flag' | 'shadow' | 'remove' | 'ban';
 
-        limit?: number;
-    
+  ban_duration: number;
 
-        offset?: number;
-    
+  cascading_action: 'flag' | 'shadow' | 'remove' | 'ban';
 
-        presence?: boolean;
-    
+  cascading_threshold: number;
 
-        sort?: Array<SortParamRequest>;
-    
+  check_message_context: boolean;
 
-        }
-    
+  fast_spam_threshold: number;
 
+  fast_spam_ttl: number;
 
+  ip_ban: boolean;
 
+  probation_period: number;
 
-    export interface QueryUsersResponse {duration: string;
-    
+  shadow_ban: boolean;
 
-        users: Array<FullUserResponse>;
-    
+  slow_spam_threshold: number;
 
-        }
-    
+  slow_spam_ttl: number;
 
+  url_only: boolean;
 
+  slow_spam_ban_duration?: number;
+}
 
+export interface VideoCallRuleConfig {
+  flag_all_labels: boolean;
 
-    export interface RTMPIngress {address: string;
-    
+  flagged_labels: string[];
 
-        }
-    
+  rules: HarmConfig[];
+}
 
+export interface VideoContentParameters {
+  harm_labels?: string[];
+}
 
+export interface VideoEndCallRequestPayload {}
 
+export interface VideoKickUserRequestPayload {}
 
-    export interface RTMPSettingsResponse {enabled: boolean;
-    
+export interface VideoRuleParameters {
+  threshold?: number;
 
-        quality: string;
-    
+  time_window?: string;
 
-        }
-    
+  harm_labels?: string[];
+}
 
+export interface VideoSettingsResponse {
+  access_request_enabled: boolean;
 
+  camera_default_on: boolean;
 
+  camera_facing: 'front' | 'back' | 'external';
 
-    export interface RankingConfig {score?: string;
-    
+  enabled: boolean;
 
-        type?: string;
-    
+  target_resolution: TargetResolution;
+}
 
-        defaults?: Record<string, any>;
-    
+export interface VoteData {
+  answer_text?: string;
 
-        functions?: Record<string, DecayFunctionConfig>;
-    
+  option_id?: string;
+}
 
-        }
-    
+export interface WHIPIngress {
+  address: string;
+}
 
+export interface WSAuthMessage {
+  token: string;
 
+  user_details: ConnectUserDetailsRequest;
 
+  products?: string[];
+}
 
-    export interface RawRecordingResponse {status: string;
-    
+export type WSClientEvent =
+  | ({ type: 'app.updated' } & AppUpdatedEvent)
+  | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
+  | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
+  | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
+  | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
+  | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
+  | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+  | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent)
+  | ({
+      type: 'feeds.activity.removed_from_feed';
+    } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'feeds.activity.restored' } & ActivityRestoredEvent)
+  | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
+  | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
+  | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
+  | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
+  | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
+  | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent)
+  | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
+  | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
+  | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
+  | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
+  | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
+  | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
+  | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
+  | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
+  | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
+  | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
+  | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
+  | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
+  | ({ type: 'feeds.feed_group.restored' } & FeedGroupRestoredEvent)
+  | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
+  | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
+  | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
+  | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
+  | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
+  | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
+  | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent)
+  | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
+  | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
+  | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
+  | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
+  | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
+  | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
+  | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
+  | ({ type: 'health.check' } & HealthCheckEvent)
+  | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+  | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
+  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
+  | ({ type: 'user.banned' } & UserBannedEvent)
+  | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
+  | ({ type: 'user.reactivated' } & UserReactivatedEvent)
+  | ({ type: 'user.unbanned' } & UserUnbannedEvent)
+  | ({ type: 'user.updated' } & UserUpdatedEvent);
 
-        }
-    
-
-
-
-
-    export interface RawRecordingSettingsResponse {
-        mode:| "available" | "disabled" | "auto-on" ;
-
-        }
-    
-
-
-
-
-    export interface Reaction {activity_id: string;
-    
-
-        created_at: Date;
-    
-
-        kind: string;
-    
-
-        updated_at: Date;
-    
-
-        user_id: string;
-    
-
-        deleted_at?: Date;
-    
-
-        id?: string;
-    
-
-        parent?: string;
-    
-
-        score?: number;
-    
-
-        target_feeds?: Array<string>;
-    
-
-        children_counts?: Record<string, any>;
-    
-
-        data?: Record<string, any>;
-    
-
-        latest_children?: Record<string, Array<Reaction>>;
-    
-
-        moderation?: Record<string, any>;
-    
-
-        own_children?: Record<string, Array<Reaction>>;
-    
-
-        target_feeds_extra_data?: Record<string, any>;
-    
-
-        user?: User;
-    
-
-        }
-    
-
-
-
-
-    export interface ReactionGroupResponse {count: number;
-    
-
-        first_reaction_at: Date;
-    
-
-        last_reaction_at: Date;
-    
-
-        sum_scores: number;
-    
-
-        }
-    
-
-
-
-
-    export interface ReactionResponse {created_at: Date;
-    
-
-        message_id: string;
-    
-
-        score: number;
-    
-
-        type: string;
-    
-
-        updated_at: Date;
-    
-
-        user_id: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        user: UserResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface ReadCollectionsResponse {duration: string;
-    
-
-        collections: Array<CollectionResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface ReadReceiptsResponse {enabled: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface RecordSettingsResponse {audio_only: boolean;
-    
-
-        mode: string;
-    
-
-        quality: string;
-    
-
-        }
-    
-
-
-
-
-    export interface RejectAppealRequestPayload {decision_reason: string;
-    
-
-        }
-    
-
-
-
-
-    export interface RejectFeedMemberInviteRequest {}
-    
-
-
-
-
-    export interface RejectFeedMemberInviteResponse {duration: string;
-    
-
-        member: FeedMemberResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface RejectFollowRequest {source: string;
-    
-
-        target: string;
-    
-
-        }
-    
-
-
-
-
-    export interface RejectFollowResponse {duration: string;
-    
-
-        follow: FollowResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface ReminderResponseData {channel_cid: string;
-    
-
-        created_at: Date;
-    
-
-        message_id: string;
-    
-
-        updated_at: Date;
-    
-
-        user_id: string;
-    
-
-        remind_at?: Date;
-    
-
-        channel?: ChannelResponse;
-    
-
-        message?: MessageResponse;
-    
-
-        user?: UserResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface RemoveUserGroupMembersRequest {member_ids: Array<string>;
-    
-
-        team_id?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface RemoveUserGroupMembersResponse {duration: string;
-    
-
-        user_group?: UserGroupResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface RepliesMeta {depth_truncated: boolean;
-    
-
-        has_more: boolean;
-    
-
-        remaining: number;
-    
-
-        next_cursor?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface Response {duration: string;
-    
-
-        }
-    
-
-
-
-
-    export interface RestoreActionRequestPayload {decision_reason?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface RestoreActivityRequest {}
-    
-
-
-
-
-    export interface RestoreActivityResponse {duration: string;
-    
-
-        activity: ActivityResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface ReviewQueueItemResponse {ai_text_severity: string;
-    
-
-        created_at: Date;
-    
-
-        entity_id: string;
-    
-
-        entity_type: string;
-    
-
-        flags_count: number;
-    
-
-        id: string;
-    
-
-        latest_moderator_action: string;
-    
-
-        recommended_action: string;
-    
-
-        reviewed_by: string;
-    
-
-        severity: number;
-    
-
-        status: string;
-    
-
-        updated_at: Date;
-    
-
-        actions: Array<ActionLogResponse>;
-    
-
-        bans: Array<BanInfoResponse>;
-    
-
-        flags: Array<ModerationFlagResponse>;
-    
-
-        languages: Array<string>;
-    
-
-        completed_at?: Date;
-    
-
-        config_key?: string;
-    
-
-        entity_creator_id?: string;
-    
-
-        reviewed_at?: Date;
-    
-
-        teams?: Array<string>;
-    
-
-        activity?: EnrichedActivity;
-    
-
-        appeal?: AppealItemResponse;
-    
-
-        assigned_to?: UserResponse;
-    
-
-        call?: CallResponse;
-    
-
-        entity_creator?: EntityCreatorResponse;
-    
-
-        feeds_v2_activity?: EnrichedActivity;
-    
-
-        feeds_v2_reaction?: Reaction;
-    
-
-        feeds_v3_activity?: ActivityResponse;
-    
-
-        feeds_v3_comment?: CommentResponse;
-    
-
-        message?: MessageResponse;
-    
-
-        moderation_payload?: ModerationPayloadResponse;
-    
-
-        reaction?: Reaction;
-    
-
-        }
-    
-
-
-
-
-    export interface RingSettingsResponse {auto_cancel_timeout_ms: number;
-    
-
-        incoming_call_timeout_ms: number;
-    
-
-        missed_call_timeout_ms: number;
-    
-
-        }
-    
-
-
-
-
-    export interface RuleBuilderAction {skip_inbox?: boolean;
-    
-
-        
-        type?:| "ban_user" | "flag_user" | "flag_content" | "block_content" | "shadow_content" | "bounce_flag_content" | "bounce_content" | "bounce_remove_content" | "mute_video" | "mute_audio" | "blur" | "call_blur" | "end_call" | "kick_user" | "warning" | "call_warning" | "webhook_only" ;
-
-        ban_options?: BanOptions;
-    
-
-        call_options?: CallActionOptions;
-    
-
-        flag_user_options?: FlagUserOptions;
-    
-
-        }
-    
-
-
-
-
-    export interface RuleBuilderCondition {confidence?: number;
-    
-
-        type?: string;
-    
-
-        call_custom_property_params?: CallCustomPropertyParameters;
-    
-
-        call_type_rule_params?: CallTypeRuleParameters;
-    
-
-        call_violation_count_params?: CallViolationCountParameters;
-    
-
-        closed_caption_rule_params?: ClosedCaptionRuleParameters;
-    
-
-        content_count_rule_params?: ContentCountRuleParameters;
-    
-
-        content_flag_count_rule_params?: FlagCountRuleParameters;
-    
-
-        image_content_params?: ImageContentParameters;
-    
-
-        image_rule_params?: ImageRuleParameters;
-    
-
-        keyframe_rule_params?: KeyframeRuleParameters;
-    
-
-        text_content_params?: TextContentParameters;
-    
-
-        text_rule_params?: TextRuleParameters;
-    
-
-        user_created_within_params?: UserCreatedWithinParameters;
-    
-
-        user_custom_property_params?: UserCustomPropertyParameters;
-    
-
-        user_flag_count_rule_params?: FlagCountRuleParameters;
-    
-
-        user_identical_content_count_params?: UserIdenticalContentCountParameters;
-    
-
-        user_role_params?: UserRoleParameters;
-    
-
-        user_rule_params?: UserRuleParameters;
-    
-
-        video_content_params?: VideoContentParameters;
-    
-
-        video_rule_params?: VideoRuleParameters;
-    
-
-        }
-    
-
-
-
-
-    export interface RuleBuilderConditionGroup {logic?: string;
-    
-
-        conditions?: Array<RuleBuilderCondition>;
-    
-
-        }
-    
-
-
-
-
-    export interface RuleBuilderConfig {async?: boolean;
-    
-
-        rules?: Array<RuleBuilderRule>;
-    
-
-        }
-    
-
-
-
-
-    export interface RuleBuilderRule {rule_type: string;
-    
-
-        cooldown_period?: string;
-    
-
-        id?: string;
-    
-
-        logic?: string;
-    
-
-        action_sequences?: Array<CallRuleActionSequence>;
-    
-
-        conditions?: Array<RuleBuilderCondition>;
-    
-
-        groups?: Array<RuleBuilderConditionGroup>;
-    
-
-        action?: RuleBuilderAction;
-    
-
-        }
-    
-
-
-
-
-    export interface SRTIngress {address: string;
-    
-
-        }
-    
-
-
-
-
-    export interface ScreensharingSettingsResponse {access_request_enabled: boolean;
-    
-
-        enabled: boolean;
-    
-
-        target_resolution?: TargetResolution;
-    
-
-        }
-    
-
-
-
-
-    export interface SearchUserGroupsResponse {duration: string;
-    
-
-        user_groups: Array<UserGroupResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface SessionSettingsResponse {inactivity_timeout_seconds: number;
-    
-
-        }
-    
-
-
-
-
-    export interface ShadowBlockActionRequestPayload {reason?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface SharedLocationResponse {channel_cid: string;
-    
-
-        created_at: Date;
-    
-
-        created_by_device_id: string;
-    
-
-        duration: string;
-    
-
-        latitude: number;
-    
-
-        longitude: number;
-    
-
-        message_id: string;
-    
-
-        updated_at: Date;
-    
-
-        user_id: string;
-    
-
-        end_at?: Date;
-    
-
-        channel?: ChannelResponse;
-    
-
-        message?: MessageResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface SharedLocationResponseData {channel_cid: string;
-    
-
-        created_at: Date;
-    
-
-        created_by_device_id: string;
-    
-
-        latitude: number;
-    
-
-        longitude: number;
-    
-
-        message_id: string;
-    
-
-        updated_at: Date;
-    
-
-        user_id: string;
-    
-
-        end_at?: Date;
-    
-
-        channel?: ChannelResponse;
-    
-
-        message?: MessageResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface SharedLocationsResponse {duration: string;
-    
-
-        active_live_locations: Array<SharedLocationResponseData>;
-    
-
-        }
-    
-
-
-
-
-    export interface SingleFollowResponse {duration: string;
-    
-
-        follow: FollowResponse;
-    
-
-        notification_created?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface SortParam {direction: number;
-    
-
-        field: string;
-    
-
-        type: string;
-    
-
-        }
-    
-
-
-
-
-    export interface SortParamRequest {direction?: number;
-    
-
-        field?: string;
-    
-
-        type?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface SpeechSegmentConfig {max_speech_caption_ms?: number;
-    
-
-        silence_duration_ms?: number;
-    
-
-        }
-    
-
-
-
-
-    export interface StoriesConfig {skip_watched?: boolean;
-    
-
-        track_watched?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface StoriesFeedUpdatedEvent {created_at: Date;
-    
-
-        fid: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        type: string;
-    
-
-        feed_visibility?: string;
-    
-
-        received_at?: Date;
-    
-
-        activities?: Array<ActivityResponse>;
-    
-
-        aggregated_activities?: Array<AggregatedActivityResponse>;
-    
-
-        user?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface SubmitActionRequest {
-        action_type:| "flag" | "mark_reviewed" | "delete_message" | "delete_activity" | "delete_comment" | "delete_reaction" | "ban" | "custom" | "unban" | "restore" | "delete_user" | "unblock" | "block" | "shadow_block" | "unmask" | "kick_user" | "end_call" | "reject_appeal" ;
-
-        appeal_id?: string;
-    
-
-        item_id?: string;
-    
-
-        ban?: BanActionRequestPayload;
-    
-
-        block?: BlockActionRequestPayload;
-    
-
-        custom?: CustomActionRequestPayload;
-    
-
-        delete_activity?: DeleteActivityRequestPayload;
-    
-
-        delete_comment?: DeleteCommentRequestPayload;
-    
-
-        delete_message?: DeleteMessageRequestPayload;
-    
-
-        delete_reaction?: DeleteReactionRequestPayload;
-    
-
-        delete_user?: DeleteUserRequestPayload;
-    
-
-        flag?: FlagRequest;
-    
-
-        mark_reviewed?: MarkReviewedRequestPayload;
-    
-
-        reject_appeal?: RejectAppealRequestPayload;
-    
-
-        restore?: RestoreActionRequestPayload;
-    
-
-        shadow_block?: ShadowBlockActionRequestPayload;
-    
-
-        unban?: UnbanActionRequestPayload;
-    
-
-        unblock?: UnblockActionRequestPayload;
-    
-
-        }
-    
-
-
-
-
-    export interface SubmitActionResponse {duration: string;
-    
-
-        appeal_item?: AppealItemResponse;
-    
-
-        item?: ReviewQueueItemResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface TargetResolution {bitrate: number;
-    
-
-        height: number;
-    
-
-        width: number;
-    
-
-        }
-    
-
-
-
-
-    export interface TextContentParameters {contains_url?: boolean;
-    
-
-        severity?: string;
-    
-
-        blocklist_match?: Array<string>;
-    
-
-        harm_labels?: Array<string>;
-    
-
-        llm_harm_labels?: Record<string, string>;
-    
-
-        }
-    
-
-
-
-
-    export interface TextRuleParameters {contains_url?: boolean;
-    
-
-        semantic_filter_min_threshold?: number;
-    
-
-        severity?: string;
-    
-
-        threshold?: number;
-    
-
-        time_window?: string;
-    
-
-        blocklist_match?: Array<string>;
-    
-
-        harm_labels?: Array<string>;
-    
-
-        semantic_filter_names?: Array<string>;
-    
-
-        llm_harm_labels?: Record<string, string>;
-    
-
-        }
-    
-
-
-
-
-    export interface ThreadedCommentResponse {confidence_score: number;
-    
-
-        created_at: Date;
-    
-
-        downvote_count: number;
-    
-
-        id: string;
-    
-
-        object_id: string;
-    
-
-        object_type: string;
-    
-
-        reaction_count: number;
-    
-
-        reply_count: number;
-    
-
-        score: number;
-    
-
-        
-        status:| "active" | "deleted" | "removed" | "hidden" | "shadow_blocked" ;
-
-        updated_at: Date;
-    
-
-        upvote_count: number;
-    
-
-        mentioned_users: Array<UserResponse>;
-    
-
-        own_reactions: Array<FeedsReactionResponse>;
-    
-
-        user: UserResponse;
-    
-
-        controversy_score?: number;
-    
-
-        deleted_at?: Date;
-    
-
-        edited_at?: Date;
-    
-
-        parent_id?: string;
-    
-
-        text?: string;
-    
-
-        attachments?: Array<Attachment>;
-    
-
-        latest_reactions?: Array<FeedsReactionResponse>;
-    
-
-        replies?: Array<ThreadedCommentResponse>;
-    
-
-        custom?: Record<string, any>;
-    
-
-        meta?: RepliesMeta;
-    
-
-        moderation?: ModerationV2Response;
-    
-
-        reaction_groups?: Record<string, FeedsReactionGroupResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface Thresholds {explicit?: LabelThresholds;
-    
-
-        spam?: LabelThresholds;
-    
-
-        toxic?: LabelThresholds;
-    
-
-        }
-    
-
-
-
-
-    export interface ThumbnailResponse {image_url: string;
-    
-
-        }
-    
-
-
-
-
-    export interface ThumbnailsSettingsResponse {enabled: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface Time {}
-    
-
-
-
-
-    export interface TrackActivityMetricsEvent {activity_id: string;
-    
-
-        metric: string;
-    
-
-        delta?: number;
-    
-
-        }
-    
-
-
-
-
-    export interface TrackActivityMetricsEventResult {activity_id: string;
-    
-
-        allowed: boolean;
-    
-
-        metric: string;
-    
-
-        error?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface TrackActivityMetricsRequest {events: Array<TrackActivityMetricsEvent>;
-    
-
-        }
-    
-
-
-
-
-    export interface TrackActivityMetricsResponse {duration: string;
-    
-
-        results: Array<TrackActivityMetricsEventResult>;
-    
-
-        }
-    
-
-
-
-
-    export interface TranscriptionSettingsResponse {
-        closed_caption_mode:| "available" | "disabled" | "auto-on" ;
-
-        
-        language:| "auto" | "en" | "fr" | "es" | "de" | "it" | "nl" | "pt" | "pl" | "ca" | "cs" | "da" | "el" | "fi" | "id" | "ja" | "ru" | "sv" | "ta" | "th" | "tr" | "hu" | "ro" | "zh" | "ar" | "tl" | "he" | "hi" | "hr" | "ko" | "ms" | "no" | "uk" | "bg" | "et" | "sl" | "sk" ;
-
-        
-        mode:| "available" | "disabled" | "auto-on" ;
-
-        speech_segment_config?: SpeechSegmentConfig;
-    
-
-        translation?: TranslationSettings;
-    
-
-        }
-    
-
-
-
-
-    export interface TranslationSettings {enabled: boolean;
-    
-
-        languages: Array<string>;
-    
-
-        }
-    
-
-
-
-
-    export interface TypingIndicatorsResponse {enabled: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface UnbanActionRequestPayload {channel_cid?: string;
-    
-
-        decision_reason?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UnblockActionRequestPayload {decision_reason?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UnblockUsersRequest {blocked_user_id: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UnblockUsersResponse {duration: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UnfollowBatchRequest {follows: Array<FollowPair>;
-    
-
-        delete_notification_activity?: boolean;
-    
-
-        enrich_own_fields?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface UnfollowBatchResponse {duration: string;
-    
-
-        follows: Array<FollowResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface UnfollowResponse {duration: string;
-    
-
-        follow: FollowResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UnpinActivityResponse {duration: string;
-    
-
-        feed: string;
-    
-
-        user_id: string;
-    
-
-        activity: ActivityResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateActivityPartialRequest {copy_custom_to_notification?: boolean;
-    
-
-        enrich_own_fields?: boolean;
-    
-
-        handle_mention_notifications?: boolean;
-    
-
-        run_activity_processors?: boolean;
-    
-
-        unset?: Array<string>;
-    
-
-        set?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateActivityPartialResponse {duration: string;
-    
-
-        activity: ActivityResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateActivityRequest {copy_custom_to_notification?: boolean;
-    
-
-        enrich_own_fields?: boolean;
-    
-
-        expires_at?: Date;
-    
-
-        handle_mention_notifications?: boolean;
-    
-
-        poll_id?: string;
-    
-
-        
-        restrict_replies?:| "everyone" | "people_i_follow" | "nobody" ;
-
-        run_activity_processors?: boolean;
-    
-
-        skip_enrich_url?: boolean;
-    
-
-        text?: string;
-    
-
-        
-        visibility?:| "public" | "private" | "tag" ;
-
-        visibility_tag?: string;
-    
-
-        attachments?: Array<Attachment>;
-    
-
-        collection_refs?: Array<string>;
-    
-
-        feeds?: Array<string>;
-    
-
-        filter_tags?: Array<string>;
-    
-
-        interest_tags?: Array<string>;
-    
-
-        mentioned_user_ids?: Array<string>;
-    
-
-        custom?: Record<string, any>;
-    
-
-        location?: ActivityLocation;
-    
-
-        search_data?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateActivityResponse {duration: string;
-    
-
-        activity: ActivityResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateBlockListRequest {is_leet_check_enabled?: boolean;
-    
-
-        is_plural_check_enabled?: boolean;
-    
-
-        team?: string;
-    
-
-        words?: Array<string>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateBlockListResponse {duration: string;
-    
-
-        blocklist?: BlockListResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateBookmarkFolderRequest {name?: string;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateBookmarkFolderResponse {duration: string;
-    
-
-        bookmark_folder: BookmarkFolderResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateBookmarkRequest {folder_id?: string;
-    
-
-        new_folder_id?: string;
-    
-
-        custom?: Record<string, any>;
-    
-
-        new_folder?: AddFolderRequest;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateBookmarkResponse {duration: string;
-    
-
-        bookmark: BookmarkResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateCollectionRequest {id: string;
-    
-
-        name: string;
-    
-
-        custom: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateCollectionsRequest {collections: Array<UpdateCollectionRequest>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateCollectionsResponse {duration: string;
-    
-
-        collections: Array<CollectionResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateCommentRequest {comment?: string;
-    
-
-        copy_custom_to_notification?: boolean;
-    
-
-        handle_mention_notifications?: boolean;
-    
-
-        skip_enrich_url?: boolean;
-    
-
-        skip_push?: boolean;
-    
-
-        attachments?: Array<Attachment>;
-    
-
-        mentioned_user_ids?: Array<string>;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateCommentResponse {duration: string;
-    
-
-        comment: CommentResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateFeedMembersRequest {
-        operation:| "upsert" | "remove" | "set" ;
-
-        limit?: number;
-    
-
-        next?: string;
-    
-
-        prev?: string;
-    
-
-        members?: Array<FeedMemberRequest>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateFeedMembersResponse {duration: string;
-    
-
-        added: Array<FeedMemberResponse>;
-    
-
-        removed_ids: Array<string>;
-    
-
-        updated: Array<FeedMemberResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateFeedRequest {description?: string;
-    
-
-        enrich_own_fields?: boolean;
-    
-
-        name?: string;
-    
-
-        filter_tags?: Array<string>;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateFeedResponse {duration: string;
-    
-
-        feed: FeedResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateFollowRequest {source: string;
-    
-
-        target: string;
-    
-
-        copy_custom_to_notification?: boolean;
-    
-
-        create_notification_activity?: boolean;
-    
-
-        enrich_own_fields?: boolean;
-    
-
-        follower_role?: string;
-    
-
-        
-        push_preference?:| "all" | "none" ;
-
-        skip_push?: boolean;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateFollowResponse {duration: string;
-    
-
-        follow: FollowResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateLiveLocationRequest {message_id: string;
-    
-
-        end_at?: Date;
-    
-
-        latitude?: number;
-    
-
-        longitude?: number;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdatePollOptionRequest {id: string;
-    
-
-        text: string;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdatePollPartialRequest {unset?: Array<string>;
-    
-
-        set?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdatePollRequest {id: string;
-    
-
-        name: string;
-    
-
-        allow_answers?: boolean;
-    
-
-        allow_user_suggested_options?: boolean;
-    
-
-        description?: string;
-    
-
-        enforce_unique_vote?: boolean;
-    
-
-        is_closed?: boolean;
-    
-
-        max_votes_allowed?: number;
-    
-
-        
-        voting_visibility?:| "anonymous" | "public" ;
-
-        options?: Array<PollOptionRequest>;
-    
-
-        custom?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateUserGroupRequest {description?: string;
-    
-
-        name?: string;
-    
-
-        team_id?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateUserGroupResponse {duration: string;
-    
-
-        user_group?: UserGroupResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateUserPartialRequest {id: string;
-    
-
-        unset?: Array<string>;
-    
-
-        set?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateUsersPartialRequest {users: Array<UpdateUserPartialRequest>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateUsersRequest {users: Record<string, UserRequest>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpdateUsersResponse {duration: string;
-    
-
-        membership_deletion_task_id: string;
-    
-
-        users: Record<string, FullUserResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpsertActivitiesRequest {activities: Array<ActivityRequest>;
-    
-
-        enrich_own_fields?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface UpsertActivitiesResponse {duration: string;
-    
-
-        activities: Array<ActivityResponse>;
-    
-
-        mention_notifications_created?: number;
-    
-
-        }
-    
-
-
-
-
-    export interface UpsertConfigRequest {key: string;
-    
-
-        async?: boolean;
-    
-
-        team?: string;
-    
-
-        ai_image_config?: AIImageConfig;
-    
-
-        ai_text_config?: AITextConfig;
-    
-
-        ai_video_config?: AIVideoConfig;
-    
-
-        automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
-    
-
-        automod_semantic_filters_config?: AutomodSemanticFiltersConfig;
-    
-
-        automod_toxicity_config?: AutomodToxicityConfig;
-    
-
-        aws_rekognition_config?: AIImageConfig;
-    
-
-        block_list_config?: BlockListConfig;
-    
-
-        bodyguard_config?: AITextConfig;
-    
-
-        google_vision_config?: GoogleVisionConfig;
-    
-
-        llm_config?: LLMConfig;
-    
-
-        rule_builder_config?: RuleBuilderConfig;
-    
-
-        velocity_filter_config?: VelocityFilterConfig;
-    
-
-        video_call_rule_config?: VideoCallRuleConfig;
-    
-
-        }
-    
-
-
-
-
-    export interface UpsertConfigResponse {duration: string;
-    
-
-        config?: ConfigResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UpsertPushPreferencesRequest {preferences: Array<PushPreferenceInput>;
-    
-
-        }
-    
-
-
-
-
-    export interface UpsertPushPreferencesResponse {duration: string;
-    
-
-        user_channel_preferences: Record<string, Record<string, ChannelPushPreferencesResponse | null>>;
-    
-
-        user_preferences: Record<string, PushPreferencesResponse>;
-    
-
-        }
-    
-
-
-
-
-    export interface User {id: string;
-    
-
-        data?: Record<string, any>;
-    
-
-        }
-    
-
-
-
-
-    export interface UserBannedEvent {created_at: Date;
-    
-
-        custom: Record<string, any>;
-    
-
-        user: UserResponseCommonFields;
-    
-
-        type: string;
-    
-
-        channel_id?: string;
-    
-
-        channel_member_count?: number;
-    
-
-        channel_message_count?: number;
-    
-
-        channel_type?: string;
-    
-
-        cid?: string;
-    
-
-        expiration?: Date;
-    
-
-        reason?: string;
-    
-
-        received_at?: Date;
-    
-
-        shadow?: boolean;
-    
-
-        team?: string;
-    
-
-        total_bans?: number;
-    
-
-        channel_custom?: Record<string, any>;
-    
-
-        created_by?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface UserCreatedWithinParameters {max_age?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UserCustomPropertyParameters {operator?: string;
-    
-
-        property_key?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UserDeactivatedEvent {created_at: Date;
-    
-
-        custom: Record<string, any>;
-    
-
-        user: UserResponseCommonFields;
-    
-
-        type: string;
-    
-
-        received_at?: Date;
-    
-
-        created_by?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface UserGroupMember {app_pk: number;
-    
-
-        created_at: Date;
-    
-
-        group_id: string;
-    
-
-        is_admin: boolean;
-    
-
-        user_id: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UserGroupResponse {created_at: Date;
-    
-
-        id: string;
-    
-
-        name: string;
-    
-
-        updated_at: Date;
-    
-
-        created_by?: string;
-    
-
-        description?: string;
-    
-
-        team_id?: string;
-    
-
-        members?: Array<UserGroupMember>;
-    
-
-        }
-    
-
-
-
-
-    export interface UserIdenticalContentCountParameters {threshold?: number;
-    
-
-        time_window?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UserMuteResponse {created_at: Date;
-    
-
-        updated_at: Date;
-    
-
-        expires?: Date;
-    
-
-        target?: UserResponse;
-    
-
-        user?: UserResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UserReactivatedEvent {created_at: Date;
-    
-
-        custom: Record<string, any>;
-    
-
-        user: UserResponseCommonFields;
-    
-
-        type: string;
-    
-
-        received_at?: Date;
-    
-
-        created_by?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface UserRequest {id: string;
-    
-
-        image?: string;
-    
-
-        invisible?: boolean;
-    
-
-        language?: string;
-    
-
-        name?: string;
-    
-
-        custom?: Record<string, any>;
-    
-
-        privacy_settings?: PrivacySettingsResponse;
-    
-
-        }
-    
-
-
-
-
-    export interface UserResponse {banned: boolean;
-    
-
-        created_at: Date;
-    
-
-        id: string;
-    
-
-        language: string;
-    
-
-        online: boolean;
-    
-
-        role: string;
-    
-
-        updated_at: Date;
-    
-
-        blocked_user_ids: Array<string>;
-    
-
-        teams: Array<string>;
-    
-
-        custom: Record<string, any>;
-    
-
-        avg_response_time?: number;
-    
-
-        deactivated_at?: Date;
-    
-
-        deleted_at?: Date;
-    
-
-        image?: string;
-    
-
-        last_active?: Date;
-    
-
-        name?: string;
-    
-
-        revoke_tokens_issued_before?: Date;
-    
-
-        teams_role?: Record<string, string>;
-    
-
-        }
-    
-
-
-
-
-    export interface UserResponseCommonFields {banned: boolean;
-    
-
-        created_at: Date;
-    
-
-        id: string;
-    
-
-        language: string;
-    
-
-        online: boolean;
-    
-
-        role: string;
-    
-
-        updated_at: Date;
-    
-
-        blocked_user_ids: Array<string>;
-    
-
-        teams: Array<string>;
-    
-
-        custom: Record<string, any>;
-    
-
-        avg_response_time?: number;
-    
-
-        deactivated_at?: Date;
-    
-
-        deleted_at?: Date;
-    
-
-        image?: string;
-    
-
-        last_active?: Date;
-    
-
-        name?: string;
-    
-
-        revoke_tokens_issued_before?: Date;
-    
-
-        teams_role?: Record<string, string>;
-    
-
-        }
-    
-
-
-
-
-    export interface UserResponsePrivacyFields {banned: boolean;
-    
-
-        created_at: Date;
-    
-
-        id: string;
-    
-
-        language: string;
-    
-
-        online: boolean;
-    
-
-        role: string;
-    
-
-        updated_at: Date;
-    
-
-        blocked_user_ids: Array<string>;
-    
-
-        teams: Array<string>;
-    
-
-        custom: Record<string, any>;
-    
-
-        avg_response_time?: number;
-    
-
-        deactivated_at?: Date;
-    
-
-        deleted_at?: Date;
-    
-
-        image?: string;
-    
-
-        invisible?: boolean;
-    
-
-        last_active?: Date;
-    
-
-        name?: string;
-    
-
-        revoke_tokens_issued_before?: Date;
-    
-
-        privacy_settings?: PrivacySettingsResponse;
-    
-
-        teams_role?: Record<string, string>;
-    
-
-        }
-    
-
-
-
-
-    export interface UserRoleParameters {operator?: string;
-    
-
-        role?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UserRuleParameters {max_age?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface UserUnbannedEvent {created_at: Date;
-    
-
-        custom: Record<string, any>;
-    
-
-        user: UserResponseCommonFields;
-    
-
-        type: string;
-    
-
-        channel_id?: string;
-    
-
-        channel_member_count?: number;
-    
-
-        channel_message_count?: number;
-    
-
-        channel_type?: string;
-    
-
-        cid?: string;
-    
-
-        received_at?: Date;
-    
-
-        shadow?: boolean;
-    
-
-        team?: string;
-    
-
-        channel_custom?: Record<string, any>;
-    
-
-        created_by?: UserResponseCommonFields;
-    
-
-        }
-    
-
-
-
-
-    export interface UserUpdatedEvent {created_at: Date;
-    
-
-        custom: Record<string, any>;
-    
-
-        user: UserResponsePrivacyFields;
-    
-
-        type: string;
-    
-
-        received_at?: Date;
-    
-
-        }
-    
-
-
-
-
-    export interface VelocityFilterConfig {advanced_filters: boolean;
-    
-
-        cascading_actions: boolean;
-    
-
-        cids_per_user: number;
-    
-
-        enabled: boolean;
-    
-
-        first_message_only: boolean;
-    
-
-        rules: Array<VelocityFilterConfigRule>;
-    
-
-        async?: boolean;
-    
-
-        }
-    
-
-
-
-
-    export interface VelocityFilterConfigRule {
-        action:| "flag" | "shadow" | "remove" | "ban" ;
-
-        ban_duration: number;
-    
-
-        
-        cascading_action:| "flag" | "shadow" | "remove" | "ban" ;
-
-        cascading_threshold: number;
-    
-
-        check_message_context: boolean;
-    
-
-        fast_spam_threshold: number;
-    
-
-        fast_spam_ttl: number;
-    
-
-        ip_ban: boolean;
-    
-
-        probation_period: number;
-    
-
-        shadow_ban: boolean;
-    
-
-        slow_spam_threshold: number;
-    
-
-        slow_spam_ttl: number;
-    
-
-        url_only: boolean;
-    
-
-        slow_spam_ban_duration?: number;
-    
-
-        }
-    
-
-
-
-
-    export interface VideoCallRuleConfig {flag_all_labels: boolean;
-    
-
-        flagged_labels: Array<string>;
-    
-
-        rules: Array<HarmConfig>;
-    
-
-        }
-    
-
-
-
-
-    export interface VideoContentParameters {harm_labels?: Array<string>;
-    
-
-        }
-    
-
-
-
-
-    export interface VideoEndCallRequestPayload {}
-    
-
-
-
-
-    export interface VideoKickUserRequestPayload {}
-    
-
-
-
-
-    export interface VideoRuleParameters {threshold?: number;
-    
-
-        time_window?: string;
-    
-
-        harm_labels?: Array<string>;
-    
-
-        }
-    
-
-
-
-
-    export interface VideoSettingsResponse {access_request_enabled: boolean;
-    
-
-        camera_default_on: boolean;
-    
-
-        
-        camera_facing:| "front" | "back" | "external" ;
-
-        enabled: boolean;
-    
-
-        target_resolution: TargetResolution;
-    
-
-        }
-    
-
-
-
-
-    export interface VoteData {answer_text?: string;
-    
-
-        option_id?: string;
-    
-
-        }
-    
-
-
-
-
-    export interface WHIPIngress {address: string;
-    
-
-        }
-    
-
-
-
-
-    export interface WSAuthMessage {token: string;
-    
-
-        user_details: ConnectUserDetailsRequest;
-    
-
-        products?: Array<string>;
-    
-
-        }
-    
-
-
-
-
-    export type WSClientEvent =
-        
-            | ({ type: 'app.updated' } & AppUpdatedEvent )
-        
-            | ({ type: 'feeds.activity.added' } & ActivityAddedEvent )
-        
-            | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent )
-        
-            | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent )
-        
-            | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent )
-        
-            | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent )
-        
-            | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent )
-        
-            | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent )
-        
-            | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent )
-        
-            | ({ type: 'feeds.activity.removed_from_feed' } & ActivityRemovedFromFeedEvent )
-        
-            | ({ type: 'feeds.activity.restored' } & ActivityRestoredEvent )
-        
-            | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent )
-        
-            | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent )
-        
-            | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent )
-        
-            | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent )
-        
-            | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent )
-        
-            | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent )
-        
-            | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent )
-        
-            | ({ type: 'feeds.comment.added' } & CommentAddedEvent )
-        
-            | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent )
-        
-            | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent )
-        
-            | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent )
-        
-            | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent )
-        
-            | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent )
-        
-            | ({ type: 'feeds.feed.created' } & FeedCreatedEvent )
-        
-            | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent )
-        
-            | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent )
-        
-            | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent )
-        
-            | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent )
-        
-            | ({ type: 'feeds.feed_group.restored' } & FeedGroupRestoredEvent )
-        
-            | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent )
-        
-            | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent )
-        
-            | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent )
-        
-            | ({ type: 'feeds.follow.created' } & FollowCreatedEvent )
-        
-            | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent )
-        
-            | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent )
-        
-            | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent )
-        
-            | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent )
-        
-            | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent )
-        
-            | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent )
-        
-            | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent )
-        
-            | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent )
-        
-            | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent )
-        
-            | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent )
-        
-            | ({ type: 'health.check' } & HealthCheckEvent )
-        
-            | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent )
-        
-            | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent )
-        
-            | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent )
-        
-            | ({ type: 'user.banned' } & UserBannedEvent )
-        
-            | ({ type: 'user.deactivated' } & UserDeactivatedEvent )
-        
-            | ({ type: 'user.reactivated' } & UserReactivatedEvent )
-        
-            | ({ type: 'user.unbanned' } & UserUnbannedEvent )
-        
-            | ({ type: 'user.updated' } & UserUpdatedEvent )
-        
-
-
-
-
-
-    export type WSEvent =
-        
-            | ({ type: 'app.updated' } & AppUpdatedEvent )
-        
-            | ({ type: 'feeds.activity.added' } & ActivityAddedEvent )
-        
-            | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent )
-        
-            | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent )
-        
-            | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent )
-        
-            | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent )
-        
-            | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent )
-        
-            | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent )
-        
-            | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent )
-        
-            | ({ type: 'feeds.activity.removed_from_feed' } & ActivityRemovedFromFeedEvent )
-        
-            | ({ type: 'feeds.activity.restored' } & ActivityRestoredEvent )
-        
-            | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent )
-        
-            | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent )
-        
-            | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent )
-        
-            | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent )
-        
-            | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent )
-        
-            | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent )
-        
-            | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent )
-        
-            | ({ type: 'feeds.comment.added' } & CommentAddedEvent )
-        
-            | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent )
-        
-            | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent )
-        
-            | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent )
-        
-            | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent )
-        
-            | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent )
-        
-            | ({ type: 'feeds.feed.created' } & FeedCreatedEvent )
-        
-            | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent )
-        
-            | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent )
-        
-            | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent )
-        
-            | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent )
-        
-            | ({ type: 'feeds.feed_group.restored' } & FeedGroupRestoredEvent )
-        
-            | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent )
-        
-            | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent )
-        
-            | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent )
-        
-            | ({ type: 'feeds.follow.created' } & FollowCreatedEvent )
-        
-            | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent )
-        
-            | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent )
-        
-            | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent )
-        
-            | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent )
-        
-            | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent )
-        
-            | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent )
-        
-            | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent )
-        
-            | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent )
-        
-            | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent )
-        
-            | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent )
-        
-            | ({ type: 'health.check' } & HealthCheckEvent )
-        
-            | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent )
-        
-            | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent )
-        
-            | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent )
-        
-            | ({ type: 'user.banned' } & UserBannedEvent )
-        
-            | ({ type: 'user.deactivated' } & UserDeactivatedEvent )
-        
-            | ({ type: 'user.reactivated' } & UserReactivatedEvent )
-        
-            | ({ type: 'user.unbanned' } & UserUnbannedEvent )
-        
-            | ({ type: 'user.updated' } & UserUpdatedEvent )
-        
-
-
-
-
-
-
-
-
-
-
+export type WSEvent =
+  | ({ type: 'app.updated' } & AppUpdatedEvent)
+  | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
+  | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
+  | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
+  | ({ type: 'feeds.activity.marked' } & ActivityMarkEvent)
+  | ({ type: 'feeds.activity.pinned' } & ActivityPinnedEvent)
+  | ({ type: 'feeds.activity.reaction.added' } & ActivityReactionAddedEvent)
+  | ({ type: 'feeds.activity.reaction.deleted' } & ActivityReactionDeletedEvent)
+  | ({ type: 'feeds.activity.reaction.updated' } & ActivityReactionUpdatedEvent)
+  | ({
+      type: 'feeds.activity.removed_from_feed';
+    } & ActivityRemovedFromFeedEvent)
+  | ({ type: 'feeds.activity.restored' } & ActivityRestoredEvent)
+  | ({ type: 'feeds.activity.unpinned' } & ActivityUnpinnedEvent)
+  | ({ type: 'feeds.activity.updated' } & ActivityUpdatedEvent)
+  | ({ type: 'feeds.bookmark.added' } & BookmarkAddedEvent)
+  | ({ type: 'feeds.bookmark.deleted' } & BookmarkDeletedEvent)
+  | ({ type: 'feeds.bookmark.updated' } & BookmarkUpdatedEvent)
+  | ({ type: 'feeds.bookmark_folder.deleted' } & BookmarkFolderDeletedEvent)
+  | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
+  | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
+  | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
+  | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
+  | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
+  | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
+  | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
+  | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
+  | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
+  | ({ type: 'feeds.feed.updated' } & FeedUpdatedEvent)
+  | ({ type: 'feeds.feed_group.changed' } & FeedGroupChangedEvent)
+  | ({ type: 'feeds.feed_group.deleted' } & FeedGroupDeletedEvent)
+  | ({ type: 'feeds.feed_group.restored' } & FeedGroupRestoredEvent)
+  | ({ type: 'feeds.feed_member.added' } & FeedMemberAddedEvent)
+  | ({ type: 'feeds.feed_member.removed' } & FeedMemberRemovedEvent)
+  | ({ type: 'feeds.feed_member.updated' } & FeedMemberUpdatedEvent)
+  | ({ type: 'feeds.follow.created' } & FollowCreatedEvent)
+  | ({ type: 'feeds.follow.deleted' } & FollowDeletedEvent)
+  | ({ type: 'feeds.follow.updated' } & FollowUpdatedEvent)
+  | ({ type: 'feeds.notification_feed.updated' } & NotificationFeedUpdatedEvent)
+  | ({ type: 'feeds.poll.closed' } & PollClosedFeedEvent)
+  | ({ type: 'feeds.poll.deleted' } & PollDeletedFeedEvent)
+  | ({ type: 'feeds.poll.updated' } & PollUpdatedFeedEvent)
+  | ({ type: 'feeds.poll.vote_casted' } & PollVoteCastedFeedEvent)
+  | ({ type: 'feeds.poll.vote_changed' } & PollVoteChangedFeedEvent)
+  | ({ type: 'feeds.poll.vote_removed' } & PollVoteRemovedFeedEvent)
+  | ({ type: 'feeds.stories_feed.updated' } & StoriesFeedUpdatedEvent)
+  | ({ type: 'health.check' } & HealthCheckEvent)
+  | ({ type: 'moderation.custom_action' } & ModerationCustomActionEvent)
+  | ({ type: 'moderation.flagged' } & ModerationFlaggedEvent)
+  | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
+  | ({ type: 'user.banned' } & UserBannedEvent)
+  | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
+  | ({ type: 'user.reactivated' } & UserReactivatedEvent)
+  | ({ type: 'user.unbanned' } & UserUnbannedEvent)
+  | ({ type: 'user.updated' } & UserUpdatedEvent);
