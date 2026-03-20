@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   createTestClient,
   createTestTokenGenerator,
+  deleteUsersIgnoringRateLimit,
   getServerClient,
   getTestUser,
 } from '../utils';
@@ -228,7 +229,10 @@ describe('Feeds page', () => {
       ],
     });
 
-    await serverClient.deleteUsers({ user_ids: [userId], user: 'hard' });
+    await deleteUsersIgnoringRateLimit(serverClient, {
+      user_ids: [userId],
+      user: 'hard',
+    });
   });
 
   it('Member invites', async () => {

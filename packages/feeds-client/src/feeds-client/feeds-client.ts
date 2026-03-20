@@ -237,6 +237,7 @@ export class FeedsClient extends FeedsApi {
           if (event.poll?.id) {
             this.pollFromState(event.poll.id)?.handlePollClosed(event);
           }
+          this.dispatchPollEventToInterestedFeeds(event);
           break;
         }
         case 'feeds.poll.deleted': {
@@ -261,30 +262,35 @@ export class FeedsClient extends FeedsApi {
               }
             }
           }
+          this.dispatchPollEventToInterestedFeeds(event);
           break;
         }
         case 'feeds.poll.updated': {
           if (event.poll?.id) {
             this.pollFromState(event.poll.id)?.handlePollUpdated(event);
           }
+          this.dispatchPollEventToInterestedFeeds(event);
           break;
         }
         case 'feeds.poll.vote_casted': {
           if (event.poll?.id) {
             this.pollFromState(event.poll.id)?.handleVoteCasted(event);
           }
+          this.dispatchPollEventToInterestedFeeds(event);
           break;
         }
         case 'feeds.poll.vote_changed': {
           if (event.poll?.id) {
             this.pollFromState(event.poll.id)?.handleVoteChanged(event);
           }
+          this.dispatchPollEventToInterestedFeeds(event);
           break;
         }
         case 'feeds.poll.vote_removed': {
           if (event.poll?.id) {
             this.pollFromState(event.poll.id)?.handleVoteRemoved(event);
           }
+          this.dispatchPollEventToInterestedFeeds(event);
           break;
         }
         case 'feeds.bookmark.added':
@@ -1422,6 +1428,12 @@ export class FeedsClient extends FeedsApi {
         })
         .map((a) => getFeed.call(a)!),
     ];
+  }
+
+  /** Notifies matching active feeds so `feed.on('feeds.poll.*')` listeners receive WS events. */
+  private dispatchPollEventToInterestedFeeds(event: FeedsEvent) {
+    const feeds = this.findAllActiveFeedsFromWSEvent(event);
+    new Set(feeds).forEach((f) => f.handleWSEvent(event as unknown as WSEvent));
   }
 
   private updateStateFromFollows(

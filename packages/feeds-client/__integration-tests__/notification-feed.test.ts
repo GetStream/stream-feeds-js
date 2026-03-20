@@ -1,5 +1,3 @@
- 
-
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   createTestClient,
@@ -74,10 +72,10 @@ describe('Notification Feed Test Setup', () => {
 
   it(`user 2 follows user 1 - user 1 receives notification`, async () => {
     await Promise.all([
+      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
       user2TimelineFeed.follow(user1UserFeed.feed, {
         create_notification_activity: true,
       }),
-      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
     ]);
 
     expect(
@@ -97,12 +95,12 @@ describe('Notification Feed Test Setup', () => {
     const activity = user2TimelineFeed.state.getLatestValue().activities?.[0]!;
 
     await Promise.all([
+      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
       client2.addActivityReaction({
         activity_id: activity.id,
         type: 'like',
         create_notification_activity: true,
       }),
-      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
     ]);
 
     expect(
@@ -122,13 +120,13 @@ describe('Notification Feed Test Setup', () => {
     const activity = user2TimelineFeed.state.getLatestValue().activities?.[0]!;
 
     await Promise.all([
+      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
       client2.addComment({
         object_id: activity.id,
         object_type: 'activity',
         comment: 'Nice post!',
         create_notification_activity: true,
       }),
-      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
     ]);
 
     expect(
@@ -149,11 +147,11 @@ describe('Notification Feed Test Setup', () => {
       user1NotificationFeed.state.getLatestValue().aggregated_activities?.[0]!;
 
     await Promise.all([
+      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
       user1NotificationFeed.markActivity({
         mark_read: [firstActivity.group],
         mark_seen: [firstActivity.group],
       }),
-      waitForEvent(user1NotificationFeed, 'feeds.notification_feed.updated'),
     ]);
 
     const stateAfter = user1NotificationFeed.state.getLatestValue();

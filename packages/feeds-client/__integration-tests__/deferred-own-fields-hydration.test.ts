@@ -11,6 +11,7 @@ import type { UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
+  deleteUsersIgnoringRateLimit,
   getServerClient,
   getTestUser,
   waitForEvent,
@@ -81,17 +82,14 @@ describe('Deferred own_ fields hydration', () => {
 
     const otherUser = otherUsers[0];
 
+    const timelineAdded = waitForEvent(timeline, 'feeds.activity.added');
     serverClient.feeds.addActivity({
       user_id: otherUser.id,
       type: 'post',
       feeds: [`user:${otherUser.id}`],
       text: `Initial activity from ${otherUser.id}`,
     });
-
-    await waitForEvent(timeline, 'feeds.activity.added', {
-      timeoutMs: 10000,
-      shouldReject: true,
-    });
+    await timelineAdded;
 
     await vi.waitFor(
       () => {
@@ -125,7 +123,7 @@ describe('Deferred own_ fields hydration', () => {
         hard_delete: true,
       });
     }
-    await serverClient.deleteUsers({
+    await deleteUsersIgnoringRateLimit(serverClient, {
       user_ids: [...otherUsers].map((u) => u.id),
     });
     await clientRef.disconnectUser();
