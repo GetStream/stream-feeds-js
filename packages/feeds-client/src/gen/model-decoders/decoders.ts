@@ -685,6 +685,17 @@ decoders.CommentResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.CommentRestoredEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    comment: { type: 'CommentResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.CommentUpdatedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -1703,6 +1714,15 @@ decoders.RemoveUserGroupMembersResponse = (input?: Record<string, any>) => {
 decoders.RestoreActivityResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     activity: { type: 'ActivityResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.RestoreCommentResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    activity: { type: 'ActivityResponse', isSingle: true },
+
+    comment: { type: 'CommentResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };

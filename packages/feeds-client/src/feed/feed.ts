@@ -182,6 +182,7 @@ export class Feed extends FeedApi {
     'feeds.comment.added': handleCommentAdded.bind(this),
     'feeds.comment.deleted': handleCommentDeleted.bind(this),
     'feeds.comment.updated': handleCommentUpdated.bind(this),
+    'feeds.comment.restored': Feed.noop,
     'feeds.feed.created': Feed.noop,
     'feeds.feed.deleted': handleFeedDeleted.bind(this),
     'feeds.feed.updated': handleFeedUpdated.bind(this),
