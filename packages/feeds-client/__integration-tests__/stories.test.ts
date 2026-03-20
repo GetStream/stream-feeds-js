@@ -81,9 +81,7 @@ describe('Stories Feed', () => {
             .activities![0].id,
         ],
       }),
-      waitForEvent(user2StoriesFeed, 'feeds.stories_feed.updated', {
-        shouldReject: true,
-      }),
+      waitForEvent(user2StoriesFeed, 'feeds.stories_feed.updated'),
     ]);
 
     expect(
@@ -116,9 +114,7 @@ describe('Stories Feed', () => {
           },
         ],
       }),
-      waitForEvent(feed, 'feeds.activity.added', {
-        shouldReject: true,
-      }),
+      waitForEvent(feed, 'feeds.activity.added'),
     ]);
 
     expect(feed.state.getLatestValue().activities).toHaveLength(2);
@@ -137,9 +133,7 @@ describe('Stories Feed', () => {
       feed.markActivity({
         mark_watched: [feed.state.getLatestValue().activities![0].id],
       }),
-      waitForEvent(feed, 'feeds.stories_feed.updated', {
-        shouldReject: true,
-      }),
+      waitForEvent(feed, 'feeds.stories_feed.updated'),
     ]);
 
     expect(feed.state.getLatestValue().activities![0].is_watched).toBe(true);

@@ -88,10 +88,7 @@ describe('Deferred own_ fields hydration', () => {
       text: `Initial activity from ${otherUser.id}`,
     });
 
-    await waitForEvent(timeline, 'feeds.activity.added', {
-      timeoutMs: 10000,
-      shouldReject: true,
-    });
+    await waitForEvent(timeline, 'feeds.activity.added');
 
     await vi.waitFor(
       () => {

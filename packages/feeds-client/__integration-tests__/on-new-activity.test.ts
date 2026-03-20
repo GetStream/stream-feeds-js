@@ -27,8 +27,15 @@ describe('Feeds - onNewActivity and activityFilter', () => {
   it('onNewActivity with activityFilter: only add activities matching feed filter (filter_tags)', async () => {
     feed = client.feed('user', crypto.randomUUID(), {
       onNewActivity: ({ activity, currentUser }) => {
-        if (activityFilter(activity, feed.currentState.last_get_or_create_request_config)) {
-          return activity.user.id === currentUser?.id ? 'add-to-start' : 'ignore';
+        if (
+          activityFilter(
+            activity,
+            feed.currentState.last_get_or_create_request_config,
+          )
+        ) {
+          return activity.user.id === currentUser?.id
+            ? 'add-to-start'
+            : 'ignore';
         }
         return 'ignore';
       },
@@ -48,7 +55,7 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       user_id: user.id,
     });
 
-    await waitForEvent(feed, 'feeds.activity.added', { shouldReject: true });
+    await waitForEvent(feed, 'feeds.activity.added');
 
     expect(feed.state.getLatestValue().activities).toHaveLength(0);
 
@@ -60,10 +67,12 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       user_id: user.id,
     });
 
-    await waitForEvent(feed, 'feeds.activity.added', { shouldReject: true });
+    await waitForEvent(feed, 'feeds.activity.added');
 
     expect(feed.state.getLatestValue().activities).toHaveLength(1);
-    expect(feed.state.getLatestValue().activities?.[0].text).toBe('Post with blue tag');
+    expect(feed.state.getLatestValue().activities?.[0].text).toBe(
+      'Post with blue tag',
+    );
   });
 
   it('addActivity HTTP response is added when onNewActivity returns add-to-start', async () => {
@@ -80,8 +89,12 @@ describe('Feeds - onNewActivity and activityFilter', () => {
 
     expect(response.activity).toBeDefined();
     expect(testFeed.state.getLatestValue().activities).toHaveLength(1);
-    expect(testFeed.state.getLatestValue().activities?.[0].id).toBe(response.activity.id);
-    expect(testFeed.state.getLatestValue().activities?.[0].text).toBe('My new post from HTTP');
+    expect(testFeed.state.getLatestValue().activities?.[0].id).toBe(
+      response.activity.id,
+    );
+    expect(testFeed.state.getLatestValue().activities?.[0].text).toBe(
+      'My new post from HTTP',
+    );
 
     await testFeed.delete({ hard_delete: true });
   });
@@ -120,7 +133,7 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       user_id: user.id,
     });
 
-    await waitForEvent(testFeed, 'feeds.activity.added', { shouldReject: true });
+    await waitForEvent(testFeed, 'feeds.activity.added');
 
     expect(testFeed.state.getLatestValue().activities).toHaveLength(1);
     expect(testFeed.state.getLatestValue().activities?.[0].text).toBe(
@@ -134,8 +147,15 @@ describe('Feeds - onNewActivity and activityFilter', () => {
     const feedId = crypto.randomUUID();
     const testFeed = client.feed('user', feedId, {
       onNewActivity: ({ activity, currentUser }) => {
-        if (activityFilter(activity, testFeed.currentState.last_get_or_create_request_config)) {
-          return activity.user.id === currentUser?.id ? 'add-to-start' : 'ignore';
+        if (
+          activityFilter(
+            activity,
+            testFeed.currentState.last_get_or_create_request_config,
+          )
+        ) {
+          return activity.user.id === currentUser?.id
+            ? 'add-to-start'
+            : 'ignore';
         }
         return 'ignore';
       },
@@ -159,7 +179,9 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       text: 'Hike in Amsterdam',
       location: { lat: 52.38, lng: 4.87 },
     });
-    expect(testFeed.state.getLatestValue().activities?.length).toBeGreaterThanOrEqual(0);
+    expect(
+      testFeed.state.getLatestValue().activities?.length,
+    ).toBeGreaterThanOrEqual(0);
     await testFeed.delete({ hard_delete: true });
   });
 

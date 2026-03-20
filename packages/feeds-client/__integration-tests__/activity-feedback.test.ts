@@ -34,9 +34,7 @@ describe('Activity feedback test', () => {
       hide: true,
     });
 
-    await waitForEvent(client, 'feeds.activity.feedback', {
-      shouldReject: true,
-    });
+    await waitForEvent(client, 'feeds.activity.feedback');
 
     expect(
       feed.currentState.activities?.find((a) => a.id === activity.id)?.hidden,
@@ -49,9 +47,7 @@ describe('Activity feedback test', () => {
       hide: false,
     });
 
-    await waitForEvent(client, 'feeds.activity.feedback', {
-      shouldReject: true,
-    });
+    await waitForEvent(client, 'feeds.activity.feedback');
 
     expect(
       feed.currentState.activities?.find((a) => a.id === activity.id)?.hidden,

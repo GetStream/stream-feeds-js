@@ -92,9 +92,7 @@ describe('deleteActivity state deduplication with watch', () => {
 
     // Wait for both HTTP and WS so we don't depend on arrival order (WS can beat HTTP).
     const deletePromise = client.deleteActivity({ id: activityId });
-    const wsEventPromise = waitForEvent(feed, 'feeds.activity.deleted', {
-      timeoutMs: 10000,
-    });
+    const wsEventPromise = waitForEvent(feed, 'feeds.activity.deleted');
     await Promise.all([deletePromise, wsEventPromise]);
 
     // State should show 0 activities; dedup ensures only one state update

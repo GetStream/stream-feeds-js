@@ -92,8 +92,6 @@ describe('State layer page', () => {
       poll_id: response.poll.id,
     });
 
-    await waitForEvent(feed, 'feeds.activity.added');
-
     // pollResponse object won't receive state updates
     const pollResponse = feed.state.getLatestValue().activities?.[0].poll!;
     // poll object has a state store which can notify about state changes

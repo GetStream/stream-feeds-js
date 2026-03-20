@@ -60,16 +60,11 @@ export const getTestUser = (name = 'emily') => {
   return { id: `${name}-${randomId()}` };
 };
 
+const WAIT_FOR_EVENT_MS = 30_000;
+
 export const waitForEvent = (
   client: FeedsClient | Feed,
   type: FeedsEvent['type'] | WSEvent['type'],
-  {
-    timeoutMs = 10000,
-    shouldReject = false,
-  }: {
-    timeoutMs?: number;
-    shouldReject?: boolean;
-  } = {},
 ) => {
   return new Promise((resolve, reject) => {
     // @ts-expect-error client expects WSEvents
@@ -78,11 +73,7 @@ export const waitForEvent = (
       clearTimeout(timeout);
     });
     const timeout = setTimeout(() => {
-      if (shouldReject) {
-        reject(new Error(`Event not received: ${type}`));
-      } else {
-        resolve(undefined);
-      }
-    }, timeoutMs);
+      reject(new Error(`Event not received: ${type}`));
+    }, WAIT_FOR_EVENT_MS);
   });
 };

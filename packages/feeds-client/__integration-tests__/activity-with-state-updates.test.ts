@@ -111,9 +111,7 @@ describe('Activity with state updates', () => {
       user_id: user.id,
     });
 
-    await waitForEvent(feed, 'feeds.activity.updated', {
-      shouldReject: true,
-    });
+    await waitForEvent(feed, 'feeds.activity.updated');
 
     expect(spy).toHaveBeenCalled();
     expect(spy.mock.lastCall?.[0].activity.text).toBe('Updated activity 1');

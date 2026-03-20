@@ -57,7 +57,7 @@ describe('WebSocket connection', () => {
 
     await client.connectUser(user, createTestTokenGenerator(user));
 
-    await waitForEvent(client, 'health.check', { timeoutMs: 35000 });
+    await waitForEvent(client, 'health.check');
 
     const event = spy.mock.lastCall?.[0] as HealthCheckEvent | undefined;
     expect(event?.type).toBe('health.check');

@@ -106,7 +106,7 @@ describe('updateFeed state deduplication with watch', () => {
     expect(stateChangeCountAfterHttp).toBeGreaterThanOrEqual(1);
 
     // Wait for the WS event (should be deduplicated)
-    await waitForEvent(feed, 'feeds.feed.updated', { timeoutMs: 10000 });
+    await waitForEvent(feed, 'feeds.feed.updated');
 
     // No additional state change from the WS event
     expect(stateChangeSpy.mock.calls.length).toBe(stateChangeCountAfterHttp);
@@ -169,7 +169,7 @@ describe('deleteFeed state deduplication with watch', () => {
     expect(stateChangeCountAfterHttp).toBeGreaterThanOrEqual(1);
 
     // Wait for the WS event (should be deduplicated)
-    await waitForEvent(feed, 'feeds.feed.deleted', { timeoutMs: 10000 });
+    await waitForEvent(feed, 'feeds.feed.deleted');
 
     // No additional state change from the WS event
     expect(stateChangeSpy.mock.calls.length).toBe(stateChangeCountAfterHttp);

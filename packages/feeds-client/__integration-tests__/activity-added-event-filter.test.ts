@@ -26,9 +26,7 @@ describe('Feeds - onNewActivity filters WS events', () => {
   it('create feed and provide onNewActivity callback', async () => {
     feed = client.feed('user', crypto.randomUUID(), {
       onNewActivity: ({ activity }) =>
-        activity.filter_tags?.includes('important')
-          ? 'add-to-start'
-          : 'ignore',
+        activity.filter_tags?.includes('important') ? 'add-to-start' : 'ignore',
     });
     await feed.getOrCreate({
       watch: true,
@@ -44,9 +42,7 @@ describe('Feeds - onNewActivity filters WS events', () => {
       user_id: user.id,
     });
 
-    await waitForEvent(feed, 'feeds.activity.added', {
-      shouldReject: true,
-    });
+    await waitForEvent(feed, 'feeds.activity.added');
 
     expect(feed.state.getLatestValue().activities).toHaveLength(0);
 
@@ -58,9 +54,7 @@ describe('Feeds - onNewActivity filters WS events', () => {
       user_id: user.id,
     });
 
-    await waitForEvent(feed, 'feeds.activity.added', {
-      shouldReject: true,
-    });
+    await waitForEvent(feed, 'feeds.activity.added');
 
     expect(feed.state.getLatestValue().activities).toHaveLength(1);
     expect(feed.state.getLatestValue().activities?.[0].text).toBe(

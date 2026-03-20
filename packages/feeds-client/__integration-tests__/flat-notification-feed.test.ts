@@ -74,14 +74,10 @@ describe('Flat notification feed', () => {
 
   it('user 2 follows user 1 - user 1 receives flat notification', async () => {
     const notificationPromise = Promise.all([
-      waitForEvent(user1FlatNotificationFeed, 'feeds.activity.added', {
-        timeoutMs: 15000,
-        shouldReject: true,
-      }),
+      waitForEvent(user1FlatNotificationFeed, 'feeds.activity.added'),
       waitForEvent(
         user1FlatNotificationFeed,
         'feeds.notification_feed.updated',
-        { timeoutMs: 15000, shouldReject: true },
       ),
     ]);
     void serverClient.feeds.addActivity({
@@ -107,14 +103,10 @@ describe('Flat notification feed', () => {
 
   it("user 2 likes user 1's post - user 1 receives flat notification", async () => {
     const notificationPromise = Promise.all([
-      waitForEvent(user1FlatNotificationFeed, 'feeds.activity.added', {
-        timeoutMs: 15000,
-        shouldReject: true,
-      }),
+      waitForEvent(user1FlatNotificationFeed, 'feeds.activity.added'),
       waitForEvent(
         user1FlatNotificationFeed,
         'feeds.notification_feed.updated',
-        { timeoutMs: 15000, shouldReject: true },
       ),
     ]);
     void serverClient.feeds.addActivity({
@@ -140,14 +132,10 @@ describe('Flat notification feed', () => {
 
   it("user 2 adds comment to user 1's post - user 1 receives flat notification", async () => {
     const notificationPromise = Promise.all([
-      waitForEvent(user1FlatNotificationFeed, 'feeds.activity.added', {
-        timeoutMs: 15000,
-        shouldReject: true,
-      }),
+      waitForEvent(user1FlatNotificationFeed, 'feeds.activity.added'),
       waitForEvent(
         user1FlatNotificationFeed,
         'feeds.notification_feed.updated',
-        { timeoutMs: 15000, shouldReject: true },
       ),
     ]);
     void serverClient.feeds.addActivity({
@@ -185,7 +173,6 @@ describe('Flat notification feed', () => {
       waitForEvent(
         user1FlatNotificationFeed,
         'feeds.notification_feed.updated',
-        { timeoutMs: 15000, shouldReject: true },
       ),
     ]);
 
