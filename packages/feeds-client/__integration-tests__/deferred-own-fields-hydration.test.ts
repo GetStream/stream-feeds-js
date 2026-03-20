@@ -11,6 +11,7 @@ import type { UserRequest } from '../src/gen/models';
 import {
   createTestClient,
   createTestTokenGenerator,
+  deleteUsersIgnoringRateLimit,
   getServerClient,
   getTestUser,
   waitForEvent,
@@ -122,7 +123,7 @@ describe('Deferred own_ fields hydration', () => {
         hard_delete: true,
       });
     }
-    await serverClient.deleteUsers({
+    await deleteUsersIgnoringRateLimit(serverClient, {
       user_ids: [...otherUsers].map((u) => u.id),
     });
     await clientRef.disconnectUser();

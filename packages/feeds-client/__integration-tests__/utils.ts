@@ -7,6 +7,31 @@ import type { FeedsEvent } from '../src/types';
 import { StreamClient } from '@stream-io/node-sdk';
 import { randomId } from '../src/common/utils';
 
+const isTooManyRequestsError = (error: unknown): boolean => {
+  if (typeof error !== 'object' || error === null) return false;
+  const responseCode = (error as { metadata?: { responseCode?: unknown } })
+    .metadata?.responseCode;
+  return responseCode === 429;
+};
+
+/**
+ * Deletes users via the server client. In test cleanup, rate limits (HTTP 429)
+ * are ignored so teardown does not fail the suite when the API is throttled.
+ */
+export const deleteUsersIgnoringRateLimit = async (
+  serverClient: StreamClient,
+  request: Parameters<StreamClient['deleteUsers']>[0],
+) => {
+  try {
+    await serverClient.deleteUsers(request);
+  } catch (error: unknown) {
+    if (isTooManyRequestsError(error)) {
+      return;
+    }
+    throw error;
+  }
+};
+
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 const secret = import.meta.env.VITE_STREAM_API_SECRET;
 const baseUrl = import.meta.env.VITE_API_URL;

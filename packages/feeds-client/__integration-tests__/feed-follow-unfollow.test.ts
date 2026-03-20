@@ -3,6 +3,7 @@ import type { FeedsClient } from '../src/feeds-client';
 import {
   createTestClient,
   createTestTokenGenerator,
+  deleteUsersIgnoringRateLimit,
   getTestUser,
   getServerClient,
   waitForEvent,
@@ -140,7 +141,7 @@ describe('Feed follow and unfollow', () => {
 
       await client.disconnectUser();
 
-      await serverClient.deleteUsers({
+      await deleteUsersIgnoringRateLimit(serverClient, {
         user_ids: [secondUser.id, thirdUser.id],
         user: 'hard',
       });
@@ -202,7 +203,7 @@ describe('Feed follow and unfollow', () => {
 
       await client.disconnectUser();
 
-      await serverClient.deleteUsers({
+      await deleteUsersIgnoringRateLimit(serverClient, {
         user_ids: [secondUser.id],
         user: 'hard',
       });
@@ -309,7 +310,7 @@ describe('Feed follow and unfollow', () => {
 
       await client.disconnectUser();
 
-      await serverClient.deleteUsers({
+      await deleteUsersIgnoringRateLimit(serverClient, {
         user_ids: [secondUser.id],
         user: 'hard',
       });
