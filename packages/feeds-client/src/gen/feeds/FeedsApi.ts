@@ -448,6 +448,7 @@ export class FeedsApi {
   ): Promise<StreamResponse<QueryActivitiesResponse>> {
     const body = {
       enrich_own_fields: request?.enrich_own_fields,
+      include_soft_deleted_activities: request?.include_soft_deleted_activities,
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,

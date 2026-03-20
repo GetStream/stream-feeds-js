@@ -4457,6 +4457,8 @@ export interface PushPreferencesResponse {
 export interface QueryActivitiesRequest {
   enrich_own_fields?: boolean;
 
+  include_soft_deleted_activities?: boolean;
+
   limit?: number;
 
   next?: string;
