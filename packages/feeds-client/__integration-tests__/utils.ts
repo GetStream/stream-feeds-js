@@ -67,13 +67,22 @@ export const waitForEvent = (
   type: FeedsEvent['type'] | WSEvent['type'],
 ) => {
   return new Promise((resolve, reject) => {
-    // @ts-expect-error client expects WSEvents
-    client.on(type, (e) => {
-      resolve(e);
+    let timeout: ReturnType<typeof setTimeout>;
+
+    const listener = (e: FeedsEvent | WSEvent) => {
+      // @ts-expect-error client expects WSEvents
+      client.off(type, listener);
       clearTimeout(timeout);
-    });
-    const timeout = setTimeout(() => {
+      resolve(e);
+    };
+
+    timeout = setTimeout(() => {
+      // @ts-expect-error client expects WSEvents
+      client.off(type, listener);
       reject(new Error(`Event not received: ${type}`));
     }, WAIT_FOR_EVENT_MS);
+
+    // @ts-expect-error client expects WSEvents
+    client.on(type, listener);
   });
 };
