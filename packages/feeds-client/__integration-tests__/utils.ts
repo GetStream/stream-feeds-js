@@ -67,8 +67,6 @@ export const waitForEvent = (
   type: FeedsEvent['type'] | WSEvent['type'],
 ) => {
   return new Promise((resolve, reject) => {
-    let timeout: ReturnType<typeof setTimeout>;
-
     const listener = (e: FeedsEvent | WSEvent) => {
       // @ts-expect-error client expects WSEvents
       client.off(type, listener);
@@ -76,7 +74,7 @@ export const waitForEvent = (
       resolve(e);
     };
 
-    timeout = setTimeout(() => {
+    const timeout = setTimeout(() => {
       // @ts-expect-error client expects WSEvents
       client.off(type, listener);
       reject(new Error(`Event not received: ${type}`));
