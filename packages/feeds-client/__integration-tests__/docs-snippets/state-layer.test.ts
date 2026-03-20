@@ -3,7 +3,6 @@ import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
-  waitForEvent,
 } from '../utils';
 import type { FeedsClient } from '../../src/feeds-client';
 import type { Feed } from '../../src/feed';
