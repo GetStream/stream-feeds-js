@@ -56,13 +56,13 @@ describe('Aggregated Feed Pagination Integration Tests', () => {
   });
 
   it(`should mark first page as seen`, async () => {
-    feed.markActivity({
+    const eventPromise = waitForEvent(feed, 'feeds.notification_feed.updated');
+    await feed.markActivity({
       mark_seen: feed.state
         .getLatestValue()
         .aggregated_activities!.map((a) => a.group),
     });
-
-    const event = await waitForEvent(feed, 'feeds.notification_feed.updated');
+    const event = await eventPromise;
 
     expect(feed.state.getLatestValue().notification_status?.unseen).toBe(1);
     expect(
@@ -87,15 +87,15 @@ describe('Aggregated Feed Pagination Integration Tests', () => {
   });
 
   it(`mark second page as seen`, async () => {
-    feed.markActivity({
+    const eventPromise = waitForEvent(feed, 'feeds.notification_feed.updated');
+    await feed.markActivity({
       mark_seen: [
         feed.state.getLatestValue().aggregated_activities![
           feed.state.getLatestValue().aggregated_activities!.length - 1
         ].group,
       ],
     });
-
-    await waitForEvent(feed, 'feeds.notification_feed.updated');
+    await eventPromise;
   });
 
   it(`seen activities aren't paginated, they contain the last 100 seen groups`, async () => {

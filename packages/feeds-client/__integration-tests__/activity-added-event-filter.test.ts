@@ -35,17 +35,18 @@ describe('Feeds - onNewActivity filters WS events', () => {
       },
     });
 
+    const notImportantAdded = waitForEvent(feed, 'feeds.activity.added');
     serverClient.feeds.addActivity({
       type: 'post',
       feeds: [feed.feed],
       text: 'Not important post',
       user_id: user.id,
     });
-
-    await waitForEvent(feed, 'feeds.activity.added');
+    await notImportantAdded;
 
     expect(feed.state.getLatestValue().activities).toHaveLength(0);
 
+    const importantAdded = waitForEvent(feed, 'feeds.activity.added');
     serverClient.feeds.addActivity({
       type: 'post',
       feeds: [feed.feed],
@@ -53,8 +54,7 @@ describe('Feeds - onNewActivity filters WS events', () => {
       filter_tags: ['important'],
       user_id: user.id,
     });
-
-    await waitForEvent(feed, 'feeds.activity.added');
+    await importantAdded;
 
     expect(feed.state.getLatestValue().activities).toHaveLength(1);
     expect(feed.state.getLatestValue().activities?.[0].text).toBe(

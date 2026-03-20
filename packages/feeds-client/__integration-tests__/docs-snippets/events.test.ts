@@ -32,11 +32,12 @@ describe('Events page', () => {
     const unsubscribeAll = feed.on('all', (event) => console.log(event));
 
     // Trigger an event
+    const addedPromise = waitForEvent(feed, 'feeds.activity.added');
     await feed.addActivity({
       type: 'post',
       text: 'Event test',
     });
-    await waitForEvent(feed, 'feeds.activity.added');
+    await addedPromise;
 
     unsubscribe();
     unsubscribeAll();

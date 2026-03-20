@@ -81,14 +81,14 @@ describe('Deferred own_ fields hydration', () => {
 
     const otherUser = otherUsers[0];
 
+    const timelineAdded = waitForEvent(timeline, 'feeds.activity.added');
     serverClient.feeds.addActivity({
       user_id: otherUser.id,
       type: 'post',
       feeds: [`user:${otherUser.id}`],
       text: `Initial activity from ${otherUser.id}`,
     });
-
-    await waitForEvent(timeline, 'feeds.activity.added');
+    await timelineAdded;
 
     await vi.waitFor(
       () => {

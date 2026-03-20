@@ -91,8 +91,8 @@ describe('deleteActivity state deduplication with watch', () => {
     stateChangeSpy.mockClear();
 
     // Wait for both HTTP and WS so we don't depend on arrival order (WS can beat HTTP).
-    const deletePromise = client.deleteActivity({ id: activityId });
     const wsEventPromise = waitForEvent(feed, 'feeds.activity.deleted');
+    const deletePromise = client.deleteActivity({ id: activityId });
     await Promise.all([deletePromise, wsEventPromise]);
 
     // State should show 0 activities; dedup ensures only one state update

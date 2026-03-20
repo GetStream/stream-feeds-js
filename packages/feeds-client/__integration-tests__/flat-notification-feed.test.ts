@@ -166,14 +166,14 @@ describe('Flat notification feed', () => {
     expect(firstActivity?.id).toBeDefined();
 
     await Promise.all([
-      user1FlatNotificationFeed.markActivity({
-        mark_read: [firstActivity.id],
-        mark_seen: [firstActivity.id],
-      }),
       waitForEvent(
         user1FlatNotificationFeed,
         'feeds.notification_feed.updated',
       ),
+      user1FlatNotificationFeed.markActivity({
+        mark_read: [firstActivity.id],
+        mark_seen: [firstActivity.id],
+      }),
     ]);
 
     const stateAfter = user1FlatNotificationFeed.state.getLatestValue();

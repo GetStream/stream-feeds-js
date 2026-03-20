@@ -47,6 +47,7 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       },
     });
 
+    const withoutBlueAdded = waitForEvent(feed, 'feeds.activity.added');
     serverClient.feeds.addActivity({
       type: 'post',
       feeds: [feed.feed],
@@ -54,11 +55,11 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       filter_tags: ['green'],
       user_id: user.id,
     });
-
-    await waitForEvent(feed, 'feeds.activity.added');
+    await withoutBlueAdded;
 
     expect(feed.state.getLatestValue().activities).toHaveLength(0);
 
+    const withBlueAdded = waitForEvent(feed, 'feeds.activity.added');
     serverClient.feeds.addActivity({
       type: 'post',
       feeds: [feed.feed],
@@ -66,8 +67,7 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       filter_tags: ['blue'],
       user_id: user.id,
     });
-
-    await waitForEvent(feed, 'feeds.activity.added');
+    await withBlueAdded;
 
     expect(feed.state.getLatestValue().activities).toHaveLength(1);
     expect(feed.state.getLatestValue().activities?.[0].text).toBe(
@@ -125,6 +125,7 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       filter: { filter_tags: ['blue'] },
     });
 
+    const currentUserBlueAdded = waitForEvent(testFeed, 'feeds.activity.added');
     serverClient.feeds.addActivity({
       type: 'post',
       feeds: [testFeed.feed],
@@ -132,8 +133,7 @@ describe('Feeds - onNewActivity and activityFilter', () => {
       filter_tags: ['blue'],
       user_id: user.id,
     });
-
-    await waitForEvent(testFeed, 'feeds.activity.added');
+    await currentUserBlueAdded;
 
     expect(testFeed.state.getLatestValue().activities).toHaveLength(1);
     expect(testFeed.state.getLatestValue().activities?.[0].text).toBe(

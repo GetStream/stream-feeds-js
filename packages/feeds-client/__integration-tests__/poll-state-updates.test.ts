@@ -148,6 +148,7 @@ describe('Poll state with watched feed', () => {
       // Reset spy after subscription's initial call
       spy.mockReset();
 
+      const voteCastedPromise = waitForEvent(feed, 'feeds.poll.vote_casted');
       await client.castPollVote({
         activity_id: activityId,
         poll_id: pollId,
@@ -158,7 +159,7 @@ describe('Poll state with watched feed', () => {
       expect(spy).toHaveBeenCalledTimes(1);
       expect(poll.data.own_votes_by_option_id[optionIds[0]]).toBeDefined();
 
-      await waitForEvent(feed, 'feeds.poll.vote_casted');
+      await voteCastedPromise;
 
       // Spy should still have been called only once (WS echo was deduplicated)
       expect(spy).toHaveBeenCalledTimes(1);
@@ -178,6 +179,7 @@ describe('Poll state with watched feed', () => {
       const unsubscribe = poll.state.subscribe(spy);
       spy.mockReset();
 
+      const voteRemovedPromise = waitForEvent(feed, 'feeds.poll.vote_removed');
       await client.deletePollVote({
         activity_id: activityId,
         poll_id: pollId,
@@ -188,7 +190,7 @@ describe('Poll state with watched feed', () => {
       expect(spy).toHaveBeenCalledTimes(1);
       expect(poll.data.own_votes_by_option_id[optionIds[0]]).toBeUndefined();
 
-      await waitForEvent(feed, 'feeds.poll.vote_removed');
+      await voteRemovedPromise;
 
       // Spy should still have been called only once (WS echo was deduplicated)
       expect(spy).toHaveBeenCalledTimes(1);
@@ -205,12 +207,12 @@ describe('Poll state with watched feed', () => {
       const unsubscribe = poll.state.subscribe(spy);
       spy.mockReset();
 
+      const updatedPromise = waitForEvent(feed, 'feeds.poll.updated');
       const request = client.updatePollPartial({
         poll_id: pollId,
         set: { name: 'Dedup updated name' },
       });
-
-      await Promise.all([request, waitForEvent(feed, 'feeds.poll.updated')]);
+      await Promise.all([request, updatedPromise]);
 
       // Spy should still have been called only once (WS echo was deduplicated)
       expect(spy).toHaveBeenCalledTimes(1);
@@ -225,13 +227,14 @@ describe('Poll state with watched feed', () => {
       const unsubscribe = poll.state.subscribe(spy);
       spy.mockReset();
 
+      const pollClosedPromise = waitForEvent(feed, 'feeds.poll.closed');
       await client.closePoll({ poll_id: pollId });
 
       // HTTP update should have been applied
       expect(spy).toHaveBeenCalledTimes(1);
       expect(poll.data.is_closed).toBe(true);
 
-      await waitForEvent(feed, 'feeds.poll.closed');
+      await pollClosedPromise;
 
       // Spy should still have been called only once (WS echo was deduplicated)
       expect(spy).toHaveBeenCalledTimes(1);

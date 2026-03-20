@@ -54,10 +54,11 @@ describe('WebSocket connection', () => {
   it('should be able to receive health check events', async () => {
     const spy = vi.fn();
     client.on('health.check', spy);
+    const healthCheckPromise = waitForEvent(client, 'health.check');
 
     await client.connectUser(user, createTestTokenGenerator(user));
 
-    await waitForEvent(client, 'health.check');
+    await healthCheckPromise;
 
     const event = spy.mock.lastCall?.[0] as HealthCheckEvent | undefined;
     expect(event?.type).toBe('health.check');

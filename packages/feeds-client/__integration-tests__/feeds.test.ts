@@ -98,6 +98,7 @@ describe('updateFeed state deduplication with watch', () => {
     const unsubscribe = feed.state.subscribe(stateChangeSpy);
     stateChangeSpy.mockClear();
 
+    const updatedEventPromise = waitForEvent(feed, 'feeds.feed.updated');
     await feed.update({ name: 'Updated Name' });
 
     expect(feed.currentState.name).toBe('Updated Name');
@@ -106,7 +107,7 @@ describe('updateFeed state deduplication with watch', () => {
     expect(stateChangeCountAfterHttp).toBeGreaterThanOrEqual(1);
 
     // Wait for the WS event (should be deduplicated)
-    await waitForEvent(feed, 'feeds.feed.updated');
+    await updatedEventPromise;
 
     // No additional state change from the WS event
     expect(stateChangeSpy.mock.calls.length).toBe(stateChangeCountAfterHttp);
@@ -161,6 +162,7 @@ describe('deleteFeed state deduplication with watch', () => {
     const unsubscribe = feed.state.subscribe(stateChangeSpy);
     stateChangeSpy.mockClear();
 
+    const deletedEventPromise = waitForEvent(feed, 'feeds.feed.deleted');
     await feed.delete();
 
     expect(feed.currentState.deleted_at).toBeInstanceOf(Date);
@@ -169,7 +171,7 @@ describe('deleteFeed state deduplication with watch', () => {
     expect(stateChangeCountAfterHttp).toBeGreaterThanOrEqual(1);
 
     // Wait for the WS event (should be deduplicated)
-    await waitForEvent(feed, 'feeds.feed.deleted');
+    await deletedEventPromise;
 
     // No additional state change from the WS event
     expect(stateChangeSpy.mock.calls.length).toBe(stateChangeCountAfterHttp);
