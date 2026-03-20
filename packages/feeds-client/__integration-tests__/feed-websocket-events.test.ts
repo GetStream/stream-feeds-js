@@ -24,13 +24,13 @@ describe('Feed state updates via WebSocket events', () => {
     client.on('feeds.feed.created', createSpy);
 
     const createdPromise = waitForEvent(client, 'feeds.feed.created');
-    client.getOrCreateFeed({
+    const createRequestPromise = client.getOrCreateFeed({
       feed_group_id: feedGroup,
       feed_id: feedId,
       data: { visibility: 'public', custom: { color: 'red' } },
       watch: true,
     });
-    await createdPromise;
+    await Promise.all([createdPromise, createRequestPromise]);
 
     const feed = client.feed(feedGroup, feedId);
 
