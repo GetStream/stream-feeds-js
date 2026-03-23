@@ -75,14 +75,12 @@ describe('Stories Feed', () => {
     user2StoriesFeed.on('feeds.stories_feed.updated', (_) => {});
 
     await Promise.all([
+      waitForEvent(user2StoriesFeed, 'feeds.stories_feed.updated'),
       user2StoriesFeed.markActivity({
         mark_watched: [
           user2StoriesFeed.state.getLatestValue().aggregated_activities![0]
             .activities![0].id,
         ],
-      }),
-      waitForEvent(user2StoriesFeed, 'feeds.stories_feed.updated', {
-        shouldReject: true,
       }),
     ]);
 
@@ -105,6 +103,7 @@ describe('Stories Feed', () => {
     expect(feed.state.getLatestValue().activities).toHaveLength(1);
 
     await Promise.all([
+      waitForEvent(feed, 'feeds.activity.added'),
       client1.addActivity({
         type: 'post',
         feeds: [user1StoryFeed.feed],
@@ -115,9 +114,6 @@ describe('Stories Feed', () => {
             custom: {},
           },
         ],
-      }),
-      waitForEvent(feed, 'feeds.activity.added', {
-        shouldReject: true,
       }),
     ]);
 
@@ -134,11 +130,9 @@ describe('Stories Feed', () => {
     });
 
     await Promise.all([
+      waitForEvent(feed, 'feeds.stories_feed.updated'),
       feed.markActivity({
         mark_watched: [feed.state.getLatestValue().activities![0].id],
-      }),
-      waitForEvent(feed, 'feeds.stories_feed.updated', {
-        shouldReject: true,
       }),
     ]);
 

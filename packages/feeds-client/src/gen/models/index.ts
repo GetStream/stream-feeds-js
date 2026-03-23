@@ -8,6 +8,16 @@ export interface AIImageConfig {
   async?: boolean;
 }
 
+export interface AIImageLabelDefinition {
+  description: string;
+
+  group: string;
+
+  key: string;
+
+  label: string;
+}
+
 export interface AITextConfig {
   enabled: boolean;
 
@@ -59,7 +69,7 @@ export interface AWSRekognitionRule {
 
   min_confidence: number;
 
-  subclassifications?: Record<string, boolean>;
+  subclassifications?: Record<string, any>;
 }
 
 export interface AcceptFeedMemberInviteRequest {}
@@ -502,6 +512,8 @@ export interface ActivityResponse {
   parent?: ActivityResponse;
 
   poll?: PollResponseData;
+
+  score_vars?: Record<string, any>;
 }
 
 export interface ActivityRestoredEvent {
@@ -1508,6 +1520,8 @@ export interface ChannelConfigWithInfo {
 
   automod_thresholds?: Thresholds;
 
+  chat_preferences?: ChatPreferences;
+
   grants?: Record<string, string[]>;
 }
 
@@ -1612,6 +1626,8 @@ export interface ChannelPushPreferencesResponse {
   chat_level?: string;
 
   disabled_until?: Date;
+
+  chat_preferences?: ChatPreferencesResponse;
 }
 
 export interface ChannelResponse {
@@ -1670,6 +1686,56 @@ export interface ChannelResponse {
   created_by?: UserResponse;
 
   truncated_by?: UserResponse;
+}
+
+export interface ChatPreferences {
+  channel_mentions?: string;
+
+  default_preference?: string;
+
+  direct_mentions?: string;
+
+  distinct_channel_messages?: string;
+
+  group_mentions?: string;
+
+  here_mentions?: string;
+
+  role_mentions?: string;
+
+  thread_replies?: string;
+}
+
+export interface ChatPreferencesInput {
+  channel_mentions?: 'all' | 'none';
+
+  default_preference?: 'all' | 'none';
+
+  direct_mentions?: 'all' | 'none';
+
+  group_mentions?: 'all' | 'none';
+
+  here_mentions?: 'all' | 'none';
+
+  role_mentions?: 'all' | 'none';
+
+  thread_replies?: 'all' | 'none';
+}
+
+export interface ChatPreferencesResponse {
+  channel_mentions?: string;
+
+  default_preference?: string;
+
+  direct_mentions?: string;
+
+  group_mentions?: string;
+
+  here_mentions?: string;
+
+  role_mentions?: string;
+
+  thread_replies?: string;
 }
 
 export interface ClosedCaptionRuleParameters {
@@ -1868,6 +1934,24 @@ export interface CommentResponse {
   reaction_groups?: Record<string, FeedsReactionGroupResponse>;
 }
 
+export interface CommentRestoredEvent {
+  created_at: Date;
+
+  fid: string;
+
+  comment: CommentResponse;
+
+  custom: Record<string, any>;
+
+  type: string;
+
+  feed_visibility?: string;
+
+  received_at?: Date;
+
+  user?: UserResponseCommonFields;
+}
+
 export interface CommentUpdatedEvent {
   created_at: Date;
 
@@ -1902,6 +1986,8 @@ export interface ConfigResponse {
   updated_at: Date;
 
   supported_video_call_harm_types: string[];
+
+  ai_image_label_definitions?: AIImageLabelDefinition[];
 
   ai_image_config?: AIImageConfig;
 
@@ -2382,6 +2468,8 @@ export interface EnrichedReaction {
 
 export interface EnrichmentOptions {
   enrich_own_followings?: boolean;
+
+  include_score_vars?: boolean;
 
   skip_activity?: boolean;
 
@@ -2953,6 +3041,8 @@ export interface FilterConfigResponse {
   llm_labels: string[];
 
   ai_text_labels?: string[];
+
+  config_keys?: string[];
 }
 
 export interface FlagCountRuleParameters {
@@ -4349,6 +4439,8 @@ export interface PushPreferenceInput {
 
   user_id?: string;
 
+  chat_preferences?: ChatPreferencesInput;
+
   feeds_preferences?: FeedsPreferences;
 }
 
@@ -4361,11 +4453,15 @@ export interface PushPreferencesResponse {
 
   feeds_level?: string;
 
+  chat_preferences?: ChatPreferencesResponse;
+
   feeds_preferences?: FeedsPreferencesResponse;
 }
 
 export interface QueryActivitiesRequest {
   enrich_own_fields?: boolean;
+
+  include_soft_deleted_activities?: boolean;
 
   limit?: number;
 
@@ -4944,6 +5040,16 @@ export interface RestoreActivityResponse {
   activity: ActivityResponse;
 }
 
+export interface RestoreCommentRequest {}
+
+export interface RestoreCommentResponse {
+  duration: string;
+
+  activity: ActivityResponse;
+
+  comment: CommentResponse;
+}
+
 export interface ReviewQueueItemResponse {
   ai_text_severity: string;
 
@@ -5021,6 +5127,8 @@ export interface RingSettingsResponse {
 }
 
 export interface RuleBuilderAction {
+  skip_inbox?: boolean;
+
   type?:
     | 'ban_user'
     | 'flag_user'
@@ -6389,6 +6497,7 @@ export type WSClientEvent =
   | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
   | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
   | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
+  | ({ type: 'feeds.comment.restored' } & CommentRestoredEvent)
   | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
   | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
   | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)
@@ -6446,6 +6555,7 @@ export type WSEvent =
   | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
   | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
   | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
+  | ({ type: 'feeds.comment.restored' } & CommentRestoredEvent)
   | ({ type: 'feeds.comment.updated' } & CommentUpdatedEvent)
   | ({ type: 'feeds.feed.created' } & FeedCreatedEvent)
   | ({ type: 'feeds.feed.deleted' } & FeedDeletedEvent)

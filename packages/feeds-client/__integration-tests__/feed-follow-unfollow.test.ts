@@ -3,6 +3,7 @@ import type { FeedsClient } from '../src/feeds-client';
 import {
   createTestClient,
   createTestTokenGenerator,
+  deleteUsersIgnoringRateLimit,
   getTestUser,
   getServerClient,
   waitForEvent,
@@ -140,7 +141,7 @@ describe('Feed follow and unfollow', () => {
 
       await client.disconnectUser();
 
-      await serverClient.deleteUsers({
+      await deleteUsersIgnoringRateLimit(serverClient, {
         user_ids: [secondUser.id, thirdUser.id],
         user: 'hard',
       });
@@ -202,7 +203,7 @@ describe('Feed follow and unfollow', () => {
 
       await client.disconnectUser();
 
-      await serverClient.deleteUsers({
+      await deleteUsersIgnoringRateLimit(serverClient, {
         user_ids: [secondUser.id],
         user: 'hard',
       });
@@ -256,8 +257,8 @@ describe('Feed follow and unfollow', () => {
 
     it('should update state when following', async () => {
       await Promise.all([
+        waitForEvent(feed, 'feeds.follow.created'),
         feed.follow(secondUserFeed.feed),
-        waitForEvent(feed, 'feeds.follow.created', { shouldReject: true }),
       ]);
 
       expect(feed.currentState.following).toHaveLength(1);
@@ -266,11 +267,11 @@ describe('Feed follow and unfollow', () => {
 
     it('should update state when someone follows me', async () => {
       await Promise.all([
+        waitForEvent(feed, 'feeds.follow.created'),
         serverClient.feeds.follow({
           target: feed.feed,
           source: secondUserTimeline.feed,
         }),
-        waitForEvent(feed, 'feeds.follow.created', { shouldReject: true }),
       ]);
 
       expect(feed.currentState.followers).toHaveLength(1);
@@ -279,8 +280,8 @@ describe('Feed follow and unfollow', () => {
 
     it('should update state when I unfollow someone', async () => {
       await Promise.all([
+        waitForEvent(feed, 'feeds.follow.deleted'),
         feed.unfollow(secondUserFeed.feed),
-        waitForEvent(feed, 'feeds.follow.deleted', { shouldReject: true }),
       ]);
 
       expect(feed.currentState.following).toHaveLength(0);
@@ -289,12 +290,10 @@ describe('Feed follow and unfollow', () => {
 
     it('should update state when someone unfollows me', async () => {
       await Promise.all([
+        waitForEvent(feed, 'feeds.follow.deleted'),
         serverClient.feeds.unfollow({
           target: feed.feed,
           source: secondUserTimeline.feed,
-        }),
-        waitForEvent(feed, 'feeds.follow.deleted', {
-          shouldReject: true,
         }),
       ]);
 
@@ -311,7 +310,7 @@ describe('Feed follow and unfollow', () => {
 
       await client.disconnectUser();
 
-      await serverClient.deleteUsers({
+      await deleteUsersIgnoringRateLimit(serverClient, {
         user_ids: [secondUser.id],
         user: 'hard',
       });

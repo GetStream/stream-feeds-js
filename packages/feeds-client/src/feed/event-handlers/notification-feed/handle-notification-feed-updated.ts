@@ -71,11 +71,7 @@ export const updateNotificationFeedFromEvent = (
   const seenActivities = effectiveStatus?.seen_activities ?? [];
 
   // For flat feeds — update currentActivities with is_read/is_seen
-  if (
-    currentActivities?.length &&
-    !currentAggregatedActivities?.length &&
-    effectiveStatus
-  ) {
+  if (currentActivities?.length && effectiveStatus) {
     let anyChanged = false;
     const updatedActivities = currentActivities.map((activity) => {
       const isRead =

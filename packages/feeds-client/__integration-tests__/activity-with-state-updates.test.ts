@@ -105,15 +105,13 @@ describe('Activity with state updates', () => {
     activityWithStateUpdates.state.subscribe(spy);
     spy.mockReset();
 
+    const updatedPromise = waitForEvent(feed, 'feeds.activity.updated');
     serverClient.feeds.updateActivity({
       id: activityWithStateUpdates.id,
       text: 'Updated activity 1',
       user_id: user.id,
     });
-
-    await waitForEvent(feed, 'feeds.activity.updated', {
-      shouldReject: true,
-    });
+    await updatedPromise;
 
     expect(spy).toHaveBeenCalled();
     expect(spy.mock.lastCall?.[0].activity.text).toBe('Updated activity 1');
