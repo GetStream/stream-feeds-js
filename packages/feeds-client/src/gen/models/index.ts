@@ -512,6 +512,8 @@ export interface ActivityResponse {
   parent?: ActivityResponse;
 
   poll?: PollResponseData;
+
+  score_vars?: Record<string, any>;
 }
 
 export interface ActivityRestoredEvent {
@@ -2466,6 +2468,8 @@ export interface EnrichedReaction {
 
 export interface EnrichmentOptions {
   enrich_own_followings?: boolean;
+
+  include_score_vars?: boolean;
 
   skip_activity?: boolean;
 
