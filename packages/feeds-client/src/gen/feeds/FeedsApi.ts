@@ -1084,6 +1084,7 @@ export class FeedsApi {
     depth?: number;
     sort?: string;
     replies_limit?: number;
+    id_around?: string;
     limit?: number;
     prev?: string;
     next?: string;
@@ -1094,6 +1095,7 @@ export class FeedsApi {
       depth: request?.depth,
       sort: request?.sort,
       replies_limit: request?.replies_limit,
+      id_around: request?.id_around,
       limit: request?.limit,
       prev: request?.prev,
       next: request?.next,
@@ -1357,6 +1359,7 @@ export class FeedsApi {
     depth?: number;
     sort?: string;
     replies_limit?: number;
+    id_around?: string;
     limit?: number;
     prev?: string;
     next?: string;
@@ -1365,6 +1368,7 @@ export class FeedsApi {
       depth: request?.depth,
       sort: request?.sort,
       replies_limit: request?.replies_limit,
+      id_around: request?.id_around,
       limit: request?.limit,
       prev: request?.prev,
       next: request?.next,
