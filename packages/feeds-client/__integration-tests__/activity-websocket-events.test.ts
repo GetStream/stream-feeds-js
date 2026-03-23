@@ -50,11 +50,10 @@ describe('Activity state updates via WebSocket events', () => {
       feeds: [feed.feed],
       text: 'Test activity',
     };
+    const addedEventPromise = waitForEvent(feed, 'feeds.activity.added');
     const response = await client.addActivity(activityData);
     const activity = response.activity;
-
-    // Wait for the activity.added event
-    await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 10000 });
+    await addedEventPromise;
 
     // Verify the event was received
     const addEvent = addSpy.mock.lastCall?.[0] as ActivityAddedEvent;
@@ -88,13 +87,12 @@ describe('Activity state updates via WebSocket events', () => {
 
     // Update the activity
     const updatedText = 'Updated activity text';
+    const updatedEventPromise = waitForEvent(feed, 'feeds.activity.updated');
     await client.updateActivity({
       id: activityId,
       text: updatedText,
     });
-
-    // Wait for the activity.updated event
-    await waitForEvent(feed, 'feeds.activity.updated', { timeoutMs: 10000 });
+    await updatedEventPromise;
 
     // Verify the event was received
     const updateEvent = updateSpy.mock.lastCall?.[0] as ActivityUpdatedEvent;
@@ -127,12 +125,11 @@ describe('Activity state updates via WebSocket events', () => {
     const activityId = feedActivities![0].id;
 
     // Delete the activity
+    const deletedEventPromise = waitForEvent(feed, 'feeds.activity.deleted');
     await client.deleteActivity({
       id: activityId,
     });
-
-    // Wait for the activity.deleted event
-    await waitForEvent(feed, 'feeds.activity.deleted', { timeoutMs: 10000 });
+    await deletedEventPromise;
 
     // Verify the event was received
     const deleteEvent = deleteSpy.mock.lastCall?.[0] as ActivityDeletedEvent;
@@ -161,13 +158,14 @@ describe('Activity state updates via WebSocket events', () => {
       const secondFeed = client.feed(feedGroup, crypto.randomUUID());
       await secondFeed.getOrCreate();
 
-      const response = await client.addActivity({
+      const addedPromise = waitForEvent(feed, 'feeds.activity.added');
+      const request = client.addActivity({
         type: 'post',
         feeds: [feed.feed, secondFeed.feed],
         text: 'Test activity',
       });
-
-      await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 10000 });
+      await addedPromise;
+      const response = await request;
 
       expect(
         feed.state
@@ -175,6 +173,10 @@ describe('Activity state updates via WebSocket events', () => {
           .activities?.find((a) => a.id === response.activity.id),
       ).toBeDefined();
 
+      const removedFromFeedPromise = waitForEvent(
+        feed,
+        'feeds.activity.removed_from_feed',
+      );
       await client.upsertActivities({
         activities: [
           {
@@ -185,10 +187,7 @@ describe('Activity state updates via WebSocket events', () => {
           },
         ],
       });
-
-      await waitForEvent(feed, 'feeds.activity.removed_from_feed', {
-        timeoutMs: 10000,
-      });
+      await removedFromFeedPromise;
 
       const removeEvent = removeSpy.mock
         .lastCall?.[0] as ActivityRemovedFromFeedEvent;
@@ -215,13 +214,13 @@ describe('Activity state updates via WebSocket events', () => {
     await secondFeed.getOrCreate();
 
     const activityId = crypto.randomUUID();
+    const addedPromise = waitForEvent(feed, 'feeds.activity.added');
     client.addActivity({
       type: 'post',
       feeds: [feed.feed, secondFeed.feed],
       id: activityId,
     });
-
-    await waitForEvent(feed, 'feeds.activity.added', { timeoutMs: 10000 });
+    await addedPromise;
 
     let activity = feed.currentState.activities?.find(
       (a) => a.id === activityId,
@@ -238,13 +237,13 @@ describe('Activity state updates via WebSocket events', () => {
     expect(activity?.current_feed?.feed).toBe(feed.feed);
 
     const serverClient = getServerClient();
+    const updatedPromise = waitForEvent(feed, 'feeds.activity.updated');
     serverClient.feeds.updateActivity({
       id: activityId,
       text: 'Test activity',
       user_id: user.id,
     });
-
-    await waitForEvent(feed, 'feeds.activity.updated', { timeoutMs: 10000 });
+    await updatedPromise;
 
     activity = feed.currentState.activities?.find((a) => a.id === activityId);
 

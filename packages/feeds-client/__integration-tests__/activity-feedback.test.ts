@@ -29,14 +29,12 @@ describe('Activity feedback test', () => {
   });
 
   it(`hiding activity`, async () => {
+    const feedbackPromise = waitForEvent(client, 'feeds.activity.feedback');
     client.activityFeedback({
       activity_id: activity.id,
       hide: true,
     });
-
-    await waitForEvent(client, 'feeds.activity.feedback', {
-      shouldReject: true,
-    });
+    await feedbackPromise;
 
     expect(
       feed.currentState.activities?.find((a) => a.id === activity.id)?.hidden,
@@ -44,14 +42,12 @@ describe('Activity feedback test', () => {
   });
 
   it.skip(`unhiding activity`, async () => {
+    const feedbackPromise = waitForEvent(client, 'feeds.activity.feedback');
     client.activityFeedback({
       activity_id: activity.id,
       hide: false,
     });
-
-    await waitForEvent(client, 'feeds.activity.feedback', {
-      shouldReject: true,
-    });
+    await feedbackPromise;
 
     expect(
       feed.currentState.activities?.find((a) => a.id === activity.id)?.hidden,

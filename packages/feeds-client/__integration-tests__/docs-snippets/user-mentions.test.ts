@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   createTestClient,
   createTestTokenGenerator,
+  deleteUsersIgnoringRateLimit,
   getServerClient,
   getTestUser,
 } from '../utils';
@@ -80,7 +81,7 @@ describe('User mentions page', () => {
     await feed?.delete({ hard_delete: true });
     await client?.disconnectUser();
     const serverClient = getServerClient();
-    await serverClient.deleteUsers({
+    await deleteUsersIgnoringRateLimit(serverClient, {
       user_ids: [user.id],
       user: 'hard',
     });

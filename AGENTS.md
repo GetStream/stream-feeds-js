@@ -159,6 +159,9 @@ Testing policy
 • Generated API clients and their interactions
 • Integration tests live in `packages/feeds-client/__integration-tests__/`
 
+**Integration tests: HTTP + WebSocket**  
+When a test calls an async client API that should produce a WebSocket event (or state updated from that event), always await the HTTP/API promise together with the event waiter. Do not fire the API and only await `waitForEvent`—a late-rejecting request causes unhandled rejections and hides failures. Typical pattern: start `waitForEvent(clientOrFeed, 'event.name')`, assign the API call to a variable, then `await Promise.all([eventPromise, apiPromise])`. See `__integration-tests__/utils.ts` for `waitForEvent` and `feed-websocket-events.test.ts` for an example.
+
 Security & credentials
 • Never commit API keys or customer data.
 • Example code must use obvious placeholders (e.g., YOUR_STREAM_KEY).

@@ -90,6 +90,7 @@ describe('Polls page', () => {
   });
 
   it(`Send an Answer (if answers are configured to be allowed)`, async () => {
+    const voteCastedPromise = waitForEvent(feed, 'feeds.poll.vote_casted');
     await client.castPollVote({
       activity_id: activity.id,
       poll_id: activity.poll?.id!,
@@ -97,8 +98,7 @@ describe('Polls page', () => {
         answer_text: `Let's go somewhere else`,
       },
     });
-
-    await waitForEvent(feed, 'feeds.poll.vote_casted');
+    await voteCastedPromise;
   });
 
   it(`Removing a poll vote`, async () => {

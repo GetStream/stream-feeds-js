@@ -41,6 +41,8 @@ yarn vitest run path/to/test.test.ts
 # VITE_STREAM_API_KEY and VITE_STREAM_API_SECRET (see packages/feeds-client/__integration-tests__/utils.ts)
 ```
 
+**Integration tests (HTTP + WebSocket):** If a test triggers an API call and waits for a matching real-time event, await both the API promise and the event (e.g. `Promise.all` with `waitForEvent` from `__integration-tests__/utils.ts` and the promise returned by the client method). Avoid calling async client methods without awaiting—otherwise rejections can occur after assertions and races become harder to reason about.
+
 ## Linting
 
 ```bash
@@ -90,10 +92,12 @@ This is a Yarn 4 monorepo with three main packages and sample applications.
 ### feeds-client Structure
 
 The core SDK with two entry points:
+
 - Main entry (`index.ts`): `FeedsClient`, `Feed`, state management, types
 - React bindings entry (`/react-bindings`): hooks, contexts, wrapper components
 
 Key classes:
+
 - **FeedsClient** (`src/feeds-client/feeds-client.ts`): Main client for API communication, WebSocket connections, and state management. Extends auto-generated `FeedsApi`.
 - **Feed** (`src/feed/feed.ts`): Represents a single feed with its state. Extends auto-generated `FeedApi`.
 - **StateStore**: From `@stream-io/state-store`, manages reactive state for both client and feeds.
@@ -101,6 +105,7 @@ Key classes:
 ### Generated Code
 
 `src/gen/` contains OpenAPI-generated code:
+
 - `models/`: API request/response types
 - `feeds/`: `FeedsApi` and `FeedApi` base classes
 - `model-decoders/`: WebSocket event decoders
@@ -108,6 +113,7 @@ Key classes:
 ### React Bindings
 
 Located in `src/bindings/react/`:
+
 - **Contexts**: `StreamFeedsContext`, `StreamFeedContext`, `StreamActivityWithStateUpdatesContext`, `StreamSearchContext`
 - **Hooks**: `useCreateFeedsClient`, client/feed/search state hooks
 - **Wrappers**: `StreamFeeds`, `StreamFeed`, `StreamActivityWithStateUpdates`, `StreamSearch`
@@ -126,5 +132,5 @@ WebSocket events are processed through handlers in `src/feed/event-handlers/`. E
 
 - State management uses `@stream-io/state-store` with React bindings via `useSyncExternalStore`
 - API types are generated from OpenAPI spec - don't manually edit files in `src/gen/`
-- Integration tests in `packages/feeds-client/__integration-tests__/` require Stream API credentials
+- Integration tests in `packages/feeds-client/__integration-tests__/` require Stream API credentials; when asserting on WebSocket-driven behavior, await API promises alongside `waitForEvent` (see Testing section above)
 - Tests use vitest; configuration is in `vite.config.ts`

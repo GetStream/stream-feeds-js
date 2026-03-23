@@ -113,6 +113,8 @@ import type {
   Response,
   RestoreActivityRequest,
   RestoreActivityResponse,
+  RestoreCommentRequest,
+  RestoreCommentResponse,
   SearchUserGroupsResponse,
   SharedLocationResponse,
   SharedLocationsResponse,
@@ -446,6 +448,7 @@ export class FeedsApi {
   ): Promise<StreamResponse<QueryActivitiesResponse>> {
     const body = {
       enrich_own_fields: request?.enrich_own_fields,
+      include_soft_deleted_activities: request?.include_soft_deleted_activities,
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,
@@ -1375,6 +1378,30 @@ export class FeedsApi {
     >('GET', '/api/v2/feeds/comments/{id}/replies', pathParams, queryParams);
 
     decoders.GetCommentRepliesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async restoreComment(
+    request: RestoreCommentRequest & { id: string },
+  ): Promise<StreamResponse<RestoreCommentResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {};
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<RestoreCommentResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/comments/{id}/restore',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.RestoreCommentResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

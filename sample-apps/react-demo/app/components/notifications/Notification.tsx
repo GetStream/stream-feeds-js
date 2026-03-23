@@ -1,4 +1,7 @@
-import type { AggregatedActivityResponse, UserResponse } from '@stream-io/feeds-react-sdk';
+import type {
+  AggregatedActivityResponse,
+  UserResponse,
+} from '@stream-io/feeds-react-sdk';
 import { useMemo } from 'react';
 import { NavLink } from '../utility/NavLink';
 import { Avatar } from '../utility/Avatar';
@@ -19,37 +22,124 @@ export const Notification = ({
     const targetActivity = notification.group.includes('follow')
       ? undefined
       : notification.activities[0].notification_context?.target;
-    let activityText = targetActivity ? (targetActivity.text ?? targetActivity.parent_activity?.text) : '';
+    let activityText = targetActivity
+      ? (targetActivity.text ?? targetActivity.parent_activity?.text)
+      : '';
     activityText = activityText ? `"${truncateText(activityText)}"` : '';
+
+    const groupPrefix = notification.group.split('_')[0];
+    const targetComment = targetActivity?.comment;
+    const isCommentAggregation =
+      notification.group.includes('comment') &&
+      !!targetComment?.id &&
+      groupPrefix === targetComment.id;
+
+    if (isCommentAggregation) {
+      const commentPreview = targetComment.comment
+        ? `"${truncateText(targetComment.comment)}"`
+        : '';
+      const { icon, actionText: commentActionText } =
+        action === 'comment_reply'
+          ? { icon: 'chat_bubble', actionText: 'replied to your comment' }
+          : action === 'comment_mention'
+            ? {
+                icon: 'alternate_email',
+                actionText: 'mentioned you in a reply to your comment',
+              }
+            : { icon: 'favorite', actionText: 'reacted to your comment' };
+      return (
+        <NotificationContent
+          icon={icon}
+          postLink={`/activity/${targetActivity?.id}`}
+          notification={notification}
+          actionText={commentActionText}
+          activityText={commentPreview}
+        />
+      );
+    }
 
     let notificationContent: React.ReactNode;
     switch (action) {
       case 'comment': {
-        notificationContent = <NotificationContent icon="chat_bubble" postLink={`/activity/${targetActivity?.id}`} notification={notification} actionText="commented on your post" activityText={activityText} />;
+        notificationContent = (
+          <NotificationContent
+            icon="chat_bubble"
+            postLink={`/activity/${targetActivity?.id}`}
+            notification={notification}
+            actionText="commented on your post"
+            activityText={activityText}
+          />
+        );
         break;
       }
       case 'reaction': {
-        notificationContent = <NotificationContent icon="favorite" postLink={`/activity/${targetActivity?.id}`} notification={notification} actionText="reacted to your post" activityText={activityText} />;
+        notificationContent = (
+          <NotificationContent
+            icon="favorite"
+            postLink={`/activity/${targetActivity?.id}`}
+            notification={notification}
+            actionText="reacted to your post"
+            activityText={activityText}
+          />
+        );
         break;
       }
       case 'comment_reaction': {
-        notificationContent = <NotificationContent icon="favorite" postLink={`/activity/${targetActivity?.id}`} notification={notification} actionText="reacted to your comment on post" activityText={activityText} />;
+        notificationContent = (
+          <NotificationContent
+            icon="favorite"
+            postLink={`/activity/${targetActivity?.id}`}
+            notification={notification}
+            actionText="reacted to your comment on post"
+            activityText={activityText}
+          />
+        );
         break;
       }
       case 'comment_reply': {
-        notificationContent = <NotificationContent icon="chat_bubble" postLink={`/activity/${targetActivity?.id}`} notification={notification} actionText="replied to your comment on post" activityText={activityText} />;
+        notificationContent = (
+          <NotificationContent
+            icon="chat_bubble"
+            postLink={`/activity/${targetActivity?.id}`}
+            notification={notification}
+            actionText="replied to your comment on post"
+            activityText={activityText}
+          />
+        );
         break;
       }
       case 'follow': {
-        notificationContent = <NotificationContent icon="person" notification={notification} actionText="started following you" />;
+        notificationContent = (
+          <NotificationContent
+            icon="person"
+            notification={notification}
+            actionText="started following you"
+          />
+        );
         break;
       }
       case 'mention': {
-        notificationContent = <NotificationContent icon="alternate_email" postLink={`/activity/${targetActivity?.id}`} notification={notification} actionText="mentioned you in a post" activityText={activityText} />;
+        notificationContent = (
+          <NotificationContent
+            icon="alternate_email"
+            postLink={`/activity/${targetActivity?.id}`}
+            notification={notification}
+            actionText="mentioned you in a post"
+            activityText={activityText}
+          />
+        );
         break;
       }
       case 'comment_mention': {
-        notificationContent = <NotificationContent icon="alternate_email" postLink={`/activity/${targetActivity?.id}`} notification={notification} actionText="mentioned you in a comment on post" activityText={activityText} />;
+        notificationContent = (
+          <NotificationContent
+            icon="alternate_email"
+            postLink={`/activity/${targetActivity?.id}`}
+            notification={notification}
+            actionText="mentioned you in a comment on post"
+            activityText={activityText}
+          />
+        );
         break;
       }
       default: {
@@ -80,7 +170,11 @@ const getPreviewActors = (notification: AggregatedActivityResponse) => {
   return Array.from(Object.values(uniqueUsers)).slice(0, previewCount);
 };
 
-const Actors = ({ notification }: { notification: AggregatedActivityResponse }) => {
+const Actors = ({
+  notification,
+}: {
+  notification: AggregatedActivityResponse;
+}) => {
   const previewActors = getPreviewActors(notification);
 
   const remainingActors = notification.user_count - previewActors.length;
@@ -95,8 +189,11 @@ const Actors = ({ notification }: { notification: AggregatedActivityResponse }) 
     <>
       {previewActors.map((actor, index) => (
         <span key={actor.id}>
-          {index > 0 ? remainingActors > 0 ? ', ' : ' and ' : ''}
-          <NavLink href={`/profile/${actor.id}`} className="font-semibold underline decoration-base-content/20 hover:decoration-base-content/50 underline-offset-2">
+          {index > 0 ? (remainingActors > 0 ? ', ' : ' and ') : ''}
+          <NavLink
+            href={`/profile/${actor.id}`}
+            className="font-semibold underline decoration-base-content/20 hover:decoration-base-content/50 underline-offset-2"
+          >
             {actor.name}
           </NavLink>
         </span>
@@ -106,27 +203,57 @@ const Actors = ({ notification }: { notification: AggregatedActivityResponse }) 
   );
 };
 
-const ActorAvatars = ({ notification }: { notification: AggregatedActivityResponse }) => {
+const ActorAvatars = ({
+  notification,
+}: {
+  notification: AggregatedActivityResponse;
+}) => {
   const previewActors = getPreviewActors(notification);
   return (
     <div className="flex flex-row -space-x-1.5">
       {previewActors.map((actor) => (
-        <Avatar key={actor.id} user={actor} className="size-6 ring-2 ring-base-100" />
+        <Avatar
+          key={actor.id}
+          user={actor}
+          className="size-6 ring-2 ring-base-100"
+        />
       ))}
     </div>
   );
 };
 
-const NotificationContent = ({ icon, postLink, notification, activityText, actionText }: { icon: string, postLink?: string, notification: AggregatedActivityResponse, actionText: string, activityText?: string }) => {
+const NotificationContent = ({
+  icon,
+  postLink,
+  notification,
+  activityText,
+  actionText,
+}: {
+  icon: string;
+  postLink?: string;
+  notification: AggregatedActivityResponse;
+  actionText: string;
+  activityText?: string;
+}) => {
   return (
     <div className="flex flex-row gap-3 items-start w-full min-w-0">
-      <span className="material-symbols-outlined text-primary text-[18px]! shrink-0 mt-0.5">{icon}</span>
+      <span className="material-symbols-outlined text-primary text-[18px]! shrink-0 mt-0.5">
+        {icon}
+      </span>
       <div className="flex-1 min-w-0 flex flex-col gap-1.5">
         <ActorAvatars notification={notification} />
         <p className="text-[13px] leading-relaxed text-base-content/80">
           <Actors notification={notification} /> {actionText}
           {activityText && postLink && (
-            <span> <NavLink href={`${postLink}`} className="text-base-content underline decoration-base-content/20 hover:decoration-base-content/50 underline-offset-2">{activityText}</NavLink></span>
+            <span>
+              {' '}
+              <NavLink
+                href={`${postLink}`}
+                className="text-base-content underline decoration-base-content/20 hover:decoration-base-content/50 underline-offset-2"
+              >
+                {activityText}
+              </NavLink>
+            </span>
           )}
         </p>
       </div>

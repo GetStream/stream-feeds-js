@@ -73,6 +73,9 @@ const eventDecoderMapping: Record<
   'feeds.comment.reaction.updated': (data: Record<string, any>) =>
     decoders.CommentReactionUpdatedEvent(data),
 
+  'feeds.comment.restored': (data: Record<string, any>) =>
+    decoders.CommentRestoredEvent(data),
+
   'feeds.comment.updated': (data: Record<string, any>) =>
     decoders.CommentUpdatedEvent(data),
 

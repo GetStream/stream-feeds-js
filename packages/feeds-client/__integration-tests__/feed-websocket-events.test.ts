@@ -23,14 +23,14 @@ describe('Feed state updates via WebSocket events', () => {
     const createSpy = vi.fn();
     client.on('feeds.feed.created', createSpy);
 
-    await client.getOrCreateFeed({
+    const createdPromise = waitForEvent(client, 'feeds.feed.created');
+    const createRequestPromise = client.getOrCreateFeed({
       feed_group_id: feedGroup,
       feed_id: feedId,
       data: { visibility: 'public', custom: { color: 'red' } },
       watch: true,
     });
-
-    await waitForEvent(client, 'feeds.feed.created', { timeoutMs: 10000 });
+    await Promise.all([createdPromise, createRequestPromise]);
 
     const feed = client.feed(feedGroup, feedId);
 
@@ -48,13 +48,13 @@ describe('Feed state updates via WebSocket events', () => {
     const updateSpy = vi.fn();
     feed.on('feeds.feed.updated', updateSpy);
 
+    const updatedEventPromise = waitForEvent(feed, 'feeds.feed.updated');
     await client.updateFeed({
       feed_group_id: feedGroup,
       feed_id: feedId,
       custom: { testField: 'updated value' },
     });
-
-    await waitForEvent(feed, 'feeds.feed.updated', { timeoutMs: 10000 });
+    await updatedEventPromise;
 
     const updateEvent = updateSpy.mock.lastCall?.[0];
     expect(updateEvent?.type).toBe('feeds.feed.updated');
@@ -70,12 +70,12 @@ describe('Feed state updates via WebSocket events', () => {
     const deleteSpy = vi.fn();
     feed.on('feeds.feed.deleted', deleteSpy);
 
+    const deletedEventPromise = waitForEvent(feed, 'feeds.feed.deleted');
     await client.deleteFeed({
       feed_group_id: feedGroup,
       feed_id: feedId,
     });
-
-    await waitForEvent(feed, 'feeds.feed.deleted', { timeoutMs: 20000 });
+    await deletedEventPromise;
 
     const newFeed = client.feed(feedGroup, feedId);
     // testing we get a new reference to the feed
