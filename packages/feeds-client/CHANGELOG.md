@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.4.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.3.0...@stream-io/feeds-client-1.4.0) (2026-03-23)
+
+
+### Features
+
+* Include "score vars" and ranking expression in getOrCreateFeed response ([#264](https://github.com/GetStream/stream-feeds-js/issues/264)) ([8c07752](https://github.com/GetStream/stream-feeds-js/commit/8c077525fe194348a46ec14158a0b8fc07eb6196))
+* include soft-deleted activities ([#266](https://github.com/GetStream/stream-feeds-js/issues/266)) ([a3ca887](https://github.com/GetStream/stream-feeds-js/commit/a3ca887f7d8f41dbfc235c95e00786ed61919e61))
+
 ## [1.3.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.2.0...@stream-io/feeds-client-1.3.0) (2026-03-20)
 
 
