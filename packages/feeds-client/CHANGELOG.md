@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.5.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.4.0...@stream-io/feeds-client-1.5.0) (2026-03-23)
+
+
+### Features
+
+* Add id_around for getComments and getCommentReplies ([#270](https://github.com/GetStream/stream-feeds-js/issues/270)) ([6b3a40c](https://github.com/GetStream/stream-feeds-js/commit/6b3a40cc549e43360d06f39686e6bd64d2712fb3))
+
 ## [1.4.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.3.0...@stream-io/feeds-client-1.4.0) (2026-03-23)
 
 
