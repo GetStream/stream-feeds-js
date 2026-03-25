@@ -1174,6 +1174,7 @@ export class FeedsClient extends FeedsApi {
     source: string;
     target: string;
     enrich_own_fields?: boolean;
+    keep_history?: boolean;
   }) {
     const response = await super.unfollow(request);
     this.updateStateFromUnfollows([response.follow]);

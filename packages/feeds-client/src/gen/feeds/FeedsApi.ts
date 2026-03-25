@@ -2087,10 +2087,12 @@ export class FeedsApi {
     source: string;
     target: string;
     delete_notification_activity?: boolean;
+    keep_history?: boolean;
     enrich_own_fields?: boolean;
   }): Promise<StreamResponse<UnfollowResponse>> {
     const queryParams = {
       delete_notification_activity: request?.delete_notification_activity,
+      keep_history: request?.keep_history,
       enrich_own_fields: request?.enrich_own_fields,
     };
     const pathParams = {

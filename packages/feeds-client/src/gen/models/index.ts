@@ -5651,7 +5651,7 @@ export interface UnblockUsersResponse {
 }
 
 export interface UnfollowBatchRequest {
-  follows: FollowPair[];
+  follows: UnfollowPair[];
 
   delete_notification_activity?: boolean;
 
@@ -5662,6 +5662,14 @@ export interface UnfollowBatchResponse {
   duration: string;
 
   follows: FollowResponse[];
+}
+
+export interface UnfollowPair {
+  source: string;
+
+  target: string;
+
+  keep_history?: boolean;
 }
 
 export interface UnfollowResponse {
