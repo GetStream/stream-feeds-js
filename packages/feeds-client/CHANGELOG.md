@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.6.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.5.0...@stream-io/feeds-client-1.6.0) (2026-03-25)
+
+
+### Features
+
+* Add keep_history flag when unfollowing ([#271](https://github.com/GetStream/stream-feeds-js/issues/271)) ([f2f92a4](https://github.com/GetStream/stream-feeds-js/commit/f2f92a4475feac664d21422ee84e050a0831756a))
+
 ## [1.5.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.4.0...@stream-io/feeds-client-1.5.0) (2026-03-23)
 
 
