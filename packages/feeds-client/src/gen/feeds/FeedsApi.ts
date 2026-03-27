@@ -139,6 +139,8 @@ import type {
   UpdateBookmarkResponse,
   UpdateCollectionsRequest,
   UpdateCollectionsResponse,
+  UpdateCommentPartialRequest,
+  UpdateCommentPartialResponse,
   UpdateCommentRequest,
   UpdateCommentResponse,
   UpdateFeedMembersRequest,
@@ -1262,6 +1264,37 @@ export class FeedsApi {
     );
 
     decoders.UpdateCommentResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async updateCommentPartial(
+    request: UpdateCommentPartialRequest & { id: string },
+  ): Promise<StreamResponse<UpdateCommentPartialResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      copy_custom_to_notification: request?.copy_custom_to_notification,
+      handle_mention_notifications: request?.handle_mention_notifications,
+      skip_enrich_url: request?.skip_enrich_url,
+      skip_push: request?.skip_push,
+      unset: request?.unset,
+      set: request?.set,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpdateCommentPartialResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/comments/{id}/partial',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.UpdateCommentPartialResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -2746,6 +2779,7 @@ export class FeedsApi {
     };
     const body = {
       member_ids: request?.member_ids,
+      as_admin: request?.as_admin,
       team_id: request?.team_id,
     };
 
