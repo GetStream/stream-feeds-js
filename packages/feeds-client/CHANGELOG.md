@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.7.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.6.0...@stream-io/feeds-client-1.7.0) (2026-03-27)
+
+
+### Features
+
+* Add custom to trigger and target for notifications and description to… ([#272](https://github.com/GetStream/stream-feeds-js/issues/272)) ([8f7961f](https://github.com/GetStream/stream-feeds-js/commit/8f7961fd6245ed95c6959257186b68fdcdf673bd))
+
 ## [1.6.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.5.0...@stream-io/feeds-client-1.6.0) (2026-03-25)
 
 
