@@ -554,7 +554,7 @@ export interface ActivityRequest {
 
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when create_notification_activity is true) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -971,7 +971,7 @@ export interface AddActivityRequest {
 
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when create_notification_activity is true) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -1111,7 +1111,7 @@ export interface AddCommentReactionRequest {
 
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when create_notification_activity is true) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -1157,7 +1157,7 @@ export interface AddCommentRequest {
 
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when create_notification_activity is true) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -1261,7 +1261,7 @@ export interface AddReactionRequest {
 
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when create_notification_activity is true) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -5042,8 +5042,13 @@ export interface FollowRequest {
   target: string;
 
   /**
+   * Maximum number of historical activities to copy from the target feed when the follow is first materialized. Defaults to 100. Range: 0-1000. 0 means no historical activities are copied.
+   */
+  activity_copy_limit?: number;
+
+  /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when create_notification_activity is true) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -8577,7 +8582,7 @@ export interface UnpinActivityResponse {
 export interface UpdateActivityPartialRequest {
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when handle_mention_notifications creates notifications) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -8616,7 +8621,7 @@ export interface UpdateActivityPartialResponse {
 export interface UpdateActivityRequest {
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when handle_mention_notifications creates notifications) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -8819,7 +8824,7 @@ export interface UpdateCollectionsResponse {
 export interface UpdateCommentPartialRequest {
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to notification activities Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -8863,7 +8868,7 @@ export interface UpdateCommentRequest {
 
   /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when handle_mention_notifications creates notifications) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
@@ -8978,8 +8983,13 @@ export interface UpdateFollowRequest {
   target: string;
 
   /**
+   * Maximum number of historical activities to copy from the target feed when the follow is first materialized. Defaults to 100. Range: 0-1000. 0 means no historical activities are copied.
+   */
+  activity_copy_limit?: number;
+
+  /**
    * @deprecated
-   * Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
+   * Whether to copy custom data to the notification activity (only applies when create_notification_activity is true) Deprecated: use notification_context.trigger.custom and notification_context.target.custom instead
    */
   copy_custom_to_notification?: boolean;
 
