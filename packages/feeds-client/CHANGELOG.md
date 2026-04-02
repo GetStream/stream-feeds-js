@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.8.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.7.0...@stream-io/feeds-client-1.8.0) (2026-04-02)
+
+
+### Features
+
+* Add activity_copy_limit for follow ([#273](https://github.com/GetStream/stream-feeds-js/issues/273)) ([4d81858](https://github.com/GetStream/stream-feeds-js/commit/4d8185837fa078fe35016fee2baa8d50e25ca9db))
+
 ## [1.7.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.6.0...@stream-io/feeds-client-1.7.0) (2026-03-27)
 
 
