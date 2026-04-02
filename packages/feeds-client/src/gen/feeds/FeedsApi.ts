@@ -1937,6 +1937,7 @@ export class FeedsApi {
     const body = {
       source: request?.source,
       target: request?.target,
+      activity_copy_limit: request?.activity_copy_limit,
       copy_custom_to_notification: request?.copy_custom_to_notification,
       create_notification_activity: request?.create_notification_activity,
       enrich_own_fields: request?.enrich_own_fields,
@@ -1968,6 +1969,7 @@ export class FeedsApi {
     const body = {
       source: request?.source,
       target: request?.target,
+      activity_copy_limit: request?.activity_copy_limit,
       copy_custom_to_notification: request?.copy_custom_to_notification,
       create_notification_activity: request?.create_notification_activity,
       enrich_own_fields: request?.enrich_own_fields,
