@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.9.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.8.0...@stream-io/feeds-client-1.9.0) (2026-04-07)
+
+
+### Features
+
+* Add include_flat_activities to enrichment options ([#274](https://github.com/GetStream/stream-feeds-js/issues/274)) ([0ca5a3a](https://github.com/GetStream/stream-feeds-js/commit/0ca5a3ad23e4b6f3a3fa5063908003cd3dd35618))
+
 ## [1.8.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.7.0...@stream-io/feeds-client-1.8.0) (2026-04-02)
 
 
