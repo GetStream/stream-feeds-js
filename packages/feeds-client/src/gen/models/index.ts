@@ -3831,6 +3831,11 @@ export interface EnrichmentOptions {
   enrich_own_followings?: boolean;
 
   /**
+   * Default: false. When true, includes the top-level flat 'activities' array in responses for aggregated feeds. By default, aggregated feeds only return 'aggregated_activities'.
+   */
+  include_flat_activities?: boolean;
+
+  /**
    * Default: false. When true, includes score_vars in activity responses containing variable values used at ranking time.
    */
   include_score_vars?: boolean;
@@ -6877,6 +6882,9 @@ export interface PushPreferencesResponse {
 export interface QueryActivitiesRequest {
   enrich_own_fields?: boolean;
 
+  /**
+   * When true, include soft-deleted activities in the result.
+   */
   include_soft_deleted_activities?: boolean;
 
   limit?: number;
@@ -7459,6 +7467,9 @@ export interface QueryReviewQueueResponse {
 }
 
 export interface QueryUsersPayload {
+  /**
+   * Filter conditions to apply to the query
+   */
   filter_conditions: Record<string, any>;
 
   include_deactivated_users?: boolean;
@@ -7469,6 +7480,9 @@ export interface QueryUsersPayload {
 
   presence?: boolean;
 
+  /**
+   * Array of sort parameters
+   */
   sort?: SortParamRequest[];
 }
 
