@@ -461,6 +461,25 @@ decoders.CallParticipantResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.CallResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'Timestamp', isSingle: true },
+
+    created_by: { type: 'UserResponse', isSingle: true },
+
+    egress: { type: 'EgressResponse', isSingle: true },
+
+    updated_at: { type: 'Timestamp', isSingle: true },
+
+    ended_at: { type: 'Timestamp', isSingle: true },
+
+    session: { type: 'CallSessionResponse', isSingle: true },
+
+    starts_at: { type: 'Timestamp', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.CallSessionResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     participants: { type: 'CallParticipantResponse', isSingle: false },
@@ -800,6 +819,13 @@ decoders.DraftResponse = (input?: Record<string, any>) => {
 decoders.EgressRTMPResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     started_at: { type: 'Timestamp', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.EgressResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    rtmps: { type: 'EgressRTMPResponse', isSingle: false },
   };
   return decode(typeMappings, input);
 };
@@ -1671,6 +1697,13 @@ decoders.QueryPollsResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.QueryReviewQueueResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    items: { type: 'ReviewQueueItemResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.QueryUsersResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     users: { type: 'FullUserResponse', isSingle: false },
@@ -1795,11 +1828,15 @@ decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
 
     completed_at: { type: 'DatetimeType', isSingle: true },
 
+    escalated_at: { type: 'DatetimeType', isSingle: true },
+
     reviewed_at: { type: 'DatetimeType', isSingle: true },
 
     appeal: { type: 'AppealItemResponse', isSingle: true },
 
     assigned_to: { type: 'UserResponse', isSingle: true },
+
+    call: { type: 'CallResponse', isSingle: true },
 
     entity_creator: { type: 'EntityCreatorResponse', isSingle: true },
 

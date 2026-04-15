@@ -1526,11 +1526,13 @@ export class FeedsApi {
       feed_id: request?.feed_id,
     };
     const body = {
+      clear_location: request?.clear_location,
       description: request?.description,
       enrich_own_fields: request?.enrich_own_fields,
       name: request?.name,
       filter_tags: request?.filter_tags,
       custom: request?.custom,
+      location: request?.location,
     };
 
     const response = await this.apiClient.sendRequest<
