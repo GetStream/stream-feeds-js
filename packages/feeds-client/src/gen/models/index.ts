@@ -324,18 +324,6 @@ export interface ActivityFeedbackResponse {
   duration: string;
 }
 
-export interface ActivityLocation {
-  /**
-   * Latitude coordinate
-   */
-  lat: number;
-
-  /**
-   * Longitude coordinate
-   */
-  lng: number;
-}
-
 export interface ActivityMarkEvent {
   /**
    * Date/time of creation
@@ -645,7 +633,7 @@ export interface ActivityRequest {
    */
   custom?: Record<string, any>;
 
-  location?: ActivityLocation;
+  location?: Location;
 
   /**
    * Additional data for search indexing
@@ -849,7 +837,7 @@ export interface ActivityResponse {
 
   current_feed?: FeedResponse;
 
-  location?: ActivityLocation;
+  location?: Location;
 
   metrics?: Record<string, number>;
 
@@ -1064,7 +1052,7 @@ export interface AddActivityRequest {
    */
   custom?: Record<string, any>;
 
-  location?: ActivityLocation;
+  location?: Location;
 
   /**
    * Additional data for search indexing
@@ -1371,6 +1359,8 @@ export interface AggregatedActivityResponse {
 }
 
 export interface AggregationConfig {
+  activities_sort?: string;
+
   format?: string;
 
   group_size?: number;
@@ -1638,6 +1628,11 @@ export interface BackstageSettingsResponse {
 }
 
 export interface BanActionRequestPayload {
+  /**
+   * Also ban user from all channels this moderator creates in the future
+   */
+  ban_from_future_channels?: boolean;
+
   /**
    * Ban only from specific channel
    */
@@ -2071,6 +2066,10 @@ export interface BroadcastSettingsResponse {
   hls: HLSSettingsResponse;
 
   rtmp: RTMPSettingsResponse;
+}
+
+export interface BypassActionRequest {
+  enabled?: boolean;
 }
 
 export interface CallActionOptions {
@@ -3831,11 +3830,6 @@ export interface EnrichmentOptions {
   enrich_own_followings?: boolean;
 
   /**
-   * Default: false. When true, includes the top-level flat 'activities' array in responses for aggregated feeds. By default, aggregated feeds only return 'aggregated_activities'.
-   */
-  include_flat_activities?: boolean;
-
-  /**
    * Default: false. When true, includes score_vars in activity responses containing variable values used at ranking time.
    */
   include_score_vars?: boolean;
@@ -3977,6 +3971,31 @@ export interface EntityCreatorResponse {
   revoke_tokens_issued_before?: Date;
 
   teams_role?: Record<string, string>;
+}
+
+export interface EscalatePayload {
+  /**
+   * Additional context for the reviewer
+   */
+  notes?: string;
+
+  /**
+   * Priority of the escalation (low, medium, high)
+   */
+  priority?: string;
+
+  /**
+   * Reason for the escalation (from configured escalation_reasons)
+   */
+  reason?: string;
+}
+
+export interface EscalationMetadata {
+  notes?: string;
+
+  priority?: string;
+
+  reason?: string;
 }
 
 export interface FeedCreatedEvent {
@@ -4147,6 +4166,8 @@ export interface FeedInput {
   members?: FeedMemberRequest[];
 
   custom?: Record<string, any>;
+
+  location?: Location;
 }
 
 export interface FeedMemberAddedEvent {
@@ -4390,6 +4411,8 @@ export interface FeedRequest {
    * Custom data for the feed
    */
   custom?: Record<string, any>;
+
+  location?: Location;
 }
 
 export interface FeedResponse {
@@ -4487,6 +4510,8 @@ export interface FeedResponse {
    * Custom data for the feed
    */
   custom?: Record<string, any>;
+
+  location?: Location;
 
   own_membership?: FeedMemberResponse;
 }
@@ -4592,6 +4617,8 @@ export interface FeedSuggestionResponse {
    * Custom data for the feed
    */
   custom?: Record<string, any>;
+
+  location?: Location;
 
   own_membership?: FeedMemberResponse;
 }
@@ -5047,7 +5074,7 @@ export interface FollowRequest {
   target: string;
 
   /**
-   * Maximum number of historical activities to copy from the target feed when the follow is first materialized. Defaults to 100. Range: 0-1000. 0 means no historical activities are copied.
+   * Maximum number of historical activities to copy from the target feed when the follow is first materialized. Not set = unlimited (default). 0 = copy nothing. Range: 0-1000.
    */
   activity_copy_limit?: number;
 
@@ -5780,6 +5807,18 @@ export interface ListUserGroupsResponse {
   user_groups: UserGroupResponse[];
 }
 
+export interface Location {
+  /**
+   * Latitude coordinate
+   */
+  lat: number;
+
+  /**
+   * Longitude coordinate
+   */
+  lng: number;
+}
+
 export interface MarkActivityRequest {
   /**
    * Whether to mark all activities as read
@@ -6088,6 +6127,11 @@ export interface ModerationActionConfigResponse {
    * Display order (lower numbers shown first)
    */
   order: number;
+
+  /**
+   * Queue type this action config belongs to
+   */
+  queue_type?: string;
 
   /**
    * Custom data for the action
@@ -7119,7 +7163,7 @@ export interface QueryCommentReactionsResponse {
 
 export interface QueryCommentsRequest {
   /**
-   * MongoDB-style filter for querying comments
+   * Filter to apply to the query
    */
   filter: Record<string, any>;
 
@@ -7138,7 +7182,7 @@ export interface QueryCommentsRequest {
   prev?: string;
 
   /**
-   * first (oldest), last (newest) or top. One of: first, last, top, best, controversial
+   * Array of sort parameters
    */
 
   sort?: 'first' | 'last' | 'top' | 'best' | 'controversial';
@@ -7810,6 +7854,11 @@ export interface ReviewQueueItemResponse {
    */
   entity_type: string;
 
+  /**
+   * Whether the item has been escalated
+   */
+  escalated: boolean;
+
   flags_count: number;
 
   /**
@@ -7877,6 +7926,16 @@ export interface ReviewQueueItemResponse {
   entity_creator_id?: string;
 
   /**
+   * When the item was escalated
+   */
+  escalated_at?: Date;
+
+  /**
+   * ID of the moderator who escalated the item
+   */
+  escalated_by?: string;
+
+  /**
    * When the item was reviewed
    */
   reviewed_at?: Date;
@@ -7895,6 +7954,8 @@ export interface ReviewQueueItemResponse {
   call?: CallResponse;
 
   entity_creator?: EntityCreatorResponse;
+
+  escalation_metadata?: EscalationMetadata;
 
   feeds_v2_activity?: EnrichedActivity;
 
@@ -8222,7 +8283,7 @@ export interface StoriesFeedUpdatedEvent {
 
 export interface SubmitActionRequest {
   /**
-   * Type of moderation action to perform. One of: mark_reviewed, delete_message, delete_activity, delete_comment, delete_reaction, ban, custom, unban, restore, delete_user, unblock, block, shadow_block, unmask, kick_user, end_call
+   * Type of moderation action to perform. One of: mark_reviewed, delete_message, delete_activity, delete_comment, delete_reaction, ban, custom, unban, restore, delete_user, unblock, block, shadow_block, unmask, kick_user, end_call, escalate, de_escalate
    */
 
   action_type:
@@ -8243,7 +8304,10 @@ export interface SubmitActionRequest {
     | 'unmask'
     | 'kick_user'
     | 'end_call'
-    | 'reject_appeal';
+    | 'reject_appeal'
+    | 'escalate'
+    | 'de_escalate'
+    | 'bypass';
 
   /**
    * UUID of the appeal to act on (required for reject_appeal, optional for other actions)
@@ -8259,6 +8323,8 @@ export interface SubmitActionRequest {
 
   block?: BlockActionRequestPayload;
 
+  bypass?: BypassActionRequest;
+
   custom?: CustomActionRequestPayload;
 
   delete_activity?: DeleteActivityRequestPayload;
@@ -8270,6 +8336,8 @@ export interface SubmitActionRequest {
   delete_reaction?: DeleteReactionRequestPayload;
 
   delete_user?: DeleteUserRequestPayload;
+
+  escalate?: EscalatePayload;
 
   flag?: FlagRequest;
 
@@ -8508,6 +8576,11 @@ export interface UnbanActionRequestPayload {
    * Reason for the appeal decision
    */
   decision_reason?: string;
+
+  /**
+   * Also remove the future channels ban for this user
+   */
+  remove_future_channels_ban?: boolean;
 }
 
 export interface UnblockActionRequestPayload {
@@ -8726,7 +8799,7 @@ export interface UpdateActivityRequest {
    */
   custom?: Record<string, any>;
 
-  location?: ActivityLocation;
+  location?: Location;
 
   /**
    * Additional data for search indexing
@@ -8954,6 +9027,11 @@ export interface UpdateFeedMembersResponse {
 
 export interface UpdateFeedRequest {
   /**
+   * If true, removes the geographic location from the feed
+   */
+  clear_location?: boolean;
+
+  /**
    * Description of the feed
    */
   description?: string;
@@ -8977,6 +9055,8 @@ export interface UpdateFeedRequest {
    * Custom data for the feed
    */
   custom?: Record<string, any>;
+
+  location?: Location;
 }
 
 export interface UpdateFeedResponse {
@@ -8997,7 +9077,7 @@ export interface UpdateFollowRequest {
   target: string;
 
   /**
-   * Maximum number of historical activities to copy from the target feed when the follow is first materialized. Defaults to 100. Range: 0-1000. 0 means no historical activities are copied.
+   * Maximum number of historical activities to copy from the target feed when the follow is first materialized. Not set = unlimited (default). 0 = copy nothing. Range: 0-1000.
    */
   activity_copy_limit?: number;
 
