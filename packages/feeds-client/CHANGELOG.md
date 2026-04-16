@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.10.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.9.0...@stream-io/feeds-client-1.10.0) (2026-04-16)
+
+
+### Features
+
+* add bookmarks for comments ([#276](https://github.com/GetStream/stream-feeds-js/issues/276)) ([1c6b667](https://github.com/GetStream/stream-feeds-js/commit/1c6b667ae5e134ca4a70791d779eef9eebbc0f2f))
+* update to latest open api spec ([#275](https://github.com/GetStream/stream-feeds-js/issues/275)) ([f464617](https://github.com/GetStream/stream-feeds-js/commit/f4646177cf58ddb228d125f2f656c4a0b32c4e95))
+
 ## [1.9.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.8.0...@stream-io/feeds-client-1.9.0) (2026-04-07)
 
 
