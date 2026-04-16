@@ -261,6 +261,13 @@ decoders.AddBookmarkResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.AddCommentBookmarkResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    bookmark: { type: 'BookmarkResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.AddCommentReactionResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     comment: { type: 'CommentResponse', isSingle: true },
@@ -435,6 +442,8 @@ decoders.BookmarkResponse = (input?: Record<string, any>) => {
     activity: { type: 'ActivityResponse', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
+
+    comment: { type: 'CommentResponse', isSingle: true },
 
     folder: { type: 'BookmarkFolderResponse', isSingle: true },
   };
@@ -763,6 +772,13 @@ decoders.DeleteActivityReactionResponse = (input?: Record<string, any>) => {
 };
 
 decoders.DeleteBookmarkResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    bookmark: { type: 'BookmarkResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.DeleteCommentBookmarkResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     bookmark: { type: 'BookmarkResponse', isSingle: true },
   };
@@ -2023,6 +2039,13 @@ decoders.UpdateBookmarkResponse = (input?: Record<string, any>) => {
 decoders.UpdateCollectionsResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     collections: { type: 'CollectionResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpdateCommentBookmarkResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    bookmark: { type: 'BookmarkResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
