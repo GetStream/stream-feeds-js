@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.10.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.10.0...@stream-io/feeds-client-1.10.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* aggregated_activities wiped out by event handler ([#280](https://github.com/GetStream/stream-feeds-js/issues/280)) ([16a95c0](https://github.com/GetStream/stream-feeds-js/commit/16a95c0a39b0f54d03f0715089b53fe405b7a17c))
+
 ## [1.10.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.9.0...@stream-io/feeds-client-1.10.0) (2026-04-16)
 
 
