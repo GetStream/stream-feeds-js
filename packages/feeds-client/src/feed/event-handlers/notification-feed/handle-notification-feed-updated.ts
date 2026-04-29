@@ -156,7 +156,9 @@ export function handleNotificationFeedUpdated(
   if (result.changed) {
     this.state.partialNext({
       notification_status: result.data?.notification_status,
-      aggregated_activities: result.data?.aggregated_activities,
+      aggregated_activities:
+        result.data?.aggregated_activities ??
+        this.currentState.aggregated_activities,
       activities: result.data?.activities ?? this.currentState.activities,
     });
   }

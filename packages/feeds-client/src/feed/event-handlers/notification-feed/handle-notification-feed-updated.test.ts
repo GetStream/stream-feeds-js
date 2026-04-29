@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { Feed } from '../../feed';
+import { FeedsClient } from '../../../feeds-client';
 import {
+  handleNotificationFeedUpdated,
   updateNotificationFeedFromEvent,
   updateNotificationStatus,
 } from './handle-notification-feed-updated';
@@ -8,7 +11,10 @@ import {
   createMockNotificationFeedUpdatedEvent,
   createMockNotificationStatus,
   generateActivityResponse,
-} from '../../../test-utils';
+  generateFeedResponse,
+  generateOwnUser,
+  getHumanId,
+} from '../../../test-utils/response-generators';
 
 describe('notification-feed-utils', () => {
   describe('updateNotificationFeedFromEvent', () => {
@@ -372,5 +378,73 @@ describe('notification-feed-utils', () => {
       expect(groups?.every((g) => g.is_read === true)).toBe(true);
       expect(groups?.every((g) => g.is_seen === true)).toBe(true);
     });
+  });
+});
+
+describe(handleNotificationFeedUpdated.name, () => {
+  let feed: Feed;
+  let client: FeedsClient;
+
+  beforeEach(() => {
+    client = new FeedsClient('mock-api-key');
+    client.state.partialNext({
+      connected_user: generateOwnUser({ id: getHumanId() }),
+    });
+
+    const feedResponse = generateFeedResponse({
+      id: 'user1',
+      group_id: 'notification',
+    });
+
+    feed = new Feed(
+      client,
+      feedResponse.group_id,
+      feedResponse.id,
+      feedResponse,
+    );
+  });
+
+  it('keeps aggregated_activities when a status-only event refreshes last_seen_at and groups are unchanged', () => {
+    const lastSeenFirst = new Date('2023-06-01');
+    const lastSeenSecond = new Date('2023-12-01');
+    const aggregated = [
+      createMockAggregatedActivity({
+        group: 'group1',
+        updated_at: new Date('2023-01-01'),
+        is_read: true,
+        is_seen: true,
+      }),
+    ];
+    const notificationStatus = createMockNotificationStatus({
+      unseen: 0,
+      unread: 0,
+      last_seen_at: lastSeenFirst,
+      last_read_at: lastSeenFirst,
+    });
+
+    feed.state.partialNext({
+      aggregated_activities: aggregated,
+      notification_status: notificationStatus,
+    });
+
+    const event = createMockNotificationFeedUpdatedEvent({
+      notification_status: createMockNotificationStatus({
+        unseen: 0,
+        unread: 0,
+        last_seen_at: lastSeenSecond,
+        last_read_at: lastSeenSecond,
+      }),
+    });
+
+    handleNotificationFeedUpdated.call(
+      feed,
+      event as Parameters<typeof handleNotificationFeedUpdated>[1],
+    );
+
+    expect(feed.currentState.aggregated_activities).toHaveLength(1);
+    expect(feed.currentState.aggregated_activities?.[0].group).toBe('group1');
+    expect(feed.currentState.notification_status?.last_seen_at).toEqual(
+      lastSeenSecond,
+    );
   });
 });
