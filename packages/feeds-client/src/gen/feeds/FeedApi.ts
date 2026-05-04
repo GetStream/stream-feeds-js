@@ -2,6 +2,8 @@ import type { StreamResponse, FeedsApi } from '../../gen-imports';
 import type {
   AcceptFeedMemberInviteRequest,
   AcceptFeedMemberInviteResponse,
+  ChangeFeedVisibilityRequest,
+  ChangeFeedVisibilityResponse,
   DeleteFeedResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
@@ -84,6 +86,16 @@ export class FeedApi {
     request: PinActivityRequest & { activity_id: string },
   ): Promise<StreamResponse<PinActivityResponse>> {
     return this.feedsApi.pinActivity({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
+    });
+  }
+
+  changeFeedVisibility(
+    request: ChangeFeedVisibilityRequest,
+  ): Promise<StreamResponse<ChangeFeedVisibilityResponse>> {
+    return this.feedsApi.changeFeedVisibility({
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,

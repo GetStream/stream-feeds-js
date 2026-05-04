@@ -4,9 +4,15 @@ import type {
   AppealResponse,
   BanRequest,
   BanResponse,
+  BulkDeleteActionConfigRequest,
+  BulkDeleteActionConfigResponse,
+  BulkUpsertActionConfigRequest,
+  BulkUpsertActionConfigResponse,
+  DeleteActionConfigResponse,
   DeleteModerationConfigResponse,
   FlagRequest,
   FlagResponse,
+  GetActionConfigResponse,
   GetAppealResponse,
   GetConfigResponse,
   MuteRequest,
@@ -19,6 +25,8 @@ import type {
   QueryReviewQueueResponse,
   SubmitActionRequest,
   SubmitActionResponse,
+  UpsertActionConfigRequest,
+  UpsertActionConfigResponse,
   UpsertConfigRequest,
   UpsertConfigResponse,
 } from '../models';
@@ -26,6 +34,120 @@ import { decoders } from '../model-decoders/decoders';
 
 export class ModerationApi {
   constructor(public readonly apiClient: ApiClient) {}
+
+  async getActionConfig(request?: {
+    queue_type?: string;
+    entity_type?: string;
+    exclude_defaults?: boolean;
+    only_defaults?: boolean;
+  }): Promise<StreamResponse<GetActionConfigResponse>> {
+    const queryParams = {
+      queue_type: request?.queue_type,
+      entity_type: request?.entity_type,
+      exclude_defaults: request?.exclude_defaults,
+      only_defaults: request?.only_defaults,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetActionConfigResponse>
+    >('GET', '/api/v2/moderation/action_config', undefined, queryParams);
+
+    decoders.GetActionConfigResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async upsertActionConfig(
+    request: UpsertActionConfigRequest,
+  ): Promise<StreamResponse<UpsertActionConfigResponse>> {
+    const body = {
+      action: request?.action,
+      entity_type: request?.entity_type,
+      order: request?.order,
+      description: request?.description,
+      icon: request?.icon,
+      id: request?.id,
+      queue_type: request?.queue_type,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpsertActionConfigResponse>
+    >(
+      'POST',
+      '/api/v2/moderation/action_config',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.UpsertActionConfigResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async bulkUpsertActionConfig(
+    request: BulkUpsertActionConfigRequest,
+  ): Promise<StreamResponse<BulkUpsertActionConfigResponse>> {
+    const body = {
+      action_configs: request?.action_configs,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<BulkUpsertActionConfigResponse>
+    >(
+      'POST',
+      '/api/v2/moderation/action_config/bulk',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.BulkUpsertActionConfigResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async bulkDeleteActionConfig(
+    request: BulkDeleteActionConfigRequest,
+  ): Promise<StreamResponse<BulkDeleteActionConfigResponse>> {
+    const body = {
+      ids: request?.ids,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<BulkDeleteActionConfigResponse>
+    >(
+      'POST',
+      '/api/v2/moderation/action_config/bulk_delete',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.BulkDeleteActionConfigResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async deleteActionConfig(request: {
+    id: string;
+  }): Promise<StreamResponse<DeleteActionConfigResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteActionConfigResponse>
+    >('DELETE', '/api/v2/moderation/action_config/{id}', pathParams, undefined);
+
+    decoders.DeleteActionConfigResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
 
   async appeal(
     request: AppealRequest,
@@ -284,6 +406,7 @@ export class ModerationApi {
     request?: QueryReviewQueueRequest,
   ): Promise<StreamResponse<QueryReviewQueueResponse>> {
     const body = {
+      exclude_default_action_config: request?.exclude_default_action_config,
       limit: request?.limit,
       lock_count: request?.lock_count,
       lock_duration: request?.lock_duration,

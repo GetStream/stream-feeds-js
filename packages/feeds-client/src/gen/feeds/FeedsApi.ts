@@ -25,6 +25,8 @@ import type {
   BlockUsersRequest,
   BlockUsersResponse,
   CastPollVoteRequest,
+  ChangeFeedVisibilityRequest,
+  ChangeFeedVisibilityResponse,
   CreateBlockListRequest,
   CreateBlockListResponse,
   CreateCollectionsRequest,
@@ -757,14 +759,20 @@ export class FeedsApi {
 
   async getActivity(request: {
     id: string;
+    comment_sort?: string;
+    comment_limit?: number;
   }): Promise<StreamResponse<GetActivityResponse>> {
+    const queryParams = {
+      comment_sort: request?.comment_sort,
+      comment_limit: request?.comment_limit,
+    };
     const pathParams = {
       id: request?.id,
     };
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<GetActivityResponse>
-    >('GET', '/api/v2/feeds/activities/{id}', pathParams, undefined);
+    >('GET', '/api/v2/feeds/activities/{id}', pathParams, queryParams);
 
     decoders.GetActivityResponse?.(response.body);
 
@@ -1724,6 +1732,37 @@ export class FeedsApi {
     );
 
     decoders.PinActivityResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async changeFeedVisibility(
+    request: ChangeFeedVisibilityRequest & {
+      feed_group_id: string;
+      feed_id: string;
+    },
+  ): Promise<StreamResponse<ChangeFeedVisibilityResponse>> {
+    const pathParams = {
+      feed_group_id: request?.feed_group_id,
+      feed_id: request?.feed_id,
+    };
+    const body = {
+      visibility: request?.visibility,
+      pending_follows_action: request?.pending_follows_action,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ChangeFeedVisibilityResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/change_visibility',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.ChangeFeedVisibilityResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

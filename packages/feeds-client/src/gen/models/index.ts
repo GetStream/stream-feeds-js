@@ -156,6 +156,11 @@ export interface ActionLogResponse {
   reason: string;
 
   /**
+   * Classification of who triggered the action (e.g. user, moderator, automod, api_integration)
+   */
+  reporter_type: string;
+
+  /**
    * ID of the user who was the target of the action
    */
   target_user_id: string;
@@ -322,6 +327,10 @@ export interface ActivityFeedbackResponse {
   activity_id: string;
 
   duration: string;
+}
+
+export interface ActivityFilterConfig {
+  exclude_owner_activities: boolean;
 }
 
 export interface ActivityMarkEvent {
@@ -1571,24 +1580,6 @@ export interface Attachment {
   giphy?: Images;
 }
 
-export interface AudioSettingsResponse {
-  access_request_enabled: boolean;
-
-  default_device: string;
-
-  hifi_audio_enabled: boolean;
-
-  mic_default_on: boolean;
-
-  opus_dtx_enabled: boolean;
-
-  redundant_coding_enabled: boolean;
-
-  speaker_default_on: boolean;
-
-  noise_cancellation?: NoiseCancellationSettings;
-}
-
 export interface AutomodPlatformCircumventionConfig {
   enabled: boolean;
 
@@ -1639,12 +1630,6 @@ export interface AutomodToxicityConfig {
   rules: AutomodRule[];
 
   async?: boolean;
-}
-
-export interface BackstageSettingsResponse {
-  enabled: boolean;
-
-  join_ahead_time_seconds?: number;
 }
 
 export interface BanActionRequestPayload {
@@ -1902,8 +1887,15 @@ export interface BlockedUserResponse {
   user: UserResponse;
 }
 
+export interface BodyguardProfileSummary {
+  name: string;
+
+  display_name?: string;
+}
+
 export interface BodyguardRule {
   action:
+    | 'keep'
     | 'flag'
     | 'shadow'
     | 'remove'
@@ -2094,12 +2086,36 @@ export interface BookmarkUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface BroadcastSettingsResponse {
-  enabled: boolean;
+export interface BulkDeleteActionConfigRequest {
+  /**
+   * UUIDs of the action configs to delete
+   */
+  ids: string[];
+}
 
-  hls: HLSSettingsResponse;
+export interface BulkDeleteActionConfigResponse {
+  /**
+   * Number of action configs deleted
+   */
+  deleted: number;
 
-  rtmp: RTMPSettingsResponse;
+  duration: string;
+}
+
+export interface BulkUpsertActionConfigRequest {
+  /**
+   * List of action configs to create or update
+   */
+  action_configs: UpsertActionConfigItem[];
+}
+
+export interface BulkUpsertActionConfigResponse {
+  duration: string;
+
+  /**
+   * The created or updated action configs in the same order as the request
+   */
+  action_configs: ModerationActionConfigResponse[];
 }
 
 export interface BypassActionRequest {
@@ -2128,30 +2144,14 @@ export interface CallCustomPropertyParameters {
   property_key?: string;
 }
 
-export interface CallIngressResponse {
-  rtmp: RTMPIngress;
-
-  srt: SRTIngress;
-
-  whip: WHIPIngress;
-}
-
-export interface CallParticipantResponse {
-  role: string;
-
-  user_session_id: string;
-
-  joined_at: Timestamp;
-
-  user: UserResponse;
-}
-
 export interface CallResponse {
   backstage: boolean;
 
   captioning: boolean;
 
   cid: string;
+
+  created_at: Date;
 
   current_session_id: string;
 
@@ -2165,37 +2165,25 @@ export interface CallResponse {
 
   type: string;
 
+  updated_at: Date;
+
   blocked_user_ids: string[];
-
-  created_at: Timestamp;
-
-  created_by: UserResponse;
 
   custom: Record<string, any>;
 
-  egress: EgressResponse;
-
-  ingress: CallIngressResponse;
-
-  settings: CallSettingsResponse;
-
-  updated_at: Timestamp;
-
   channel_cid?: string;
+
+  ended_at?: Date;
 
   join_ahead_time_seconds?: number;
 
   routing_number?: string;
 
+  starts_at?: Date;
+
   team?: string;
 
-  ended_at?: Timestamp;
-
-  session?: CallSessionResponse;
-
-  starts_at?: Timestamp;
-
-  thumbnails?: ThumbnailResponse;
+  created_by?: UserResponse;
 }
 
 export interface CallRuleActionSequence {
@@ -2204,66 +2192,6 @@ export interface CallRuleActionSequence {
   actions?: string[];
 
   call_options?: CallActionOptions;
-}
-
-export interface CallSessionResponse {
-  anonymous_participant_count: number;
-
-  id: string;
-
-  participants: CallParticipantResponse[];
-
-  accepted_by: Record<string, Timestamp>;
-
-  missed_by: Record<string, Timestamp>;
-
-  participants_count_by_role: Record<string, number>;
-
-  rejected_by: Record<string, Timestamp>;
-
-  ended_at?: Timestamp;
-
-  live_ended_at?: Timestamp;
-
-  live_started_at?: Timestamp;
-
-  started_at?: Timestamp;
-
-  timer_ends_at?: Timestamp;
-}
-
-export interface CallSettingsResponse {
-  audio: AudioSettingsResponse;
-
-  backstage: BackstageSettingsResponse;
-
-  broadcasting: BroadcastSettingsResponse;
-
-  frame_recording: FrameRecordingSettingsResponse;
-
-  geofencing: GeofenceSettingsResponse;
-
-  individual_recording: IndividualRecordingSettingsResponse;
-
-  limits: LimitsSettingsResponse;
-
-  raw_recording: RawRecordingSettingsResponse;
-
-  recording: RecordSettingsResponse;
-
-  ring: RingSettingsResponse;
-
-  screensharing: ScreensharingSettingsResponse;
-
-  session: SessionSettingsResponse;
-
-  thumbnails: ThumbnailsSettingsResponse;
-
-  transcription: TranscriptionSettingsResponse;
-
-  video: VideoSettingsResponse;
-
-  ingress?: IngressSettingsResponse;
 }
 
 export interface CallTypeRuleParameters {
@@ -2278,6 +2206,26 @@ export interface CallViolationCountParameters {
 
 export interface CastPollVoteRequest {
   vote?: VoteData;
+}
+
+export interface ChangeFeedVisibilityRequest {
+  /**
+   * Feed visibility level: public, visible, followers, members, or private
+   */
+
+  visibility: 'public' | 'visible' | 'followers' | 'members' | 'private';
+
+  /**
+   * What to do with existing pending follows when loosening visibility from 'followers': auto_approve (default) or reject
+   */
+
+  pending_follows_action?: 'auto_approve' | 'reject';
+}
+
+export interface ChangeFeedVisibilityResponse {
+  duration: string;
+
+  feed: FeedResponse;
 }
 
 export interface ChannelConfigWithInfo {
@@ -2429,6 +2377,12 @@ export interface ChannelMemberResponse {
   deleted_messages?: string[];
 
   user?: UserResponse;
+}
+
+export interface ChannelMessageCountRuleParameters {
+  operator?: string;
+
+  threshold?: number;
 }
 
 export interface ChannelMute {
@@ -2633,6 +2587,164 @@ export interface ChannelResponse {
   truncated_by?: UserResponse;
 }
 
+export interface ChatDraftPayloadResponse {
+  id: string;
+
+  text: string;
+
+  custom: Record<string, any>;
+
+  html?: string;
+
+  mml?: string;
+
+  parent_id?: string;
+
+  poll_id?: string;
+
+  quoted_message_id?: string;
+
+  show_in_channel?: boolean;
+
+  silent?: boolean;
+
+  type?: string;
+
+  attachments?: Attachment[];
+
+  mentioned_users?: UserResponse[];
+}
+
+export interface ChatDraftResponse {
+  channel_cid: string;
+
+  created_at: Date;
+
+  message: ChatDraftPayloadResponse;
+
+  parent_id?: string;
+
+  parent_message?: ChatMessageResponse;
+
+  quoted_message?: ChatMessageResponse;
+}
+
+export interface ChatMessageResponse {
+  cid: string;
+
+  created_at: Date;
+
+  deleted_reply_count: number;
+
+  html: string;
+
+  id: string;
+
+  mentioned_channel: boolean;
+
+  mentioned_here: boolean;
+
+  pinned: boolean;
+
+  reply_count: number;
+
+  shadowed: boolean;
+
+  silent: boolean;
+
+  text: string;
+
+  type: string;
+
+  updated_at: Date;
+
+  attachments: Attachment[];
+
+  latest_reactions: ChatReactionResponse[];
+
+  mentioned_users: UserResponse[];
+
+  own_reactions: ChatReactionResponse[];
+
+  restricted_visibility: string[];
+
+  custom: Record<string, any>;
+
+  reaction_counts: Record<string, number>;
+
+  reaction_scores: Record<string, number>;
+
+  user: UserResponse;
+
+  command?: string;
+
+  deleted_at?: Date;
+
+  deleted_for_me?: boolean;
+
+  message_text_updated_at?: Date;
+
+  mml?: string;
+
+  parent_id?: string;
+
+  pin_expires?: Date;
+
+  pinned_at?: Date;
+
+  poll_id?: string;
+
+  quoted_message_id?: string;
+
+  show_in_channel?: boolean;
+
+  mentioned_group_ids?: string[];
+
+  mentioned_roles?: string[];
+
+  thread_participants?: UserResponse[];
+
+  draft?: ChatDraftResponse;
+
+  i18n?: Record<string, string>;
+
+  image_labels?: Record<string, string[]>;
+
+  member?: ChannelMemberResponse;
+
+  moderation?: ChatModerationV2Response;
+
+  pinned_by?: UserResponse;
+
+  poll?: PollResponseData;
+
+  quoted_message?: ChatMessageResponse;
+
+  reaction_groups?: Record<string, ChatReactionGroupResponse>;
+
+  reminder?: ChatReminderResponseData;
+
+  shared_location?: ChatSharedLocationResponseData;
+}
+
+export interface ChatModerationV2Response {
+  action: string;
+
+  original_text: string;
+
+  blocklist_matched?: string;
+
+  platform_circumvented?: boolean;
+
+  semantic_filter_matched?: string;
+
+  blocklists_matched?: string[];
+
+  image_harms?: string[];
+
+  text_harms?: string[];
+}
+
 export interface ChatPreferences {
   channel_mentions?: string;
 
@@ -2681,6 +2793,84 @@ export interface ChatPreferencesResponse {
   role_mentions?: string;
 
   thread_replies?: string;
+}
+
+export interface ChatReactionGroupResponse {
+  count: number;
+
+  first_reaction_at: Date;
+
+  last_reaction_at: Date;
+
+  sum_scores: number;
+
+  latest_reactions_by: ChatReactionGroupUserResponse[];
+}
+
+export interface ChatReactionGroupUserResponse {
+  created_at: Date;
+
+  user_id: string;
+
+  user?: UserResponse;
+}
+
+export interface ChatReactionResponse {
+  created_at: Date;
+
+  message_id: string;
+
+  score: number;
+
+  type: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  custom: Record<string, any>;
+
+  user: UserResponse;
+}
+
+export interface ChatReminderResponseData {
+  channel_cid: string;
+
+  created_at: Date;
+
+  message_id: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  remind_at?: Date;
+
+  message?: ChatMessageResponse;
+
+  user?: UserResponse;
+}
+
+export interface ChatSharedLocationResponseData {
+  channel_cid: string;
+
+  created_at: Date;
+
+  created_by_device_id: string;
+
+  latitude: number;
+
+  longitude: number;
+
+  message_id: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  end_at?: Date;
+
+  message?: ChatMessageResponse;
 }
 
 export interface ClosedCaptionRuleParameters {
@@ -3074,10 +3264,6 @@ export interface CommentUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
-export interface CompositeRecordingResponse {
-  status: string;
-}
-
 export interface ConfigResponse {
   /**
    * Whether moderation should be performed asynchronously
@@ -3110,6 +3296,11 @@ export interface ConfigResponse {
    * Configurable image moderation label definitions for dashboard rendering
    */
   ai_image_label_definitions?: AIImageLabelDefinition[];
+
+  /**
+   * Names of Bodyguard credential profiles registered on this app. The dashboard uses this list to render the profile picker on the AI Text section.
+   */
+  available_bodyguard_profiles?: BodyguardProfileSummary[];
 
   ai_image_config?: AIImageConfig;
 
@@ -3388,6 +3579,15 @@ export interface DecayFunctionConfig {
   origin?: string;
 
   scale?: string;
+}
+
+export interface DeleteActionConfigResponse {
+  /**
+   * Number of action configs deleted (0 or 1)
+   */
+  deleted: number;
+
+  duration: string;
 }
 
 export interface DeleteActivitiesRequest {
@@ -3725,38 +3925,6 @@ export interface DraftResponse {
   quoted_message?: MessageResponse;
 }
 
-export interface EgressHLSResponse {
-  playlist_url: string;
-
-  status: string;
-}
-
-export interface EgressRTMPResponse {
-  name: string;
-
-  started_at: Timestamp;
-
-  stream_key?: string;
-
-  stream_url?: string;
-}
-
-export interface EgressResponse {
-  broadcasting: boolean;
-
-  rtmps: EgressRTMPResponse[];
-
-  composite_recording?: CompositeRecordingResponse;
-
-  frame_recording?: FrameRecordingResponse;
-
-  hls?: EgressHLSResponse;
-
-  individual_recording?: IndividualRecordingResponse;
-
-  raw_recording?: RawRecordingResponse;
-}
-
 export interface EnrichedActivity {
   foreign_id?: string;
 
@@ -3781,22 +3949,6 @@ export interface EnrichedActivity {
   reaction_counts?: Record<string, number>;
 
   target?: Data;
-}
-
-export interface EnrichedCollection {
-  created_at: Date;
-
-  id: string;
-
-  name: string;
-
-  status: string;
-
-  updated_at: Date;
-
-  user_id: string;
-
-  custom: Record<string, any>;
 }
 
 export interface EnrichedCollectionResponse {
@@ -3870,6 +4022,11 @@ export interface EnrichmentOptions {
    * Default: false. When true, includes fetching and enriching own_followings (follows where activity author's feeds follow current user's feeds).
    */
   enrich_own_followings?: boolean;
+
+  /**
+   * Controls the top-level flat 'activities' array for aggregated feeds. For new apps, defaults to false (excluded); set to true to include. For older apps, defaults to true (included) for backward compatibility; set to false to exclude.
+   */
+  include_flat_activities?: boolean;
 
   /**
    * Default: false. When true, includes score_vars in activity responses containing variable values used at ranking time.
@@ -4110,6 +4267,8 @@ export interface FeedGroup {
   deleted_at?: Date;
 
   last_feed_get_at?: Date;
+
+  activity_filter?: ActivityFilterConfig;
 
   aggregation?: AggregationConfig;
 
@@ -4686,6 +4845,140 @@ export interface FeedUpdatedEvent {
   user?: UserResponseCommonFields;
 }
 
+export interface FeedsActivityLocation {
+  lat: number;
+
+  lng: number;
+}
+
+export interface FeedsBookmarkResponse {
+  created_at: Date;
+
+  object_id: string;
+
+  object_type: string;
+
+  updated_at: Date;
+
+  user: UserResponse;
+
+  activity_id?: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface FeedsEnrichedCollectionResponse {
+  created_at: Date;
+
+  id: string;
+
+  name: string;
+
+  status: string;
+
+  updated_at: Date;
+
+  user_id: string;
+
+  custom: Record<string, any>;
+}
+
+export interface FeedsFeedResponse {
+  activity_count: number;
+
+  created_at: Date;
+
+  description: string;
+
+  feed: string;
+
+  follower_count: number;
+
+  following_count: number;
+
+  group_id: string;
+
+  id: string;
+
+  member_count: number;
+
+  name: string;
+
+  pin_count: number;
+
+  updated_at: Date;
+
+  created_by: UserResponse;
+
+  deleted_at?: Date;
+
+  visibility?: string;
+
+  filter_tags?: string[];
+
+  custom?: Record<string, any>;
+
+  location?: FeedsActivityLocation;
+}
+
+export interface FeedsNotificationComment {
+  comment: string;
+
+  id: string;
+
+  user_id: string;
+
+  attachments?: Attachment[];
+}
+
+export interface FeedsNotificationContext {
+  target?: FeedsNotificationTarget;
+
+  trigger?: FeedsNotificationTrigger;
+}
+
+export interface FeedsNotificationParentActivity {
+  id: string;
+
+  text?: string;
+
+  type?: string;
+
+  user_id?: string;
+
+  attachments?: Attachment[];
+}
+
+export interface FeedsNotificationTarget {
+  id: string;
+
+  name?: string;
+
+  text?: string;
+
+  type?: string;
+
+  user_id?: string;
+
+  attachments?: Attachment[];
+
+  comment?: FeedsNotificationComment;
+
+  custom?: Record<string, any>;
+
+  parent_activity?: FeedsNotificationParentActivity;
+}
+
+export interface FeedsNotificationTrigger {
+  text: string;
+
+  type: string;
+
+  comment?: FeedsNotificationComment;
+
+  custom?: Record<string, any>;
+}
+
 export interface FeedsPreferences {
   /**
    * Push notification preference for comments on user's activities. One of: all, none
@@ -4753,62 +5046,27 @@ export interface FeedsPreferencesResponse {
   custom_activity_types?: Record<string, string>;
 }
 
-export interface FeedsReactionGroup {
-  count: number;
-
-  first_reaction_at: Date;
-
-  last_reaction_at: Date;
-}
-
 export interface FeedsReactionGroupResponse {
-  /**
-   * Number of reactions in this group
-   */
   count: number;
 
-  /**
-   * Time of the first reaction
-   */
   first_reaction_at: Date;
 
-  /**
-   * Time of the most recent reaction
-   */
   last_reaction_at: Date;
 }
 
 export interface FeedsReactionResponse {
-  /**
-   * ID of the activity that was reacted to
-   */
   activity_id: string;
 
-  /**
-   * When the reaction was created
-   */
   created_at: Date;
 
-  /**
-   * Type of reaction
-   */
   type: string;
 
-  /**
-   * When the reaction was last updated
-   */
   updated_at: Date;
 
   user: UserResponse;
 
-  /**
-   * ID of the comment that was reacted to
-   */
   comment_id?: string;
 
-  /**
-   * Custom data for the reaction
-   */
   custom?: Record<string, any>;
 }
 
@@ -4851,19 +5109,19 @@ export interface FeedsV3ActivityResponse {
 
   interest_tags: string[];
 
-  latest_reactions: any[];
+  latest_reactions: FeedsReactionResponse[];
 
   mentioned_users: UserResponse[];
 
-  own_bookmarks: any[];
+  own_bookmarks: FeedsBookmarkResponse[];
 
-  own_reactions: any[];
+  own_reactions: FeedsReactionResponse[];
 
-  collections: Record<string, EnrichedCollection>;
+  collections: Record<string, FeedsEnrichedCollectionResponse>;
 
   custom: Record<string, any>;
 
-  reaction_groups: Record<string, FeedsReactionGroup>;
+  reaction_groups: Record<string, FeedsReactionGroupResponse>;
 
   search_data: Record<string, any>;
 
@@ -4875,18 +5133,44 @@ export interface FeedsV3ActivityResponse {
 
   expires_at?: Date;
 
+  friend_reaction_count?: number;
+
+  is_read?: boolean;
+
+  is_seen?: boolean;
+
+  is_watched?: boolean;
+
   moderation_action?: string;
+
+  selector_source?: string;
 
   text?: string;
 
   visibility_tag?: string;
 
+  friend_reactions?: FeedsReactionResponse[];
+
+  current_feed?: FeedsFeedResponse;
+
+  location?: FeedsActivityLocation;
+
   metrics?: Record<string, number>;
 
   moderation?: ModerationV2Response;
+
+  notification_context?: FeedsNotificationContext;
+
+  parent?: FeedsV3ActivityResponse;
+
+  poll?: PollResponseData;
+
+  score_vars?: Record<string, any>;
 }
 
 export interface FeedsV3CommentResponse {
+  bookmark_count: number;
+
   confidence_score: number;
 
   created_at: Date;
@@ -4913,7 +5197,7 @@ export interface FeedsV3CommentResponse {
 
   mentioned_users: UserResponse[];
 
-  own_reactions: any[];
+  own_reactions: FeedsReactionResponse[];
 
   user: UserResponse;
 
@@ -4929,9 +5213,13 @@ export interface FeedsV3CommentResponse {
 
   attachments?: Attachment[];
 
+  latest_reactions?: FeedsReactionResponse[];
+
   custom?: Record<string, any>;
 
   moderation?: ModerationV2Response;
+
+  reaction_groups?: Record<string, FeedsReactionGroupResponse>;
 }
 
 export interface Field {
@@ -5223,18 +5511,6 @@ export interface FollowUpdatedEvent {
   received_at?: Date;
 }
 
-export interface FrameRecordingResponse {
-  status: string;
-}
-
-export interface FrameRecordingSettingsResponse {
-  capture_interval_in_seconds: number;
-
-  mode: string;
-
-  quality?: string;
-}
-
 export interface FriendReactionsOptions {
   /**
    * Default: false. When true, fetches friend reactions for activities.
@@ -5315,8 +5591,13 @@ export interface FullUserResponse {
   teams_role?: Record<string, string>;
 }
 
-export interface GeofenceSettingsResponse {
-  names: string[];
+export interface GetActionConfigResponse {
+  duration: string;
+
+  /**
+   * Moderation action configs grouped by entity type, sorted by order ascending
+   */
+  action_config: Record<string, ModerationActionConfigResponse[]>;
 }
 
 export interface GetActivityResponse {
@@ -5566,16 +5847,6 @@ export interface GoogleVisionConfig {
   enabled?: boolean;
 }
 
-export interface HLSSettingsResponse {
-  auto_on: boolean;
-
-  enabled: boolean;
-
-  quality_tracks: string[];
-
-  layout: LayoutSettingsResponse;
-}
-
 export interface HarmConfig {
   cooldown_period: number;
 
@@ -5699,58 +5970,6 @@ export interface Images {
   original: ImageData;
 }
 
-export interface IndividualRecordingResponse {
-  status: string;
-}
-
-export interface IndividualRecordingSettingsResponse {
-  mode: string;
-
-  output_types?: string[];
-}
-
-export interface IngressAudioEncodingResponse {
-  bitrate: number;
-
-  channels: number;
-
-  enable_dtx: boolean;
-}
-
-export interface IngressSettingsResponse {
-  enabled: boolean;
-
-  audio_encoding_options?: IngressAudioEncodingResponse;
-
-  video_encoding_options?: Record<string, IngressVideoEncodingResponse>;
-}
-
-export interface IngressSourceResponse {
-  fps: number;
-
-  height: number;
-
-  width: number;
-}
-
-export interface IngressVideoEncodingResponse {
-  layers: IngressVideoLayerResponse[];
-
-  source: IngressSourceResponse;
-}
-
-export interface IngressVideoLayerResponse {
-  bitrate: number;
-
-  codec: string;
-
-  frame_rate_limit: number;
-
-  max_dimension: number;
-
-  min_dimension: number;
-}
-
 export interface KeyframeRuleParameters {
   min_confidence?: number;
 
@@ -5798,28 +6017,6 @@ export interface LabelThresholds {
    * Threshold for automatic message flag
    */
   flag?: number;
-}
-
-export interface LayoutSettingsResponse {
-  external_app_url: string;
-
-  external_css_url: string;
-
-  name: string;
-
-  detect_orientation?: boolean;
-
-  options?: Record<string, any>;
-}
-
-export interface LimitsSettingsResponse {
-  max_participants_exclude_roles: string[];
-
-  max_duration_seconds?: number;
-
-  max_participants?: number;
-
-  max_participants_exclude_owner?: boolean;
 }
 
 export interface ListBlockListResponse {
@@ -6170,6 +6367,8 @@ export interface ModerationActionConfigResponse {
    */
   order: number;
 
+  id?: string;
+
   /**
    * Queue type this action config belongs to
    */
@@ -6347,10 +6546,6 @@ export interface MuteResponse {
   non_existing_users?: string[];
 
   own_user?: OwnUserResponse;
-}
-
-export interface NoiseCancellationSettings {
-  mode: string;
 }
 
 export interface NotificationComment {
@@ -7490,6 +7685,8 @@ export interface QueryPollsResponse {
 }
 
 export interface QueryReviewQueueRequest {
+  exclude_default_action_config?: boolean;
+
   limit?: number;
 
   /**
@@ -7549,6 +7746,8 @@ export interface QueryReviewQueueResponse {
 
   prev?: string;
 
+  default_action_config?: Record<string, ModerationActionConfigResponse[]>;
+
   filter_config?: FilterConfigResponse;
 }
 
@@ -7584,18 +7783,6 @@ export interface QueryUsersResponse {
   users: FullUserResponse[];
 }
 
-export interface RTMPIngress {
-  address: string;
-}
-
-export interface RTMPSettingsResponse {
-  enabled: boolean;
-
-  quality: string;
-
-  layout: LayoutSettingsResponse;
-}
-
 export interface RankingConfig {
   score?: string;
 
@@ -7604,14 +7791,6 @@ export interface RankingConfig {
   defaults?: Record<string, any>;
 
   functions?: Record<string, DecayFunctionConfig>;
-}
-
-export interface RawRecordingResponse {
-  status: string;
-}
-
-export interface RawRecordingSettingsResponse {
-  mode: string;
 }
 
 export interface Reaction {
@@ -7741,16 +7920,6 @@ export interface ReadCollectionsResponse {
 
 export interface ReadReceiptsResponse {
   enabled: boolean;
-}
-
-export interface RecordSettingsResponse {
-  audio_only: boolean;
-
-  mode: string;
-
-  quality: string;
-
-  layout: LayoutSettingsResponse;
 }
 
 export interface RejectAppealRequestPayload {
@@ -8007,19 +8176,11 @@ export interface ReviewQueueItemResponse {
 
   feeds_v3_comment?: FeedsV3CommentResponse;
 
-  message?: MessageResponse;
+  message?: ChatMessageResponse;
 
   moderation_payload?: ModerationPayloadResponse;
 
   reaction?: Reaction;
-}
-
-export interface RingSettingsResponse {
-  auto_cancel_timeout_ms: number;
-
-  incoming_call_timeout_ms: number;
-
-  missed_call_timeout_ms: number;
 }
 
 export interface RuleBuilderAction {
@@ -8061,6 +8222,8 @@ export interface RuleBuilderCondition {
   call_type_rule_params?: CallTypeRuleParameters;
 
   call_violation_count_params?: CallViolationCountParameters;
+
+  channel_message_count_rule_params?: ChannelMessageCountRuleParameters;
 
   closed_caption_rule_params?: ClosedCaptionRuleParameters;
 
@@ -8125,18 +8288,6 @@ export interface RuleBuilderRule {
   action?: RuleBuilderAction;
 }
 
-export interface SRTIngress {
-  address: string;
-}
-
-export interface ScreensharingSettingsResponse {
-  access_request_enabled: boolean;
-
-  enabled: boolean;
-
-  target_resolution?: TargetResolution;
-}
-
 export interface SearchUserGroupsResponse {
   duration: string;
 
@@ -8144,10 +8295,6 @@ export interface SearchUserGroupsResponse {
    * List of matching user groups
    */
   user_groups: UserGroupResponse[];
-}
-
-export interface SessionSettingsResponse {
-  inactivity_timeout_seconds: number;
 }
 
 export interface ShadowBlockActionRequestPayload {
@@ -8276,12 +8423,6 @@ export interface SortParamRequest {
   type?: string;
 }
 
-export interface SpeechSegmentConfig {
-  max_speech_caption_ms?: number;
-
-  silence_duration_ms?: number;
-}
-
 export interface StoriesConfig {
   skip_watched?: boolean;
 
@@ -8404,14 +8545,6 @@ export interface SubmitActionResponse {
   item?: ReviewQueueItemResponse;
 }
 
-export interface TargetResolution {
-  bitrate: number;
-
-  height: number;
-
-  width: number;
-}
-
 export interface TextContentParameters {
   contains_url?: boolean;
 
@@ -8519,19 +8652,7 @@ export interface Thresholds {
   toxic?: LabelThresholds;
 }
 
-export interface ThumbnailResponse {
-  image_url: string;
-}
-
-export interface ThumbnailsSettingsResponse {
-  enabled: boolean;
-}
-
 export interface Time {}
-
-export interface Timestamp {
-  time?: Date;
-}
 
 export interface TrackActivityMetricsEvent {
   /**
@@ -8586,24 +8707,6 @@ export interface TrackActivityMetricsResponse {
    * Results for each event in the request, in the same order
    */
   results: TrackActivityMetricsEventResult[];
-}
-
-export interface TranscriptionSettingsResponse {
-  closed_caption_mode: string;
-
-  language: string;
-
-  mode: string;
-
-  speech_segment_config?: SpeechSegmentConfig;
-
-  translation?: TranslationSettings;
-}
-
-export interface TranslationSettings {
-  enabled: boolean;
-
-  languages: string[];
 }
 
 export interface TypingIndicatorsResponse {
@@ -9353,6 +9456,72 @@ export interface UpdateUsersResponse {
   users: Record<string, FullUserResponse>;
 }
 
+export interface UpsertActionConfigItem {
+  action: string;
+
+  entity_type: string;
+
+  order: number;
+
+  description?: string;
+
+  icon?: string;
+
+  id?: string;
+
+  queue_type?: string;
+
+  custom?: Record<string, any>;
+}
+
+export interface UpsertActionConfigRequest {
+  /**
+   * The action to perform (e.g. ban, delete_message, custom)
+   */
+  action: string;
+
+  /**
+   * Type of entity this action applies to (e.g. stream:chat:v1:message)
+   */
+  entity_type: string;
+
+  /**
+   * Display order in the dashboard (0–100, lower numbers shown first)
+   */
+  order: number;
+
+  /**
+   * Human-readable label for the dashboard button
+   */
+  description?: string;
+
+  /**
+   * Icon identifier for the dashboard button
+   */
+  icon?: string;
+
+  /**
+   * UUID of an existing action config to update; omit to create a new record
+   */
+  id?: string;
+
+  /**
+   * Queue this config belongs to; null means the default queue
+   */
+  queue_type?: string;
+
+  /**
+   * Action-specific parameters passed to the action handler
+   */
+  custom?: Record<string, any>;
+}
+
+export interface UpsertActionConfigResponse {
+  duration: string;
+
+  action_config?: ModerationActionConfigResponse;
+}
+
 export interface UpsertActivitiesRequest {
   /**
    * List of activities to create or update
@@ -9963,26 +10132,10 @@ export interface VideoRuleParameters {
   harm_labels?: string[];
 }
 
-export interface VideoSettingsResponse {
-  access_request_enabled: boolean;
-
-  camera_default_on: boolean;
-
-  camera_facing: string;
-
-  enabled: boolean;
-
-  target_resolution: TargetResolution;
-}
-
 export interface VoteData {
   answer_text?: string;
 
   option_id?: string;
-}
-
-export interface WHIPIngress {
-  address: string;
 }
 
 export interface WSAuthMessage {
