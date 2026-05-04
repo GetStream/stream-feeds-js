@@ -2,6 +2,17 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.0.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.10.1...@stream-io/feeds-client-2.0.0) (2026-05-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* regenerate OpenAPI SDK with breaking model export changes (#281)
+
+### Features
+
+* regenerate OpenAPI SDK with breaking model export changes ([#281](https://github.com/GetStream/stream-feeds-js/issues/281)) ([ee7b3b7](https://github.com/GetStream/stream-feeds-js/commit/ee7b3b738d79cc729a95b5220150bfd2a6c66c19))
+
 ## [1.10.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.10.0...@stream-io/feeds-client-1.10.1) (2026-04-29)
 
 
