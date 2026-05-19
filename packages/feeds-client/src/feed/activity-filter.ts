@@ -52,8 +52,9 @@ export function activityFilter(
  *
  * For each group, individual activities that don't match the filter are removed.
  * A group is kept only if at least one activity matches; otherwise the whole
- * group is dropped. Server-aggregated metadata (`activity_count`, `user_count`,
- * `score`, etc.) is preserved as-is — only the `activities` array is trimmed.
+ * group is dropped. `activity_count` is decreased by the number of activities
+ * filtered out; other server-aggregated metadata (`user_count`, `score`, etc.)
+ * is preserved as-is.
  *
  * If `requestConfig` has no filter (or an empty filter), the input array is
  * returned as-is to preserve referential equality.
@@ -77,7 +78,12 @@ export function filterAggregatedActivities(
       activityFilter(activity, requestConfig),
     );
     if (matching.length > 0) {
-      result.push({ ...group, activities: matching });
+      const removed = group.activities.length - matching.length;
+      result.push({
+        ...group,
+        activities: matching,
+        activity_count: Math.max(0, group.activity_count - removed),
+      });
     }
   }
   return result;

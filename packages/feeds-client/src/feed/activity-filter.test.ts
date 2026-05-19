@@ -289,7 +289,7 @@ describe('filterAggregatedActivities', () => {
     expect(result[0].activities.map((a) => a.id)).toEqual(['a1']);
   });
 
-  it('preserves server-aggregated counts on the kept group', () => {
+  it('decreases activity_count by the number of filtered-out activities and preserves other server-aggregated counts', () => {
     const groups = [
       createMockAggregatedActivity({
         group: 'g1',
@@ -307,9 +307,48 @@ describe('filterAggregatedActivities', () => {
       filter: { filter_tags: ['blue'] },
     });
 
-    expect(result[0].activity_count).toBe(99);
+    expect(result[0].activity_count).toBe(98);
     expect(result[0].user_count).toBe(42);
     expect(result[0].score).toBe(7);
+  });
+
+  it('keeps activity_count unchanged when no activities are filtered out of a kept group', () => {
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g1',
+        activity_count: 5,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+          generateActivityResponse({ id: 'a2', filter_tags: ['blue'] }),
+        ],
+      }),
+    ];
+
+    const result = filterAggregatedActivities(groups, {
+      filter: { filter_tags: ['blue'] },
+    });
+
+    expect(result[0].activity_count).toBe(5);
+  });
+
+  it('floors activity_count at 0 if more activities are filtered out than the server-reported count', () => {
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g1',
+        activity_count: 1,
+        activities: [
+          generateActivityResponse({ id: 'a-match', filter_tags: ['blue'] }),
+          generateActivityResponse({ id: 'a-miss-1', filter_tags: ['red'] }),
+          generateActivityResponse({ id: 'a-miss-2', filter_tags: ['red'] }),
+        ],
+      }),
+    ];
+
+    const result = filterAggregatedActivities(groups, {
+      filter: { filter_tags: ['blue'] },
+    });
+
+    expect(result[0].activity_count).toBe(0);
   });
 
   it('does not mutate the input groups or their activity arrays', () => {
