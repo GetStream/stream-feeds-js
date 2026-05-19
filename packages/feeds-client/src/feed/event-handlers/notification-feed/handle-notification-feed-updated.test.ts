@@ -730,7 +730,7 @@ describe('notification-feed-utils', () => {
       expect(result.data?.notification_status?.unseen).toBe(4);
     });
 
-    it('falls back to the event value as base when currentNotificationStatus is undefined', () => {
+    it('copies event notification_status verbatim when currentNotificationStatus is undefined (no base for delta)', () => {
       const newGroup = createMockAggregatedActivity({
         group: 'g-new',
         is_read: false,
@@ -755,8 +755,8 @@ describe('notification-feed-utils', () => {
         filteredConfig,
       );
 
-      expect(result.data?.notification_status?.unread).toBe(6);
-      expect(result.data?.notification_status?.unseen).toBe(6);
+      expect(result.data?.notification_status?.unread).toBe(5);
+      expect(result.data?.notification_status?.unseen).toBe(5);
     });
 
     it('keeps current unread/unseen when neither aggregated_activities nor flags change', () => {

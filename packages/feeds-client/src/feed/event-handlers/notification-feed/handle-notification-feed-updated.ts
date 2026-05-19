@@ -140,7 +140,7 @@ export const updateNotificationFeedFromEvent = (
       !!filter && typeof filter === 'object' && Object.keys(filter).length > 0;
     const isAggregatedFeed = currentAggregatedActivities !== undefined;
 
-    if (hasFilter && isAggregatedFeed) {
+    if (hasFilter && isAggregatedFeed && currentNotificationStatus) {
       const finalAggregated =
         updates.aggregated_activities ?? currentAggregatedActivities ?? [];
       const before = currentAggregatedActivities ?? [];
@@ -154,7 +154,7 @@ export const updateNotificationFeedFromEvent = (
           ? 0
           : Math.max(
               0,
-              (currentNotificationStatus?.unread ?? eventUnread) +
+              currentNotificationStatus.unread +
                 (countGroupsWithFlag(finalAggregated, 'is_read', false) -
                   countGroupsWithFlag(before, 'is_read', false)),
             );
@@ -163,7 +163,7 @@ export const updateNotificationFeedFromEvent = (
           ? 0
           : Math.max(
               0,
-              (currentNotificationStatus?.unseen ?? eventUnseen) +
+              currentNotificationStatus.unseen +
                 (countGroupsWithFlag(finalAggregated, 'is_seen', false) -
                   countGroupsWithFlag(before, 'is_seen', false)),
             );
