@@ -2,7 +2,7 @@
   "name": "@stream-io/feeds-js-root",
   "description": "Stream Feeds JS SDKs",
   "author": "https://getstream.io",
-  "packageManager": "yarn@4.12.0",
+  "packageManager": "yarn@4.14.1",
   "private": true,
   "license": "See license in LICENSE",
   "workspaces": [
@@ -58,5 +58,22 @@
     "typescript-eslint": "^8.57.0",
     "vercel": "^50.32.3",
     "vite": "^8.0.0"
+  },
+  "dependenciesMeta": {
+    "@firebase/util": {
+      "built": true
+    },
+    "@sentry/cli": {
+      "built": true
+    },
+    "nx": {
+      "built": true
+    },
+    "sharp": {
+      "built": true
+    },
+    "unrs-resolver": {
+      "built": true
+    }
   }
 }

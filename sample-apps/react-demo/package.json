@@ -14,7 +14,7 @@
     "@stream-io/node-sdk": "catalog:",
     "date-fns": "^4.1.0",
     "material-symbols": "^0.40.2",
-    "next": "16",
+    "next": "^16.2.6",
     "react": "catalog:",
     "react-dom": "catalog:",
     "unique-username-generator": "^1.5.1"
