@@ -379,6 +379,147 @@ describe('notification-feed-utils', () => {
       expect(groups?.every((g) => g.is_seen === true)).toBe(true);
     });
   });
+
+  describe('aggregated_activities filtering by requestConfig', () => {
+    it('drops groups whose activities do not match the filter', () => {
+      const matchingGroup = createMockAggregatedActivity({
+        group: 'g-match',
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        ],
+      });
+      const missingGroup = createMockAggregatedActivity({
+        group: 'g-miss',
+        activities: [
+          generateActivityResponse({ id: 'a2', filter_tags: ['red'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [matchingGroup, missingGroup],
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        undefined,
+        undefined,
+        { filter: { filter_tags: ['blue'] } },
+      );
+
+      expect(result.changed).toBe(true);
+      expect(result.data?.aggregated_activities?.map((g) => g.group)).toEqual([
+        'g-match',
+      ]);
+    });
+
+    it('keeps a group but trims its activities to only those matching the filter', () => {
+      const group = createMockAggregatedActivity({
+        group: 'g1',
+        activities: [
+          generateActivityResponse({ id: 'a-match', filter_tags: ['blue'] }),
+          generateActivityResponse({ id: 'a-miss', filter_tags: ['red'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [group],
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        undefined,
+        undefined,
+        { filter: { filter_tags: ['blue'] } },
+      );
+
+      const merged = result.data?.aggregated_activities;
+      expect(merged).toHaveLength(1);
+      expect(merged?.[0].activities.map((a) => a.id)).toEqual(['a-match']);
+    });
+
+    it('passes aggregated_activities through unchanged when requestConfig has no filter', () => {
+      const group = createMockAggregatedActivity({
+        group: 'g1',
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['red'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [group],
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        undefined,
+        undefined,
+        { limit: 10 },
+      );
+
+      expect(result.data?.aggregated_activities).toHaveLength(1);
+      expect(result.data?.aggregated_activities?.[0].group).toBe('g1');
+    });
+
+    it('applies activity_type filter to event groups', () => {
+      const group = createMockAggregatedActivity({
+        group: 'g1',
+        activities: [
+          generateActivityResponse({ id: 'a1', type: 'hike' }),
+          generateActivityResponse({ id: 'a2', type: 'post' }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [group],
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        undefined,
+        undefined,
+        { filter: { activity_type: 'hike' } },
+      );
+
+      const merged = result.data?.aggregated_activities;
+      expect(merged).toHaveLength(1);
+      expect(merged?.[0].activities.map((a) => a.id)).toEqual(['a1']);
+    });
+
+    it('replaces an existing group with its filtered version (replace-then-start merge)', () => {
+      const existingGroup = createMockAggregatedActivity({
+        group: 'g1',
+        activities: [
+          generateActivityResponse({ id: 'a-old', filter_tags: ['blue'] }),
+        ],
+      });
+      const incomingGroup = createMockAggregatedActivity({
+        group: 'g1',
+        activities: [
+          generateActivityResponse({
+            id: 'a-new-match',
+            filter_tags: ['blue'],
+          }),
+          generateActivityResponse({ id: 'a-new-miss', filter_tags: ['red'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [incomingGroup],
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [existingGroup],
+        undefined,
+        undefined,
+        { filter: { filter_tags: ['blue'] } },
+      );
+
+      const merged = result.data?.aggregated_activities;
+      expect(merged).toHaveLength(1);
+      expect(merged?.[0].group).toBe('g1');
+      expect(merged?.[0].activities.map((a) => a.id)).toEqual(['a-new-match']);
+    });
+  });
 });
 
 describe(handleNotificationFeedUpdated.name, () => {
@@ -402,6 +543,43 @@ describe(handleNotificationFeedUpdated.name, () => {
       feedResponse.id,
       feedResponse,
     );
+  });
+
+  it('drops event groups that do not match the feed-level filter stored in last_get_or_create_request_config', () => {
+    const matchingGroup = createMockAggregatedActivity({
+      group: 'g-match',
+      activities: [
+        generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        generateActivityResponse({ id: 'a2', filter_tags: ['red'] }),
+      ],
+    });
+    const missingGroup = createMockAggregatedActivity({
+      group: 'g-miss',
+      activities: [
+        generateActivityResponse({ id: 'a3', filter_tags: ['red'] }),
+      ],
+    });
+
+    feed.state.partialNext({
+      aggregated_activities: [],
+      last_get_or_create_request_config: {
+        filter: { filter_tags: ['blue'] },
+      },
+    });
+
+    const event = createMockNotificationFeedUpdatedEvent({
+      aggregated_activities: [matchingGroup, missingGroup],
+    });
+
+    handleNotificationFeedUpdated.call(
+      feed,
+      event as Parameters<typeof handleNotificationFeedUpdated>[1],
+    );
+
+    const aggregated = feed.currentState.aggregated_activities;
+    expect(aggregated).toHaveLength(1);
+    expect(aggregated?.[0].group).toBe('g-match');
+    expect(aggregated?.[0].activities.map((a) => a.id)).toEqual(['a1']);
   });
 
   it('keeps aggregated_activities when a status-only event refreshes last_seen_at and groups are unchanged', () => {

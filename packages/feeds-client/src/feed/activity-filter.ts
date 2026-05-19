@@ -1,5 +1,9 @@
 import { itemMatchesFilter, resolveDotPathValue } from '@stream-io/filter';
-import type { ActivityResponse, GetOrCreateFeedRequest } from '../gen/models';
+import type {
+  ActivityResponse,
+  AggregatedActivityResponse,
+  GetOrCreateFeedRequest,
+} from '../gen/models';
 
 /**
  * Resolvers that map feed filter field names to activity properties.
@@ -41,4 +45,40 @@ export function activityFilter(
     resolvers: [...activityResolvers],
     arrayEqMode: 'contains',
   });
+}
+
+/**
+ * Applies the feed's getOrCreate filter to an array of aggregated activity groups.
+ *
+ * For each group, individual activities that don't match the filter are removed.
+ * A group is kept only if at least one activity matches; otherwise the whole
+ * group is dropped. Server-aggregated metadata (`activity_count`, `user_count`,
+ * `score`, etc.) is preserved as-is — only the `activities` array is trimmed.
+ *
+ * If `requestConfig` has no filter (or an empty filter), the input array is
+ * returned as-is to preserve referential equality.
+ */
+export function filterAggregatedActivities(
+  aggregatedActivities: AggregatedActivityResponse[],
+  requestConfig?: GetOrCreateFeedRequest,
+): AggregatedActivityResponse[] {
+  const filter = requestConfig?.filter;
+  if (
+    !filter ||
+    typeof filter !== 'object' ||
+    Object.keys(filter).length === 0
+  ) {
+    return aggregatedActivities;
+  }
+
+  const result: AggregatedActivityResponse[] = [];
+  for (const group of aggregatedActivities) {
+    const matching = group.activities.filter((activity) =>
+      activityFilter(activity, requestConfig),
+    );
+    if (matching.length > 0) {
+      result.push({ ...group, activities: matching });
+    }
+  }
+  return result;
 }

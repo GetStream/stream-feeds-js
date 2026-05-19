@@ -2,10 +2,12 @@ import type { Feed } from '../..';
 import type {
   ActivityResponse,
   AggregatedActivityResponse,
+  GetOrCreateFeedRequest,
   NotificationFeedUpdatedEvent,
   NotificationStatusResponse,
 } from '../../../gen/models';
 import type { EventPayload, UpdateStateResult } from '../../../types-internal';
+import { filterAggregatedActivities } from '../../activity-filter';
 import { addAggregatedActivitiesToState } from '../add-aggregated-activities-to-state';
 
 export const updateNotificationStatus = (
@@ -37,6 +39,7 @@ export const updateNotificationFeedFromEvent = (
   currentAggregatedActivities?: AggregatedActivityResponse[],
   currentNotificationStatus?: NotificationStatusResponse,
   currentActivities?: ActivityResponse[],
+  requestConfig?: GetOrCreateFeedRequest,
 ): UpdateStateResult<{
   data?: {
     notification_status?: NotificationStatusResponse;
@@ -119,8 +122,12 @@ export const updateNotificationFeedFromEvent = (
 
   // Leave this to the end, because notification_status may not be 100% accurate (only includes last 100 activities)
   if (event.aggregated_activities && currentAggregatedActivities) {
-    const aggregatedActivitiesResult = addAggregatedActivitiesToState(
+    const filteredAggregated = filterAggregatedActivities(
       event.aggregated_activities,
+      requestConfig,
+    );
+    const aggregatedActivitiesResult = addAggregatedActivitiesToState(
+      filteredAggregated,
       updates.aggregated_activities ?? currentAggregatedActivities,
       'replace-then-start',
     );
@@ -152,6 +159,7 @@ export function handleNotificationFeedUpdated(
     this.currentState.aggregated_activities,
     this.currentState.notification_status,
     this.currentState.activities,
+    this.currentState.last_get_or_create_request_config,
   );
   if (result.changed) {
     this.state.partialNext({

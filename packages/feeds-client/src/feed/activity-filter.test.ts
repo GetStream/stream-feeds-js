@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { activityFilter } from './activity-filter';
+import { activityFilter, filterAggregatedActivities } from './activity-filter';
 import type { GetOrCreateFeedRequest } from '../gen/models';
-import { generateActivityResponse } from '../test-utils';
+import {
+  createMockAggregatedActivity,
+  generateActivityResponse,
+} from '../test-utils';
 
 describe('activityFilter', () => {
   it('returns true when requestConfig is undefined', () => {
@@ -173,5 +176,160 @@ describe('activityFilter', () => {
         },
       }),
     ).toBe(false);
+  });
+});
+
+describe('filterAggregatedActivities', () => {
+  it('returns input unchanged when requestConfig is undefined', () => {
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g1',
+        activities: [generateActivityResponse({ filter_tags: ['blue'] })],
+      }),
+    ];
+    expect(filterAggregatedActivities(groups, undefined)).toBe(groups);
+  });
+
+  it('returns input unchanged when filter is empty', () => {
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g1',
+        activities: [generateActivityResponse({ filter_tags: ['blue'] })],
+      }),
+    ];
+    expect(filterAggregatedActivities(groups, { filter: {} })).toBe(groups);
+  });
+
+  it('keeps a group with only the matching activities', () => {
+    const matching = generateActivityResponse({
+      id: 'a-match',
+      filter_tags: ['blue'],
+    });
+    const notMatching = generateActivityResponse({
+      id: 'a-miss',
+      filter_tags: ['red'],
+    });
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g1',
+        activities: [matching, notMatching],
+      }),
+    ];
+
+    const result = filterAggregatedActivities(groups, {
+      filter: { filter_tags: ['blue'] },
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].group).toBe('g1');
+    expect(result[0].activities).toHaveLength(1);
+    expect(result[0].activities[0].id).toBe('a-match');
+  });
+
+  it('drops a group entirely when no activity matches the filter', () => {
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g1',
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['red'] }),
+          generateActivityResponse({ id: 'a2', filter_tags: ['green'] }),
+        ],
+      }),
+    ];
+
+    const result = filterAggregatedActivities(groups, {
+      filter: { filter_tags: ['blue'] },
+    });
+
+    expect(result).toHaveLength(0);
+  });
+
+  it('keeps groups that have at least one matching activity and drops groups with none', () => {
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g-match',
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+          generateActivityResponse({ id: 'a2', filter_tags: ['red'] }),
+        ],
+      }),
+      createMockAggregatedActivity({
+        group: 'g-miss',
+        activities: [
+          generateActivityResponse({ id: 'a3', filter_tags: ['red'] }),
+        ],
+      }),
+    ];
+
+    const result = filterAggregatedActivities(groups, {
+      filter: { filter_tags: ['blue'] },
+    });
+
+    expect(result.map((g) => g.group)).toEqual(['g-match']);
+    expect(result[0].activities).toHaveLength(1);
+    expect(result[0].activities[0].id).toBe('a1');
+  });
+
+  it('applies activity_type filter to activities inside groups', () => {
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g1',
+        activities: [
+          generateActivityResponse({ id: 'a1', type: 'hike' }),
+          generateActivityResponse({ id: 'a2', type: 'post' }),
+        ],
+      }),
+    ];
+
+    const result = filterAggregatedActivities(groups, {
+      filter: { activity_type: 'hike' },
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].activities.map((a) => a.id)).toEqual(['a1']);
+  });
+
+  it('preserves server-aggregated counts on the kept group', () => {
+    const groups = [
+      createMockAggregatedActivity({
+        group: 'g1',
+        activity_count: 99,
+        user_count: 42,
+        score: 7,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+          generateActivityResponse({ id: 'a2', filter_tags: ['red'] }),
+        ],
+      }),
+    ];
+
+    const result = filterAggregatedActivities(groups, {
+      filter: { filter_tags: ['blue'] },
+    });
+
+    expect(result[0].activity_count).toBe(99);
+    expect(result[0].user_count).toBe(42);
+    expect(result[0].score).toBe(7);
+  });
+
+  it('does not mutate the input groups or their activity arrays', () => {
+    const matching = generateActivityResponse({
+      id: 'a-match',
+      filter_tags: ['blue'],
+    });
+    const notMatching = generateActivityResponse({
+      id: 'a-miss',
+      filter_tags: ['red'],
+    });
+    const group = createMockAggregatedActivity({
+      group: 'g1',
+      activities: [matching, notMatching],
+    });
+    const originalActivities = group.activities;
+
+    filterAggregatedActivities([group], { filter: { filter_tags: ['blue'] } });
+
+    expect(group.activities).toBe(originalActivities);
+    expect(group.activities).toHaveLength(2);
   });
 });
