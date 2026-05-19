@@ -1170,6 +1170,21 @@ export class FeedsClient extends FeedsApi {
     return response;
   }
 
+  async getOrCreateFollow(request: FollowRequest) {
+    const response = await super.getOrCreateFollow(request);
+
+    this.updateStateFromFollows([response.follow], !!request.enrich_own_fields);
+    this.checkIfOwnFieldsChanged(
+      response.follow.source_feed,
+      !!request.enrich_own_fields,
+    );
+    this.checkIfOwnFieldsChanged(
+      response.follow.target_feed,
+      !!request.enrich_own_fields,
+    );
+    return response;
+  }
+
   async unfollow(request: {
     source: string;
     target: string;
