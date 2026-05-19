@@ -34,6 +34,12 @@ export const updateNotificationStatus = (
   }
 };
 
+const countGroupsWithFlag = (
+  groups: AggregatedActivityResponse[],
+  flag: 'is_read' | 'is_seen',
+  value: boolean,
+) => groups.reduce((n, g) => (g[flag] === value ? n + 1 : n), 0);
+
 export const updateNotificationFeedFromEvent = (
   event: NotificationFeedUpdatedEvent,
   currentAggregatedActivities?: AggregatedActivityResponse[],
@@ -52,18 +58,6 @@ export const updateNotificationFeedFromEvent = (
     aggregated_activities?: AggregatedActivityResponse[];
     activities?: ActivityResponse[];
   } = {};
-
-  if (event.notification_status) {
-    const notificationStatusResult = updateNotificationStatus(
-      event.notification_status,
-      currentNotificationStatus,
-    );
-
-    if (notificationStatusResult.changed) {
-      updates.notification_status =
-        notificationStatusResult.notification_status;
-    }
-  }
 
   // Determine effective notification status (prefer new from event, fall back to current)
   const effectiveStatus =
@@ -120,7 +114,6 @@ export const updateNotificationFeedFromEvent = (
     }
   }
 
-  // Leave this to the end, because notification_status may not be 100% accurate (only includes last 100 activities)
   if (event.aggregated_activities && currentAggregatedActivities) {
     const filteredAggregated = filterAggregatedActivities(
       event.aggregated_activities,
@@ -135,6 +128,61 @@ export const updateNotificationFeedFromEvent = (
     if (aggregatedActivitiesResult.changed) {
       updates.aggregated_activities =
         aggregatedActivitiesResult.aggregated_activities;
+    }
+  }
+
+  // Update notification_status. For filtered aggregated feeds, derive unread/unseen
+  // by delta from aggregated_activities changes — the server's counts are computed
+  // across all groups regardless of client-side filtering.
+  if (event.notification_status) {
+    const filter = requestConfig?.filter;
+    const hasFilter =
+      !!filter && typeof filter === 'object' && Object.keys(filter).length > 0;
+    const isAggregatedFeed = currentAggregatedActivities !== undefined;
+
+    if (hasFilter && isAggregatedFeed) {
+      const finalAggregated =
+        updates.aggregated_activities ?? currentAggregatedActivities ?? [];
+      const before = currentAggregatedActivities ?? [];
+
+      const eventUnread = event.notification_status.unread;
+      const eventUnseen = event.notification_status.unseen;
+
+      // Server-side 0 → filtered count is also 0 (filtering can only remove groups).
+      const unread =
+        eventUnread === 0
+          ? 0
+          : Math.max(
+              0,
+              (currentNotificationStatus?.unread ?? eventUnread) +
+                (countGroupsWithFlag(finalAggregated, 'is_read', false) -
+                  countGroupsWithFlag(before, 'is_read', false)),
+            );
+      const unseen =
+        eventUnseen === 0
+          ? 0
+          : Math.max(
+              0,
+              (currentNotificationStatus?.unseen ?? eventUnseen) +
+                (countGroupsWithFlag(finalAggregated, 'is_seen', false) -
+                  countGroupsWithFlag(before, 'is_seen', false)),
+            );
+
+      updates.notification_status = {
+        ...event.notification_status,
+        unread,
+        unseen,
+      };
+    } else {
+      const notificationStatusResult = updateNotificationStatus(
+        event.notification_status,
+        currentNotificationStatus,
+      );
+
+      if (notificationStatusResult.changed) {
+        updates.notification_status =
+          notificationStatusResult.notification_status;
+      }
     }
   }
 

@@ -520,6 +520,314 @@ describe('notification-feed-utils', () => {
       expect(merged?.[0].activities.map((a) => a.id)).toEqual(['a-new-match']);
     });
   });
+
+  describe('notification_status delta logic for filtered aggregated feeds', () => {
+    const filteredConfig = { filter: { filter_tags: ['blue'] } };
+
+    it('increments unread/unseen by 1 when a filter-matching unread group is added', () => {
+      const newGroup = createMockAggregatedActivity({
+        group: 'g-new',
+        is_read: false,
+        is_seen: false,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [newGroup],
+        notification_status: createMockNotificationStatus({
+          unread: 5,
+          unseen: 5,
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        createMockNotificationStatus({ unread: 3, unseen: 3 }),
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(4);
+      expect(result.data?.notification_status?.unseen).toBe(4);
+    });
+
+    it('keeps unread/unseen unchanged when a non-matching unread group is filtered out', () => {
+      const missingGroup = createMockAggregatedActivity({
+        group: 'g-miss',
+        is_read: false,
+        is_seen: false,
+        activities: [
+          generateActivityResponse({ id: 'a-miss', filter_tags: ['red'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [missingGroup],
+        notification_status: createMockNotificationStatus({
+          unread: 5,
+          unseen: 5,
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        createMockNotificationStatus({ unread: 3, unseen: 3 }),
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(3);
+      expect(result.data?.notification_status?.unseen).toBe(3);
+    });
+
+    it('decrements unread when last_read_at flips an existing group to read', () => {
+      const existingGroup = createMockAggregatedActivity({
+        group: 'g1',
+        updated_at: new Date('2023-01-01'),
+        is_read: false,
+        is_seen: false,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        notification_status: createMockNotificationStatus({
+          unread: 5,
+          unseen: 5,
+          last_read_at: new Date('2023-06-01'),
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [existingGroup],
+        createMockNotificationStatus({ unread: 3, unseen: 3 }),
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(2);
+      expect(result.data?.notification_status?.unseen).toBe(3);
+    });
+
+    it('copies last_read_at, last_seen_at, read_activities, seen_activities verbatim from the event', () => {
+      const lastReadAt = new Date('2023-06-01');
+      const lastSeenAt = new Date('2023-07-01');
+      const event = createMockNotificationFeedUpdatedEvent({
+        notification_status: createMockNotificationStatus({
+          unread: 5,
+          unseen: 5,
+          last_read_at: lastReadAt,
+          last_seen_at: lastSeenAt,
+          read_activities: ['g-read-1', 'g-read-2'],
+          seen_activities: ['g-seen-1'],
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        createMockNotificationStatus({ unread: 1, unseen: 1 }),
+        undefined,
+        filteredConfig,
+      );
+
+      const status = result.data?.notification_status;
+      expect(status?.last_read_at).toEqual(lastReadAt);
+      expect(status?.last_seen_at).toEqual(lastSeenAt);
+      expect(status?.read_activities).toEqual(['g-read-1', 'g-read-2']);
+      expect(status?.seen_activities).toEqual(['g-seen-1']);
+    });
+
+    it('clamps unread/unseen to 0 when the delta would push them negative', () => {
+      const existingGroup = createMockAggregatedActivity({
+        group: 'g1',
+        updated_at: new Date('2023-01-01'),
+        is_read: false,
+        is_seen: false,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        notification_status: createMockNotificationStatus({
+          unread: 1,
+          unseen: 1,
+          last_read_at: new Date('2023-06-01'),
+          last_seen_at: new Date('2023-06-01'),
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [existingGroup],
+        createMockNotificationStatus({ unread: 0, unseen: 0 }),
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(0);
+      expect(result.data?.notification_status?.unseen).toBe(0);
+    });
+
+    it('short-circuits to 0 when the event reports unread=0 or unseen=0', () => {
+      const newGroup = createMockAggregatedActivity({
+        group: 'g-new',
+        is_read: false,
+        is_seen: false,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [newGroup],
+        notification_status: createMockNotificationStatus({
+          unread: 0,
+          unseen: 0,
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        createMockNotificationStatus({ unread: 10, unseen: 10 }),
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(0);
+      expect(result.data?.notification_status?.unseen).toBe(0);
+    });
+
+    it('short-circuits unread and unseen independently', () => {
+      const newGroup = createMockAggregatedActivity({
+        group: 'g-new',
+        is_read: false,
+        is_seen: false,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [newGroup],
+        notification_status: createMockNotificationStatus({
+          unread: 0,
+          unseen: 5,
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        createMockNotificationStatus({ unread: 3, unseen: 3 }),
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(0);
+      expect(result.data?.notification_status?.unseen).toBe(4);
+    });
+
+    it('falls back to the event value as base when currentNotificationStatus is undefined', () => {
+      const newGroup = createMockAggregatedActivity({
+        group: 'g-new',
+        is_read: false,
+        is_seen: false,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [newGroup],
+        notification_status: createMockNotificationStatus({
+          unread: 5,
+          unseen: 5,
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        undefined,
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(6);
+      expect(result.data?.notification_status?.unseen).toBe(6);
+    });
+
+    it('keeps current unread/unseen when neither aggregated_activities nor flags change', () => {
+      const event = createMockNotificationFeedUpdatedEvent({
+        notification_status: createMockNotificationStatus({
+          unread: 99,
+          unseen: 99,
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        createMockNotificationStatus({ unread: 3, unseen: 3 }),
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(3);
+      expect(result.data?.notification_status?.unseen).toBe(3);
+    });
+
+    it('uses full copy (no delta) when the request has no filter', () => {
+      const newGroup = createMockAggregatedActivity({
+        group: 'g-new',
+        is_read: false,
+        is_seen: false,
+        activities: [
+          generateActivityResponse({ id: 'a1', filter_tags: ['blue'] }),
+        ],
+      });
+      const event = createMockNotificationFeedUpdatedEvent({
+        aggregated_activities: [newGroup],
+        notification_status: createMockNotificationStatus({
+          unread: 9,
+          unseen: 9,
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        [],
+        createMockNotificationStatus({ unread: 3, unseen: 3 }),
+        undefined,
+        { limit: 10 },
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(9);
+      expect(result.data?.notification_status?.unseen).toBe(9);
+    });
+
+    it('uses full copy (no delta) for a flat feed even when filter is active', () => {
+      const event = createMockNotificationFeedUpdatedEvent({
+        notification_status: createMockNotificationStatus({
+          unread: 9,
+          unseen: 9,
+        }),
+      });
+
+      const result = updateNotificationFeedFromEvent(
+        event,
+        undefined,
+        createMockNotificationStatus({ unread: 3, unseen: 3 }),
+        undefined,
+        filteredConfig,
+      );
+
+      expect(result.data?.notification_status?.unread).toBe(9);
+      expect(result.data?.notification_status?.unseen).toBe(9);
+    });
+  });
 });
 
 describe(handleNotificationFeedUpdated.name, () => {
