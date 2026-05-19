@@ -66,6 +66,9 @@ import type {
   GetOGResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
+  GetOrCreateFollowResponse,
+  GetOrCreateUnfollowRequest,
+  GetOrCreateUnfollowResponse,
   GetUserGroupResponse,
   ImageUploadRequest,
   ImageUploadResponse,
@@ -2246,6 +2249,37 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async getOrCreateFollow(
+    request: FollowRequest,
+  ): Promise<StreamResponse<GetOrCreateFollowResponse>> {
+    const body = {
+      source: request?.source,
+      target: request?.target,
+      activity_copy_limit: request?.activity_copy_limit,
+      copy_custom_to_notification: request?.copy_custom_to_notification,
+      create_notification_activity: request?.create_notification_activity,
+      enrich_own_fields: request?.enrich_own_fields,
+      push_preference: request?.push_preference,
+      skip_push: request?.skip_push,
+      custom: request?.custom,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetOrCreateFollowResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/follows/upsert',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.GetOrCreateFollowResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async unfollow(request: {
     source: string;
     target: string;
@@ -2298,6 +2332,33 @@ export class FeedsApi {
     );
 
     decoders.UnfollowBatchResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getOrCreateUnfollow(
+    request: GetOrCreateUnfollowRequest,
+  ): Promise<StreamResponse<GetOrCreateUnfollowResponse>> {
+    const body = {
+      source: request?.source,
+      target: request?.target,
+      delete_notification_activity: request?.delete_notification_activity,
+      enrich_own_fields: request?.enrich_own_fields,
+      keep_history: request?.keep_history,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetOrCreateUnfollowResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/unfollow/upsert',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.GetOrCreateUnfollowResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

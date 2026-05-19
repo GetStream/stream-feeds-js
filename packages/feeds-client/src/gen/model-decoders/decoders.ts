@@ -1390,6 +1390,20 @@ decoders.GetOrCreateFeedResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.GetOrCreateFollowResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    follow: { type: 'FollowResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.GetOrCreateUnfollowResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    follow: { type: 'FollowResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.GetUserGroupResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     user_group: { type: 'UserGroupResponse', isSingle: true },
