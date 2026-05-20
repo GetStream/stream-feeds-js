@@ -5837,6 +5837,60 @@ export interface GetOrCreateFeedResponse {
   notification_status?: NotificationStatusResponse;
 }
 
+export interface GetOrCreateFollowResponse {
+  /**
+   * True if the follow was newly created by this request; false if it already existed
+   */
+  created: boolean;
+
+  duration: string;
+
+  follow: FollowResponse;
+
+  /**
+   * Whether a notification activity was successfully created (only set when the follow was newly created)
+   */
+  notification_created?: boolean;
+}
+
+export interface GetOrCreateUnfollowRequest {
+  /**
+   * Fully qualified ID of the source feed
+   */
+  source: string;
+
+  /**
+   * Fully qualified ID of the target feed
+   */
+  target: string;
+
+  /**
+   * Whether to delete the corresponding notification activity (default: false)
+   */
+  delete_notification_activity?: boolean;
+
+  /**
+   * If true, enriches the follow's source_feed and target_feed with own_* fields (own_follows, own_followings, own_capabilities, own_membership). Defaults to false for performance.
+   */
+  enrich_own_fields?: boolean;
+
+  /**
+   * When true, activities from the unfollowed feed will remain in the source feed's timeline (default: false)
+   */
+  keep_history?: boolean;
+}
+
+export interface GetOrCreateUnfollowResponse {
+  /**
+   * True if a follow was found and removed by this request; false if no follow existed
+   */
+  deleted: boolean;
+
+  duration: string;
+
+  follow?: FollowResponse;
+}
+
 export interface GetUserGroupResponse {
   duration: string;
 
