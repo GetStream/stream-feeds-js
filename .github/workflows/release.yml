@@ -52,7 +52,7 @@ jobs:
 
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SDK_BOT_GH_TOKEN }}
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
