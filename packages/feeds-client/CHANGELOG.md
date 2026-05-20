@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.1.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.0.0...@stream-io/feeds-client-2.1.0) (2026-05-20)
+
+
+### Features
+
+* Add get or create follow and unfollow endpoints and fix generate command ([#282](https://github.com/GetStream/stream-feeds-js/issues/282)) ([a781713](https://github.com/GetStream/stream-feeds-js/commit/a781713abed58fe7f1674902e702c19ad7d6adb7))
+
 ## [2.0.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-1.10.1...@stream-io/feeds-client-2.0.0) (2026-05-04)
 
 
