@@ -54,6 +54,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SDK_BOT_GH_TOKEN }}
         run: |
+          gh auth status
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           yarn config set npmRegistryServer https://registry.npmjs.org/
