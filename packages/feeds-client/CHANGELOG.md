@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.2.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.1.0...@stream-io/feeds-client-2.2.0) (2026-05-21)
+
+
+### Features
+
+* apply filters for aggregated activities ([#287](https://github.com/GetStream/stream-feeds-js/issues/287)) ([7141838](https://github.com/GetStream/stream-feeds-js/commit/7141838de052a5ad80128f0a066a74e8fecde65c))
+
 ## [2.1.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.0.0...@stream-io/feeds-client-2.1.0) (2026-05-20)
 
 
