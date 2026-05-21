@@ -2,7 +2,7 @@
 
 Bring users together through personalized feeds, threaded discussions, and real-time updates that make every interaction feel meaningful.
 
-## **Quick Links**
+## Quick Links
 
 - [Register](https://getstream.io/chat/trial/) to get an API key for Stream Feeds
 - [React SDK](./packages/react-sdk#official-react-sdk-for-steram-feeds)
