@@ -3,6 +3,7 @@ env:
   VITE_STREAM_API_KEY: ${{ vars.CLIENT_TEST_API_KEY }}
   VITE_STREAM_API_SECRET: ${{ secrets.CLIENT_TEST_SECRET }}
   VITE_API_URL: ${{ vars.CLIENT_TEST_API_URL }}
+  GITHUB_TOKEN: ${{ secrets.SDK_BOT_GH_TOKEN }}
 
 on:
   workflow_dispatch:
@@ -51,10 +52,7 @@ jobs:
         run: yarn test:docs-snippets
 
       - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.SDK_BOT_GH_TOKEN }}
         run: |
-          gh auth status
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           yarn config set npmRegistryServer https://registry.npmjs.org/
