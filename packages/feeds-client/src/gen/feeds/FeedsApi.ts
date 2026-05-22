@@ -70,6 +70,7 @@ import type {
   GetOrCreateUnfollowRequest,
   GetOrCreateUnfollowResponse,
   GetUserGroupResponse,
+  GetUserInterestsResponse,
   ImageUploadRequest,
   ImageUploadResponse,
   ListBlockListResponse,
@@ -1545,9 +1546,11 @@ export class FeedsApi {
     feed_group_id: string;
     feed_id: string;
     hard_delete?: boolean;
+    purge_user_activities?: boolean;
   }): Promise<StreamResponse<DeleteFeedResponse>> {
     const queryParams = {
       hard_delete: request?.hard_delete,
+      purge_user_activities: request?.purge_user_activities,
     };
     const pathParams = {
       feed_group_id: request?.feed_group_id,
@@ -2359,6 +2362,31 @@ export class FeedsApi {
     );
 
     decoders.GetOrCreateUnfollowResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async getUserInterests(request: {
+    user_id: string;
+    limit?: number;
+  }): Promise<StreamResponse<GetUserInterestsResponse>> {
+    const queryParams = {
+      limit: request?.limit,
+    };
+    const pathParams = {
+      user_id: request?.user_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetUserInterestsResponse>
+    >(
+      'GET',
+      '/api/v2/feeds/users/{user_id}/interests',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.GetUserInterestsResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

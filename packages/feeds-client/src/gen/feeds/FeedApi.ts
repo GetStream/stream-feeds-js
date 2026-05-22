@@ -33,6 +33,7 @@ export class FeedApi {
 
   delete(request?: {
     hard_delete?: boolean;
+    purge_user_activities?: boolean;
   }): Promise<StreamResponse<DeleteFeedResponse>> {
     return this.feedsApi.deleteFeed({
       feed_id: this.id,

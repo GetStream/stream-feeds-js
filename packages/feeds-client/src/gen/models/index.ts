@@ -5897,6 +5897,15 @@ export interface GetUserGroupResponse {
   user_group?: UserGroupResponse;
 }
 
+export interface GetUserInterestsResponse {
+  duration: string;
+
+  /**
+   * Top-N interest tags sorted by descending count, then alphabetically by tag
+   */
+  interests: InterestTagResponse[];
+}
+
 export interface GoogleVisionConfig {
   enabled?: boolean;
 }
@@ -6022,6 +6031,18 @@ export interface Images {
   fixed_width_still: ImageData;
 
   original: ImageData;
+}
+
+export interface InterestTagResponse {
+  /**
+   * Number of distinct reacted-to activities tagged with this value
+   */
+  count: number;
+
+  /**
+   * The interest tag value
+   */
+  tag: string;
 }
 
 export interface KeyframeRuleParameters {
