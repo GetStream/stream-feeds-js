@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.3.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.2.0...@stream-io/feeds-client-2.3.0) (2026-05-27)
+
+
+### Features
+
+* new endpoint for fetching user interests and opt-in flag for purge user activities ([#290](https://github.com/GetStream/stream-feeds-js/issues/290)) ([444cd05](https://github.com/GetStream/stream-feeds-js/commit/444cd05a412437f908c920c182ae625555b491c3))
+
 ## [2.2.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.1.0...@stream-io/feeds-client-2.2.0) (2026-05-21)
 
 
