@@ -5777,6 +5777,8 @@ export interface GetOrCreateFeedRequest {
 
   next?: string;
 
+  overwrite_interest_weights?: boolean;
+
   prev?: string;
 
   view?: string;

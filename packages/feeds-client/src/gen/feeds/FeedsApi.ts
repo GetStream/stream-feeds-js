@@ -1589,6 +1589,7 @@ export class FeedsApi {
       id_around: request?.id_around,
       limit: request?.limit,
       next: request?.next,
+      overwrite_interest_weights: request?.overwrite_interest_weights,
       prev: request?.prev,
       view: request?.view,
       watch: request?.watch,
