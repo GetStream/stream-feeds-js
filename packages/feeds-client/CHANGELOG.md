@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.4.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.3.0...@stream-io/feeds-client-2.4.0) (2026-06-10)
+
+
+### Features
+
+* Make merging external with computed interest_weights opt-out ([#293](https://github.com/GetStream/stream-feeds-js/issues/293)) ([112c79c](https://github.com/GetStream/stream-feeds-js/commit/112c79c8596ccabcae18ab7c6f82cc03a9a80f3d))
+
 ## [2.3.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.2.0...@stream-io/feeds-client-2.3.0) (2026-05-27)
 
 
