@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.5.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.4.0...@stream-io/feeds-client-2.5.0) (2026-06-26)
+
+
+### Features
+
+* Add batch query activity and comment reactions endpoints ([#300](https://github.com/GetStream/stream-feeds-js/issues/300)) ([258d690](https://github.com/GetStream/stream-feeds-js/commit/258d690e4d8b38fc609fbcfe1aaa6ac3e814111f))
+
+
+### Bug Fixes
+
+* Fix queryUsers failing test ([#301](https://github.com/GetStream/stream-feeds-js/issues/301)) ([d829f52](https://github.com/GetStream/stream-feeds-js/commit/d829f522581fe4d36d30d498e40648c75b82aeb4))
+
 ## [2.4.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.3.0...@stream-io/feeds-client-2.4.0) (2026-06-10)
 
 
