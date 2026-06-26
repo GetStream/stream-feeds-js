@@ -1760,6 +1760,72 @@ export interface BanResponse {
   duration: string;
 }
 
+export interface BatchQueryActivityReactionsRequest {
+  /**
+   * Activity IDs to fetch the user's reactions for (max 100)
+   */
+  activity_ids: string[];
+
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  /**
+   * Optional filter on reaction_type or created_at
+   */
+  filter?: Record<string, any>;
+}
+
+export interface BatchQueryActivityReactionsResponse {
+  /**
+   * Duration of the request in milliseconds
+   */
+  duration: string;
+
+  reactions: FeedsReactionResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
+export interface BatchQueryCommentReactionsRequest {
+  /**
+   * Comment IDs to fetch the user's reactions for (max 100)
+   */
+  comment_ids: string[];
+
+  limit?: number;
+
+  next?: string;
+
+  prev?: string;
+
+  sort?: SortParamRequest[];
+
+  /**
+   * Optional filter on reaction_type or created_at
+   */
+  filter?: Record<string, any>;
+}
+
+export interface BatchQueryCommentReactionsResponse {
+  /**
+   * Duration of the request in milliseconds
+   */
+  duration: string;
+
+  reactions: FeedsReactionResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
 export interface BlockActionRequestPayload {
   /**
    * Reason for blocking
