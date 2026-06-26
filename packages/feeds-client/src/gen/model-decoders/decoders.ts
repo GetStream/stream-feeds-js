@@ -351,6 +351,22 @@ decoders.BanInfoResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.BatchQueryActivityReactionsResponse = (
+  input?: Record<string, any>,
+) => {
+  const typeMappings: TypeMapping = {
+    reactions: { type: 'FeedsReactionResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.BatchQueryCommentReactionsResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    reactions: { type: 'FeedsReactionResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.BlockListResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
