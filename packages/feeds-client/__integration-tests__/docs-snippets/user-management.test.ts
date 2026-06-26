@@ -81,7 +81,7 @@ describe('User management', () => {
         payload: {
           filter_conditions: {
             role: { $in: ['admin', 'moderator'] },
-            'custom.age': { $gte: 18 },
+            created_at: { $gte: '2020-01-01T00:00:00Z' },
           },
         },
       });
