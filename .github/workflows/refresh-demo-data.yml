@@ -5,6 +5,9 @@ on:
     - cron: '0 0 */10 * *' # Every 10 days at 00:00 UTC
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   refresh-data:
     runs-on: ubuntu-latest
