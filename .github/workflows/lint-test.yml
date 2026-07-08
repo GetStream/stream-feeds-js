@@ -11,6 +11,10 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   lint-and-test:
     timeout-minutes: 30
