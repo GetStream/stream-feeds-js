@@ -5,6 +5,9 @@ on:
     - cron: '0 2 * * *' # Daily at 02:00 UTC
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
