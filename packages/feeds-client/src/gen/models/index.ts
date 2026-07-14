@@ -1,3 +1,17 @@
+export interface AIAudioConfigRequest {
+  profile?: string;
+
+  rules?: BodyguardRule[];
+}
+
+export interface AIAudioConfigResponse {
+  enabled: boolean;
+
+  profile: string;
+
+  rules: BodyguardRule[];
+}
+
 export interface AIImageConfig {
   enabled: boolean;
 
@@ -844,7 +858,14 @@ export interface ActivityResponse {
    */
   friend_reactions?: FeedsReactionResponse[];
 
+  /**
+   * Recent shares of the activity, one entry per share (org-gated)
+   */
+  latest_shares?: ShareResponse[];
+
   current_feed?: FeedResponse;
+
+  i18n?: Record<string, string>;
 
   location?: Location;
 
@@ -1145,6 +1166,11 @@ export interface AddCommentReactionRequest {
   skip_push?: boolean;
 
   /**
+   * Optional list of feeds to create a reference (share) activity of the commented-on activity in. The reference activity's type mirrors the reaction type.
+   */
+  target_feeds?: string[];
+
+  /**
    * Optional custom data to add to the reaction
    */
   custom?: Record<string, any>;
@@ -1161,9 +1187,22 @@ export interface AddCommentReactionResponse {
   reaction: FeedsReactionResponse;
 
   /**
-   * Whether a notification activity was successfully created
+   * Whether notification creation was accepted for asynchronous processing
+   */
+  notification_accepted?: boolean;
+
+  /**
+   * @deprecated
+   * Deprecated. Mirrors notification_accepted; use notification_accepted for async enqueue status Deprecated: use notification_accepted
    */
   notification_created?: boolean;
+
+  /**
+   * ID of the async notification-creation task; poll GET /tasks/{id} for its status
+   */
+  notification_task_id?: string;
+
+  reference_activity?: ActivityResponse;
 }
 
 export interface AddCommentRequest {
@@ -1295,6 +1334,11 @@ export interface AddReactionRequest {
   skip_push?: boolean;
 
   /**
+   * Optional list of feeds to create a reference (share) activity of the original activity in. The reference activity's type mirrors the reaction type.
+   */
+  target_feeds?: string[];
+
+  /**
    * Custom data for the reaction
    */
   custom?: Record<string, any>;
@@ -1308,9 +1352,22 @@ export interface AddReactionResponse {
   reaction: FeedsReactionResponse;
 
   /**
-   * Whether a notification activity was successfully created
+   * Whether notification creation was accepted for asynchronous processing
+   */
+  notification_accepted?: boolean;
+
+  /**
+   * @deprecated
+   * Deprecated. Mirrors notification_accepted; use notification_accepted for async enqueue status Deprecated: use notification_accepted
    */
   notification_created?: boolean;
+
+  /**
+   * ID of the async notification-creation task; poll GET /tasks/{id} for its status
+   */
+  notification_task_id?: string;
+
+  reference_activity?: ActivityResponse;
 }
 
 export interface AddUserGroupMembersRequest {
@@ -1486,16 +1543,70 @@ export interface AppealItemResponse {
   updated_at: Date;
 
   /**
+   * Text severity level assigned by the AI provider
+   */
+  ai_text_severity?: string;
+
+  /**
+   * CID of the channel the entity belongs to, if applicable
+   */
+  channel_cid?: string;
+
+  /**
+   * Moderation policy key that was applied
+   */
+  config_key?: string;
+
+  /**
    * Decision Reason of the Appeal Item
    */
   decision_reason?: string;
+
+  /**
+   * Action recommended by the automated moderation system (e.g. flag, remove, shadow)
+   */
+  recommended_action?: string;
+
+  /**
+   * ID of the review queue item linked to this appeal, if the appeal was submitted with one
+   */
+  review_queue_item_id?: string;
+
+  /**
+   * Overall content severity score (1–100)
+   */
+  severity?: number;
+
+  /**
+   * Full chronological history of all moderation actions on the review queue item
+   */
+  actions?: ActionLogResponse[];
 
   /**
    * Attachments(e.g. Images) of the Appeal Item
    */
   attachments?: string[];
 
+  /**
+   * Classification labels from automated and manual review
+   */
+  flag_labels?: string[];
+
+  /**
+   * Types of flags applied to the entity (e.g. user_report, bodyguard)
+   */
+  flag_types?: string[];
+
+  /**
+   * Per-provider flag records explaining why the action was taken
+   */
+  flags?: ModerationFlagResponse[];
+
   entity_content?: ModerationPayload;
+
+  moderation_action?: ActionLogResponse;
+
+  original_moderation_action?: ActionLogResponse;
 
   user?: UserResponse;
 }
@@ -1515,6 +1626,11 @@ export interface AppealRequest {
    * Type of entity being appealed (e.g., message, user)
    */
   entity_type: string;
+
+  /**
+   * ID of the review queue item (flagged message) that triggered the ban. Applicable only for user ban appeals.
+   */
+  review_queue_item_id?: string;
 
   /**
    * Array of Attachment URLs(e.g., images)
@@ -1756,10 +1872,6 @@ export interface BanRequest {
   banned_by?: UserRequest;
 }
 
-export interface BanResponse {
-  duration: string;
-}
-
 export interface BatchQueryActivityReactionsRequest {
   /**
    * Activity IDs to fetch the user's reactions for (max 100)
@@ -1857,9 +1969,13 @@ export interface BlockListOptions {
 }
 
 export interface BlockListResponse {
+  is_confusable_folding_enabled: boolean;
+
   is_leet_check_enabled: boolean;
 
   is_plural_check_enabled: boolean;
+
+  is_substring_matching_enabled: boolean;
 
   /**
    * Block list name
@@ -1894,6 +2010,7 @@ export interface BlockListResponse {
 export interface BlockListRule {
   action:
     | 'flag'
+    | 'mask'
     | 'mask_flag'
     | 'shadow'
     | 'remove'
@@ -1957,12 +2074,16 @@ export interface BodyguardProfileSummary {
   name: string;
 
   display_name?: string;
+
+  text_type?: string;
 }
 
 export interface BodyguardRule {
   action:
     | 'keep'
     | 'flag'
+    | 'mask'
+    | 'mask_flag'
     | 'shadow'
     | 'remove'
     | 'bounce'
@@ -1976,7 +2097,9 @@ export interface BodyguardRule {
 
 export interface BodyguardSeverityRule {
   action:
+    | 'keep'
     | 'flag'
+    | 'mask'
     | 'shadow'
     | 'remove'
     | 'bounce'
@@ -2150,6 +2273,60 @@ export interface BookmarkUpdatedEvent {
   received_at?: Date;
 
   user?: UserResponseCommonFields;
+}
+
+export interface BulkActionAppealsRequest {
+  /**
+   * Action to apply: unban, restore, unblock, mark_reviewed, or reject_appeal
+   */
+
+  action_type:
+    | 'unban'
+    | 'restore'
+    | 'unblock'
+    | 'mark_reviewed'
+    | 'reject_appeal';
+
+  /**
+   * List of appeal UUIDs to process
+   */
+  appeal_ids: string[];
+
+  mark_reviewed?: MarkReviewedRequestPayload;
+
+  reject_appeal?: RejectAppealRequestPayload;
+
+  restore?: RestoreActionRequestPayload;
+
+  unban?: UnbanActionRequestPayload;
+
+  unblock?: UnblockActionRequestPayload;
+}
+
+export interface BulkActionAppealsResponse {
+  duration: string;
+
+  /**
+   * Appeals that could not be processed, with per-item error messages
+   */
+  errors: BulkAppealError[];
+
+  /**
+   * Successfully processed appeals
+   */
+  results: BulkAppealResult[];
+}
+
+export interface BulkAppealError {
+  appeal_id: string;
+
+  error: string;
+}
+
+export interface BulkAppealResult {
+  appeal_id: string;
+
+  appeal_item?: AppealItemResponse;
 }
 
 export interface BulkDeleteActionConfigRequest {
@@ -2477,6 +2654,7 @@ export const ChannelOwnCapability = {
   CAST_POLL_VOTE: 'cast-poll-vote',
   CONNECT_EVENTS: 'connect-events',
   CREATE_ATTACHMENT: 'create-attachment',
+  CREATE_MENTION: 'create-mention',
   DELETE_ANY_MESSAGE: 'delete-any-message',
   DELETE_CHANNEL: 'delete-channel',
   DELETE_OWN_MESSAGE: 'delete-own-message',
@@ -2486,6 +2664,10 @@ export const ChannelOwnCapability = {
   JOIN_CHANNEL: 'join-channel',
   LEAVE_CHANNEL: 'leave-channel',
   MUTE_CHANNEL: 'mute-channel',
+  NOTIFY_CHANNEL: 'notify-channel',
+  NOTIFY_GROUP: 'notify-group',
+  NOTIFY_HERE: 'notify-here',
+  NOTIFY_ROLE: 'notify-role',
   PIN_MESSAGE: 'pin-message',
   QUERY_POLL_VOTES: 'query-poll-votes',
   QUOTE_MESSAGE: 'quote-message',
@@ -2766,6 +2948,8 @@ export interface ChatMessageResponse {
 
   mentioned_group_ids?: string[];
 
+  mentioned_groups?: UserGroupResponse[];
+
   mentioned_roles?: string[];
 
   thread_participants?: UserResponse[];
@@ -2940,7 +3124,11 @@ export interface ChatSharedLocationResponseData {
 }
 
 export interface ClosedCaptionRuleParameters {
+  severity?: string;
+
   threshold?: number;
+
+  time_window?: string;
 
   harm_labels?: string[];
 
@@ -3274,6 +3462,8 @@ export interface CommentResponse {
    */
   custom?: Record<string, any>;
 
+  i18n?: Record<string, string>;
+
   moderation?: ModerationV2Response;
 
   /**
@@ -3368,6 +3558,8 @@ export interface ConfigResponse {
    */
   available_bodyguard_profiles?: BodyguardProfileSummary[];
 
+  ai_audio_config?: AIAudioConfigResponse;
+
   ai_image_config?: AIImageConfig;
 
   /**
@@ -3386,6 +3578,8 @@ export interface ConfigResponse {
   automod_toxicity_config?: AutomodToxicityConfig;
 
   block_list_config?: BlockListConfig;
+
+  flood_config?: FloodConfig;
 
   llm_config?: LLMConfig;
 
@@ -3416,6 +3610,22 @@ export interface ContentCountRuleParameters {
   time_window?: string;
 }
 
+export interface ContentCustomPropertyCountParameters {
+  operator?: string;
+
+  property_key?: string;
+
+  threshold?: number;
+
+  time_window?: string;
+}
+
+export interface ContentCustomPropertyParameters {
+  operator?: string;
+
+  property_key?: string;
+}
+
 export interface CreateBlockListRequest {
   /**
    * Block list name
@@ -3427,9 +3637,13 @@ export interface CreateBlockListRequest {
    */
   words: string[];
 
+  is_confusable_folding_enabled?: boolean;
+
   is_leet_check_enabled?: boolean;
 
   is_plural_check_enabled?: boolean;
+
+  is_substring_matching_enabled?: boolean;
 
   team?: string;
 
@@ -3482,6 +3696,11 @@ export interface CreateDeviceRequest {
    */
 
   push_provider: 'firebase' | 'apn' | 'huawei' | 'xiaomi';
+
+  /**
+   * Stable physical device identifier used to deduplicate pushes across push providers (e.g. APNs VoIP and Firebase on the same iOS device). Distinct from 'id', which is the push token.
+   */
+  hardware_id?: string;
 
   /**
    * Push provider name
@@ -3582,6 +3801,18 @@ export interface CreatePollRequest {
   options?: PollOptionInput[];
 
   custom?: Record<string, any>;
+}
+
+export interface CreateQueueRequest {
+  name: string;
+
+  type: 'personal_view' | 'operational_queue';
+
+  description?: string;
+
+  sort?: Array<Record<string, any>>;
+
+  filters?: Record<string, any>;
 }
 
 export interface CreateUserGroupRequest {
@@ -3809,6 +4040,8 @@ export interface DeleteModerationConfigResponse {
   duration: string;
 }
 
+export interface DeleteQueueRequest {}
+
 export interface DeleteReactionRequestPayload {
   /**
    * ID of the reaction to delete (alternative to item_id)
@@ -3869,7 +4102,7 @@ export interface DeleteUserRequestPayload {
 }
 
 export interface DeliveryReceiptsResponse {
-  enabled: boolean;
+  enabled?: boolean;
 }
 
 export interface DeviceResponse {
@@ -3902,6 +4135,11 @@ export interface DeviceResponse {
    * Reason explaining why device had been disabled
    */
   disabled_reason?: string;
+
+  /**
+   * Stable physical device identifier used to deduplicate pushes across push providers
+   */
+  hardware_id?: string;
 
   /**
    * Push provider name
@@ -5136,6 +5374,14 @@ export interface FeedsReactionResponse {
   custom?: Record<string, any>;
 }
 
+export interface FeedsShareResponse {
+  activity_id: string;
+
+  created_at: Date;
+
+  user: UserResponse;
+}
+
 export interface FeedsV3ActivityResponse {
   bookmark_count: number;
 
@@ -5217,7 +5463,11 @@ export interface FeedsV3ActivityResponse {
 
   friend_reactions?: FeedsReactionResponse[];
 
+  latest_shares?: FeedsShareResponse[];
+
   current_feed?: FeedsFeedResponse;
+
+  i18n?: Record<string, string>;
 
   location?: FeedsActivityLocation;
 
@@ -5283,6 +5533,8 @@ export interface FeedsV3CommentResponse {
 
   custom?: Record<string, any>;
 
+  i18n?: Record<string, string>;
+
   moderation?: ModerationV2Response;
 
   reaction_groups?: Record<string, FeedsReactionGroupResponse>;
@@ -5335,15 +5587,43 @@ export interface FileUploadResponse {
 }
 
 export interface FilterConfigResponse {
+  /**
+   * LLM moderation labels available as filter values
+   */
   llm_labels: string[];
 
+  /**
+   * AI image moderation labels available as filter values. Reflects the app's effective image taxonomy: custom Bodyguard taxonomy when enabled, otherwise the standard L1 label set.
+   */
+  ai_image_labels?: string[];
+
+  /**
+   * AI text moderation labels available as filter values
+   */
   ai_text_labels?: string[];
 
+  /**
+   * Moderation config keys present in the queue, available as filter values
+   */
   config_keys?: string[];
+
+  /**
+   * The moderation_payload.custom keys the app has configured as review-queue filter chips (via moderation_dashboard_preferences.filterable_custom_keys). Discovery hint for the dashboard only — the filter accepts any custom key regardless of this list.
+   */
+  filterable_custom_keys?: string[];
 }
 
 export interface FlagCountRuleParameters {
   threshold?: number;
+}
+
+export interface FlagItemResponse {
+  duration: string;
+
+  /**
+   * Unique identifier of the created moderation item
+   */
+  item_id: string;
 }
 
 export interface FlagRequest {
@@ -5375,17 +5655,36 @@ export interface FlagRequest {
   moderation_payload?: ModerationPayload;
 }
 
-export interface FlagResponse {
-  duration: string;
-
-  /**
-   * Unique identifier of the created moderation item
-   */
-  item_id: string;
-}
-
 export interface FlagUserOptions {
   reason?: string;
+}
+
+export interface FloodConfig {
+  identical?: FloodIdenticalConfig;
+
+  similar?: FloodSimilarConfig;
+}
+
+export interface FloodIdenticalConfig {
+  action: string;
+
+  enabled: boolean;
+
+  threshold: number;
+
+  time_window: string;
+}
+
+export interface FloodSimilarConfig {
+  action: string;
+
+  enabled: boolean;
+
+  similarity_distance: number;
+
+  threshold: number;
+
+  time_window: string;
 }
 
 export interface FollowBatchRequest {
@@ -6113,10 +6412,20 @@ export interface InterestTagResponse {
   tag: string;
 }
 
+export interface KeyframeOCRRuleParameters {
+  threshold?: number;
+
+  time_window?: string;
+
+  harm_labels?: string[];
+}
+
 export interface KeyframeRuleParameters {
   min_confidence?: number;
 
   threshold?: number;
+
+  time_window?: string;
 
   harm_labels?: string[];
 }
@@ -6178,6 +6487,15 @@ export interface ListDevicesResponse {
    * List of devices
    */
   devices: DeviceResponse[];
+}
+
+export interface ListQueuesResponse {
+  /**
+   * Duration of the request in milliseconds
+   */
+  duration: string;
+
+  queues: ModerationQueueResponse[];
 }
 
 export interface ListUserGroupsResponse {
@@ -6446,6 +6764,11 @@ export interface MessageResponse {
   mentioned_group_ids?: string[];
 
   /**
+   * List of mentioned user group objects.
+   */
+  mentioned_groups?: UserGroupResponse[];
+
+  /**
    * List of roles mentioned in the message (e.g. admin, channel_moderator, custom roles). Members with matching roles will receive push notifications based on their push preferences. Max 10 roles
    */
   mentioned_roles?: string[];
@@ -6521,6 +6844,10 @@ export interface ModerationActionConfigResponse {
    * Custom data for the action
    */
   custom?: Record<string, any>;
+}
+
+export interface ModerationBanResponse {
+  duration: string;
 }
 
 export interface ModerationCustomActionEvent {
@@ -6614,20 +6941,45 @@ export interface ModerationMarkReviewedEvent {
 }
 
 export interface ModerationPayload {
+  audios?: string[];
+
+  image_ordered_keys?: string[];
+
   images?: string[];
+
+  text_ordered_keys?: string[];
 
   texts?: string[];
 
   videos?: string[];
 
   custom?: Record<string, any>;
+
+  image_ids?: Record<string, string>;
+
+  text_ids?: Record<string, string>;
 }
 
 export interface ModerationPayloadResponse {
   /**
+   * Audio URLs to moderate
+   */
+  audios?: string[];
+
+  /**
+   * Caller-supplied keys for images, index-aligned with images[]
+   */
+  image_ordered_keys?: string[];
+
+  /**
    * Image URLs to moderate
    */
   images?: string[];
+
+  /**
+   * Caller-supplied keys for texts (e.g. "title", "description"), index-aligned with texts[]
+   */
+  text_ordered_keys?: string[];
 
   /**
    * Text content to moderate
@@ -6643,6 +6995,38 @@ export interface ModerationPayloadResponse {
    * Custom data for moderation
    */
   custom?: Record<string, any>;
+
+  /**
+   * Caller-supplied content IDs per image key (from content_ids on /analyze)
+   */
+  image_ids?: Record<string, string>;
+
+  /**
+   * Caller-supplied content IDs per text key (from content_ids on /analyze)
+   */
+  text_ids?: Record<string, string>;
+}
+
+export interface ModerationQueueResponse {
+  created_at: Date;
+
+  created_by: string;
+
+  description: string;
+
+  id: string;
+
+  item_count: number;
+
+  name: string;
+
+  type: string;
+
+  updated_at: Date;
+
+  sort: Array<Record<string, any>>;
+
+  filters: Record<string, any>;
 }
 
 export interface ModerationV2Response {
@@ -6849,6 +7233,14 @@ export interface NotificationTrigger {
    * Custom data from the trigger object (comment, reaction, etc.)
    */
   custom?: Record<string, any>;
+}
+
+export interface OCRContentParameters {
+  label_operator?: string;
+
+  severity?: string;
+
+  harm_labels?: string[];
 }
 
 export interface OCRRule {
@@ -7372,6 +7764,19 @@ export interface QueryActivityReactionsResponse {
   prev?: string;
 }
 
+export interface QueryActivitySharesResponse {
+  /**
+   * Duration of the request in milliseconds
+   */
+  duration: string;
+
+  shares: ShareResponse[];
+
+  next?: string;
+
+  prev?: string;
+}
+
 export interface QueryAppealsRequest {
   limit?: number;
 
@@ -7862,7 +8267,7 @@ export interface QueryReviewQueueRequest {
   sort?: SortParamRequest[];
 
   /**
-   * Filter conditions for review queue items
+   * Filter conditions for review queue items. Accepts built-in fields (e.g. status, channel_cid, severity, recommended_action) and customer-supplied moderation_payload.custom keys: any key that is not a built-in field is matched against the item's custom moderation data (e.g. {"location_id": "loc-42"}). Use filter_config.filterable_custom_keys to discover which custom keys the app exposes as chips.
    */
   filter?: Record<string, any>;
 }
@@ -7924,6 +8329,15 @@ export interface QueryUsersResponse {
    * Array of users as result of filters applied.
    */
   users: FullUserResponse[];
+}
+
+export interface QueueResponse {
+  /**
+   * Duration of the request in milliseconds
+   */
+  duration: string;
+
+  queue?: ModerationQueueResponse;
 }
 
 export interface RankingConfig {
@@ -8062,7 +8476,7 @@ export interface ReadCollectionsResponse {
 }
 
 export interface ReadReceiptsResponse {
-  enabled: boolean;
+  enabled?: boolean;
 }
 
 export interface RejectAppealRequestPayload {
@@ -8326,7 +8740,36 @@ export interface ReviewQueueItemResponse {
   reaction?: Reaction;
 }
 
+export interface Role {
+  /**
+   * Date/time of creation
+   */
+  created_at: Date;
+
+  /**
+   * Whether this is a custom role or built-in
+   */
+  custom: boolean;
+
+  /**
+   * Unique role name
+   */
+  name: string;
+
+  /**
+   * Date/time of the last update
+   */
+  updated_at: Date;
+
+  /**
+   * List of scopes where this role is currently present. `.app` means that role is present in app-level grants
+   */
+  scopes: string[];
+}
+
 export interface RuleBuilderAction {
+  reason?: string;
+
   skip_inbox?: boolean;
 
   type?:
@@ -8372,13 +8815,21 @@ export interface RuleBuilderCondition {
 
   content_count_rule_params?: ContentCountRuleParameters;
 
+  content_custom_property_count_params?: ContentCustomPropertyCountParameters;
+
+  content_custom_property_params?: ContentCustomPropertyParameters;
+
   content_flag_count_rule_params?: FlagCountRuleParameters;
 
   image_content_params?: ImageContentParameters;
 
   image_rule_params?: ImageRuleParameters;
 
+  keyframe_ocr_rule_params?: KeyframeOCRRuleParameters;
+
   keyframe_rule_params?: KeyframeRuleParameters;
+
+  ocr_content_params?: OCRContentParameters;
 
   text_content_params?: TextContentParameters;
 
@@ -8431,6 +8882,15 @@ export interface RuleBuilderRule {
   action?: RuleBuilderAction;
 }
 
+export interface SearchRolesResponse {
+  duration: string;
+
+  /**
+   * Matching roles, sorted ascending by name
+   */
+  roles: Role[];
+}
+
 export interface SearchUserGroupsResponse {
   duration: string;
 
@@ -8445,6 +8905,20 @@ export interface ShadowBlockActionRequestPayload {
    * Reason for shadow blocking
    */
   reason?: string;
+}
+
+export interface ShareResponse {
+  /**
+   * ID of the sharing (child) activity
+   */
+  activity_id: string;
+
+  /**
+   * When the share occurred
+   */
+  created_at: Date;
+
+  user: UserResponse;
 }
 
 export interface SharedLocationResponse {
@@ -8683,6 +9157,11 @@ export interface SubmitActionRequest {
 export interface SubmitActionResponse {
   duration: string;
 
+  /**
+   * Present when the appeal was accepted but the entity could not be restored automatically. The moderator should restore it manually.
+   */
+  auto_restore_warning?: string;
+
   appeal_item?: AppealItemResponse;
 
   item?: ReviewQueueItemResponse;
@@ -8694,6 +9173,10 @@ export interface TextContentParameters {
   label_operator?: string;
 
   severity?: string;
+
+  text_length?: number;
+
+  text_length_operator?: string;
 
   blocklist_match?: string[];
 
@@ -8780,6 +9263,8 @@ export interface ThreadedCommentResponse {
 
   custom?: Record<string, any>;
 
+  i18n?: Record<string, string>;
+
   meta?: RepliesMeta;
 
   moderation?: ModerationV2Response;
@@ -8852,8 +9337,40 @@ export interface TrackActivityMetricsResponse {
   results: TrackActivityMetricsEventResult[];
 }
 
+export interface TranslateActivityRequest {
+  /**
+   * ISO 639-1 language code to translate to
+   */
+  language: string;
+}
+
+export interface TranslateActivityResponse {
+  /**
+   * Duration of the request in milliseconds
+   */
+  duration: string;
+
+  activity: ActivityResponse;
+}
+
+export interface TranslateCommentRequest {
+  /**
+   * ISO 639-1 language code to translate to
+   */
+  language: string;
+}
+
+export interface TranslateCommentResponse {
+  /**
+   * Duration of the request in milliseconds
+   */
+  duration: string;
+
+  comment: CommentResponse;
+}
+
 export interface TypingIndicatorsResponse {
-  enabled: boolean;
+  enabled?: boolean;
 }
 
 export interface UnbanActionRequestPayload {
@@ -9104,9 +9621,13 @@ export interface UpdateActivityResponse {
 }
 
 export interface UpdateBlockListRequest {
+  is_confusable_folding_enabled?: boolean;
+
   is_leet_check_enabled?: boolean;
 
   is_plural_check_enabled?: boolean;
+
+  is_substring_matching_enabled?: boolean;
 
   team?: string;
 
@@ -9543,6 +10064,16 @@ export interface UpdatePollRequest {
   custom?: Record<string, any>;
 }
 
+export interface UpdateQueueRequest {
+  description?: string;
+
+  name?: string;
+
+  sort?: Array<Record<string, any>>;
+
+  filters?: Record<string, any>;
+}
+
 export interface UpdateUserGroupRequest {
   /**
    * The new description for the group
@@ -9707,6 +10238,8 @@ export interface UpsertConfigRequest {
    */
   team?: string;
 
+  ai_audio_config?: AIAudioConfigRequest;
+
   ai_image_config?: AIImageConfig;
 
   ai_text_config?: AITextConfig;
@@ -9724,6 +10257,8 @@ export interface UpsertConfigRequest {
   block_list_config?: BlockListConfig;
 
   bodyguard_config?: AITextConfig;
+
+  flood_config?: FloodConfig;
 
   google_vision_config?: GoogleVisionConfig;
 
@@ -9820,6 +10355,11 @@ export interface UserBannedEvent {
   reason?: string;
 
   received_at?: Date;
+
+  /**
+   * ID of the review queue item (flagged message) that triggered the ban, if the ban was applied from the moderation review queue
+   */
+  review_queue_item_id?: string;
 
   /**
    * Whether the user was shadow banned

@@ -43,7 +43,11 @@ export class FeedApi {
   }
 
   getOrCreate(
-    request?: GetOrCreateFeedRequest & { connection_id?: string },
+    request?: GetOrCreateFeedRequest & {
+      language?: string;
+      translate_text?: boolean;
+      connection_id?: string;
+    },
   ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
     return this.feedsApi.getOrCreateFeed({
       feed_id: this.id,
@@ -144,7 +148,10 @@ export class FeedApi {
   }
 
   queryPinnedActivities(
-    request?: QueryPinnedActivitiesRequest,
+    request?: QueryPinnedActivitiesRequest & {
+      language?: string;
+      translate_text?: boolean;
+    },
   ): Promise<StreamResponse<QueryPinnedActivitiesResponse>> {
     return this.feedsApi.queryPinnedActivities({
       feed_id: this.id,
