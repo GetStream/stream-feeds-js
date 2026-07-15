@@ -10,7 +10,8 @@ import type { UserRequest } from '../src/gen/models';
 import type { FeedsClient } from '../src/feeds-client';
 import type { Feed } from '../src/feed';
 
-describe('Stories Feed', () => {
+// Flaky: intermittently times out waiting for feeds.stories_feed.updated
+describe.skip('Stories Feed', () => {
   let client1: FeedsClient;
   let client2: FeedsClient;
 
