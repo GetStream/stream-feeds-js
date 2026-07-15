@@ -10,8 +10,7 @@ import type { UserRequest } from '../src/gen/models';
 import type { FeedsClient } from '../src/feeds-client';
 import type { Feed } from '../src/feed';
 
-// Flaky: intermittently times out waiting for feeds.stories_feed.updated
-describe.skip('Stories Feed', () => {
+describe('Stories Feed', () => {
   let client1: FeedsClient;
   let client2: FeedsClient;
 
@@ -95,7 +94,8 @@ describe.skip('Stories Feed', () => {
     ).toBe(true);
   });
 
-  it(`user reads user1's story feed directly`, async () => {
+  // Flaky: intermittently times out waiting for feeds.stories_feed.updated
+  it.skip(`user reads user1's story feed directly`, async () => {
     const feed = client2.feed(user1StoryFeed.group, user1StoryFeed.id, {
       onNewActivity: () => 'add-to-end',
     });
