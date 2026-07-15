@@ -3,6 +3,7 @@ import {
   createTestClient,
   createTestTokenGenerator,
   getTestUser,
+  markWatchedAndSync,
   waitForEvent,
 } from './utils';
 
@@ -72,16 +73,10 @@ describe('Stories Feed', () => {
 
   it(`user 2 marks the story as watched`, async () => {
     await user2StoriesFeed.getOrCreate({ watch: true });
-    user2StoriesFeed.on('feeds.stories_feed.updated', (_) => {});
 
-    await Promise.all([
-      waitForEvent(user2StoriesFeed, 'feeds.stories_feed.updated'),
-      user2StoriesFeed.markActivity({
-        mark_watched: [
-          user2StoriesFeed.state.getLatestValue().aggregated_activities![0]
-            .activities![0].id,
-        ],
-      }),
+    await markWatchedAndSync(user2StoriesFeed, [
+      user2StoriesFeed.state.getLatestValue().aggregated_activities![0]
+        .activities![0].id,
     ]);
 
     expect(
@@ -129,11 +124,8 @@ describe('Stories Feed', () => {
       }
     });
 
-    await Promise.all([
-      waitForEvent(feed, 'feeds.stories_feed.updated'),
-      feed.markActivity({
-        mark_watched: [feed.state.getLatestValue().activities![0].id],
-      }),
+    await markWatchedAndSync(feed, [
+      feed.state.getLatestValue().activities![0].id,
     ]);
 
     expect(feed.state.getLatestValue().activities![0].is_watched).toBe(true);
