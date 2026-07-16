@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.6.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.5.0...@stream-io/feeds-client-2.6.0) (2026-07-16)
+
+
+### Features
+
+* [FEEDS-1667] Regenerate from OpenAPI with translation support ([#305](https://github.com/GetStream/stream-feeds-js/issues/305)) ([19c27b2](https://github.com/GetStream/stream-feeds-js/commit/19c27b2ce874d6febd11156b324661e0b120163a)), closes [docs-content#1429](https://github.com/GetStream/docs-content/issues/1429)
+
 ## [2.5.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.4.0...@stream-io/feeds-client-2.5.0) (2026-06-26)
 
 
