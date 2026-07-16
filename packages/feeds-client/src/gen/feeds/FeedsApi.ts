@@ -93,6 +93,7 @@ import type {
   QueryActivitiesResponse,
   QueryActivityReactionsRequest,
   QueryActivityReactionsResponse,
+  QueryActivitySharesResponse,
   QueryBookmarkFoldersRequest,
   QueryBookmarkFoldersResponse,
   QueryBookmarksRequest,
@@ -128,12 +129,17 @@ import type {
   RestoreActivityResponse,
   RestoreCommentRequest,
   RestoreCommentResponse,
+  SearchRolesResponse,
   SearchUserGroupsResponse,
   SharedLocationResponse,
   SharedLocationsResponse,
   SingleFollowResponse,
   TrackActivityMetricsRequest,
   TrackActivityMetricsResponse,
+  TranslateActivityRequest,
+  TranslateActivityResponse,
+  TranslateCommentRequest,
+  TranslateCommentResponse,
   UnblockUsersRequest,
   UnblockUsersResponse,
   UnfollowBatchRequest,
@@ -216,8 +222,10 @@ export class FeedsApi {
     const body = {
       name: request?.name,
       words: request?.words,
+      is_confusable_folding_enabled: request?.is_confusable_folding_enabled,
       is_leet_check_enabled: request?.is_leet_check_enabled,
       is_plural_check_enabled: request?.is_plural_check_enabled,
+      is_substring_matching_enabled: request?.is_substring_matching_enabled,
       team: request?.team,
       type: request?.type,
     };
@@ -268,8 +276,10 @@ export class FeedsApi {
       name: request?.name,
     };
     const body = {
+      is_confusable_folding_enabled: request?.is_confusable_folding_enabled,
       is_leet_check_enabled: request?.is_leet_check_enabled,
       is_plural_check_enabled: request?.is_plural_check_enabled,
+      is_substring_matching_enabled: request?.is_substring_matching_enabled,
       team: request?.team,
       words: request?.words,
     };
@@ -325,6 +335,7 @@ export class FeedsApi {
     const body = {
       id: request?.id,
       push_provider: request?.push_provider,
+      hardware_id: request?.hardware_id,
       push_provider_name: request?.push_provider_name,
       voip_token: request?.voip_token,
     };
@@ -461,8 +472,15 @@ export class FeedsApi {
   }
 
   async queryActivities(
-    request?: QueryActivitiesRequest,
+    request?: QueryActivitiesRequest & {
+      language?: string;
+      translate_text?: boolean;
+    },
   ): Promise<StreamResponse<QueryActivitiesResponse>> {
+    const queryParams = {
+      language: request?.language,
+      translate_text: request?.translate_text,
+    };
     const body = {
       enrich_own_fields: request?.enrich_own_fields,
       include_soft_deleted_activities: request?.include_soft_deleted_activities,
@@ -479,7 +497,7 @@ export class FeedsApi {
       'POST',
       '/api/v2/feeds/activities/query',
       undefined,
-      undefined,
+      queryParams,
       body,
       'application/json',
     );
@@ -695,6 +713,7 @@ export class FeedsApi {
       create_notification_activity: request?.create_notification_activity,
       enforce_unique: request?.enforce_unique,
       skip_push: request?.skip_push,
+      target_feeds: request?.target_feeds,
       custom: request?.custom,
     };
 
@@ -771,6 +790,35 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async queryActivityShares(request: {
+    activity_id: string;
+    limit?: number;
+    prev?: string;
+    next?: string;
+  }): Promise<StreamResponse<QueryActivitySharesResponse>> {
+    const queryParams = {
+      limit: request?.limit,
+      prev: request?.prev,
+      next: request?.next,
+    };
+    const pathParams = {
+      activity_id: request?.activity_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<QueryActivitySharesResponse>
+    >(
+      'GET',
+      '/api/v2/feeds/activities/{activity_id}/shares',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.QueryActivitySharesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async deleteActivity(request: {
     id: string;
     hard_delete?: boolean;
@@ -795,10 +843,14 @@ export class FeedsApi {
 
   async getActivity(request: {
     id: string;
+    language?: string;
+    translate_text?: boolean;
     comment_sort?: string;
     comment_limit?: number;
   }): Promise<StreamResponse<GetActivityResponse>> {
     const queryParams = {
+      language: request?.language,
+      translate_text: request?.translate_text,
       comment_sort: request?.comment_sort,
       comment_limit: request?.comment_limit,
     };
@@ -921,6 +973,32 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async translateActivity(
+    request: TranslateActivityRequest & { id: string },
+  ): Promise<StreamResponse<TranslateActivityResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      language: request?.language,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<TranslateActivityResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/activities/{id}/translate',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.TranslateActivityResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async queryBookmarkFolders(
     request?: QueryBookmarkFoldersRequest,
   ): Promise<StreamResponse<QueryBookmarkFoldersResponse>> {
@@ -997,8 +1075,15 @@ export class FeedsApi {
   }
 
   async queryBookmarks(
-    request?: QueryBookmarksRequest,
+    request?: QueryBookmarksRequest & {
+      language?: string;
+      translate_text?: boolean;
+    },
   ): Promise<StreamResponse<QueryBookmarksResponse>> {
+    const queryParams = {
+      language: request?.language,
+      translate_text: request?.translate_text,
+    };
     const body = {
       enrich_own_fields: request?.enrich_own_fields,
       limit: request?.limit,
@@ -1014,7 +1099,7 @@ export class FeedsApi {
       'POST',
       '/api/v2/feeds/bookmarks/query',
       undefined,
-      undefined,
+      queryParams,
       body,
       'application/json',
     );
@@ -1136,6 +1221,8 @@ export class FeedsApi {
     sort?: string;
     replies_limit?: number;
     id_around?: string;
+    language?: string;
+    translate_text?: boolean;
     limit?: number;
     prev?: string;
     next?: string;
@@ -1147,6 +1234,8 @@ export class FeedsApi {
       sort: request?.sort,
       replies_limit: request?.replies_limit,
       id_around: request?.id_around,
+      language: request?.language,
+      translate_text: request?.translate_text,
       limit: request?.limit,
       prev: request?.prev,
       next: request?.next,
@@ -1219,8 +1308,15 @@ export class FeedsApi {
   }
 
   async queryComments(
-    request: QueryCommentsRequest,
+    request: QueryCommentsRequest & {
+      language?: string;
+      translate_text?: boolean;
+    },
   ): Promise<StreamResponse<QueryCommentsResponse>> {
+    const queryParams = {
+      language: request?.language,
+      translate_text: request?.translate_text,
+    };
     const body = {
       filter: request?.filter,
       id_around: request?.id_around,
@@ -1236,7 +1332,7 @@ export class FeedsApi {
       'POST',
       '/api/v2/feeds/comments/query',
       undefined,
-      undefined,
+      queryParams,
       body,
       'application/json',
     );
@@ -1380,14 +1476,20 @@ export class FeedsApi {
 
   async getComment(request: {
     id: string;
+    language?: string;
+    translate_text?: boolean;
   }): Promise<StreamResponse<GetCommentResponse>> {
+    const queryParams = {
+      language: request?.language,
+      translate_text: request?.translate_text,
+    };
     const pathParams = {
       id: request?.id,
     };
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<GetCommentResponse>
-    >('GET', '/api/v2/feeds/comments/{id}', pathParams, undefined);
+    >('GET', '/api/v2/feeds/comments/{id}', pathParams, queryParams);
 
     decoders.GetCommentResponse?.(response.body);
 
@@ -1470,6 +1572,7 @@ export class FeedsApi {
       create_notification_activity: request?.create_notification_activity,
       enforce_unique: request?.enforce_unique,
       skip_push: request?.skip_push,
+      target_feeds: request?.target_feeds,
       custom: request?.custom,
     };
 
@@ -1552,6 +1655,8 @@ export class FeedsApi {
     sort?: string;
     replies_limit?: number;
     id_around?: string;
+    language?: string;
+    translate_text?: boolean;
     limit?: number;
     prev?: string;
     next?: string;
@@ -1561,6 +1666,8 @@ export class FeedsApi {
       sort: request?.sort,
       replies_limit: request?.replies_limit,
       id_around: request?.id_around,
+      language: request?.language,
+      translate_text: request?.translate_text,
       limit: request?.limit,
       prev: request?.prev,
       next: request?.next,
@@ -1602,6 +1709,32 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async translateComment(
+    request: TranslateCommentRequest & { id: string },
+  ): Promise<StreamResponse<TranslateCommentResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      language: request?.language,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<TranslateCommentResponse>
+    >(
+      'POST',
+      '/api/v2/feeds/comments/{id}/translate',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.TranslateCommentResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async deleteFeed(request: {
     feed_group_id: string;
     feed_id: string;
@@ -1635,10 +1768,14 @@ export class FeedsApi {
     request: GetOrCreateFeedRequest & {
       feed_group_id: string;
       feed_id: string;
+      language?: string;
+      translate_text?: boolean;
       connection_id?: string;
     },
   ): Promise<StreamResponse<GetOrCreateFeedResponse>> {
     const queryParams = {
+      language: request?.language,
+      translate_text: request?.translate_text,
       connection_id: request?.connection_id,
     };
     const pathParams = {
@@ -1962,8 +2099,14 @@ export class FeedsApi {
     request: QueryPinnedActivitiesRequest & {
       feed_group_id: string;
       feed_id: string;
+      language?: string;
+      translate_text?: boolean;
     },
   ): Promise<StreamResponse<QueryPinnedActivitiesResponse>> {
+    const queryParams = {
+      language: request?.language,
+      translate_text: request?.translate_text,
+    };
     const pathParams = {
       feed_group_id: request?.feed_group_id,
       feed_id: request?.feed_id,
@@ -1983,7 +2126,7 @@ export class FeedsApi {
       'POST',
       '/api/v2/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/pinned_activities/query',
       pathParams,
-      undefined,
+      queryParams,
       body,
       'application/json',
     );
@@ -2816,6 +2959,30 @@ export class FeedsApi {
     );
 
     decoders.UpsertPushPreferencesResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async searchRoles(request: {
+    query: string;
+    limit?: number;
+    name_gt?: string;
+    role_type?: string;
+    include_global_roles?: boolean;
+  }): Promise<StreamResponse<SearchRolesResponse>> {
+    const queryParams = {
+      query: request?.query,
+      limit: request?.limit,
+      name_gt: request?.name_gt,
+      role_type: request?.role_type,
+      include_global_roles: request?.include_global_roles,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<SearchRolesResponse>
+    >('GET', '/api/v2/roles/search', undefined, queryParams);
+
+    decoders.SearchRolesResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

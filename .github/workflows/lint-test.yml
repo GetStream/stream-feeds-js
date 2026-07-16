@@ -45,6 +45,8 @@ jobs:
 
       - name: Test packages
         run: yarn test:ci:libs
+      - name: Run docs code snippets
+        run: yarn test:docs-snippets
       - name: Deploy React tutorial to Vercel
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
