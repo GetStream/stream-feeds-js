@@ -37,6 +37,11 @@ describe('Translation page', () => {
   });
 
   it('Reading translated content with language projection', async () => {
+    await client.translateActivity({
+      id: activity.id,
+      language: 'es',
+    });
+
     const response = await feed.getOrCreate({
       language: 'es',
     });
@@ -56,9 +61,15 @@ describe('Translation page', () => {
   });
 
   it('Set user language', async () => {
-    await client.upsertUsers([
-      { id: user.id, language: 'en', name: user.name ?? 'Jane' },
-    ]);
+    await client.updateUsers({
+      users: {
+        [user.id]: {
+          id: user.id,
+          language: 'en',
+          name: user.name ?? 'Jane',
+        },
+      },
+    });
   });
 
   afterAll(async () => {
