@@ -18,7 +18,7 @@ describe('Translation page', () => {
     client = createTestClient();
     await client.connectUser(user, createTestTokenGenerator(user));
     feed = client.feed('user', crypto.randomUUID());
-    await feed.getOrCreate({ watch: true });
+    await feed.getOrCreate();
     activity = (
       await feed.addActivity({
         type: 'post',
@@ -61,7 +61,7 @@ describe('Translation page', () => {
   });
 
   it('Set user language', async () => {
-    await client.updateUsers({
+    const response = await client.updateUsers({
       users: {
         [user.id]: {
           id: user.id,
@@ -70,6 +70,8 @@ describe('Translation page', () => {
         },
       },
     });
+
+    expect(response.users[user.id].language).toBe('en');
   });
 
   afterAll(async () => {
