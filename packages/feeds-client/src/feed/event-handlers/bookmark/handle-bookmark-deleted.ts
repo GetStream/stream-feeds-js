@@ -6,22 +6,27 @@ import type {
 } from '../../../gen/models';
 import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import { updateEntityInArray } from '../../../utils';
+import { findBookmarkIndex, isStaleBookmark } from './bookmark-utils';
 
 export type BookmarkDeletedPayload = PartializeAllBut<
   EventPayload<'feeds.bookmark.deleted'>,
   'bookmark'
 >;
 
-export const isSameBookmark = (
-  bookmark1: BookmarkResponse,
-  bookmark2: BookmarkResponse,
-): boolean => {
-  return (
-    bookmark1.user.id === bookmark2.user.id &&
-    bookmark1.activity.id === bookmark2.activity.id &&
-    bookmark1.folder?.id === bookmark2.folder?.id &&
-    bookmark1.updated_at.getTime() === bookmark2.updated_at.getTime()
-  );
+/**
+ * -1 when there is nothing to remove: either we never had the bookmark (the delete
+ * already arrived over the other channel), or the entry we hold is newer than the delete
+ * payload, meaning the bookmark has been re-added since and this is a late delete.
+ */
+const findBookmarkToRemove = (
+  ownBookmarks: BookmarkResponse[],
+  bookmark: BookmarkResponse,
+): number => {
+  const index = findBookmarkIndex(ownBookmarks, bookmark);
+
+  return index !== -1 && isStaleBookmark(ownBookmarks[index], bookmark)
+    ? index
+    : -1;
 };
 
 const sharedUpdateActivity = ({
@@ -36,9 +41,11 @@ const sharedUpdateActivity = ({
   let newOwnBookmarks = currentActivity.own_bookmarks;
 
   if (eventBelongsToCurrentUser) {
-    newOwnBookmarks = currentActivity.own_bookmarks.filter(
-      (bookmark) => !isSameBookmark(bookmark, event.bookmark),
-    );
+    const index = findBookmarkToRemove(newOwnBookmarks, event.bookmark);
+
+    if (index !== -1) {
+      newOwnBookmarks = newOwnBookmarks.filter((_, i) => i !== index);
+    }
   }
 
   return {
@@ -58,7 +65,7 @@ export const removeBookmarkFromActivities = (
     matcher: (activity) =>
       activity.id === event.bookmark.activity.id &&
       (!eventBelongsToCurrentUser ||
-        activity.own_bookmarks.some((b) => isSameBookmark(b, event.bookmark))),
+        findBookmarkToRemove(activity.own_bookmarks, event.bookmark) !== -1),
     updater: (matchedActivity) =>
       sharedUpdateActivity({
         currentActivity: matchedActivity,
@@ -77,9 +84,10 @@ export const removeBookmarkFromPinnedActivities = (
     matcher: (pinnedActivity) =>
       pinnedActivity.activity.id === event.bookmark.activity.id &&
       (!eventBelongsToCurrentUser ||
-        pinnedActivity.activity.own_bookmarks.some((b) =>
-          isSameBookmark(b, event.bookmark),
-        )),
+        findBookmarkToRemove(
+          pinnedActivity.activity.own_bookmarks,
+          event.bookmark,
+        ) !== -1),
     updater: (matchedPinnedActivity) => {
       const newActivity = sharedUpdateActivity({
         currentActivity: matchedPinnedActivity.activity,

@@ -2,15 +2,30 @@ import type { Feed } from '../../../feed';
 import type {
   ActivityPinResponse,
   ActivityResponse,
+  BookmarkResponse,
 } from '../../../gen/models';
 import type { EventPayload, PartializeAllBut } from '../../../types-internal';
 import { updateEntityInArray } from '../../../utils';
-import { isSameBookmark } from './handle-bookmark-deleted';
+import { findBookmarkIndex, isStaleBookmark } from './bookmark-utils';
 
 export type BookmarkAddedPayload = PartializeAllBut<
   EventPayload<'feeds.bookmark.added'>,
   'bookmark'
 >;
+
+/**
+ * The same add arrives twice (HTTP response + WS broadcast), and the WS copy can be
+ * delayed past a later update of the same bookmark. Only apply a payload that adds a
+ * bookmark we don't hold yet, or that is fresher than the one we do.
+ */
+const shouldApplyToOwnBookmarks = (
+  ownBookmarks: BookmarkResponse[],
+  bookmark: BookmarkResponse,
+): boolean => {
+  const index = findBookmarkIndex(ownBookmarks, bookmark);
+
+  return index === -1 || !isStaleBookmark(bookmark, ownBookmarks[index]);
+};
 
 const sharedUpdateActivity = ({
   currentActivity,
@@ -24,7 +39,14 @@ const sharedUpdateActivity = ({
   let newOwnBookmarks = currentActivity.own_bookmarks;
 
   if (eventBelongsToCurrentUser) {
-    newOwnBookmarks = [...newOwnBookmarks, event.bookmark];
+    const index = findBookmarkIndex(newOwnBookmarks, event.bookmark);
+
+    if (index === -1) {
+      newOwnBookmarks = [...newOwnBookmarks, event.bookmark];
+    } else if (!isStaleBookmark(event.bookmark, newOwnBookmarks[index])) {
+      newOwnBookmarks = [...newOwnBookmarks];
+      newOwnBookmarks[index] = event.bookmark;
+    }
   }
 
   return {
@@ -44,7 +66,7 @@ export const addBookmarkToActivities = (
     matcher: (activity) =>
       activity.id === event.bookmark.activity.id &&
       (!eventBelongsToCurrentUser ||
-        !activity.own_bookmarks.some((b) => isSameBookmark(b, event.bookmark))),
+        shouldApplyToOwnBookmarks(activity.own_bookmarks, event.bookmark)),
     updater: (matchedActivity) =>
       sharedUpdateActivity({
         currentActivity: matchedActivity,
@@ -63,8 +85,9 @@ export const addBookmarkToPinnedActivities = (
     matcher: (pinnedActivity) =>
       pinnedActivity.activity.id === event.bookmark.activity.id &&
       (!eventBelongsToCurrentUser ||
-        !pinnedActivity.activity.own_bookmarks.some((b) =>
-          isSameBookmark(b, event.bookmark),
+        shouldApplyToOwnBookmarks(
+          pinnedActivity.activity.own_bookmarks,
+          event.bookmark,
         )),
     updater: (matchedPinnedActivity) => {
       const newActivity = sharedUpdateActivity({

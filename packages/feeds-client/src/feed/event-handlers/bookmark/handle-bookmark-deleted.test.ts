@@ -231,4 +231,90 @@ describe(handleBookmarkDeleted.name, () => {
     const stateAfter = feed.currentState;
     expect(stateAfter).toBe(stateBefore);
   });
+
+  it('removes the bookmark even when the delete payload carries a newer updated_at', () => {
+    // the payload describing the deleted bookmark does not have to be the exact snapshot
+    // we hold — it only has to identify the same bookmark
+    const activityId = crypto.randomUUID();
+    const event = generateBookmarkDeletedEvent({
+      bookmark: {
+        activity: {
+          id: activityId,
+          own_reactions: [],
+          bookmark_count: 0,
+        },
+        user: { id: currentUserId },
+        updated_at: new Date('2025-08-06T12:00:00Z'),
+      },
+    });
+    const activity = generateActivityResponse({
+      id: activityId,
+      bookmark_count: 1,
+      own_bookmarks: [
+        generateBookmarkResponse({
+          activity: { id: activityId },
+          user: { id: currentUserId },
+          updated_at: new Date('2025-08-05T12:00:00Z'),
+        }),
+      ],
+      own_reactions: [generateFeedReactionResponse()],
+    });
+    const activityPin = generateActivityPinResponse({
+      activity: { ...activity },
+    });
+    feed.state.partialNext({
+      activities: [activity],
+      pinned_activities: [activityPin],
+    });
+
+    handleBookmarkDeleted.call(feed, event);
+
+    const stateAfter = feed.currentState;
+    expect(stateAfter.activities![0].own_bookmarks).toHaveLength(0);
+    expect(
+      stateAfter.pinned_activities![0].activity.own_bookmarks,
+    ).toHaveLength(0);
+    expect(stateAfter.activities![0].bookmark_count).toBe(0);
+  });
+
+  it('keeps a bookmark that was re-added after the delete the event describes', () => {
+    const activityId = crypto.randomUUID();
+    const event = generateBookmarkDeletedEvent({
+      bookmark: {
+        activity: {
+          id: activityId,
+          own_reactions: [],
+          bookmark_count: 0,
+        },
+        user: { id: currentUserId },
+        updated_at: new Date('2025-08-05T12:00:00Z'),
+      },
+    });
+    const reAddedBookmark = generateBookmarkResponse({
+      activity: { id: activityId },
+      user: { id: currentUserId },
+      updated_at: new Date('2025-08-06T12:00:00Z'),
+    });
+    const activity = generateActivityResponse({
+      id: activityId,
+      bookmark_count: 1,
+      own_bookmarks: [reAddedBookmark],
+      own_reactions: [generateFeedReactionResponse()],
+    });
+    const activityPin = generateActivityPinResponse({
+      activity: { ...activity },
+    });
+    feed.state.partialNext({
+      activities: [activity],
+      pinned_activities: [activityPin],
+    });
+
+    const stateBefore = feed.currentState;
+
+    handleBookmarkDeleted.call(feed, event);
+
+    const stateAfter = feed.currentState;
+    expect(stateAfter).toBe(stateBefore);
+    expect(stateAfter.activities![0].own_bookmarks).toEqual([reAddedBookmark]);
+  });
 });

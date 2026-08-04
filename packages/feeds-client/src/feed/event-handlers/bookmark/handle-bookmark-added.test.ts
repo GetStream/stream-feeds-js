@@ -10,6 +10,7 @@ import {
   getHumanId,
   generateFeedReactionResponse,
   generateBookmarkAddedEvent,
+  generateBookmarkResponse,
 } from '../../../test-utils/response-generators';
 
 describe(handleBookmarkAdded.name, () => {
@@ -205,5 +206,95 @@ describe(handleBookmarkAdded.name, () => {
 
     const stateAfter = feed.currentState;
     expect(stateAfter).toBe(stateBefore);
+  });
+
+  it('ignores a delayed added event for a bookmark that has since been updated', () => {
+    // the HTTP response for addBookmark is applied first, then the bookmark is updated;
+    // the WS broadcast for the original add only arrives afterwards, carrying an older
+    // snapshot of a bookmark we already track — applying it would duplicate the entry
+    const activityId = crypto.randomUUID();
+    const event = generateBookmarkAddedEvent({
+      bookmark: {
+        activity: {
+          id: activityId,
+          own_reactions: [],
+          bookmark_count: 1,
+        },
+        user: { id: currentUserId },
+        updated_at: new Date('2025-08-05T12:00:00Z'),
+      },
+    });
+    const updatedBookmark = generateBookmarkResponse({
+      activity: { id: activityId },
+      user: { id: currentUserId },
+      updated_at: new Date('2025-08-06T12:00:00Z'),
+      custom: { color: 'red' },
+    });
+    const activity = generateActivityResponse({
+      id: activityId,
+      bookmark_count: 1,
+      own_bookmarks: [updatedBookmark],
+      own_reactions: [generateFeedReactionResponse()],
+    });
+    const activityPin = generateActivityPinResponse({
+      activity: { ...activity },
+    });
+    feed.state.partialNext({
+      activities: [activity],
+      pinned_activities: [activityPin],
+    });
+
+    const stateBefore = feed.currentState;
+
+    handleBookmarkAdded.call(feed, event);
+
+    const stateAfter = feed.currentState;
+    expect(stateAfter).toBe(stateBefore);
+    expect(stateAfter.activities![0].own_bookmarks).toEqual([updatedBookmark]);
+    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toEqual([
+      updatedBookmark,
+    ]);
+  });
+
+  it('replaces the existing entry instead of duplicating it when the added event is fresher', () => {
+    const activityId = crypto.randomUUID();
+    const event = generateBookmarkAddedEvent({
+      bookmark: {
+        activity: {
+          id: activityId,
+          own_reactions: [],
+          bookmark_count: 1,
+        },
+        user: { id: currentUserId },
+        updated_at: new Date('2025-08-06T12:00:00Z'),
+      },
+    });
+    const activity = generateActivityResponse({
+      id: activityId,
+      bookmark_count: 1,
+      own_bookmarks: [
+        generateBookmarkResponse({
+          activity: { id: activityId },
+          user: { id: currentUserId },
+          updated_at: new Date('2025-08-05T12:00:00Z'),
+        }),
+      ],
+      own_reactions: [generateFeedReactionResponse()],
+    });
+    const activityPin = generateActivityPinResponse({
+      activity: { ...activity },
+    });
+    feed.state.partialNext({
+      activities: [activity],
+      pinned_activities: [activityPin],
+    });
+
+    handleBookmarkAdded.call(feed, event);
+
+    const stateAfter = feed.currentState;
+    expect(stateAfter.activities![0].own_bookmarks).toEqual([event.bookmark]);
+    expect(stateAfter.pinned_activities![0].activity.own_bookmarks).toEqual([
+      event.bookmark,
+    ]);
   });
 });

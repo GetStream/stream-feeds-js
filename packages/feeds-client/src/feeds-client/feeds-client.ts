@@ -801,7 +801,11 @@ export class FeedsClient extends FeedsApi {
   ): Promise<StreamResponse<UpdateBookmarkResponse>> => {
     const response = await super.updateBookmark(request);
     for (const feed of this.allActiveFeeds) {
-      handleBookmarkUpdated.bind(feed)(response);
+      // the response carries the folder the bookmark was moved *to*; only the request
+      // knows where it was moved from, which is how state locates the existing entry
+      handleBookmarkUpdated.bind(feed)(response, {
+        previousFolderId: request.folder_id,
+      });
     }
     return response;
   };
