@@ -70,7 +70,6 @@ sample-apps/
   react-demo/                         # Next.js demo (stream-feeds-react-demo)
   react-native/ExpoTikTokApp/         # Expo sample app
 test-data-generator/                  # scripts to seed a Stream app with demo data
-ai-docs/                              # deep-dive notes (ai-state-management.md)
 ```
 
 Use the closest folder's patterns and conventions when editing.
@@ -177,6 +176,13 @@ Stores exist on `FeedsClient` (`FeedsClientState`), each `Feed` (`FeedState`), `
 
 **Updates must change the reference of the key you write.** Mutating an array or object in place will not re-render — build a new one.
 
+**What writes feed state.** Most updates arrive as WebSocket events, but not all:
+
+- `Feed.getOrCreate()` — the main write path. Sets `is_loading` / `is_loading_activities`, then either patches or fully replaces state (the replace branch also clears `stateUpdateQueue`). It throws `'Only one getOrCreate call is allowed at a time'` if called while `is_loading_activities` is set, and de-duplicates identical in-flight requests.
+- `Feed.getNextPage()` — pagination, which delegates to `getOrCreate({ next })` rather than writing state itself. Same for the `loadNextPage*` helpers (comments, replies, follows).
+- `FeedsClient.queryFeeds()` — writes indirectly, by hydrating each returned feed through `getOrCreateActiveFeed`.
+- Some HTTP responses write directly so the UI reflects an action without waiting for the WebSocket round-trip — follow/unfollow is the canonical case (see the comment at `feeds-client.ts` on updating state after the HTTP response to support `queryFeeds` with `watch: false`). This is exactly why the state update queue below exists.
+
 React reads state through `useStateStore`, re-exported from `@stream-io/state-store/react-bindings`. Four rules, all load-bearing:
 
 1. **The selector must return an object or array**, never a primitive — equality is a shallow per-key `Object.is` comparison.
@@ -208,8 +214,6 @@ const selector = ({
 });
 ```
 
-Deep dive: [`ai-docs/ai-state-management.md`](ai-docs/ai-state-management.md).
-
 ## Critical architectural patterns
 
 ### 1. HTTP + WebSocket deduplication (state update queue)
@@ -218,13 +222,19 @@ Deep dive: [`ai-docs/ai-state-management.md`](ai-docs/ai-state-management.md).
 
 The same logical change can arrive twice — once in an HTTP response, once as a WebSocket broadcast (follow, reactions, comments). Each `Feed` owns a `protected readonly stateUpdateQueue: Set<string>` and the queue makes sure the update is applied exactly once:
 
-- Keys are prefixed: `http-<id>` or `ws-<id>`, built with `getStateUpdateQueueId(payload, prefix)`.
+- Keys are `http-<id>` or `ws-<id>`, where `<id>` comes from `getStateUpdateQueueId(payload, prefix)` — the prefix joined with the identifying fields for that event (`activity-updated-<activityId>`, `follow-created-<sourceFeed>-<targetFeed>`, `activity-reaction-created-<activityId>-<reactionType>`, …). The `switch` in `src/utils/state-update-queue.ts` is the authoritative list of valid prefixes; it is `ensureExhausted`-guarded, so adding an event type there is a compile-time-checked change.
 - On arrival, `shouldUpdateState({ stateUpdateQueueId, stateUpdateQueue, watch, fromWs, isTriggeredByConnectedUser })` looks for the **paired** key. Found → remove it and **skip** the update. Not found → add this key and **apply**.
 - Either order (HTTP-first or WS-first) works.
 - Dedup only engages when `watch === true`, the change was triggered by the connected user, and a `stateUpdateQueueId` was supplied. Otherwise the update always applies.
 - The queue is cleared on full state re-init (`getOrCreate`'s replace branch) so stale keys don't leak.
 
-Handlers that use it: all three `follow` handlers; `handleActivityUpdated` plus the three activity-reaction handlers; all six comment and comment-reaction handlers. WS-only handlers do not.
+19 handlers currently use it — all of `follow/` and `feed-member/`, all six `comment/` handlers, and the activity handlers for `updated`, `deleted`, `pinned`, `unpinned` and the three reaction events. WS-only handlers do not. Rather than trust that list, check:
+
+```bash
+grep -rl shouldUpdateState packages/feeds-client/src/feed/event-handlers --include='*.ts' | grep -v test
+```
+
+Two-way handlers pass `fromWs: true` from the WebSocket path and `fromWs: false` from the HTTP path (the parameter defaults to `true`).
 
 ### 2. WebSocket event handling
 
@@ -296,6 +306,8 @@ Enforced with `--max-warnings=0` from the single flat config at `eslint.config.m
 ## Testing
 
 **Policy:** add or extend tests next to the code, with a `.test.ts` suffix — event handlers and utils have co-located tests, not a central `__tests__/` tree. Reuse the repo's existing factories instead of hand-rolling mocks. Cover `FeedsClient` and `Feed`, event handlers and state updates, React hooks and contexts, and utility functions.
+
+**Test state updates through the public state-update functions**, not by poking at handler internals — that is what exercises the edge cases, queue deduplication included. For a new event, add the unit test beside the handler in `src/feed/event-handlers/<domain>/`, and if the flow needs live-event coverage add an integration test alongside `feed-websocket-events.test.ts` (for example an `activity-websocket-events.test.ts` for activity-specific flows).
 
 Coverage expectations apply to `feeds-client`: `react-native-sdk`'s `test-ci` is `echo 'No tests yet'` and `react-sdk` has no test script at all.
 
@@ -424,7 +436,6 @@ Mirror existing patterns in the nearest module. Prefer additive changes; avoid b
 
 ## References
 
-- **State management deep dive:** [`ai-docs/ai-state-management.md`](ai-docs/ai-state-management.md)
 - **PR template:** `.github/pull_request_template.md`
 - **Feeds docs:** https://getstream.io/activity-feeds/docs/
 - **React tutorial:** https://getstream.io/activity-feeds/sdk/react/
