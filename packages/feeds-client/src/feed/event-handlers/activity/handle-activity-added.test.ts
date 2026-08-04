@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Feed } from '../../../feed';
 import { FeedsClient } from '../../../feeds-client';
 import { handleActivityAdded } from './handle-activity-added';
+import { handleActivityDeleted } from './handle-activity-deleted';
+import type { ActivityResponse } from '../../../gen/models';
 import {
   generateActivityAddedEvent,
   generateActivityResponse,
@@ -141,5 +143,83 @@ describe(handleActivityAdded.name, () => {
     handleActivityAdded.call(feed, event);
     expect(feed.currentState.activities).toHaveLength(1);
     expect(feed.currentState.activities?.[0]).toBe(event.activity);
+  });
+
+  describe('HTTP + WS deduplication (watch)', () => {
+    let watchedFeed: Feed;
+
+    beforeEach(() => {
+      const feedResponse = generateFeedResponse({
+        id: 'watched',
+        group_id: 'user',
+        created_by: { id: currentUserId },
+      });
+      watchedFeed = new Feed(
+        client,
+        feedResponse.group_id,
+        feedResponse.id,
+        feedResponse,
+        true,
+      );
+      watchedFeed.state.partialNext({
+        activities: [],
+        last_get_or_create_request_config: {},
+      });
+    });
+
+    const generateOwnActivity = () =>
+      generateActivityResponse({
+        user: generateUserResponse({ id: currentUserId }),
+      });
+
+    // simulates client.addActivity applying its HTTP response to the feed
+    const applyHttpResponse = (activity: ActivityResponse) =>
+      watchedFeed['addActivityFromHTTPResponse'](activity);
+
+    it('skips the WS broadcast of an add already applied from the HTTP response', () => {
+      const activity = generateOwnActivity();
+
+      applyHttpResponse(activity);
+      expect(watchedFeed.currentState.activities).toHaveLength(1);
+
+      const stateAfterHttp = watchedFeed.currentState;
+      handleActivityAdded.call(watchedFeed, { activity });
+
+      expect(watchedFeed.currentState).toBe(stateAfterHttp);
+      expect(watchedFeed.currentState.activities).toHaveLength(1);
+    });
+
+    it('skips the HTTP response when the WS broadcast arrived first', () => {
+      const activity = generateOwnActivity();
+
+      handleActivityAdded.call(watchedFeed, { activity });
+      expect(watchedFeed.currentState.activities).toHaveLength(1);
+
+      const stateAfterWs = watchedFeed.currentState;
+      applyHttpResponse(activity);
+
+      expect(watchedFeed.currentState).toBe(stateAfterWs);
+      expect(watchedFeed.currentState.activities).toHaveLength(1);
+    });
+
+    it('does not re-add an activity deleted before its delayed WS broadcast arrives', () => {
+      const activity = generateOwnActivity();
+
+      // add, applied from the HTTP response; the WS broadcast is still in flight
+      applyHttpResponse(activity);
+      expect(watchedFeed.currentState.activities).toHaveLength(1);
+
+      // the activity is deleted before the add is broadcast
+      handleActivityDeleted.call(watchedFeed, { activity }, false);
+      expect(watchedFeed.currentState.activities).toHaveLength(0);
+
+      // the delayed add broadcast must not resurrect it
+      handleActivityAdded.call(watchedFeed, { activity });
+      expect(watchedFeed.currentState.activities).toHaveLength(0);
+
+      // ...and the delete broadcast is still deduplicated against its HTTP response
+      handleActivityDeleted.call(watchedFeed, { activity });
+      expect(watchedFeed.currentState.activities).toHaveLength(0);
+    });
   });
 });

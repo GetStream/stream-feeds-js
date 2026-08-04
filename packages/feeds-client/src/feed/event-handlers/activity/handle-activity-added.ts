@@ -1,6 +1,13 @@
 import type { Feed } from '../../feed';
 import type { ActivityResponse } from '../../../gen/models';
-import type { EventPayload } from '../../../types-internal';
+import type { EventPayload, PartializeAllBut } from '../../../types-internal';
+import { getStateUpdateQueueId, shouldUpdateState } from '../../../utils';
+import { eventTriggeredByConnectedUser } from '../../../utils/event-triggered-by-connected-user';
+
+export type ActivityAddedPayload = PartializeAllBut<
+  EventPayload<'feeds.activity.added'>,
+  'activity'
+>;
 
 export function addActivitiesToState(
   this: Feed,
@@ -51,13 +58,43 @@ export function addActivitiesToState(
   return result;
 }
 
+/**
+ * Adding an activity reaches a watched feed twice — once through the HTTP response and
+ * once as a WebSocket broadcast — so the two have to be paired off through the state
+ * update queue.
+ *
+ * `hasActivity` alone is not enough: it only says whether the activity is in state right
+ * now, so a WS broadcast delayed past a subsequent delete would re-add an activity that
+ * has already been removed.
+ */
+export function shouldApplyActivityAdded(
+  this: Feed,
+  activity: ActivityResponse,
+  fromWs: boolean,
+) {
+  return shouldUpdateState({
+    stateUpdateQueueId: getStateUpdateQueueId({ activity }, 'activity-added'),
+    stateUpdateQueue: this.stateUpdateQueue,
+    watch: this.currentState.watch,
+    fromWs,
+    isTriggeredByConnectedUser: eventTriggeredByConnectedUser.call(this, {
+      user: activity.user,
+    }),
+  });
+}
+
 export function handleActivityAdded(
   this: Feed,
-  event: EventPayload<'feeds.activity.added'>,
+  payload: ActivityAddedPayload,
+  fromWs = true,
 ) {
+  if (!shouldApplyActivityAdded.call(this, payload.activity, fromWs)) {
+    return;
+  }
+
   const currentUser = this.client.state.getLatestValue().connected_user;
   const decision = this.resolveNewActivityDecision(
-    event.activity,
+    payload.activity,
     currentUser,
     false,
   );
@@ -67,13 +104,13 @@ export function handleActivityAdded(
   const position = decision === 'add-to-end' ? 'end' : 'start';
   const currentActivities = this.currentState.activities;
   const result = addActivitiesToState.bind(this)(
-    [event.activity],
+    [payload.activity],
     currentActivities,
     position,
     { hasOwnFields: false, backfillOwnFields: true },
   );
   if (result.changed) {
-    const activity = event.activity;
+    const activity = payload.activity;
     this.client.hydratePollCache([activity]);
 
     this.state.partialNext({ activities: result.activities });
