@@ -5,6 +5,7 @@ Bring users together through personalized feeds, threaded discussions, and real-
 ## **Quick Links**
 
 - [Register](https://getstream.io/chat/trial/) to get an API key for Stream Feeds
+- [AI Agent Skills](#build-with-ai-agents) for Claude Code, Cursor, and Codex
 - [React Sample apps](../../#react-demo-app)
 - [Docs](https://getstream.io/activity-feeds/docs/)
 
@@ -16,6 +17,23 @@ Stream's Activity Feed V3 SDK enables teams of all sizes to build scalable activ
 
 - [React tutorial](https://getstream.io/activity-feeds/sdk/react/)
 - [React Native tutorial](https://getstream.io/activity-feeds/sdk/react-native/)
+
+## Build with AI Agents
+
+If you build with an AI coding agent, our [agent skills](https://getstream.io/agent-skills/docs/installation/) teach it how to use Stream's SDKs correctly. Install them once:
+
+```bash
+curl -fsSL https://getstream.io/cli.sh | bash
+getstream init
+```
+
+This package is the headless, framework-agnostic client, so reach for [`/stream-docs`](https://getstream.io/agent-skills/docs/skills/stream-docs/) to look up any client method, state field or WebSocket event against the live documentation:
+
+```
+/stream-docs how do I paginate activities with the Feeds JS client?
+```
+
+If you are building a UI on top of it, use [`/stream-react`](https://getstream.io/agent-skills/docs/skills/stream-react/) for web or [`/stream-react-native`](https://getstream.io/agent-skills/docs/skills/stream-react-native/) for React Native and Expo instead — those can scaffold an app with the SDK wired up, add Feeds to an app you already have, or audit an existing integration. Works with Claude Code, Cursor, Codex, and any other agent that reads the universal `.agents` location.
 
 ## 👩‍💻 Free for Makers 👨‍💻
 

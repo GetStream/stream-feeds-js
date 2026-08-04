@@ -7,6 +7,7 @@ Supported React versions: ^17 || ^18 || ^19
 ## **Quick Links 🔗**
 
 - [Register](https://getstream.io/chat/trial/) to get an API key for Stream Feeds
+- [AI Agent Skills](#build-with-ai-agents) for Claude Code, Cursor, and Codex
 - [Sample apps](../../#react-demo-app)
 - [Docs](https://getstream.io/activity-feeds/docs/)
 
@@ -15,6 +16,24 @@ Supported React versions: ^17 || ^18 || ^19
 Stream allows developers to rapidly deploy scalable feeds, chat messaging and video with an industry leading 99.999% uptime SLA guarantee.
 
 Stream's Activity Feed V3 SDK enables teams of all sizes to build scalable activity feeds. The best place to get started is to [follow the tutorial](https://getstream.io/activity-feeds/sdk/react/).
+
+## Build with AI Agents
+
+If you build with an AI coding agent, our [agent skills](https://getstream.io/agent-skills/docs/installation/) teach it how to use this SDK correctly. Install them once:
+
+```bash
+curl -fsSL https://getstream.io/cli.sh | bash
+getstream init
+```
+
+Then reach for the [`/stream-react`](https://getstream.io/agent-skills/docs/skills/stream-react/) skill:
+
+```
+/stream-react scaffold a Next.js app with a following feed and an activity composer
+/stream-react add a notification feed to my existing React app
+```
+
+It can scaffold a new Next.js app with the SDK wired up, add Feeds to an app you already have, audit an existing integration, or migrate between SDK major versions. Works with Claude Code, Cursor, Codex, and any other agent that reads the universal `.agents` location.
 
 ## 👩‍💻 Free for Makers 👨‍💻
 
