@@ -31,6 +31,7 @@ import {
   handleBookmarkUpdated,
   handleActivityAdded,
   addActivitiesToState,
+  shouldApplyActivityAdded,
   handleActivityUpdated,
   handleFeedMemberAdded,
   handleFeedMemberRemoved,
@@ -964,6 +965,10 @@ export class Feed extends FeedApi {
    * Used when the activity was added via this feed's addActivity or via client.addActivity.
    */
   protected addActivityFromHTTPResponse(activity: ActivityResponse): void {
+    if (!shouldApplyActivityAdded.call(this, activity, false)) {
+      return;
+    }
+
     const currentUser = this.client.state.getLatestValue().connected_user;
     const decision = this.resolveNewActivityDecision(
       activity,

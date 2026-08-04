@@ -13,6 +13,14 @@ import {
   generateBookmarkResponse,
 } from '../../../test-utils/response-generators';
 
+const generateBookmarkFolder = (id: string) => ({
+  id,
+  name: `Folder ${id}`,
+  created_at: new Date(),
+  updated_at: new Date(),
+  custom: {},
+});
+
 describe(handleBookmarkUpdated.name, () => {
   let feed: Feed;
   let client: FeedsClient;
@@ -237,5 +245,190 @@ describe(handleBookmarkUpdated.name, () => {
     handleBookmarkUpdated.call(feed, event);
     const stateAfter = feed.currentState;
     expect(stateAfter).toBe(stateBefore);
+  });
+
+  it('ignores an update event older than the bookmark in state', () => {
+    const activityId = crypto.randomUUID();
+    const event = generateBookmarkUpdatedEvent({
+      bookmark: {
+        activity: {
+          id: activityId,
+          own_reactions: [],
+          bookmark_count: 1,
+        },
+        user: { id: currentUserId },
+        updated_at: new Date('2025-08-05T12:00:00Z'),
+      },
+    });
+    const currentBookmark = generateBookmarkResponse({
+      activity: { id: activityId },
+      user: { id: currentUserId },
+      updated_at: new Date('2025-08-06T12:00:00Z'),
+    });
+    const activity = generateActivityResponse({
+      id: activityId,
+      bookmark_count: 1,
+      own_bookmarks: [currentBookmark],
+      own_reactions: [generateFeedReactionResponse()],
+    });
+    feed.state.partialNext({
+      activities: [activity],
+      pinned_activities: [generateActivityPinResponse({ activity })],
+    });
+
+    const stateBefore = feed.currentState;
+
+    handleBookmarkUpdated.call(feed, event);
+
+    const stateAfter = feed.currentState;
+    expect(stateAfter).toBe(stateBefore);
+    expect(stateAfter.activities![0].own_bookmarks).toEqual([currentBookmark]);
+  });
+
+  describe('folder moves', () => {
+    it('moves a bookmark to another folder using the previous folder from the request', () => {
+      // the payload carries the folder the bookmark was moved *to*, so it no longer
+      // matches the entry in state by identity — only the request knows where it came
+      // from
+      const activityId = crypto.randomUUID();
+      const event = generateBookmarkUpdatedEvent({
+        bookmark: {
+          activity: {
+            id: activityId,
+            own_reactions: [],
+            bookmark_count: 1,
+          },
+          user: { id: currentUserId },
+          folder: generateBookmarkFolder('folder2'),
+          updated_at: new Date('2025-08-06T12:00:00Z'),
+        },
+      });
+      const activity = generateActivityResponse({
+        id: activityId,
+        bookmark_count: 1,
+        own_bookmarks: [
+          generateBookmarkResponse({
+            activity: { id: activityId },
+            user: { id: currentUserId },
+            folder: generateBookmarkFolder('folder1'),
+            updated_at: new Date('2025-08-05T12:00:00Z'),
+          }),
+          // a second bookmark of the same activity, which must not be touched
+          generateBookmarkResponse({
+            activity: { id: activityId },
+            user: { id: currentUserId },
+            folder: generateBookmarkFolder('folder3'),
+            updated_at: new Date('2025-08-05T12:00:00Z'),
+          }),
+        ],
+        own_reactions: [generateFeedReactionResponse()],
+      });
+      const activityPin = generateActivityPinResponse({
+        activity: { ...activity },
+      });
+      feed.state.partialNext({
+        activities: [activity],
+        pinned_activities: [activityPin],
+      });
+
+      handleBookmarkUpdated.call(feed, event, { previousFolderId: 'folder1' });
+
+      const ownBookmarks = feed.currentState.activities![0].own_bookmarks;
+      expect(ownBookmarks).toHaveLength(2);
+      expect(ownBookmarks[0]).toBe(event.bookmark);
+      expect(ownBookmarks[1].folder?.id).toBe('folder3');
+      expect(
+        feed.currentState.pinned_activities![0].activity.own_bookmarks[0],
+      ).toBe(event.bookmark);
+    });
+
+    it('moves a bookmark to another folder from a WS event when it is the only bookmark for the activity', () => {
+      // WS events carry no previous folder; with a single candidate the move is
+      // unambiguous
+      const activityId = crypto.randomUUID();
+      const event = generateBookmarkUpdatedEvent({
+        bookmark: {
+          activity: {
+            id: activityId,
+            own_reactions: [],
+            bookmark_count: 1,
+          },
+          user: { id: currentUserId },
+          folder: generateBookmarkFolder('folder2'),
+          updated_at: new Date('2025-08-06T12:00:00Z'),
+        },
+      });
+      const activity = generateActivityResponse({
+        id: activityId,
+        bookmark_count: 1,
+        own_bookmarks: [
+          generateBookmarkResponse({
+            activity: { id: activityId },
+            user: { id: currentUserId },
+            folder: generateBookmarkFolder('folder1'),
+            updated_at: new Date('2025-08-05T12:00:00Z'),
+          }),
+        ],
+        own_reactions: [generateFeedReactionResponse()],
+      });
+      feed.state.partialNext({
+        activities: [activity],
+        pinned_activities: [generateActivityPinResponse({ activity })],
+      });
+
+      handleBookmarkUpdated.call(feed, event);
+
+      expect(feed.currentState.activities![0].own_bookmarks).toEqual([
+        event.bookmark,
+      ]);
+    });
+
+    it('leaves own_bookmarks untouched when a WS folder move is ambiguous', () => {
+      const activityId = crypto.randomUUID();
+      const event = generateBookmarkUpdatedEvent({
+        bookmark: {
+          activity: {
+            id: activityId,
+            own_reactions: [],
+            bookmark_count: 2,
+          },
+          user: { id: currentUserId },
+          folder: generateBookmarkFolder('folder3'),
+          updated_at: new Date('2025-08-06T12:00:00Z'),
+        },
+      });
+      const ownBookmarks = [
+        generateBookmarkResponse({
+          activity: { id: activityId },
+          user: { id: currentUserId },
+          folder: generateBookmarkFolder('folder1'),
+          updated_at: new Date('2025-08-05T12:00:00Z'),
+        }),
+        generateBookmarkResponse({
+          activity: { id: activityId },
+          user: { id: currentUserId },
+          folder: generateBookmarkFolder('folder2'),
+          updated_at: new Date('2025-08-05T12:00:00Z'),
+        }),
+      ];
+      const activity = generateActivityResponse({
+        id: activityId,
+        bookmark_count: 2,
+        own_bookmarks: ownBookmarks,
+        own_reactions: [generateFeedReactionResponse()],
+      });
+      feed.state.partialNext({
+        activities: [activity],
+        pinned_activities: [generateActivityPinResponse({ activity })],
+      });
+
+      const stateBefore = feed.currentState;
+
+      handleBookmarkUpdated.call(feed, event);
+
+      const stateAfter = feed.currentState;
+      expect(stateAfter).toBe(stateBefore);
+      expect(stateAfter.activities![0].own_bookmarks).toEqual(ownBookmarks);
+    });
   });
 });

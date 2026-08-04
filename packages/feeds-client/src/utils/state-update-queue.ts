@@ -1,5 +1,6 @@
 import type { FollowResponse } from '../gen/models';
 import type {
+  ActivityAddedPayload,
   ActivityDeletedPayload,
   ActivityPinnedPayload,
   ActivityReactionAddedPayload,
@@ -20,6 +21,7 @@ import type { FeedMemberUpdatedPayload } from '../feed/event-handlers/feed-membe
 import type { FeedMemberRemovedPayload } from '../feed/event-handlers/feed-member/handle-feed-member-removed';
 
 export type StateUpdateQueuePrefix =
+  | 'activity-added'
   | 'activity-deleted'
   | 'activity-pinned'
   | 'activity-unpinned'
@@ -41,6 +43,7 @@ export type StateUpdateQueuePrefix =
   | 'feed-member-removed';
 
 type StateUpdateQueuePayloadByPrefix = {
+  'activity-added': ActivityAddedPayload;
   'activity-deleted': ActivityDeletedPayload;
   'activity-pinned': ActivityPinnedPayload;
   'activity-unpinned': ActivityUnpinnedPayload;
@@ -179,6 +182,7 @@ export function getStateUpdateQueueId(...args: StateUpdateQueuePairTuples) {
   const toJoin = [prefix as string];
 
   switch (prefix) {
+    case 'activity-added':
     case 'activity-deleted': {
       return toJoin.concat([data.activity.id]).join('-');
     }
