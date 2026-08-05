@@ -5,6 +5,7 @@ Bring users together through personalized feeds, threaded discussions, and real-
 ## Quick Links
 
 - [Register](https://getstream.io/chat/trial/) to get an API key for Stream Feeds
+- [AI Agent Skills](#build-with-ai-agents) for Claude Code, Cursor, and Codex
 - [React SDK](./packages/react-sdk#official-react-sdk-for-steram-feeds)
 - [React Native SDK](./packages/react-native-sdk#official-react-native-sdk-for-stream-feeds)
 - [JavaScript SDK](./packages/feeds-client#official-plain-js-sdk-and-low-level-client-for-stream-feeds)
@@ -20,6 +21,24 @@ Stream's Activity Feed V3 SDK enables teams of all sizes to build scalable activ
 
 - [React tutorial](https://getstream.io/activity-feeds/sdk/react/)
 - [React Native tutorial](https://getstream.io/activity-feeds/sdk/react-native/)
+
+## Build with AI Agents
+
+If you build with an AI coding agent, our [agent skills](https://getstream.io/agent-skills/docs/installation/) teach it how to use these SDKs correctly. Install them once:
+
+```bash
+curl -fsSL https://getstream.io/cli.sh | bash
+getstream init
+```
+
+Then reach for [`/stream-react`](https://getstream.io/agent-skills/docs/skills/stream-react/) for web, or [`/stream-react-native`](https://getstream.io/agent-skills/docs/skills/stream-react-native/) for React Native and Expo:
+
+```
+/stream-react scaffold a Next.js app with a following feed and an activity composer
+/stream-react-native add a Stream Feeds timeline with comments to my Expo app
+```
+
+Each skill can scaffold a new app with the SDK wired up, add Feeds to an app you already have, audit an existing integration, or migrate between SDK major versions. There is also [`/stream-docs`](https://getstream.io/agent-skills/docs/skills/stream-docs/) for looking up any Stream SDK method or hook against the live documentation. Works with Claude Code, Cursor, Codex, and any other agent that reads the universal `.agents` location.
 
 ## 👩‍💻 Free for Makers 👨‍💻
 
@@ -188,7 +207,7 @@ yarn download-images --replace 1,5,10
 
 ### Prerequisites
 
-You'll need to have [node 22](https://nodejs.org/en/download) installed on your computer
+You'll need to have [node 24](https://nodejs.org/en/download) installed on your computer (see `.nvmrc`)
 
 ### Install dependencies
 
@@ -206,3 +225,9 @@ yarn build
 # or
 yarn start
 ```
+
+## Contributing
+
+Using AI assistants (Claude Code/Cursor/Codex/Copilot):
+See [AGENTS.md](./AGENTS.md) about repository and project structure, architecture, and contribution guides.
+To have an agent integrate these SDKs into your own app, see [Build with AI Agents](#build-with-ai-agents).
