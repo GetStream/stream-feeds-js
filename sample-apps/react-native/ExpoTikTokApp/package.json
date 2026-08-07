@@ -50,7 +50,7 @@
     "react-native-worklets": "^0.5.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
+    "@babel/core": "^7.29.6",
     "@rnx-kit/metro-config": "^2.1.0",
     "@rnx-kit/metro-resolver-symlinks": "^0.2.5",
     "@stream-io/node-sdk": "catalog:",
