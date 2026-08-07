@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.6.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.6.0...@stream-io/feeds-client-2.6.1) (2026-08-07)
+
+
+### Bug Fixes
+
+* late WS events override state ([#308](https://github.com/GetStream/stream-feeds-js/issues/308)) ([18c46a3](https://github.com/GetStream/stream-feeds-js/commit/18c46a3f260de7b3392a12f0b5df317b40607e12))
+
 ## [2.6.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.5.0...@stream-io/feeds-client-2.6.0) (2026-07-16)
 
 
