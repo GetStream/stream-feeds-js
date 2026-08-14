@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from 'axios';
 import type { ConfigureLoggersOptions } from '../utils/logger';
 
 export * from './search/types';
@@ -7,6 +8,13 @@ export type FeedsClientOptions = {
   timeout?: number;
   configure_loggers_options?: ConfigureLoggersOptions;
   query_batch_own_fields_throttling_interval?: number;
+  /**
+   * Custom headers sent along with every API request.
+   *
+   * Can't be used to overwrite the SDK's internal settings. Applies to HTTP
+   * requests only, not the WebSocket connection.
+   */
+  custom_headers?: AxiosRequestConfig['headers'];
 };
 
 export type RateLimit = {
