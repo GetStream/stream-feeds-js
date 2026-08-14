@@ -1,6 +1,7 @@
 import type {
   AxiosError,
   AxiosInstance,
+  AxiosRequestConfig,
   AxiosResponse,
   RawAxiosRequestHeaders,
 } from 'axios';
@@ -33,6 +34,7 @@ export class ApiClient {
   public readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
   private timeout: number;
+  private readonly customHeaders: AxiosRequestConfig['headers'];
   public extraHeaderInformation: ExtraHeaderInformation = {};
   private readonly logger = feedsLoggerSystem.getLogger('api-client');
 
@@ -44,6 +46,7 @@ export class ApiClient {
   ) {
     this.baseUrl = options?.base_url ?? 'https://feeds.stream-io-api.com';
     this.timeout = options?.timeout ?? 3000;
+    this.customHeaders = options?.custom_headers;
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
     });
@@ -88,7 +91,10 @@ export class ApiClient {
 
     const token = await this.tokenManager.getToken();
 
+    // Custom headers are spread first, so they can never overwrite the SDK's
+    // internal settings.
     const headers: RawAxiosRequestHeaders = {
+      ...this.customHeaders,
       ...this.commonHeaders,
       Authorization: token,
       'Content-Type': requestContentType ?? 'application/json',
