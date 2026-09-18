@@ -888,3 +888,142 @@ describe('Feeds client tests', () => {
     });
   });
 });
+
+describe('reconnect reconciliation', () => {
+  let client: FeedsClient;
+
+  // FeedsClient extends the generated FeedsApi; stubbing the grandparent
+  // prototype intercepts the actual network calls.
+  const feedsApiPrototype = () =>
+    Object.getPrototypeOf(Object.getPrototypeOf(client));
+
+  const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+  const reconnect = async () => {
+    client['eventDispatcher'].dispatch({
+      type: 'connection.changed',
+      online: false,
+    });
+    client['eventDispatcher'].dispatch({
+      type: 'connection.changed',
+      online: true,
+    });
+    await flush();
+  };
+
+  beforeEach(() => {
+    client = new FeedsClient('mock-api-key');
+
+    vi.spyOn(
+      client['connectionIdManager'],
+      'getConnectionId',
+    ).mockResolvedValue('connection-id');
+    vi.spyOn(feedsApiPrototype(), 'getOrCreateFeed').mockResolvedValue({
+      activities: [],
+      aggregated_activities: [],
+      members: [],
+      next: undefined,
+      prev: undefined,
+      duration: '10ms',
+      feed: generateFeedResponse({ id: 'main', group_id: 'user' }),
+    });
+    vi.spyOn(feedsApiPrototype(), 'stopWatchingFeed').mockResolvedValue({
+      duration: '10ms',
+    });
+    vi.spyOn(feedsApiPrototype(), '_queryFeeds').mockResolvedValue({
+      feeds: [generateFeedResponse({ id: 'main', group_id: 'user' })],
+      next: undefined,
+      prev: undefined,
+      duration: '10ms',
+    });
+
+    // recoverOnReconnect deliberately skips the very first healthy event
+    client['healthyConnectionChangedEventCount'] = 1;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('refetches a feed that is still being watched', async () => {
+    const feed = client.feed('user', 'main');
+    await feed.getOrCreate({ watch: true });
+
+    const getOrCreateSpy = vi.spyOn(feed, 'getOrCreate');
+
+    await reconnect();
+
+    expect(getOrCreateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ watch: true }),
+    );
+  });
+
+  it('does not refetch a feed after stopWatching', async () => {
+    const feed = client.feed('user', 'main');
+    await feed.getOrCreate({ watch: true });
+    await feed.stopWatching();
+
+    expect(feed.currentState.watch).toBe(false);
+
+    const getOrCreateSpy = vi.spyOn(feed, 'getOrCreate');
+
+    await reconnect();
+
+    expect(getOrCreateSpy).not.toHaveBeenCalled();
+  });
+
+  it('refetches again once the feed is re-watched after stopWatching', async () => {
+    const feed = client.feed('user', 'main');
+    await feed.getOrCreate({ watch: true });
+    await feed.stopWatching();
+    await feed.getOrCreate({ watch: true });
+
+    const getOrCreateSpy = vi.spyOn(feed, 'getOrCreate');
+
+    await reconnect();
+
+    expect(getOrCreateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ watch: true }),
+    );
+  });
+
+  it('refetches again when queryFeeds re-watches a stop-watched feed', async () => {
+    const feed = client.feed('user', 'main');
+    await feed.getOrCreate({ watch: true });
+    await feed.stopWatching();
+
+    await client.queryFeeds({ filter: { feed: 'user:main' }, watch: true });
+
+    // state.watch and the replay gate must not disagree
+    expect(feed.currentState.watch).toBe(true);
+    expect(feed.currentState.last_get_or_create_request_config?.watch).toBe(
+      true,
+    );
+
+    const getOrCreateSpy = vi.spyOn(feed, 'getOrCreate');
+
+    await reconnect();
+
+    expect(getOrCreateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ watch: true }),
+    );
+  });
+
+  it('only stops refetching the feed that was stop-watched', async () => {
+    const stopped = client.feed('user', 'stopped');
+    const watched = client.feed('user', 'watched');
+    await stopped.getOrCreate({ watch: true });
+    await watched.getOrCreate({ watch: true });
+    await stopped.stopWatching();
+
+    const stoppedSpy = vi.spyOn(stopped, 'getOrCreate');
+    const watchedSpy = vi.spyOn(watched, 'getOrCreate');
+
+    await reconnect();
+
+    expect(stoppedSpy).not.toHaveBeenCalled();
+    expect(watchedSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ watch: true }),
+    );
+  });
+});

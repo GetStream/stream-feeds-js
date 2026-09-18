@@ -105,6 +105,33 @@ describe('Feed watch and unwatch', () => {
     expect(activity['feed']?.currentState.watch).toBe(true);
   });
 
+  it(`stop watching prevents the feed from being refetched on reconnect`, async () => {
+    // a dedicated feed: the reconnect test above leaves an unawaited
+    // getOrCreate in flight on the shared one
+    const ownFeed = client.feed(feedGroup, crypto.randomUUID());
+    await ownFeed.getOrCreate({ watch: true });
+    expect(ownFeed.currentState.watch).toBe(true);
+
+    await ownFeed.stopWatching();
+    expect(ownFeed.currentState.watch).toBe(false);
+
+    const spy = vi.spyOn(ownFeed, 'getOrCreate');
+
+    client['eventDispatcher'].dispatch({
+      type: 'connection.changed',
+      online: false,
+    });
+    client['eventDispatcher'].dispatch({
+      type: 'connection.changed',
+      online: true,
+    });
+
+    expect(spy).not.toHaveBeenCalled();
+
+    spy.mockRestore();
+    await ownFeed.delete();
+  });
+
   afterAll(async () => {
     await feed.delete();
     await client.disconnectUser();
