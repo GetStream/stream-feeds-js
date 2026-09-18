@@ -6,6 +6,7 @@ import type { ActivityResponse, GetOrCreateFeedResponse } from '../gen/models';
 import { generateActivityResponse, generateFeedResponse } from '../test-utils';
 import { clearQueuedFeeds } from '../utils/throttling';
 import { StreamApiError, type StreamResponse } from '../common/types';
+import { handleWatchStopped } from './event-handlers/watch/handle-watch-stopped';
 
 describe('Feed derived state updates', () => {
   let feed: Feed;
@@ -722,6 +723,20 @@ describe('synchronize retry', () => {
     feed.state.partialNext({
       last_get_or_create_request_config: { watch: false },
     });
+
+    await feed.synchronize();
+
+    expect(getOrCreateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not synchronize after the watch intent is cleared', async () => {
+    feed.state.partialNext({
+      watch: true,
+      last_get_or_create_request_config: { watch: true, limit: 20 },
+    });
+
+    // what an explicit feed.stopWatching() does to the feed's state
+    handleWatchStopped.call(feed, { clearWatchIntent: true });
 
     await feed.synchronize();
 

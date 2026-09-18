@@ -1229,7 +1229,9 @@ export class FeedsClient extends FeedsApi {
     const feeds = this.findAllActiveFeedsByFid(
       `${request.feed_group_id}:${request.feed_id}`,
     );
-    feeds.forEach((f) => handleWatchStopped.bind(f)());
+    feeds.forEach((f) =>
+      handleWatchStopped.call(f, { clearWatchIntent: true }),
+    );
 
     return response;
   }
@@ -1247,7 +1249,9 @@ export class FeedsClient extends FeedsApi {
       const feeds = this.findAllActiveFeedsByFid(
         `${request.feed_group_id}:${request.feed_id}`,
       );
-      feeds.forEach((f) => handleWatchStarted.bind(f)());
+      feeds.forEach((f) =>
+        handleWatchStarted.call(f, { setWatchIntent: true }),
+      );
     }
 
     return response;
@@ -1326,7 +1330,7 @@ export class FeedsClient extends FeedsApi {
           wasFullUpdate = true;
         }
       }
-      if (watch) handleWatchStarted.call(feed);
+      if (watch) handleWatchStarted.call(feed, { setWatchIntent: true });
     }
 
     // If we didn't do a full update, check if own_* fields have changed
