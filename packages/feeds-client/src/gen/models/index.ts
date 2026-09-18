@@ -44,7 +44,15 @@ export interface AITextConfig {
   async?: boolean;
 }
 
-export interface AIVideoConfig {
+export interface AIVideoConfigRequest {
+  async?: boolean;
+
+  enabled?: boolean;
+
+  rules?: AWSRekognitionRule[];
+}
+
+export interface AIVideoConfigResponse {
   enabled: boolean;
 
   rules: AWSRekognitionRule[];
@@ -130,7 +138,7 @@ export interface AcceptFollowRequest {
   target: string;
 
   /**
-   * Optional role for the follower in the follow relationship
+   * Optional role for the follower in the follow relationship. Server-side only. Either a built-in ('feed_follower' (the default) or 'feed_member_viewer') or any role your app has defined; grants are not inspected.
    */
   follower_role?: string;
 }
@@ -198,8 +206,14 @@ export interface ActionLogResponse {
 
   review_queue_item?: ReviewQueueItemResponse;
 
+  /**
+   * User response object
+   */
   target_user?: UserResponse;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -314,6 +328,9 @@ export interface ActivityFeedbackEventPayload {
    */
   value: string;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 }
 
@@ -412,6 +429,9 @@ export interface ActivityPinResponse {
 
   activity: ActivityResponse;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 }
 
@@ -445,7 +465,9 @@ export interface ActivityPinnedEvent {
 export interface ActivityProcessorConfig {
   type: string;
 
-  openai_key?: string;
+  min_text_length?: number;
+
+  min_word_count?: number;
 
   config?: Record<string, any>;
 }
@@ -637,6 +659,11 @@ export interface ActivityRequest {
   collection_refs?: string[];
 
   /**
+   * Collections to create or update as part of this request, so an activity and the collections it references can be written in one call. Their refs (name:id) are added to collection_refs automatically; you do not need to restate them, and they count toward the same per-activity collection-reference limit, which is the effective cap here. A collection that already exists has its custom data updated. Use collection_refs instead when the collection already exists and you are only referencing it, which requires no collection permissions.
+   */
+  collections?: CollectionRequest[];
+
+  /**
    * Tags for filtering activities
    */
   filter_tags?: string[];
@@ -802,6 +829,9 @@ export interface ActivityResponse {
    */
   search_data: Record<string, any>;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   /**
@@ -1063,6 +1093,11 @@ export interface AddActivityRequest {
   collection_refs?: string[];
 
   /**
+   * Collections to create or update as part of this request, so an activity and the collections it references can be written in one call. Their refs (name:id) are added to collection_refs automatically; you do not need to restate them, and they count toward the same per-activity collection-reference limit, which is the effective cap here. A collection that already exists has its custom data updated. Use collection_refs instead when the collection already exists and you are only referencing it, which requires no collection permissions.
+   */
+  collections?: CollectionRequest[];
+
+  /**
    * Tags for filtering activities
    */
   filter_tags?: string[];
@@ -1178,9 +1213,19 @@ export interface AddCommentReactionRequest {
 
 export interface AddCommentReactionResponse {
   /**
+   * The change this write made to the number of reactions the user holds on this target: 1 when outcome is 'created', 0 when it is 'replaced' or 'unchanged'. These endpoints never return -1; a successful delete-reaction call is what decrements the count. With enforce_unique this is the delta of the user's reaction on the target; without it, the delta of reactions of this type.
+   */
+  counter_delta: number;
+
+  /**
    * Duration of the request
    */
   duration: string;
+
+  /**
+   * What this write did to the user's reaction on this target. One of: created, replaced, unchanged. 'created' means a new reaction was written and nothing was replaced; 'replaced' means enforce_unique removed one or more of the user's other reaction types; 'unchanged' means the user already held this reaction type (its custom data may still have been updated). Without enforce_unique a user can hold several reaction types on one target, so 'created' then means 'this reaction type was newly added', not 'the user's first reaction on this target'.
+   */
+  outcome: string;
 
   comment: CommentResponse;
 
@@ -1201,6 +1246,11 @@ export interface AddCommentReactionResponse {
    * ID of the async notification-creation task; poll GET /tasks/{id} for its status
    */
   notification_task_id?: string;
+
+  /**
+   * The reaction type this write replaced, or null when nothing was replaced. Non-null exactly when outcome is 'replaced'. If enforce_unique removed several reactions — possible only for data created before enforce_unique was adopted — this is the most recently created one.
+   */
+  previous_reaction_type?: string;
 
   reference_activity?: ActivityResponse;
 }
@@ -1345,7 +1395,17 @@ export interface AddReactionRequest {
 }
 
 export interface AddReactionResponse {
+  /**
+   * The change this write made to the number of reactions the user holds on this target: 1 when outcome is 'created', 0 when it is 'replaced' or 'unchanged'. These endpoints never return -1; a successful delete-reaction call is what decrements the count. With enforce_unique this is the delta of the user's reaction on the target; without it, the delta of reactions of this type.
+   */
+  counter_delta: number;
+
   duration: string;
+
+  /**
+   * What this write did to the user's reaction on this target. One of: created, replaced, unchanged. 'created' means a new reaction was written and nothing was replaced; 'replaced' means enforce_unique removed one or more of the user's other reaction types; 'unchanged' means the user already held this reaction type (its custom data may still have been updated). Without enforce_unique a user can hold several reaction types on one target, so 'created' then means 'this reaction type was newly added', not 'the user's first reaction on this target'.
+   */
+  outcome: string;
 
   activity: ActivityResponse;
 
@@ -1366,6 +1426,11 @@ export interface AddReactionResponse {
    * ID of the async notification-creation task; poll GET /tasks/{id} for its status
    */
   notification_task_id?: string;
+
+  /**
+   * The reaction type this write replaced, or null when nothing was replaced. Non-null exactly when outcome is 'replaced'. If enforce_unique removed several reactions — possible only for data created before enforce_unique was adopted — this is the most recently created one.
+   */
+  previous_reaction_type?: string;
 
   reference_activity?: ActivityResponse;
 }
@@ -1548,7 +1613,12 @@ export interface AppealItemResponse {
   ai_text_severity?: string;
 
   /**
-   * CID of the channel the entity belongs to, if applicable
+   * Detected language of the appeal_reason text itself
+   */
+  appeal_reason_language?: string;
+
+  /**
+   * CID of the channel the entity belongs to (content appeals), or of the channel ban being appealed (stream:user appeals). Empty for a global ban appeal.
    */
   channel_cid?: string;
 
@@ -1602,12 +1672,20 @@ export interface AppealItemResponse {
    */
   flags?: ModerationFlagResponse[];
 
+  /**
+   * Detected languages in the content
+   */
+  languages?: string[];
+
   entity_content?: ModerationPayload;
 
   moderation_action?: ActionLogResponse;
 
   original_moderation_action?: ActionLogResponse;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -1626,6 +1704,11 @@ export interface AppealRequest {
    * Type of entity being appealed (e.g., message, user)
    */
   entity_type: string;
+
+  /**
+   * CID of the channel ban being appealed. Only used when entity_type is stream:user; omit to appeal the global ban.
+   */
+  channel_cid?: string;
 
   /**
    * ID of the review queue item (flagged message) that triggered the ban. Applicable only for user ban appeals.
@@ -1800,6 +1883,11 @@ export interface BanInfoResponse {
   created_at: Date;
 
   /**
+   * The channel this ban applies to. Empty if this is an app-wide (global) ban rather than a per-channel ban.
+   */
+  channel_cid?: string;
+
+  /**
    * When the ban expires
    */
   expires?: Date;
@@ -1814,8 +1902,16 @@ export interface BanInfoResponse {
    */
   shadow?: boolean;
 
+  channel?: ChannelMetadata;
+
+  /**
+   * User response object
+   */
   created_by?: UserResponse;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -1836,11 +1932,6 @@ export interface BanRequest {
    * ID of the user to ban
    */
   target_user_id: string;
-
-  /**
-   * ID of the user performing the ban
-   */
-  banned_by_id?: string;
 
   /**
    * Channel where the ban applies
@@ -1868,8 +1959,6 @@ export interface BanRequest {
    * Duration of the ban in minutes
    */
   timeout?: number;
-
-  banned_by?: UserRequest;
 }
 
 export interface BatchQueryActivityReactionsRequest {
@@ -1999,6 +2088,8 @@ export interface BlockListResponse {
 
   id?: string;
 
+  owner_user_id?: string;
+
   team?: string;
 
   /**
@@ -2065,8 +2156,14 @@ export interface BlockedUserResponse {
    */
   user_id: string;
 
+  /**
+   * User response object
+   */
   blocked_user: UserResponse;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 }
 
@@ -2190,6 +2287,9 @@ export interface BookmarkFolderResponse {
    */
   updated_at: Date;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   /**
@@ -2241,6 +2341,9 @@ export interface BookmarkResponse {
 
   activity: ActivityResponse;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   activity_id?: string;
@@ -2292,14 +2395,29 @@ export interface BulkActionAppealsRequest {
    */
   appeal_ids: string[];
 
+  /**
+   * Configuration for mark reviewed action
+   */
   mark_reviewed?: MarkReviewedRequestPayload;
 
+  /**
+   * Configuration for rejecting an appeal
+   */
   reject_appeal?: RejectAppealRequestPayload;
 
+  /**
+   * Configuration for restore action. State-aware: reverses whichever of a delete, a block, or a shadow block currently applies to the content (including both a delete and a block/shadow block at once).
+   */
   restore?: RestoreActionRequestPayload;
 
+  /**
+   * Configuration for unban moderation action
+   */
   unban?: UnbanActionRequestPayload;
 
+  /**
+   * Deprecated: use restore instead — it now also reverses a block or shadow block. Configuration for unblock action.
+   */
   unblock?: UnblockActionRequestPayload;
 }
 
@@ -2387,48 +2505,6 @@ export interface CallCustomPropertyParameters {
   property_key?: string;
 }
 
-export interface CallResponse {
-  backstage: boolean;
-
-  captioning: boolean;
-
-  cid: string;
-
-  created_at: Date;
-
-  current_session_id: string;
-
-  id: string;
-
-  recording: boolean;
-
-  transcribing: boolean;
-
-  translating: boolean;
-
-  type: string;
-
-  updated_at: Date;
-
-  blocked_user_ids: string[];
-
-  custom: Record<string, any>;
-
-  channel_cid?: string;
-
-  ended_at?: Date;
-
-  join_ahead_time_seconds?: number;
-
-  routing_number?: string;
-
-  starts_at?: Date;
-
-  team?: string;
-
-  created_by?: UserResponse;
-}
-
 export interface CallRuleActionSequence {
   violation_number?: number;
 
@@ -2490,6 +2566,8 @@ export interface ChannelConfigWithInfo {
 
   max_message_length: number;
 
+  message_retention: string;
+
   mutes: boolean;
 
   name: string;
@@ -2540,11 +2618,31 @@ export interface ChannelConfigWithInfo {
 
   blocklists?: BlockListOptions[];
 
+  /**
+   * Sets thresholds for AI moderation
+   */
   automod_thresholds?: Thresholds;
 
   chat_preferences?: ChatPreferences;
 
   grants?: Record<string, string[]>;
+}
+
+export interface ChannelMemberPartialResponse {
+  /**
+   * Role of the member in the channel
+   */
+  channel_role: string;
+
+  /**
+   * Whether the user muted notifications for this channel
+   */
+  notifications_muted: boolean;
+
+  /**
+   * Channel-member custom fields projected via `member_custom_include`
+   */
+  custom?: Record<string, any>;
 }
 
 export interface ChannelMemberResponse {
@@ -2584,7 +2682,17 @@ export interface ChannelMemberResponse {
    */
   ban_expires?: Date;
 
+  /**
+   * Whether the member's ban also applies to channels the channel's creator will create in the future (an active future channel ban by the creator targets this member)
+   */
+  ban_from_future_channels?: boolean;
+
   deleted_at?: Date;
+
+  /**
+   * Expiration date of the future channel ban; absent when the future channel ban is permanent
+   */
+  future_channel_ban_expires?: Date;
 
   /**
    * Date when invite was accepted
@@ -2619,6 +2727,9 @@ export interface ChannelMemberResponse {
 
   deleted_messages?: string[];
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -2626,6 +2737,26 @@ export interface ChannelMessageCountRuleParameters {
   operator?: string;
 
   threshold?: number;
+}
+
+export interface ChannelMetadata {
+  cid: string;
+
+  id: string;
+
+  type: string;
+
+  custom: Record<string, any>;
+
+  last_message_at?: Date;
+
+  member_count?: number;
+
+  message_count?: number;
+
+  push_level?: string;
+
+  team?: string;
 }
 
 export interface ChannelMute {
@@ -2644,8 +2775,14 @@ export interface ChannelMute {
    */
   expires?: Date;
 
+  /**
+   * Represents channel in chat
+   */
   channel?: ChannelResponse;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -2749,7 +2886,7 @@ export interface ChannelResponse {
   auto_translation_enabled?: boolean;
 
   /**
-   * Language to translate to when auto translation is active
+   * Language (or comma-separated list of languages) to translate to when auto translation is active
    */
   auto_translation_language?: string;
 
@@ -2830,8 +2967,14 @@ export interface ChannelResponse {
 
   config?: ChannelConfigWithInfo;
 
+  /**
+   * User response object
+   */
   created_by?: UserResponse;
 
+  /**
+   * User response object
+   */
   truncated_by?: UserResponse;
 }
 
@@ -2922,6 +3065,9 @@ export interface ChatMessageResponse {
 
   reaction_scores: Record<string, number>;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   command?: string;
@@ -2960,10 +3106,13 @@ export interface ChatMessageResponse {
 
   image_labels?: Record<string, string[]>;
 
-  member?: ChannelMemberResponse;
+  member?: ChannelMemberPartialResponse;
 
   moderation?: ChatModerationV2Response;
 
+  /**
+   * User response object
+   */
   pinned_by?: UserResponse;
 
   poll?: PollResponseData;
@@ -3062,6 +3211,9 @@ export interface ChatReactionGroupUserResponse {
 
   user_id: string;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -3080,6 +3232,9 @@ export interface ChatReactionResponse {
 
   custom: Record<string, any>;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 }
 
@@ -3098,6 +3253,9 @@ export interface ChatReminderResponseData {
 
   message?: ChatMessageResponse;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -3420,6 +3578,9 @@ export interface CommentResponse {
    */
   own_reactions: FeedsReactionResponse[];
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   /**
@@ -3569,7 +3730,7 @@ export interface ConfigResponse {
 
   ai_text_config?: AITextConfig;
 
-  ai_video_config?: AIVideoConfig;
+  ai_video_config?: AIVideoConfigResponse;
 
   automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
 
@@ -3666,6 +3827,9 @@ export interface CreateBlockListResponse {
    */
   duration: string;
 
+  /**
+   * Block list contains restricted words
+   */
   blocklist?: BlockListResponse;
 }
 
@@ -3735,6 +3899,9 @@ export interface CreateFeedsBatchResponse {
 }
 
 export interface CreateGuestRequest {
+  /**
+   * User request object
+   */
   user: UserRequest;
 }
 
@@ -3749,6 +3916,9 @@ export interface CreateGuestResponse {
    */
   duration: string;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 }
 
@@ -3758,6 +3928,9 @@ export interface CreatePollOptionRequest {
    */
   text: string;
 
+  /**
+   * Custom data for this object
+   */
   custom?: Record<string, any>;
 }
 
@@ -3800,6 +3973,9 @@ export interface CreatePollRequest {
 
   options?: PollOptionInput[];
 
+  /**
+   * Custom data for this object
+   */
   custom?: Record<string, any>;
 }
 
@@ -4064,6 +4240,48 @@ export interface DeleteReactionRequestPayload {
   reason?: string;
 }
 
+export interface DeleteUserInterestsResponse {
+  duration: string;
+
+  /**
+   * Interest tags still set on the user
+   */
+  interests: InterestTagResponse[];
+}
+
+export interface DeleteUserMessagesRequestPayload {
+  /**
+   * Message deletion mode: soft, pruning, or hard
+   */
+
+  delete_messages: 'soft' | 'pruning' | 'hard';
+
+  /**
+   * Optional: scope deletion to a single channel (alternative to app-wide deletion)
+   */
+  channel_cid?: string;
+
+  /**
+   * Whether to also delete the user's reactions on other users' messages
+   */
+  delete_reactions?: boolean;
+
+  /**
+   * ID of the user whose messages should be deleted (alternative to item_id)
+   */
+  entity_id?: string;
+
+  /**
+   * Type of the entity
+   */
+  entity_type?: string;
+
+  /**
+   * Reason for the deletion
+   */
+  reason?: string;
+}
+
 export interface DeleteUserRequestPayload {
   /**
    * Also delete all user conversations
@@ -4102,7 +4320,7 @@ export interface DeleteUserRequestPayload {
 }
 
 export interface DeliveryReceiptsResponse {
-  enabled?: boolean;
+  enabled: boolean;
 }
 
 export interface DeviceResponse {
@@ -4218,14 +4436,26 @@ export interface DraftResponse {
 
   created_at: Date;
 
+  /**
+   * Contains the draft message content
+   */
   message: DraftPayloadResponse;
 
   parent_id?: string;
 
+  /**
+   * Represents channel in chat
+   */
   channel?: ChannelResponse;
 
+  /**
+   * Represents any chat message
+   */
   parent_message?: MessageResponse;
 
+  /**
+   * Represents any chat message
+   */
   quoted_message?: MessageResponse;
 }
 
@@ -4556,6 +4786,8 @@ export interface FeedGroup {
 
   created_at: Date;
 
+  default_follower_role: string;
+
   default_visibility: string;
 
   group_id: string;
@@ -4772,6 +5004,9 @@ export interface FeedMemberResponse {
    */
   updated_at: Date;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   /**
@@ -4978,6 +5213,9 @@ export interface FeedResponse {
    */
   updated_at: Date;
 
+  /**
+   * User response object
+   */
   created_by: UserResponse;
 
   /**
@@ -5079,6 +5317,9 @@ export interface FeedSuggestionResponse {
    */
   updated_at: Date;
 
+  /**
+   * User response object
+   */
   created_by: UserResponse;
 
   /**
@@ -5164,6 +5405,9 @@ export interface FeedsBookmarkResponse {
 
   updated_at: Date;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   activity_id?: string;
@@ -5212,6 +5456,9 @@ export interface FeedsFeedResponse {
 
   updated_at: Date;
 
+  /**
+   * User response object
+   */
   created_by: UserResponse;
 
   deleted_at?: Date;
@@ -5367,6 +5614,9 @@ export interface FeedsReactionResponse {
 
   updated_at: Date;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   comment_id?: string;
@@ -5379,6 +5629,9 @@ export interface FeedsShareResponse {
 
   created_at: Date;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 }
 
@@ -5437,6 +5690,9 @@ export interface FeedsV3ActivityResponse {
 
   search_data: Record<string, any>;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   deleted_at?: Date;
@@ -5515,6 +5771,9 @@ export interface FeedsV3CommentResponse {
 
   own_reactions: FeedsReactionResponse[];
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   controversy_score?: number;
@@ -5611,6 +5870,11 @@ export interface FilterConfigResponse {
    * The moderation_payload.custom keys the app has configured as review-queue filter chips (via moderation_dashboard_preferences.filterable_custom_keys). Discovery hint for the dashboard only — the filter accepts any custom key regardless of this list.
    */
   filterable_custom_keys?: string[];
+
+  /**
+   * AI image moderation labels available as filter values, as a map of L1 label to its L2 sub-labels. Reflects the app's effective image taxonomy: custom Bodyguard taxonomy when enabled, otherwise the standard catalogue of the org's enabled image providers.
+   */
+  ai_image_taxonomy?: Record<string, string[]>;
 }
 
 export interface FlagCountRuleParameters {
@@ -5660,6 +5924,8 @@ export interface FlagUserOptions {
 }
 
 export interface FloodConfig {
+  allowlist?: string[];
+
   identical?: FloodIdenticalConfig;
 
   similar?: FloodSimilarConfig;
@@ -5675,6 +5941,18 @@ export interface FloodIdenticalConfig {
   time_window: string;
 }
 
+export interface FloodIdenticalRuleParameters {
+  min_text_length?: number;
+
+  threshold?: number;
+
+  time_window?: string;
+
+  track_across_users?: boolean;
+
+  allowlist?: string[];
+}
+
 export interface FloodSimilarConfig {
   action: string;
 
@@ -5685,6 +5963,16 @@ export interface FloodSimilarConfig {
   threshold: number;
 
   time_window: string;
+}
+
+export interface FloodSimilarRuleParameters {
+  similarity_distance?: number;
+
+  threshold?: number;
+
+  time_window?: string;
+
+  allowlist?: string[];
 }
 
 export interface FollowBatchRequest {
@@ -5813,7 +6101,7 @@ export interface FollowResponse {
   created_at: Date;
 
   /**
-   * Role of the follower (source user) in the follow relationship
+   * Role of the follower (source user) in the follow relationship, as stored. A reserved name, or a role your app no longer defines, is reported as stored but evaluated as 'feed_follower'.
    */
   follower_role: string;
 
@@ -6046,6 +6334,25 @@ export interface GetConfigResponse {
   config?: ConfigResponse;
 }
 
+export interface GetFeedCountsResponse {
+  /**
+   * Number of activities in the feed
+   */
+  activity_count: number;
+
+  /**
+   * Total number of comments on those activities, including nested replies
+   */
+  comment_count: number;
+
+  duration: string;
+
+  /**
+   * Sum of activity_count and comment_count
+   */
+  total_count: number;
+}
+
 export interface GetFollowSuggestionsResponse {
   duration: string;
 
@@ -6152,6 +6459,9 @@ export interface GetOrCreateFeedRequest {
 
   data?: FeedInput;
 
+  /**
+   * Options to skip specific enrichments to improve performance. Default is false (enrichments are included). Setting a field to true skips that enrichment.
+   */
   enrichment_options?: EnrichmentOptions;
 
   external_ranking?: Record<string, any>;
@@ -6162,6 +6472,9 @@ export interface GetOrCreateFeedRequest {
 
   following_pagination?: PagerRequest;
 
+  /**
+   * Options to control fetching reactions from friends (users you follow or have mutual follows with).
+   */
   friend_reactions_options?: FriendReactionsOptions;
 
   interest_weights?: Record<string, number>;
@@ -6268,7 +6581,7 @@ export interface GetUserInterestsResponse {
   duration: string;
 
   /**
-   * Top-N interest tags sorted by descending count, then alphabetically by tag
+   * Interest tags sorted by descending weight, then manually set tags before computed ones, then descending count, then alphabetically by tag
    */
   interests: InterestTagResponse[];
 }
@@ -6303,6 +6616,22 @@ export interface HealthCheckEvent {
   received_at?: Date;
 
   me?: OwnUserResponse;
+}
+
+export interface IPContentCountRuleParameters {
+  threshold?: number;
+
+  time_window?: string;
+}
+
+export interface IPFlagCountRuleParameters {
+  severity?: string;
+
+  threshold?: number;
+
+  time_window?: string;
+
+  harm_labels?: string[];
 }
 
 export interface ImageContentParameters {
@@ -6400,16 +6729,41 @@ export interface Images {
   original: ImageData;
 }
 
+export interface ImportBlockListRequest {
+  items: string[];
+
+  chunk_size?: number;
+}
+
+export interface ImportBlockListResponse {
+  /**
+   * Duration of the request in milliseconds
+   */
+  duration: string;
+
+  task_id: string;
+}
+
 export interface InterestTagResponse {
   /**
-   * Number of distinct reacted-to activities tagged with this value
+   * Lifetime number of distinct reacted-to activities tagged with this value, without decay; 0 for manually set tags
    */
   count: number;
+
+  /**
+   * How the tag was set: computed (from the user's reactions) or manual (through the API)
+   */
+  source: string;
 
   /**
    * The interest tag value
    */
   tag: string;
+
+  /**
+   * Ranking weight between -1.0 and 1.0. Computed tags carry a recency-decayed weight in (0, 1.0]: the user's strongest tag is 1.0 and every other a proportional share
+   */
+  weight: number;
 }
 
 export interface KeyframeOCRRuleParameters {
@@ -6478,6 +6832,8 @@ export interface ListBlockListResponse {
   duration: string;
 
   blocklists: BlockListResponse[];
+
+  next_cursor?: string;
 }
 
 export interface ListDevicesResponse {
@@ -6710,6 +7066,9 @@ export interface MessageResponse {
    */
   reaction_scores: Record<string, number>;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   /**
@@ -6790,14 +7149,25 @@ export interface MessageResponse {
    */
   image_labels?: Record<string, string[]>;
 
-  member?: ChannelMemberResponse;
+  member?: ChannelMemberPartialResponse;
+
+  /**
+   * Channel member data for the users mentioned in the message, keyed by user id. Only present when the app has member custom on mentioned users enabled, and only for the first two mentioned users of each message
+   */
+  mentioned_channel_members?: Record<string, ChannelMemberPartialResponse>;
 
   moderation?: ModerationV2Response;
 
+  /**
+   * User response object
+   */
   pinned_by?: UserResponse;
 
   poll?: PollResponseData;
 
+  /**
+   * Represents any chat message
+   */
   quoted_message?: MessageResponse;
 
   reaction_groups?: Record<string, ReactionGroupResponse>;
@@ -6850,6 +7220,51 @@ export interface ModerationBanResponse {
   duration: string;
 }
 
+export interface ModerationCallResponse {
+  backstage: boolean;
+
+  captioning: boolean;
+
+  cid: string;
+
+  created_at: Date;
+
+  current_session_id: string;
+
+  id: string;
+
+  recording: boolean;
+
+  transcribing: boolean;
+
+  translating: boolean;
+
+  type: string;
+
+  updated_at: Date;
+
+  blocked_user_ids: string[];
+
+  custom: Record<string, any>;
+
+  channel_cid?: string;
+
+  ended_at?: Date;
+
+  join_ahead_time_seconds?: number;
+
+  routing_number?: string;
+
+  starts_at?: Date;
+
+  team?: string;
+
+  /**
+   * User response object
+   */
+  created_by?: UserResponse;
+}
+
 export interface ModerationCustomActionEvent {
   /**
    * The ID of the custom action that was executed
@@ -6871,6 +7286,9 @@ export interface ModerationCustomActionEvent {
    */
   action_options?: Record<string, any>;
 
+  /**
+   * Represents any chat message
+   */
   message?: MessageResponse;
 }
 
@@ -6889,6 +7307,8 @@ export interface ModerationFlagResponse {
 
   result: Array<Record<string, any>>;
 
+  content_published_at?: Date;
+
   entity_creator_id?: string;
 
   reason?: string;
@@ -6899,10 +7319,16 @@ export interface ModerationFlagResponse {
 
   custom?: Record<string, any>;
 
+  /**
+   * Content payload for moderation
+   */
   moderation_payload?: ModerationPayloadResponse;
 
   review_queue_item?: ReviewQueueItemResponse;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -6937,6 +7363,9 @@ export interface ModerationMarkReviewedEvent {
 
   received_at?: Date;
 
+  /**
+   * Represents any chat message
+   */
   message?: MessageResponse;
 }
 
@@ -6946,6 +7375,8 @@ export interface ModerationPayload {
   image_ordered_keys?: string[];
 
   images?: string[];
+
+  other_media?: string[];
 
   text_ordered_keys?: string[];
 
@@ -6975,6 +7406,11 @@ export interface ModerationPayloadResponse {
    * Image URLs to moderate
    */
   images?: string[];
+
+  /**
+   * Media URLs from attachments outside the typed image/video/audio lists (custom attachment types such as GIF pickers)
+   */
+  other_media?: string[];
 
   /**
    * Caller-supplied keys for texts (e.g. "title", "description"), index-aligned with texts[]
@@ -7479,7 +7915,11 @@ export interface PollResponseData {
 
   vote_count: number;
 
-  voting_visibility: string;
+  /**
+   * Voting visibility of the poll
+   */
+
+  voting_visibility: 'anonymous' | 'public';
 
   latest_answers: PollVoteResponseData[];
 
@@ -7497,6 +7937,9 @@ export interface PollResponseData {
 
   max_votes_allowed?: number;
 
+  /**
+   * User response object
+   */
   created_by?: UserResponse;
 }
 
@@ -7598,6 +8041,9 @@ export interface PollVoteResponseData {
 
   user_id?: string;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -7748,6 +8194,9 @@ export interface QueryActivityReactionsRequest {
 
   sort?: SortParamRequest[];
 
+  /**
+   * Filters to apply to the query
+   */
   filter?: Record<string, any>;
 }
 
@@ -7930,6 +8379,9 @@ export interface QueryCommentReactionsRequest {
 
   sort?: SortParamRequest[];
 
+  /**
+   * Filters to apply to the query
+   */
   filter?: Record<string, any>;
 }
 
@@ -8305,6 +8757,14 @@ export interface QueryUsersPayload {
    */
   filter_conditions: Record<string, any>;
 
+  id_gt?: string;
+
+  id_gte?: string;
+
+  id_lt?: string;
+
+  id_lte?: string;
+
   include_deactivated_users?: boolean;
 
   limit?: number;
@@ -8424,6 +8884,9 @@ export interface ReactionGroupUserResponse {
    */
   user_id: string;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -8463,6 +8926,9 @@ export interface ReactionResponse {
    */
   custom: Record<string, any>;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 }
 
@@ -8476,7 +8942,7 @@ export interface ReadCollectionsResponse {
 }
 
 export interface ReadReceiptsResponse {
-  enabled?: boolean;
+  enabled: boolean;
 }
 
 export interface RejectAppealRequestPayload {
@@ -8525,10 +8991,19 @@ export interface ReminderResponseData {
 
   remind_at?: Date;
 
+  /**
+   * Represents channel in chat
+   */
   channel?: ChannelResponse;
 
+  /**
+   * Represents any chat message
+   */
   message?: MessageResponse;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
 }
 
@@ -8686,6 +9161,11 @@ export interface ReviewQueueItemResponse {
    */
   completed_at?: Date;
 
+  /**
+   * Highest per-label confidence (0-1) any provider reported across the item's flags; absent when no flag carried one
+   */
+  confidence_score?: number;
+
   config_key?: string;
 
   /**
@@ -8717,9 +9197,12 @@ export interface ReviewQueueItemResponse {
 
   appeal?: AppealItemResponse;
 
+  /**
+   * User response object
+   */
   assigned_to?: UserResponse;
 
-  call?: CallResponse;
+  call?: ModerationCallResponse;
 
   entity_creator?: EntityCreatorResponse;
 
@@ -8735,6 +9218,9 @@ export interface ReviewQueueItemResponse {
 
   message?: ChatMessageResponse;
 
+  /**
+   * Content payload for moderation
+   */
   moderation_payload?: ModerationPayloadResponse;
 
   reaction?: Reaction;
@@ -8821,9 +9307,17 @@ export interface RuleBuilderCondition {
 
   content_flag_count_rule_params?: FlagCountRuleParameters;
 
+  flood_identical_params?: FloodIdenticalRuleParameters;
+
+  flood_similar_params?: FloodSimilarRuleParameters;
+
   image_content_params?: ImageContentParameters;
 
   image_rule_params?: ImageRuleParameters;
+
+  ip_content_count_rule_params?: IPContentCountRuleParameters;
+
+  ip_flag_count_rule_params?: IPFlagCountRuleParameters;
 
   keyframe_ocr_rule_params?: KeyframeOCRRuleParameters;
 
@@ -8842,6 +9336,10 @@ export interface RuleBuilderCondition {
   user_flag_count_rule_params?: FlagCountRuleParameters;
 
   user_identical_content_count_params?: UserIdenticalContentCountParameters;
+
+  user_identical_image_count_params?: UserIdenticalImageCountParameters;
+
+  user_reaction_count_params?: UserReactionCountRuleParameters;
 
   user_role_params?: UserRoleParameters;
 
@@ -8918,6 +9416,9 @@ export interface ShareResponse {
    */
   created_at: Date;
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 }
 
@@ -8969,8 +9470,14 @@ export interface SharedLocationResponse {
    */
   end_at?: Date;
 
+  /**
+   * Represents channel in chat
+   */
   channel?: ChannelResponse;
 
+  /**
+   * Represents any chat message
+   */
   message?: MessageResponse;
 }
 
@@ -8993,8 +9500,14 @@ export interface SharedLocationResponseData {
 
   end_at?: Date;
 
+  /**
+   * Represents channel in chat
+   */
   channel?: ChannelResponse;
 
+  /**
+   * Represents any chat message
+   */
   message?: MessageResponse;
 }
 
@@ -9083,7 +9596,7 @@ export interface StoriesFeedUpdatedEvent {
 
 export interface SubmitActionRequest {
   /**
-   * Type of moderation action to perform. One of: mark_reviewed, delete_message, delete_activity, delete_comment, delete_reaction, ban, custom, unban, restore, delete_user, unblock, block, shadow_block, unmask, kick_user, end_call, escalate, de_escalate
+   * Type of moderation action to perform. One of: mark_reviewed, delete_message, delete_activity, delete_comment, delete_reaction, ban, custom, unban, restore, delete_user, delete_user_messages, unblock, block, shadow_block, unmask, kick_user, end_call, escalate, de_escalate
    */
 
   action_type:
@@ -9098,6 +9611,7 @@ export interface SubmitActionRequest {
     | 'unban'
     | 'restore'
     | 'delete_user'
+    | 'delete_user_messages'
     | 'unblock'
     | 'block'
     | 'shadow_block'
@@ -9119,38 +9633,88 @@ export interface SubmitActionRequest {
    */
   item_id?: string;
 
+  /**
+   * Configuration for ban moderation action
+   */
   ban?: BanActionRequestPayload;
 
+  /**
+   * Configuration for block action
+   */
   block?: BlockActionRequestPayload;
 
   bypass?: BypassActionRequest;
 
+  /**
+   * Configuration for custom moderation action
+   */
   custom?: CustomActionRequestPayload;
 
+  /**
+   * Configuration for activity deletion action
+   */
   delete_activity?: DeleteActivityRequestPayload;
 
+  /**
+   * Configuration for comment deletion action
+   */
   delete_comment?: DeleteCommentRequestPayload;
 
+  /**
+   * Configuration for message deletion action
+   */
   delete_message?: DeleteMessageRequestPayload;
 
+  /**
+   * Configuration for reaction deletion action
+   */
   delete_reaction?: DeleteReactionRequestPayload;
 
+  /**
+   * Configuration for user deletion action
+   */
   delete_user?: DeleteUserRequestPayload;
 
+  /**
+   * Configuration for deleting all of a user's chat messages without banning them or deleting their account
+   */
+  delete_user_messages?: DeleteUserMessagesRequestPayload;
+
+  /**
+   * Configuration for escalation action
+   */
   escalate?: EscalatePayload;
 
   flag?: FlagRequest;
 
+  /**
+   * Configuration for mark reviewed action
+   */
   mark_reviewed?: MarkReviewedRequestPayload;
 
+  /**
+   * Configuration for rejecting an appeal
+   */
   reject_appeal?: RejectAppealRequestPayload;
 
+  /**
+   * Configuration for restore action. State-aware: reverses whichever of a delete, a block, or a shadow block currently applies to the content (including both a delete and a block/shadow block at once).
+   */
   restore?: RestoreActionRequestPayload;
 
+  /**
+   * Configuration for shadow block action
+   */
   shadow_block?: ShadowBlockActionRequestPayload;
 
+  /**
+   * Configuration for unban moderation action
+   */
   unban?: UnbanActionRequestPayload;
 
+  /**
+   * Deprecated: use restore instead — it now also reverses a block or shadow block. Configuration for unblock action.
+   */
   unblock?: UnblockActionRequestPayload;
 }
 
@@ -9240,6 +9804,9 @@ export interface ThreadedCommentResponse {
 
   own_reactions: FeedsReactionResponse[];
 
+  /**
+   * User response object
+   */
   user: UserResponse;
 
   controversy_score?: number;
@@ -9265,6 +9832,9 @@ export interface ThreadedCommentResponse {
 
   i18n?: Record<string, string>;
 
+  /**
+   * Cursor & depth information for a comment's direct replies. Mirrors Reddit's 'load more replies' semantics.
+   */
   meta?: RepliesMeta;
 
   moderation?: ModerationV2Response;
@@ -9370,7 +9940,7 @@ export interface TranslateCommentResponse {
 }
 
 export interface TypingIndicatorsResponse {
-  enabled?: boolean;
+  enabled: boolean;
 }
 
 export interface UnbanActionRequestPayload {
@@ -9388,6 +9958,17 @@ export interface UnbanActionRequestPayload {
    * Also remove the future channels ban for this user
    */
   remove_future_channels_ban?: boolean;
+
+  /**
+   * Optional: unban user directly without review item
+   */
+  target_user_id?: string;
+}
+
+export interface UnbanRequest {}
+
+export interface UnbanResponse {
+  duration: string;
 }
 
 export interface UnblockActionRequestPayload {
@@ -9455,6 +10036,22 @@ export interface UnfollowResponse {
   duration: string;
 
   follow: FollowResponse;
+}
+
+export interface UnmuteRequest {
+  /**
+   * User IDs to unmute
+   */
+  target_ids: string[];
+}
+
+export interface UnmuteResponse {
+  duration: string;
+
+  /**
+   * A list of users that can't be found. Common cause for this is deleted users
+   */
+  non_existing_users?: string[];
 }
 
 export interface UnpinActivityResponse {
@@ -9643,6 +10240,9 @@ export interface UpdateBlockListResponse {
    */
   duration: string;
 
+  /**
+   * Block list contains restricted words
+   */
   blocklist?: BlockListResponse;
 }
 
@@ -9936,6 +10536,9 @@ export interface UpdateFollowRequest {
    */
   enrich_own_fields?: boolean;
 
+  /**
+   * Optional role for the follower in the follow relationship. Server-side only. Either a built-in ('feed_follower' (the default) or 'feed_member_viewer') or any role your app has defined; grants are not inspected.
+   */
   follower_role?: string;
 
   /**
@@ -9994,6 +10597,9 @@ export interface UpdatePollOptionRequest {
    */
   text: string;
 
+  /**
+   * Custom data for this object
+   */
   custom?: Record<string, any>;
 }
 
@@ -10061,6 +10667,9 @@ export interface UpdatePollRequest {
    */
   options?: PollOptionRequest[];
 
+  /**
+   * Custom data for this object
+   */
   custom?: Record<string, any>;
 }
 
@@ -10122,6 +10731,10 @@ export interface UpdateUsersResponse {
    */
   duration: string;
 
+  /**
+   * @deprecated
+   * Deprecated: always empty. Removing a user from a team no longer deletes their memberships in that team's channels, so there is no task to poll
+   */
   membership_deletion_task_id: string;
 
   /**
@@ -10193,6 +10806,9 @@ export interface UpsertActionConfigRequest {
 export interface UpsertActionConfigResponse {
   duration: string;
 
+  /**
+   * Configuration for a moderation action
+   */
   action_config?: ModerationActionConfigResponse;
 }
 
@@ -10244,7 +10860,7 @@ export interface UpsertConfigRequest {
 
   ai_text_config?: AITextConfig;
 
-  ai_video_config?: AIVideoConfig;
+  ai_video_config?: AIVideoConfigRequest;
 
   automod_platform_circumvention_config?: AutomodPlatformCircumventionConfig;
 
@@ -10302,6 +10918,22 @@ export interface UpsertPushPreferencesResponse {
    * The user preferences, always returned regardless if you edited it
    */
   user_preferences: Record<string, PushPreferencesResponse>;
+}
+
+export interface UpsertUserInterestsRequest {
+  /**
+   * Interest tags to add or update (1-50)
+   */
+  interests: UserInterestRequest[];
+}
+
+export interface UpsertUserInterestsResponse {
+  duration: string;
+
+  /**
+   * All interest tags of the user after the write
+   */
+  interests: InterestTagResponse[];
 }
 
 export interface User {
@@ -10444,6 +11076,28 @@ export interface UserIdenticalContentCountParameters {
   time_window?: string;
 }
 
+export interface UserIdenticalImageCountParameters {
+  match?: string;
+
+  similarity_distance?: number;
+
+  threshold?: number;
+
+  time_window?: string;
+}
+
+export interface UserInterestRequest {
+  /**
+   * The interest tag; trimmed and lower-cased like activity interest_tags
+   */
+  tag: string;
+
+  /**
+   * Ranking weight between -1.0 (dislike) and 1.0 (like). Defaults to 1.0
+   */
+  weight?: number;
+}
+
 export interface UserMuteResponse {
   created_at: Date;
 
@@ -10451,9 +11105,23 @@ export interface UserMuteResponse {
 
   expires?: Date;
 
+  /**
+   * User response object
+   */
   target?: UserResponse;
 
+  /**
+   * User response object
+   */
   user?: UserResponse;
+}
+
+export interface UserReactionCountRuleParameters {
+  count?: string;
+
+  threshold?: number;
+
+  time_window?: string;
 }
 
 export interface UserReactivatedEvent {
@@ -10828,6 +11496,11 @@ export interface WSAuthMessage {
   token: string;
 
   user_details: ConnectUserDetailsRequest;
+
+  /**
+   * Channel-member custom keys to project onto message.member for messages this connection receives (opt-in; capped, off by default).
+   */
+  member_custom_include?: string[];
 
   /**
    * List of products to subscribe to. One of: chat, video, feeds
