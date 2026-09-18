@@ -55,6 +55,7 @@ import type {
   DeleteCommentReactionResponse,
   DeleteCommentResponse,
   DeleteFeedResponse,
+  DeleteUserInterestsResponse,
   FileUploadRequest,
   FileUploadResponse,
   FollowBatchRequest,
@@ -66,6 +67,7 @@ import type {
   GetCommentRepliesResponse,
   GetCommentResponse,
   GetCommentsResponse,
+  GetFeedCountsResponse,
   GetFollowSuggestionsResponse,
   GetOGResponse,
   GetOrCreateFeedRequest,
@@ -77,6 +79,8 @@ import type {
   GetUserInterestsResponse,
   ImageUploadRequest,
   ImageUploadResponse,
+  ImportBlockListRequest,
+  ImportBlockListResponse,
   ListBlockListResponse,
   ListDevicesResponse,
   ListUserGroupsResponse,
@@ -183,6 +187,8 @@ import type {
   UpsertActivitiesResponse,
   UpsertPushPreferencesRequest,
   UpsertPushPreferencesResponse,
+  UpsertUserInterestsRequest,
+  UpsertUserInterestsResponse,
   WSAuthMessage,
 } from '../models';
 import { decoders } from '../model-decoders/decoders';
@@ -202,9 +208,13 @@ export class FeedsApi {
 
   async listBlockLists(request?: {
     team?: string;
+    cursor?: string;
+    limit?: number;
   }): Promise<StreamResponse<ListBlockListResponse>> {
     const queryParams = {
       team: request?.team,
+      cursor: request?.cursor,
+      limit: request?.limit,
     };
 
     const response = await this.apiClient.sendRequest<
@@ -242,6 +252,33 @@ export class FeedsApi {
     );
 
     decoders.CreateBlockListResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async importBlockList(
+    request: ImportBlockListRequest & { id: string },
+  ): Promise<StreamResponse<ImportBlockListResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      items: request?.items,
+      chunk_size: request?.chunk_size,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<ImportBlockListResponse>
+    >(
+      'POST',
+      '/api/v2/blocklists/{id}/import',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.ImportBlockListResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -375,6 +412,7 @@ export class FeedsApi {
       visibility_tag: request?.visibility_tag,
       attachments: request?.attachments,
       collection_refs: request?.collection_refs,
+      collections: request?.collections,
       filter_tags: request?.filter_tags,
       interest_tags: request?.interest_tags,
       mentioned_user_ids: request?.mentioned_user_ids,
@@ -676,11 +714,7 @@ export class FeedsApi {
     activity_id: string;
     poll_id: string;
     vote_id: string;
-    user_id?: string;
   }): Promise<StreamResponse<PollVoteResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
     const pathParams = {
       activity_id: request?.activity_id,
       poll_id: request?.poll_id,
@@ -693,7 +727,7 @@ export class FeedsApi {
       'DELETE',
       '/api/v2/feeds/activities/{activity_id}/polls/{poll_id}/vote/{vote_id}',
       pathParams,
-      queryParams,
+      undefined,
     );
 
     decoders.PollVoteResponse?.(response.body);
@@ -843,16 +877,18 @@ export class FeedsApi {
 
   async getActivity(request: {
     id: string;
-    language?: string;
-    translate_text?: boolean;
     comment_sort?: string;
     comment_limit?: number;
+    skip_own_followings?: boolean;
+    language?: string;
+    translate_text?: boolean;
   }): Promise<StreamResponse<GetActivityResponse>> {
     const queryParams = {
-      language: request?.language,
-      translate_text: request?.translate_text,
       comment_sort: request?.comment_sort,
       comment_limit: request?.comment_limit,
+      skip_own_followings: request?.skip_own_followings,
+      language: request?.language,
+      translate_text: request?.translate_text,
     };
     const pathParams = {
       id: request?.id,
@@ -1971,6 +2007,29 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async getFeedCounts(request: {
+    feed_group_id: string;
+    feed_id: string;
+  }): Promise<StreamResponse<GetFeedCountsResponse>> {
+    const pathParams = {
+      feed_group_id: request?.feed_group_id,
+      feed_id: request?.feed_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<GetFeedCountsResponse>
+    >(
+      'GET',
+      '/api/v2/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/counts',
+      pathParams,
+      undefined,
+    );
+
+    decoders.GetFeedCountsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async updateFeedMembers(
     request: UpdateFeedMembersRequest & {
       feed_group_id: string;
@@ -2570,6 +2629,31 @@ export class FeedsApi {
     return { ...response.body, metadata: response.metadata };
   }
 
+  async deleteUserInterests(request: {
+    user_id: string;
+    tags: string[];
+  }): Promise<StreamResponse<DeleteUserInterestsResponse>> {
+    const queryParams = {
+      tags: request?.tags,
+    };
+    const pathParams = {
+      user_id: request?.user_id,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<DeleteUserInterestsResponse>
+    >(
+      'DELETE',
+      '/api/v2/feeds/users/{user_id}/interests',
+      pathParams,
+      queryParams,
+    );
+
+    decoders.DeleteUserInterestsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
   async getUserInterests(request: {
     user_id: string;
     limit?: number;
@@ -2591,6 +2675,32 @@ export class FeedsApi {
     );
 
     decoders.GetUserInterestsResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async upsertUserInterests(
+    request: UpsertUserInterestsRequest & { user_id: string },
+  ): Promise<StreamResponse<UpsertUserInterestsResponse>> {
+    const pathParams = {
+      user_id: request?.user_id,
+    };
+    const body = {
+      interests: request?.interests,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UpsertUserInterestsResponse>
+    >(
+      'PUT',
+      '/api/v2/feeds/users/{user_id}/interests',
+      pathParams,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.UpsertUserInterestsResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }
@@ -2701,11 +2811,8 @@ export class FeedsApi {
   }
 
   async queryPolls(
-    request?: QueryPollsRequest & { user_id?: string },
+    request?: QueryPollsRequest,
   ): Promise<StreamResponse<QueryPollsResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
     const body = {
       limit: request?.limit,
       next: request?.next,
@@ -2720,7 +2827,7 @@ export class FeedsApi {
       'POST',
       '/api/v2/polls/query',
       undefined,
-      queryParams,
+      undefined,
       body,
       'application/json',
     );
@@ -2732,11 +2839,7 @@ export class FeedsApi {
 
   async deletePoll(request: {
     poll_id: string;
-    user_id?: string;
   }): Promise<StreamResponse<Response>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
     const pathParams = {
       poll_id: request?.poll_id,
     };
@@ -2745,7 +2848,7 @@ export class FeedsApi {
       'DELETE',
       '/api/v2/polls/{poll_id}',
       pathParams,
-      queryParams,
+      undefined,
     );
 
     decoders.Response?.(response.body);
@@ -2755,18 +2858,14 @@ export class FeedsApi {
 
   async getPoll(request: {
     poll_id: string;
-    user_id?: string;
   }): Promise<StreamResponse<PollResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
     const pathParams = {
       poll_id: request?.poll_id,
     };
 
     const response = await this.apiClient.sendRequest<
       StreamResponse<PollResponse>
-    >('GET', '/api/v2/polls/{poll_id}', pathParams, queryParams);
+    >('GET', '/api/v2/polls/{poll_id}', pathParams, undefined);
 
     decoders.PollResponse?.(response.body);
 
@@ -2858,11 +2957,7 @@ export class FeedsApi {
   async deletePollOption(request: {
     poll_id: string;
     option_id: string;
-    user_id?: string;
   }): Promise<StreamResponse<Response>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
     const pathParams = {
       poll_id: request?.poll_id,
       option_id: request?.option_id,
@@ -2872,7 +2967,7 @@ export class FeedsApi {
       'DELETE',
       '/api/v2/polls/{poll_id}/options/{option_id}',
       pathParams,
-      queryParams,
+      undefined,
     );
 
     decoders.Response?.(response.body);
@@ -2883,11 +2978,7 @@ export class FeedsApi {
   async getPollOption(request: {
     poll_id: string;
     option_id: string;
-    user_id?: string;
   }): Promise<StreamResponse<PollOptionResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
     const pathParams = {
       poll_id: request?.poll_id,
       option_id: request?.option_id,
@@ -2899,7 +2990,7 @@ export class FeedsApi {
       'GET',
       '/api/v2/polls/{poll_id}/options/{option_id}',
       pathParams,
-      queryParams,
+      undefined,
     );
 
     decoders.PollOptionResponse?.(response.body);
@@ -2908,11 +2999,8 @@ export class FeedsApi {
   }
 
   async queryPollVotes(
-    request: QueryPollVotesRequest & { poll_id: string; user_id?: string },
+    request: QueryPollVotesRequest & { poll_id: string },
   ): Promise<StreamResponse<PollVotesResponse>> {
-    const queryParams = {
-      user_id: request?.user_id,
-    };
     const pathParams = {
       poll_id: request?.poll_id,
     };
@@ -2930,7 +3018,7 @@ export class FeedsApi {
       'POST',
       '/api/v2/polls/{poll_id}/votes',
       pathParams,
-      queryParams,
+      undefined,
       body,
       'application/json',
     );

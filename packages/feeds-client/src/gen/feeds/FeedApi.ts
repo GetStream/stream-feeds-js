@@ -5,6 +5,7 @@ import type {
   ChangeFeedVisibilityRequest,
   ChangeFeedVisibilityResponse,
   DeleteFeedResponse,
+  GetFeedCountsResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   MarkActivityRequest,
@@ -104,6 +105,13 @@ export class FeedApi {
       feed_id: this.id,
       feed_group_id: this.group,
       ...request,
+    });
+  }
+
+  getFeedCounts(): Promise<StreamResponse<GetFeedCountsResponse>> {
+    return this.feedsApi.getFeedCounts({
+      feed_id: this.id,
+      feed_group_id: this.group,
     });
   }
 
