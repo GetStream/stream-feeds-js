@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.7.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.7.0...@stream-io/feeds-client-2.7.1) (2026-09-18)
+
+
+### Bug Fixes
+
+* don't rewatch a feed on reconnect after stopWatching was called ([#310](https://github.com/GetStream/stream-feeds-js/issues/310)) ([d06befb](https://github.com/GetStream/stream-feeds-js/commit/d06befb2d99f56c41975fa358de8cf680f0b95dd))
+
 ## [2.7.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.6.1...@stream-io/feeds-client-2.7.0) (2026-08-14)
 
 
