@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.8.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.7.1...@stream-io/feeds-client-2.8.0) (2026-09-21)
+
+
+### Features
+
+* **feeds-client:** regenerate for reaction write outcome fields ([#311](https://github.com/GetStream/stream-feeds-js/issues/311)) ([4d10b97](https://github.com/GetStream/stream-feeds-js/commit/4d10b975fcf72d80f1de1d9c108039c459229954)), closes [GetStream/chat#17241](https://github.com/GetStream/chat/issues/17241) [GetStream/chat#17241](https://github.com/GetStream/chat/issues/17241) [GetStream/chat#17241](https://github.com/GetStream/chat/issues/17241)
+
 ## [2.7.1](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.7.0...@stream-io/feeds-client-2.7.1) (2026-09-18)
 
 
