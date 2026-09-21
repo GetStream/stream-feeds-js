@@ -31,6 +31,10 @@ import type {
   QueueResponse,
   SubmitActionRequest,
   SubmitActionResponse,
+  UnbanRequest,
+  UnbanResponse,
+  UnmuteRequest,
+  UnmuteResponse,
   UpdateQueueRequest,
   UpsertActionConfigRequest,
   UpsertActionConfigResponse,
@@ -163,6 +167,7 @@ export class ModerationApi {
       appeal_reason: request?.appeal_reason,
       entity_id: request?.entity_id,
       entity_type: request?.entity_type,
+      channel_cid: request?.channel_cid,
       review_queue_item_id: request?.review_queue_item_id,
       attachments: request?.attachments,
     };
@@ -260,14 +265,12 @@ export class ModerationApi {
   ): Promise<StreamResponse<ModerationBanResponse>> {
     const body = {
       target_user_id: request?.target_user_id,
-      banned_by_id: request?.banned_by_id,
       channel_cid: request?.channel_cid,
       delete_messages: request?.delete_messages,
       ip_ban: request?.ip_ban,
       reason: request?.reason,
       shadow: request?.shadow,
       timeout: request?.timeout,
-      banned_by: request?.banned_by,
     };
 
     const response = await this.apiClient.sendRequest<
@@ -597,6 +600,7 @@ export class ModerationApi {
       delete_message: request?.delete_message,
       delete_reaction: request?.delete_reaction,
       delete_user: request?.delete_user,
+      delete_user_messages: request?.delete_user_messages,
       escalate: request?.escalate,
       flag: request?.flag,
       mark_reviewed: request?.mark_reviewed,
@@ -619,6 +623,54 @@ export class ModerationApi {
     );
 
     decoders.SubmitActionResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async unban(
+    request: UnbanRequest & { target_user_id: string; channel_cid?: string },
+  ): Promise<StreamResponse<UnbanResponse>> {
+    const queryParams = {
+      target_user_id: request?.target_user_id,
+      channel_cid: request?.channel_cid,
+    };
+    const body = {};
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UnbanResponse>
+    >(
+      'POST',
+      '/api/v2/moderation/unban',
+      undefined,
+      queryParams,
+      body,
+      'application/json',
+    );
+
+    decoders.UnbanResponse?.(response.body);
+
+    return { ...response.body, metadata: response.metadata };
+  }
+
+  async unmute(
+    request: UnmuteRequest,
+  ): Promise<StreamResponse<UnmuteResponse>> {
+    const body = {
+      target_ids: request?.target_ids,
+    };
+
+    const response = await this.apiClient.sendRequest<
+      StreamResponse<UnmuteResponse>
+    >(
+      'POST',
+      '/api/v2/moderation/unmute',
+      undefined,
+      undefined,
+      body,
+      'application/json',
+    );
+
+    decoders.UnmuteResponse?.(response.body);
 
     return { ...response.body, metadata: response.metadata };
   }

@@ -358,6 +358,8 @@ decoders.BanInfoResponse = (input?: Record<string, any>) => {
 
     expires: { type: 'DatetimeType', isSingle: true },
 
+    channel: { type: 'ChannelMetadata', isSingle: true },
+
     created_by: { type: 'UserResponse', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
@@ -505,21 +507,6 @@ decoders.BulkAppealResult = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
-decoders.CallResponse = (input?: Record<string, any>) => {
-  const typeMappings: TypeMapping = {
-    created_at: { type: 'DatetimeType', isSingle: true },
-
-    updated_at: { type: 'DatetimeType', isSingle: true },
-
-    ended_at: { type: 'DatetimeType', isSingle: true },
-
-    starts_at: { type: 'DatetimeType', isSingle: true },
-
-    created_by: { type: 'UserResponse', isSingle: true },
-  };
-  return decode(typeMappings, input);
-};
-
 decoders.ChangeFeedVisibilityResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     feed: { type: 'FeedResponse', isSingle: true },
@@ -550,6 +537,8 @@ decoders.ChannelMemberResponse = (input?: Record<string, any>) => {
 
     deleted_at: { type: 'DatetimeType', isSingle: true },
 
+    future_channel_ban_expires: { type: 'DatetimeType', isSingle: true },
+
     invite_accepted_at: { type: 'DatetimeType', isSingle: true },
 
     invite_rejected_at: { type: 'DatetimeType', isSingle: true },
@@ -557,6 +546,13 @@ decoders.ChannelMemberResponse = (input?: Record<string, any>) => {
     pinned_at: { type: 'DatetimeType', isSingle: true },
 
     user: { type: 'UserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ChannelMetadata = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    last_message_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -650,8 +646,6 @@ decoders.ChatMessageResponse = (input?: Record<string, any>) => {
     thread_participants: { type: 'UserResponse', isSingle: false },
 
     draft: { type: 'ChatDraftResponse', isSingle: true },
-
-    member: { type: 'ChannelMemberResponse', isSingle: true },
 
     pinned_by: { type: 'UserResponse', isSingle: true },
 
@@ -1544,8 +1538,6 @@ decoders.MessageResponse = (input?: Record<string, any>) => {
 
     draft: { type: 'DraftResponse', isSingle: true },
 
-    member: { type: 'ChannelMemberResponse', isSingle: true },
-
     pinned_by: { type: 'UserResponse', isSingle: true },
 
     poll: { type: 'PollResponseData', isSingle: true },
@@ -1557,6 +1549,21 @@ decoders.MessageResponse = (input?: Record<string, any>) => {
     reminder: { type: 'ReminderResponseData', isSingle: true },
 
     shared_location: { type: 'SharedLocationResponseData', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ModerationCallResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    ended_at: { type: 'DatetimeType', isSingle: true },
+
+    starts_at: { type: 'DatetimeType', isSingle: true },
+
+    created_by: { type: 'UserResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1579,6 +1586,8 @@ decoders.ModerationFlagResponse = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
+
+    content_published_at: { type: 'DatetimeType', isSingle: true },
 
     review_queue_item: { type: 'ReviewQueueItemResponse', isSingle: true },
 
@@ -2072,7 +2081,7 @@ decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
 
     assigned_to: { type: 'UserResponse', isSingle: true },
 
-    call: { type: 'CallResponse', isSingle: true },
+    call: { type: 'ModerationCallResponse', isSingle: true },
 
     entity_creator: { type: 'EntityCreatorResponse', isSingle: true },
 
