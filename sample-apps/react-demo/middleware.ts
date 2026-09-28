@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { parseSession } from './lib/session';
+
+/** Query param carrying a session from lib/session.ts. */
+const SESSION_PARAM = 'session';
 
 /** Query param shown when create-user API fails; middleware serves the error page. */
 const CREATE_USER_ERROR_PARAM = 'create_user_error';
@@ -120,12 +124,26 @@ function loadingPageHtml(redirectPath: string): string {
 }
 
 export async function middleware(request: NextRequest) {
-  const userId = request.nextUrl.searchParams.get('user_id');
+  const url = request.nextUrl.clone();
+  const userId = url.searchParams.get('user_id');
   if (userId?.trim()) {
     return NextResponse.next();
   }
 
-  const createUserError = request.nextUrl.searchParams.get(CREATE_USER_ERROR_PARAM);
+  // A valid session stands for an already seeded user, so it becomes a plain
+  // user_id load. The param is dropped either way, so a rejected session is
+  // not carried into the fresh demo.
+  const session = url.searchParams.get(SESSION_PARAM);
+  if (session) {
+    url.searchParams.delete(SESSION_PARAM);
+    const resumedUserId = await parseSession(session);
+    if (resumedUserId) {
+      url.searchParams.set('user_id', resumedUserId);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  const createUserError = url.searchParams.get(CREATE_USER_ERROR_PARAM);
   if (createUserError) {
     const html = createUserErrorPageHtml();
     return new NextResponse(html, {
@@ -136,7 +154,7 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  const path = request.nextUrl.pathname + request.nextUrl.search;
+  const path = url.pathname + url.search;
   const html = loadingPageHtml(path);
   return new NextResponse(html, {
     status: 200,
@@ -149,9 +167,9 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all pathnames except static files and API routes.
-     * Skip /api so we don't call create-user from within the API.
+     * Match all pathnames except static files, the embed example page and
+     * API routes. Skip /api so we don't call create-user from within the API.
      */
-    '/((?!_next/static|_next/image|favicon.ico|api).*)',
+    '/((?!_next/static|_next/image|favicon.ico|embed-example.html|api).*)',
   ],
 };

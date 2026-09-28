@@ -10,6 +10,7 @@ import { generateUsername } from 'unique-username-generator';
 import { useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { LoadingIndicator } from './components/utility/LoadingIndicator';
+import { EmbedSession } from './components/utility/EmbedSession';
 import { userIdToName } from './utility/userIdToName';
 
 export const ClientApp = ({ children }: PropsWithChildren) => {
@@ -21,7 +22,9 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
   const [USER_ID] = useState(userIdFromUrl ?? generateUsername('-'));
   // When user_id is in the URL, middleware already ran create-user server-side, so we
   // treat data as ready and do not run create-user again on the client.
-  const [testDataGeneration, setTestDataGeneration] = useState<'not-started' | 'in-progress' | 'completed' | 'error'>(userIdFromUrl ? 'completed' : 'not-started');
+  const [testDataGeneration, setTestDataGeneration] = useState<
+    'not-started' | 'in-progress' | 'completed' | 'error'
+  >(userIdFromUrl ? 'completed' : 'not-started');
 
   // Set user_id as URL parameter if not already present
   useEffect(() => {
@@ -61,12 +64,12 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
         typeof process.env.NEXT_PUBLIC_USER_TOKEN === 'string'
           ? process.env.NEXT_PUBLIC_USER_TOKEN
           : () =>
-            fetch(`/api/token?user_id=${encodeURIComponent(USER_ID)}`)
-              .then((res) => {
-                if (!res.ok) throw new Error('Token request failed');
-                return res.json();
-              })
-              .then((data: { token: string }) => data.token),
+              fetch(`/api/token?user_id=${encodeURIComponent(USER_ID)}`)
+                .then((res) => {
+                  if (!res.ok) throw new Error('Token request failed');
+                  return res.json();
+                })
+                .then((data: { token: string }) => data.token),
     }),
     [USER_ID],
   );
@@ -112,23 +115,35 @@ export const ClientApp = ({ children }: PropsWithChildren) => {
     );
   }
 
+  // Same position in both branches below so that it does not remount
+  const embedSession =
+    testDataGeneration === 'completed' ? (
+      <EmbedSession userId={USER_ID} />
+    ) : null;
+
   if (!client || testDataGeneration !== 'completed') {
     return (
-      <div className="flex flex-col gap-2 items-center justify-center h-screen">
-        <LoadingIndicator />
-        <div>Generating data...</div>
-      </div>
+      <>
+        {embedSession}
+        <div className="flex flex-col gap-2 items-center justify-center h-screen">
+          <LoadingIndicator />
+          <div>Generating data...</div>
+        </div>
+      </>
     );
   }
 
   return (
-    <StreamFeeds client={client}>
-      <ConnectionAlert />
-      <OwnFeedsContextProvider>
-        <FollowSuggestionsContextProvider>
-          <AppSkeleton>{children}</AppSkeleton>
-        </FollowSuggestionsContextProvider>
-      </OwnFeedsContextProvider>
-    </StreamFeeds>
+    <>
+      {embedSession}
+      <StreamFeeds client={client}>
+        <ConnectionAlert />
+        <OwnFeedsContextProvider>
+          <FollowSuggestionsContextProvider>
+            <AppSkeleton>{children}</AppSkeleton>
+          </FollowSuggestionsContextProvider>
+        </OwnFeedsContextProvider>
+      </StreamFeeds>
+    </>
   );
 };

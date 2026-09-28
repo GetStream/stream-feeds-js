@@ -8,6 +8,7 @@ import { OwnStories } from '../components/stories/OwnStories';
 import { StoryTimeline } from '../components/stories/StoryTimeline';
 import { Avatar } from '../components/utility/Avatar';
 import { HomePageSkeleton } from '../components/utility/loading-skeletons/HomePageSkeleton';
+import { EmbedReady } from '../components/utility/EmbedReady';
 
 const HomeActivityComposer = () => {
   const currentUser = useClientConnectedUser();
@@ -45,6 +46,8 @@ export default function Home() {
 
   return (
     <div className="w-full flex flex-col items-center justify-start">
+      <EmbedReady />
+
       {/* Stories Section */}
       <section className="w-full border-b border-base-content/10 py-3 flex flex-row gap-2 px-4">
         <StreamFeed feed={ownStoryFeed}>

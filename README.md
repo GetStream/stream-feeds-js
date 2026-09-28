@@ -82,6 +82,34 @@ yarn dev
 
 You can provide `user_id=<user id>` query param when opening the app, or provide nothing, and let the application generate a user for you.
 
+### Embedding
+
+The demo can be iframed. Every load without a `user_id` creates a fresh user, which on a multi-page host site would throw the demo away each time the visitor navigates away and comes back. To resume it instead, store the session the demo hands you and pass it back on the next load:
+
+```js
+const key = 'stream-feeds-demo-session';
+const session = sessionStorage.getItem(key);
+iframe.src = 'https://<host>/home' + (session ? `?session=${session}` : '');
+
+window.addEventListener('message', (event) => {
+  if (event.source !== iframe.contentWindow) return;
+  if (event.data?.source !== 'stream-feeds-demo') return;
+
+  if (event.data.type === 'session') {
+    sessionStorage.setItem(key, event.data.session);
+  }
+  if (event.data.type === 'ready') {
+    // Connected and painted: hide your loader, fade the iframe in
+  }
+});
+```
+
+The demo posts `{ source: 'stream-feeds-demo', type: 'session', session }` as soon as its user is seeded, before it even connects, so a stored session always stands for a fully seeded user. A load with a valid session is redirected to the same page with that user's `user_id`, creating nothing and calling Stream for nothing. `{ source: 'stream-feeds-demo', type: 'ready' }` follows once the home page has rendered its content in place of the loading skeleton, so embed `/home`. A host that attached its listener late can post `{ source: 'stream-feeds-demo', type: 'ready?' }` to the iframe to get both messages again. The message types live in `sample-apps/react-demo/app/utility/embed.ts`.
+
+The session is a signed JWT (the key is derived from `API_SECRET`, so there is nothing extra to configure), re-issued on every load and expiring 24 hours after the last one. A session that does not verify (tampered with, issued by another environment, expired) is ignored: that load creates a fresh user and posts a new session to store. Treat sessions as secrets, since anyone holding one opens the demo as that user, exactly like the `user_id` param. When both params are present `user_id` wins. `sessionStorage` scopes the demo to the tab; `localStorage` also survives closing it.
+
+A minimal host page is served at `/embed-example.html`.
+
 ## Test Data Generator
 
 The `test-data-generator` directory contains scripts to populate your Stream Feeds app with sample data for testing and development purposes.
