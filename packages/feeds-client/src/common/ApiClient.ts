@@ -10,7 +10,11 @@ import axiosImport from 'axios';
 // from the React Native SDK, to prevent the default `require` from being
 // accessed directly from `require('axios')` rather than `require('axios').default`.
 const axios = axiosImport.default ?? axiosImport;
-import type { RequestMetadata, FeedsClientOptions } from './types';
+import type {
+  RequestMetadata,
+  FeedsClientOptions,
+  StreamResponse,
+} from './types';
 import { StreamApiError } from './types';
 import { getRateLimitFromResponseHeader } from './rate-limit';
 import { KnownCodes, randomId } from './utils';
@@ -59,7 +63,7 @@ export class ApiClient {
     queryParams?: Record<string, any>,
     body?: any,
     requestContentType?: string,
-  ): Promise<{ body: T; metadata: RequestMetadata }> => {
+  ): Promise<StreamResponse<T>> => {
     queryParams = queryParams ?? {};
     queryParams.api_key = this.apiKey;
 
@@ -135,7 +139,7 @@ export class ApiClient {
         response,
       );
 
-      return { body: response.data, metadata };
+      return { ...response.data, metadata };
     } catch (error) {
       if (!this.isAxiosError(error)) {
         throw new Error('Unknown error received during an API call', {
