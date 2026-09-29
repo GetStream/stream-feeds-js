@@ -521,7 +521,6 @@ export class FeedsApi {
     };
     const body = {
       enrich_own_fields: request?.enrich_own_fields,
-      include_soft_deleted_activities: request?.include_soft_deleted_activities,
       limit: request?.limit,
       next: request?.next,
       prev: request?.prev,
@@ -2770,6 +2769,7 @@ export class FeedsApi {
       id: request?.id,
       is_closed: request?.is_closed,
       max_votes_allowed: request?.max_votes_allowed,
+      team: request?.team,
       voting_visibility: request?.voting_visibility,
       options: request?.options,
       custom: request?.custom,

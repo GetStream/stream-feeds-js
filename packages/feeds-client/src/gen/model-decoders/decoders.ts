@@ -2025,6 +2025,8 @@ decoders.ReminderResponseData = (input?: Record<string, any>) => {
 
     updated_at: { type: 'DatetimeType', isSingle: true },
 
+    expires_at: { type: 'DatetimeType', isSingle: true },
+
     remind_at: { type: 'DatetimeType', isSingle: true },
 
     channel: { type: 'ChannelResponse', isSingle: true },
