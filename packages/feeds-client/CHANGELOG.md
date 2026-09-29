@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.9.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.8.0...@stream-io/feeds-client-2.9.0) (2026-09-29)
+
+
+### Features
+
+* [FEEDS-1965] add top_level_comment_count to getActivity and getComments ([#315](https://github.com/GetStream/stream-feeds-js/issues/315)) ([cbdcad2](https://github.com/GetStream/stream-feeds-js/commit/cbdcad2085c45a596f6fe63aaa6a55c9060fea03)), closes [#17426](https://github.com/GetStream/stream-feeds-js/issues/17426) [#311](https://github.com/GetStream/stream-feeds-js/issues/311)
+* **feeds-client:** regenerate for flattening the sendRequest response and stop passing the default JSON content type ([#314](https://github.com/GetStream/stream-feeds-js/issues/314)) ([b8e8fdf](https://github.com/GetStream/stream-feeds-js/commit/b8e8fdfc69599d8823490e448cbcfc856bd68b9b)), closes [GetStream/chat#17574](https://github.com/GetStream/chat/issues/17574)
+
 ## [2.8.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.7.1...@stream-io/feeds-client-2.8.0) (2026-09-21)
 
 
