@@ -844,6 +844,7 @@ export class FeedsApi {
     skip_own_followings?: boolean;
     language?: string;
     translate_text?: boolean;
+    include_top_level_comment_count?: boolean;
   }): Promise<StreamResponse<GetActivityResponse>> {
     const queryParams = {
       comment_sort: request?.comment_sort,
@@ -851,6 +852,7 @@ export class FeedsApi {
       skip_own_followings: request?.skip_own_followings,
       language: request?.language,
       translate_text: request?.translate_text,
+      include_top_level_comment_count: request?.include_top_level_comment_count,
     };
     const pathParams = {
       id: request?.id,
@@ -1209,6 +1211,7 @@ export class FeedsApi {
     limit?: number;
     prev?: string;
     next?: string;
+    include_top_level_comment_count?: boolean;
   }): Promise<StreamResponse<GetCommentsResponse>> {
     const queryParams = {
       object_id: request?.object_id,
@@ -1222,6 +1225,7 @@ export class FeedsApi {
       limit: request?.limit,
       prev: request?.prev,
       next: request?.next,
+      include_top_level_comment_count: request?.include_top_level_comment_count,
     };
 
     const response = await this.apiClient.sendRequest<GetCommentsResponse>(

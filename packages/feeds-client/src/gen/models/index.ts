@@ -679,6 +679,10 @@ export interface ActivityResponse {
    */
   text?: string;
   /**
+   * Number of top-level comments (comments directly on the activity, excluding replies). Only returned by GetActivity when include_top_level_comment_count=true; never set on feed reads or events. Same status/deletion rules as comment_count; not adjusted per viewer.
+   */
+  top_level_comment_count?: number;
+  /**
    * If visibility is 'tag', this is the tag name
    */
   visibility_tag?: string;
@@ -2863,6 +2867,7 @@ export interface ConfigResponse {
   automod_toxicity_config?: AutomodToxicityConfig;
   block_list_config?: BlockListConfig;
   flood_config?: FloodConfig;
+  intent_config?: IntentConfigResponse;
   llm_config?: LLMConfig;
   velocity_filter_config?: VelocityFilterConfig;
   video_call_rule_config?: VideoCallRuleConfig;
@@ -4816,6 +4821,10 @@ export interface GetCommentResponse {
 }
 
 export interface GetCommentsResponse {
+  /**
+   * Total number of comments on the object, including replies at every depth
+   */
+  comment_count: number;
   duration: string;
   /**
    * Sort order used for the comments (first, last, top, best, controversial)
@@ -4827,6 +4836,10 @@ export interface GetCommentsResponse {
   comments: ThreadedCommentResponse[];
   next?: string;
   prev?: string;
+  /**
+   * Number of comments directly on the object, excluding replies. Independent of depth, replies_limit and id_around, and not adjusted per viewer. Only present when include_top_level_comment_count is set
+   */
+  top_level_comment_count?: number;
 }
 
 export interface GetConfigResponse {
@@ -5136,6 +5149,82 @@ export interface ImportBlockListResponse {
    */
   duration: string;
   task_id: string;
+}
+
+export interface IntentConfigRequest {
+  /**
+   * Topics to classify conversation text against (max 20, labels must be unique)
+   */
+  topics?: IntentTopicRequest[];
+}
+
+export interface IntentConfigResponse {
+  /**
+   * Topics conversation text is classified against
+   */
+  topics: IntentTopicResponse[];
+}
+
+export interface IntentTopicRequest {
+  /**
+   * Unique topic label (e.g. purchase_intent)
+   */
+  label: string;
+  /**
+   * How long the buffer collects items before scoring runs
+   */
+  analysis_cooldown_seconds?: number;
+  /**
+   * Optional description used in the classification prompt; the label alone is used when empty
+   */
+  description?: string;
+  /**
+   * Whether this topic is evaluated
+   */
+  enabled?: boolean;
+  /**
+   * Items buffered per conversation before scoring runs early
+   */
+  max_captured_items?: number;
+  /**
+   * Suppresses this topic for a user and conversation after it fires; 0 uses the default
+   */
+  refire_cooldown_seconds?: number;
+  /**
+   * Conversation score (0-100) required to fire moderation.intent_detected
+   */
+  score_threshold?: number;
+}
+
+export interface IntentTopicResponse {
+  /**
+   * How long the buffer collects items before scoring runs
+   */
+  analysis_cooldown_seconds: number;
+  /**
+   * Whether this topic is evaluated
+   */
+  enabled: boolean;
+  /**
+   * Unique topic label (e.g. purchase_intent)
+   */
+  label: string;
+  /**
+   * Items buffered per conversation before scoring runs early
+   */
+  max_captured_items: number;
+  /**
+   * Conversation score (0-100) required to fire moderation.intent_detected
+   */
+  score_threshold: number;
+  /**
+   * Optional description used in the classification prompt; the label alone is used when empty
+   */
+  description?: string;
+  /**
+   * Suppresses this topic for a user and conversation after it fires; 0 uses the default
+   */
+  refire_cooldown_seconds?: number;
 }
 
 export interface InterestTagResponse {
@@ -8369,6 +8458,7 @@ export interface UpsertConfigRequest {
   bodyguard_config?: AITextConfig;
   flood_config?: FloodConfig;
   google_vision_config?: GoogleVisionConfig;
+  intent_config?: IntentConfigRequest;
   llm_config?: LLMConfig;
   rule_builder_config?: RuleBuilderConfig;
   velocity_filter_config?: VelocityFilterConfig;
