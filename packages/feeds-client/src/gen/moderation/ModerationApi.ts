@@ -59,13 +59,16 @@ export class ModerationApi {
       only_defaults: request?.only_defaults,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<GetActionConfigResponse>
-    >('GET', '/api/v2/moderation/action_config', undefined, queryParams);
+    const response = await this.apiClient.sendRequest<GetActionConfigResponse>(
+      'GET',
+      '/api/v2/moderation/action_config',
+      undefined,
+      queryParams,
+    );
 
-    decoders.GetActionConfigResponse?.(response.body);
+    decoders.GetActionConfigResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async upsertActionConfig(
@@ -82,20 +85,18 @@ export class ModerationApi {
       custom: request?.custom,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<UpsertActionConfigResponse>
-    >(
-      'POST',
-      '/api/v2/moderation/action_config',
-      undefined,
-      undefined,
-      body,
-      'application/json',
-    );
+    const response =
+      await this.apiClient.sendRequest<UpsertActionConfigResponse>(
+        'POST',
+        '/api/v2/moderation/action_config',
+        undefined,
+        undefined,
+        body,
+      );
 
-    decoders.UpsertActionConfigResponse?.(response.body);
+    decoders.UpsertActionConfigResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async bulkUpsertActionConfig(
@@ -105,20 +106,18 @@ export class ModerationApi {
       action_configs: request?.action_configs,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<BulkUpsertActionConfigResponse>
-    >(
-      'POST',
-      '/api/v2/moderation/action_config/bulk',
-      undefined,
-      undefined,
-      body,
-      'application/json',
-    );
+    const response =
+      await this.apiClient.sendRequest<BulkUpsertActionConfigResponse>(
+        'POST',
+        '/api/v2/moderation/action_config/bulk',
+        undefined,
+        undefined,
+        body,
+      );
 
-    decoders.BulkUpsertActionConfigResponse?.(response.body);
+    decoders.BulkUpsertActionConfigResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async bulkDeleteActionConfig(
@@ -128,20 +127,18 @@ export class ModerationApi {
       ids: request?.ids,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<BulkDeleteActionConfigResponse>
-    >(
-      'POST',
-      '/api/v2/moderation/action_config/bulk_delete',
-      undefined,
-      undefined,
-      body,
-      'application/json',
-    );
+    const response =
+      await this.apiClient.sendRequest<BulkDeleteActionConfigResponse>(
+        'POST',
+        '/api/v2/moderation/action_config/bulk_delete',
+        undefined,
+        undefined,
+        body,
+      );
 
-    decoders.BulkDeleteActionConfigResponse?.(response.body);
+    decoders.BulkDeleteActionConfigResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async deleteActionConfig(request: {
@@ -151,13 +148,17 @@ export class ModerationApi {
       id: request?.id,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<DeleteActionConfigResponse>
-    >('DELETE', '/api/v2/moderation/action_config/{id}', pathParams, undefined);
+    const response =
+      await this.apiClient.sendRequest<DeleteActionConfigResponse>(
+        'DELETE',
+        '/api/v2/moderation/action_config/{id}',
+        pathParams,
+        undefined,
+      );
 
-    decoders.DeleteActionConfigResponse?.(response.body);
+    decoders.DeleteActionConfigResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async appeal(
@@ -172,20 +173,17 @@ export class ModerationApi {
       attachments: request?.attachments,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<AppealResponse>
-    >(
+    const response = await this.apiClient.sendRequest<AppealResponse>(
       'POST',
       '/api/v2/moderation/appeal',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.AppealResponse?.(response.body);
+    decoders.AppealResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async getAppeal(request: {
@@ -195,13 +193,16 @@ export class ModerationApi {
       id: request?.id,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<GetAppealResponse>
-    >('GET', '/api/v2/moderation/appeal/{id}', pathParams, undefined);
+    const response = await this.apiClient.sendRequest<GetAppealResponse>(
+      'GET',
+      '/api/v2/moderation/appeal/{id}',
+      pathParams,
+      undefined,
+    );
 
-    decoders.GetAppealResponse?.(response.body);
+    decoders.GetAppealResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async queryAppeals(
@@ -215,20 +216,17 @@ export class ModerationApi {
       filter: request?.filter,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<QueryAppealsResponse>
-    >(
+    const response = await this.apiClient.sendRequest<QueryAppealsResponse>(
       'POST',
       '/api/v2/moderation/appeals',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.QueryAppealsResponse?.(response.body);
+    decoders.QueryAppealsResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async bulkActionAppeals(
@@ -244,20 +242,18 @@ export class ModerationApi {
       unblock: request?.unblock,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<BulkActionAppealsResponse>
-    >(
-      'POST',
-      '/api/v2/moderation/appeals/bulk_action',
-      undefined,
-      undefined,
-      body,
-      'application/json',
-    );
+    const response =
+      await this.apiClient.sendRequest<BulkActionAppealsResponse>(
+        'POST',
+        '/api/v2/moderation/appeals/bulk_action',
+        undefined,
+        undefined,
+        body,
+      );
 
-    decoders.BulkActionAppealsResponse?.(response.body);
+    decoders.BulkActionAppealsResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async ban(
@@ -273,20 +269,17 @@ export class ModerationApi {
       timeout: request?.timeout,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<ModerationBanResponse>
-    >(
+    const response = await this.apiClient.sendRequest<ModerationBanResponse>(
       'POST',
       '/api/v2/moderation/ban',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.ModerationBanResponse?.(response.body);
+    decoders.ModerationBanResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async upsertConfig(
@@ -316,20 +309,17 @@ export class ModerationApi {
       video_call_rule_config: request?.video_call_rule_config,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<UpsertConfigResponse>
-    >(
+    const response = await this.apiClient.sendRequest<UpsertConfigResponse>(
       'POST',
       '/api/v2/moderation/config',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.UpsertConfigResponse?.(response.body);
+    decoders.UpsertConfigResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async deleteConfig(request: {
@@ -343,13 +333,17 @@ export class ModerationApi {
       key: request?.key,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<DeleteModerationConfigResponse>
-    >('DELETE', '/api/v2/moderation/config/{key}', pathParams, queryParams);
+    const response =
+      await this.apiClient.sendRequest<DeleteModerationConfigResponse>(
+        'DELETE',
+        '/api/v2/moderation/config/{key}',
+        pathParams,
+        queryParams,
+      );
 
-    decoders.DeleteModerationConfigResponse?.(response.body);
+    decoders.DeleteModerationConfigResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async getConfig(request: {
@@ -363,13 +357,16 @@ export class ModerationApi {
       key: request?.key,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<GetConfigResponse>
-    >('GET', '/api/v2/moderation/config/{key}', pathParams, queryParams);
+    const response = await this.apiClient.sendRequest<GetConfigResponse>(
+      'GET',
+      '/api/v2/moderation/config/{key}',
+      pathParams,
+      queryParams,
+    );
 
-    decoders.GetConfigResponse?.(response.body);
+    decoders.GetConfigResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async queryModerationConfigs(
@@ -383,20 +380,18 @@ export class ModerationApi {
       filter: request?.filter,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<QueryModerationConfigsResponse>
-    >(
-      'POST',
-      '/api/v2/moderation/configs',
-      undefined,
-      undefined,
-      body,
-      'application/json',
-    );
+    const response =
+      await this.apiClient.sendRequest<QueryModerationConfigsResponse>(
+        'POST',
+        '/api/v2/moderation/configs',
+        undefined,
+        undefined,
+        body,
+      );
 
-    decoders.QueryModerationConfigsResponse?.(response.body);
+    decoders.QueryModerationConfigsResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async flag(request: FlagRequest): Promise<StreamResponse<FlagItemResponse>> {
@@ -409,20 +404,17 @@ export class ModerationApi {
       moderation_payload: request?.moderation_payload,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<FlagItemResponse>
-    >(
+    const response = await this.apiClient.sendRequest<FlagItemResponse>(
       'POST',
       '/api/v2/moderation/flag',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.FlagItemResponse?.(response.body);
+    decoders.FlagItemResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async mute(request: MuteRequest): Promise<StreamResponse<MuteResponse>> {
@@ -431,30 +423,30 @@ export class ModerationApi {
       timeout: request?.timeout,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<MuteResponse>
-    >(
+    const response = await this.apiClient.sendRequest<MuteResponse>(
       'POST',
       '/api/v2/moderation/mute',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.MuteResponse?.(response.body);
+    decoders.MuteResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async listQueues(): Promise<StreamResponse<ListQueuesResponse>> {
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<ListQueuesResponse>
-    >('GET', '/api/v2/moderation/queues', undefined, undefined);
+    const response = await this.apiClient.sendRequest<ListQueuesResponse>(
+      'GET',
+      '/api/v2/moderation/queues',
+      undefined,
+      undefined,
+    );
 
-    decoders.ListQueuesResponse?.(response.body);
+    decoders.ListQueuesResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async createQueue(
@@ -468,20 +460,17 @@ export class ModerationApi {
       filters: request?.filters,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<QueueResponse>
-    >(
+    const response = await this.apiClient.sendRequest<QueueResponse>(
       'POST',
       '/api/v2/moderation/queues',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.QueueResponse?.(response.body);
+    decoders.QueueResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async getQueue(request: {
@@ -491,13 +480,16 @@ export class ModerationApi {
       id: request?.id,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<QueueResponse>
-    >('GET', '/api/v2/moderation/queues/{id}', pathParams, undefined);
+    const response = await this.apiClient.sendRequest<QueueResponse>(
+      'GET',
+      '/api/v2/moderation/queues/{id}',
+      pathParams,
+      undefined,
+    );
 
-    decoders.QueueResponse?.(response.body);
+    decoders.QueueResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async updateQueue(
@@ -513,20 +505,17 @@ export class ModerationApi {
       filters: request?.filters,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<QueueResponse>
-    >(
+    const response = await this.apiClient.sendRequest<QueueResponse>(
       'PATCH',
       '/api/v2/moderation/queues/{id}',
       pathParams,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.QueueResponse?.(response.body);
+    decoders.QueueResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async deleteQueue(
@@ -537,20 +526,17 @@ export class ModerationApi {
     };
     const body = {};
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<QueueResponse>
-    >(
+    const response = await this.apiClient.sendRequest<QueueResponse>(
       'POST',
       '/api/v2/moderation/queues/{id}/delete',
       pathParams,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.QueueResponse?.(response.body);
+    decoders.QueueResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async queryReviewQueue(
@@ -569,20 +555,17 @@ export class ModerationApi {
       filter: request?.filter,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<QueryReviewQueueResponse>
-    >(
+    const response = await this.apiClient.sendRequest<QueryReviewQueueResponse>(
       'POST',
       '/api/v2/moderation/review_queue',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.QueryReviewQueueResponse?.(response.body);
+    decoders.QueryReviewQueueResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async submitAction(
@@ -612,20 +595,17 @@ export class ModerationApi {
       unblock: request?.unblock,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<SubmitActionResponse>
-    >(
+    const response = await this.apiClient.sendRequest<SubmitActionResponse>(
       'POST',
       '/api/v2/moderation/submit_action',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.SubmitActionResponse?.(response.body);
+    decoders.SubmitActionResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async unban(
@@ -637,20 +617,17 @@ export class ModerationApi {
     };
     const body = {};
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<UnbanResponse>
-    >(
+    const response = await this.apiClient.sendRequest<UnbanResponse>(
       'POST',
       '/api/v2/moderation/unban',
       undefined,
       queryParams,
       body,
-      'application/json',
     );
 
-    decoders.UnbanResponse?.(response.body);
+    decoders.UnbanResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 
   async unmute(
@@ -660,19 +637,16 @@ export class ModerationApi {
       target_ids: request?.target_ids,
     };
 
-    const response = await this.apiClient.sendRequest<
-      StreamResponse<UnmuteResponse>
-    >(
+    const response = await this.apiClient.sendRequest<UnmuteResponse>(
       'POST',
       '/api/v2/moderation/unmute',
       undefined,
       undefined,
       body,
-      'application/json',
     );
 
-    decoders.UnmuteResponse?.(response.body);
+    decoders.UnmuteResponse?.(response);
 
-    return { ...response.body, metadata: response.metadata };
+    return response;
   }
 }
