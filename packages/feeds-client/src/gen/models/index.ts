@@ -1,12 +1,31 @@
 export interface AIAudioConfigRequest {
+  /**
+   * Bodyguard credentials profile to classify transcripts with. Applies to the NLP engine only; ignored when LLM configurability is enabled. Empty falls back to the app-pinned profile, then the organization's top-level credentials
+   */
   profile?: string;
+  /**
+   * Deprecated pre-split rule list. Still the live config while no engine config exists; once one does it is kept as a fallback for whichever engine has none of its own
+   */
   rules?: BodyguardRule[];
+  ai_text_config?: AITextConfig;
+  llm_config?: LLMConfig;
 }
 
 export interface AIAudioConfigResponse {
+  /**
+   * Whether the engine selected by the application's LLM configurability flag has a rule that does something. Derived, not stored
+   */
   enabled: boolean;
+  /**
+   * Bodyguard credentials profile transcripts are classified with. Applies to the NLP engine only
+   */
   profile: string;
+  /**
+   * The active engine's rules, flattened into the pre-split shape for clients that predate the per-engine configs. This is the whole config for a policy that has no per-engine config stored
+   */
   rules: BodyguardRule[];
+  ai_text_config?: AITextConfig;
+  llm_config?: LLMConfig;
 }
 
 export interface AIImageConfig {
@@ -68,6 +87,10 @@ export interface APIError {
    * Additional error-specific information
    */
   details: number[];
+  /**
+   * Milliseconds until the user's slow mode cool down period ends. Only set on code 60 (cool down) errors
+   */
+  cooldown_remaining_ms?: number;
   /**
    * Flag that indicates if the error is unrecoverable, requests that return unrecoverable errors should not be retried, this error only applies to the request that caused it
    */
@@ -193,8 +216,11 @@ export interface ActivityAddedEvent {
    * The type of event: "feeds.activity.added" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -210,8 +236,11 @@ export interface ActivityDeletedEvent {
    * The type of event: "feeds.activity.deleted" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -295,7 +324,6 @@ export interface ActivityMarkEvent {
    * The type of event: "feeds.activity.marked" in this case
    */
   type: string;
-  feed_visibility?: string;
   /**
    * Whether all activities were marked as read
    */
@@ -317,6 +345,10 @@ export interface ActivityMarkEvent {
    * The IDs of activities marked as watched
    */
   mark_watched?: string[];
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -355,8 +387,11 @@ export interface ActivityPinnedEvent {
    * The type of event: "feeds.activity.pinned" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -380,8 +415,11 @@ export interface ActivityReactionAddedEvent {
    * The type of event: "feeds.activity.reaction.added" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -398,8 +436,11 @@ export interface ActivityReactionDeletedEvent {
    * The type of the reaction that was removed
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -416,8 +457,11 @@ export interface ActivityReactionUpdatedEvent {
    * The type of event: "feeds.activity.reaction.updated" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -433,8 +477,11 @@ export interface ActivityRemovedFromFeedEvent {
    * The type of event: "feeds.activity.removed_from_feed" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -473,10 +520,6 @@ export interface ActivityRequest {
    */
   poll_id?: string;
   /**
-   * Controls who can add comments/replies to this activity. One of: everyone, people_i_follow, nobody
-   */
-  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
-  /**
    * Whether to skip URL enrichment for the activity
    */
   skip_enrich_url?: boolean;
@@ -488,10 +531,6 @@ export interface ActivityRequest {
    * Text content of the activity
    */
   text?: string;
-  /**
-   * Visibility setting for the activity. One of: public, private, tag
-   */
-  visibility?: 'public' | 'private' | 'tag';
   /**
    * If visibility is 'tag', this is the tag name and is required
    */
@@ -526,9 +565,17 @@ export interface ActivityRequest {
   custom?: Record<string, any>;
   location?: Location;
   /**
+   * Who is allowed to reply to an activity.
+   */
+  restrict_replies?: RestrictReplies;
+  /**
    * Additional data for search indexing
    */
   search_data?: Record<string, any>;
+  /**
+   * Who can see an activity.
+   */
+  visibility?: ActivityVisibility;
 }
 
 export interface ActivityResponse {
@@ -565,10 +612,6 @@ export interface ActivityResponse {
    */
   reaction_count: number;
   /**
-   * Controls who can add comments/replies to this activity. One of: everyone, people_i_follow, nobody
-   */
-  restrict_replies: 'everyone' | 'people_i_follow' | 'nobody';
-  /**
    * Ranking score for this activity
    */
   score: number;
@@ -584,10 +627,6 @@ export interface ActivityResponse {
    * When the activity was last updated
    */
   updated_at: Date;
-  /**
-   * Visibility setting for the activity. One of: public, private, tag
-   */
-  visibility: 'public' | 'private' | 'tag';
   /**
    * Media attachments for the activity
    */
@@ -637,6 +676,10 @@ export interface ActivityResponse {
    */
   reaction_groups: Record<string, FeedsReactionGroupResponse>;
   /**
+   * Who is allowed to reply to an activity.
+   */
+  restrict_replies: RestrictReplies;
+  /**
    * Data for search indexing
    */
   search_data: Record<string, any>;
@@ -644,6 +687,10 @@ export interface ActivityResponse {
    * User response object
    */
   user: UserResponse;
+  /**
+   * Who can see an activity.
+   */
+  visibility: ActivityVisibility;
   /**
    * When the activity was deleted
    */
@@ -720,8 +767,11 @@ export interface ActivityRestoredEvent {
    * The type of the event
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -729,11 +779,23 @@ export interface ActivitySelectorConfig {
   cutoff_time: Date;
   cutoff_window?: string;
   min_popularity?: number;
-  type?: string;
   sort?: SortParam[];
   filter?: Record<string, any>;
   params?: Record<string, any>;
+  /**
+   * How a feed group selects the activities it shows.
+   */
+  type?: ActivitySelectorType;
 }
+
+export type ActivitySelectorType =
+  | 'popular'
+  | 'proximity'
+  | 'following'
+  | 'current_feed'
+  | 'query'
+  | 'interest'
+  | 'follow_suggestion';
 
 export interface ActivityUnpinnedEvent {
   /**
@@ -750,8 +812,11 @@ export interface ActivityUnpinnedEvent {
    * The type of event: "feeds.activity.unpinned" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -767,10 +832,15 @@ export interface ActivityUpdatedEvent {
    * The type of the event
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
+
+export type ActivityVisibility = 'public' | 'private' | 'tag';
 
 export interface AddActivityRequest {
   /**
@@ -808,10 +878,6 @@ export interface AddActivityRequest {
    */
   poll_id?: string;
   /**
-   * Controls who can add comments/replies to this activity. One of: everyone, people_i_follow, nobody
-   */
-  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
-  /**
    * Whether to skip URL enrichment for the activity
    */
   skip_enrich_url?: boolean;
@@ -823,10 +889,6 @@ export interface AddActivityRequest {
    * Text content of the activity
    */
   text?: string;
-  /**
-   * Visibility setting for the activity. One of: public, private, tag
-   */
-  visibility?: 'public' | 'private' | 'tag';
   /**
    * If visibility is 'tag', this is the tag name and is required
    */
@@ -861,9 +923,17 @@ export interface AddActivityRequest {
   custom?: Record<string, any>;
   location?: Location;
   /**
+   * Who is allowed to reply to an activity.
+   */
+  restrict_replies?: RestrictReplies;
+  /**
    * Additional data for search indexing
    */
   search_data?: Record<string, any>;
+  /**
+   * Who can see an activity.
+   */
+  visibility?: ActivityVisibility;
 }
 
 export interface AddActivityResponse {
@@ -873,6 +943,10 @@ export interface AddActivityResponse {
    * Number of mention notification activities created for mentioned users
    */
   mention_notifications_created?: number;
+  /**
+   * Contains the activity ID when skip_existing is true and the activity already existed, so it was left unchanged.
+   */
+  skipped_existing?: string[];
 }
 
 export interface AddBookmarkRequest {
@@ -1190,6 +1264,17 @@ export interface AggregationConfig {
   score_strategy?: string;
 }
 
+export interface AppDefaults {
+  /**
+   * Defaults applied by the get-or-create channel endpoint.
+   */
+  get_or_create_channel: GetOrCreateChannelDefaults;
+  /**
+   * Defaults applied by the query channels endpoint.
+   */
+  query_channels: QueryChannelsDefaults;
+}
+
 export interface AppEventResponse {
   /**
    * boolean
@@ -1208,11 +1293,24 @@ export interface AppEventResponse {
 }
 
 export interface AppResponseFields {
+  /**
+   * A boolean value determining if async url enrichment is enabled.
+   */
   async_url_enrich_enabled: boolean;
+  /**
+   * A boolean value determining if auto translation is enabled.
+   */
   auto_translation_enabled: boolean;
   id: number;
+  /**
+   * The name of the app.
+   */
   name: string;
   placement: string;
+  /**
+   * Request limit defaults applied by the server when the corresponding field is omitted.
+   */
+  defaults: AppDefaults;
   file_upload_config: FileUploadConfig;
   image_upload_config: FileUploadConfig;
 }
@@ -1509,10 +1607,18 @@ export interface BanRequest {
    */
   target_user_id: string;
   /**
+   * Whether to also ban the user from future channels created by the banner
+   */
+  ban_from_future_channels?: boolean;
+  /**
    * Channel where the ban applies
    */
   channel_cid?: string;
   delete_messages?: 'soft' | 'pruning' | 'hard';
+  /**
+   * Whether to delete reactions by the banned user on other users' messages
+   */
+  delete_reactions?: boolean;
   /**
    * Whether to ban the user's IP address
    */
@@ -1616,7 +1722,7 @@ export interface BlockListResponse {
    */
   name: string;
   /**
-   * Block list type. One of: regex, domain, domain_allowlist, email, email_allowlist, word
+   * Block list type. One of: regex, domain, domain_allowlist, email, email_allowlist, word, word_allowlist
    */
   type: string;
   /**
@@ -1992,9 +2098,9 @@ export interface CastPollVoteRequest {
 
 export interface ChangeFeedVisibilityRequest {
   /**
-   * Feed visibility level: public, visible, followers, members, or private
+   * Who can see and follow a feed.
    */
-  visibility: 'public' | 'visible' | 'followers' | 'members' | 'private';
+  visibility: FeedVisibility;
   /**
    * What to do with existing pending follows when loosening visibility from 'followers': auto_approve (default) or reject
    */
@@ -2090,6 +2196,7 @@ export interface ChannelMemberResponse {
    * Date/time of the last update
    */
   updated_at: Date;
+  user_id: string;
   custom: Record<string, any>;
   archived_at?: Date;
   /**
@@ -2127,7 +2234,6 @@ export interface ChannelMemberResponse {
    */
   role?: string;
   status?: string;
-  user_id?: string;
   deleted_messages?: string[];
   /**
    * User response object
@@ -2198,6 +2304,7 @@ export const ChannelOwnCapability = {
   QUERY_POLL_VOTES: 'query-poll-votes',
   QUOTE_MESSAGE: 'quote-message',
   READ_EVENTS: 'read-events',
+  SCHEDULE_MESSAGE: 'schedule-message',
   SEARCH_MESSAGES: 'search-messages',
   SEND_CUSTOM_EVENTS: 'send-custom-events',
   SEND_LINKS: 'send-links',
@@ -2224,7 +2331,13 @@ export type ChannelOwnCapability =
   (typeof ChannelOwnCapability)[keyof typeof ChannelOwnCapability];
 
 export interface ChannelPushPreferencesResponse {
+  /**
+   * The scope level of the push notifications.
+   */
   chat_level?: string;
+  /**
+   * If provided the notifications will be disabled until the set date.
+   */
   disabled_until?: Date;
   chat_preferences?: ChatPreferencesResponse;
 }
@@ -2571,6 +2684,8 @@ export interface CollectionResponse {
   custom?: Record<string, any>;
 }
 
+export type CollectionStatus = 'ok' | 'notfound';
+
 export interface Command {
   /**
    * Arguments help text, shown in commands auto-completion
@@ -2611,8 +2726,11 @@ export interface CommentAddedEvent {
    * The type of event: "feeds.comment.added" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -2628,9 +2746,69 @@ export interface CommentDeletedEvent {
    * The type of event: "feeds.comment.deleted" in this case
    */
   type: string;
-  feed_visibility?: string;
+  received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
+  user?: UserResponseCommonFields;
+}
+
+export interface CommentFeedbackEvent {
+  /**
+   * Date/time of creation
+   */
+  created_at: Date;
+  comment_feedback: CommentFeedbackEventPayload;
+  custom: Record<string, any>;
+  /**
+   * The type of event: "feeds.comment.feedback" in this case
+   */
+  type: string;
   received_at?: Date;
   user?: UserResponseCommonFields;
+}
+
+export interface CommentFeedbackEventPayload {
+  /**
+   * The comment that received feedback
+   */
+  comment_id: string;
+  /**
+   * When the feedback was created
+   */
+  created_at: Date;
+  /**
+   * Whether the comment is hidden for the user
+   */
+  hide: boolean;
+  /**
+   * When the feedback was last updated
+   */
+  updated_at: Date;
+  /**
+   * User response object
+   */
+  user: UserResponse;
+}
+
+export interface CommentFeedbackRequest {
+  /**
+   * Whether to hide this comment for the user
+   */
+  hide?: boolean;
+}
+
+export interface CommentFeedbackResponse {
+  /**
+   * The ID of the comment that received feedback
+   */
+  comment_id: string;
+  duration: string;
+  /**
+   * Whether the comment is hidden for the user
+   */
+  hide: boolean;
 }
 
 export interface CommentReactionAddedEvent {
@@ -2647,8 +2825,11 @@ export interface CommentReactionAddedEvent {
    * The type of event: "feeds.comment.reaction.added" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -2665,8 +2846,11 @@ export interface CommentReactionDeletedEvent {
    * The type of reaction that was removed
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface CommentReactionUpdatedEvent {
@@ -2683,8 +2867,11 @@ export interface CommentReactionUpdatedEvent {
    * The type of event: "feeds.comment.reaction.updated" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -2702,6 +2889,10 @@ export interface CommentResponse {
    * Number of downvotes for this comment
    */
   downvote_count: number;
+  /**
+   * Only true in QueryComments results filtered with hidden: true
+   */
+  hidden: boolean;
   /**
    * Unique identifier for the comment
    */
@@ -2727,10 +2918,6 @@ export interface CommentResponse {
    */
   score: number;
   /**
-   * Status of the comment. One of: active, deleted, removed, hidden
-   */
-  status: 'active' | 'deleted' | 'removed' | 'hidden' | 'shadow_blocked';
-  /**
    * When the comment was last updated
    */
   updated_at: Date;
@@ -2746,6 +2933,10 @@ export interface CommentResponse {
    * Current user's reactions to this activity
    */
   own_reactions: FeedsReactionResponse[];
+  /**
+   * Moderation status of a comment.
+   */
+  status: CommentStatus;
   /**
    * User response object
    */
@@ -2802,10 +2993,20 @@ export interface CommentRestoredEvent {
    * The type of event: "feeds.comment.restored" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
+
+export type CommentStatus =
+  | 'active'
+  | 'deleted'
+  | 'removed'
+  | 'hidden'
+  | 'shadow_blocked';
 
 export interface CommentUpdatedEvent {
   /**
@@ -2819,8 +3020,11 @@ export interface CommentUpdatedEvent {
    * The type of event: "feeds.comment.updated" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -2880,12 +3084,43 @@ export interface ConnectUserDetailsRequest {
   language?: string;
   name?: string;
   custom?: Record<string, any>;
+  /**
+   * The privacy settings of the user.
+   */
   privacy_settings?: PrivacySettingsResponse;
+}
+
+export interface ConnectedEvent {
+  /**
+   * The connection_id for this client
+   */
+  connection_id: string;
+  created_at: Date;
+  me: OwnUserResponse;
+  /**
+   * The type of event: "connection.ok" in this case
+   */
+  type: string;
+}
+
+export interface ConnectionErrorEvent {
+  connection_id: string;
+  created_at: Date;
+  error: APIError;
+  /**
+   * The type of event: "connection.error" in this case
+   */
+  type: string;
 }
 
 export interface ContentCountRuleParameters {
   threshold?: number;
   time_window?: string;
+}
+
+export interface ContentCountryCodeParameters {
+  operator?: string;
+  country_codes?: string[];
 }
 
 export interface ContentCustomPropertyCountParameters {
@@ -2915,7 +3150,7 @@ export interface CreateBlockListRequest {
   is_substring_matching_enabled?: boolean;
   team?: string;
   /**
-   * Block list type. One of: regex, domain, domain_allowlist, email, email_allowlist, word
+   * Block list type. One of: regex, domain, domain_allowlist, email, email_allowlist, word, word_allowlist
    */
   type?:
     | 'regex'
@@ -2923,7 +3158,8 @@ export interface CreateBlockListRequest {
     | 'domain_allowlist'
     | 'email'
     | 'email_allowlist'
-    | 'word';
+    | 'word'
+    | 'word_allowlist';
 }
 
 export interface CreateBlockListResponse {
@@ -3055,6 +3291,9 @@ export interface CreatePollRequest {
    */
   max_votes_allowed?: number;
   team?: string;
+  /**
+   * Represents the visibility of votes in a poll.
+   */
   voting_visibility?: 'anonymous' | 'public';
   options?: PollOptionInput[];
   /**
@@ -3263,6 +3502,31 @@ export interface DeleteModerationConfigResponse {
   duration: string;
 }
 
+export interface DeletePollAnswerRequestPayload {
+  /**
+   * Reason for deletion
+   */
+  reason?: string;
+}
+
+export interface DeletePollOptionRequestPayload {
+  /**
+   * Option to delete. Required on an item for a whole poll (create or edit); defaults to the option an add_option / update_option item was raised for
+   */
+  option_id?: string;
+  /**
+   * Reason for deletion
+   */
+  reason?: string;
+}
+
+export interface DeletePollRequestPayload {
+  /**
+   * Reason for deletion
+   */
+  reason?: string;
+}
+
 export interface DeleteQueueRequest {}
 
 export interface DeleteReactionRequestPayload {
@@ -3356,11 +3620,11 @@ export interface DeliveryReceiptsResponse {
 
 export interface DeviceResponse {
   /**
-   * Date/time of creation
+   * The date when the device was created.
    */
   created_at: Date;
   /**
-   * Device ID
+   * The device identifier.
    */
   id: string;
   /**
@@ -3489,9 +3753,9 @@ export interface EnrichedCollectionResponse {
    */
   name: string;
   /**
-   * Enrichment status of the collection. One of: ok, notfound
+   * Enrichment status of a collection entry.
    */
-  status: 'ok' | 'notfound';
+  status: CollectionStatus;
   /**
    * When the collection was created
    */
@@ -3638,7 +3902,6 @@ export interface EntityCreatorResponse {
   image?: string;
   last_active?: Date;
   name?: string;
-  revoke_tokens_issued_before?: Date;
   teams_role?: Record<string, string>;
 }
 
@@ -3677,8 +3940,11 @@ export interface FeedCreatedEvent {
    * The type of event: "feeds.feed.created" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface FeedDeletedEvent {
@@ -3692,8 +3958,11 @@ export interface FeedDeletedEvent {
    * The type of event: "feeds.feed.deleted" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -3702,12 +3971,15 @@ export interface FeedGroup {
   app_pk: number;
   created_at: Date;
   default_follower_role: string;
-  default_visibility: string;
   group_id: string;
   updated_at: Date;
   activity_processors: ActivityProcessorConfig[];
   activity_selectors: ActivitySelectorConfig[];
   custom: Record<string, any>;
+  /**
+   * Who can see and follow a feed.
+   */
+  default_visibility: FeedVisibility;
   deleted_at?: Date;
   last_feed_get_at?: Date;
   activity_filter?: ActivityFilterConfig;
@@ -3729,9 +4001,12 @@ export interface FeedGroupChangedEvent {
    * The type of event: "feeds.feed_group.changed" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
   feed_group?: FeedGroup;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -3750,8 +4025,11 @@ export interface FeedGroupDeletedEvent {
    * The type of event: "feeds.feed_group.deleted" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface FeedGroupRestoredEvent {
@@ -3769,18 +4047,24 @@ export interface FeedGroupRestoredEvent {
    * The type of event: "feeds.feed_group.restored" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface FeedInput {
   description?: string;
   name?: string;
-  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
   filter_tags?: string[];
   members?: FeedMemberRequest[];
   custom?: Record<string, any>;
   location?: Location;
+  /**
+   * Who can see and follow a feed.
+   */
+  visibility?: FeedVisibility;
 }
 
 export interface FeedMemberAddedEvent {
@@ -3795,8 +4079,11 @@ export interface FeedMemberAddedEvent {
    * The type of event: "feeds.feed_member.added" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -3812,8 +4099,11 @@ export interface FeedMemberRemovedEvent {
    * The type of event: "feeds.feed_member.removed" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -3850,13 +4140,13 @@ export interface FeedMemberResponse {
    */
   role: string;
   /**
-   * Status of the membership. One of: member, pending, rejected
-   */
-  status: 'member' | 'pending' | 'rejected';
-  /**
    * When the membership was last updated
    */
   updated_at: Date;
+  /**
+   * Membership status of a feed member.
+   */
+  status: FeedMemberStatus;
   /**
    * User response object
    */
@@ -3876,6 +4166,8 @@ export interface FeedMemberResponse {
   membership_level?: MembershipLevelResponse;
 }
 
+export type FeedMemberStatus = 'member' | 'pending' | 'rejected';
+
 export interface FeedMemberUpdatedEvent {
   /**
    * Date/time of creation
@@ -3888,8 +4180,11 @@ export interface FeedMemberUpdatedEvent {
    * The type of event: "feeds.feed_member.updated" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
@@ -3966,10 +4261,6 @@ export interface FeedRequest {
    */
   name?: string;
   /**
-   * Visibility setting for the feed. One of: public, visible, followers, members, private
-   */
-  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
-  /**
    * Tags used for filtering feeds
    */
   filter_tags?: string[];
@@ -3982,6 +4273,10 @@ export interface FeedRequest {
    */
   custom?: Record<string, any>;
   location?: Location;
+  /**
+   * Who can see and follow a feed.
+   */
+  visibility?: FeedVisibility;
 }
 
 export interface FeedResponse {
@@ -4039,10 +4334,6 @@ export interface FeedResponse {
    */
   deleted_at?: Date;
   /**
-   * Visibility setting for the feed
-   */
-  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
-  /**
    * Tags used for filtering feeds
    */
   filter_tags?: string[];
@@ -4064,6 +4355,10 @@ export interface FeedResponse {
   custom?: Record<string, any>;
   location?: Location;
   own_membership?: FeedMemberResponse;
+  /**
+   * Who can see and follow a feed.
+   */
+  visibility?: FeedVisibility;
 }
 
 export interface FeedSuggestionResponse {
@@ -4123,10 +4418,6 @@ export interface FeedSuggestionResponse {
   reason?: string;
   recommendation_score?: number;
   /**
-   * Visibility setting for the feed
-   */
-  visibility?: 'public' | 'visible' | 'followers' | 'members' | 'private';
-  /**
    * Tags used for filtering feeds
    */
   filter_tags?: string[];
@@ -4149,6 +4440,10 @@ export interface FeedSuggestionResponse {
   custom?: Record<string, any>;
   location?: Location;
   own_membership?: FeedMemberResponse;
+  /**
+   * Who can see and follow a feed.
+   */
+  visibility?: FeedVisibility;
 }
 
 export interface FeedUpdatedEvent {
@@ -4160,10 +4455,20 @@ export interface FeedUpdatedEvent {
    * The type of event: "feeds.feed.updated" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
+
+export type FeedVisibility =
+  | 'public'
+  | 'visible'
+  | 'followers'
+  | 'members'
+  | 'private';
 
 export interface FeedsActivityLocation {
   lat: number;
@@ -4187,10 +4492,13 @@ export interface FeedsEnrichedCollectionResponse {
   created_at: Date;
   id: string;
   name: string;
-  status: string;
   updated_at: Date;
   user_id: string;
   custom: Record<string, any>;
+  /**
+   * Enrichment status of a collection entry.
+   */
+  status: CollectionStatus;
 }
 
 export interface FeedsFeedResponse {
@@ -4211,16 +4519,20 @@ export interface FeedsFeedResponse {
    */
   created_by: UserResponse;
   deleted_at?: Date;
-  visibility?: string;
   filter_tags?: string[];
   custom?: Record<string, any>;
   location?: FeedsActivityLocation;
+  /**
+   * Who can see and follow a feed.
+   */
+  visibility?: FeedVisibility;
 }
 
 export interface FeedsNotificationComment {
   comment: string;
   id: string;
   user_id: string;
+  parent_id?: string;
   attachments?: Attachment[];
 }
 
@@ -4339,12 +4651,10 @@ export interface FeedsV3ActivityResponse {
   popularity: number;
   preview: boolean;
   reaction_count: number;
-  restrict_replies: string;
   score: number;
   share_count: number;
   type: string;
   updated_at: Date;
-  visibility: string;
   attachments: Attachment[];
   comments: FeedsV3CommentResponse[];
   feeds: string[];
@@ -4357,11 +4667,19 @@ export interface FeedsV3ActivityResponse {
   collections: Record<string, FeedsEnrichedCollectionResponse>;
   custom: Record<string, any>;
   reaction_groups: Record<string, FeedsReactionGroupResponse>;
+  /**
+   * Who is allowed to reply to an activity.
+   */
+  restrict_replies: RestrictReplies;
   search_data: Record<string, any>;
   /**
    * User response object
    */
   user: UserResponse;
+  /**
+   * Who can see an activity.
+   */
+  visibility: ActivityVisibility;
   deleted_at?: Date;
   edited_at?: Date;
   expires_at?: Date;
@@ -4391,17 +4709,21 @@ export interface FeedsV3CommentResponse {
   confidence_score: number;
   created_at: Date;
   downvote_count: number;
+  hidden: boolean;
   id: string;
   object_id: string;
   object_type: string;
   reaction_count: number;
   reply_count: number;
   score: number;
-  status: string;
   updated_at: Date;
   upvote_count: number;
   mentioned_users: UserResponse[];
   own_reactions: FeedsReactionResponse[];
+  /**
+   * Moderation status of a comment.
+   */
+  status: CommentStatus;
   /**
    * User response object
    */
@@ -4426,10 +4748,26 @@ export interface Field {
 }
 
 export interface FileUploadConfig {
+  /**
+   * The file size limit allowed in Bytes. 0 means no app-specific limit.
+   * This value is configurable from Stream's Dashboard App Settings.
+   */
   size_limit: number;
+  /**
+   * The allowed file extensions.
+   */
   allowed_file_extensions: string[];
+  /**
+   * The allowed mime types.
+   */
   allowed_mime_types: string[];
+  /**
+   * The blocked file extensions.
+   */
   blocked_file_extensions: string[];
+  /**
+   * The blocked mime types.
+   */
   blocked_mime_types: string[];
 }
 
@@ -4465,6 +4803,10 @@ export interface FilterConfigResponse {
    * AI image moderation labels available as filter values. Reflects the app's effective image taxonomy: custom Bodyguard taxonomy when enabled, otherwise the standard L1 label set.
    */
   ai_image_labels?: string[];
+  /**
+   * Labels the image OCR pipeline can flag, available as filter values on the `label` field under the ai_image category. The app's LLM labels when LLM configurability is enabled, otherwise the AI text labels. OCR and image-classification labels share the `label` field, so a name present in both matches either.
+   */
+  ai_image_ocr_labels?: string[];
   /**
    * AI text moderation labels available as filter values
    */
@@ -4599,8 +4941,11 @@ export interface FollowCreatedEvent {
    * The type of event: "feeds.follow.created" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface FollowDeletedEvent {
@@ -4615,8 +4960,11 @@ export interface FollowDeletedEvent {
    * The type of event: "feeds.follow.deleted" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface FollowRequest {
@@ -4673,14 +5021,14 @@ export interface FollowResponse {
    */
   push_preference: 'all' | 'none';
   /**
-   * Status of the follow relationship. One of: accepted, pending, rejected
-   */
-  status: 'accepted' | 'pending' | 'rejected';
-  /**
    * When the follow relationship was last updated
    */
   updated_at: Date;
   source_feed: FeedResponse;
+  /**
+   * Status of a follow request.
+   */
+  status: FollowStatus;
   target_feed: FeedResponse;
   /**
    * When the follow request was accepted
@@ -4696,6 +5044,8 @@ export interface FollowResponse {
   custom?: Record<string, any>;
 }
 
+export type FollowStatus = 'accepted' | 'pending' | 'rejected';
+
 export interface FollowUpdatedEvent {
   /**
    * Date/time of creation
@@ -4708,8 +5058,11 @@ export interface FollowUpdatedEvent {
    * The type of event: "feeds.follow.updated" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface FriendReactionsOptions {
@@ -4758,8 +5111,10 @@ export interface FullUserResponse {
   image?: string;
   last_active?: Date;
   name?: string;
-  revoke_tokens_issued_before?: Date;
   latest_hidden_channels?: string[];
+  /**
+   * The privacy settings of the user.
+   */
   privacy_settings?: PrivacySettingsResponse;
   teams_role?: Record<string, string>;
 }
@@ -4787,6 +5142,9 @@ export interface GetApplicationResponse {
    * Duration of the request in milliseconds
    */
   duration: string;
+  /**
+   * A type representing the app settings.
+   */
   app: AppResponseFields;
 }
 
@@ -4928,6 +5286,17 @@ export interface GetOGResponse {
   giphy?: Images;
 }
 
+export interface GetOrCreateChannelDefaults {
+  /**
+   * Resolved defaults for a nested pagination object.
+   */
+  members: PagerDefaults;
+  /**
+   * Resolved defaults for a nested pagination object.
+   */
+  messages: PagerDefaults;
+}
+
 export interface GetOrCreateFeedRequest {
   id_around?: string;
   limit?: number;
@@ -4936,6 +5305,10 @@ export interface GetOrCreateFeedRequest {
   prev?: string;
   view?: string;
   watch?: boolean;
+  /**
+   * Feature-gated; not available for all apps. Request-scoped list of actor/user IDs whose activities are filtered from this GetOrCreateFeed response only. Merged (union) into the viewing user's in-memory blocked authors for this request; never persisted to blocked_users. Max: 1000.
+   */
+  discard_actors?: string[];
   data?: FeedInput;
   /**
    * Options to skip specific enrichments to improve performance. Default is false (enrichments are included). Setting a field to true skips that enrichment.
@@ -4968,6 +5341,10 @@ export interface GetOrCreateFeedResponse {
   feed: FeedResponse;
   next?: string;
   prev?: string;
+  /**
+   * Activity selectors dropped from this read because they exceeded their time budget (see the time_budget_ms selector setting). Their activities are missing from this page, and they stay out for the rest of this pagination session. Omitted when every selector completed
+   */
+  degraded_selectors?: string[];
   followers_pagination?: PagerResponse;
   following_pagination?: PagerResponse;
   member_pagination?: PagerResponse;
@@ -5165,66 +5542,31 @@ export interface IntentConfigResponse {
   topics: IntentTopicResponse[];
 }
 
+export interface IntentRuleParameters {
+  topic: string;
+  threshold?: number;
+}
+
 export interface IntentTopicRequest {
   /**
    * Unique topic label (e.g. purchase_intent)
    */
   label: string;
   /**
-   * How long the buffer collects items before scoring runs
-   */
-  analysis_cooldown_seconds?: number;
-  /**
    * Optional description used in the classification prompt; the label alone is used when empty
    */
   description?: string;
-  /**
-   * Whether this topic is evaluated
-   */
-  enabled?: boolean;
-  /**
-   * Items buffered per conversation before scoring runs early
-   */
-  max_captured_items?: number;
-  /**
-   * Suppresses this topic for a user and conversation after it fires; 0 uses the default
-   */
-  refire_cooldown_seconds?: number;
-  /**
-   * Conversation score (0-100) required to fire moderation.intent_detected
-   */
-  score_threshold?: number;
 }
 
 export interface IntentTopicResponse {
-  /**
-   * How long the buffer collects items before scoring runs
-   */
-  analysis_cooldown_seconds: number;
-  /**
-   * Whether this topic is evaluated
-   */
-  enabled: boolean;
   /**
    * Unique topic label (e.g. purchase_intent)
    */
   label: string;
   /**
-   * Items buffered per conversation before scoring runs early
-   */
-  max_captured_items: number;
-  /**
-   * Conversation score (0-100) required to fire moderation.intent_detected
-   */
-  score_threshold: number;
-  /**
    * Optional description used in the classification prompt; the label alone is used when empty
    */
   description?: string;
-  /**
-   * Suppresses this topic for a user and conversation after it fires; 0 uses the default
-   */
-  refire_cooldown_seconds?: number;
 }
 
 export interface InterestTagResponse {
@@ -5816,9 +6158,25 @@ export interface MuteResponse {
 }
 
 export interface NotificationComment {
+  /**
+   * The text of the comment
+   */
   comment: string;
+  /**
+   * The ID of the comment
+   */
   id: string;
+  /**
+   * The ID of the user who wrote the comment
+   */
   user_id: string;
+  /**
+   * The ID of the parent comment when this comment is a reply; omitted for top-level comments
+   */
+  parent_id?: string;
+  /**
+   * Attachments on the comment
+   */
   attachments?: Attachment[];
 }
 
@@ -5847,12 +6205,15 @@ export interface NotificationFeedUpdatedEvent {
    * The type of event: "feeds.notification_feed.updated" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
   /**
    * Aggregated activities for notification feeds
    */
   aggregated_activities?: AggregatedActivityResponse[];
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   notification_status?: NotificationStatusResponse;
   user?: UserResponseCommonFields;
 }
@@ -5998,6 +6359,7 @@ export interface OwnUserResponse {
   unread_count: number;
   unread_threads: number;
   updated_at: Date;
+  blocked_user_ids: string[];
   channel_mutes: ChannelMute[];
   devices: DeviceResponse[];
   mutes: UserMuteResponse[];
@@ -6009,13 +6371,24 @@ export interface OwnUserResponse {
   image?: string;
   last_active?: Date;
   name?: string;
-  revoke_tokens_issued_before?: Date;
-  blocked_user_ids?: string[];
   latest_hidden_channels?: string[];
+  /**
+   * The privacy settings of the user.
+   */
   privacy_settings?: PrivacySettingsResponse;
+  /**
+   * The push preference details.
+   */
   push_preferences?: PushPreferencesResponse;
   teams_role?: Record<string, string>;
   total_unread_count_by_team?: Record<string, number>;
+}
+
+export interface PagerDefaults {
+  /**
+   * Number of records returned when `limit` is omitted.
+   */
+  limit: number;
 }
 
 export interface PagerRequest {
@@ -6059,8 +6432,11 @@ export interface PollClosedFeedEvent {
   custom: Record<string, any>;
   poll: PollResponseData;
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface PollDeletedFeedEvent {
@@ -6069,8 +6445,11 @@ export interface PollDeletedFeedEvent {
   custom: Record<string, any>;
   poll: PollResponseData;
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface PollOptionInput {
@@ -6145,8 +6524,11 @@ export interface PollUpdatedFeedEvent {
   custom: Record<string, any>;
   poll: PollResponseData;
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface PollVoteCastedFeedEvent {
@@ -6156,8 +6538,11 @@ export interface PollVoteCastedFeedEvent {
   poll: PollResponseData;
   poll_vote: PollVoteResponseData;
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface PollVoteChangedFeedEvent {
@@ -6167,8 +6552,11 @@ export interface PollVoteChangedFeedEvent {
   poll: PollResponseData;
   poll_vote: PollVoteResponseData;
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface PollVoteRemovedFeedEvent {
@@ -6178,8 +6566,11 @@ export interface PollVoteRemovedFeedEvent {
   poll: PollResponseData;
   poll_vote: PollVoteResponseData;
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
 }
 
 export interface PollVoteResponse {
@@ -6221,8 +6612,17 @@ export interface PollVotesResponse {
 }
 
 export interface PrivacySettingsResponse {
+  /**
+   * The settings for the delivery receipt events.
+   */
   delivery_receipts?: DeliveryReceiptsResponse;
+  /**
+   * The settings for the read receipt events.
+   */
   read_receipts?: ReadReceiptsResponse;
+  /**
+   * The settings for typing indicator events.
+   */
   typing_indicators?: TypingIndicatorsResponse;
 }
 
@@ -6272,7 +6672,13 @@ export interface PushPreferenceInput {
 
 export interface PushPreferencesResponse {
   call_level?: string;
+  /**
+   * The scope level of the push notifications.
+   */
   chat_level?: string;
+  /**
+   * If provided the notifications will be disabled until the set date.
+   */
   disabled_until?: Date;
   feeds_level?: string;
   chat_preferences?: ChatPreferencesResponse;
@@ -6424,6 +6830,25 @@ export interface QueryBookmarksResponse {
    * Cursor for previous page
    */
   prev?: string;
+}
+
+export interface QueryChannelsDefaults {
+  /**
+   * Number of channels returned when `limit` is omitted.
+   */
+  limit: number;
+  /**
+   * Largest number of channels returned for one request. A bigger `limit` is silently clamped to this value rather than rejected. An app with no per-app override gets a higher ceiling for the narrow case of a request asking for at most one message and one member per channel.
+   */
+  max_limit: number;
+  /**
+   * Number of members returned per channel when `member_limit` is omitted.
+   */
+  member_limit: number;
+  /**
+   * Number of messages returned per channel when `message_limit` is omitted.
+   */
+  message_limit: number;
 }
 
 export interface QueryCollectionsRequest {
@@ -6795,6 +7220,7 @@ export interface QueueResponse {
 }
 
 export interface RankingConfig {
+  exclude_below?: number;
   score?: string;
   type?: string;
   defaults?: Record<string, any>;
@@ -7019,6 +7445,8 @@ export interface RestoreCommentResponse {
   comment: CommentResponse;
 }
 
+export type RestrictReplies = 'everyone' | 'people_i_follow' | 'nobody';
+
 export interface ReviewQueueItemResponse {
   /**
    * AI-determined text severity
@@ -7091,6 +7519,7 @@ export interface ReviewQueueItemResponse {
    */
   confidence_score?: number;
   config_key?: string;
+  country_code?: string;
   /**
    * ID of who created the entity
    */
@@ -7129,6 +7558,7 @@ export interface ReviewQueueItemResponse {
    * Content payload for moderation
    */
   moderation_payload?: ModerationPayloadResponse;
+  poll?: PollResponseData;
   reaction?: Reaction;
 }
 
@@ -7190,6 +7620,7 @@ export interface RuleBuilderCondition {
   channel_message_count_rule_params?: ChannelMessageCountRuleParameters;
   closed_caption_rule_params?: ClosedCaptionRuleParameters;
   content_count_rule_params?: ContentCountRuleParameters;
+  content_country_code_params?: ContentCountryCodeParameters;
   content_custom_property_count_params?: ContentCustomPropertyCountParameters;
   content_custom_property_params?: ContentCustomPropertyParameters;
   content_flag_count_rule_params?: FlagCountRuleParameters;
@@ -7197,6 +7628,10 @@ export interface RuleBuilderCondition {
   flood_similar_params?: FloodSimilarRuleParameters;
   image_content_params?: ImageContentParameters;
   image_rule_params?: ImageRuleParameters;
+  /**
+   * intent_rule params: policy intent topic label and the minimum final score (1-100) that fires the condition
+   */
+  intent_rule_params?: IntentRuleParameters;
   ip_content_count_rule_params?: IPContentCountRuleParameters;
   ip_flag_count_rule_params?: IPFlagCountRuleParameters;
   keyframe_ocr_rule_params?: KeyframeOCRRuleParameters;
@@ -7204,6 +7639,7 @@ export interface RuleBuilderCondition {
   ocr_content_params?: OCRContentParameters;
   text_content_params?: TextContentParameters;
   text_rule_params?: TextRuleParameters;
+  user_channel_ban_count_params?: UserChannelBanCountRuleParameters;
   user_channel_count_params?: UserChannelCountRuleParameters;
   user_created_within_params?: UserCreatedWithinParameters;
   user_custom_property_params?: UserCustomPropertyParameters;
@@ -7325,14 +7761,42 @@ export interface SharedLocationResponse {
 }
 
 export interface SharedLocationResponseData {
+  /**
+   * The CID (type:id) of the channel that the location is attached to.
+   */
   channel_cid: string;
+  /**
+   * The date when the location was created.
+   */
   created_at: Date;
+  /**
+   * The ID of the device that created the location.
+   */
   created_by_device_id: string;
+  /**
+   * The latitude of the location.
+   */
   latitude: number;
+  /**
+   * The longitude of the location.
+   */
   longitude: number;
+  /**
+   * The ID of the message that the location is attached to.
+   */
   message_id: string;
+  /**
+   * The date when the location was updated.
+   */
   updated_at: Date;
+  /**
+   * The ID of the user that created the location.
+   */
   user_id: string;
+  /**
+   * The date when the location sharing ends.
+   * If it's empty, it means the location sharing is static instead of live.
+   */
   end_at?: Date;
   /**
    * Represents channel in chat
@@ -7398,7 +7862,6 @@ export interface StoriesFeedUpdatedEvent {
    * The type of event: "feeds.stories_feed.updated" in this case
    */
   type: string;
-  feed_visibility?: string;
   received_at?: Date;
   /**
    * Individual activities for stories feeds
@@ -7408,12 +7871,16 @@ export interface StoriesFeedUpdatedEvent {
    * Aggregated activities for stories feeds
    */
   aggregated_activities?: AggregatedActivityResponse[];
+  /**
+   * Who can see and follow a feed.
+   */
+  feed_visibility?: FeedVisibility;
   user?: UserResponseCommonFields;
 }
 
 export interface SubmitActionRequest {
   /**
-   * Type of moderation action to perform. One of: mark_reviewed, delete_message, delete_activity, delete_comment, delete_reaction, ban, custom, unban, restore, delete_user, delete_user_messages, unblock, block, shadow_block, unmask, kick_user, end_call, escalate, de_escalate
+   * Type of moderation action to perform. One of: mark_reviewed, delete_message, delete_activity, delete_comment, delete_reaction, delete_poll, delete_poll_option, delete_poll_answer, ban, custom, unban, restore, delete_user, delete_user_messages, unblock, block, shadow_block, unmask, kick_user, end_call, escalate, de_escalate
    */
   action_type:
     | 'flag'
@@ -7422,6 +7889,9 @@ export interface SubmitActionRequest {
     | 'delete_activity'
     | 'delete_comment'
     | 'delete_reaction'
+    | 'delete_poll'
+    | 'delete_poll_option'
+    | 'delete_poll_answer'
     | 'ban'
     | 'custom'
     | 'unban'
@@ -7471,6 +7941,18 @@ export interface SubmitActionRequest {
    * Configuration for message deletion action
    */
   delete_message?: DeleteMessageRequestPayload;
+  /**
+   * Configuration for poll deletion action. Poll deletion is always permanent.
+   */
+  delete_poll?: DeletePollRequestPayload;
+  /**
+   * Configuration for deleting the free-text poll answer a review item was raised for. Chat polls only. Deletion is permanent; the poll and other votes are kept.
+   */
+  delete_poll_answer?: DeletePollAnswerRequestPayload;
+  /**
+   * Configuration for deleting the single poll option a review item was raised for. Deletion is permanent; the rest of the poll is kept.
+   */
+  delete_poll_option?: DeletePollOptionRequestPayload;
   /**
    * Configuration for reaction deletion action
    */
@@ -7553,20 +8035,21 @@ export interface ThreadedCommentResponse {
   confidence_score: number;
   created_at: Date;
   downvote_count: number;
+  hidden: boolean;
   id: string;
   object_id: string;
   object_type: string;
   reaction_count: number;
   reply_count: number;
   score: number;
-  /**
-   * Status of the comment. One of: active, deleted, removed, hidden
-   */
-  status: 'active' | 'deleted' | 'removed' | 'hidden' | 'shadow_blocked';
   updated_at: Date;
   upvote_count: number;
   mentioned_users: UserResponse[];
   own_reactions: FeedsReactionResponse[];
+  /**
+   * Moderation status of a comment.
+   */
+  status: CommentStatus;
   /**
    * User response object
    */
@@ -7853,10 +8336,6 @@ export interface UpdateActivityRequest {
    */
   poll_id?: string;
   /**
-   * Controls who can add comments/replies to this activity. One of: everyone, people_i_follow, nobody
-   */
-  restrict_replies?: 'everyone' | 'people_i_follow' | 'nobody';
-  /**
    * If true, runs activity processors on the updated activity. Processors will only run if the activity text and/or attachments are changed. Defaults to false.
    */
   run_activity_processors?: boolean;
@@ -7868,10 +8347,6 @@ export interface UpdateActivityRequest {
    * The text content of the activity
    */
   text?: string;
-  /**
-   * Visibility setting for the activity
-   */
-  visibility?: 'public' | 'private' | 'tag';
   /**
    * If visibility is 'tag', this is the tag name and is required
    */
@@ -7906,9 +8381,17 @@ export interface UpdateActivityRequest {
   custom?: Record<string, any>;
   location?: Location;
   /**
+   * Who is allowed to reply to an activity.
+   */
+  restrict_replies?: RestrictReplies;
+  /**
    * Additional data for search indexing
    */
   search_data?: Record<string, any>;
+  /**
+   * Who can see an activity.
+   */
+  visibility?: ActivityVisibility;
 }
 
 export interface UpdateActivityResponse {
@@ -8431,6 +8914,10 @@ export interface UpsertActivitiesResponse {
    * Total number of mention notification activities created for mentioned users across all activities
    */
   mention_notifications_created?: number;
+  /**
+   * IDs of activities left unchanged because they already existed. Only set when skip_existing is true.
+   */
+  skipped_existing?: string[];
 }
 
 export interface UpsertConfigRequest {
@@ -8566,6 +9053,12 @@ export interface UserBannedEvent {
   created_by?: UserResponseCommonFields;
 }
 
+export interface UserChannelBanCountRuleParameters {
+  banned_by?: string;
+  threshold?: number;
+  time_window?: string;
+}
+
 export interface UserChannelCountRuleParameters {
   threshold?: number;
   time_window?: string;
@@ -8593,6 +9086,44 @@ export interface UserDeactivatedEvent {
   type: string;
   received_at?: Date;
   created_by?: UserResponseCommonFields;
+}
+
+export interface UserDeletedEvent {
+  /**
+   * Date/time of creation
+   */
+  created_at: Date;
+  /**
+   * The type of deletion that was used for the user's conversations. One of: hard, soft, pruning, (empty string)
+   */
+  delete_conversation: string;
+  /**
+   * Whether the user's conversation channels were deleted
+   */
+  delete_conversation_channels: boolean;
+  /**
+   * The type of deletion that was used for the user's messages. One of: hard, soft, pruning, (empty string)
+   */
+  delete_messages: string;
+  /**
+   * The type of deletion that was used for the user. One of: hard, soft, pruning, (empty string)
+   */
+  delete_user: string;
+  /**
+   * Whether the user was hard deleted
+   */
+  hard_delete: boolean;
+  /**
+   * Whether the user's messages were marked as deleted
+   */
+  mark_messages_deleted: boolean;
+  custom: Record<string, any>;
+  user: UserResponseCommonFields;
+  /**
+   * The type of event: "user.deleted" in this case
+   */
+  type: string;
+  received_at?: Date;
 }
 
 export interface UserGroupMember {
@@ -8691,6 +9222,9 @@ export interface UserRequest {
    * Custom user data
    */
   custom?: Record<string, any>;
+  /**
+   * The privacy settings of the user.
+   */
   privacy_settings?: PrivacySettingsResponse;
 }
 
@@ -8750,10 +9284,6 @@ export interface UserResponse {
    * Optional name of user
    */
   name?: string;
-  /**
-   * Revocation date for tokens
-   */
-  revoke_tokens_issued_before?: Date;
   teams_role?: Record<string, string>;
 }
 
@@ -8774,7 +9304,6 @@ export interface UserResponseCommonFields {
   image?: string;
   last_active?: Date;
   name?: string;
-  revoke_tokens_issued_before?: Date;
   teams_role?: Record<string, string>;
 }
 
@@ -8796,7 +9325,9 @@ export interface UserResponsePrivacyFields {
   invisible?: boolean;
   last_active?: Date;
   name?: string;
-  revoke_tokens_issued_before?: Date;
+  /**
+   * The privacy settings of the user.
+   */
   privacy_settings?: PrivacySettingsResponse;
   teams_role?: Record<string, string>;
 }
@@ -8900,10 +9431,6 @@ export interface VideoContentParameters {
   harm_labels?: string[];
 }
 
-export interface VideoEndCallRequestPayload {}
-
-export interface VideoKickUserRequestPayload {}
-
 export interface VideoRuleParameters {
   threshold?: number;
   time_window?: string;
@@ -8921,6 +9448,10 @@ export interface WSAuthMessage {
    */
   token: string;
   user_details: ConnectUserDetailsRequest;
+  /**
+   * Realtime event protocol version. 3 omits channel.members from channel.updated, member.*, notification.message_new and notification.added_to_channel of channels with more than 100 members and sets members_included:false. Values above the newest supported version negotiate down to it.
+   */
+  event_protocol?: number;
   /**
    * Channel-member custom keys to project onto message.member for messages this connection receives (opt-in; capped, off by default).
    */
@@ -8954,6 +9485,7 @@ export type WSClientEvent =
   | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
   | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
   | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
+  | ({ type: 'feeds.comment.feedback' } & CommentFeedbackEvent)
   | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
   | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
   | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
@@ -8985,12 +9517,15 @@ export type WSClientEvent =
   | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
   | ({ type: 'user.banned' } & UserBannedEvent)
   | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
+  | ({ type: 'user.deleted' } & UserDeletedEvent)
   | ({ type: 'user.reactivated' } & UserReactivatedEvent)
   | ({ type: 'user.unbanned' } & UserUnbannedEvent)
   | ({ type: 'user.updated' } & UserUpdatedEvent);
 
 export type WSEvent =
   | ({ type: 'app.updated' } & AppUpdatedEvent)
+  | ({ type: 'connection.error' } & ConnectionErrorEvent)
+  | ({ type: 'connection.ok' } & ConnectedEvent)
   | ({ type: 'feeds.activity.added' } & ActivityAddedEvent)
   | ({ type: 'feeds.activity.deleted' } & ActivityDeletedEvent)
   | ({ type: 'feeds.activity.feedback' } & ActivityFeedbackEvent)
@@ -9012,6 +9547,7 @@ export type WSEvent =
   | ({ type: 'feeds.bookmark_folder.updated' } & BookmarkFolderUpdatedEvent)
   | ({ type: 'feeds.comment.added' } & CommentAddedEvent)
   | ({ type: 'feeds.comment.deleted' } & CommentDeletedEvent)
+  | ({ type: 'feeds.comment.feedback' } & CommentFeedbackEvent)
   | ({ type: 'feeds.comment.reaction.added' } & CommentReactionAddedEvent)
   | ({ type: 'feeds.comment.reaction.deleted' } & CommentReactionDeletedEvent)
   | ({ type: 'feeds.comment.reaction.updated' } & CommentReactionUpdatedEvent)
@@ -9043,6 +9579,7 @@ export type WSEvent =
   | ({ type: 'moderation.mark_reviewed' } & ModerationMarkReviewedEvent)
   | ({ type: 'user.banned' } & UserBannedEvent)
   | ({ type: 'user.deactivated' } & UserDeactivatedEvent)
+  | ({ type: 'user.deleted' } & UserDeletedEvent)
   | ({ type: 'user.reactivated' } & UserReactivatedEvent)
   | ({ type: 'user.unbanned' } & UserUnbannedEvent)
   | ({ type: 'user.updated' } & UserUpdatedEvent);

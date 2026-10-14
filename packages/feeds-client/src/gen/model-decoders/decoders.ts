@@ -766,6 +766,15 @@ decoders.CommentDeletedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.CommentFeedbackEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.CommentReactionAddedEvent = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -859,6 +868,22 @@ decoders.ConfigResponse = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ConnectedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    me: { type: 'OwnUserResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ConnectionErrorEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -988,8 +1013,6 @@ decoders.EntityCreatorResponse = (input?: Record<string, any>) => {
     deleted_at: { type: 'DatetimeType', isSingle: true },
 
     last_active: { type: 'DatetimeType', isSingle: true },
-
-    revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1355,8 +1378,6 @@ decoders.FullUserResponse = (input?: Record<string, any>) => {
     deleted_at: { type: 'DatetimeType', isSingle: true },
 
     last_active: { type: 'DatetimeType', isSingle: true },
-
-    revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -1685,8 +1706,6 @@ decoders.OwnUserResponse = (input?: Record<string, any>) => {
     deleted_at: { type: 'DatetimeType', isSingle: true },
 
     last_active: { type: 'DatetimeType', isSingle: true },
-
-    revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
 
     push_preferences: { type: 'PushPreferencesResponse', isSingle: true },
   };
@@ -2095,6 +2114,8 @@ decoders.ReviewQueueItemResponse = (input?: Record<string, any>) => {
 
     message: { type: 'ChatMessageResponse', isSingle: true },
 
+    poll: { type: 'PollResponseData', isSingle: true },
+
     reaction: { type: 'Reaction', isSingle: true },
   };
   return decode(typeMappings, input);
@@ -2405,6 +2426,15 @@ decoders.UserDeactivatedEvent = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.UserDeletedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.UserGroupMember = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     created_at: { type: 'DatetimeType', isSingle: true },
@@ -2458,8 +2488,6 @@ decoders.UserResponse = (input?: Record<string, any>) => {
     deleted_at: { type: 'DatetimeType', isSingle: true },
 
     last_active: { type: 'DatetimeType', isSingle: true },
-
-    revoke_tokens_issued_before: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
