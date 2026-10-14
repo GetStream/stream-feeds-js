@@ -31,6 +31,8 @@ import type {
   CastPollVoteRequest,
   ChangeFeedVisibilityRequest,
   ChangeFeedVisibilityResponse,
+  CommentFeedbackRequest,
+  CommentFeedbackResponse,
   CreateBlockListRequest,
   CreateBlockListResponse,
   CreateCollectionsRequest,
@@ -403,11 +405,9 @@ export class FeedsApi {
       id: request?.id,
       parent_id: request?.parent_id,
       poll_id: request?.poll_id,
-      restrict_replies: request?.restrict_replies,
       skip_enrich_url: request?.skip_enrich_url,
       skip_push: request?.skip_push,
       text: request?.text,
-      visibility: request?.visibility,
       visibility_tag: request?.visibility_tag,
       attachments: request?.attachments,
       collection_refs: request?.collection_refs,
@@ -417,7 +417,9 @@ export class FeedsApi {
       mentioned_user_ids: request?.mentioned_user_ids,
       custom: request?.custom,
       location: request?.location,
+      restrict_replies: request?.restrict_replies,
       search_data: request?.search_data,
+      visibility: request?.visibility,
     };
 
     const response = await this.apiClient.sendRequest<AddActivityResponse>(
@@ -911,11 +913,9 @@ export class FeedsApi {
       expires_at: request?.expires_at,
       handle_mention_notifications: request?.handle_mention_notifications,
       poll_id: request?.poll_id,
-      restrict_replies: request?.restrict_replies,
       run_activity_processors: request?.run_activity_processors,
       skip_enrich_url: request?.skip_enrich_url,
       text: request?.text,
-      visibility: request?.visibility,
       visibility_tag: request?.visibility_tag,
       attachments: request?.attachments,
       collection_refs: request?.collection_refs,
@@ -925,7 +925,9 @@ export class FeedsApi {
       mentioned_user_ids: request?.mentioned_user_ids,
       custom: request?.custom,
       location: request?.location,
+      restrict_replies: request?.restrict_replies,
       search_data: request?.search_data,
+      visibility: request?.visibility,
     };
 
     const response = await this.apiClient.sendRequest<UpdateActivityResponse>(
@@ -1506,6 +1508,29 @@ export class FeedsApi {
     return response;
   }
 
+  async commentFeedback(
+    request: CommentFeedbackRequest & { id: string },
+  ): Promise<StreamResponse<CommentFeedbackResponse>> {
+    const pathParams = {
+      id: request?.id,
+    };
+    const body = {
+      hide: request?.hide,
+    };
+
+    const response = await this.apiClient.sendRequest<CommentFeedbackResponse>(
+      'POST',
+      '/api/v2/feeds/comments/{id}/feedback',
+      pathParams,
+      undefined,
+      body,
+    );
+
+    decoders.CommentFeedbackResponse?.(response);
+
+    return response;
+  }
+
   async updateCommentPartial(
     request: UpdateCommentPartialRequest & { id: string },
   ): Promise<StreamResponse<UpdateCommentPartialResponse>> {
@@ -1756,6 +1781,7 @@ export class FeedsApi {
       prev: request?.prev,
       view: request?.view,
       watch: request?.watch,
+      discard_actors: request?.discard_actors,
       data: request?.data,
       enrichment_options: request?.enrichment_options,
       external_ranking: request?.external_ranking,
@@ -2585,10 +2611,12 @@ export class FeedsApi {
 
   async longPoll(request?: {
     connection_id?: string;
+    close?: boolean;
     json?: WSAuthMessage;
   }): Promise<StreamResponse<{}>> {
     const queryParams = {
       connection_id: request?.connection_id,
+      close: request?.close,
       json: request?.json,
     };
 

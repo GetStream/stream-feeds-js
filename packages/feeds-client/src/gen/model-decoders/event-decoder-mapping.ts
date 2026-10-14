@@ -7,6 +7,11 @@ const eventDecoderMapping: Record<
 > = {
   'app.updated': (data: Record<string, any>) => decoders.AppUpdatedEvent(data),
 
+  'connection.error': (data: Record<string, any>) =>
+    decoders.ConnectionErrorEvent(data),
+
+  'connection.ok': (data: Record<string, any>) => decoders.ConnectedEvent(data),
+
   'feeds.activity.added': (data: Record<string, any>) =>
     decoders.ActivityAddedEvent(data),
 
@@ -63,6 +68,9 @@ const eventDecoderMapping: Record<
 
   'feeds.comment.deleted': (data: Record<string, any>) =>
     decoders.CommentDeletedEvent(data),
+
+  'feeds.comment.feedback': (data: Record<string, any>) =>
+    decoders.CommentFeedbackEvent(data),
 
   'feeds.comment.reaction.added': (data: Record<string, any>) =>
     decoders.CommentReactionAddedEvent(data),
@@ -155,6 +163,9 @@ const eventDecoderMapping: Record<
 
   'user.deactivated': (data: Record<string, any>) =>
     decoders.UserDeactivatedEvent(data),
+
+  'user.deleted': (data: Record<string, any>) =>
+    decoders.UserDeletedEvent(data),
 
   'user.reactivated': (data: Record<string, any>) =>
     decoders.UserReactivatedEvent(data),

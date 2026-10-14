@@ -261,8 +261,10 @@ export class ModerationApi {
   ): Promise<StreamResponse<ModerationBanResponse>> {
     const body = {
       target_user_id: request?.target_user_id,
+      ban_from_future_channels: request?.ban_from_future_channels,
       channel_cid: request?.channel_cid,
       delete_messages: request?.delete_messages,
+      delete_reactions: request?.delete_reactions,
       ip_ban: request?.ip_ban,
       reason: request?.reason,
       shadow: request?.shadow,
@@ -582,6 +584,9 @@ export class ModerationApi {
       delete_activity: request?.delete_activity,
       delete_comment: request?.delete_comment,
       delete_message: request?.delete_message,
+      delete_poll: request?.delete_poll,
+      delete_poll_answer: request?.delete_poll_answer,
+      delete_poll_option: request?.delete_poll_option,
       delete_reaction: request?.delete_reaction,
       delete_user: request?.delete_user,
       delete_user_messages: request?.delete_user_messages,
