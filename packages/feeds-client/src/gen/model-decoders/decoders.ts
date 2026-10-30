@@ -1455,6 +1455,13 @@ decoders.GetOrCreateUnfollowResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.GetScheduledActivityResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.GetUserGroupResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     user_group: { type: 'UserGroupResponse', isSingle: true },
@@ -1823,6 +1830,15 @@ decoders.PollVotesResponse = (input?: Record<string, any>) => {
   return decode(typeMappings, input);
 };
 
+decoders.PublishScheduledActivityNowResponse = (
+  input?: Record<string, any>,
+) => {
+  const typeMappings: TypeMapping = {
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
 decoders.PushPreferencesResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     disabled_until: { type: 'DatetimeType', isSingle: true },
@@ -1938,6 +1954,16 @@ decoders.QueryPollsResponse = (input?: Record<string, any>) => {
 decoders.QueryReviewQueueResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     items: { type: 'ReviewQueueItemResponse', isSingle: false },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.QueryScheduledActivitiesResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    scheduled_activities: {
+      type: 'ScheduledActivityResponse',
+      isSingle: false,
+    },
   };
   return decode(typeMappings, input);
 };
@@ -2105,6 +2131,88 @@ decoders.Role = (input?: Record<string, any>) => {
     created_at: { type: 'DatetimeType', isSingle: true },
 
     updated_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ScheduleActivityResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ScheduledActivityCreatedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ScheduledActivityDeletedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ScheduledActivityFailedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ScheduledActivityPreview = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    expires_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ScheduledActivityPublishedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ScheduledActivityResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    scheduled_at: { type: 'DatetimeType', isSingle: true },
+
+    updated_at: { type: 'DatetimeType', isSingle: true },
+
+    activity: { type: 'ScheduledActivityPreview', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.ScheduledActivityUpdatedEvent = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    created_at: { type: 'DatetimeType', isSingle: true },
+
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
+
+    received_at: { type: 'DatetimeType', isSingle: true },
   };
   return decode(typeMappings, input);
 };
@@ -2346,6 +2454,13 @@ decoders.UpdateFeedResponse = (input?: Record<string, any>) => {
 decoders.UpdateFollowResponse = (input?: Record<string, any>) => {
   const typeMappings: TypeMapping = {
     follow: { type: 'FollowResponse', isSingle: true },
+  };
+  return decode(typeMappings, input);
+};
+
+decoders.UpdateScheduledActivityResponse = (input?: Record<string, any>) => {
+  const typeMappings: TypeMapping = {
+    scheduled_activity: { type: 'ScheduledActivityResponse', isSingle: true },
   };
   return decode(typeMappings, input);
 };
