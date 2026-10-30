@@ -223,6 +223,11 @@ export class Feed extends FeedApi {
     'feeds.activity.feedback': handleActivityFeedback.bind(this),
     'feeds.activity.restored': Feed.noop,
     'user.unbanned': Feed.noop,
+    'feeds.scheduled_activity.created': Feed.noop,
+    'feeds.scheduled_activity.deleted': Feed.noop,
+    'feeds.scheduled_activity.failed': Feed.noop,
+    'feeds.scheduled_activity.published': Feed.noop,
+    'feeds.scheduled_activity.updated': Feed.noop,
   };
 
   protected eventDispatcher: EventDispatcher<WSEvent['type'], WSEvent> =
