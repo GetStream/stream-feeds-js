@@ -49,7 +49,7 @@ jobs:
         run: yarn test:docs-snippets
       - name: Deploy React tutorial to Vercel
         env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
           NEXT_PUBLIC_API_KEY: ${{ vars.REACT_TUTORIAL_API_KEY }}
         run: >
