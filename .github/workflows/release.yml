@@ -3,21 +3,30 @@ env:
   VITE_STREAM_API_KEY: ${{ vars.CLIENT_TEST_API_KEY }}
   VITE_STREAM_API_SECRET: ${{ secrets.CLIENT_TEST_SECRET }}
   VITE_API_URL: ${{ vars.CLIENT_TEST_API_URL }}
-  GITHUB_TOKEN: ${{ secrets.SDK_BOT_GH_TOKEN }}
 
 on:
+  # Releases are cut by hand (Actions -> Version and Release -> Run workflow) on main.
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: compute the release versions, publish nothing'
+        type: boolean
+        default: true
 
 concurrency:
   group: version-and-release-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  id-token: write # Required for OIDC
-  contents: write # required for committing the version bump
+  id-token: write # npm trusted publishing (OIDC)
+  contents: write # version commits, tags and GitHub releases
 
 jobs:
   version-and-release:
+    if: github.ref == 'refs/heads/main'
+    # Every run waits for a reviewer's approval, only main may use this environment,
+    # and the npm trusted publisher requires it.
+    environment: npm-release
     timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
@@ -28,7 +37,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.SDK_BOT_GH_TOKEN }}
 
       - name: Setup Node ${{ matrix.node-version }}
         uses: actions/setup-node@v6
@@ -53,8 +61,10 @@ jobs:
         run: yarn test:docs-snippets
 
       - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub releases
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           yarn config set npmRegistryServer https://registry.npmjs.org/
-          yarn release
+          yarn release ${{ inputs.dry_run && '--dryRun' || '' }}
