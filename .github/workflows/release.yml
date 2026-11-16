@@ -15,7 +15,8 @@ on:
 
 concurrency:
   group: version-and-release-${{ github.ref }}
-  cancel-in-progress: true
+  # A new run (a dry run included) waits instead of cancelling a release that may be mid-publish.
+  cancel-in-progress: false
 
 permissions:
   id-token: write # npm trusted publishing (OIDC)
