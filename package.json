@@ -56,7 +56,7 @@
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.0",
-    "vercel": "^50.32.3",
+    "vercel": "^65.15.0",
     "vite": "^8.0.0"
   },
   "dependenciesMeta": {
