@@ -6,6 +6,7 @@ import type {
   ChangeFeedVisibilityResponse,
   DeleteFeedResponse,
   GetFeedCountsResponse,
+  GetNotificationStatusResponse,
   GetOrCreateFeedRequest,
   GetOrCreateFeedResponse,
   MarkActivityRequest,
@@ -112,6 +113,16 @@ export class FeedApi {
     return this.feedsApi.getFeedCounts({
       feed_id: this.id,
       feed_group_id: this.group,
+    });
+  }
+
+  getNotificationStatus(request?: {
+    view?: string;
+  }): Promise<StreamResponse<GetNotificationStatusResponse>> {
+    return this.feedsApi.getNotificationStatus({
+      feed_id: this.id,
+      feed_group_id: this.group,
+      ...request,
     });
   }
 

@@ -68,6 +68,7 @@ import type {
   GetCommentResponse,
   GetCommentsResponse,
   GetFeedCountsResponse,
+  GetNotificationStatusResponse,
   GetFollowSuggestionsResponse,
   GetOGResponse,
   GetOrCreateFeedRequest,
@@ -1940,6 +1941,32 @@ export class FeedsApi {
     );
 
     decoders.GetFeedCountsResponse?.(response);
+
+    return response;
+  }
+
+  async getNotificationStatus(request: {
+    feed_group_id: string;
+    feed_id: string;
+    view?: string;
+  }): Promise<StreamResponse<GetNotificationStatusResponse>> {
+    const queryParams = {
+      view: request?.view,
+    };
+    const pathParams = {
+      feed_group_id: request?.feed_group_id,
+      feed_id: request?.feed_id,
+    };
+
+    const response =
+      await this.apiClient.sendRequest<GetNotificationStatusResponse>(
+        'GET',
+        '/api/v2/feeds/feed_groups/{feed_group_id}/feeds/{feed_id}/notification_status',
+        pathParams,
+        queryParams,
+      );
+
+    decoders.GetNotificationStatusResponse?.(response);
 
     return response;
   }
