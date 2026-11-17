@@ -90,6 +90,7 @@ const WAIT_FOR_EVENT_MS = 30_000;
 export const waitForEvent = (
   client: FeedsClient | Feed,
   type: FeedsEvent['type'] | WSEvent['type'],
+  timeoutMs = WAIT_FOR_EVENT_MS,
 ) => {
   return new Promise((resolve, reject) => {
     const listener = (e: FeedsEvent | WSEvent) => {
@@ -103,9 +104,32 @@ export const waitForEvent = (
       // @ts-expect-error client expects WSEvents
       client.off(type, listener);
       reject(new Error(`Event not received: ${type}`));
-    }, WAIT_FOR_EVENT_MS);
+    }, timeoutMs);
 
     // @ts-expect-error client expects WSEvents
     client.on(type, listener);
   });
+};
+
+/**
+ * Marks activities as watched and prefers the realtime
+ * `feeds.stories_feed.updated` event. If that event is dropped by the API
+ * (known intermittent flake), falls back to reloading the feed.
+ */
+export const markWatchedAndSync = async (
+  feed: Feed,
+  activityIds: string[],
+  eventTimeoutMs = 5_000,
+) => {
+  const eventPromise = waitForEvent(
+    feed,
+    'feeds.stories_feed.updated',
+    eventTimeoutMs,
+  );
+  await feed.markActivity({ mark_watched: activityIds });
+  try {
+    await eventPromise;
+  } catch {
+    await feed.getOrCreate({ watch: true });
+  }
 };
