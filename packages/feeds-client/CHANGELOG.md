@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.10.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.9.0...@stream-io/feeds-client-2.10.0) (2026-11-17)
+
+
+### Features
+
+* Add getNotificationStatus endpoint ([#319](https://github.com/GetStream/stream-feeds-js/issues/319)) ([1000b77](https://github.com/GetStream/stream-feeds-js/commit/1000b770122a9159b2d65a473e4830c2bc228b25))
+
 ## [2.9.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.8.0...@stream-io/feeds-client-2.9.0) (2026-09-29)
 
 
