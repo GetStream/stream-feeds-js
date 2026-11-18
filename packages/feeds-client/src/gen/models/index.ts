@@ -4876,6 +4876,26 @@ export interface GetFollowSuggestionsResponse {
   algorithm_used?: string;
 }
 
+export interface GetNotificationStatusResponse {
+  duration: string;
+  /**
+   * Number of unread activities or groups
+   */
+  unread: number;
+  /**
+   * Number of unseen activities or groups
+   */
+  unseen: number;
+  /**
+   * When the feed was last marked read
+   */
+  last_read_at?: Date;
+  /**
+   * When the feed was last marked seen
+   */
+  last_seen_at?: Date;
+}
+
 export interface GetOGResponse {
   duration: string;
   custom: Record<string, any>;
