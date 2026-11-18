@@ -2,6 +2,11 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [1.0.25](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-1.0.24...@stream-io/feeds-react-sdk-1.0.25) (2026-11-18)
+
+### Dependency Updates
+
+* `@stream-io/feeds-client` updated to version `2.11.0`
 ## [1.0.24](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-react-sdk-1.0.23...@stream-io/feeds-react-sdk-1.0.24) (2026-11-17)
 
 ### Dependency Updates
