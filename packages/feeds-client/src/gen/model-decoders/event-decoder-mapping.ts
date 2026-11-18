@@ -136,6 +136,21 @@ const eventDecoderMapping: Record<
   'feeds.poll.vote_removed': (data: Record<string, any>) =>
     decoders.PollVoteRemovedFeedEvent(data),
 
+  'feeds.scheduled_activity.created': (data: Record<string, any>) =>
+    decoders.ScheduledActivityCreatedEvent(data),
+
+  'feeds.scheduled_activity.deleted': (data: Record<string, any>) =>
+    decoders.ScheduledActivityDeletedEvent(data),
+
+  'feeds.scheduled_activity.failed': (data: Record<string, any>) =>
+    decoders.ScheduledActivityFailedEvent(data),
+
+  'feeds.scheduled_activity.published': (data: Record<string, any>) =>
+    decoders.ScheduledActivityPublishedEvent(data),
+
+  'feeds.scheduled_activity.updated': (data: Record<string, any>) =>
+    decoders.ScheduledActivityUpdatedEvent(data),
+
   'feeds.stories_feed.updated': (data: Record<string, any>) =>
     decoders.StoriesFeedUpdatedEvent(data),
 
