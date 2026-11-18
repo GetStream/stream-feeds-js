@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [2.11.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.10.0...@stream-io/feeds-client-2.11.0) (2026-11-18)
+
+
+### Features
+
+* **feeds-client:** add scheduled activities (FEEDS-2164) ([#317](https://github.com/GetStream/stream-feeds-js/issues/317)) ([93f2bbe](https://github.com/GetStream/stream-feeds-js/commit/93f2bbea480bb1b774c2f3cc91d8259b5c16bf9a)), closes [GetStream/stream-node#385](https://github.com/GetStream/stream-node/issues/385)
+
 ## [2.10.0](https://github.com/GetStream/stream-feeds-js/compare/@stream-io/feeds-client-2.9.0...@stream-io/feeds-client-2.10.0) (2026-11-17)
 
 
