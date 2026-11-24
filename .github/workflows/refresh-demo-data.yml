@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   refresh-data:
-    runs-on: ubuntu-latest
+    runs-on: { group: github-public-amd64 }
     steps:
       - uses: actions/checkout@v6
 

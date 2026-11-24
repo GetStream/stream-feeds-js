@@ -18,7 +18,7 @@ permissions:
 jobs:
   lint-and-test:
     timeout-minutes: 30
-    runs-on: ubuntu-latest
+    runs-on: { group: github-public-amd64 }
     strategy:
       matrix:
         node-version: [24.x]
